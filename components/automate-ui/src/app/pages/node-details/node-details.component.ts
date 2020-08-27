@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { NodeDetailsService } from '../../services/node-details/node-details.service';
+import { NodeDetailsService, LogModalObject } from '../../services/node-details/node-details.service';
 import { NodeRun, RunInfo } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { previousRoute } from '../../route.selectors';
@@ -22,6 +22,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
   previousRoute$: Observable<RouterState>;
 
   public modalIsVisible = false;
+  public resourceId: string;
   public runHistoryVisible = false;
   private events: Subscription;
 
@@ -48,8 +49,8 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
       this.endTime = new Date(this.getRouteParam('end_time'));
     });
 
-    this.events = this.eventService.showModal$.subscribe((show) => {
-      this.toggleModal(show);
+    this.events = this.eventService.showModal$.subscribe((logModalObject) => {
+      this.toggleModal(logModalObject);
       this.changeDetectorRef.markForCheck();
     });
     this.changeDetectorRef.markForCheck();
@@ -81,8 +82,9 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
     );
   }
 
-  toggleModal(status: boolean): void {
-    this.modalIsVisible = status;
+  toggleModal(logModalObject: LogModalObject): void {
+    this.modalIsVisible = logModalObject.isVisible;
+    this.resourceId = logModalObject.resourceId;
   }
 
   openRunHistory() {

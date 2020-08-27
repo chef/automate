@@ -329,6 +329,15 @@ export interface Resource {
   cookbook_version?: string;
   recipe_name?: string;
   conditional?: string;
+  error?: {
+    class: string;
+    message: string;
+    backtrace: string[];
+    description: {
+      title: string;
+      sections: object[];
+    }
+  };
 }
 
 export class NodeRun {
