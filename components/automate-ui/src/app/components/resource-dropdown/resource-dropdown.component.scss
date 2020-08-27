@@ -122,3 +122,7 @@ chef-dropdown {
   font-size: 12px;
   line-height: 1.6;
 }
+
+::ng-deep chef-checkbox .label-wrap {
+  overflow-wrap: anywhere;
+}
