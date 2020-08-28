@@ -13,16 +13,37 @@ draft = false
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/monitoring.md)
 
-## Overview
+Use the authenticated https endpoint `/status` to monitor your Chef Automate installation.
 
-The `/status` endpoint is an authenticated API endpoint for users who want to monitor their Automate installation by connecting to an http endpoint. Previously, users ran the `chef-automate status` command from the Automate node itself to monitor an Automate installation.
+## Checking the Status Endpoint
 
-## Checking the status endpoint
+The authenticated endpoint `/status` provides status for the overall Chef Automate installation as well as for its component services.
+When all Chef Automate component services are up, `/status` returns a response code of 200.
+Otherwise, `/status` returns 500.
 
-The authenticated endpoint `/status` provides status for the overall Chef Automate installation as well as its component services. 
-When all Chef Automate component services are up, `/status` returns a response code of 200. Otherwise, `/status` returns 500.
+The status of a service can be `OK`, `UNKNOWN`, or `CRITICAL`, and is reflected in the JSON output:
 
-To use `/status`, set up an authentication token that can be used with your monitoring system by following the steps below:
+   ```json
+       {
+         "ok": false,
+         "service_status": [
+          {
+          "service": "deployment-service",
+          "status": "OK"
+        },  
+        {
+          "service": "config-mgmt-service",
+          "status": "UNKNOWN"
+        },
+        {
+          "service": "ingest-service",
+          "status": "CRITICAL"
+        },
+         ]
+       }
+   ```
+
+To use `/status`, set up an authentication token for use with your monitoring system by following the steps below:
 
 1. Generate a token:
 
@@ -37,29 +58,31 @@ To use `/status`, set up an authentication token that can be used with your moni
     ```
 
 3. Test that your token and policy give you access to the `/status` endpoint by running the following command:
+
     ```bash
     curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/status?pretty
     ```
-The output appears in the following JSON format:
 
-```json
-    {
-      "ok": true,
-      "services": [
-        {
-          "name": "deployment-service",
-          "status": "OK"
-        },
-        {
-          "name": "backup-gateway",
-          "status": "OK"
-        },
-        {
-          "name": "automate-postgresql",
-          "status": "OK"
-        },
-        ...
-      ]
-    }
-```
-After establishing your authentication token and confirming access, connect to the `/status` endpoint.
+   The output appears in the following JSON format:
+
+   ```json
+       {
+         "ok": true,
+         "services": [
+           {
+             "name": "deployment-service",
+             "status": "OK"
+           },
+           {
+             "name": "backup-gateway",
+             "status": "OK"
+           },
+           {
+             "name": "automate-postgresql",
+             "status": "OK"
+           },
+         ]
+       }
+   ```
+
+4. After establishing your authentication token and confirming access, connect to the `/status` endpoint.
