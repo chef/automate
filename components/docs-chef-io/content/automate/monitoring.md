@@ -17,7 +17,7 @@ Use the authenticated https endpoint `/status` to monitor your Chef Automate ins
 
 ## Checking the Status Endpoint
 
-The authenticated endpoint `/status` provides status for the overall Chef Automate installation as well as its component services.
+The authenticated endpoint `/status` provides status for the overall Chef Automate installation as well as for its component services.
 When all Chef Automate component services are up, `/status` returns a response code of 200.
 Otherwise, `/status` returns 500.
 
