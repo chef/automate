@@ -17,7 +17,9 @@ The _Reports_ page (Compliance > Reports) provides comprehensive insight into th
 Scan results for audit cookbook configurations also appear in this view.
 
 {{% note %}}
-The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
+
+If the size of a Compliance Report is over 4MB, then the _Reports_ page may not display as expected.
+
 {{% /note %}}
 
 ![Reports](/images/automate/reports.png)
@@ -40,8 +42,26 @@ The Compliance search allows you to view and filter compliance scan results base
 Wildcard searches on field values will not return suggestions, but they will filter the results.
 For example, you can search for `Node Name: prod*` and filter the results to list all the node names that begin with `prod`.
 
-Profile
-: Filter your results by profile name. This lists executed profiles, which are profiles with received scan results.
+Chef Infra Server
+: Filter your results by Chef Infra Server.
+
+Chef Organization
+: Filter your results by Chef organization.
+
+Chef Tag
+: Filter your results by Chef tag.
+
+Control Tag
+: Filter your results by control tag.
+
+Controls
+: Filter your results by control name. Filtered results display the status of nodes that ran the selected control.
+
+Environment
+: Filter your results by environment.
+
+InSpec Version
+: Filter your results by Chef InSpec version.
 
 Node Name
 : Filter your results by node name.
@@ -49,17 +69,20 @@ Node Name
 Platform
 : Filter your results by platform.
 
-Environment
-: Filter your results by environment.
+Policy Group
+: Filter your results by policy group.
 
-Control
-: Filter your results by control name. Filtered results display the status of nodes that ran the selected control.
+Policy Name
+: Filter your results by policy name.
 
-Role
-: Filter by Chef role, on all applicable nodes.
+Profile
+: Filter your results by profile name. This lists executed profiles, which are profiles with received scan results.
 
 Recipe
 : Filter by Chef recipe, on all applicable nodes.
+
+Role
+: Filter by Chef role, on all applicable nodes.
 
 ### Deep Filtering
 
@@ -68,8 +91,8 @@ Use deep filtering to see the compliance reporting for an entire profile or an i
 
 Deep filtering supports filtering for:
 
-    * one profile
-    * one profile and one of its associated controls
+- one profile
+- one profile and one of its associated controls
 
 ### Waivers
 
@@ -119,6 +142,10 @@ Top Platform Failures
 ### Profile Status
 
 The _Profile Status_ view shows your system's compliance status from the compliance perspective of Compliance profiles run during scans.
+
+{{% note %}}
+The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
+{{% /note %}}
 
 Control Status
 : Shows the number of controls in your system, grouped by passing, failing, and skipped controls.
