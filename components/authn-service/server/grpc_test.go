@@ -68,26 +68,26 @@ func defaultMockPurgeFunc(context.Context,
 }
 
 func newTestGRPCServer(ctx context.Context,
-	t *testing.T, config Config) (*grpc.ClientConn, func(), *authz.PoliciesServerMock) {
+	t *testing.T, config Config) (*grpc.ClientConn, func(), *authz.PoliciesServiceServerMock) {
 	t.Helper()
 
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 
-	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies := authz.NewPoliciesServiceServerMock()
 	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterPoliciesServer(grpcAuthz, mockPolicies)
+	authz.RegisterPoliciesServiceServer(grpcAuthz, mockPolicies)
 
-	mockAuthz := authz.NewAuthorizationServerMock()
-	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
+	authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	authzClient := authz.NewAuthorizationClient(authzConn)
-	policiesClient := authz.NewPoliciesClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
+	policiesClient := authz.NewPoliciesServiceClient(authzConn)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
 	serv, err := NewServer(ctx, config)
@@ -135,7 +135,7 @@ func TestTokenGRPC(t *testing.T) {
 	conn, close, authzMock := newTestGRPCServer(ctx, t, config)
 	defer close()
 
-	cl := api.NewTokensMgmtClient(conn)
+	cl := api.NewTokensMgmtServiceClient(conn)
 
 	// note: we're a bit reckless with state in the token mock adapter so better
 	// run this first
@@ -443,7 +443,7 @@ func TestTokenGRPCInternalErrors(t *testing.T) {
 
 	conn, close, _ := newTestGRPCServer(ctx, t, config)
 	defer close()
-	cl := api.NewTokensMgmtClient(conn)
+	cl := api.NewTokensMgmtServiceClient(conn)
 
 	t.Run("GetTokens", func(t *testing.T) {
 		_, err := cl.GetTokens(ctx, &api.GetTokensReq{})

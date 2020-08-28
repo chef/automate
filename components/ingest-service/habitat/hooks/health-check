@@ -5,7 +5,7 @@ health=$(grpcurl -max-time 2 \
   -cert {{pkg.svc_config_path}}/service.crt \
   -key {{pkg.svc_config_path}}/service.key \
   {{sys.ip}}:{{cfg.service.port}} \
-  chef.automate.domain.ingest.IngestStatus.GetHealth)
+  chef.automate.domain.ingest.IngestStatusService.GetHealth)
 
 # Inspect the health of the ingest service
 #

@@ -32,7 +32,7 @@ var (
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
-func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient,
+func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarServiceClient,
 	nodeMgrClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient) error {
 	err := patterns.RegisterSingleTaskWorkflowExecutor(c, DeleteNodesWorkflowName,
 		false, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})

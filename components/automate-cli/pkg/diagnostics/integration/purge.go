@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	dlcAPI "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/diagnostics"
@@ -37,7 +38,7 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{
+					Es: []*dlcAPI.EsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "feed",
@@ -86,12 +87,12 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{},
+					Es: []*dlcAPI.EsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &data_lifecycle.EsPolicyUpdate{
+				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
@@ -126,7 +127,7 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{
+					Es: []*dlcAPI.EsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "compliance-reports",
@@ -180,12 +181,12 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{},
+					Es: []*dlcAPI.EsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &data_lifecycle.EsPolicyUpdate{
+				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,
@@ -220,7 +221,7 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			_, err = client.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{
+					Es: []*dlcAPI.EsPolicyUpdate{
 						{
 							Disabled:      true,
 							PolicyName:    "actions",
@@ -274,12 +275,12 @@ func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 			req := &data_lifecycle.ConfigureRequest{
 				Enabled: true,
 				PolicyUpdate: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{},
+					Es: []*dlcAPI.EsPolicyUpdate{},
 				},
 			}
 
 			for _, p := range show.EsPolicies {
-				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &data_lifecycle.EsPolicyUpdate{
+				req.PolicyUpdate.Es = append(req.PolicyUpdate.Es, &dlcAPI.EsPolicyUpdate{
 					Disabled:      p.Disabled,
 					PolicyName:    p.Name,
 					OlderThanDays: p.OlderThanDays,

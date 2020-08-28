@@ -18,7 +18,7 @@ message AuthenticateResponse {
   repeated string teams = 2;
 };
 
-service Authentication {
+service AuthenticationService {
 
   // Authenticate inspects the request's metadata -- for this, an empty argument
   // is just enough. Getting a response means it was authenticated successfully.

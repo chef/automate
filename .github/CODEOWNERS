@@ -27,6 +27,7 @@ components/chef-ui-library/**              @chef/ui-team @chef/ux-team
 components/compliance-service/**           @chef/superteam
 components/config-mgmt-service/**          @chef/superteam
 components/data-lifecycle-service/**       @chef/automate-deployment-team
+components/docs-chef-io/**                 @chef/docs-team
 components/es-sidecar-service/**           @chef/automate-deployment-team
 components/event-gateway/**                @chef/superteam
 components/event-service/**                @chef/superteam

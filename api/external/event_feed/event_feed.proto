@@ -1,17 +1,18 @@
 syntax = "proto3";
 
 package chef.automate.api.event_feed;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed";
+option go_package = "github.com/chef/automate/api/external/event_feed";
 
-import "automate-gateway/api/event_feed/request/event.proto";
-import "automate-gateway/api/event_feed/request/eventstrings.proto";
-import "automate-gateway/api/event_feed/response/event.proto";
-import "automate-gateway/api/event_feed/response/eventstrings.proto";
+import "external/event_feed/request/event.proto";
+import "external/event_feed/request/eventstrings.proto";
+import "external/event_feed/response/event.proto";
+import "external/event_feed/response/eventstrings.proto";
+import "external/common/response.proto";
 
 import "google/api/annotations.proto";
 import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
-service EventFeed {
+service EventFeedService {
   /*
   List Events
 
@@ -28,7 +29,7 @@ service EventFeed {
 	event:events:list
 	```
 	*/
-  rpc GetEventFeed(event_feed.request.EventFilter) returns (event_feed.response.Events) {
+  rpc GetEventFeed(event_feed.request.GetEventFeedRequest) returns (event_feed.response.GetEventFeedResponse) {
     option (google.api.http).get =  "/api/v0/eventfeed";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
@@ -48,7 +49,7 @@ service EventFeed {
 	event:events:list
 	```
 	*/
-  rpc GetEventTypeCounts(request.EventCountsFilter) returns (response.EventCounts) {
+  rpc GetEventTypeCounts(request.GetEventTypeCountsRequest) returns (response.GetEventTypeCountsResponse) {
     option (google.api.http).get =  "/api/v0/event_type_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
@@ -68,7 +69,7 @@ service EventFeed {
 	event:events:list
 	```
 	*/
-  rpc GetEventTaskCounts(request.EventCountsFilter) returns (response.EventCounts) {
+  rpc GetEventTaskCounts(request.GetEventTaskCountsRequest) returns (response.GetEventTaskCountsResponse) {
     option (google.api.http).get =  "/api/v0/event_task_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
@@ -88,9 +89,11 @@ service EventFeed {
 	event:events:list
 	```
 	*/
-  rpc GetEventStringBuckets(request.EventStrings) returns (response.EventStrings) {
+  rpc GetEventStringBuckets(request.GetEventStringBucketsRequest) returns (response.GetEventStringBucketsResponse) {
     option (google.api.http).get = "/api/v0/eventstrings";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
   };
+
+  rpc EventExport(request.EventExportRequest) returns (stream response.EventExportResponse) {};
 }

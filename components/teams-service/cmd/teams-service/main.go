@@ -129,8 +129,8 @@ Please pass a config file as the only argument to this command.`))
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
 
-	authzPoliciesClient := authz.NewPoliciesClient(authzConn)
-	authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
+	authzPoliciesClient := authz.NewPoliciesServiceClient(authzConn)
+	authzAuthorizationClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	mustBeADirectory(cfg.MigrationsPath)
 	u, err := url.Parse(cfg.PGURL)

@@ -279,7 +279,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 func TestActionBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
-	authzClient := authz.NewMockProjectsClient(ctrl)
+	authzClient := authz.NewMockProjectsServiceClient(ctrl)
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
@@ -299,7 +299,7 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
-	authzClient := authz.NewMockProjectsClient(ctrl)
+	authzClient := authz.NewMockProjectsServiceClient(ctrl)
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
@@ -344,7 +344,7 @@ func TestActionBundlerMatchProjectRule(t *testing.T) {
 			},
 		},
 	}
-	authzClient := authz.NewMockProjectsClient(gomock.NewController(t))
+	authzClient := authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
 		&authz.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)

@@ -15,10 +15,10 @@ import (
 )
 
 type Server struct {
-	projects authz.ProjectsClient
+	projects authz.ProjectsServiceClient
 }
 
-func NewServer(projects authz.ProjectsClient) *Server {
+func NewServer(projects authz.ProjectsServiceClient) *Server {
 	return &Server{
 		projects: projects,
 	}

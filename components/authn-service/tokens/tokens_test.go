@@ -80,13 +80,13 @@ func TestToken(t *testing.T) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
-	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	// Note: because the pg adapter doesn't let us set the stage so easily,
 	//       these overlap a bit: most _create_ 1+ tokens first

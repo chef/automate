@@ -65,7 +65,7 @@ message CookbookLock {
     // Cookbook cache key.
     string cache_key = 6;
     // SCM detail.
-    SCMDetail SCMDetail = 7;
+    SCMDetail scm_detail = 7;
     // Cookbook source path.
     SourceOptions source_options = 8;
 }

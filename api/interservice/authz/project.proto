@@ -55,7 +55,7 @@ message DeleteProjectReq {
 
 message DeleteProjectResp {}
 
-service Projects {
+service ProjectsService {
     rpc UpdateProject(UpdateProjectReq) returns (UpdateProjectResp) {};
     rpc CreateProject(CreateProjectReq) returns (CreateProjectResp) {};
     rpc GetProject(GetProjectReq) returns (GetProjectResp) {};

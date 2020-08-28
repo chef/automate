@@ -19,28 +19,28 @@ func TestMarkForDeleteNodeTerminated(t *testing.T) {
 		ctx        = context.Background()
 		instanceID = "instanceid"
 		event      = &aEvent.EventMsg{
-			EventID: uuid.Must(uuid.NewV4()).String(),
+			EventId: uuid.Must(uuid.NewV4()).String(),
 			Type:    &aEvent.EventType{Name: event.NodeTerminatedEventName},
 			Producer: &aEvent.Producer{
-				ID:           "urn:chef:compliance:mgrpolling",
+				Id:           "urn:chef:compliance:mgrpolling",
 				ProducerName: "Node Manager Polling",
 				ProducerType: "system component",
 			},
 			Tags:      []string{},
 			Published: ptypes.TimestampNow(),
 			Actor: &aEvent.Actor{
-				ID:          "",
+				Id:          "",
 				ObjectType:  "nodemanager",
 				DisplayName: "nodemanager",
 			},
 			Verb: "terminate",
 			Object: &aEvent.Object{
-				ID:          instanceID,
+				Id:          instanceID,
 				ObjectType:  "instance ID",
 				DisplayName: instanceID,
 			},
 			Target: &aEvent.Target{
-				ID:          "",
+				Id:          "",
 				ObjectType:  "Not Applicable",
 				DisplayName: "Not Applicable",
 			},

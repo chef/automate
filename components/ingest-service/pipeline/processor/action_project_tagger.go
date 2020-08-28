@@ -11,7 +11,7 @@ import (
 )
 
 // BuildActionProjectTagger - Build a project tagger for Chef Actions
-func BuildActionProjectTagger(authzClient authz.ProjectsClient) message.ChefActionPipe {
+func BuildActionProjectTagger(authzClient authz.ProjectsServiceClient) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
 		return actionBundleProjectTagger(in, authzClient)
 	}
@@ -23,7 +23,7 @@ func BuildActionProjectTagger(authzClient authz.ProjectsClient) message.ChefActi
 // these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
 // of messages that can use the current project rules from authz.
 func actionBundleProjectTagger(in <-chan message.ChefAction,
-	authzClient authz.ProjectsClient) <-chan message.ChefAction {
+	authzClient authz.ProjectsServiceClient) <-chan message.ChefAction {
 	out := make(chan message.ChefAction, 100)
 	go func() {
 		nextNumToDrop := 1

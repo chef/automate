@@ -73,11 +73,11 @@ type Suite struct {
 	cfgmgmt                    cfgBackend.Client
 	ingest                     iBackend.Client
 	client                     *elastic.Client
-	projectsClient             *authz.MockProjectsClient
+	projectsClient             *authz.MockProjectsServiceClient
 	eventFeedServiceClientMock *event_feed.MockEventFeedServiceClient
 	managerServiceClientMock   *manager.MockNodeManagerServiceClient
 	nodesServiceClientMock     *nodes.MockNodesServiceClient
-	cfgmgmtClientMock          *cfgmgmt.MockCfgMgmtClient
+	cfgmgmtClientMock          *cfgmgmt.MockCfgMgmtServiceClient
 	cleanup                    func() error
 }
 
@@ -381,11 +381,11 @@ func createServices(s *Suite) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to create connection to es-sidecar-service")
 	}
-	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
+	esSidecarClient := es_sidecar.NewEsSidecarServiceClient(esSidecarConn)
 	s.cleanup = esSidecarConn.Close
 
 	err = server.InitializeJobManager(jobManager, s.ingest,
-		es_sidecar.NewEsSidecarClient(esSidecarConn), s.managerServiceClientMock,
+		es_sidecar.NewEsSidecarServiceClient(esSidecarConn), s.managerServiceClientMock,
 		s.nodesServiceClientMock)
 	if err != nil {
 		return errors.Wrap(err, "could not initialize job manager")
@@ -428,7 +428,7 @@ func createServices(s *Suite) error {
 }
 
 func createMocksWithDefaultFunctions(s *Suite) {
-	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(nil))
+	s.projectsClient = authz.NewMockProjectsServiceClient(gomock.NewController(nil))
 	s.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 
@@ -436,7 +436,7 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.eventFeedServiceClientMock.EXPECT().HandleEvent(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.EventResponse{}, nil)
 
-	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(nil))
+	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtServiceClient(gomock.NewController(nil))
 	s.cfgmgmtClientMock.EXPECT().HandlePolicyUpdateAction(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&cfgmgmt_response.PolicyUpdateAction{}, nil)
 
@@ -450,9 +450,9 @@ func createMocksWithDefaultFunctions(s *Suite) {
 }
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {
-	s.projectsClient = authz.NewMockProjectsClient(gomock.NewController(t))
+	s.projectsClient = authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	s.eventFeedServiceClientMock = event_feed.NewMockEventFeedServiceClient(gomock.NewController(t))
-	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	s.cfgmgmtClientMock = cfgmgmt.NewMockCfgMgmtServiceClient(gomock.NewController(t))
 	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(t))
 	s.nodesServiceClientMock = nodes.NewMockNodesServiceClient(gomock.NewController(t))
 }

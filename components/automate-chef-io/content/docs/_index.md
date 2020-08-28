@@ -1,5 +1,5 @@
 +++
 title = "Docs"
-redirect_url = "/docs/quickstart"
+redirect_url = "https://docs.chef.io/automate/"
 layout = "redirect"
 +++

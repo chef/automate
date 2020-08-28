@@ -52,9 +52,9 @@ type Server struct {
 	authenticators map[string]authenticator.Authenticator
 	logger         *zap.Logger
 	connFactory    *secureconn.Factory
-	teamsClient    teams.TeamsClient
-	policiesClient authz.PoliciesClient
-	authzClient    authz.AuthorizationClient
+	teamsClient    teams.TeamsServiceClient
+	policiesClient authz.PoliciesServiceClient
+	authzClient    authz.AuthorizationServiceClient
 	health         *health.Service
 }
 
@@ -77,7 +77,7 @@ func (s *Server) Serve(grpcEndpoint, http1Endpoint string) error {
 	}
 	pbmux := runtime.NewServeMux(opts...)
 	ctx := context.Background()
-	err = api.RegisterAuthenticationHandlerFromEndpoint(
+	err = api.RegisterAuthenticationServiceHandlerFromEndpoint(
 		ctx, pbmux, grpcEndpoint, s.connFactory.DialOptions("authn-service"))
 	if err != nil {
 		return err
@@ -139,8 +139,8 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
-	authzClient := authz.NewAuthorizationClient(authzConn)
-	policiesClient := authz.NewPoliciesClient(authzConn)
+	authzClient := authz.NewAuthorizationServiceClient(authzConn)
+	policiesClient := authz.NewPoliciesServiceClient(authzConn)
 
 	var ts tokens.Storage
 	if c.Token != nil {
@@ -159,7 +159,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		authenticators: authenticators,
 		logger:         c.Logger,
 		connFactory:    factory,
-		teamsClient:    teams.NewTeamsClient(teamsConn),
+		teamsClient:    teams.NewTeamsServiceClient(teamsConn),
 		health:         health.NewService(),
 	}
 

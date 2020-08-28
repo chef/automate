@@ -23,11 +23,11 @@ import (
 
 // CfgMgmtServer stores client
 type CfgMgmtServer struct {
-	cfgMgmtClient cmsService.CfgMgmtClient
+	cfgMgmtClient cmsService.CfgMgmtServiceClient
 }
 
 // NewCfgMgmtServer initializes CfgMgmtServer with client
-func NewCfgMgmtServer(cfgMgmtClient cmsService.CfgMgmtClient) *CfgMgmtServer {
+func NewCfgMgmtServer(cfgMgmtClient cmsService.CfgMgmtServiceClient) *CfgMgmtServer {
 	return &CfgMgmtServer{
 		cfgMgmtClient: cfgMgmtClient,
 	}
@@ -211,7 +211,7 @@ func (s *CfgMgmtServer) GetVersion(ctx context.Context, e *version.VersionInfoRe
 		Version: r.GetVersion(),
 		Built:   r.GetBuilt(),
 		Name:    r.GetName(),
-		Sha:     r.GetSHA(),
+		Sha:     r.GetSha(),
 	}, nil
 }
 

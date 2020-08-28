@@ -24,18 +24,18 @@ func TestUserMgmtClient(t *testing.T) {
 	// https://github.com/chef/automate/blob/master/components/automate-grpc/protoc-gen-grpc-mock/README.md
 	serviceCerts := helpers.LoadDevCerts(t, "teams-service")
 
-	mockTeams := teams.NewTeamsServerMock()
+	mockTeams := teams.NewTeamsServiceServerMock()
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	teams.RegisterTeamsServer(g, mockTeams)
+	teams.RegisterTeamsServiceServer(g, mockTeams)
 	teamsServer := grpctest.NewServer(g)
 	defer teamsServer.Close()
 
-	mockLocalUser := local_users_api.NewUsersMgmtServerMock()
+	mockLocalUser := local_users_api.NewUsersMgmtServiceServerMock()
 	serviceCerts = helpers.LoadDevCerts(t, "local-user-service")
 	connFactory = secureconn.NewFactory(*serviceCerts)
 	g = connFactory.NewServer()
-	local_users_api.RegisterUsersMgmtServer(g, mockLocalUser)
+	local_users_api.RegisterUsersMgmtServiceServer(g, mockLocalUser)
 	localUser := grpctest.NewServer(g)
 	defer localUser.Close()
 

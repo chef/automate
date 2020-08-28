@@ -24,7 +24,7 @@ import (
 func TestOrgs(t *testing.T) {
 	ctx := context.Background()
 	_, serviceRef, conn, close, authzMock, secretsMock := test.SetupInfraProxyService(ctx, t)
-	cl := infra_proxy.NewInfraProxyClient(conn)
+	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 	defer close()
 
 	secretID := &secrets.Id{
@@ -1182,7 +1182,7 @@ func TestOrgs(t *testing.T) {
 	})
 }
 
-func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClient, orgID string, serverID string) {
+func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyServiceClient, orgID string, serverID string) {
 	t.Helper()
 	deleteReq := &request.DeleteOrg{Id: orgID, ServerId: serverID}
 	_, err := cl.DeleteOrg(context.Background(), deleteReq)

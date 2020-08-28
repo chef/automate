@@ -19,7 +19,7 @@ message PurgeRequest{
 	// Optional field. Purge documents based on the time value in this field rather than
 	// the default field, end_time. Values for this field come from client purge policies.
 	// If this field is empty, purge defaults to end_time.
-	string customPurgeField = 5;
+	string custom_purge_field = 5;
 }
 
 message PurgeResponse {
@@ -28,7 +28,7 @@ message PurgeResponse {
 		string type = 2; // document
 	}
 
-	bool Success = 1;
+	bool success = 1;
 	string message = 2;
 	repeated Failure failures = 3;
 }
@@ -109,7 +109,7 @@ message DeleteSnapshotRequest{
 message DeleteSnapshotResponse{
 }
 
-service EsSidecar {
+service EsSidecarService {
 	// Will begin a new purge if the identified purge is not already in progress.
 	// If it is in progress, the PurgeResponse status field will indicate this.
 	rpc PurgeTimeSeriesIndicesByAge(PurgeRequest) returns (PurgeResponse);

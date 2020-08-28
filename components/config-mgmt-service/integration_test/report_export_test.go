@@ -28,7 +28,7 @@ import (
 func TestReportExportProjectFilters(t *testing.T) {
 	mockConn := reportExportSetup(t)
 	defer mockConn.Close()
-	client := api.NewCfgMgmtClient(mockConn)
+	client := api.NewCfgMgmtServiceClient(mockConn)
 
 	cases := []struct {
 		description     string
@@ -215,7 +215,7 @@ func createTimestamp(t *testing.T, date time.Time) *timestamp.Timestamp {
 func TestReportExportFilters(t *testing.T) {
 	mockConn := reportExportSetup(t)
 	defer mockConn.Close()
-	client := api.NewCfgMgmtClient(mockConn)
+	client := api.NewCfgMgmtServiceClient(mockConn)
 
 	cases := []struct {
 		description    string
@@ -405,7 +405,7 @@ func reportExportSetup(t *testing.T) *grpc.ClientConn {
 
 	lis := bufconn.Listen(1024 * 1024)
 	s := grpc.NewServer()
-	api.RegisterCfgMgmtServer(s, server)
+	api.RegisterCfgMgmtServiceServer(s, server)
 
 	go func() {
 		if err := s.Serve(lis); err != nil {

@@ -23,7 +23,7 @@ import "interservice/cfgmgmt/request/node_export.proto";
 import "external/cfgmgmt/request/errors.proto";
 import "external/cfgmgmt/request/rollouts.proto";
 
-service CfgMgmt {
+service CfgMgmtService {
 	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
 	rpc GetHealth (chef.automate.domain.cfgmgmt.request.Health) returns (chef.automate.domain.cfgmgmt.response.Health);
 	rpc GetNodesCounts (chef.automate.domain.cfgmgmt.request.NodesCounts) returns (chef.automate.domain.cfgmgmt.response.NodesCounts);

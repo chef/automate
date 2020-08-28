@@ -5,9 +5,9 @@ date = 2019-10-18T18:54:09+00:00
 draft = false
 [menu]
   [menu.automate]
-    title = "Setting up the Applications Dashboard"
+    title = "Applications Dashboard"
     parent = "automate/applications"
-    identifier = "automate/applications/applications_dashboard.md Setting up the Applications Dashboard"
+    identifier = "automate/applications/applications_dashboard.md Applications Dashboard"
     weight = 30
 +++
 

@@ -21,7 +21,7 @@ import (
 func TestServers(t *testing.T) {
 	ctx := context.Background()
 	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
-	cl := infra_proxy.NewInfraProxyClient(conn)
+	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 
 	defer close()
 
@@ -478,7 +478,7 @@ func TestServers(t *testing.T) {
 	})
 }
 
-func cleanupServer(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClient, serverID string) {
+func cleanupServer(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyServiceClient, serverID string) {
 	t.Helper()
 	deleteReq := request.DeleteServer{Id: serverID}
 	_, err := cl.DeleteServer(ctx, &deleteReq)

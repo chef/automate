@@ -10,29 +10,29 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the AuthenticationServer interface (at compile time)
-var _ AuthenticationServer = &AuthenticationServerMock{}
+// verify that the mock satisfies the AuthenticationServiceServer interface (at compile time)
+var _ AuthenticationServiceServer = &AuthenticationServiceServerMock{}
 
-// NewAuthenticationServerMock gives you a fresh instance of AuthenticationServerMock.
-func NewAuthenticationServerMock() *AuthenticationServerMock {
-	return &AuthenticationServerMock{validateRequests: true}
+// NewAuthenticationServiceServerMock gives you a fresh instance of AuthenticationServiceServerMock.
+func NewAuthenticationServiceServerMock() *AuthenticationServiceServerMock {
+	return &AuthenticationServiceServerMock{validateRequests: true}
 }
 
-// NewAuthenticationServerMockWithoutValidation gives you a fresh instance of
-// AuthenticationServerMock which does not attempt to validate requests before passing
+// NewAuthenticationServiceServerMockWithoutValidation gives you a fresh instance of
+// AuthenticationServiceServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewAuthenticationServerMockWithoutValidation() *AuthenticationServerMock {
-	return &AuthenticationServerMock{}
+func NewAuthenticationServiceServerMockWithoutValidation() *AuthenticationServiceServerMock {
+	return &AuthenticationServiceServerMock{}
 }
 
-// AuthenticationServerMock is the mock-what-you-want struct that stubs all not-overridden
+// AuthenticationServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type AuthenticationServerMock struct {
+type AuthenticationServiceServerMock struct {
 	validateRequests bool
 	AuthenticateFunc func(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 }
 
-func (m *AuthenticationServerMock) Authenticate(ctx context.Context, req *AuthenticateRequest) (*AuthenticateResponse, error) {
+func (m *AuthenticationServiceServerMock) Authenticate(ctx context.Context, req *AuthenticateRequest) (*AuthenticateResponse, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -45,6 +45,6 @@ func (m *AuthenticationServerMock) Authenticate(ctx context.Context, req *Authen
 }
 
 // Reset resets all overridden functions
-func (m *AuthenticationServerMock) Reset() {
+func (m *AuthenticationServiceServerMock) Reset() {
 	m.AuthenticateFunc = nil
 }

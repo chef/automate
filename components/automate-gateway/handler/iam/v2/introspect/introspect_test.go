@@ -236,21 +236,21 @@ func TestIntrospect(t *testing.T) {
 }
 
 func testServerAndHandler(t *testing.T) (
-	*authz.AuthorizationServerMock,
+	*authz.AuthorizationServiceServerMock,
 	*grpctest.Server,
 	*introspect.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	authSrv := authz.NewAuthorizationServerMock()
+	authSrv := authz.NewAuthorizationServiceServerMock()
 
 	g := connFactory.NewServer()
-	authz.RegisterAuthorizationServer(g, authSrv)
+	authz.RegisterAuthorizationServiceServer(g, authSrv)
 	s := grpctest.NewServer(g)
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
 	require.NoError(t, err)
-	client := authz.NewAuthorizationClient(conn)
+	client := authz.NewAuthorizationServiceClient(conn)
 
 	return authSrv,
 		s,

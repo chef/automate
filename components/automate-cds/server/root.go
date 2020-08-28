@@ -204,7 +204,7 @@ func (s *Server) InstallContentItem(ctx context.Context,
 
 // DownloadContentItem - download content item
 func (s *Server) DownloadContentItem(request *request.DownloadContentItem,
-	stream interservice.AutomateCds_DownloadContentItemServer) error {
+	stream interservice.AutomateCdsService_DownloadContentItemServer) error {
 
 	credentials, found, err := s.secrets.GetCredentials()
 	if err != nil {

@@ -35,7 +35,7 @@ func (s *server) newLicenseControlServiceConnection(ctx context.Context,
 	return connection, nil
 }
 
-func (s *server) licenseControlClient(ctx context.Context) (lc.LicenseControlClient, error) {
+func (s *server) licenseControlClient(ctx context.Context) (lc.LicenseControlServiceClient, error) {
 	if s.lcClient != nil {
 		return s.lcClient, nil
 	}
@@ -45,7 +45,7 @@ func (s *server) licenseControlClient(ctx context.Context) (lc.LicenseControlCli
 		return nil, errors.Wrap(err, "Failed to create connection to license-control-service")
 	}
 
-	s.lcClient = lc.NewLicenseControlClient(connection)
+	s.lcClient = lc.NewLicenseControlServiceClient(connection)
 	return s.lcClient, nil
 }
 

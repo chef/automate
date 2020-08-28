@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/managers/awsec2"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	libSecrets "github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/gofrs/uuid"

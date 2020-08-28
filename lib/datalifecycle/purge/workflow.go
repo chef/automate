@@ -116,7 +116,7 @@ func CreateOrUpdatePurgeWorkflow(
 
 type TaskOpt func(*Task)
 
-func WithTaskEsSidecarClient(client es.EsSidecarClient) TaskOpt {
+func WithTaskEsSidecarClient(client es.EsSidecarServiceClient) TaskOpt {
 	return func(t *Task) {
 		t.EsSidecarClient = client
 	}
@@ -180,7 +180,7 @@ func (s *Workflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) ce
 }
 
 type Task struct {
-	EsSidecarClient es.EsSidecarClient
+	EsSidecarClient es.EsSidecarServiceClient
 }
 
 func (t *Task) Run(ctx context.Context, task cereal.Task) (interface{}, error) {

@@ -23,7 +23,7 @@ type ChefIngestServer struct {
 	chefRunPipeline    pipeline.ChefRunPipeline
 	chefActionPipeline pipeline.ChefActionPipeline
 	client             backend.Client
-	authzClient        authz.ProjectsClient
+	authzClient        authz.ProjectsServiceClient
 	nodeMgrClient      manager.NodeManagerServiceClient
 	nodesClient        nodes.NodesServiceClient
 }
@@ -31,7 +31,7 @@ type ChefIngestServer struct {
 // NewChefIngestServer creates a new server instance and it automatically
 // initializes the ChefRun Pipeline by consuming the provided
 // backend client
-func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsClient,
+func NewChefIngestServer(client backend.Client, authzClient authz.ProjectsServiceClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
 	nodesClient nodes.NodesServiceClient,
 	actionPipeline pipeline.ChefActionPipeline,

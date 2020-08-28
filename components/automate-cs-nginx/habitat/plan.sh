@@ -7,7 +7,7 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.0.22"
+pkg_version="14.0.25"
 pkg_deps=(
   core/coreutils
   chef/mlsa
@@ -20,8 +20,8 @@ pkg_deps=(
   core/curl/7.68.0/20200601114640
   core/ruby26/2.6.5/20200404043345
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/14.0.22/20200812154419"
-  "${vendor_origin}/chef-server-ctl/14.0.22/20200812153852"
+  "${vendor_origin}/chef-server-nginx/14.0.25/20200828082112"
+  "${vendor_origin}/chef-server-ctl/14.0.25/20200828081545"
 )
 
 pkg_bin_dirs=(bin)

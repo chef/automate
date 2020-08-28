@@ -89,7 +89,12 @@ where:
 - `sso_url` contains the value of _Login URL_
 - `entity_issuer` contains the value of _Identifier (Entity ID)_
 
-See the SAML Configuration Settings below for further configuration options.
+See the [SAML Configuration Settings]({{< relref "saml.md#saml-configuration-settings" >}}) for further configuration options.
+
+{{< warning >}}
+Azure AD lets you choose the _NameID_ field, and optionally apply _transformations_ to it.
+The SAML configuration setting is only respected if the selected value in "Choose name identifier format" in Azure AD matches the `name_id_policy_format` configuration in Chef Automate.
+{{< /warning >}}
 
 ## SAML Configuration Settings
 

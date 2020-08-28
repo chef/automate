@@ -18,7 +18,6 @@ import (
 	_ "github.com/chef/automate/api/external/nodes/manager"
 	_ "github.com/chef/automate/api/external/secrets"
 	_ "github.com/chef/automate/components/automate-gateway/api/deployment"
-	_ "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	_ "github.com/chef/automate/components/automate-gateway/api/gateway"
 	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	_ "github.com/chef/automate/components/automate-gateway/api/legacy"

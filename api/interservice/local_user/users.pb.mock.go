@@ -10,24 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the UsersMgmtServer interface (at compile time)
-var _ UsersMgmtServer = &UsersMgmtServerMock{}
+// verify that the mock satisfies the UsersMgmtServiceServer interface (at compile time)
+var _ UsersMgmtServiceServer = &UsersMgmtServiceServerMock{}
 
-// NewUsersMgmtServerMock gives you a fresh instance of UsersMgmtServerMock.
-func NewUsersMgmtServerMock() *UsersMgmtServerMock {
-	return &UsersMgmtServerMock{validateRequests: true}
+// NewUsersMgmtServiceServerMock gives you a fresh instance of UsersMgmtServiceServerMock.
+func NewUsersMgmtServiceServerMock() *UsersMgmtServiceServerMock {
+	return &UsersMgmtServiceServerMock{validateRequests: true}
 }
 
-// NewUsersMgmtServerMockWithoutValidation gives you a fresh instance of
-// UsersMgmtServerMock which does not attempt to validate requests before passing
+// NewUsersMgmtServiceServerMockWithoutValidation gives you a fresh instance of
+// UsersMgmtServiceServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewUsersMgmtServerMockWithoutValidation() *UsersMgmtServerMock {
-	return &UsersMgmtServerMock{}
+func NewUsersMgmtServiceServerMockWithoutValidation() *UsersMgmtServiceServerMock {
+	return &UsersMgmtServiceServerMock{}
 }
 
-// UsersMgmtServerMock is the mock-what-you-want struct that stubs all not-overridden
+// UsersMgmtServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type UsersMgmtServerMock struct {
+type UsersMgmtServiceServerMock struct {
 	validateRequests bool
 	GetUsersFunc     func(context.Context, *GetUsersReq) (*Users, error)
 	GetUserFunc      func(context.Context, *Email) (*User, error)
@@ -37,7 +37,7 @@ type UsersMgmtServerMock struct {
 	UpdateSelfFunc   func(context.Context, *UpdateSelfReq) (*User, error)
 }
 
-func (m *UsersMgmtServerMock) GetUsers(ctx context.Context, req *GetUsersReq) (*Users, error) {
+func (m *UsersMgmtServiceServerMock) GetUsers(ctx context.Context, req *GetUsersReq) (*Users, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -49,7 +49,7 @@ func (m *UsersMgmtServerMock) GetUsers(ctx context.Context, req *GetUsersReq) (*
 	return nil, status.Error(codes.Internal, "mock: 'GetUsers' not implemented")
 }
 
-func (m *UsersMgmtServerMock) GetUser(ctx context.Context, req *Email) (*User, error) {
+func (m *UsersMgmtServiceServerMock) GetUser(ctx context.Context, req *Email) (*User, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -61,7 +61,7 @@ func (m *UsersMgmtServerMock) GetUser(ctx context.Context, req *Email) (*User, e
 	return nil, status.Error(codes.Internal, "mock: 'GetUser' not implemented")
 }
 
-func (m *UsersMgmtServerMock) CreateUser(ctx context.Context, req *CreateUserReq) (*User, error) {
+func (m *UsersMgmtServiceServerMock) CreateUser(ctx context.Context, req *CreateUserReq) (*User, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -73,7 +73,7 @@ func (m *UsersMgmtServerMock) CreateUser(ctx context.Context, req *CreateUserReq
 	return nil, status.Error(codes.Internal, "mock: 'CreateUser' not implemented")
 }
 
-func (m *UsersMgmtServerMock) DeleteUser(ctx context.Context, req *Email) (*DeleteUserResp, error) {
+func (m *UsersMgmtServiceServerMock) DeleteUser(ctx context.Context, req *Email) (*DeleteUserResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -85,7 +85,7 @@ func (m *UsersMgmtServerMock) DeleteUser(ctx context.Context, req *Email) (*Dele
 	return nil, status.Error(codes.Internal, "mock: 'DeleteUser' not implemented")
 }
 
-func (m *UsersMgmtServerMock) UpdateUser(ctx context.Context, req *UpdateUserReq) (*User, error) {
+func (m *UsersMgmtServiceServerMock) UpdateUser(ctx context.Context, req *UpdateUserReq) (*User, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -97,7 +97,7 @@ func (m *UsersMgmtServerMock) UpdateUser(ctx context.Context, req *UpdateUserReq
 	return nil, status.Error(codes.Internal, "mock: 'UpdateUser' not implemented")
 }
 
-func (m *UsersMgmtServerMock) UpdateSelf(ctx context.Context, req *UpdateSelfReq) (*User, error) {
+func (m *UsersMgmtServiceServerMock) UpdateSelf(ctx context.Context, req *UpdateSelfReq) (*User, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -110,7 +110,7 @@ func (m *UsersMgmtServerMock) UpdateSelf(ctx context.Context, req *UpdateSelfReq
 }
 
 // Reset resets all overridden functions
-func (m *UsersMgmtServerMock) Reset() {
+func (m *UsersMgmtServiceServerMock) Reset() {
 	m.GetUsersFunc = nil
 	m.GetUserFunc = nil
 	m.CreateUserFunc = nil
