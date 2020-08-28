@@ -22,7 +22,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/server/nodes"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/stringutils"
 )

@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/secretsint"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	libSecrets "github.com/chef/automate/lib/secrets"

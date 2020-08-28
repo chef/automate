@@ -23,7 +23,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/scanner"
 	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )

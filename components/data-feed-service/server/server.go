@@ -19,7 +19,7 @@ import (
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/components/data-feed-service/service"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 

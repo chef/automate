@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 // GetSuggestions - Report #12

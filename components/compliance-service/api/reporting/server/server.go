@@ -16,7 +16,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"

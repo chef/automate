@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/chef/automate/api/external/common/query"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	logs "github.com/sirupsen/logrus"
 )
 

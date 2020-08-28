@@ -8,7 +8,7 @@ import (
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/secrets-service/dao"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 )
 

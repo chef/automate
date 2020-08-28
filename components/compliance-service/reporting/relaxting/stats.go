@@ -8,7 +8,7 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/compliance/stats"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 //GetStatsSummary - Report #16
