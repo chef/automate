@@ -20,7 +20,7 @@ Scan results for audit cookbook configurations also appear in this view.
 The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
 {{% /note %}}
 
-![Reports](/images/docs/reports.png)
+![Reports](/images/automate/reports.png)
 
 ### Dates in Compliance Reports
 
@@ -32,7 +32,7 @@ You can change it to display overviews of the past 10 days, 1 month, 3 months, o
 
 To view scan reports in the past, users can select a different date from the calendar located in the search bar.
 
-![Reports Date Selector](/images/docs/reports-date.png)
+![Reports Date Selector](/images/automate/reports-date.png)
 
 ### Search Bar and Filters
 
@@ -79,7 +79,7 @@ _Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status
 Selecting the _Waived_ status filter displays the respective Node or Profile reporting with the `waived` status.
 Hover over the control's Waived icon under the Node Status column in _Controls_ to view more details about the waiver applied to the control.
 
-Use Chef InSpec to configure [waivers](https://www.inspec.io/docs/reference/waivers/).
+Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 
 ### Download Report Results
 
@@ -91,7 +91,7 @@ The downloaded contents are the result of all of the applied filters--including 
 The _Compliance Status and Report Metadata_ bar is directly beneath the search bar.
 Expand the `Report Metadata` information by selecting the compliance status bar. The report metadata shows a summary of the nodes, report date, duration, status, number of platforms, number of environments, and number of profiles used in your scan.
 
-![Reports Metadata](/images/docs/reports-metadata.png)
+![Reports Metadata](/images/automate/reports-metadata.png)
 
 ## Compliance Overview
 
@@ -145,7 +145,7 @@ The _Nodes_ view provides more detailed insight into the compliance status of th
 Sort this table by node name, platform, environment, last scan, and the number of control failures from the most recent compliance scan.
 Scroll to the bottom of the page for pagination navigation options.
 
-![Reports Nodes](/images/docs/reports-nodes.png)
+![Reports Nodes](/images/automate/reports-nodes.png)
 
 Node
 : A node is any machine that is under management by Chef.
@@ -172,7 +172,7 @@ More Options
 
 Use the **Profiles** tab to examine the compliance profiles installed under your individual user account.
 
-![Reports Profiles](/images/docs/reports-profiles.png)
+![Reports Profiles](/images/automate/reports-profiles.png)
 
 Profile Title
 : The name of the profile obtained from the _Profile Store_ or uploaded.
@@ -190,7 +190,7 @@ More Options
 
 Use the **Controls** tab to examine the compliance controls installed under your individual user account.
 
-![Reports Controls](/images/docs/reports-controls.png)
+![Reports Controls](/images/automate/reports-controls.png)
 
 Control Name
 : Control name and short description of its purpose
@@ -214,7 +214,7 @@ More Information
 
 The node name is at the top of the header, directly above the node compliance status.
 
-![Reports Node Detail](/images/docs/reports-node-detail.png)
+![Reports Node Detail](/images/automate/reports-node-detail.png)
 
 The node history table displays the following information:
 
@@ -238,4 +238,4 @@ More Information
 Select **Scan History** in the upper right corner to open a side-window.
 Choosing a compliance scan from this list redirects you to a view of all controls run during the selected scan.
 
-![Scan History](/images/docs/reports-scan-history.png)
+![Scan History](/images/automate/reports-scan-history.png)
