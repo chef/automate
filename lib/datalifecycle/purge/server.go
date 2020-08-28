@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	dlcAPI "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	es "github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/lib/cereal"
@@ -128,8 +129,8 @@ func (server *Server) Show(ctx context.Context,
 		err          error
 		sched        *cereal.Schedule
 		policies     Policies
-		dsEsPolicies = []*data_lifecycle.EsPolicy{}
-		dsPgPolicies = []*data_lifecycle.PgPolicy{}
+		dsEsPolicies = []*dlcAPI.EsPolicy{}
+		dsPgPolicies = []*dlcAPI.PgPolicy{}
 	)
 
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
@@ -144,7 +145,7 @@ func (server *Server) Show(ctx context.Context,
 	}
 
 	for _, policy := range policies.Es {
-		dsEsPolicies = append(dsEsPolicies, &data_lifecycle.EsPolicy{
+		dsEsPolicies = append(dsEsPolicies, &dlcAPI.EsPolicy{
 			Name:             policy.Name,
 			Index:            policy.IndexName,
 			OlderThanDays:    policy.OlderThanDays,
@@ -154,7 +155,7 @@ func (server *Server) Show(ctx context.Context,
 	}
 
 	for _, policy := range policies.Pg {
-		dsPgPolicies = append(dsPgPolicies, &data_lifecycle.PgPolicy{
+		dsPgPolicies = append(dsPgPolicies, &dlcAPI.PgPolicy{
 			Name:     policy.Name,
 			Disabled: policy.Disabled,
 		})
@@ -309,7 +310,7 @@ func (server *Server) Configure(ctx context.Context,
 // updateEsPolicies takes in desired policy update and the current policies set
 // and return updated policy set, a boolean that indicates that the set was updated, and
 // an error if the policy update refers to an unknown policy.
-func (server *Server) updateEsPolicies(esUpdates []*data_lifecycle.EsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
+func (server *Server) updateEsPolicies(esUpdates []*dlcAPI.EsPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
 	var (
 		updated     = false
 		newPolicies = Policies{
@@ -368,7 +369,7 @@ func (server *Server) updateEsPolicies(esUpdates []*data_lifecycle.EsPolicyUpdat
 // updatePgPolicies takes in a update and currently set policies and returns an
 // updated policy set, a boolean that indicates that the set was updated, and
 // an error if the policy update refers to an unknown policy.
-func (server Server) updatePgPolicies(pgUpdate []*data_lifecycle.PgPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
+func (server Server) updatePgPolicies(pgUpdate []*dlcAPI.PgPolicyUpdate, currentPolicies Policies) (Policies, bool, error) {
 	// NOTE: Right now PG policy support is a shim to be filled in later.
 	return currentPolicies, false, nil
 }

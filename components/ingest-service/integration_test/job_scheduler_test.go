@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/teambition/rrule-go"
 
+	dlcAPI "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/config"
@@ -54,7 +55,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*data_lifecycle.EsPolicyUpdate{
+				Es: []*dlcAPI.EsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -82,7 +83,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    false,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*data_lifecycle.EsPolicyUpdate{
+				Es: []*dlcAPI.EsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,
@@ -109,7 +110,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 			Enabled:    true,
 			Recurrence: rec.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*data_lifecycle.EsPolicyUpdate{
+				Es: []*dlcAPI.EsPolicyUpdate{
 					{
 						PolicyName:    "converge-history",
 						OlderThanDays: 14,

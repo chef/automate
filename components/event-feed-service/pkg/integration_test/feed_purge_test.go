@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/teambition/rrule-go"
 
+	dlcAPI "github.com/chef/automate/api/external/data_lifecycle"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
@@ -53,7 +54,7 @@ func TestPurgeServer(t *testing.T) {
 				enabled:    true,
 				recurrence: rec1.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{
+					Es: []*dlcAPI.EsPolicyUpdate{
 						{
 							PolicyName: server.PurgeFeedPolicyName,
 						},
@@ -64,7 +65,7 @@ func TestPurgeServer(t *testing.T) {
 				enabled:    false,
 				recurrence: rec2.String(),
 				update: &data_lifecycle.PolicyUpdate{
-					Es: []*data_lifecycle.EsPolicyUpdate{
+					Es: []*dlcAPI.EsPolicyUpdate{
 						{
 							PolicyName: server.PurgeFeedPolicyName,
 						},
@@ -117,7 +118,7 @@ func TestPurgeServer(t *testing.T) {
 			Enabled:    true,
 			Recurrence: recurrence.String(),
 			PolicyUpdate: &data_lifecycle.PolicyUpdate{
-				Es: []*data_lifecycle.EsPolicyUpdate{
+				Es: []*dlcAPI.EsPolicyUpdate{
 					{
 						PolicyName: "not-a-valid-policy",
 					},
@@ -175,7 +176,7 @@ func TestPurgeServer(t *testing.T) {
 					Enabled:    true,
 					Recurrence: recurrence.String(),
 					PolicyUpdate: &data_lifecycle.PolicyUpdate{
-						Es: []*data_lifecycle.EsPolicyUpdate{
+						Es: []*dlcAPI.EsPolicyUpdate{
 							{
 								PolicyName:    server.PurgeFeedPolicyName,
 								OlderThanDays: 100,

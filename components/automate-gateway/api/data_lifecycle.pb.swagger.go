@@ -459,6 +459,44 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.data_lifecycle.EsPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "index": {
+          "type": "string"
+        },
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "custom_purge_field": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "chef.automate.api.data_lifecycle.EsPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "older_than_days": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "chef.automate.api.data_lifecycle.GetComplianceStatusResponse": {
       "type": "object",
       "properties": {
@@ -583,19 +621,43 @@ func init() {
       },
       "description": "JobStatus presents the current configuration of job, when it will be executed,\nand details about it's most recent execution."
     },
+    "chef.automate.api.data_lifecycle.PgPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "chef.automate.api.data_lifecycle.PgPolicyUpdate": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "chef.automate.api.data_lifecycle.PurgePolicies": {
       "type": "object",
       "properties": {
         "elasticsearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.EsPolicy"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicy"
           }
         },
         "postgres": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.PgPolicy"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.PgPolicy"
           }
         }
       },
@@ -607,13 +669,13 @@ func init() {
         "elasticsearch": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.EsPolicyUpdate"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.EsPolicyUpdate"
           }
         },
         "postgres": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.PgPolicyUpdate"
+            "$ref": "#/definitions/chef.automate.api.data_lifecycle.PgPolicyUpdate"
           }
         }
       },
@@ -724,68 +786,6 @@ func init() {
     },
     "chef.automate.api.data_lifecycle.SetServicesConfigResponse": {
       "type": "object"
-    },
-    "chef.automate.infra.data_lifecycle.api.EsPolicy": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "index": {
-          "type": "string"
-        },
-        "older_than_days": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "custom_purge_field": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "chef.automate.infra.data_lifecycle.api.EsPolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "policy_name": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "older_than_days": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "chef.automate.infra.data_lifecycle.api.PgPolicy": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "chef.automate.infra.data_lifecycle.api.PgPolicyUpdate": {
-      "type": "object",
-      "properties": {
-        "policy_name": {
-          "type": "string"
-        },
-        "disabled": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
     },
     "google.protobuf.Any": {
       "type": "object",
