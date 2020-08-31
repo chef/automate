@@ -57,7 +57,6 @@ To configure your Chef Automate installation's backup directory to another locat
 
 To store backups offline in single-file archives, single-file archives must include both the configuration data and the reporting data contained in the standard backup.
 
-
 The [configured backup directory]({{< ref "backup.md#backup-to-a-filesystem" >}}) contains both the timestamp-based directory for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory.
 
 A timestamp-based directory has a date-based name, such as `20180518010336`, in the `automate-elasticsearch-data` directory.
