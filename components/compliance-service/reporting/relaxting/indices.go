@@ -118,7 +118,7 @@ func wholeCalendarYears(prefix string, startTime time.Time, endTime time.Time) (
 	endOfStartYear := time.Date(startTime.Year(), time.December, 31, 23, 59, 59, 0, time.UTC)
 
 	firstWholeCalYear := startTime.Year()
-	if !(startTime.Day() == 1 && startTime.Month() == 1 && (endTime.Equal(endOfStartYear) || endTime.After(endOfStartYear))) {
+	if !(startTime.Day() == 1 && startTime.Month() == 1 && ((endTime.Equal(endOfStartYear) && endTime.Year() > startTime.Year()) || endTime.After(endOfStartYear))) {
 		firstWholeCalYear++ //exclude from full year
 		straddle.left = &DateRange{StartTime: startTime}
 
