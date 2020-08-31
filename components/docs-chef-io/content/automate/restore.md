@@ -52,6 +52,13 @@ Ensure access for the backup type used:
          # """
     ```
 
+1. To restore a backup to a machine with less memory than the original system, adjust for the appropriate lower memory settings by adding the following to the configuration file:
+
+    ```toml
+    [elasticsearch.v1.sys.runtime]
+      heapsize = 4096m
+    ```
+
 ## Restore From a Filesystem Backup
 
 Meet the required [prerequisites]({{< ref "restore.md#prerequisites" >}}) before beginning your restore process.
@@ -193,11 +200,6 @@ Set the log level to `debug` before re-running a failed restore to output debug 
 chef-automate debug set-log-level deployment-service debug
 ```
 
-If you are restoring to a machine with less memory than the original system, you my need to add the following to your config patch (adjusted for your appropriate memory settings):
-```
-[elasticsearch.v1.sys.runtime]
-heapsize = 4096m
-```
 ## References
 
 See the [`chef-automate backup restore` command reference]({{< ref "cli_chef_automate/#chef-automate-backup-restore" >}}).
