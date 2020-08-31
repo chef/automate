@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chef.automate.api.iam;
 
-option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam";
+option go_package = "github.com/chef/automate/api/external/annotations/iam";
 
 message PolicyInfo {
   string resource = 1;

@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package chef.automate.api.iam;
 
-import "automate-grpc/protoc-gen-policy/iam/policy.proto";
+import "external/annotations/iam/policy.proto";
 import "google/protobuf/descriptor.proto";
 
-option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam";
+option go_package = "github.com/chef/automate/api/external/annotations/iam";
 
 extend google.protobuf.MethodOptions {
   // ... 50000-9999.

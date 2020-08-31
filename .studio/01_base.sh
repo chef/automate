@@ -228,61 +228,8 @@ install_go_tool() {
   for tool in "$@"; do
     go_tool=$(basename "$tool")
     if [[ ! -f "${GOBIN}/${go_tool}" ]]; then
-      eval "go install -v $tool"
+      go install -v "$tool" || return 1
     fi
   done
 }
 
-document "compile_go_protobuf" <<DOC
-  Compile the protobuf definitions from the provided script.
-  @(arg:1) Path to the script to execute. (default: scripts/grpc.sh)
-  The script should look like:
-  ------------------------------------------------------------------
-  #!/bin/bash
-  set -x
-  GOPATH=\$(go env GOPATH)
-  protoc -I. \\
-    -I\$GOPATH/src \\
-    --go_out=plugins=grpc:. \\
-    proto/*.proto
-  ------------------------------------------------------------------
-DOC
-compile_go_protobuf() {
-  local rc
-  proto_script="${1:-scripts/grpc.sh}"
-
-  # Verify that the script exists and is executable.
-  if [[ -x $proto_script ]]; then
-    install_if_missing core/protobuf-cpp protoc
-    install_go_tool github.com/golang/protobuf/protoc-gen-go
-
-    # Install grpc-gateway
-    # only_if the script has an entry like: '--grpc-gateway_out'
-    if [[ "$(grep -w "\\-\\-grpc-gateway_out" "$proto_script")" != "" ]]; then
-      local grpc_gateway_proto_tools=(
-        github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-        github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
-      )
-
-      install_go_tool "${grpc_gateway_proto_tools[@]}"
-    fi
-
-    # Install protoc-gen-lint from the internet instead of
-    # installing it from our vendor/ directory. (why? because if
-    # not we will need to add it to all our Gopkg.toml files)
-    #
-    # only_if the script has an entry like: '--lint_out'
-    if [[ "$(grep -w "\\-\\-lint_out" "$proto_script")" != "" ]]; then
-      install_go_tool github.com/ckaznocha/protoc-gen-lint
-    fi
-
-    eval "$proto_script";
-    rc=$?
-  else
-    error "File '$proto_script' doesn't exist or is not executable."
-    error "Try 'describe ${FUNCNAME[0]}'."
-    return 1
-  fi
-
-  return $rc
-}

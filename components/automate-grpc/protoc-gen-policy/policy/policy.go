@@ -13,7 +13,7 @@ import (
 	pgsgo "github.com/lyft/protoc-gen-star/lang/go"
 	options "google.golang.org/genproto/googleapis/api/annotations"
 
-	"github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
+	"github.com/chef/automate/api/external/annotations/iam"
 )
 
 const (

@@ -86,14 +86,12 @@ ruby-grpc-tools:
 	@if ! gem list grpc -i; then gem install grpc -v 1.28.0 ; fi > /dev/null
 	@if ! gem list grpc-tools -i; then gem install grpc-tools -v 1.28.0; fi > /dev/null
 
-PROTOS = $(shell find ../../api/interservice/compliance ../../api/external/common -name '*.proto')
+PROTOS = $(shell find ../../api/interservice/compliance ../../api/external/common ../../api/external/annotations -name '*.proto')
 RUBY_PROTOS = $(patsubst %.proto, %_pb.rb, $(PROTOS))
-
-EXTRA_PROTOS = '../../components/automate-grpc/protoc-gen-policy/iam/policy_pb.rb' '../../components/automate-grpc/protoc-gen-policy/iam/annotations_pb.rb'
 
 generate-ruby-grpc:
 	@printf "\n===> ${blue}Generating ruby grpc files${reset}\n"
-	$(MAKE) ruby-grpc-tools $(EXTRA_PROTOS) $(RUBY_PROTOS)
+	$(MAKE) ruby-grpc-tools $(RUBY_PROTOS)
 	$(MAKE) generate-ruby-grpc-nodemanager
 	$(MAKE) generate-ruby-grpc-secrets-service
 

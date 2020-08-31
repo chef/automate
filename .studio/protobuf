@@ -1,0 +1,205 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+
+document "clean_all_compiled_protos" <<DOC
+  Delete all the files with extensions matching '*pb*go' in the repo (except in vendor/)
+DOC
+function clean_all_compiled_protos() {
+  find /src/{api,components,lib} -name '*pb*go' -exec rm '{}' \;
+}
+
+document "bootstrap_proto_compilers" <<DOC
+  Builds everything you need to start recompiling protos from scratch (e.g.,
+  after running clean_all_compiled_protos). Our custom protoc-gen-* tools have
+  to be built in a certain order or else they will fail on circular dependencies.
+DOC
+function bootstrap_proto_compilers() {
+  install_protoc_toolchain
+}
+
+document "install_protoc_toolchain" <<DOC
+  Install all the protobuf plugins, linters, etc. we use to compile and vet our protobufs.
+DOC
+function install_protoc_toolchain() {
+  install_if_missing core/protobuf-cpp protoc
+  install_go_tool github.com/golang/protobuf/protoc-gen-go
+  compile_go_protobuf api/scripts/bootstrap_protoc.sh
+  compile_go_protobuf components/automate-grpc/scripts/bootstrap_protoc.sh
+
+  local proto_tools_plugins=(
+    github.com/chef/automate/components/automate-grpc/protoc-gen-policy
+    github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
+    github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
+    github.com/envoyproxy/protoc-gen-validate
+    github.com/ckaznocha/protoc-gen-lint
+    github.com/bufbuild/buf/cmd/buf
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking
+    github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+  )
+  install_go_tool "${proto_tools_plugins[@]}"
+}
+document "compile_go_protobuf" <<DOC
+  Compile the protobuf definitions from the provided script.
+  @(arg:1) Path to the script to execute. (default: scripts/grpc.sh)
+  The script should look like:
+  ------------------------------------------------------------------
+  #!/bin/bash
+  set -x
+  GOPATH=\$(go env GOPATH)
+  protoc -I. \\
+    -I\$GOPATH/src \\
+    --go_out=plugins=grpc:. \\
+    proto/*.proto
+  ------------------------------------------------------------------
+DOC
+compile_go_protobuf() {
+  local rc
+  proto_script="${1:-scripts/grpc.sh}"
+
+  # Verify that the script exists and is executable.
+  if [[ -x $proto_script ]]; then
+    eval "$proto_script";
+    rc=$?
+  else
+    error "File '$proto_script' doesn't exist or is not executable."
+    error "Try 'describe ${FUNCNAME[0]}'."
+    return 1
+  fi
+
+  return $rc
+}
+
+
+# Compile protobuf definitions
+document "compile_go_protobuf_component" <<DOC
+  A wrapper around the compile_go_protobuf to compile the protobuf definitions of a specific component.
+DOC
+function compile_go_protobuf_component() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+
+  # NOTE: To (re)build the world from scratch, automate-grpc must first be
+  # bootstrapped so that our custom protoc-gen-* commands can be used in later
+  # build steps. See `bootstrap_proto_compilers` above.
+
+  local path
+  if [ "$1" == "api" ]; then
+    path=api
+  elif [ "$1" == "config" ]; then
+    path=api/config
+  elif [ "$1" == "license" ]; then
+    path=lib/license
+  else
+    path="components/$1"
+    if [ ! -f "/src/$path/scripts/grpc.sh" ]; then
+      error "Compile go protobuf target is invalid."
+      display_valid_protobuf_targets
+      return 1
+    fi
+  fi
+
+  install_protoc_toolchain || return 1
+
+  # For handling faux GOPATH copying for non-module aware protoc extensions
+  install_if_missing core/rsync rsync
+
+  # "api" doesn't compile the config directory so let's not delete the config directory in that case
+  if [ "$path" == "api" ]; then
+      find "$path" -not -path 'api/config/*' \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' -o -name '*pb.client_mock.go' \) -delete
+  else
+      find "$path" \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
+  fi
+
+  local proto_script="$path/scripts/grpc.sh"
+  if [ -x "$proto_script" ]; then
+      compile_go_protobuf "$proto_script" || return $?
+  else
+      error "$proto_script doesn't exist or is not executable!"
+      case $path in
+          # NOTE: Don't warn for services that haven't been moved or
+          # which still have some protos that they use internally
+          api|api/config|automate-deployment|automate-gateway|notifications-service)
+              return 1
+              ;;
+          *)
+              log_warning "Most internal protobufs have moved into the api folder."
+              log_warning "Did you mean: compile_go_protobuf_component api"
+              return 1
+      esac
+  fi
+
+  if [ "$1" == "api" ]; then
+    log_line "compiling client mocks"
+    compile_client_mocks
+  fi
+}
+# Adding auto tab complete
+complete -F _component_auto_complete compile_go_protobuf_component
+
+function lint_all_protobuf_components() {
+  install_protoc_toolchain || return 1
+
+  local ret
+  local lintercmd="buf check lint"
+  pushd /src/ > /dev/null || return 1
+  echo "Linting protos with \`${lintercmd}\`..."
+  $lintercmd
+  ret=$?
+  if [[ $ret -ne 0 ]]; then
+    echo "😱 Command \`${lintercmd}\` failed! Refer to the docs if you need help fixing:"
+    echo "- https://buf.build/docs/style-guide/"
+    echo "- https://buf.build/docs/lint-checkers"
+    echo "- https://buf.build/docs/lint-configuration"
+  else
+    echo "😎 All good"
+  fi
+  popd > /dev/null || return 1
+  return "$ret"
+}
+
+document "compile_all_protobuf_components" <<DOC
+  Compile every protobuf file for every component in A2.
+DOC
+function compile_all_protobuf_components() {
+  lint_all_protobuf_components && compile_all_protobuf_components_nolint
+}
+
+document "compile_all_protobuf_components_nolint" <<DOC
+  Compile every protobuf file for every component in A2 without running the
+  linter (linters in grpc.sh scripts will still run)
+DOC
+function compile_all_protobuf_components_nolint() {
+  local components
+
+  install_if_missing core/git git
+  components=()
+  read -d "\n" -ra components <<< "$(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}')"
+  # Note 2019/02/05 (sr): "api" doesn't fit in the folder structure, so it's
+  # added to the list manually, same goes for "api/config".
+  components+=("config" "api")
+  for component in "${components[@]}"; do
+    log_line "Compiling protobuf files for ${YELLOW}'$component'${NC}"
+    if ! compile_go_protobuf_component "$component"; then
+      log_line "${RED}ERROR:${NC} Unable to compile protobuf files for '$component'"
+      return 1
+    fi
+  done
+}
+
+document "verify_all_protobuf_components" <<DOC
+  Verify that all protobuf are up to date
+DOC
+function verify_all_protobuf_components() {
+  install_if_missing core/git git
+
+  clean_all_compiled_protos || return $?
+  bootstrap_proto_compilers || return $?
+  compile_all_protobuf_components || return $?
+
+  git add .
+  git diff --staged --exit-code --ignore-submodules=all || return $?
+
+  go_component_make api lint unit
+}
+

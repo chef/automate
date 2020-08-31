@@ -5,7 +5,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/te
 
 import "google/api/annotations.proto";
 
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 service Telemetry {
   rpc GetTelemetryConfiguration (TelemetryRequest) returns (TelemetryResponse) {
