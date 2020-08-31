@@ -40,7 +40,7 @@ func (m *ConfigRequest) BindPort(name string, value uint16) error {
 // ListPorts lists all the ports exposed by the config
 func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
 	return []a2conf.PortInfo{a2conf.PortInfo{
-		Default:  uint16(int32(14001)),
+		Default:  uint16(int32(10105)),
 		Name:     "service",
 		Protocol: "grpc",
 	}}

@@ -24,7 +24,7 @@ message ConfigRequest {
 
 			message Service {
 				google.protobuf.StringValue host = 1;
-				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 14001, protocol: "grpc" } ];
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10105, protocol: "grpc" } ];
 				google.protobuf.StringValue feed_interval = 3;
 				google.protobuf.Int32Value asset_page_size = 4;
 				google.protobuf.Int32Value reports_page_size = 5;
