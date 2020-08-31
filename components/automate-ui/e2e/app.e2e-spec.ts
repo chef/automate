@@ -35,7 +35,7 @@ xdescribe('Welcome Modal', () => {
     // element(by.css('.help-link')).click().then(function () {
     //   browser.getAllWindowHandles().then(function (handles) {
     //     browser.switchTo().window(handles[handles.length - 1]).then(function () {
-    //         expect(browser.getCurrentUrl()).toEqual('https://automate.chef.io/docs');
+    //         expect(browser.getCurrentUrl()).toEqual('https://docs.chef.io/automate');
     //     });
 
     //     // switch back to the main window
