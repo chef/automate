@@ -9,7 +9,7 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { NodeRun } from 'app/types/types';
-import { NodeDetailsService } from 'app/services/node-details/node-details.service';
+import { NodeDetailsService, LogModalObject } from 'app/services/node-details/node-details.service';
 import { AttributesService } from 'app/services/attributes/attributes.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -24,6 +24,8 @@ describe('NodeDetailsComponent', () => {
   let component: NodeDetailsComponent;
   let eventService: NodeDetailsService;
   let nodeRunSource: Subject<{ nodeRun: NodeRun }>;
+  let logModalObject: LogModalObject;
+  logModalObject = { 'isVisible': true };
 
   describe('after nodeRun is set', () => {
     beforeEach(() => {
@@ -49,7 +51,7 @@ describe('NodeDetailsComponent', () => {
     describe('#toggleModal()', () => {
       it('sets the logs-modal visibility', () => {
         expect(component.modalIsVisible).toBe(false);
-        component.toggleModal(true);
+        component.toggleModal(logModalObject);
         expect(component.modalIsVisible).toBe(true);
       });
     });

@@ -101,6 +101,7 @@ message Resource {
   // Fields that might be empty
   string conditional = 16;
   bool ignore_failure = 17;
+  ChefError error = 18;
 }
 
 message ChefError {

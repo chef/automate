@@ -182,6 +182,7 @@ func toResponseResources(resources []ingestBackend.Resource) []*response.Resourc
 	responseResources := make([]*response.Resource, len(resources))
 
 	for index, resource := range resources {
+		chefError, _ := toResponseError(resource.Error)
 		responseResources[index] = &response.Resource{
 			Type:            resource.Type,
 			Name:            resource.Name,
@@ -195,6 +196,7 @@ func toResponseResources(resources []ingestBackend.Resource) []*response.Resourc
 			Result:          resource.Result,
 			Conditional:     resource.Conditional,   // might be empty
 			IgnoreFailure:   resource.IgnoreFailure, // might be empty
+			Error:           chefError,
 		}
 	}
 

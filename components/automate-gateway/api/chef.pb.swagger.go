@@ -453,6 +453,9 @@ func init() {
         },
         "result": {
           "type": "string"
+        },
+        "error": {
+          "$ref": "#/definitions/chef.automate.api.ingest.request.Error"
         }
       }
     },

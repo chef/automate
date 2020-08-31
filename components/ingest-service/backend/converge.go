@@ -128,19 +128,20 @@ type Ec2 struct {
 
 // Resource is the representation of a Chef Resource
 type Resource struct {
-	Type            string `json:"type"`
-	Name            string `json:"name"`
-	ID              string `json:"id"`
-	Duration        string `json:"duration"`
-	Delta           string `json:"delta"`
-	IgnoreFailure   bool   `json:"ignore_failure,omitempty"`
-	Result          string `json:"result"`
-	Status          string `json:"status"`
-	CookbookName    string `json:"cookbook_name,omitempty"`
-	CookbookVersion string `json:"cookbook_version,omitempty"`
-	CookbookType    string `json:"cookbook_type,omitempty"`
-	RecipeName      string `json:"recipe_name,omitempty"`
-	Conditional     string `json:"conditional,omitempty"`
+	Type            string    `json:"type"`
+	Name            string    `json:"name"`
+	ID              string    `json:"id"`
+	Duration        string    `json:"duration"`
+	Delta           string    `json:"delta"`
+	IgnoreFailure   bool      `json:"ignore_failure,omitempty"`
+	Result          string    `json:"result"`
+	Status          string    `json:"status"`
+	CookbookName    string    `json:"cookbook_name,omitempty"`
+	CookbookVersion string    `json:"cookbook_version,omitempty"`
+	CookbookType    string    `json:"cookbook_type,omitempty"`
+	RecipeName      string    `json:"recipe_name,omitempty"`
+	Conditional     string    `json:"conditional,omitempty"`
+	Error           ChefError `json:"error,omitempty"`
 }
 
 type Deprecation struct {
