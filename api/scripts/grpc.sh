@@ -64,11 +64,20 @@ for i in external/**/; do
     list=("$i"*.proto)
     printf 'GEN: %s\n' "${list[@]}"
 
+    protoc_args=("--go_out=plugins=grpc,paths=source_relative:/src/api")
+    protoc_args+=("--grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath")
+    protoc_args+=("--policy_out=logtostderr=true:$fauxpath") 
+
+    # The IAM mocks are used in the automate-cli unit tests, but the mock
+    # generator makes invalid code for some services/protos. So we make the
+    # mocks just for IAM.
+    if echo "${list[@]}" | grep -q "^external/iam/v2"; then
+      protoc_args+=("--grpc-mock_out=${fauxpath}")
+    fi
+
     # service, grpc-gateway, policy mapping
     protoc "${IMPORTS[@]}" \
-      --go_out=plugins=grpc,paths=source_relative:/src/api \
-      --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
-      --policy_out="logtostderr=true:$fauxpath"  \
+      "${protoc_args[@]}" \
       "${list[@]}" || exit 1
 
     sync_from_fauxpath "${list[0]}"
@@ -101,8 +110,6 @@ for i in interservice/**/; do
     protoc "${IMPORTS[@]}" \
       "${protoc_args[@]}" \
       "${list[@]}" || exit 1
-
-      ### --grpc-gateway_out="request_context=true,logtostderr=true:$fauxpath"  \
 
     sync_from_fauxpath "${list[0]}"
 
