@@ -3,7 +3,7 @@
 
 package applications
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/api/v0/applications/service-groups", func(unexpandedResource string, input interface{}) string {

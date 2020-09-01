@@ -7,8 +7,8 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/compliance/reporting"
+	iam "github.com/chef/automate/api/external/iam/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
-	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"

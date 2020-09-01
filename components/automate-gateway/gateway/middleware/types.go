@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
+	"github.com/chef/automate/api/external/iam/v2/pairs"
 )
 
 // AuthorizationInterceptor abstracts the common logic that can be used for both

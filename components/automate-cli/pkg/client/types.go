@@ -3,7 +3,7 @@ package client
 import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/compliance/reporting"
-	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	iam "github.com/chef/automate/api/external/iam/v2"
 )
 
 // APIClient is an API client ready for making requests against our public API.

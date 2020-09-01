@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/request";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+message CreateUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name", "password"]
+    },
+    example: { value: '{"name": "Display Name", "id": "username001rulez", "password": "aSafePassword"}'}
+  };
+  // Unique ID. Cannot be changed. Used to sign in.
+  string id = 1;
+  // Display name for local user.
+  string name = 2;
+  // Password for user. Used to sign in.
+  string password = 3;
+}
+
+message ListUsersReq {}
+
+message DeleteUserReq {
+  // ID of the user.
+  string id = 1;
+}
+
+message GetUserReq {
+  // ID of the user.
+  string id = 1;
+}
+
+message UpdateUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    },
+    example: { value: '{"name": "New Name", "password": "aSafePassword"}'}
+  };
+  // ID of the user. Cannot be changed. Used to sign in.
+  string id = 1;
+  // Display name for local user.
+  string name = 2;
+  // Password used to log in. Will overwrite preexisting password.
+  string password = 3;
+}
+
+message UpdateSelfReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    },
+    example: { value: '{"name": "My New Name", "password": "aNewSafePassword", "previous_password": "aPreviousSafePassword"}'}
+  };
+  // ID of the user. Cannot be changed. Used to sign in.
+  string id = 1;
+  // Display name for local user.
+  string name = 2;
+  // New password for user. Used to sign in.
+  // Optional, but if included, previous_password is also required.
+  string password = 3;
+  // Previous password for user.
+  // Optional, but if included, password is also required.
+  string previous_password = 4;
+}

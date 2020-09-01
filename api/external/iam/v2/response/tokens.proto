@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/response";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "external/iam/v2/common/tokens.proto";
+
+// NB: Doc annotations in responses will only apply for simple types; others will be ignored.
+
+message CreateTokenResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}'}
+  };
+  Token token = 1;
+}
+
+message GetTokenResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}'}
+  };
+  Token token = 1;
+}
+
+message UpdateTokenResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}'}
+  };
+  Token token = 1;
+}
+
+message DeleteTokenResp {}
+
+message ListTokensResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"tokens": [{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}, {"name": "token 2", "id": "token-2", "active": false, "projects": ["north-region", "south-region"]}]}'}
+  };
+  repeated Token tokens = 1;
+}

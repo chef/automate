@@ -13,9 +13,9 @@ import (
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
 	"github.com/chef/automate/components/automate-cli/pkg/client/mock"
-	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	iam_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	iam_common "github.com/chef/automate/api/external/iam/v2/common"
+	iam_req "github.com/chef/automate/api/external/iam/v2/request"
+	iam_resp "github.com/chef/automate/api/external/iam/v2/response"
 )
 
 func TestCreateAdminUserOrUpdatePassword(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	"github.com/chef/automate/api/external/iam/v2/request"
+	"github.com/chef/automate/api/external/iam/v2/response"
 	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -26,7 +26,7 @@ import (
 	_ "github.com/chef/automate/api/external/cfgmgmt"
 	_ "github.com/chef/automate/api/external/compliance/profiles"
 	_ "github.com/chef/automate/api/external/ingest"
-	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	_ "github.com/chef/automate/api/external/iam/v2"
 	_ "github.com/chef/automate/components/automate-gateway/api/notifications"
 )
 

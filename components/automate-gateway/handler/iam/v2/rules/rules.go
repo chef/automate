@@ -8,10 +8,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	pb_common "github.com/chef/automate/api/external/iam/v2/common"
+	pb_req "github.com/chef/automate/api/external/iam/v2/request"
+	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
 	"github.com/chef/automate/api/interservice/authz"
-	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 type Server struct {

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/common";
+
+message User {
+    // Display name for local user.
+    string name = 1;
+    // Unique ID. Cannot be changed. Used to log in.
+    string id = 2;
+    // Unique ID used to add local users to local teams. Cannot be changed.
+    string membership_id = 3;
+}

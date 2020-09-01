@@ -17,12 +17,12 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 
 	// Gateway Requests/Response/Service definitions
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
-	gwAuthzReq "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	"github.com/chef/automate/api/external/iam/v2/pairs"
+	gwAuthzReq "github.com/chef/automate/api/external/iam/v2/request"
+	gwAuthzRes "github.com/chef/automate/api/external/iam/v2/response"
 
 	// other dependencies
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+	"github.com/chef/automate/api/external/iam/v2/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )

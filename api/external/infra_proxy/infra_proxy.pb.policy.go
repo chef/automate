@@ -4,8 +4,8 @@
 package infra_proxy
 
 import (
+	policy "github.com/chef/automate/api/external/iam/v2/policy"
 	request "github.com/chef/automate/api/external/infra_proxy/request"
-	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 )
 
 func init() {

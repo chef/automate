@@ -3,7 +3,7 @@
 
 package stats
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.stats.v1.StatsService/ReadSummary", "compliance:reporting:stats:summary", "compliance:reportSummary:get", "POST", "/api/v0/compliance/reporting/stats/summary", func(unexpandedResource string, input interface{}) string {

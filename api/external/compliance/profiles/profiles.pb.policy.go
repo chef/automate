@@ -3,7 +3,7 @@
 
 package profiles
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.profiles.v1.ProfilesService/Read", "compliance:profiles:{owner}", "compliance:profiles:get", "GET", "/api/v0/compliance/profiles/read/{owner}/{name}/version/{version}", func(unexpandedResource string, input interface{}) string {

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2";
+
+import "google/api/annotations.proto";
+
+import "external/iam/v2/request/introspect.proto";
+import "external/iam/v2/response/introspect.proto";
+
+import "external/annotations/iam/annotations.proto";
+
+service Authorization {
+  rpc IntrospectAll (IntrospectAllReq) returns (IntrospectResp) {
+    option (google.api.http).get = "/apis/iam/v2/introspect";
+    option (chef.automate.api.iam.policy).resource = "iam:introspect";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:getAll";
+    };
+  rpc IntrospectSome (IntrospectSomeReq) returns (IntrospectResp) {
+    option (google.api.http).post = "/apis/iam/v2/introspect_some";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "iam:introspect";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:getSome";
+    };
+  rpc Introspect (IntrospectReq) returns (IntrospectResp) {
+    option (google.api.http).post = "/apis/iam/v2/introspect";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "iam:introspect";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:get";
+    };
+}
