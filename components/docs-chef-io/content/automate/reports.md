@@ -13,28 +13,28 @@ draft = false
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/reports.md)
 
-The Reports view under the Compliance tab provides comprehensive insight into the compliance status of all scanned infrastructure.
+The _Reports_ page (Compliance > Reports) provides comprehensive insight into the compliance status of all scanned infrastructure.
+Scan results for audit cookbook configurations also appear in this view.
 
-{{< note >}}
-Note: The count of controls listed in the _Profile Status_ pane of the Reports Overview represents how many controls have been executed, and not the count of unique controls executed.
-{{< /note >}}
+{{% note %}}
 
-![Compliance](/images/automate/compliance.png)
+If the size of a Compliance Report is over 4MB, then the _Reports_ page may not display as expected.
+
+{{% /note %}}
+
+![Reports](/images/automate/reports.png)
 
 ### Dates in Compliance Reports
 
-The dashboard shows the results of all scans with end times on the _currently selected day_.
-The currently selected day, as highlighted in the search bar, bases itself on timestamps in Coordinated Universal Time (UTC).
+The dashboard shows the results of all scans with end times on the _current selected day_.
+The _current selected day_ is based on timestamps in Coordinated Universal Time (UTC).
 
-A historical view is provided through the trend graph, which can be adjusted to show a 10 day, month, 3 month, or year overview.
+The trend graph provides a historical overview of node status over time.
+You can change it to display overviews of the past 10 days, 1 month, 3 months, or 1 year.
 
 To view scan reports in the past, users can select a different date from the calendar located in the search bar.
 
-![Compliance Date Selector](/images/automate/compliance-date.png)
-
-### Compliance Data Sources
-
-Users with audit cookbook configurations can expect to see the results of those scans land in this view. The results of any scan jobs executed in Chef Automate also land in this view.
+![Reports Date Selector](/images/automate/reports-date.png)
 
 ### Search Bar and Filters
 
@@ -42,120 +42,143 @@ The Compliance search allows you to view and filter compliance scan results base
 Wildcard searches on field values will not return suggestions, but they will filter the results.
 For example, you can search for `Node Name: prod*` and filter the results to list all the node names that begin with `prod`.
 
-Profile
-: Filter your results by profile. This list will include any executed profiles (a profile for which scan results have been received).
+Chef Infra Server
+: Filter your results by Chef Infra Server.
 
-Node
-: Filter your results by node item. A node is any scannable for which we have received scan results, which can be a Chef node, an aws node, an aws account region, or any other target inspec supports.
+Chef Organization
+: Filter your results by Chef organization.
 
-Platform
-: Filter your results by platform.
+Chef Tag
+: Filter your results by Chef tag.
+
+Control Tag
+: Filter your results by control tag.
+
+Controls
+: Filter your results by control name. Filtered results display the status of nodes that ran the selected control.
 
 Environment
 : Filter your results by environment.
 
-Control
-: Filtering your results by control will show you the status of the nodes in your infrastructure that ran that control.
+InSpec Version
+: Filter your results by Chef InSpec version.
 
-Role
-: Filter by Chef role, on all applicable nodes.
+Node Name
+: Filter your results by node name.
+
+Platform
+: Filter your results by platform.
+
+Policy Group
+: Filter your results by policy group.
+
+Policy Name
+: Filter your results by policy name.
+
+Profile
+: Filter your results by profile name. This lists executed profiles, which are profiles with received scan results.
 
 Recipe
 : Filter by Chef recipe, on all applicable nodes.
 
+Role
+: Filter by Chef role, on all applicable nodes.
+
 ### Deep Filtering
 
-Deep Filtering allows you to view the state of your infrastructure from the perspective of a single profile, or a single profile and one of its child controls.  
-Adding a profile filter will modify all compliance reports screens to display the status of that profile across all nodes executing that profile. Adding a filter for a child control of that profile will modify all compliance reports screens to display the status of that child control.
+Deep filtering shifts the perspective of the results from the node to the profile and its associated control.
+Use deep filtering to see the compliance reporting for an entire profile or an individual control within a profile.
 
-Please note the only supported filters for deep filtering are:
+Deep filtering supports filtering for:
 
-    * one profile
-    * one profile and one of its child controls
+- one profile
+- one profile and one of its associated controls
 
 ### Waivers
 
-A node's waived status appears if applicable in displays where a node's status appears in Chef Automate. 
+A node's waived status appears if applicable in displays where a node's status appears in Chef Automate.
 The Compliance Reports overview displays the node count and history of waived nodes, and the count and history of waived controls.
-_Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status filters respectively. 
-Select the _Waived_ status filter to display only the respective Node or Profile reporting with that status.
+_Nodes_ and _Profiles_ views include _Waived Nodes_ and _Waived Profiles_ status filters respectively.
+Selecting the _Waived_ status filter displays the respective Node or Profile reporting with the `waived` status.
 Hover over the control's Waived icon under the Node Status column in _Controls_ to view more details about the waiver applied to the control.
 
 Use Chef InSpec to configure [waivers](https://docs.chef.io/inspec/waivers/).
 
 ### Download Report Results
 
-The download button located to the right of the search bar allows the user to download a JSON or CSV format of the reports, based on all currently applied filters (including end time selected in calendar).
-
-### Compliance Reports Results and Job ID Filters
-
-Chef Automate users can see the results of their scan jobs from https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs by selecting _Report_, which will redirect to the compliance tab. This reports view uses the _job id_ filter as well as any additional filters, and ignores the _end time_ filter.
-
-![Getting to Compliance from a Scan Job](/images/automate/compliance-jobid.png)
+The download button located to the right of the search bar allows users to download a JSON or CSV format of the reports.
+The downloaded contents are the result of all of the applied filters--including end time selected in calendar.
 
 ## Compliance Status and Report Metadata
 
-The _Compliance Status and Report Metadata_ bar resides directly beneath the search bar. Selecting anywhere on the compliance status bar expands the ``Report Metadata`` information, which summarizes the nodes, report date, duration, status, number of platforms, number of environments, and number of profiles used in your scan.
+The _Compliance Status and Report Metadata_ bar is directly beneath the search bar.
+Expand the `Report Metadata` information by selecting the compliance status bar. The report metadata shows a summary of the nodes, report date, duration, status, number of platforms, number of environments, and number of profiles used in your scan.
 
-![Compliance Metadata](/images/automate/compliance-metadata.png)
+![Reports Metadata](/images/automate/reports-metadata.png)
 
-## Status Views
+## Compliance Overview
 
-The compliance overview provides insights into the status of your system. Toggle between the _Node Status_ and _System Status_ to view your system's overall compliance.
+Toggle between _Node Status_ and _Profile Status_ to view your system's compliance state.
 
 ### Node Status
 
-The node status overview provides insight into your system's compliance status from the operational perspective of nodes.
+The _Node Status_ view shows your system's compliance status from the operational perspective of nodes.
 
-Global Compliance
-: Visualizes the quantity of nodes that have passed a failed compliance scans, as well as the number of nodes that were skipped.
+Node Status
+: Shows the number of nodes that passed or failed compliance scans, and the number of skipped or waived nodes.
 
 Severity of Node Failures
-: Indicates the severity of the compliance scan failures on your system's nodes.
+: Shows the severity of the compliance scan failures on your system's nodes.
 
-Global Compliance Over Time
-: Represents the changes in size and compliance status of your system over times. The calendar in the upper right corner of the visualization allows you to change the dates represented in this view,
+Node Status Over Time
+: Shows the changes in size and compliance status of your system over time. Use the dropdown menu in the upper left corner to change the date range. Changing the date range also changes the displays in related charts and tables.
 
 Top Platform Failures
-: Represents the amount of compliance scan failures ranked by operating system. Hovering over an individual bubble shows the platform and the number of nodes impacted.
+: Shows the number of compliance scan failures grouped by operating system. Hovering over an individual bubble shows the platform name and the number of failed nodes.
 
  Top Environment Failures
-: Represents the amount of compliance scan failures ranked by environment. Hovering over an individual bubble shows the environment and the number of nodes impacted.
+: Shows the number of compliance scan failures grouped by environment. Hovering over an individual bubble shows the environment name and the number of failed nodes.
 
 ### Profile Status
 
-The profile status overview provides insight into your system's compliance status from the compliance perspective of Compliance profiles run during scans.
+The _Profile Status_ view shows your system's compliance status from the compliance perspective of Compliance profiles run during scans.
+
+{{% note %}}
+The control count in the _Profile Status_ pane (Reports > Profile Status) shows the total number of executed controls, not the total number of unique controls.
+{{% /note %}}
 
 Control Status
-: The control status displays the number of controls in your system, organized by passing, failing, and skipped controls.
- 
-Severity of Control Failures
-: Displays a ranked view of the number and significance of failed controls, sorted into critical, major, and minor control failures.
+: Shows the number of controls in your system, grouped by passing, failing, and skipped controls.
 
-Test Results Over Time
-: A line graph representing the quantity of controls and Compliance scan results over time. The time-frame can be altered using calendar button in the upper right corner of the chart.
+Severity of Control Failures
+: Shows failed controls, ranked by number and importance of the control failure, grouped as critical, major, and minor.
+
+Control Status Over Time
+: A line graph showing the number of controls and Compliance scan results over time. Use the calendar button in the upper right corner of the chart to change the time frame.
 
 Top Profile Failures
-: Indicates the profiles with the highest failure rate. Hovering over an individual bubble shows the full name of the profile and the number of nodes impacted.
+: Indicates the profiles with the highest failure rate. Hover over an individual bubble to show the full profile name and the number of failed nodes.
 
 Top Control Failures
-: The Top Control Failures chart illustrates the most frequently failing controls. Hovering over an individual bubble shows the name of the control and the number of nodes impacted.
+: Indicates the most frequently failing controls. Hover over an individual bubble to show the control name and the number of failed nodes.
 
-## Switching views
+## Switching Views
 
-In addition to filtering your reports data, you can also switch your views to see compliance report results from the perspective of _Nodes_, _Profiles_, and _Controls_.
+Switch your views by selecting the appropriate tabs and see compliance report results from the perspective of _Nodes_, _Profiles_, and _Controls_.
 
 ### Nodes
 
-This view provides more detailed insight into the compliance status of the nodes in your system. This table can be sorted by node name, platform, environment, last scan, and the number of control failures from the most recent compliance scan.
+The _Nodes_ view provides more detailed insight into the compliance status of the nodes in your system.
+Sort this table by node name, platform, environment, last scan, and the number of control failures from the most recent compliance scan.
+Scroll to the bottom of the page for pagination navigation options.
 
-![Compliance Nodes](/images/automate/compliance-nodes.png)
+![Reports Nodes](/images/automate/reports-nodes.png)
 
 Node
 : A node is any machine that is under management by Chef.
 
 Platform
-: The operating system on your node such as AIX, Amazon Linux, Apache, AppleOSX, CentOS, Oracle Linux, Oracle Solaris, RHEL, SUSE Linux, Ubuntu, and Microsoft Windows.
+: The operating system on your node, such as AIX, Amazon Linux, Apache, macOS, CentOS, Oracle Linux, Oracle Solaris, RHEL, SUSE Linux, Ubuntu, and Windows.
 
 Environment
 : You can filter compliance reports by the environments in any stage of your workflow.
@@ -167,43 +190,16 @@ Control Failures
 : Shows the number of failing controls, if any.
 
 Filter
-: Select a node by selecting the filter icon on the right side of the row.
+: Select the filter icon on the right side of the row to select a node.
 
-More Information
-: Selecting the more information icon redirects you to the results of the most recent compliance scan. Use this view to examine all of the controls run on the node. Selecting **View Source** from an expanded control displays the full InSpec control.
+More Options
+: Select the (...) icon to display a menu with two additional options: _Add Filter_ and _Scan Results_. Use _Add Filter_ to narrow the results to the `id` of the selected node. Use _Scan Results_ to show the scan results of controls for the specific node in a side window.
 
-![Compliance Node Information](/images/automate/compliance-node-information.png)
+### Profiles
 
-#### Scan History
+Use the **Profiles** tab to examine the compliance profiles installed under your individual user account.
 
-Selecting **scan history** on the upper right corner of the screen opens a side-window. Choosing a compliance scan from this list redirects you to a view of all of the controls run during the selected scan.
-
-![Node History](/images/automate/compliance-node-history.png)
-
-The node name is at the top of the header, directly above the node compliance status. To the right is a summary of node information: _Last Scan_, _Profiles_, _Platform_ and _Environment_.
-
-The node history table displays the following information:
-
-Control
-: Control name and short description of its purpose.
-
-Test Results
-: Number of tests within an individual control
-
-Severity
-: Importance of the control
-
-Root Profile
-: Profile containing the controls.
-
-More Information
-: View the tests within a control and their results. Use the **View Source** button within the expanded view to examine the InSpec control source code.
-
-## Profiles
-
-Use the compliance reports **Profiles** tab lets you examine the compliance profiles installed under your individual user account.
-
-![Compliance Profiles](/images/automate/compliance-profiles.png)
+![Reports Profiles](/images/automate/reports-profiles.png)
 
 Profile Title
 : The name of the profile obtained from the _Profile Store_ or uploaded.
@@ -214,11 +210,59 @@ Version
 Identifier
 : The name under which the profile is installed and a short profile title.
 
-Filter
-: Select a node by selecting the filter icon on the right side of the row.
+More Options
+: Select the (...) icon to display a menu with two additional options: _Add Filter_ and _Scan Results_. Use _Add Filter_ to narrow the results to the `id` of the selected profile. Use _Scan Results_ to show the scan results of controls for the specific node in a side window.
 
-Scan Results
-: Displays the scan results summary for the selected profile. Selecting **plus** expands the list of nodes on which the profile was run. Select a node to see the control-level results.
+### Controls
+
+Use the **Controls** tab to examine the compliance controls installed under your individual user account.
+
+![Reports Controls](/images/automate/reports-controls.png)
+
+Control Name
+: Control name and short description of its purpose
+
+Profile
+: Profile containing the controls
+
+Impact
+: Importance of the control
+
+Last Scan
+: When the last scan occurred
+
+Node Status
+: Shows the number of failed, passed, and skipped nodes
 
 More Information
-: Opens a control-level view of all of the runs for all of the controls within the profile. Selecting the **scan results** button displays all of the nodes on which the selected control has been run. Selecting a node from this list displays the scan results of the selected control on for the specific node. Selecting **view source** displays the InSpec controls.
+: Select the (...) icon to display a menu with one additional option: _Add Filter_. Use _Add Filter_ to narrow the results to the `id` of the selected profile and to the `id` of the selected control.
+
+### Individual Node Display
+
+The node name is at the top of the header, directly above the node compliance status.
+
+![Reports Node Detail](/images/automate/reports-node-detail.png)
+
+The node history table displays the following information:
+
+Control
+: Control name and short description of its purpose
+
+Severity
+: Importance of the control
+
+Root Profile
+: Profile containing the controls
+
+Test Results
+: Number of tests within an individual control
+
+More Information
+: Select the plus icon to display a control description and to toggle between **Results** and **Source**. **Results** describes the node compliance status and **Source** displays the Chef InSpec control source code.
+
+#### Scan History
+
+Select **Scan History** in the upper right corner to open a side-window.
+Choosing a compliance scan from this list redirects you to a view of all controls run during the selected scan.
+
+![Scan History](/images/automate/reports-scan-history.png)
