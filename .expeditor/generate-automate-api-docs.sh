@@ -10,9 +10,9 @@ if [[ ! -L /go/src/github.com/chef/automate ]]; then
 fi
 
 branch="expeditor/generate-automate-api-docs"
-git checkout -b "$branch"
+git checkout -B "$branch"
 
-git submodule update
+git submodule update --init --recursive
 
 pushd /go/src/github.com/chef/automate/components/docs-chef-io
   make sync_swagger_files
