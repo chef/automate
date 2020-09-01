@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -39,16 +38,7 @@ WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertBySourceIDRunData = `
-INSERT INTO nodes
-	(id, name, platform, platform_version, source_state,
-		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-ON CONFLICT (source_id, source_region, source_account_id)
-DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5,
-	last_contact = $6,  source_id = $7, source_region = $8, source_account_id = $9, last_run = $10, projects_data = $11
-WHERE nodes.source_state != 'TERMINATED' RETURNING id;
-`
+SELECT insert_node($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`
 
 const sqlUpsertBySourceIDScanData = `
 INSERT INTO nodes
@@ -142,20 +132,12 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 			projectsDataByte:    projectsDataByte,
 		}
 
-		if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
+		if !hasCloudInformation(node) {
 			err = tx.upsertByID(node, nodeDetails)
 		} else {
 			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)
 			if err != nil {
-				if pgerr, ok := err.(*pq.Error); ok {
-					if pgerr.Code == pq.ErrorCode("23505") {
-						logrus.Debugf("got duplicate uuid error when attempting upsert. updating by id")
-						// start a new transaction b/c we can't continue the transaction after a failed one
-						return Transact(db, func(tx *DBTrans) error {
-							return tx.upsertByID(node, nodeDetails)
-						})
-					}
-				}
+				return errors.Wrap(err, "ProcessIncomingNode unable upsert with cloudDetails")
 			}
 		}
 		if err != nil {
@@ -179,6 +161,10 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	})
 
 	return err
+}
+
+func hasCloudInformation(node *manager.NodeMetadata) bool {
+	return len(node.GetSourceId()) != 0 && len(node.GetSourceAccountId()) != 0 && len(node.GetSourceRegion()) != 0
 }
 
 type nodeDetails struct {
