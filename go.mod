@@ -21,6 +21,7 @@ require (
 	github.com/bufbuild/buf v0.20.5
 	github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
+	github.com/chef/automate/api/external v0.0.0-00010101000000-000000000000
 	github.com/chef/toml v0.3.1-0.20200730001027-920c30b33b5d
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
@@ -42,7 +43,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
-	github.com/golang/mock v1.4.3
+	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1
 	github.com/googleapis/googleapis v0.0.0-20200727200613-a94df49e8f20 // indirect
@@ -51,7 +52,7 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.14.6
+	github.com/grpc-ecosystem/grpc-gateway v1.14.7
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20171214222146-0e7658f8ee99
 	github.com/hashicorp/go-hclog v0.12.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.1.0 // indirect
@@ -62,9 +63,8 @@ require (
 	github.com/kevinburke/go-bindata v3.16.0+incompatible
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348
 	github.com/leanovate/gopter v0.2.4
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.8.0
 	github.com/lyft/protoc-gen-star v0.4.16-0.20200805193024-077ca8f98fb2
-	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
@@ -76,7 +76,6 @@ require (
 	github.com/nats-io/nats-streaming-server v0.17.0
 	github.com/nats-io/nats.go v1.9.1
 	github.com/nats-io/stan.go v0.6.0
-	github.com/olivere/elastic v6.2.16+incompatible // indirect
 	github.com/open-policy-agent/opa v0.19.1
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
@@ -95,7 +94,7 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
 	github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c // indirect
-	github.com/sirupsen/logrus v1.5.0
+	github.com/sirupsen/logrus v1.6.0
 	github.com/smartystreets/assertions v1.0.1 // indirect
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/cobra v1.0.1-0.20200713175500-884edc58ad08
@@ -116,16 +115,16 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
-	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
 	golang.org/x/text v0.3.3
-	google.golang.org/api v0.13.0
-	google.golang.org/genproto v0.0.0-20200724131911-43cab4749ae7
-	google.golang.org/grpc v1.29.1
+	google.golang.org/api v0.30.0
+	google.golang.org/genproto v0.0.0-20200901141002-b3bf27a9dbd1
+	google.golang.org/grpc v1.31.1
+	google.golang.org/grpc/examples v0.0.0-20200902210233-8630cac324bf
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
-	gopkg.in/olivere/elastic.v6 v6.2.28
+	gopkg.in/olivere/elastic.v6 v6.2.35
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.3.0
@@ -133,3 +132,5 @@ require (
 
 // https://github.com/dexidp/dex/issues/1578
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible
+
+replace github.com/chef/automate/api/external => ./api/external/
