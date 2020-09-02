@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/response";
+
+import "protoc-gen-swagger/options/annotations.proto";
+import "external/iam/v2/common/teams.proto";
+
+message GetTeamResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"team": {"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}}'}
+    };
+    Team team = 1;
+}
+
+message ListTeamsResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"teams": [{"id": "test-1", "name": "My Test Team", "projects": ["project1", "project2"]}, {"id": "test-2", "name": "My Test Team 2", "projects": ["project1"]}]}'}
+    };
+    repeated Team teams = 1;
+}
+
+message CreateTeamResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"team": {"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}}'}
+    };
+    Team team = 1;
+}
+
+message UpdateTeamResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"team": {"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}}'}
+    };
+    Team team = 1;
+}
+
+message DeleteTeamResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"team": {"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}}'}
+    };
+    Team team = 1;
+}
+
+message AddTeamMembersResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+    };
+    repeated string membership_ids = 1;
+}
+
+message GetTeamMembershipResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+    };
+    repeated string membership_ids = 1;
+}
+
+message RemoveTeamMembersResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"membership_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
+    };
+    repeated string membership_ids = 1;
+}
+
+message GetTeamsForMemberResp {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        example: { value: '{"teams": [{"id": "test-1", "name": "My Test Team", "projects": ["project1", "project2"]}, {"id": "test-2", "name": "My Test Team 2", "projects": ["project1"]}]}'}
+    };
+    repeated Team teams = 1;
+}
+
+message ApplyV2DataMigrationsResp { }
+
+message ResetAllTeamProjectsResp { }

@@ -3,7 +3,7 @@
 
 package data_lifecycle
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.data_lifecycle.DataLifecycle/GetStatus", "dataLifecycle:status", "dataLifecycle:status:get", "GET", "/api/v0/data-lifecycle/status", func(unexpandedResource string, input interface{}) string {

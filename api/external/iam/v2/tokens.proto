@@ -1,0 +1,179 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+import "external/iam/v2/request/tokens.proto";
+import "external/iam/v2/response/tokens.proto";
+
+import "external/annotations/iam/annotations.proto";
+
+service Tokens {
+
+  /*
+  Creates a token
+
+  Creates a token.
+  Active defaults to true when not specified.
+  Value is auto-generated when not specified.
+
+  Note that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).
+
+  You cannot create admin tokens via the REST API.
+  Admin tokens can only be created by specifying the `--admin` flag to this chef-automate sub-command:
+  ```
+  chef-automate iam token create <your-token-name> --admin`
+  ```
+
+  Authorization Action:
+  ```
+  iam:tokens:create
+  ```
+  */
+  rpc CreateToken (CreateTokenReq) returns (CreateTokenResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/tokens"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:tokens";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:create";
+  };
+
+  /*
+  Gets a token
+
+  Returns the details for a token.
+
+  Authorization Action:
+  ```
+  iam:tokens:get
+  ```
+  */
+  rpc GetToken (GetTokenReq) returns (GetTokenResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/tokens/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
+  };
+
+  /*
+  Updates a token
+
+  This operation overwrites all fields excepting ID, timestamps, and value,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
+
+  Authorization Action:
+  ```
+  iam:tokens:update
+  ```
+  */
+  rpc UpdateToken (UpdateTokenReq) returns (UpdateTokenResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "updated token name", "active": true, "projects": ["east-region", "south-region"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/tokens/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:update";
+  };
+
+  /*
+  Deletes a token
+
+  Deletes a token and remove it from any policies.
+
+  Authorization Action:
+  ```
+  iam:tokens:delete
+  ```
+  */
+  rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/tokens/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
+  };
+
+  /*
+  Lists all tokens
+
+  Lists all tokens, both admin and non-admin.
+
+  Authorization Action:
+  ```
+  iam:tokens:list
+  ```
+  */
+  rpc ListTokens (ListTokensReq) returns (ListTokensResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/tokens"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:tokens";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
+  }
+};

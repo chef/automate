@@ -1,0 +1,270 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "external/iam/v2/request/rules.proto";
+import "external/iam/v2/response/rules.proto";
+
+import "external/annotations/iam/annotations.proto";
+
+service Rules {
+
+  /*
+  Create a project rule
+
+  Creates a new project rule to move ingested resources into projects.
+
+  A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
+
+  Each condition specifies one or more values to match for a particular attribute on an ingested resource.
+
+  The choice of attributes depends on the rule type.
+  For NODE type, specify any of the available attributes.
+  For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
+
+  The choice of operator depends on how many values you provide.
+  If you wish to match one among a group of values, set the operator to MEMBER_OF.
+  For a single value, use EQUALS.
+
+  Authorization Action:
+  ```
+  iam:projects:update
+  ```
+  */
+  rpc CreateRule (CreateRuleReq) returns (CreateRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "rules";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/projects/{project_id}/rules"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
+  };
+
+  /*
+  Update a project rule
+
+  Updates the name and conditions of an existing project rule.
+  New conditions can be added. Existing conditions can be updated or removed.
+
+  This operation overwrites all fields excluding ID and Type,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
+
+  The resulting change to the project's resources does not take effect immediately.
+  Updates to project rules must be applied to ingested resources by a project update.
+
+  Authorization Action:
+  ```
+  iam:projects:update
+  ```
+  */
+  rpc UpdateRule (UpdateRuleReq) returns (UpdateRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "rules";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/projects/{project_id}/rules/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
+  };
+
+  /*
+  Get a project rule
+
+  Returns the details for a project rule.
+
+  Authorization Action:
+  ```
+  iam:projects:get
+  ```
+  */
+  rpc GetRule (GetRuleReq) returns (GetRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/projects/{project_id}/rules/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:get";
+  };
+
+  /*
+  List a project's rules
+
+  Lists all of the project rules of a specific project.
+
+  Authorization Action:
+  ```
+  iam:projects:get
+  ```
+  */
+  rpc ListRulesForProject (ListRulesForProjectReq) returns (ListRulesForProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/projects/{id}/rules"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:get";
+  };
+
+  /*
+  Delete a project rule
+
+  The resulting change to the project's resources does not take effect immediately.
+  Updates to project rules must be applied to ingested resources by a project update.
+
+  Authorization Action:
+  ```
+  iam:projects:update
+  ```
+  */
+  rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/projects/{project_id}/rules/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
+  };
+
+  /*
+  Start project update
+
+  Any changes to a project's rules are staged first. They do not take effect until
+  all projects are updated.
+
+  Updating all projects begins an operation that applies all pending rule edits
+  and then moves ingested resources into the correct projects according to those latest changes.
+
+  With a large amount of historical compliance data, rule application can take a considerable amount of time.
+  It’s best to batch up rule changes and apply them all at once.
+
+  Authorization Action:
+  ```
+  iam:rules:apply
+  ```
+  */
+  rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      post: "/apis/iam/v2/apply-rules"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:apply";
+  };
+
+  /*
+  Cancel project update
+
+  Cancels an ongoing project update.
+
+  Warning! This action leaves the system in an unknown state that only another
+  successful project update can rectify.
+
+  This command exists really just for one scenario: you started a project update
+  but shortly thereafter discovered that you had one more change to include in the
+  batch of updates to be done.
+
+  Authorization Action:
+  ```
+  iam:rules:cancel
+  ```
+  */
+  rpc ApplyRulesCancel (ApplyRulesCancelReq) returns (ApplyRulesCancelResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/apply-rules"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:cancel";
+  };
+
+  /*
+  Get the status of a project update
+
+  Returns details about a project update operation.
+
+  You can poll this endpoint during a project update to monitor progress.
+  Querying this endpoint when there is no update in progress will return details
+  about the completion status of the most recent update.
+
+  Authorization Action:
+  ```
+  iam:rules:status
+  ```
+  */
+  rpc ApplyRulesStatus (ApplyRulesStatusReq) returns (ApplyRulesStatusResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/apply-rules"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:status";
+  };
+}

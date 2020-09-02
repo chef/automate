@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/response";
+
+// Statement, Policy definitions
+import "external/iam/v2/common/policy.proto";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+// NB: Doc annotations in responses will only apply for simple types; others will be ignored.
+
+message CreatePolicyResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
+  };
+  Policy policy = 1;
+}
+
+message GetPolicyResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
+  };
+  Policy policy = 1;
+}
+
+message ListPoliciesResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"policies": [{"name": "My Viewer Policy 1","id": "custom-viewer-policy-1","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}, {"name": "My Custom Policy 2","id": "custom-policy-2","members": ["team:local:test"], "statements": [{"role": "auditor", "projects": ["project1"], "effect": "ALLOW"}],"projects": []}]}'}
+  };
+  repeated Policy policies = 1;
+}
+
+message DeletePolicyResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
+  };
+}
+
+message UpdatePolicyResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Updated Viewer Policy", "members": ["user:ldap:newuser", "team:ldap:newteam"], "statements": [{"role": "viewer","projects":["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
+  };
+  Policy policy = 1;
+}
+
+message GetPolicyVersionResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"version":{"major":"V2","minor":"V1"}}'}
+  };
+  Version version = 1;
+}
+
+message ListPolicyMembersResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"members": ["team:local:viewers", "user:local:test"]}'}
+  };
+  // List of policy members.
+  repeated string members = 1;
+}
+
+message ReplacePolicyMembersResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"members": ["team:local:viewers", "user:local:test"]}'}
+  };
+  // Resulting list of policy members.
+  repeated string members = 1;
+}
+
+message RemovePolicyMembersResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"members": ["user:local:test"]}'}
+  };
+  // Resulting list of policy members.
+  repeated string members = 1;
+}
+
+message AddPolicyMembersResp {
+  // Resulting list of policy members.
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"members": ["team:local:viewers", "user:local:test"]}'}
+  };
+  repeated string members = 1;
+}
+
+message CreateRoleResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
+  };
+  Role role = 1;
+}
+
+message ListRolesResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"roles": [{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}, {"id": "custom-role-2", "name": "My Custom Secret Role 2", "actions": ["infra:*"]}]}'}
+  };
+  repeated Role roles = 1;
+}
+
+message GetRoleResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
+  };
+  Role role = 1;
+}
+
+message DeleteRoleResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
+  };
+}
+
+message UpdateRoleResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
+  };
+  Role role = 1;
+}
+
+message CreateProjectResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+  };
+  Project project = 1;
+}
+
+message UpdateProjectResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+  };
+  Project project = 1;
+}
+
+message GetProjectResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+  };
+  Project project = 1;
+}
+
+message ListProjectsResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"projects": [{"name": "My Custom Project", "id": "custom-project"}, {"name": "My Custom Project 2", "id": "custom-project-2"}]}'}
+  };
+  repeated Project projects = 1;
+}
+
+message DeleteProjectResp {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+  };
+}
+
+message UpgradeToV2Resp {
+  repeated string reports = 1;
+}
+
+message ResetToV1Resp {}

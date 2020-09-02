@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/request";
+
+import "google/protobuf/wrappers.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+message CreateTokenReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name"]
+      },
+      example: { value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}'}
+    };
+    // Unique ID. Cannot be changed.
+    string id = 1;
+    // Name for the token.
+    string name = 2;
+    // Active state. Defaults to true.
+    // If set to false, token will not be authenticated or authorized.
+    google.protobuf.BoolValue active = 3;
+    // Unique value for the token; if omitted the system will generate this.
+    string value = 4;
+    // List of projects this token belongs to.
+    repeated string projects = 5;
+}
+
+
+message GetTokenReq {
+    // ID of the token.
+    string id = 1;
+}
+
+message UpdateTokenReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["name"]
+      },
+      example: { value: '{"name": "updated token name", "active": true, "projects": ["east-region", "south-region"]}'}
+    };
+     // Unique ID. Cannot be changed.
+    string id = 1;
+    // Name for the token.
+    string name = 2;
+    // Active state. Defaults to true.
+    // If set to false, token will not be authenticated or authorized.
+    google.protobuf.BoolValue active = 3;
+    // List of projects this token belongs to.
+    repeated string projects = 5;
+}
+
+message DeleteTokenReq {
+    // ID of the token.
+    string id = 1;
+}
+
+message ListTokensReq {}
+

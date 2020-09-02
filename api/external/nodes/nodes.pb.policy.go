@@ -3,7 +3,7 @@
 
 package nodes
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.nodes.v1.NodesService/Create", "infra:nodes", "infra:nodes:create", "POST", "/api/v0/nodes", func(unexpandedResource string, input interface{}) string {

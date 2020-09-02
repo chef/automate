@@ -1,0 +1,426 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "external/iam/v2/tokens.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/apis/iam/v2/tokens": {
+      "get": {
+        "summary": "Lists all tokens",
+        "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n```\niam:tokens:list\n```",
+        "operationId": "Tokens_ListTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ListTokensResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      },
+      "post": {
+        "summary": "Creates a token",
+        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the `--admin` flag to this chef-automate sub-command:\n```\nchef-automate iam token create \u003cyour-token-name\u003e --admin`\n```\n\nAuthorization Action:\n```\niam:tokens:create\n```",
+        "operationId": "Tokens_CreateToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateTokenResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"token 1\", \"id\": \"token-1\", \"active\": true, \"projects\": [\"east-region\", \"west-region\"]}"
+          }
+        ]
+      }
+    },
+    "/apis/iam/v2/tokens/{id}": {
+      "get": {
+        "summary": "Gets a token",
+        "description": "Returns the details for a token.\n\nAuthorization Action:\n```\niam:tokens:get\n```",
+        "operationId": "Tokens_GetToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.GetTokenResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of the token.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "tokens"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes a token",
+        "description": "Deletes a token and remove it from any policies.\n\nAuthorization Action:\n```\niam:tokens:delete\n```",
+        "operationId": "Tokens_DeleteToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.DeleteTokenResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of the token.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "tokens"
+        ]
+      },
+      "put": {
+        "summary": "Updates a token",
+        "description": "This operation overwrites all fields excepting ID, timestamps, and value,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nAuthorization Action:\n```\niam:tokens:update\n```",
+        "operationId": "Tokens_UpdateToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateTokenResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique ID. Cannot be changed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"updated token name\", \"active\": true, \"projects\": [\"east-region\", \"south-region\"]}"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "chef.automate.api.iam.v2.CreateTokenReq": {
+      "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the token."
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
+        },
+        "value": {
+          "type": "string",
+          "description": "Unique value for the token; if omitted the system will generate this."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects this token belongs to."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "chef.automate.api.iam.v2.CreateTokenResp": {
+      "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.DeleteTokenResp": {
+      "type": "object"
+    },
+    "chef.automate.api.iam.v2.GetTokenResp": {
+      "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.ListTokensResp": {
+      "type": "object",
+      "example": {
+        "tokens": [
+          {
+            "name": "token 1",
+            "id": "token-1",
+            "active": true,
+            "projects": [
+              "east-region",
+              "west-region"
+            ]
+          },
+          {
+            "name": "token 2",
+            "id": "token-2",
+            "active": false,
+            "projects": [
+              "north-region",
+              "south-region"
+            ]
+          }
+        ]
+      },
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
+          }
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.Token": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the token."
+        },
+        "value": {
+          "type": "string",
+          "description": "Unique, optionally user-specified value."
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Created timestamp."
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "Updated timestamp."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects this token belongs to. May be empty."
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.UpdateTokenReq": {
+      "type": "object",
+      "example": {
+        "name": "updated token name",
+        "active": true,
+        "projects": [
+          "east-region",
+          "south-region"
+        ]
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the token."
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects this token belongs to."
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "chef.automate.api.iam.v2.UpdateTokenResp": {
+      "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    }
+  }
+}

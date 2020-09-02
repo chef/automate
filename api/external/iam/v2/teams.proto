@@ -1,0 +1,304 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "external/iam/v2/request/teams.proto";
+import "external/iam/v2/response/teams.proto";
+import "external/annotations/iam/annotations.proto";
+
+service Teams {
+  /*
+  Creates a local team
+
+  Creates a local team that is used to group local users as members of IAM policies.
+
+  Authorization Action:
+  ```
+  iam:teams:create
+  ```
+  */
+  rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "teams";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/teams"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams";
+    option (chef.automate.api.iam.policy).action = "iam:teams:create";
+  };
+
+  /*
+  Lists all local teams
+
+  Lists all local teams.
+
+  Authorization Action:
+  ```
+  iam:teams:list
+  ```
+  */
+  rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "teams";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/teams"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams";
+    option (chef.automate.api.iam.policy).action = "iam:teams:list";
+  };
+
+  /*
+  Get a team
+
+  Returns the details for a team.
+
+  Authorization Action:
+  ```
+  iam:teams:get
+  ```
+  */
+  rpc GetTeam (GetTeamReq) returns (GetTeamResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "teams";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/teams/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:teams:get";
+  };
+
+  /*
+  Updates a local team
+
+  Updates a local team.
+
+  Authorization Action:
+  ```
+  iam:teams:update
+  ```
+  */
+  rpc UpdateTeam (UpdateTeamReq) returns (UpdateTeamResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "teams";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Update Test Team", "projects": ["project1", "projectnew"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/teams/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:teams:update";
+  };
+
+  /*
+  Deletes a local team
+
+  Deletes a local team and removes it from any policies.
+
+  Authorization Action:
+  ```
+  iam:teams:delete
+  ```
+  */
+  rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "teams";
+    };
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/teams/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:teams:delete";
+  };
+
+  /*
+  Gets local team membership
+
+  Lists all users of a local team. Users are listed by their membership_id.
+
+  Authorization Action:
+  ```
+  iam:teamUsers:list
+  ```
+  */
+  rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "teams";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/teams/{id}/users"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}:users";
+    option (chef.automate.api.iam.policy).action = "iam:teamUsers:list";
+  };
+
+  /*
+  Adds local team membership
+
+  Adds a list of users to a local team. Users are added by their membership_id.
+  The request currently does not validate that membership_id maps to a real user.
+
+  The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+
+  Authorization Action:
+  ```
+  iam:teamUsers:create
+  ```
+  */
+  rpc AddTeamMembers (AddTeamMembersReq) returns (AddTeamMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "teams";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{membership_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/teams/{id}/users:add"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:teamUsers:create";
+  };
+
+  /*
+  Removes local team membership
+
+  Removes a list of users from a local team. Users are removed by their membership_id.
+  The request currently does not validate that membership_id maps to a real user.
+
+  The membership_id for users can be found via GET /apis/apis/iam/v2/users/<user_id>.
+
+  Authorization Action:
+  ```
+  iam:teamUsers:delete
+  ```
+  */
+  rpc RemoveTeamMembers (RemoveTeamMembersReq) returns (RemoveTeamMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "teams";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{membership_ids: ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "987c8475-5747-4f9b-a766-c337f73965ae"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/teams/{id}/users:remove"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:teamUsers:delete";
+  };
+
+  /*
+  Gets team membership for a user
+
+  Lists all local teams for a specific user. You must use their membership_id in the request URL.
+
+  Authorization Action:
+  ```
+  iam:userTeams:get
+  ```
+  */
+  rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "teams";
+    };
+    option (google.api.http) = {
+      get: "/apis/iam/v2/users/{membership_id}/teams"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:users:{membership_id}:teams";
+    option (chef.automate.api.iam.policy).action = "iam:userTeams:get";
+  };
+}

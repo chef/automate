@@ -3,7 +3,7 @@
 
 package secrets
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.secrets.SecretsService/Create", "secrets:secrets", "secrets:secrets:create", "POST", "/api/v0/secrets", func(unexpandedResource string, input interface{}) string {

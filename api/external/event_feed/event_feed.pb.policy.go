@@ -5,7 +5,7 @@ package event_feed
 
 import (
 	request "github.com/chef/automate/api/external/event_feed/request"
-	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+	policy "github.com/chef/automate/api/external/iam/v2/policy"
 )
 
 func init() {
