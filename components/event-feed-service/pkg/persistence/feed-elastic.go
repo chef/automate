@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	olivere "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	olivere "gopkg.in/olivere/elastic.v6"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
@@ -183,13 +183,13 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 	entries := make([]*feed.FeedEntry, 0, len(searchResult.Hits.Hits))
 	for _, hit := range searchResult.Hits.Hits {
 		entry := new(feed.FeedEntry)
-		if err := json.Unmarshal(*hit.Source, entry); err != nil {
+		if err := json.Unmarshal(hit.Source, entry); err != nil {
 			return nil, 0, errors.Wrapf(err, "unmarshaling feed entry for object %s", hit.Source)
 		}
 		entries = append(entries, entry)
 	}
 
-	return entries, searchResult.Hits.TotalHits, nil
+	return entries, searchResult.TotalHits(), nil
 }
 
 func (efs ElasticFeedStore) GetFeedSummary(query *feed.FeedSummaryQuery) (map[string]int64, error) {
@@ -649,7 +649,7 @@ func (efs ElasticFeedStore) createStore(ctx context.Context, indexName string, m
 }
 
 func (efs ElasticFeedStore) updateMapping(ctx context.Context, esMap Mapping) error {
-	_, err := efs.client.PutMapping().Index(esMap.Index).Type(esMap.Type).BodyString(esMap.Properties).Do(ctx)
+	_, err := efs.client.PutMapping().Index(esMap.Index).BodyString(esMap.Properties).Do(ctx)
 
 	if err != nil {
 		return errors.Wrapf(err, "updating index mappings for %s", esMap.Index)

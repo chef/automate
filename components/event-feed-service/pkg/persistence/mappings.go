@@ -18,7 +18,6 @@ const (
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 	Properties string
@@ -159,12 +158,10 @@ var feedProps = `
 // Feeds mapping used to create the feeds-[version] index
 var Feeds = Mapping{
 	Index:      IndexNameFeeds,
-	Type:       DocType,
 	Timeseries: false,
 	Properties: fmt.Sprintf(`{ %s }`, feedProps),
 	Mapping: fmt.Sprintf(`
 			{
-				"template":"`+IndexNameFeeds+`",
 				"settings":{
 					"analysis": {
 						"analyzer": {
@@ -199,10 +196,7 @@ var Feeds = Mapping{
 					}
 				},
 				"mappings":{
-					"`+DocType+`":{
-						"dynamic": false,
 						%s
-					}
 				}
 			}
 		`, feedProps),

@@ -11,8 +11,8 @@ import (
 	"os"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	cElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	"github.com/chef/automate/components/config-mgmt-service/backend/postgres"

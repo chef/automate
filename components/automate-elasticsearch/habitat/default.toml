@@ -45,7 +45,7 @@
 [node]
   # Use a descriptive name for the node:
   #
-  name = ""
+  name = "automate"
   #
   # Add custom attributes to the node:
   #

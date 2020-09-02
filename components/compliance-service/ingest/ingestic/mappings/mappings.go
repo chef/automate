@@ -33,7 +33,6 @@ const (
 	compAndVersionTimeSeries = "comp-" + ComplianceCurrentTimeSeriesIndicesVersion
 	compAndVersionProfiles   = "comp-" + ComplianceCurrentProfilesIndicesVersion
 
-	DocType       = "_doc"
 	IndexNameProf = compAndVersionProfiles + "-profiles"
 
 	IndexNameRep = compAndVersionTimeSeries + "-r"
@@ -46,7 +45,6 @@ const (
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 }

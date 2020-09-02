@@ -3,7 +3,7 @@ package elastic
 import (
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 )
 
 // This is a copy from https://github.com/olivere/elastic/blob/release-branch.v6/search_aggs_bucket_date_range.go

@@ -25,7 +25,6 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
@@ -519,7 +518,7 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	if report.Environment == "" {
 		report.Environment = "unknown"
 	}
-	report.Type = mappings.DocType
+	report.Type = "_doc"
 	report.NodeName = job.InspecBaseJob.NodeName
 	report.NodeUuid = job.InspecBaseJob.NodeID
 	report.ReportUuid = reportID

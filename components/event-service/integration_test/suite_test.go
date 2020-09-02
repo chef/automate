@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
-	olivere "gopkg.in/olivere/elastic.v6"
+	olivere "github.com/olivere/elastic/v7"
 
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/event-service/config"

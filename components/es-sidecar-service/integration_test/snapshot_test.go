@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
+	es "github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	es "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
 )

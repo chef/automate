@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/config-mgmt-service/backend"

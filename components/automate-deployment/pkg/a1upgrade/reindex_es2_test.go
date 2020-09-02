@@ -3,8 +3,8 @@ package a1upgrade
 import (
 	"testing"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 func indicesSettingsForIndex(idx indexInfo) *elastic.IndicesGetSettingsResponse {

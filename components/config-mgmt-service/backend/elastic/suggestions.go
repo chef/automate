@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/schollz/closestmatch"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/lib/stringutils"
 

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
@@ -93,7 +93,7 @@ func BulkInsertComplianceSummaryDocs(client *elastic.Client, ctx context.Context
 	// Bulk add the summary documents to the compliance timeseries index using the specified report id as document id
 	bulkRequest := client.Bulk()
 	for _, doc := range docsArray {
-		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Type(mappings.DocType).Id(doc.ReportID).Doc(doc))
+		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(doc.ReportID).Doc(doc))
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
@@ -115,7 +115,7 @@ func BulkInsertComplianceReportDocs(client *elastic.Client, ctx context.Context,
 	// Bulk add the report documents to the compliance timeseries index using the specified report id as document id
 	bulkRequest := client.Bulk()
 	for _, doc := range docsArray {
-		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Type(mappings.DocType).Id(doc.ReportID).Doc(doc))
+		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Id(doc.ReportID).Doc(doc))
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
 	bulkResponse, err := bulkRequest.Refresh("false").Do(ctx)
@@ -416,7 +416,7 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 	}
 
 	var minDateAsString string
-	err = json.Unmarshal(*minDate.Aggregations["value_as_string"], &minDateAsString)
+	err = json.Unmarshal(minDate.Aggregations["value_as_string"], &minDateAsString)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal min_date", myName))
 	}
@@ -430,7 +430,7 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 	}
 
 	var maxDateAsString string
-	err = json.Unmarshal(*maxDate.Aggregations["value_as_string"], &maxDateAsString)
+	err = json.Unmarshal(maxDate.Aggregations["value_as_string"], &maxDateAsString)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal max_date", myName))
 	}
@@ -487,8 +487,7 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 		Type(srcDocType)
 
 	reindexDestination := elastic.NewReindexDestination().
-		Index(dest).
-		Type(mappings.DocType)
+		Index(dest)
 
 	script := elastic.NewScript(reindexScript)
 
@@ -568,7 +567,7 @@ func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) er
 	}
 
 	indicesToUpdate := fmt.Sprintf("%s*,%s*", summaryIndexToUpdate, reportIndexToUpdate)
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(reportIds.Ids...)
 
 	script := elastic.NewScript("ctx._source.daily_latest = true")
@@ -664,7 +663,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 				reportId := hit.Id
 				esInSpecSummary := ESInSpecSummaryA2v2{}
 				if hit.Source != nil {
-					err := json.Unmarshal(*hit.Source, &esInSpecSummary)
+					err := json.Unmarshal(hit.Source, &esInSpecSummary)
 					if err != nil {
 						return errors.Wrapf(err, "migrateTimeSeries unable to unmarshall report with ID=%s", reportId)
 					}

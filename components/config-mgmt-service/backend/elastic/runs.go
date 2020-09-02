@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
@@ -56,12 +56,12 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 		return run, err
 	}
 
-	if searchResult.Hits.TotalHits == 0 {
+	if searchResult.TotalHits() == 0 {
 		return run, errors.New(errors.RunNotFound, "Invalid ID")
 	}
 
 	source := searchResult.Hits.Hits[0].Source
-	err = json.Unmarshal(*source, &run)
+	err = json.Unmarshal(source, &run)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"object": source,
@@ -349,10 +349,10 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 		return nil, err
 	}
 
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
 		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &r)
+			err := json.Unmarshal(hit.Source, &r)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -398,11 +398,11 @@ func (es Backend) GetRunsPageByCursor(ctx context.Context, nodeID string, start 
 	}
 
 	var runs []backend.Run
-	if searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Run
 		for _, hit := range searchResult.Hits.Hits {
 			var run backend.Run
-			err := json.Unmarshal(*hit.Source, &run)
+			err := json.Unmarshal(hit.Source, &run)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
