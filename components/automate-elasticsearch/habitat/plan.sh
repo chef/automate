@@ -4,12 +4,12 @@
 pkg_name="automate-elasticsearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="6.8.3"
+pkg_version="7.9.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
-pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}.tar.gz"
-pkg_shasum=824078e421c9f7e5ab9c875e4019d9ebfe3ada99db286b54dec090f97d1cbe25
+pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}-linux-x86_64.tar.gz"
+pkg_shasum=9f8ce7308cd0d0c691b0bd5b43716cf58e40f2cd54a7f4c36e9188aca199a379
 
 pkg_build_deps=(
   core/patchelf
@@ -53,7 +53,7 @@ do_build() {
 
 do_install() {
   cd "$HAB_CACHE_SRC_PATH/elasticsearch-${pkg_version}"
-  install -vDm644 README.textile "${pkg_prefix}/README.textile"
+  install -vDm644 README.asciidoc "${pkg_prefix}/README.asciidoc"
   install -vDm644 LICENSE.txt "${pkg_prefix}/LICENSE.txt"
   install -vDm644 NOTICE.txt "${pkg_prefix}/NOTICE.txt"
 
@@ -66,13 +66,10 @@ do_install() {
   # mkdir -p "$pkg_prefix/es/config"
   # install -vDm644 config/jvm.options "$pkg_prefix/es/config/jvm.options"
 
-  # Delete unused binaries to save space
-  rm "${pkg_prefix}/es/bin/"*.bat "${pkg_prefix}/es/bin/"*.exe
-
   LD_RUN_PATH=$LD_RUN_PATH:${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/lib
   export LD_RUN_PATH
 
-  for bin in autoconfig autodetect categorize controller normalize; do
+  for bin in data_frame_analyzer autodetect categorize controller normalize; do
     build_line "patch ${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
     patchelf --interpreter "$(pkg_path_for glibc)/lib/ld-linux-x86-64.so.2" --set-rpath "${LD_RUN_PATH}" \
       "${pkg_prefix}/es/modules/x-pack-ml/platform/linux-x86_64/bin/${bin}"
