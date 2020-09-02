@@ -16,8 +16,8 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/external/lib/errorutils"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 )
 
 // GetSuggestions - Report #12
@@ -556,14 +556,20 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	//Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
 	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
 
+	//default to 10 suggs
+	numOfSugg := 10
+	if size > 0 {
+		numOfSugg = size
+	}
+
 	controlsTitles := elastic.NewTermsAggregation().
 		Field("profiles.controls.title").
-		Size(10).
+		Size(numOfSugg).
 		Order("_count", false)
 
 	controlIds := elastic.NewTermsAggregation().
 		Field("profiles.controls.id").
-		Size(10).
+		Size(numOfSugg).
 		Order("_count", false)
 
 	controlsTitles.SubAggregation("ids", controlIds)
@@ -671,9 +677,15 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		FetchSource(false).
 		Size(0) //set to 0 because we do aggs now
 
+	//default to 10 suggs
+	numOfSugg := 10
+	if size > 0 {
+		numOfSugg = size
+	}
+
 	controlsTitles := elastic.NewTermsAggregation().
 		Field(target).
-		Size(10).
+		Size(numOfSugg).
 		Order("_count", false)
 
 	stringTagsAgg := elastic.NewFilterAggregation().Filter(finalInnerBoolQuery).
