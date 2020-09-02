@@ -38,19 +38,10 @@ WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertBySourceIDRunData = `
-SELECT insert_node($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`
+SELECT upsert_by_source_id_run_data($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);`
 
 const sqlUpsertBySourceIDScanData = `
-INSERT INTO nodes
-	(id, name, platform, platform_version, source_state,
-		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-ON CONFLICT (source_id, source_region, source_account_id)
-DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5,
-	last_contact = $6, source_id = $7, source_region = $8, source_account_id = $9, last_job = $10, last_scan = $11, projects_data = $12
-WHERE nodes.source_state != 'TERMINATED' RETURNING id;
-`
+SELECT upsert_by_source_id_scan_data($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);`
 
 const sqlGetCurrentRunStatus = `
 SELECT coalesce(last_run ->> 'Status', '') AS status
