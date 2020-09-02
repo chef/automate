@@ -11,7 +11,6 @@ BEGIN
         RETURN _id;
     END IF;
 
-
     BEGIN
         INSERT INTO nodes
             (id, name, platform, platform_version, source_state,
@@ -27,7 +26,6 @@ BEGIN
 END;
 $$;
 
-
 CREATE OR REPLACE FUNCTION upsert_by_source_id_scan_data(_id text, _name text, _platform text, _platform_version text, _source_state text,
 		_last_contact timestamp, _source_id text, _source_region text, _source_account_id text, _last_job text, _last_scan json, _projects_data json, _manager text)
 RETURNS TEXT
@@ -41,7 +39,6 @@ BEGIN
     IF found THEN
         RETURN _id;
     END IF;
-
 
     BEGIN
         INSERT INTO nodes

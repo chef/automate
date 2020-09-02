@@ -154,10 +154,6 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	return err
 }
 
-func hasCloudInformation(node *manager.NodeMetadata) bool {
-	return len(node.GetSourceId()) != 0 && len(node.GetSourceAccountId()) != 0 && len(node.GetSourceRegion()) != 0
-}
-
 type nodeDetails struct {
 	nodeState           string
 	lastContact         string
@@ -233,6 +229,10 @@ func (db *DB) handleIncomingLastContactData(node *manager.NodeMetadata) (lastCon
 		}
 	}
 	return lastContactInfo, nil
+}
+
+func hasCloudInformation(node *manager.NodeMetadata) bool {
+	return len(node.GetSourceId()) != 0 && len(node.GetSourceAccountId()) != 0 && len(node.GetSourceRegion()) != 0
 }
 
 func translateToDBStruct(nodeData *nodes.LastContactData) (lastContactData, error) {
