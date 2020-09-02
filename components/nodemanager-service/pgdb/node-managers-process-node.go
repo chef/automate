@@ -128,7 +128,7 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		} else {
 			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)
 			if err != nil {
-				return errors.Wrap(err, "ProcessIncomingNode unable upsert with cloudDetails")
+				return errors.Wrap(err, "ProcessIncomingNode unable to upsert with cloudDetails")
 			}
 		}
 		if err != nil {
