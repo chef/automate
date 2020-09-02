@@ -18,9 +18,7 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 
 ## Setting Up the Desktop Dashboard
 
-Enable the Desktop dashboard with: `chef-automate deploy --product automate --product infra-server --product desktop`.
-For more installation information, see [Install Chef Infra Server with Chef Automate](/automate/infra-server/).
-The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
+Enable the Desktop dashboard by [installing Chef Desktop](https://docs.chef.io/desktop/desktop_setup_chef/). The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
 
 {{< note >}}
 When installing Chef Automate with the `--product desktop` flag, _Data Lifecycle_ settings will not mark nodes as missing and not delete missing nodes by default.
