@@ -1,18 +1,6 @@
 @import "~styles/variables";
 
 :host {
-
-  ::ng-deep .mat-select-panel {
-    position: relative;
-    margin-top: 12px;
-    right: 24px;
-    width: 54px;
-  }
-
-  ::ng-deep .mat-select-panel-wrap {
-    margin-left: -75px;
-  }
-
   .empty-state {
     text-align: center;
 
@@ -22,4 +10,15 @@
       margin-top: 42px;
     }
   }
+}
+
+::ng-deep .mat-select-panel {
+  position: relative;
+  margin-top: 12px;
+  right: 24px;
+  width: 54px;
+}
+
+::ng-deep .mat-select-panel-wrap {
+  margin-left: -75px;
 }
