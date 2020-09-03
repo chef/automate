@@ -48,7 +48,7 @@ test_properties_with_db: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
 	@echo $(DOCKER_CLEAN_MSG)
 
-# Example: make test_with_db/server/v2/ValidateProjectAssignment
+# Example: make test_with_db/server/ValidateProjectAssignment
 # turns into: go test...$(PACKAGE_PATH)/server/v2 -run ValidateProjectAssignment
 test_with_db/%: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 -v $(PACKAGE_PATH)/$(subst test_with_db/,,$(@D))/... -run $(@F)
