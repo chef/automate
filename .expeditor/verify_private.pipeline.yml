@@ -141,6 +141,22 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: "data-feed-service"
+    command:
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.
   - label: "nodemanager-integration"
