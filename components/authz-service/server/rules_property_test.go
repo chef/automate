@@ -37,8 +37,7 @@ type projectAndRuleReq struct {
 var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProjectsAndRulesGen = getGenerators()
 
 func TestCreateRuleProperties(t *testing.T) {
-	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
-		[]string{SuperuserSubject}, []string{}, "*", "*"))
+	ctx := genContext()
 
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
@@ -74,6 +73,7 @@ func TestCreateRuleProperties(t *testing.T) {
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
+				ctx = insertProjectsIntoContext(ctx, []string{reqs.CreateProjectReq.Id})
 
 				if _, err := projectClient.CreateRule(ctx, &reqs.rules[0]); err != nil {
 					return reportErrorAndYieldFalse(t, err)
@@ -101,8 +101,7 @@ func TestCreateRuleProperties(t *testing.T) {
 }
 
 func TestGetRuleProperties(t *testing.T) {
-	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
-		[]string{SuperuserSubject}, []string{}, "*", "*"))
+	ctx := genContext()
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	defer testDB.CloseDB(t)
 	defer store.Close()
@@ -712,6 +711,15 @@ func genStandardProjectAndRules(project api.CreateProjectReq, rules []api.Create
 	}
 }
 
+func genContext() context.Context {
+	return auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+		[]string{SuperuserSubject}, []string{}, "*", "*"))
+}
+
+func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
+	return auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{SuperuserSubject}, projects, "*", "*"))
+}
+
 func reportErrorAndYieldFalse(t *testing.T, err error) bool {
 	t.Helper()
 	t.Error(err.Error())
@@ -787,6 +795,7 @@ func createProjectAndRule(
 	if err != nil {
 		return nil, err
 	}
+	ctx = insertProjectsIntoContext(ctx, []string{reqs.CreateProjectReq.Id})
 
 	rule, err := projClient.CreateRule(ctx, &reqs.rules[0])
 	if err != nil {
