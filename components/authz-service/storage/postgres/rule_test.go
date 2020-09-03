@@ -131,6 +131,23 @@ func TestCreateRule(t *testing.T) {
 			assertCount(t, 3, db.QueryRow(
 				`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleID))
 		},
+		"when the project filter does not match, return ErrNotFound": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"not-a-match", "some-other-project"})
+
+			condition, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleID := "new-id-1"
+			rule, err := storage.NewRule(ruleID, "project-1", "name", storage.Event, []storage.Condition{condition})
+			require.NoError(t, err)
+
+			resp, err := store.CreateRule(ctx, &rule)
+
+			assert.Nil(t, resp)
+			assert.Regexp(t, "project with ID.*not found", err.Error())
+		},
 	}
 
 	for name, test := range cases {
