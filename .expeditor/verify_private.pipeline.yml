@@ -16,7 +16,7 @@ steps:
   - label: lint hugo site
     command:
       - .expeditor/buildkite/hugo_lint.sh
-      - cd components/automate-chef-io && make lint
+      - cd components/docs-chef-io && make lint
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -45,8 +45,7 @@ steps:
       executor:
         docker:
 
-  # The build depends on GitHub access to build
-  # automate-chef-io. Further we need to build in order to run the
+  # We need to build in order to run the
   # integration tests.
   - label: build
     command:

@@ -251,20 +251,6 @@ class ManifestGenerator
       manifest["packages"] << "#{pkg}"
     end
 
-    # Add extra packages to manifest that deployment-service doesn't need to manage
-    # but we still want versioned with each release.
-    %w{
-       chef/automate-chef-io
-    }.each do |extra_package|
-      package_ident = extra_package.split("/")
-      pkg_origin = package_ident[0]
-      pkg_name = package_ident[1]
-
-      latest_release = package_querier.get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
-      log.info "Adding package #{latest_release.pretty}"
-      manifest["packages"] << latest_release.ident
-    end
-
     manifest["packages"].uniq!
     # Sort the packages for easier diff-ing
     manifest["packages"].sort!

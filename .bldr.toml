@@ -2407,12 +2407,6 @@ paths = [
   "components/chef-ui-library/*"
 ]
 
-[automate-chef-io]
-plan_path = "components/automate-chef-io"
-paths = [
-      "components/automate-chef-io/*"
-]
-
 [notifications-service]
 plan_path = "components/notifications-service"
 paths = [
