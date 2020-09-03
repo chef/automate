@@ -448,7 +448,7 @@ message ServicesReq {
   // * `status:unknown`: returns services with an "unknown" healthcheck result
   // * `status:warning`: returns services with a "warning" healthcheck result
   // * `status:ok`: returns services with an  "ok" health check result
-  repeated string filter = 1;
+  repeated string borkenfilter = 1;
   // Applies pagination parameters.
   common.query.Pagination pagination = 2;
   // Applies sorting parameters.
