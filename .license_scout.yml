@@ -2,6 +2,7 @@
 name: a2
 directories:
   - ./
+  - ./api/external
   - ./components/applications-service
   - ./components/authn-service
   - ./components/authz-service
@@ -215,6 +216,9 @@ fallbacks:
     - name: gopkg.in/tomb.v1
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/go-tomb/tomb/v1/LICENSE
+    - name: github.com/josharian/intern
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/josharian/intern/master/license.md
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
