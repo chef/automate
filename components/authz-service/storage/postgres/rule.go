@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -17,6 +18,21 @@ const (
 )
 
 func (p *pg) CreateRule(ctx context.Context, rule *storage.Rule) (*storage.Rule, error) {
+
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	found := false
+	for _, proj := range projectsFilter {
+		if proj == rule.ProjectID {
+			found = true
+		}
+	}
+	if !found {
+		return nil, fmt.Errorf("project with ID %q not found", rule.ProjectID)
+	}
+
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
