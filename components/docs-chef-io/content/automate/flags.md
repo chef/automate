@@ -15,4 +15,4 @@ draft = false
 Use the beta, lega, or feat flags to turn on or off beta, legacy, or in-development features.
 
 Select anywhere on the Chef Automate interface and enter "feat", "lega", or "beta" to open the feature flags window.
-Toggle your desired feature to either the “ON” or "OFF" position.
+Toggle your desired feature to either the "ON" or "OFF" position.
