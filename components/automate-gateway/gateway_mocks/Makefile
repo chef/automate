@@ -5,7 +5,7 @@
 # in practice it appears to be compiling the module anyway, leading to
 # a chicken-and-egg problem.
 
-export GOFLAGS = -mod=vendor -tags=mockgen
+export GOFLAGS = -tags=mockgen
 
 all: mock_gateway/clients_mock.go mock_notifier/notifier_mock.go
 

@@ -23,7 +23,7 @@ ${MIGRATION_READMES}:
 
 build:
 	mkdir -p bin/
-	go build -mod=vendor -o bin/infra-proxy-service ./cmd/infra-proxy-service
+	go build -o bin/infra-proxy-service ./cmd/infra-proxy-service
 
 test:
 	@PG_URL=$(PG_URL) go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)

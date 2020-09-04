@@ -54,7 +54,7 @@ setup_gobin
 export PATH=$PATH:$GOBIN
 
 # Enable vendor mode by default
-export GOFLAGS=-mod=vendor
+export GOFLAGS=""
 
 # Delve Server port for remote debugging
 export GO_DEBUG_PORT=2345
