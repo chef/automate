@@ -106,8 +106,8 @@ generate-ruby-grpc-secrets-service:
 	@-grpc_tools_ruby_protoc \
 		-I../../api \
 		-I../../components \
-		-I../../vendor \
-		-I../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I../../protovendor \
+		-I../../protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--ruby_out=. \
 		--grpc_out=. \
 		$<

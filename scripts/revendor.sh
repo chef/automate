@@ -8,9 +8,13 @@ googleAPIsVendorPath=./protovendor/github.com/googleapis/googleapis/google/api
 googleAPIsSubsetToKeep=google/api
 envoyproxyVendorPath=./protovendor/github.com/envoyproxy/protoc-gen-validate
 
-echo "Vendoring protos in protovendor/ ..."
+# This has the side effect of downloading all the modules, which needs to
+# happen before we can copy the protos from those modules to protovendor/
+echo "Tidying and Verifying Go Modules"
 go mod tidy
 go mod verify
+
+echo "Vendoring protos in protovendor/ ..."
 
 # Originally this script existed to copy .proto files from the go module cache
 # because go mod vendor doesn't keep .proto files. Now that we are not using
@@ -55,7 +59,7 @@ else
 fi
 
 echo "Cleaning up unnecessary files from protovendor/"
-find ./protovendor -type f \( -name .gitignore -o -name .travis.yml -o -name package.json -o -name Makefile -o -name Dockerfile -o -name MAINTAINERS -o -name \*.md -o -name \*.vim -o -name \*.yml \) -delete
+find protovendor -not -name "*proto" -type f -exec rm '{}' \;
 
 # Explicitly clean out grpc-gateway example folder
 rm -rf ./protovendor/github.com/grpc-ecosystem/grpc-gateway/examples/

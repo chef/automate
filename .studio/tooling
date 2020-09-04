@@ -157,7 +157,7 @@ function install_gomock() {
 }
 
 document "revendor" <<DOC
-  Revendor the go modules vendor directory
+  Revendor the protovendor directory
 DOC
 function revendor() {
   install_go

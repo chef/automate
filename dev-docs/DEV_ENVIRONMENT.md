@@ -347,8 +347,6 @@ the hab-studio to execute its unit tests as the following example:
 
 ``` console
 [1][default:/src:0]# go_component_unit ingest-service
-(help) You can always set 'GO_FAST=true' to go faster!
-=> Executing Go dependency solver (dep ensure -vendor-only)
 => Executing Go test
 === RUN   TestJsonMarshalling
 --- PASS: TestJsonMarshalling (0.01s)

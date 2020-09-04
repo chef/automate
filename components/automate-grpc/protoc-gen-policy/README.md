@@ -57,7 +57,7 @@ In this example, it is regenerating
 teams.pb.policy.go from teams.proto, which was annotated with some policy information.
 
 ```bash
-protoc -I$GOPATH/src -I$PWD/vendor -I$PWD/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+protoc -I$GOPATH/src -I$PWD/protovendor -I$PWD/protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 -I. --policy_out=v=4,logtostderr=true:$GOPATH/src $PWD/components/automate-gateway/api/iam/v2/teams.proto`
 ```
 
