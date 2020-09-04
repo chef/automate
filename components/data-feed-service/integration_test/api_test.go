@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -33,6 +35,7 @@ func NewClient() *http.Client {
 }
 
 func TestDataFeedAPI(t *testing.T) {
+	t.Logf("API TOKEN: %s", automateApiToken)
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
@@ -55,7 +58,8 @@ func TestAddDuplicate(t *testing.T) {
 }
 
 func TestAddError(t *testing.T) {
-	addDestinationRequest(t, emptyAddData, 500)
+	_, err := addDestinationRequest(emptyAddData, 500)
+	assert.Nil(t, err, "test add destination error failed %v", err)
 }
 
 func TestUpdateUniqueViolation(t *testing.T) {
@@ -74,10 +78,11 @@ func TestListDestinations(t *testing.T) {
 	destinationId2 := addDestination(t, updateData, updateDataValues)
 	destinations := listDestinationRequest(t, 200)
 	// check we have 2 destinations
-	if assert.Equal(t, 2, len(destinations), "Expected 2 responses got: %v", len(destinations)) {
+	if assert.Equal(t, 3, len(destinations), "Expected 3 responses got: %v", len(destinations)) {
 		// validate the destinations
-		dest1 := destinations[0].(map[string]interface{})
-		dest2 := destinations[1].(map[string]interface{})
+		//destinations[0] should be the integration_test_suite destination added in global setup, don't test it
+		dest1 := destinations[1].(map[string]interface{})
+		dest2 := destinations[2].(map[string]interface{})
 		isValid, err := validateResponseBody(t, dest1, addDataValues)
 		assert.NotNil(t, err)
 		assert.True(t, isValid, "destination 1 is not valid")
@@ -92,11 +97,13 @@ func TestListDestinations(t *testing.T) {
 
 func TestListNoDestinations(t *testing.T) {
 	destinations := listDestinationRequest(t, 200)
-	assert.Equal(t, 0, len(destinations), "Expected 0 responses got: %v", len(destinations))
+	// we expect 1 whosh shoule be integration_test_suite
+	assert.Equal(t, 1, len(destinations), "Expected 1 responses got: %v", len(destinations))
 }
 
 func TestDeleteNonExistent(t *testing.T) {
-	deleteDestinationRequest(t, "10000", 404)
+	_, err := deleteDestinationRequest("10000", 404)
+	assert.Nil(t, err, "%v", err)
 }
 
 func TestTestDestination(t *testing.T) {
@@ -108,17 +115,21 @@ func TestTestDestinationError(t *testing.T) {
 }
 
 func TestDestinationWithSecret(t *testing.T) {
-	secretId := addSecretRequest(t, secretData, 200)
+	secretId, err := addSecretRequest(secretData, 200)
+	assert.Nil(t, err, "%v", err)
 	dataWithSecret := []byte(`{"url":"http://localhost:38080/success", "secret_id": {"id":"` + secretId + `"}}`)
 	testDestinationRequestSuccess(t, dataWithSecret)
-	deleteSecretRequest(t, secretId, 200)
+	err = deleteSecretRequest(secretId, 200)
+	assert.Nil(t, err, "%v", err)
 }
 
 func TestDestinationWithSecretError(t *testing.T) {
-	secretId := addSecretRequest(t, secretData, 200)
+	secretId, err := addSecretRequest(secretData, 200)
+	assert.Nil(t, err, "%v", err)
 	dataWithSecret := []byte(`{"url":"http://localhost:38080/fails", "secret_id": {"id":"` + secretId + `"}}`)
 	testDestinationRequestFail(t, dataWithSecret)
-	deleteSecretRequest(t, secretId, 200)
+	err = deleteSecretRequest(secretId, 200)
+	assert.Nil(t, err, "%v", err)
 }
 
 func validateResponseBody(t *testing.T, responseBody map[string]interface{}, values []string) (bool, string) {
@@ -156,7 +167,8 @@ func parseResponse(body io.ReadCloser) (map[string]interface{}, error) {
 
 func addDestination(t *testing.T, data []byte, expectedValues []string) string {
 	destinationId := ""
-	response := addDestinationRequest(t, data, 200)
+	response, err := addDestinationRequest(data, 200)
+	assert.Nil(t, err, "add destination error %v", err)
 	if response != nil {
 		responseBody, err := parseResponse(response.Body)
 		if err != nil {
@@ -169,19 +181,26 @@ func addDestination(t *testing.T, data []byte, expectedValues []string) string {
 	return destinationId
 }
 
-func addDestinationRequest(t *testing.T, data []byte, statusCode int) *http.Response {
+func addDestinationRequest(data []byte, statusCode int) (*http.Response, error) {
 	add, err := http.NewRequest("POST", "https://127.0.0.1/api/v0/datafeed/destination", bytes.NewBuffer(data))
-	assert.Nil(t, err, "Error creating http request: %v", err)
+	if err != nil {
+		return nil, err
+	}
 	add.Header.Add("api-token", automateApiToken)
 	response, err := client.Do(add)
-	if assert.Nil(t, err, "Error sending request %v", err) {
-		assert.Equal(t, statusCode, response.StatusCode, "Expected status code %d, got: %d", statusCode, response.StatusCode)
+	if err != nil {
+		return response, err
 	}
-	return response
+	if statusCode != response.StatusCode {
+		return response, fmt.Errorf("Expected status code %d, got: %d", statusCode, response.StatusCode)
+	}
+
+	return response, nil
 }
 
 func addDuplicateDestination(t *testing.T, data []byte) {
-	addDestinationRequest(t, data, 400)
+	_, err := addDestinationRequest(data, 400)
+	assert.Nil(t, err, "add destination duplicate test failed %v", err)
 }
 
 func getDestination(t *testing.T, destinationId string, statusCode int) {
@@ -219,18 +238,22 @@ func updateDestination(t *testing.T, destinationId string, data []byte, expected
 	assert.Equal(t, destinationId, updateDestinationId, "Expected UpdateDestination ID to be %s, got %s", destinationId, updateDestinationId)
 }
 
-func deleteDestinationRequest(t *testing.T, destinationId string, statusCode int) *http.Response {
+func deleteDestinationRequest(destinationId string, statusCode int) (*http.Response, error) {
 	delete, err := http.NewRequest("DELETE", "https://127.0.0.1/api/v0/datafeed/destination/"+destinationId, nil)
 	delete.Header.Add("api-token", automateApiToken)
 	response, err := client.Do(delete)
-	if assert.Nil(t, err, "Error sending request %v", err) {
-		assert.True(t, response.StatusCode == statusCode, "Expected status code %d, got: %d", statusCode, response.StatusCode)
+	if err != nil {
+		return response, err
 	}
-	return response
+	if response.StatusCode != statusCode {
+		return response, fmt.Errorf("Expected status code %d, got: %d", statusCode, response.StatusCode)
+	}
+	return response, nil
 }
 
 func deleteDestination(t *testing.T, destinationId string, expectedValues []string) {
-	response := deleteDestinationRequest(t, destinationId, 200)
+	response, err := deleteDestinationRequest(destinationId, 200)
+	assert.Nil(t, err, "%v", err)
 	responseBody, err := parseResponse(response.Body)
 	assert.Nil(t, err, "Error parsing response body %v", err)
 	isValid, _ := validateResponseBody(t, responseBody, expectedValues)
@@ -268,31 +291,45 @@ func testDestinationRequestFail(t *testing.T, data []byte) {
 	}
 }
 
-func addSecretRequest(t *testing.T, data []byte, statusCode int) string {
+func addSecretRequest(data []byte, statusCode int) (string, error) {
 	add, err := http.NewRequest("POST", "https://127.0.0.1/api/v0/secrets", bytes.NewBuffer(data))
-	assert.Nil(t, err, "Error creating http request: %v", err)
+	if err != nil {
+		return "", err
+	}
 	add.Header.Add("api-token", automateApiToken)
 	response, err := client.Do(add)
-	if assert.Nil(t, err, "Error sending request %v", err) {
-		assert.True(t, response.StatusCode == statusCode)
+	if err != nil {
+		return "", err
+	}
+	if response.StatusCode != statusCode {
+		return "", fmt.Errorf("Expected status code %d, got: %d", statusCode, response.StatusCode)
 	}
 	responseBody, err := parseResponse(response.Body)
-	assert.Nil(t, err, "Could not parse response body: %v", err)
+	if err != nil {
+		return "", fmt.Errorf("Could not parse response body: %v", err)
+	}
 	secretId, ok := responseBody["id"].(string)
 	if !ok {
-		t.Errorf("Response body has no id")
+		return "", errors.New("Response body has no id")
 	}
-	return secretId
+	return secretId, nil
 }
 
-func deleteSecretRequest(t *testing.T, secretId string, statusCode int) {
+func deleteSecretRequest(secretId string, statusCode int) error {
 	delete, err := http.NewRequest("DELETE", "https://127.0.0.1/api/v0/secrets/id/"+secretId, nil)
-	assert.Nil(t, err, "Error creating http request: %v", err)
+	if err != nil {
+		return err
+	}
+
 	delete.Header.Add("api-token", automateApiToken)
 	response, err := client.Do(delete)
-	if assert.Nil(t, err, "Error sending request %v", err) {
-		assert.True(t, response.StatusCode == statusCode)
+	if err != nil {
+		return err
 	}
+	if response.StatusCode != statusCode {
+		return fmt.Errorf("Expected status code %d, got: %d", statusCode, response.StatusCode)
+	}
+	return nil
 }
 
 func listDestinationRequest(t *testing.T, statusCode int) []interface{} {
