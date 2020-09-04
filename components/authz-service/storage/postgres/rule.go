@@ -23,10 +23,12 @@ func (p *pg) CreateRule(ctx context.Context, rule *storage.Rule) (*storage.Rule,
 	if err != nil {
 		return nil, err
 	}
-	found := false
-	for _, proj := range projectsFilter {
-		if proj == rule.ProjectID {
-			found = true
+	found := len(projectsFilter) == 0 // empty means all projects allowed
+	if !found {
+		for _, proj := range projectsFilter {
+			if proj == rule.ProjectID {
+				found = true
+			}
 		}
 	}
 	if !found {
