@@ -862,8 +862,7 @@ control 'iam-api-1' do
         it "creates a new rule" do
           resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id}/rules",
             http_method: 'POST',
-            request_body: CUSTOM_RULE.to_json,
-            request_headers: { projects: [ custom_project_id ] }
+            request_body: CUSTOM_RULE.to_json
           )
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:rule]).to eq(staged_custom_rule)
@@ -948,22 +947,19 @@ control 'iam-api-1' do
 
         resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id}/rules",
           http_method: 'POST',
-          request_body: CUSTOM_RULE_1.to_json,
-          request_headers: { projects: [ custom_project_id ] }
+          request_body: CUSTOM_RULE_1.to_json
         )
         expect(resp.http_status).to eq 200
 
         resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id}/rules",
           http_method: 'POST',
-          request_body: CUSTOM_RULE_2.to_json,
-          request_headers: { projects: [ custom_project_id ] }
+          request_body: CUSTOM_RULE_2.to_json
         )
         expect(resp.http_status).to eq 200
 
         resp = automate_api_request("/apis/iam/v2/projects/#{custom_project_id_2}/rules",
           http_method: 'POST',
-          request_body: CUSTOM_RULE_3.to_json,
-          request_headers: { projects: [ custom_project_id_2 ] }
+          request_body: CUSTOM_RULE_3.to_json
         )
         expect(resp.http_status).to eq 200
       end
