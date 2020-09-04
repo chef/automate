@@ -159,6 +159,19 @@ func Detect(target *TargetConfig, timeout time.Duration, env map[string]string) 
 	return &res, nil
 }
 
+func sanitizeEnv(env map[string]string) map[string]string {
+	outEnv := make(map[string]string, len(env))
+	for k, v := range env {
+		switch k {
+		case "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AZURE_CLIENT_SECRET":
+			outEnv[k] = "REDACTED"
+		default:
+			outEnv[k] = v
+		}
+	}
+	return outEnv
+}
+
 func run(args []string, conf *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -167,7 +180,7 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 	logrus.WithFields(logrus.Fields{
 		"path":  os.Getenv("PATH"),
 		"args":  args,
-		"env":   env,
+		"env":   sanitizeEnv(env),
 		"which": which,
 	}).Info("Running inspec cli command")
 	var cmd *exec.Cmd
