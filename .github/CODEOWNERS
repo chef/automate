@@ -14,7 +14,6 @@ www/**                  @chef/release-engineering
 components/applications-service/**         @chef/superteam
 components/authn-service/**                @chef/auth-team
 components/authz-service/**                @chef/auth-team
-components/automate-chef-io/**             @chef/docs-team
 components/automate-debug/**               @chef/automate-deployment-team
 components/automate-deployment/**          @chef/automate-deployment-team
 components/automate-dex/**                 @chef/auth-team
