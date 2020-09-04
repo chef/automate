@@ -39,3 +39,21 @@ function datafeed_quick_build() {
   done
   (cd components/data-feed-service && make hab_test)
 }
+
+
+document "datafeed_init_integration_tests" <<DOC
+  Start all services so that data feed service's integration tests can run
+DOC
+function datafeed_init_integration_tests() {
+  start_all_services
+}
+
+document "datafeed_run_integration_tests" <<DOC
+  Run the data feed service's integration tests
+DOC
+function datafeed_run_integration_tests() {
+  chef-automate config patch components/data-feed-service/integration_test/patch.toml
+  api_token=$(get_admin_token)
+  export AUTOMATE_API_TOKEN="${api_token}"
+  go_test -v github.com/chef/automate/components/data-feed-service/integration_test/...
+}
