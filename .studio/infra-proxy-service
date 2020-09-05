@@ -111,8 +111,6 @@ function infra_service_load_chef_repo() {
   infra_service_server_id="local-dev"
   infra_service_org_id="test-org"
 
-  set_up_chef_server_test_environment
-
   # make sure we've deployed and can find a pivotal key to create our client
   check_if_deployinate_started || return 1
   if [ ! -f ${chef_server_pivotal_key_path} ]; then
