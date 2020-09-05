@@ -102,7 +102,7 @@ there are three options...
 
 1. `infra_service_load_chef_repo`
 
-    This will spin up the local chef infra server and it will add the data resides at [chef-repo](../infra/chef-repo) folder using `knife upload` method.
+    This will spin up the local chef infra server and it will add the data resides at [chef-repo](./infra/chef-repo) folder using `knife upload` method.
 
 ----------------------------------------------------------------------------------
 # DELETING DATA
