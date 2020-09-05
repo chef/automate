@@ -181,6 +181,7 @@ func GetEsIndex(filters map[string][]string, useSummaryIndex bool) (esIndex stri
 		// This way, we have the indices to query the last 24 hours worth of reports
 		startDateAsString = time.Now().Add(-24 * time.Hour).UTC().Format(time.RFC3339)
 	} else if len(filters["start_time"]) == 0 {
+		// If we have an end_time, and no start_time, setting start_time with the same value as end_time
 		startDateAsString = endDateAsString
 	} else {
 		// Using the start_time specified in the filters
