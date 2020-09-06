@@ -56,7 +56,7 @@
       <section class="page-body" *ngIf="tabValue === 'rules'">
         <ng-container *ngIf="showRulesTable()">
           <chef-toolbar>
-            <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
+            <app-authorized [allOf]="['/apis/iam/v2/projects/{project_id}/rules', 'post', project?.id]">
               <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" primary>Create Rule</chef-button>
             </app-authorized>
           </chef-toolbar>
@@ -94,7 +94,7 @@
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="showNoRulesMessage()">
-          <app-authorized [allOf]="['/apis/iam/v2/projects', 'post']">
+          <app-authorized [allOf]="['/apis/iam/v2/projects/{project_id}/rules', 'post', project?.id]">
             <div class="empty-case-container">
               <small class="empty-case-entry" *ngIf="project?.status === 'EDITS_PENDING'">
                 Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.
