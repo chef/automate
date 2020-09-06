@@ -52,9 +52,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public authorizedChecker: AuthorizedChecker;
-  public isAuthorized = false;
 
   // Whether the edit ID form is open or not.
   public modifyID = false;
@@ -116,11 +115,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         project_id
       }));
    });
-
-    this.authorizedChecker.isAuthorized$
-      .subscribe(isAuthorized => {
-        return this.isAuthorized = isAuthorized;
-      });
 
     this.store.select(projectFromRoute).pipe(
       filter(identity),
