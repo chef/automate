@@ -68,7 +68,10 @@
         <div id="condition-section" *ngIf="ruleForm.get('type').value">
           <div class="label">Conditions</div>
           <small>All conditions must be true for the rule to be true.</small>
+          <app-authorized
+            [allOf]="['/apis/iam/v2/projects/{project_id}/rules/{id}', 'put', [project.id, rule.id]]">
           <chef-button primary (click)="addCondition()">Add Condition</chef-button>
+          </app-authorized>
 
           <div id="condition-list" formArrayName="conditions">
 
