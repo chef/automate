@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 // These must match what SQL function query_rule_table_associations returns.
@@ -18,25 +19,17 @@ const (
 )
 
 func (p *pg) CreateRule(ctx context.Context, rule *storage.Rule) (*storage.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	found := len(projectsFilter) == 0 // empty means all projects allowed
-	if !found {
-		for _, proj := range projectsFilter {
-			if proj == rule.ProjectID {
-				found = true
-			}
-		}
-	}
-	if !found {
+	allProjectsAlowed := len(projectsFilter) == 0
+	if !allProjectsAlowed && !stringutils.SliceContains(projectsFilter, rule.ProjectID) {
 		return nil, fmt.Errorf("project with ID %q not found", rule.ProjectID)
 	}
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
