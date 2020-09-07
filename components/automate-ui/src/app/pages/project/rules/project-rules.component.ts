@@ -115,14 +115,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         id: rule_id,
         project_id
       }));
-      this.authorizedChecker.setPermissions([
-        {
-          endpoint: '/apis/iam/v2/projects/{project_id}/rules/{id}',
-          paramList: [project_id, rule_id],
-          verb: 'put'
-        }
-      ], []);
-    });
+   });
 
     this.authorizedChecker.isAuthorized$
       .subscribe(isAuthorized => {
@@ -134,6 +127,13 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(project => {
       this.project = project;
+      this.authorizedChecker.setPermissions([
+        {
+          endpoint: '/apis/iam/v2/projects/{project_id}/rules/{id}',
+          paramList: [project.id, 'rule-any'], // specific rule is irrelevant
+          verb: 'put'
+        }
+      ], []);
     });
 
     this.store.select(ruleFromRoute).pipe(
