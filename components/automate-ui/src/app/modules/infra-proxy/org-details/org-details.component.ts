@@ -2,13 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Params } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
-import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { previousRoute } from '../../../route.selectors';
-import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { routeParams, previousRoute } from 'app/route.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { EntityStatus } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -46,7 +45,6 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     private telemetryService: TelemetryService
   ) {
       this.previousRoute$ = this.store.select(previousRoute);
-
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {
         const path: string[] = params.path;
@@ -66,21 +64,11 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('cookbooks')) {
           this.resetTabs();
           this.cookbooksTab = true;
-        }
-        if ( params.path.includes('resetkey') ) {
-          this.cookbooksTab = false;
-          this.clientsTab = false;
-          this.dataBagsTab = false;
-          this.rolesTab = false;
-          this.environmentsTab = false;
+        } else if (path.includes('resetkey')) {
+          this.resetTabs();
           this.resetKeyTab = true;
-        }
-
-        if ( params.path.includes('clients') ) {
-          this.cookbooksTab = false;
-          this.environmentsTab = false;
-          this.dataBagsTab = false;
-          this.rolesTab = false;
+        } else if (path.includes('clients')) {
+          this.resetTabs();
           this.clientsTab = true;
         }
       });
@@ -117,6 +105,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     switch (tab) {
       case 0:
         this.telemetryService.track('orgDetailsTab', 'cookbooks');
+        this.resetTabs();
+        this.cookbooksTab = true;
         break;
       case 1:
         this.telemetryService.track('orgDetailsTab', 'roles');
@@ -142,12 +132,21 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  resetAdminKeyRedirection(authFailuer: boolean) {
+    if (authFailuer) {
+      this.resetTabs();
+      this.resetKeyTab = authFailuer;
+    }
+  }
+
   private resetTabs() {
     this.cookbooksTab = false;
     this.environmentsTab = false;
     this.dataBagsTab = false;
     this.rolesTab = false;
     this.policyFilesTab = false;
+    this.resetKeyTab = false;
+    this.clientsTab = false;
   }
 
   ngOnDestroy(): void {

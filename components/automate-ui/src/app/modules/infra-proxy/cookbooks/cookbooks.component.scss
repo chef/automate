@@ -1,5 +1,15 @@
 @import "~styles/variables";
 
+.empty-state {
+  text-align: center;
+
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 42px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
