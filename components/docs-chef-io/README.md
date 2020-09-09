@@ -1,6 +1,6 @@
-# Automate Documentation
+# Chef Automate Documentation
 
-The Automate Documentation is deployed on https://docs.chef.io/automate/ using Hugo
+The Chef Automate Documentation is deployed on https://docs.chef.io/automate/ using Hugo
 modules.
 
 ## The Fastest Way to Contribute
@@ -50,13 +50,15 @@ is updated in a repository, those changes won't appear in https://docs.chef.io u
 Hugo modules are updated to the new commit and documentation files are updated
 in the `_vendor` directory.
 
-This can be useful if you want to update documentation in `chef/automate`, but
-don't want it to appear on https://docs.chef.io until a later date.
+We use Expeditor to submit a pull request to `chef/chef-web-docs` when Automate is promoted to stable.
 
 To update the Hugo module for documentation in `chef/automate`:
 
 1. Make sure your documentation changes are merged into master in `chef/automate`.
-1. Contact your friendly local Docs Team who will update the Automate Hugo module for you.
+1. Wait for Expeditor to submit a PR to `chef/chef-web-docs` after Automate is promoted to stable.
+
+If you need to manually update the Automate documentation, you can contact your
+friendly local Docs Team who will update the Automate Hugo module for you.
 
 Or, for the adventurous:
 
@@ -193,8 +195,8 @@ is set to.
 
 ## Creating New Pages
 
-Please keep all of the InSpec documentation in the `content/inspec` directory.
-To add a new Markdown file, run the following command from the `www` directory:
+Please keep all of the Automate documentation in the `content/automate` directory.
+To add a new Markdown file, run the following command from the `components/docs-chef-io` directory:
 
 ```
 hugo new content/automate/<filename>.md
@@ -291,16 +293,13 @@ provide additional important information
 
 There are often cases where we want to maintain blocks of text that are identical
 from one page to the next. In those cases, we add that text, formatted in Markdown,
-to a shortcode file located in `inspec/inspec/docs/layouts/shortcodes`.
+to a shortcode file located in the [chef-web-docs](https://github.com/chef/chef-web-docs) repository in [`themes/docs-new`](https://github.com/chef/chef-web-docs/themes/docs-new/layouts/shortcodes).
 
-Each shortcode in the Chef InSpec documentation must be prefixed with `in_`.
-For example, `in_shortcode_name.md`.
-
-To add that shortcode to a page in `inspec/inspec/docs/content`, add the file name,
+To add that shortcode to a page in `components/docs-chef-io/content`, add the file name,
 minus the .md suffix, wrapped in double curly braces and percent symbols to
 the location in the Markdown page where you want that text included. For example,
-if you want to add the text in `dt_shortcode_file_name.md` to a page, add
-`{{% in_shortcode_file_name %}}` to the text of that page and it will appear when
+if you want to add the text in `shortcode_file_name.md` to a page, add
+`{{% shortcode_file_name %}}` to the text of that page and it will appear when
 Hugo rebuilds the documentation.
 
 **Shortcodes in lists**
@@ -368,23 +367,6 @@ This parameter also works on Danger and Warning shortcodes.
 Add an alias to the page metadata to redirect users from a page to the page you are
 editing. They are only needed if a page has been deleted and you want to redirect
 users from the deleted page to a new or existing page.
-
-## Resource Pages
-
-The resource pages are located in `www/content/inspec/resources/`.
-
-The InSpec resources index page is located in `www/content/inspec/resources/_index.md`
-and can be found on https://docs.chef.io/inspec/resources/
-
-The resource index page has a shortcode called `inspec_resources` that lists
-resource pages by platform. To use the shortcode, add the shortcode and
-specify the platform parameter: `{{< inspec_resources platform="<platform>" >}}`
-
-A resource page must be located in `www/content/inspec/resources` and must have
-the platform parameter set in its frontmatter. Add `platform = <platform>` to
-the page frontmatter to add the platform parameter. For example, the
-`aide_conf.md` resource frontmatter has `platform = "linux"` in its page
-frontmatter.
 
 ## Data Content
 
