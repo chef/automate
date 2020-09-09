@@ -15,6 +15,8 @@ draft = false
 
 Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-from-a-filesystem-backup" >}}), an [Amazon S3 bucket backup]({{< ref "restore.md#restore-from-an-aws-s3-backup" >}}), or a [Google Cloud Storage (GCS) bucket backup]({{< ref "restore.md#restore-from-a-google-cloud-storage-backup" >}}).
 
+Before restoring a Chef Automate installation, see how to [configure your backups]({{< ref "backup.md" >}}).
+
 ## Prerequisites
 
 1. On the restore host, download and unzip the Chef Automate command-line tool:
@@ -26,8 +28,8 @@ Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-fro
 1. To restore from **filesystem backups**, Chef Automate requires access to a backup directory in the [configured location]({{< ref "backup.md#backup-to-a-filesystem" >}}).
 Ensure access for the backup type used:
 
-     1. To restore [a network-attached filesystem backup]({{< ref "backup.md#set-up-backups-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
-     1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#set-up-backups-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
+     1. To restore [a network-attached filesystem backup]({{< ref "backup.md#backup-to-a-filesystem" >}}), mount the shared backup directory to the same mount point configured at the time of the backup.
+     1. To restore [a backup directory that is not a network-attached filesystem]({{< ref "backup.md#backup-to-a-filesystem" >}}), copy the backup directory to the configured location at the time of the backup.
      1. To restore a [single-file backup archive]({{< ref "backup.md#store-a-filesystem-backup-in-a-single-file-archive" >}}), copy your archive to the restore host and extract it to the configured backup directory.
 
 1. To restore a backup to a host with a different fully qualified domain name (FQDN) than the original backup host, create a `patch.toml` file that specifies the new FQDN and provide it at restore time:
