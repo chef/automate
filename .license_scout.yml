@@ -219,6 +219,9 @@ fallbacks:
     - name: github.com/josharian/intern
       license_id: MIT
       license_content: https://raw.githubusercontent.com/josharian/intern/master/license.md
+    - name: github.com/chzyer/logex
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/chzyer/logex/master/LICENSE
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
