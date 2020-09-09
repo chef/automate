@@ -34,7 +34,8 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 To store backups in a configurable backup directory, the backup directory should be on network-attached storage or synced periodically to a disk on another machine.
 This best practice ensures that you can restore from your backup data during a hardware failure.
 
-The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
+The default backup directory is `/var/opt/chef-automate/backups`.
+If it does not exist, the deployment process creates it.
 
 To configure your Chef Automate installation's backup directory to another location:
 
@@ -184,7 +185,8 @@ Make a backup with the [`backup create`]({{< ref "cli_chef_automate/#chef-automa
 chef-automate backup create
 ```
 
-The output shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
+The output shows the backup progress for each service.
+A successful backup displays a success message containing the timestamp of the backup:
 
 ```shell
 Success: Created backup 20180518010336
@@ -214,7 +216,8 @@ The output shows each backup and its age:
 20180508201952    completed  4 minutes old
 ```
 
-By default, this command communicates with your running Chef Automate installation to list the backups. If the Chef Automate installation is down, you can still list the backups.
+By default, this command communicates with your running Chef Automate installation to list the backups.
+If the Chef Automate installation is down, you can still list the backups.
 
 To list filesystem backups:
 
