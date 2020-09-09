@@ -35,7 +35,7 @@ The relevant snippet that goes into the components `scripts/grpc.sh` looks like 
 ```bash
 protoc -I. \
   -I$GOPATH/src \
-  -Ivendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  -Iprotovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
   --grpc-mock_out=$GOPATH/src \
   path/to/your/*.proto
 ```

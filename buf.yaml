@@ -39,18 +39,19 @@ build:
     - api
     - components
     - lib
-    - vendor/github.com/googleapis/googleapis
-    - vendor/github.com/grpc-ecosystem/grpc-gateway
-    - vendor/github.com/envoyproxy/protoc-gen-validate
+    - protovendor/github.com/googleapis/googleapis
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway
+    - protovendor/github.com/envoyproxy/protoc-gen-validate
   excludes:
     - components/notifications-service/
     - components/automate-grpc/protoc-gen-policy/testdata
-    - vendor/github.com/googleapis/googleapis/google/api/expr
-    - vendor/github.com/googleapis/googleapis/google/api/servicecontrol
-    - vendor/github.com/googleapis/googleapis/google/api/servicemanagement
-    - vendor/github.com/envoyproxy/protoc-gen-validate/license
-    - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party
-    - vendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
+    - protovendor/github.com/googleapis/googleapis/google/api/expr
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol
+    - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/license
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
 lint:
   allow_comment_ignores: true
   use:

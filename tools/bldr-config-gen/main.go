@@ -253,19 +253,13 @@ func (p *depImportReducer) Reduce(path, deps string) (GoDepInfo, error) {
 
 				if strings.HasPrefix(dep, "github.com/chef/automate/") {
 					dep = strings.TrimPrefix(dep, "github.com/chef/automate/")
-				} else {
-					dep = fmt.Sprintf("vendor/%s", dep)
+					info.deps = append(info.deps, dep)
 				}
 
 				break
 			}
 		}
 
-		if dep == "" {
-			dep = line
-		}
-
-		info.deps = append(info.deps, dep)
 	}
 	if err := scanner.Err(); err != nil {
 		return info, errors.Wrap(err, "error scanning go list output")

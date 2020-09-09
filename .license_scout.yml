@@ -155,6 +155,66 @@ fallbacks:
     - name: github.com/bgentry/go-netrc
       license_id: MIT
       license_content: https://raw.githubusercontent.com/bgentry/go-netrc/master/LICENSE
+    - name: bazil.org/fuse
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/bazil/fuse/master/LICENSE
+    - name: github.com/BurntSushi/xgb
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/BurntSushi/xgb/master/LICENSE
+    - name: github.com/bmizerany/assert
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/bmizerany/assert/master/README.md
+    - name: github.com/gonum/blas
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/floats
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/internal
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/lapack
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/matrix
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/julienschmidt/httprouter
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/julienschmidt/httprouter/master/LICENSE
+    - name: github.com/kr/logfmt
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/kr/logfmt/master/Readme
+    - name: github.com/miekg/dns
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/miekg/dns/master/LICENSE
+    - name: github.com/pascaldekloe/goe
+      license_id: CC0-1.0
+      license_content: https://raw.githubusercontent.com/pascaldekloe/goe/master/LICENSE
+    - name: github.com/russross/blackfriday/v2
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/russross/blackfriday/master/LICENSE.txt
+    - name: github.com/russross/blackfriday
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/russross/blackfriday/master/LICENSE.txt
+    - name: github.com/sean-/seed
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/sean-/seed/master/LICENSE
+    - name: github.com/smartystreets/assertions
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets/assertions/master/LICENSE.md
+    - name: github.com/smartystreets/goconvey
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets/goconvey/master/LICENSE.md
+    - name: github.com/ziutek/mymysql
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/ziutek/mymysql/master/LICENSE
+    - name: gopkg.in/check.v1
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/go-check/check/v1/LICENSE
+    - name: gopkg.in/tomb.v1
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/go-tomb/tomb/v1/LICENSE
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA

@@ -39,7 +39,7 @@ export GO111MODULE=on
 setup_gobin() {
     local vendor_hash
     vendor_hash=$(cat \
-      /src/vendor/modules.txt \
+      /src/go.sum \
       /src/components/automate-grpc/protoc-gen-policy/policy/policy.go \
       /src/api/external/annotations/iam/policy.proto \
     | sha256sum | cut -c1-16)
@@ -53,8 +53,8 @@ setup_gobin
 # Make 'go installed' binaries available in the PATH
 export PATH=$PATH:$GOBIN
 
-# Enable vendor mode by default
-export GOFLAGS=-mod=vendor
+# Disable vendor mode
+export GOFLAGS=""
 
 # Delve Server port for remote debugging
 export GO_DEBUG_PORT=2345

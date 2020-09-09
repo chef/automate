@@ -17,7 +17,7 @@ proto: bin/protoc-gen-go
 		$(BASE_PROTO_FILES)
 
 bin/protoc-gen-go:
-	go install -v ../../vendor/github.com/golang/protobuf/protoc-gen-go
+	go install -v github.com/golang/protobuf/protoc-gen-go
 
 
 clean:

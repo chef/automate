@@ -103,8 +103,6 @@ do_setup_default() {
     sysctl -w vm.dirty_expire_centisecs=20000
     sysctl -w vm.max_map_count=262144
 
-    start_requestbin
-
     if [[ "${test_proxy}" = "true" ]]; then
         log_info "Setting up proxy"
         HTTP_PROXY="http://${test_proxy_container_name}:3128"
@@ -118,6 +116,9 @@ do_setup_default() {
         npm config set proxy "http://${test_proxy_container_name}:3128"
         npm config set https-proxy "http://${test_proxy_container_name}:3128"
     fi
+
+    start_requestbin
+
 }
 
 do_build() {

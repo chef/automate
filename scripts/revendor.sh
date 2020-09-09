@@ -1,23 +1,28 @@
 #!/bin/bash
 #
-# Creates the vendor/ directory in this repository. Should be run from
+# Creates the protovendor/ directory in this repository. Should be run from
 # the root of the repository.
 #
-grpcGatewayVendorPath=./vendor/github.com/grpc-ecosystem/grpc-gateway/
-googleAPIsVendorPath=./vendor/github.com/googleapis/googleapis/google/api
+grpcGatewayVendorPath=./protovendor/github.com/grpc-ecosystem/grpc-gateway/
+googleAPIsVendorPath=./protovendor/github.com/googleapis/googleapis/google/api
 googleAPIsSubsetToKeep=google/api
+envoyproxyVendorPath=./protovendor/github.com/envoyproxy/protoc-gen-validate
 
-echo "Vendoring dependencies in vendor/"
+# This has the side effect of downloading all the modules, which needs to
+# happen before we can copy the protos from those modules to protovendor/
+echo "Tidying and Verifying Go Modules"
 go mod tidy
-go mod vendor
 go mod verify
 
-# Some of our tests and proto generators require files that go doesn't
-# believe in vendoring so we copy them from the module cache to the
-# vendor directory ourselves when we revendor.
+echo "Vendoring protos in protovendor/ ..."
+
+# Originally this script existed to copy .proto files from the go module cache
+# because go mod vendor doesn't keep .proto files. Now that we are not using
+# vendoring for go modules, we still use this mechanism to vendor the protos
 #
 # See https://github.com/golang/go/issues/26366
 grpcGatewayModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/grpc-ecosystem/grpc-gateway")
+envoyproxyModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/envoyproxy/protoc-gen-validate")
 
 # have to `go get` it first for some reason.
 # NOTE: the version here isn't particularly special, it's just the version we
@@ -27,9 +32,9 @@ grpcGatewayModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/grpc-ecosys
 go get github.com/googleapis/googleapis@a94df49e8f20
 googleAPIsModPath=$(GOFLAGS="" go list -f "{{.Dir}}" -m "github.com/googleapis/googleapis")
 
-# Add files that go mod won't vendor that we need
 mkdir -p $grpcGatewayVendorPath
 mkdir -p "$googleAPIsVendorPath"
+mkdir -p "$envoyproxyVendorPath"
 
 if [[ -n "$grpcGatewayModPath" ]]; then
     cp -rf --no-preserve=mode "$grpcGatewayModPath/"* $grpcGatewayVendorPath
@@ -38,6 +43,14 @@ else
     exit 1
 fi
 
+if [[ -n "$envoyproxyModPath" ]]; then
+    cp -rf --no-preserve=mode "$envoyproxyModPath/"* $envoyproxyVendorPath
+else
+    echo "Could not find github.com/envoyproxy/protoc-gen-validate module path"
+    exit 1
+fi
+
+
 if [[ -n "$googleAPIsVendorPath" ]]; then
     cp -rf --no-preserve=mode "$googleAPIsModPath/$googleAPIsSubsetToKeep/"* $googleAPIsVendorPath
 else
@@ -45,12 +58,11 @@ else
     exit 1
 fi
 
-echo "Cleaning up unnecessary files from vendor/"
-# Clean up files that go mod will vendor that we don't need
-find ./vendor -type f \( -name .gitignore -o -name .travis.yml -o -name package.json -o -name Makefile -o -name Dockerfile -o -name MAINTAINERS -o -name \*.md -o -name \*.vim -o -name \*.yml \) -delete
+echo "Cleaning up unnecessary files from protovendor/"
+find protovendor -not -name "*proto" -type f -exec rm '{}' \;
 
 # Explicitly clean out grpc-gateway example folder
-rm -rf ./vendor/github.com/grpc-ecosystem/grpc-gateway/examples/
+rm -rf ./protovendor/github.com/grpc-ecosystem/grpc-gateway/examples/
 
 # Update .bldr with new dep information
 echo "Regenerating .bldr configuration file"

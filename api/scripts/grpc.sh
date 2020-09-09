@@ -34,10 +34,10 @@ trap cleanup EXIT
 
 IMPORTS=(-I /src/api
          -I /src/components
-         -I /src/vendor
-         -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway
-         -I /src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-         -I /src/vendor/github.com/envoyproxy/protoc-gen-validate
+         -I /src/protovendor
+         -I /src/protovendor/github.com/grpc-ecosystem/grpc-gateway
+         -I /src/protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+         -I /src/protovendor/github.com/envoyproxy/protoc-gen-validate
          -I /src/lib
         )
 
