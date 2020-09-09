@@ -1,13 +1,13 @@
 +++
-title = "Backup & Restore"
+title = "Backup"
 
 date = 2018-03-26T15:27:52-07:00
 draft = false
 [menu]
   [menu.automate]
-    title = "Backup & Restore"
+    title = "Backup"
     parent = "automate/getting_started"
-    identifier = "automate/getting_started/backup.md Backup & Restore"
+    identifier = "automate/getting_started/backup.md Backup"
     weight = 70
 +++
 
@@ -16,7 +16,9 @@ draft = false
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
 The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra_server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on_prem_builder.md" >}}).
 By default, Chef Automate stores backups to the filesystem in the directory `/var/opt/chef-automate/backups`.
-You can also configure Chef Automate to store backups in AWS S3 buckets.
+You can also configure Chef Automate to store backups in AWS S3 buckets or in Google Cloud Storage (GCS) buckets.
+
+After configuring your backups, see how to [restore]({{< ref "restore.md" >}}) a Chef Automate installation.
 
 ## Backup Space Requirements
 
@@ -32,7 +34,8 @@ This amount of space needed for a backup varies depending on your Chef Automate 
 To store backups in a configurable backup directory, the backup directory should be on network-attached storage or synced periodically to a disk on another machine.
 This best practice ensures that you can restore from your backup data during a hardware failure.
 
-The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
+The default backup directory is `/var/opt/chef-automate/backups`.
+If it does not exist, the deployment process creates it.
 
 To configure your Chef Automate installation's backup directory to another location:
 
@@ -182,7 +185,8 @@ Make a backup with the [`backup create`]({{< ref "cli_chef_automate/#chef-automa
 chef-automate backup create
 ```
 
-The output shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
+The output shows the backup progress for each service.
+A successful backup displays a success message containing the timestamp of the backup:
 
 ```shell
 Success: Created backup 20180518010336
@@ -212,7 +216,8 @@ The output shows each backup and its age:
 20180508201952    completed  4 minutes old
 ```
 
-By default, this command communicates with your running Chef Automate installation to list the backups. If the Chef Automate installation is down, you can still list the backups.
+By default, this command communicates with your running Chef Automate installation to list the backups.
+If the Chef Automate installation is down, you can still list the backups.
 
 To list filesystem backups:
 
@@ -276,7 +281,7 @@ y
 Success: Backups deleted
 ```
 
-To prune all but a certain number of the most recent backups manually, parsing the output of `chef-automate backup list` and applying the command `chef-automate backup delete`.
+To prune all but a certain number of the most recent backups manually, parse the output of `chef-automate backup list` and apply the command `chef-automate backup delete`.
 For example:
 
 ```bash
