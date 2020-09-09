@@ -23,7 +23,7 @@ import {
 export class CookbooksComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
-  @Output() resetLink: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() resetKeyRedirection: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   private isDestroyed$ = new Subject<boolean>();
   public cookbooks: Cookbook[] = [];
@@ -57,9 +57,9 @@ export class CookbooksComponent implements OnInit, OnDestroy {
     });
   }
 
-  tabRedirection() {
+  ResetKeyTabRedirection() {
     if (this.authFailure) {
-      this.resetLink.emit(true);
+      this.resetKeyRedirection.emit(true);
     }
   }
 
