@@ -15,20 +15,17 @@ draft = false
 
 [\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/on_prem_builder.md)
 
-This guide details how to install Chef Automate and deploy Chef Habitat Builder on-prem together. Enterprise customers may wish to set up an on-premises Chef Habitat Builder depot to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.
+Enterprise customers may wish to set up an on-premises Chef Habitat Builder to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.
+This guide details how to install Chef Habitat Builder on-prem using the Chef Automate installer.
+The Chef Automate installer includes everything necessary to get started with Chef Automate and Chef Habitat Builder on-prem.
 
-This guide covers setting up Chef Automate and Chef Habitat Builder on-prem, and bootstrapping Chef Habitat Builder on-prem with curated core seed lists from the Chef Habitat public Builder.
+Using the Chef Automate installer enables you to use Chef Automate's authentication stack, configuration, and backup/restore mechanisms to operate your Chef Habitat Builder installation.
 
-The Chef installer includes everything necessary to get started with Chef Automate and Chef Habitat Builder on-prem.
-Bootstrapping Chef Habitat Builder requires:
-
-* An outward bound HTTPS connection
-* An existing Chef Habitat [public Builder](https://bldr.habitat.sh) account.
+For Chef Habitat Builder installations created prior to integration with the Chef Automate installer, see the [documentation in the github repo](https://github.com/habitat-sh/on-prem-builder) instead.
 
 ## System requirements
 
-This guide demonstrates the ease of authenticating between Chef Automate and Chef Habitat Builder on-prem by installing both components on the same host.
-Outside the boundaries of this proof-of-concept, we recommend against running installations of Chef Automate and Chef Habitat Builder on the same host. Please contact your Chef representative before using this implementation in production
+Outside the boundaries of a proof-of-concept project, we recommend against running installations of Chef Automate and Chef Habitat Builder on the same host. Please contact your Chef representative before using this implementation in production.
 
 ### Hardware Requirements
 
@@ -64,7 +61,7 @@ Chef Automate and Chef Habitat Builder require:
 
 * high-availability/DR/multinode Builder
 
-## Get Started with Chef Automate and Chef Habitat On-prem
+## Get Started Installing Chef Habitat Builder
 
 ### Download the Chef Automate Installer
 
@@ -74,40 +71,70 @@ Download and unzip the installer:
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
-### Deploy Chef Automate and Chef Habitat Builder On-prem
+### Deploy Chef Habitat Builder
 
-Deploying Chef Habitat Builder with Chef Automate requires a Chef Automate license.
+Deploying Chef Habitat Builder using the Chef Automate installer requires a Chef Automate license.
 If you already have a Chef Automate license, you may use it for the deployment.
 Otherwise, you can accept the 30-day trial license when you first sign in to Chef Automate.
 
-If you are deploying Chef Habitat Builder with Chef Automate in an airgapped environment, follow [the documentation on building an airgap bundle]({{< relref "airgapped_installation.md" >}}).
+If you are deploying Chef Habitat Builder in an airgapped environment, follow [the documentation on building an airgap bundle]({{< relref "airgapped_installation.md" >}}).
 
-You can deploy Chef Habitat Builder either with a full Chef Automate installation or with the Chef Automate auth stack only.
+You can [deploy Chef Automate and Chef Habitat Builder at the same time]({{< relref "on_prem_builder.md#deploy-chef-automate-and-chef-habitat-builder" >}} ), or you can deploy [Chef Habitat Builder standalone]({{< relref "on_prem_builder.md#deploy-standalone-chef-habitat-builder" >}}). You can also [add Chef Automate to a standalone Chef Habitat Builder installation]({{< relref "on_prem_builder.md#add-chef-automate-to-a-standalone-chef-habitat-builder-installation" >}}), or [add Chef Habitat Builder to a Chef Automate installation]({{< relref "on_prem_builder.md#add-chef-habitat-builder-to-a-chef-automate-installation" >}}).
 
 #### Deploy Chef Automate and Chef Habitat Builder
 
-To deploy Chef Automate and Chef Habitat Builder, specify both the `builder` and `automate` products on the command line.
-For example:
+1. To customize the FQDN or other configuration values for your installation, create a `config.toml` file with default values for your Chef Automate and Chef Habitat Builder installation:
 
-```shell
- ./chef-automate deploy --product builder --product automate
-```
+    ```shell
+    sudo ./chef-automate init-config
+    ```
 
-Accept the license with `y`.
+    Edit the `config.toml` to set your desired FQDN and [other configuration values]({{< relref "configuration.md#minimal-configuration" >}}).
 
-#### Deploy Chef Habitat Builder with Chef Automate Auth
+1. To deploy Chef Automate and Chef Habitat Builder at the same time, specify both the `builder` and `automate` products on the command line:
 
-To deploy Chef Habitat Builder with the Chef Automate UI and Auth services only, specify the `builder` product on the command line.
-For example:
+    ```shell
+    ./chef-automate deploy --product builder --product automate config.toml
+    ```
 
-```shell
- ./chef-automate deploy --product builder
-```
+    If you changed no configuration values in the previous step, run
 
-Accept the license with `y`.
+    ```shell
+    ./chef-automate deploy --product builder --product automate
+    ```
 
-Please note that the Chef Automate UI will only support managing Users, Groups, and Authorization policies when deployed without the full Chef Automate stack.
-If you wish to enable all of Chef Automate at a later time you can update the product configuration to include the complete Chef Automate stack. For example:
+    Accept the license with `y`.
+
+Chef Habitat Builder and Chef Automate use the same mechanisms for [user authentication]({{< relref "users.md" >}}), [configuration]({{< relref "configuration.md" >}}), [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log_management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}). In particular, Chef Automate backups contain Chef Habitat Builder data as well as packages stored in Chef Habitat Builder.
+
+#### Deploy Standalone Chef Habitat Builder
+
+1. To customize the FQDN or other configuration values for your installation, create a `config.toml` file with default values for your standalone Chef Habitat Builder installation:
+
+    ```shell
+    sudo ./chef-automate init-config
+    ```
+
+    Edit the `config.toml` to set your desired FQDN and [other configuration values]({{< relref "configuration.md#minimal-configuration" >}}).
+
+1. To deploy standalond Chef Habitat Builder, specify the `builder` product on the command line.
+
+    ```shell
+    ./chef-automate deploy --product builder config.toml
+    ```
+
+    If you changed no configuration values in the previous step, run
+
+    ```shell
+    ./chef-automate deploy --product builder --product automate
+    ```
+
+    Accept the license with `y`.
+
+Chef Habitat Builder uses the same mechanisms that Chef Automate does for [user authentication]({{< relref "users.md" >}}), [configuration]({{< relref "configuration.md" >}}), [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log_management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}). Please note that the Chef Automate UI will only support managing Users, Groups, and Authorization policies when deployed without the full Chef Automate stack.
+
+#### Add Chef Automate to a Standalone Chef Habitat Builder Installation
+If you wish to enable all of Chef Automate at a later time you can patch the product configuration to include the complete Chef Automate stack. For example:
 
 1. Create a new patch configuration toml as `config.toml` and update the products
   to include both `builder` and `automate`:
@@ -129,37 +156,12 @@ If you wish to enable all of Chef Automate at a later time you can update the pr
     Updating deployment configuration
 
     Applying deployment configuration
-      Installed automate-elasticsearch
-      Installed automate-es-gateway
-      Installed event-service
-      Installed es-sidecar-service
-      Installed event-feed-service
-      Installed secrets-service
-      Installed applications-service
-      Installed notifications-service
-      Installed nodemanager-service
-      Installed compliance-service
-      Installed ingest-service
-      Installed config-mgmt-service
-      Installed data-feed-service
-      Installed event-gateway
-      Started automate-elasticsearch
-      Started automate-es-gateway
-      Started event-service
-      Started es-sidecar-service
-      Started event-feed-service
-      Started secrets-service
-      Started applications-service
-      Started notifications-service
-      Started nodemanager-service
-      Started compliance-service
-      Started ingest-service
-      Started config-mgmt-service
-      Started data-feed-service
-      Started event-gateway
-      Started automate-load-balancer
+    ...
     Success: Configuration patched
     ```
+    Access the Chef Automate web UI through the same FQDN as your original Chef Habitat Builder installation, e.g. https://{{< example_fqdn "builder" >}}.
+
+Chef Habitat Builder and Chef Automate use the same mechanisms for [user authentication]({{< relref "users.md" >}}), [configuration]({{< relref "configuration.md" >}}), [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log_management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}). In particular, Chef Automate backups contain Chef Habitat Builder data as well as packages stored in Chef Habitat Builder.
 
 #### Add Chef Habitat Builder to a Chef Automate Installation
 
@@ -196,7 +198,13 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
        Success: Configuration patched
     ```
 
-### Sign in to Chef Automate and the Chef Habitat Builder
+    Access the Chef Habitat Builder web UI through the same FQDN as your original Chef Automate installation, e.g.  https://{{< example_fqdn "automate" >}}.
+
+Chef Habitat Builder and Chef Automate use the same mechanisms for [user authentication]({{< relref "users.md" >}}), [configuration]({{< relref "configuration.md" >}}), [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log_management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}). In particular, Chef Automate backups contain Chef Habitat Builder data as well as packages stored in Chef Habitat Builder.
+
+### Sign in to Chef Habitat Builder
+
+To sign in to Chef Habitat Builder, you must first sign in through the Chef Automate web UI, which is installed along with Chef Habitat Builder.
 
 1. View your login credentials in the terminal with:
 
@@ -220,19 +228,19 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
 1. Select **Sign in with Chef Automate**
 1. Sign into Chef Habitat Builder using the same credentials used with Chef Automate
 
-The Chef Automate-deployed Chef Habitat Builder supports authentication with local users only. We plan on adding more authentication methods in future releases.
+### Generate a Chef Habitat Builder Personal Access Token
 
-### Generate a Chef Habitat on-prem Builder Personal Access Token
+In order to bootstrap packages and to perform authenticated operations with the `hab` client, you must generate a Personal Access Token for Chef Habitat Builder:
 
-You need a Personal Access Token for Chef Habitat on-prem in order to bootstrap packages and to perform authenticated operations with the `hab` client.
-
-Select your Gravatar icon on the top right corner of the Chef Habitat Builder web page, and then select Profile. This will take you to a page where you can generate your access token. Make sure to save it securely.
+1. Select your Gravatar icon on the top right corner of the Chef Habitat Builder web page.
+1. Select Profile. This will take you to a page where you can generate your access token.
+1. Make sure to save your access token securely.
 
 ### Create the Core Origin
 
 Once you are signed in to the Chef Habitat Builder UI, select the **New Origin** button and enter `core` as the name for the origin.
 
-## Access Chef Habitat Builder On-prem With Chef Habitat Command-Line Tools
+## Access Chef Habitat Builder With Chef Habitat Command-Line Tools
 
 Use the `https://{{< example_fqdn "automate" >}}/bldr/v1` URL when accessing your Chef Habitat Builder installation with the Chef Habitat command-line tools.
 The Chef Habitat command-line tools recognize the [`HAB_BLDR_URL` environment variable](https://www.habitat.sh/docs/reference/), which you can set on the command line with:
@@ -241,122 +249,22 @@ The Chef Habitat command-line tools recognize the [`HAB_BLDR_URL` environment va
 export HAB_BLDR_URL=https://{{< example_fqdn "automate" >}}/bldr/v1/
 ```
 
-## Access the Chef Habitat Builder On-prem REST API
+Because you are using an on-prem installation of Chef Habitat Builder, you must specify the Builder API endpoint of your installation when following the [Habitat Builder documentation](https://www.habitat.sh/docs/using-builder/). This documentation covers [using origin keys](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), [using origin secrets](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), and [uploading and promoting packages](https://www.habitat.sh/docs/using-builder/#upload-and-promote-packages).
 
-To access the [REST API](https://www.habitat.sh/docs/api/builder-api/) for your on-prem installation of Chef Habitat Builder, you must specify your Builder authentication token as a bearer token in your request's
+## Bootstrap Chef Habitat Builder With Core Habitat Packages
+See [Bootstrap Chef Habitat Builder On-Prem]({{< relref "bootstrap_on_prem_builder.md" >}}) for directions on populating your Chef Habitat Builder installation with the necessary core packages from the public Chef Habitat Builder
+
+## Access the Chef Habitat Builder REST API
+
+To access the [REST API](https://www.habitat.sh/docs/api/builder-api/) for your installation of Chef Habitat Builder, you must specify your Builder authentication token as a bearer token in your request's
 `Authorization` header.
 For example:
 
 ```bash
-curl -H "Authorization: Bearer <your-habitat-builder-auth-token>" https://{{< example_fqdn
-"automate" >}}/bldr/v1/...
+curl -H "Authorization: Bearer <your-habitat-builder-auth-token>" https://{{< example_fqdn "automate" >}}/bldr/v1/...
 ```
 
-## Bootstrap Chef Habitat Builder with Core Packages (Optional)
-
-Prerequisites:
-
-* HTTPS connection
-* GitHub account
-* Public Chef Habitat Builder account
-* Public Chef Habitat Builder personal access token
-
-Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/README.md) to populate your on-premises Chef Habitat Builder installation with the packages required by your builds.
-[Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/master/package_seed_lists) exist for the following scenarios:
-
-* Full `core`: the full contents of the upstream `core` origin. The x86_64 Linux set expands to 12GB, the Linux kernel2 set to 1GB, and the Windows set to 3.5GB.
-* Core dependencies: a subset of `core` consisting of commonly-used buildtime dependencies.
-* Effortless: packages used to start with the [Effortless pattern](https://github.com/chef/effortless). A complete Effortless implementation requires the contents of both the `stable` and the `unstable` channel.
-
-### Clone the Chef Habitat Builder On-prem Repository
-
-To access the curated seed lists for bootstrapping Chef Habitat Builder on-prem, you will need to clone the Chef Habitat Builder on-prem repository using https.
-
-```shell
-git clone https://github.com/habitat-sh/on-prem-builder.git
-```
-
-Once the repository is successfully cloned, move into the `on-prem-builder` repository:
-
-```shell
-cd on-prem-builder
-```
-
-The Chef Automate installer uses a self-signed certificate. Copy the SSL public key certificate chain from Chef Automate into `/hab/cache/ssl` with this command:
-
-```shell
-cp /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert /hab/cache/ssl/{{< example_fqdn "automate" >}}.cert
-```
-
-### Download Seed List Packages from the Public Chef Habitat Builder
-
-Your host must have access to the internet to download the curated seed list packages from the **public** [Chef Habitat Builder](https://bldr.habitat.sh).
-If you have not already done so, create a user account and personal access token on the **public** [Chef Habitat Builder](https://bldr.habitat.sh/).
-
-Use the `hab pkg download` command with a seed list `</path/to/seed_list>` to download packages for
-your desired architecture `<arch>` from a channel `<channel>` to a directory `<artifact-dir>`:
-
-```shell
-HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
-```
-
-For example, to use the Effortless seed list to download `x86_64-linux` packages from the
-`stable` channel to the `builder_bootstrap` directory:
-
-```shell
-HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
-```
-
-### Bulk-Upload Seed List Packages to Chef Habitat Builder on-prem
-
-Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in the on-premises Chef Habitat Builder using the [Builder API endpoint]({{< ref "on_prem_builder.md#access-chef-habitat-builder-on-prem-with-chef-habitat-command-line-tools" >}}):
-
-```shell
-HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
-```
-
-For example,
-
-```shell
-HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel stable builder_bootstrap/ --auto-create-origins
-```
-
-Should produce the output:
-
-```output
-Preparing to upload artifacts to the 'stable' channel on https://{{< example_fqdn "automate" >}}/bldr/v1
-Using builder_bootstrap/artifacts for artifacts and builder_bootstrap/keys signing keys
-Found 46 artifact(s) for upload.
-Discovering origin names from local artifact cache
-Missing origin 'chef'
-Origin 'core' already exists
-Missing origin 'effortless'
-Creating origin chef.
-Created origin chef.
-Creating origin effortless.
-Created origin effortless.
-75 B / 75 B | [===========================================] 100.00 % 1.31 MB/s d
-Uploading public origin key chef-20160614114050.pub
-...
-```
-
-The `--auto-create-origins` flag creates each origin listed in the
-`<artifact-dir>/artifacts` directory. If you omit the `--auto-create-origins` flag,
-use the Chef Habitat Builder UI to create the necessary origins before running the
-`bulkupload` command.
-
-To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://{{< example_fqdn "automate" >}}/bldr/#/origins/core/packages`.
-
-## Using Chef Habitat Builder
-
-Because you are using an on-prem installation of Chef Habitat Builder, you must specify the [Builder API endpoint of your installation]({{< ref "on_prem_builder.md#access-chef-habitat-builder-on-prem-with-habitat-command-line-tools" >}}) when following the [Habitat Builder documentation](https://www.habitat.sh/docs/using-builder/).
-This documentation covers [using origin keys](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), [using origin secrets](https://www.habitat.sh/docs/using-builder/#using-origin-secrets), and [uploading and promoting packages](https://www.habitat.sh/docs/using-builder/#upload-and-promote-packages).
-
-## Operating Chef Habitat Builder
-
-Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log_management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
-
-### Logging errors
+## Logging errors
 
 To change the log level for Chef Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
@@ -369,8 +277,13 @@ scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=
 ## Setting up Automate as an OAuth Provider for Habitat Builder (Deprecated)
 
 {{< warning >}}
-These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem.
+These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat.
 {{< /warning >}}
+
+If you did not use the Chef Automate installer to deploy Chef Habitat Builder, you must
+provide user authentication using OAuth instead of the Chef Automate authentication
+stack. Configuring Chef Automate as an OAuth Provider for Chef Habitat Builder is a common
+way to do so.
 
 To configure Chef Automate as an OAuth Provider for Chef Habitat Builder, create a TOML file with the partial configuration below.
 Run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
