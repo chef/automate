@@ -222,6 +222,43 @@ fallbacks:
     - name: github.com/chzyer/logex
       license_id: MIT
       license_content: https://raw.githubusercontent.com/chzyer/logex/master/LICENSE
+    - name: cloud.google.com/go
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/master/LICENSE
+    - name: github.com/envoyproxy/protoc-gen-validate
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/master/LICENSE
+    - name: github.com/google/go-cmp
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/google/go-cmp/master/LICENSE
+    - name: github.com/prometheus/client_model
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/prometheus/client_model/master/LICENSE
+    - name: golang.org/x/exp
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/exp/master/LICENSE
+    - name: golang.org/x/lint
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/lint/master/LICENSE
+    - name: golang.org/x/sync
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/sync/master/LICENSE
+    - name: golang.org/x/tools
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/tools/master/LICENSE
+    - name: golang.org/x/xerrors
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/xerrors/master/LICENSE
+    - name: google.golang.org/appengine
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/golang/appengine/master/LICENSE
+    - name: gopkg.in/yaml.v2
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/go-yaml/yaml/v2.3.0/LICENSE
+    - name: honnef.co/go/tools
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
+
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA
