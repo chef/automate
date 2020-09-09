@@ -2,9 +2,10 @@ import { Component, Input, OnInit, OnDestroy, Output, EventEmitter } from '@angu
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
+
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { isNil } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
