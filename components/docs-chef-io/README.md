@@ -40,7 +40,7 @@ We'll fix build errors before we merge, so you don't have to
 worry about passing all the CI checks, but it might add an extra
 few days. The important part is submitting your change.
 
-### Update the Automate Repository Module In `chef/chef-web-docs`
+### Update the Chef Automate Repository Module In `chef/chef-web-docs`
 
 We use [Hugo modules](https://gohugo.io/hugo-modules/) and [vendoring](https://gohugo.io/hugo-modules/use-modules/#vendor-your-modules)
 to build Chef's documentation from multiple repositories. The Hugo modules are
@@ -50,14 +50,14 @@ is updated in a repository, those changes won't appear in https://docs.chef.io u
 Hugo modules are updated to the new commit and documentation files are updated
 in the `_vendor` directory.
 
-We use Expeditor to submit a pull request to `chef/chef-web-docs` when Automate is promoted to stable.
+We use Expeditor to submit a pull request to `chef/chef-web-docs` when Chef Automate is promoted to stable.
 
 To update the Hugo module for documentation in `chef/automate`:
 
 1. Make sure your documentation changes are merged into master in `chef/automate`.
-1. Wait for Expeditor to submit a PR to `chef/chef-web-docs` after Automate is promoted to stable.
+1. Wait for Expeditor to submit a PR to `chef/chef-web-docs` after Chef Automate is promoted to stable.
 
-If you need to manually update the Automate documentation, you can contact your
+If you need to manually update the Chef Automate documentation, you can contact your
 friendly local Docs Team who will update the Automate Hugo module for you.
 
 Or, for the adventurous:
@@ -69,7 +69,7 @@ Or, for the adventurous:
    1. `hugo mod vendor`
 1. Submit a pull request to `chef/chef-web-docs`.
 
-This will updated the Automate files that are vendored in `chef-web-docs/_vendor/github.com/chef/automate/`,
+This will updated the Chef Automate documentation files that are vendored in `chef-web-docs/_vendor/github.com/chef/automate/`,
 and update the commits in the go.mod and go.sum files in chef-web-docs.
 
 ## Local Development Environment
@@ -104,7 +104,7 @@ To install Hugo on Linux, run:
 
 We use a git submodule to grab the Hugo theme from the `chef/chef-web-docs` repository.
 
-## Preview Automate Documentation
+## Preview Chef Automate Documentation
 
 There are three ways to preview the documentation in `chef/automate`:
 
@@ -195,7 +195,7 @@ is set to.
 
 ## Creating New Pages
 
-Please keep all of the Automate documentation in the `content/automate` directory.
+Please keep all of the Chef Automate documentation in the `content/automate` directory.
 To add a new Markdown file, run the following command from the `components/docs-chef-io` directory:
 
 ```
@@ -249,7 +249,7 @@ Below is an example of a page menu entry:
     weight = 10
 ```
 
-## Automate Menu Config
+## Chef Automate Menu Config
 
 The framework for the Automate menu is located in the `config.toml` file in
 `chef/chef-web-docs` file. This defines the parent menu directories that each
@@ -582,7 +582,7 @@ Given a GRPC endpoint defined like this in the proto files:
 
 * Comment style of endpoint documentation supports multiline fields. Attribute style does not.
 
-* Descriptions support Github Flavored Markdown, which means that you can use lists, tables, code-blocks and more.
+* Descriptions support GitHub Flavored Markdown, which means that you can use lists, tables, code-blocks and more.
 
 #### Comment Style Descriptions
 
@@ -590,7 +590,7 @@ Given a GRPC endpoint defined like this in the proto files:
   /*
   List reports
   This is the description.
-  The description can span multiple lines and can contain `Github Flavored Markdown`
+  The description can span multiple lines and can contain `GitHub Flavored Markdown`
   */
   rpc ListReports(Query) returns (Reports) {
     option (google.api.http) = {
@@ -614,7 +614,7 @@ rpc ListReports(Query) returns (Reports) {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       tags: "Reporting"
       summary: "List reports"
-      description: "This is the description.\nThe description can span multiple lines and can contain Github Flavored Markdown."
+      description: "This is the description.\nThe description can span multiple lines and can contain GitHub Flavored Markdown."
     };
   };
 ```
