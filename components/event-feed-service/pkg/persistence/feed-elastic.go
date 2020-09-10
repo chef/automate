@@ -313,7 +313,7 @@ func newRangeQuery(start string, end string, fieldTime string) (*olivere.RangeQu
 	var ok = false
 
 	rangeQuery := olivere.NewRangeQuery(fieldTime).
-		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX")
 
 	if start != "" {
 		ok = true
@@ -510,7 +510,7 @@ func (efs ElasticFeedStore) GetActionLine(formattedFilters map[string][]string, 
 		bucketSize        = strconv.Itoa(interval) + "h"
 		eventTypeItems    = "items"
 		dateHistoTag      = "dateHisto"
-		timeFormatRFC3339 = "yyyy-MM-dd'T'HH:mm:ssZ"
+		timeFormatRFC3339 = "yyyy-MM-dd'T'HH:mm:ssXXX"
 		mainQuery         = newBoolQueryFromFilters(formattedFilters)
 	)
 
@@ -552,6 +552,8 @@ func (efs ElasticFeedStore) GetActionLine(formattedFilters map[string][]string, 
 	if err != nil {
 		return &feed.ActionLine{}, errors.Wrapf(err, "obtaining search source for action %s", action)
 	}
+
+	logQueryPartMin(IndexNameFeeds, src, "action line")
 
 	data, _ := json.Marshal(src)
 	logrus.WithFields(logrus.Fields{

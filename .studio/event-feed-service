@@ -14,7 +14,7 @@ document "event_feed_list" <<DOC
   List events in the feed
 DOC
 function event_feed_list() {
-  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeed -d '{"Size": 100}'
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeed -d '{"size": 100}'
 }
 
 document "event_feed_add_event" <<DOC
