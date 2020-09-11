@@ -16,9 +16,11 @@ _Contents of ths file:_
     - [Spin Everything Up](#spin-everything-up)
     - [Spin Up Just What You Need](#spin-up-just-what-you-need)
     - [Rebuilding a Habitat Component](#rebuilding-a-habitat-component)
+    - [Rebuilding without Chef Software premium content](#rebuilding-without-chef-software-premium-content)
     - [Rebuild Go Components](#rebuild-go-components)
     - [Recompiling Protobufs](#recompiling-protobufs)
     - [Accessing the Logs](#accessing-the-logs)
+    - [Running a Specific Build of Automate](#running-a-specific-build-of-automate)
   - [Working with Secrets](#working-with-secrets)
   - [Working with Automate UI](#working-with-automate-ui)
   - [But Wait There's More](#but-wait-theres-more)
@@ -198,7 +200,7 @@ proprietary assets:
 - automate-compliance-profiles: proprietary profiles available for use
   for Chef Automate users.
 
-- automate-chef-io: Our documentation contains some proprietary
+- docs-chef-io: Our documentation contains some proprietary
   assets, notably fonts.
 
 To avoid pulling in these components, set
@@ -345,8 +347,6 @@ the hab-studio to execute its unit tests as the following example:
 
 ``` console
 [1][default:/src:0]# go_component_unit ingest-service
-(help) You can always set 'GO_FAST=true' to go faster!
-=> Executing Go dependency solver (dep ensure -vendor-only)
 => Executing Go test
 === RUN   TestJsonMarshalling
 --- PASS: TestJsonMarshalling (0.01s)

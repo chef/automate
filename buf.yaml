@@ -39,18 +39,19 @@ build:
     - api
     - components
     - lib
-    - vendor/github.com/googleapis/googleapis
-    - vendor/github.com/grpc-ecosystem/grpc-gateway
-    - vendor/github.com/envoyproxy/protoc-gen-validate
+    - protovendor/github.com/googleapis/googleapis
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway
+    - protovendor/github.com/envoyproxy/protoc-gen-validate
   excludes:
     - components/notifications-service/
     - components/automate-grpc/protoc-gen-policy/testdata
-    - vendor/github.com/googleapis/googleapis/google/api/expr
-    - vendor/github.com/googleapis/googleapis/google/api/servicecontrol
-    - vendor/github.com/googleapis/googleapis/google/api/servicemanagement
-    - vendor/github.com/envoyproxy/protoc-gen-validate/license
-    - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party
-    - vendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
+    - protovendor/github.com/googleapis/googleapis/google/api/expr
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol
+    - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/license
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
 lint:
   allow_comment_ignores: true
   use:
@@ -77,6 +78,12 @@ lint:
       - external/cds/cds.proto
       - external/cfgmgmt/cfgmgmt.proto
       - external/data_lifecycle/data_lifecycle.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
       - external/infra_proxy/infra_proxy.proto
       - external/ingest/chef.proto
       - external/ingest/job_scheduler.proto
@@ -84,12 +91,6 @@ lint:
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
       - automate-gateway/api/gateway/gateway.proto
-      - automate-gateway/api/iam/v2/introspect.proto
-      - automate-gateway/api/iam/v2/policy.proto
-      - automate-gateway/api/iam/v2/rules.proto
-      - automate-gateway/api/iam/v2/teams.proto
-      - automate-gateway/api/iam/v2/tokens.proto
-      - automate-gateway/api/iam/v2/users.proto
       - automate-gateway/api/legacy/legacy.proto
       - automate-gateway/api/license/license.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -106,6 +107,12 @@ lint:
       - external/compliance/reporting/stats/stats.proto
       - external/compliance/scanner/jobs/jobs.proto
       - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
       - external/infra_proxy/infra_proxy.proto
       - external/ingest/chef.proto
       - external/ingest/job_scheduler.proto
@@ -145,12 +152,6 @@ lint:
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
       - automate-gateway/api/gateway/gateway.proto
-      - automate-gateway/api/iam/v2/introspect.proto
-      - automate-gateway/api/iam/v2/policy.proto
-      - automate-gateway/api/iam/v2/rules.proto
-      - automate-gateway/api/iam/v2/teams.proto
-      - automate-gateway/api/iam/v2/tokens.proto
-      - automate-gateway/api/iam/v2/users.proto
       - automate-gateway/api/legacy/legacy.proto
       - automate-gateway/api/license/license.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -167,6 +168,12 @@ lint:
       - external/compliance/reporting/stats/stats.proto
       - external/compliance/scanner/jobs/jobs.proto
       - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
       - external/infra_proxy/infra_proxy.proto
       - external/ingest/chef.proto
       - external/ingest/job_scheduler.proto
@@ -206,12 +213,6 @@ lint:
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
       - automate-gateway/api/gateway/gateway.proto
-      - automate-gateway/api/iam/v2/introspect.proto
-      - automate-gateway/api/iam/v2/policy.proto
-      - automate-gateway/api/iam/v2/rules.proto
-      - automate-gateway/api/iam/v2/teams.proto
-      - automate-gateway/api/iam/v2/tokens.proto
-      - automate-gateway/api/iam/v2/users.proto
       - automate-gateway/api/legacy/legacy.proto
       - automate-gateway/api/license/license.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -228,6 +229,12 @@ lint:
       - external/compliance/reporting/stats/stats.proto
       - external/compliance/scanner/jobs/jobs.proto
       - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
       - external/infra_proxy/infra_proxy.proto
       - external/ingest/chef.proto
       - external/ingest/job_scheduler.proto
@@ -267,12 +274,6 @@ lint:
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
       - automate-gateway/api/gateway/gateway.proto
-      - automate-gateway/api/iam/v2/introspect.proto
-      - automate-gateway/api/iam/v2/policy.proto
-      - automate-gateway/api/iam/v2/rules.proto
-      - automate-gateway/api/iam/v2/teams.proto
-      - automate-gateway/api/iam/v2/tokens.proto
-      - automate-gateway/api/iam/v2/users.proto
       - automate-gateway/api/legacy/legacy.proto
       - automate-gateway/api/license/license.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -281,6 +282,7 @@ lint:
       - grpc/debug/debug_api/debug.proto
     PACKAGE_SAME_GO_PACKAGE:
       # /api/
+      - external/iam/v2
       - config
       - interservice/authz
       - interservice/authn
@@ -293,7 +295,6 @@ lint:
       - interservice/pg_sidecar
       - interservice/teams
       # /components/
-      - automate-gateway/api/iam/v2
       - automate-gateway/api/gateway
       - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
@@ -311,6 +312,8 @@ lint:
       - external/compliance/reporting/reporting.proto
       - external/compliance/reporting/stats/stats.proto
       - external/compliance/scanner/jobs/jobs.proto
+      - external/iam/v2/common/policy.proto
+      - external/iam/v2/common/rules.proto
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
@@ -334,8 +337,6 @@ lint:
       - interservice/pg_sidecar/service.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
-      - automate-gateway/api/iam/v2/common/policy.proto
-      - automate-gateway/api/iam/v2/common/rules.proto
       - automate-gateway/api/notifications/notifications.proto
       # /lib/
       - grpc/debug/debug_api/debug.proto
@@ -347,6 +348,8 @@ lint:
       - external/compliance/reporting/reporting.proto
       - external/compliance/reporting/stats/stats.proto
       - external/compliance/scanner/jobs/jobs.proto
+      - external/iam/v2/common/policy.proto
+      - external/iam/v2/common/rules.proto
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
@@ -369,8 +372,6 @@ lint:
       - interservice/pg_sidecar/service.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
-      - automate-gateway/api/iam/v2/common/policy.proto
-      - automate-gateway/api/iam/v2/common/rules.proto
       - automate-gateway/api/notifications/notifications.proto
       # /lib/
       - grpc/debug/debug_api/debug.proto
@@ -388,4 +389,12 @@ lint:
     - external/habitat/event.proto # this file is owned by habitat and copied here
 breaking:
   use:
-    - WIRE_JSON
+    - PACKAGE
+  ignore:
+    # Changes to interservice APIs are okay until (if ever) we support clusters
+    # of interconnected internal services that would not upgrade in unison
+    - interservice
+    # If you NEED to make just one change to something else and have consensus
+    # it's the best/least bad option, you can add it here and remove it in a
+    # later PR:
+    # - external/oops/oops.proto

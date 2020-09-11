@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/api/external/iam/v2/request"
+	"github.com/chef/automate/api/external/iam/v2/response"
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 	middleware_authz "github.com/chef/automate/components/automate-gateway/gateway/middleware/authz"
 	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -25,8 +25,8 @@ import (
 	// (primarily nodes, notifications, and secrets at the time of writing).
 	_ "github.com/chef/automate/api/external/cfgmgmt"
 	_ "github.com/chef/automate/api/external/compliance/profiles"
+	_ "github.com/chef/automate/api/external/iam/v2"
 	_ "github.com/chef/automate/api/external/ingest"
-	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	_ "github.com/chef/automate/components/automate-gateway/api/notifications"
 )
 
@@ -189,7 +189,7 @@ func TestIntrospect(t *testing.T) {
 				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
 			&request.IntrospectReq{Path: "/apis/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
-			map[string]*response.MethodsAllowed{"/apis/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
+			map[string]*response.MethodsAllowed{"/apis/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": {Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
@@ -198,14 +198,29 @@ func TestIntrospect(t *testing.T) {
 			&request.IntrospectReq{
 				Parameters: []string{"entity_uuid=f33a996c-b4e8-4328-9730-90f4b351fa6e"},
 				Path:       "/api/v0/ingest/events/chef/run"},
-			map[string]*response.MethodsAllowed{"/api/v0/ingest/events/chef/run": &response.MethodsAllowed{Post: true}},
+			map[string]*response.MethodsAllowed{"/api/v0/ingest/events/chef/run": {Post: true}},
 		},
 		"response pair matching the request with multiple params in path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "infra:nodes:42", Action: "infra:nodes:get"},
 			}},
 			&request.IntrospectReq{Path: "/api/v0/cfgmgmt/nodes/42/runs/509"},
-			map[string]*response.MethodsAllowed{"/api/v0/cfgmgmt/nodes/42/runs/509": &response.MethodsAllowed{Get: true}},
+			map[string]*response.MethodsAllowed{"/api/v0/cfgmgmt/nodes/42/runs/509": {Get: true}},
+		},
+		"response pair matching the request with multiple params in path and multiple http methods": {
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
+				{Resource: "iam:projects:42", Action: "iam:projects:update"},
+			}},
+			&request.IntrospectReq{Path: "/apis/iam/v2/projects/42/rules/509"},
+			map[string]*response.MethodsAllowed{"/apis/iam/v2/projects/42/rules/509": {Put: true, Delete: true}},
+		},
+		"multiple response pairs matching the request with multiple http methods": {
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
+				{Resource: "iam:projects:42", Action: "iam:projects:get"},
+				{Resource: "iam:projects:42", Action: "iam:projects:update"},
+			}},
+			&request.IntrospectReq{Path: "/apis/iam/v2/projects/42/rules"},
+			map[string]*response.MethodsAllowed{"/apis/iam/v2/projects/42/rules": {Get: true, Post: true}},
 		},
 		// TODO: AUTH-1337 Either: enable this test case after providing support
 		// or remove test case if decide not to support it

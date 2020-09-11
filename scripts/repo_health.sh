@@ -11,9 +11,9 @@ desired_golang_version() {
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
 hab pkg install -b "core/go/$(desired_golang_version)"
 
-echo "Checking Go Dependencies"
+echo "Checking Go Dependencies And Vendored Protos"
 go mod verify
-scripts/revendor.sh # `go mod tidy` would be preferred here but it removes some proto code we have vendored.
+scripts/revendor.sh # Revendor extracts vendored protos to protovendor/
 git diff --exit-code --ignore-submodules=all # fail if anything's been changed
 
 echo "Checking automate-deployment binding data"
@@ -29,8 +29,8 @@ yml2json() {
 echo "Checking if Golang license fallbacks/exceptions are needed"
 license_scout=$(yml2json .license_scout.yml)
 for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks, .exceptions) | (.golang // [])[].name'); do
-    if [[ ! -d "vendor/$d" ]]; then
-        echo "dependency \"$d\" not required anymore"
+    if ! grep -q "$d" go.sum; then
+        echo "license_scout exception for dependency \"$d\" not required anymore"
         exit 1
     fi
 done

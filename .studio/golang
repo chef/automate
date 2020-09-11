@@ -95,7 +95,7 @@ function install_go() {
 }
 
 document "go_build" <<DOC
-  A go vendor aware wrapped for go build
+  Ensures go is installed, then runs \`go install\` 
 DOC
 function go_build() {
   install_go
@@ -282,7 +282,7 @@ function install_golangci() {
         if [[ ! -f  "$lint_bin" ]]; then
             log_line "Unpacking golang-ci ${GOLANGCILINTVERSION}"
             if [[ ! -f "$lint_tarball" ]]; then
-                error "Could not find $lint_tarball, did you vendor this version of golangci-lint?"
+                error "Could not find $lint_tarball"
                 return 1
             fi
             tar zxf "$lint_tarball" -C cache/

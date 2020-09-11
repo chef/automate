@@ -2,10 +2,10 @@
 name: a2
 directories:
   - ./
+  - ./api/external
   - ./components/applications-service
   - ./components/authn-service
   - ./components/authz-service
-  - ./components/automate-chef-io
   - ./components/automate-cli
   - ./components/automate-cs-bookshelf
   - ./components/automate-cs-nginx
@@ -156,6 +156,109 @@ fallbacks:
     - name: github.com/bgentry/go-netrc
       license_id: MIT
       license_content: https://raw.githubusercontent.com/bgentry/go-netrc/master/LICENSE
+    - name: bazil.org/fuse
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/bazil/fuse/master/LICENSE
+    - name: github.com/BurntSushi/xgb
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/BurntSushi/xgb/master/LICENSE
+    - name: github.com/bmizerany/assert
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/bmizerany/assert/master/README.md
+    - name: github.com/gonum/blas
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/floats
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/internal
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/lapack
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/gonum/matrix
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gonum/license/master/LICENSE
+    - name: github.com/julienschmidt/httprouter
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/julienschmidt/httprouter/master/LICENSE
+    - name: github.com/kr/logfmt
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/kr/logfmt/master/Readme
+    - name: github.com/miekg/dns
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/miekg/dns/master/LICENSE
+    - name: github.com/pascaldekloe/goe
+      license_id: CC0-1.0
+      license_content: https://raw.githubusercontent.com/pascaldekloe/goe/master/LICENSE
+    - name: github.com/russross/blackfriday/v2
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/russross/blackfriday/master/LICENSE.txt
+    - name: github.com/russross/blackfriday
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/russross/blackfriday/master/LICENSE.txt
+    - name: github.com/sean-/seed
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/sean-/seed/master/LICENSE
+    - name: github.com/smartystreets/assertions
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets/assertions/master/LICENSE.md
+    - name: github.com/smartystreets/goconvey
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets/goconvey/master/LICENSE.md
+    - name: github.com/ziutek/mymysql
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/ziutek/mymysql/master/LICENSE
+    - name: gopkg.in/check.v1
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/go-check/check/v1/LICENSE
+    - name: gopkg.in/tomb.v1
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/go-tomb/tomb/v1/LICENSE
+    - name: github.com/josharian/intern
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/josharian/intern/master/license.md
+    - name: github.com/chzyer/logex
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/chzyer/logex/master/LICENSE
+    - name: cloud.google.com/go
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/googleapis/google-cloud-go/master/LICENSE
+    - name: github.com/envoyproxy/protoc-gen-validate
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/master/LICENSE
+    - name: github.com/google/go-cmp
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/google/go-cmp/master/LICENSE
+    - name: github.com/prometheus/client_model
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/prometheus/client_model/master/LICENSE
+    - name: golang.org/x/exp
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/exp/master/LICENSE
+    - name: golang.org/x/lint
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/lint/master/LICENSE
+    - name: golang.org/x/sync
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/sync/master/LICENSE
+    - name: golang.org/x/tools
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/tools/master/LICENSE
+    - name: golang.org/x/xerrors
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/xerrors/master/LICENSE
+    - name: google.golang.org/appengine
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/golang/appengine/master/LICENSE
+    - name: gopkg.in/yaml.v2
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/go-yaml/yaml/v2.3.0/LICENSE
+    - name: honnef.co/go/tools
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
+
   habitat:
     - name: chef/mlsa
       license_id: Chef-MLSA

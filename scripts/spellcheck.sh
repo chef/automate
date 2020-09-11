@@ -42,7 +42,7 @@ test -f cspell.json || fatal "Oh dear, oh dear: config file (cspell.json) is mis
 # OPTS are options that will be passed to cspell
 OPTS=()
 # CHECK_GLOBAL_DOCS controls whether we check the dev-docs and
-# automate-chef-io content folders. We set this to true unless the
+# docs-chef-io content folders. We set this to true unless the
 # user specifies directories.
 CHECK_GLOBAL_DOCS="false"
 # Directories to scan for spelling errors. If the user does not

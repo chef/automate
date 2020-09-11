@@ -291,11 +291,11 @@ func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {
 			// top-level of protos that are located within the components
 			filepath.Join(topLevel, "components"),
 			// for google/api/{annotations,http}.proto
-			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
+			filepath.Join(topLevel, "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
 			// for validate/validate.proto
-			filepath.Join(topLevel, "vendor/github.com/envoyproxy/protoc-gen-validate/"),
+			filepath.Join(topLevel, "protovendor/github.com/envoyproxy/protoc-gen-validate/"),
 			// for protoc-gen-swagger/options/annotations.proto
-			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/"),
+			filepath.Join(topLevel, "protovendor/github.com/grpc-ecosystem/grpc-gateway/"),
 		},
 	}
 	return parser.ParseFiles(files...)

@@ -23,8 +23,8 @@ paths = [
   "api/config/platform/*",
   "api/config/shared/*",
   "api/external/annotations/*",
+  "api/external/iam/*",
   "api/interservice/pg_sidecar/*",
-  "components/automate-gateway/api/iam/*",
   "components/pg-sidecar-service/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -35,40 +35,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [backup-gateway]
@@ -109,11 +76,11 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/teams/*",
-  "components/automate-gateway/api/iam/*",
   "lib/authz/*",
   "lib/cereal/*",
   "lib/db/*",
@@ -130,46 +97,7 @@ paths = [
   "lib/tracing/*",
   "lib/user/*",
   "lib/uuid4/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/coreos/go-oidc/*",
-  "vendor/github.com/envoyproxy/protoc-gen-validate/*",
-  "vendor/github.com/ghodss/yaml/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/pquerna/cachecontrol/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/teambition/rrule-go/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/oauth2/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/square/go-jose.v2/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [authz-service]
@@ -180,10 +108,10 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/event/*",
-  "components/automate-gateway/api/iam/*",
   "lib/authz/*",
   "lib/cereal/*",
   "lib/db/*",
@@ -200,63 +128,7 @@ paths = [
   "lib/user/*",
   "lib/uuid4/*",
   "lib/validate/*",
-  "lib/version/*",
-  "vendor/github.com/OneOfOne/xxhash/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/davecgh/go-spew/*",
-  "vendor/github.com/envoyproxy/protoc-gen-validate/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/ghodss/yaml/*",
-  "vendor/github.com/gobwas/glob/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/jhump/protoreflect/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/open-policy-agent/opa/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/patrickmn/go-cache/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/pmezard/go-difflib/*",
-  "vendor/github.com/rcrowley/go-metrics/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/stretchr/testify/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/teambition/rrule-go/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/github.com/yashtewari/glob-intersection/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*",
-  "vendor/gopkg.in/yaml.v3/*"
+  "lib/version/*"
 ]
 
 [automate-dex]
@@ -271,52 +143,14 @@ paths = [
   "components/event-gateway/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
-  "components/automate-gateway/api/iam/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/envoyproxy/protoc-gen-validate/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/nats-io/gnatsd/*",
-  "vendor/github.com/nats-io/jwt/*",
-  "vendor/github.com/nats-io/nats.go/*",
-  "vendor/github.com/nats-io/nkeys/*",
-  "vendor/github.com/nats-io/nuid/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [automate-gateway]
@@ -376,6 +210,7 @@ paths = [
   "api/external/data_feed/*",
   "api/external/data_lifecycle/*",
   "api/external/event_feed/*",
+  "api/external/iam/*",
   "api/external/infra_proxy/*",
   "api/external/ingest/*",
   "api/external/lib/*",
@@ -420,6 +255,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/beorn7/perks/*",
@@ -475,6 +311,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [automate-load-balancer]
@@ -498,6 +337,7 @@ paths = [
   "api/external/annotations/*",
   "api/external/common/*",
   "api/external/data_lifecycle/*",
+  "api/external/iam/*",
   "api/external/ingest/*",
   "api/external/lib/*",
   "api/external/secrets/*",
@@ -510,7 +350,6 @@ paths = [
   "api/interservice/event/*",
   "api/interservice/nodemanager/*",
   "components/authz-service/*",
-  "components/automate-gateway/api/iam/*",
   "components/event-service/*",
   "components/nodemanager-service/*",
   "components/notifications-client/*",
@@ -531,6 +370,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/cloud.google.com/go/compute/*",
   "vendor/contrib.go.opencensus.io/exporter/ocagent/*",
@@ -624,6 +464,9 @@ paths = [
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*",
   "vendor/gopkg.in/yaml.v3/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [config-mgmt-service]
@@ -635,11 +478,11 @@ paths = [
   "api/external/annotations/*",
   "api/external/cfgmgmt/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/cfgmgmt/*",
   "components/authz-service/*",
-  "components/automate-gateway/api/iam/*",
   "components/ingest-service/*",
   "lib/authz/*",
   "lib/cereal/*",
@@ -658,6 +501,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/BurntSushi/toml/*",
   "vendor/github.com/apache/thrift/*",
@@ -710,6 +554,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [automate-cli]
@@ -767,13 +614,13 @@ paths = [
   "api/external/compliance/*",
   "api/external/data_lifecycle/*",
   "api/external/habitat/*",
+  "api/external/iam/*",
   "api/interservice/data_lifecycle/*",
   "api/interservice/deployment/*",
   "api/interservice/es_sidecar/*",
   "components/applications-service/*",
   "components/authz-service/*",
   "components/automate-deployment/*",
-  "components/automate-gateway/api/iam/*",
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
   "lib/cereal/*",
@@ -794,6 +641,7 @@ paths = [
   "lib/tracing/*",
   "lib/user/*",
   "lib/uuid4/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/cloud.google.com/go/compute/*",
   "vendor/cloud.google.com/go/iam/*",
@@ -889,6 +737,9 @@ paths = [
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*",
   "vendor/gopkg.in/yaml.v3/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [deployment-service]
@@ -943,6 +794,7 @@ paths = [
   "api/external/annotations/*",
   "api/external/cfgmgmt/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/external/ingest/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
@@ -958,7 +810,6 @@ paths = [
   "api/interservice/teams/*",
   "components/authz-service/*",
   "components/automate-cli/*",
-  "components/automate-gateway/api/iam/*",
   "components/automate-grpc/*",
   "components/config-mgmt-service/*",
   "components/es-sidecar-service/*",
@@ -985,6 +836,7 @@ paths = [
   "lib/tracing/*",
   "lib/user/*",
   "lib/uuid4/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/cloud.google.com/go/compute/*",
   "vendor/cloud.google.com/go/iam/*",
@@ -1086,6 +938,9 @@ paths = [
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*",
   "vendor/gopkg.in/yaml.v3/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [es-sidecar-service]
@@ -1093,12 +948,13 @@ plan_path = "components/es-sidecar-service"
 paths = [
   "components/es-sidecar-service/*",
   "api/external/annotations/*",
+  "api/external/iam/*",
   "api/interservice/es_sidecar/*",
-  "components/automate-gateway/api/iam/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/tls/*",
   "lib/tracing/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
@@ -1134,6 +990,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [automate-es-gateway]
@@ -1149,8 +1008,8 @@ paths = [
   "api/config/platform/*",
   "api/config/shared/*",
   "api/external/annotations/*",
+  "api/external/iam/*",
   "api/interservice/pg_sidecar/*",
-  "components/automate-gateway/api/iam/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -1165,46 +1024,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/davecgh/go-spew/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/pmezard/go-difflib/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/stretchr/objx/*",
-  "vendor/github.com/stretchr/testify/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*",
-  "vendor/gopkg.in/yaml.v3/*"
+  "lib/version/*"
 ]
 
 [automate-pg-gateway]
@@ -1220,70 +1040,18 @@ paths = [
   "api/external/annotations/*",
   "api/external/common/*",
   "api/external/event_feed/*",
+  "api/external/iam/*",
   "api/external/ingest/*",
   "api/interservice/compliance/*",
   "api/interservice/event/*",
   "api/interservice/event_feed/*",
   "api/interservice/ingest/*",
-  "components/automate-gateway/api/iam/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/simpledatemath/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/armon/go-metrics/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/fatih/color/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/gogo/protobuf/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/go-hclog/*",
-  "vendor/github.com/hashicorp/go-immutable-radix/*",
-  "vendor/github.com/hashicorp/go-msgpack/*",
-  "vendor/github.com/hashicorp/golang-lru/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/hashicorp/raft/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mattn/go-colorable/*",
-  "vendor/github.com/mattn/go-isatty/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/nats-io/gnatsd/*",
-  "vendor/github.com/nats-io/jwt/*",
-  "vendor/github.com/nats-io/nats-server/*",
-  "vendor/github.com/nats-io/nats-streaming-server/*",
-  "vendor/github.com/nats-io/nats.go/*",
-  "vendor/github.com/nats-io/nkeys/*",
-  "vendor/github.com/nats-io/nuid/*",
-  "vendor/github.com/nats-io/stan.go/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/prometheus/procfs/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.etcd.io/bbolt/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [applications-service]
@@ -1296,9 +1064,9 @@ paths = [
   "api/external/applications/*",
   "api/external/common/*",
   "api/external/habitat/*",
+  "api/external/iam/*",
   "api/external/lib/*",
   "api/interservice/cereal/*",
-  "components/automate-gateway/api/iam/*",
   "lib/cereal/*",
   "lib/db/*",
   "lib/grpc/*",
@@ -1314,6 +1082,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/beorn7/perks/*",
@@ -1374,6 +1143,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [applications-load-gen]
@@ -1383,24 +1155,7 @@ paths = [
   "api/external/habitat/*",
   "components/applications-service/*",
   "lib/tls/*",
-  "lib/uuid4/*",
-  "vendor/github.com/BurntSushi/toml/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/gogo/protobuf/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/nats-io/jwt/*",
-  "vendor/github.com/nats-io/nats.go/*",
-  "vendor/github.com/nats-io/nkeys/*",
-  "vendor/github.com/nats-io/nuid/*",
-  "vendor/github.com/nats-io/stan.go/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/google.golang.org/protobuf/*"
+  "lib/uuid4/*"
 ]
 
 [nodemanager-service]
@@ -1411,6 +1166,7 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/external/lib/*",
   "api/external/secrets/*",
   "api/interservice/authz/*",
@@ -1419,7 +1175,6 @@ paths = [
   "api/interservice/event/*",
   "api/interservice/nodemanager/*",
   "components/authz-service/*",
-  "components/automate-gateway/api/iam/*",
   "components/compliance-service/*",
   "components/event-service/*",
   "lib/authz/*",
@@ -1436,6 +1191,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/cloud.google.com/go/compute/*",
   "vendor/contrib.go.opencensus.io/exporter/ocagent/*",
@@ -1521,6 +1277,9 @@ paths = [
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*",
   "vendor/gopkg.in/yaml.v3/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [ingest-service]
@@ -1534,6 +1293,7 @@ paths = [
   "api/external/common/*",
   "api/external/data_lifecycle/*",
   "api/external/event_feed/*",
+  "api/external/iam/*",
   "api/external/ingest/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
@@ -1545,7 +1305,6 @@ paths = [
   "api/interservice/event_feed/*",
   "api/interservice/ingest/*",
   "api/interservice/nodemanager/*",
-  "components/automate-gateway/api/iam/*",
   "components/config-mgmt-service/*",
   "components/event-service/*",
   "lib/authz/*",
@@ -1563,6 +1322,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/buger/jsonparser/*",
@@ -1609,6 +1369,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [license-control-service]
@@ -1618,8 +1381,8 @@ paths = [
   "api/config/platform/*",
   "api/config/shared/*",
   "api/external/annotations/*",
+  "api/external/iam/*",
   "api/interservice/license_control/*",
-  "components/automate-gateway/api/iam/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -1632,47 +1395,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/dgrijalva/jwt-go/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [local-user-service]
@@ -1681,10 +1404,10 @@ paths = [
   "components/local-user-service/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authz/*",
   "api/interservice/local_user/*",
   "api/interservice/teams/*",
-  "components/automate-gateway/api/iam/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/logger/*",
@@ -1692,41 +1415,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/uuid4/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/dexidp/dex/*",
-  "vendor/github.com/envoyproxy/protoc-gen-validate/*",
-  "vendor/github.com/ghodss/yaml/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/muesli/crunchy/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/github.com/xrash/smetrics/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [secrets-service]
@@ -1737,9 +1426,9 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/external/lib/*",
   "api/external/secrets/*",
-  "components/automate-gateway/api/iam/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -1752,6 +1441,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
@@ -1799,6 +1489,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [session-service]
@@ -1808,7 +1501,7 @@ paths = [
   "api/config/platform/*",
   "api/config/shared/*",
   "api/external/annotations/*",
-  "components/automate-gateway/api/iam/*",
+  "api/external/iam/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/httputils/*",
@@ -1822,54 +1515,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/alexedwards/scs/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/coreos/go-oidc/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/gorilla/mux/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/patrickmn/go-cache/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/pquerna/cachecontrol/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/crypto/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/oauth2/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/square/go-jose.v2/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [teams-service]
@@ -1880,10 +1526,10 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/teams/*",
-  "components/automate-gateway/api/iam/*",
   "lib/authz/*",
   "lib/cereal/*",
   "lib/db/*",
@@ -1897,50 +1543,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/envoyproxy/protoc-gen-validate/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/mock/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/go-grpc-middleware/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/teambition/rrule-go/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [trial-license-service]
@@ -1948,37 +1551,7 @@ plan_path = "components/trial-license-service"
 paths = [
   "components/trial-license-service/*",
   "lib/logger/*",
-  "lib/version/*",
-  "vendor/github.com/dgrijalva/jwt-go/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/segmentio/backo-go/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/xtgo/uuid/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/segmentio/analytics-go.v3/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [automate-cs-bookshelf]
@@ -1996,6 +1569,7 @@ paths = [
 [automate-cs-oc-erchef]
 plan_path = "components/automate-cs-oc-erchef"
 paths = [
+<<<<<<< HEAD
   "components/automate-cs-oc-erchef/*",
   "vendor/github.com/josharian/intern/*",
   "vendor/github.com/mailru/easyjson/*",
@@ -2004,6 +1578,9 @@ paths = [
   "vendor/github.com/sirupsen/logrus/*",
   "vendor/golang.org/x/sys/*",
   "vendor/gopkg.in/olivere/elastic.v6/*"
+=======
+  "components/automate-cs-oc-erchef/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [automate-cs-nginx]
@@ -2012,12 +1589,7 @@ paths = [
   "components/automate-cs-nginx/*",
   "lib/io/*",
   "lib/secrets/*",
-  "lib/user/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/golang.org/x/sys/*"
+  "lib/user/*"
 ]
 
 [automate-workflow-nginx]
@@ -2042,13 +1614,13 @@ paths = [
   "api/external/cfgmgmt/*",
   "api/external/common/*",
   "api/external/data_feed/*",
+  "api/external/iam/*",
   "api/external/lib/*",
   "api/external/secrets/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/cfgmgmt/*",
   "api/interservice/compliance/*",
-  "components/automate-gateway/api/iam/*",
   "components/config-mgmt-service/*",
   "components/ingest-service/*",
   "lib/authz/*",
@@ -2064,6 +1636,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
@@ -2112,6 +1685,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [event-feed-service]
@@ -2122,6 +1698,7 @@ paths = [
   "api/external/common/*",
   "api/external/data_lifecycle/*",
   "api/external/event_feed/*",
+  "api/external/iam/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/data_lifecycle/*",
@@ -2129,7 +1706,6 @@ paths = [
   "api/interservice/event/*",
   "api/interservice/event_feed/*",
   "components/authz-service/*",
-  "components/automate-gateway/api/iam/*",
   "lib/authz/*",
   "lib/cereal/*",
   "lib/datalifecycle/*",
@@ -2139,6 +1715,7 @@ paths = [
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
@@ -2179,6 +1756,9 @@ paths = [
   "vendor/gopkg.in/ini.v1/*",
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [cereal-service]
@@ -2188,8 +1768,8 @@ paths = [
   "api/config/platform/*",
   "api/config/shared/*",
   "api/external/annotations/*",
+  "api/external/iam/*",
   "api/interservice/cereal/*",
-  "components/automate-gateway/api/iam/*",
   "lib/cereal/*",
   "lib/db/*",
   "lib/grpc/*",
@@ -2201,44 +1781,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/golang-migrate/migrate/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/lib/pq/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/peterbourgon/mergemap/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/teambition/rrule-go/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [infra-proxy-service]
@@ -2249,11 +1792,11 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/external/lib/*",
   "api/external/secrets/*",
   "api/interservice/authz/*",
   "api/interservice/infra_proxy/*",
-  "components/automate-gateway/api/iam/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -2265,6 +1808,7 @@ paths = [
   "lib/tls/*",
   "lib/tracing/*",
   "lib/user/*",
+<<<<<<< HEAD
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
@@ -2318,6 +1862,9 @@ paths = [
   "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*",
   "vendor/gopkg.in/yaml.v3/*"
+=======
+  "lib/version/*"
+>>>>>>> d63778a5dc3511e3e27712504529d376d54036d3
 ]
 
 [automate-cds]
@@ -2327,51 +1874,15 @@ paths = [
   "api/external/annotations/*",
   "api/external/cds/*",
   "api/external/common/*",
+  "api/external/iam/*",
   "api/interservice/cds/*",
   "api/interservice/compliance/*",
-  "components/automate-gateway/api/iam/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/logger/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/fsnotify/fsnotify/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/hashicorp/hcl/*",
-  "vendor/github.com/magiconair/properties/*",
-  "vendor/github.com/mitchellh/mapstructure/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pelletier/go-toml/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/afero/*",
-  "vendor/github.com/spf13/cast/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/jwalterweatherman/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/spf13/viper/*",
-  "vendor/github.com/subosito/gotenv/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/go.uber.org/atomic/*",
-  "vendor/go.uber.org/multierr/*",
-  "vendor/go.uber.org/zap/*",
-  "vendor/go.uber.org/zap/buffer/*",
-  "vendor/go.uber.org/zap/internal/*",
-  "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*",
-  "vendor/google.golang.org/protobuf/*",
-  "vendor/gopkg.in/ini.v1/*",
-  "vendor/gopkg.in/yaml.v2/*"
+  "lib/version/*"
 ]
 
 [automate-minio]
@@ -2418,12 +1929,6 @@ plan_path = "components/automate-ui"
 paths = [
   "components/automate-ui/*",
   "components/chef-ui-library/*"
-]
-
-[automate-chef-io]
-plan_path = "components/automate-chef-io"
-paths = [
-      "components/automate-chef-io/*"
 ]
 
 [notifications-service]

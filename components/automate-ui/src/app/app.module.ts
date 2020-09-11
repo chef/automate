@@ -126,9 +126,6 @@ import { DateSelectorComponent } from './page-components/date-selector/date-sele
 import {
   DeletableNodeControlComponent
 } from './page-components/deletable-node-control/deletable-node-control.component';
-import {
-  DeleteNotificationDialogComponent
-} from './page-components/delete-notification-dialog/delete-notification-dialog.component';
 import { DeltaViewerComponent } from './page-components/delta-viewer/delta-viewer.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';
 import {
@@ -217,7 +214,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
-    DeleteNotificationDialogComponent,
     DeltaViewerComponent,
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
@@ -261,9 +257,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent
-  ],
-  entryComponents: [
-    DeleteNotificationDialogComponent
   ],
   imports: [
     ApiTokenModule,

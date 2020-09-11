@@ -79,7 +79,7 @@ function notifications_compile_protobuf() {
       -I/src/api/ \
       -I/src/components/ \
       -I/src/ \
-      -I/src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/ \
+      -I/src/protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/ \
       notifications.proto \
       rules.proto \
       server.proto \

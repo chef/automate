@@ -11,15 +11,11 @@
         <table>
           <thead>
             <tr class="detail-row">
-              <th class="id-column">Name</th>
-              <th class="id-column">Admin User</th>
               <th class="projects-column">Projects</th>
             </tr>
           </thead>
           <tbody>
             <tr class="detail-row">
-              <td class="id-column">{{ org?.name }}</td>
-              <td class="id-column">{{ org?.admin_user }}</td>
               <td class="projects-column" data-cy="organization-details-projects" [ngSwitch]="org?.projects.length">
                 <ng-container *ngSwitchCase="0">{{ unassigned }}</ng-container>
                 <ng-container *ngSwitchCase="1">{{ org?.projects[0] }}</ng-container>

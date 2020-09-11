@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/response";
+
+message MethodsAllowed {
+    bool get = 1;
+    bool put = 2;
+    bool post = 3;
+    bool delete = 4;
+    bool patch = 5;
+}
+
+message IntrospectResp {
+    map<string, MethodsAllowed> endpoints = 1;
+}

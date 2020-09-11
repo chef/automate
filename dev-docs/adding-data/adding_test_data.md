@@ -97,7 +97,12 @@ there are three options...
     
     100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
     <sub>_*Only for servers & organizations testing does not get cookbooks, roles, data bags, environments etc data._<sub>
-1. [internal steps](https://chefio.slack.com/archives/CPYNX33LJ/p1583485764104300) this is the only method that works against a running chef server and will allow you to get data like cookbooks, roles, data bags, environments etc.
+1. [internal steps](https://chefio.slack.com/archives/CPYNX33LJ/p1583485764104300)
+    it will add the chef infra server detail running on AWS ec2 instance and will allow you to get data like cookbooks, roles, data bags, environments etc.
+
+1. `infra_service_load_chef_repo`
+
+    This will spin up the local chef infra server and it will add the data resides at [chef-repo](./infra/chef-repo) folder using `knife upload` method.
 
 ----------------------------------------------------------------------------------
 # DELETING DATA

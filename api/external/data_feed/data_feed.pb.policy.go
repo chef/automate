@@ -3,7 +3,7 @@
 
 package data_feed
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/AddDestination", "datafeed:destination", "datafeed:destination:add", "POST", "/api/v0/datafeed/destination", func(unexpandedResource string, input interface{}) string {

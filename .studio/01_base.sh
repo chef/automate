@@ -217,11 +217,7 @@ wait_for_ok_response() {
 document "install_go_tool" <<DOC
   Install the specified go tool(s).
   @(arg:*) The array of packages you wish to install.
-  The default behavior is to install go tools with 'go install -v -mod=vendor'
-
-  To install tools not included in the vendor directory, you'll either need to
-  include them and revendor or unset GO_LDFLAGS so that we don't use the
-  module vendor directory when installing the binary to the GOBIN directory.
+  The default behavior is to install go tools with 'go install -v'
 DOC
 install_go_tool() {
   install_if_missing "$(desired_golang_ident)" go

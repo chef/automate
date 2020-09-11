@@ -34,7 +34,7 @@ do_default_build() {
   mkdir -p "${tmp_bin}"
 
   local go_cmd
-  go_cmd="GOBIN=${tmp_bin} go install -mod=vendor"
+  go_cmd="GOBIN=${tmp_bin} go install"
 
   # Default to a static build unless the user plan has defined the
   # scaffolding_go_no_static variable.

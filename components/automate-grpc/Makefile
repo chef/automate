@@ -1,6 +1,6 @@
 include ../../Makefile.common_go
 
-GO_PROTOC=protoc -Iexample -I../../vendor --go_out=plugins=grpc:example
+GO_PROTOC=protoc -Iexample -I../../protvendor --go_out=plugins=grpc:example
 PROTO_FILES = $(wildcard example/*.proto)
 
 unit:

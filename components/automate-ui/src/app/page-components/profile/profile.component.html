@@ -45,7 +45,7 @@
               #focusElement>About</button>
           </li>
           <li>
-            <a href="https://www.chef.io/online-master-agreement/" target="_blank"
+            <a href="https://www.chef.io/online-master-agreement/" target="_blank" rel="noopener"
               (click)="closeDropdown()"
               (keydown.arrowup)="handleArrowUp($event)"
               (keydown.arrowdown)="handleArrowDown($event)"
@@ -55,7 +55,17 @@
             </a>
           </li>
           <li>
-            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" class="release-notes"
+            <a href="https://www.chef.io/patents" target="_blank" rel="noopener"
+              (click)="closeDropdown()"
+              (keydown.arrowup)="handleArrowUp($event)"
+              (keydown.arrowdown)="handleArrowDown($event)"
+              role="menuitem"
+              #focusElement>
+              Chef Patents <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+            </a>
+          </li>
+          <li>
+            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" rel="noopener" class="release-notes"
               (click)="closeDropdown()"
               (keydown.arrowup)="handleArrowUp($event)"
               (keydown.arrowdown)="handleArrowDown($event)"

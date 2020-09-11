@@ -1,0 +1,713 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2";
+
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+import "external/iam/v2/request/policy.proto";
+import "external/iam/v2/response/policy.proto";
+
+import "external/annotations/iam/annotations.proto";
+
+service Policies {
+
+  /*
+  Creates a custom policy
+
+  Creates a custom IAM policy used to control permissions in Automate.
+  A policy is composed of one or more statements that grant permissions to a set of members.
+  Each statement contains a role as well as a list of projects.
+
+  The role defines a set of actions that the statement is scoped to.
+  The project list defines the set of resources that the statement is scoped to.
+  Pass `"projects": ["*"]` to scope a statement to every project.
+
+  A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
+  whereas the *statement-level* projects list defines which projects the statement applies to.
+
+  The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
+  on a few projects for all LDAP teams and a custom role `qa` on a specific project.
+
+  Authorization Action:
+  ```
+  iam:policies:create
+  ```
+  */
+  rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/policies"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies";
+    option (chef.automate.api.iam.policy).action = "iam:policies:create";
+  };
+
+  /*
+  Gets a policy
+
+  Returns the details for a policy.
+
+  Authorization Action:
+  ```
+  iam:policies:get
+  ```
+  */
+  rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/policies/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:policies:get"; // TODO: check
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
+
+  /*
+  Lists all policies
+
+  Lists all policies.
+
+  Authorization Action:
+  ```
+  iam:policies:list
+  ```
+  */
+  rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/policies"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies";
+    option (chef.automate.api.iam.policy).action = "iam:policies:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
+
+  /*
+  Deletes a custom policy
+
+  Deletes a specified custom policy. You cannot delete Chef-managed policies.
+
+  Authorization Action:
+  ```
+  iam:policies:delete
+  ```
+  */
+  rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/policies/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:policies:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
+
+  /*
+  Updates a custom policy
+
+  This operation overwrites all fields excepting ID,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
+  The only exception is the policy ID, which is immutable; it can only be set at creation time.
+
+  While you can use this endpoint to update members on a policy, if that is the only
+  property you wish to modify you might find it more convenient to use one of these endpoints instead:
+  Add policy members, Remove policy members, or Replace policy members.
+
+  Authorization Action:
+  ```
+  iam:policies:update
+  ```
+  */
+  rpc UpdatePolicy (UpdatePolicyReq) returns (UpdatePolicyResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Updated Viewer Policy", "members": ["user:ldap:newuser", "team:ldap:newteam"], "statements": [{"role": "viewer","projects":["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/policies/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:policies:update";
+  };
+
+  /*
+  Gets IAM version
+
+  Returns the major and minor version of IAM that your automate installation is running.
+
+  Authorization Action:
+  ```
+  iam:policies:get
+  ```
+  */
+  rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/policy_version"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policyVersion";
+    option (chef.automate.api.iam.policy).action = "iam:policies:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
+
+  /*
+  Lists policy members
+
+  Lists all members of a specific policy.
+
+  Authorization Action:
+  ```
+  iam:policyMembers:get
+  ```
+  */
+  rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/policies/{id}/members"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
+    option (chef.automate.api.iam.policy).action = "iam:policyMembers:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
+
+  /*
+  Replaces policy members
+
+  Replaces the entire member list of a specific policy with a new list.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+
+  Authorization Action:
+  ```
+  iam:policyMembers:update
+  ```
+  */
+  rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/policies/{id}/members"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
+    option (chef.automate.api.iam.policy).action = "iam:policyMembers:update";
+  };
+
+  /*
+  Removes policy members
+
+  Removes members from the member list of a specific policy. Silently ignores
+  members that are not already part of the member list.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+
+  The removed members will still exist within Chef Automate, but are no longer associated with this policy.
+
+  Authorization Action:
+  ```
+  iam:policyMembers:delete
+  ```
+  */
+  rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/policies/{id}/members:remove"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
+    option (chef.automate.api.iam.policy).action = "iam:policyMembers:delete";
+  };
+
+  /*
+  Adds policy members
+
+  Adds members to the member list of a specific policy.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+
+  Authorization Action:
+  ```
+  iam:policyMembers:create
+  ```
+  */
+  rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/policies/{id}/members:add"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
+    option (chef.automate.api.iam.policy).action = "iam:policyMembers:create";
+  };
+
+  /*
+  Creates a custom role
+
+  Creates a new role to be used in the policies that control permissions in Automate.
+
+  A role defines the scope of actions in a policy statement.
+
+  Authorization Action:
+  ```
+  iam:roles:create
+  ```
+  */
+  rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "roles";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/roles"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:roles";
+    option (chef.automate.api.iam.policy).action = "iam:roles:create";
+  };
+
+  /*
+  Lists all roles
+
+  Lists all *Chef-managed* and *Custom* roles.
+
+  Authorization Action:
+  ```
+  iam:roles:list
+  ```
+  */
+  rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/roles"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:roles";
+    option (chef.automate.api.iam.policy).action = "iam:roles:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
+
+  /*
+  Gets a role
+
+  Returns the details for a role.
+
+  Authorization Action:
+  ```
+  iam:roles:get
+  ```
+  */
+  rpc GetRole (GetRoleReq) returns (GetRoleResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/roles/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:roles:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
+
+  /*
+  Deletes a custom role
+
+  Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
+  If such a statement has no other associated actions, the statement is deleted as well.
+  Similarly, if that statement removal results in a policy with no other statements,
+  that policy is removed as well.
+
+  Authorization Action:
+  ```
+  iam:roles:delete
+  ```
+  */
+  rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/roles/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:roles:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
+
+  /*
+  Updates a custom role
+
+  This operation overwrites all fields excepting ID,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
+
+  Authorization Action:
+  ```
+  iam:roles:update
+  ```
+  */
+  rpc UpdateRole (UpdateRoleReq) returns (UpdateRoleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "roles";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Updated Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/roles/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:roles:update";
+  };
+
+  /*
+  Creates a project
+
+  Creates a new project to be used in the policies that control permissions in Automate.
+
+  A project defines the scope of resources in a policy statement. Resources can be in more than one project.
+
+  When a project is created, the system also creates three policies associated with the new project,
+  one for each of the following roles: editor, viewer, and project owner.
+  You can optionally pass the `skip_policies` flag set to `true` to skip the creation of these policies.
+
+  Authorization Action:
+  ```
+  iam:projects:create
+  ```
+  */
+  rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Custom Project", "id": "custom-project", "skip_policies": true}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      post: "/apis/iam/v2/projects"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects";
+    option (chef.automate.api.iam.policy).action = "iam:projects:create";
+  };
+
+  /*
+  Updates a project
+
+  Updates the name of an existing project.
+
+  Authorization Action:
+  ```
+  iam:projects:update
+  ```
+  */
+  rpc UpdateProject (UpdateProjectReq) returns (UpdateProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Custom Updated Project Name"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+    option (google.api.http) = {
+      put: "/apis/iam/v2/projects/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
+  };
+
+  /*
+  Gets a project
+
+  Returns the details for a project.
+
+  Authorization Action:
+  ```
+  iam:projects:get
+  ```
+  */
+  rpc GetProject (GetProjectReq) returns (GetProjectResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/projects/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
+  };
+
+  /*
+  Lists all projects
+
+  Lists all projects.
+
+  Authorization Action:
+  ```
+  iam:projects:list
+  ```
+  */
+  rpc ListProjects (ListProjectsReq) returns (ListProjectsResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/projects"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects";
+    option (chef.automate.api.iam.policy).action = "iam:projects:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
+  };
+
+  /*
+  Deletes a project
+
+  Deletes a project from any resources tagged with it.
+
+  Also deletes this project from any project list in any policy statements.
+  If the resulting project list for a given statement is empty, it is deleted.
+  If the resulting policy has no statements, it is also deleted.
+
+  Authorization Action:
+  ```
+  iam:projects:delete
+  ```
+  */
+  rpc DeleteProject (DeleteProjectReq) returns (DeleteProjectResp) {
+    option (google.api.http) = {
+      delete: "/apis/iam/v2/projects/{id}"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
+  };
+
+  rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
+    option (google.api.http) = {
+      get: "/apis/iam/v2/introspect_projects"
+    };
+    option (chef.automate.api.iam.policy).resource = "iam:introspect";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:getAllProjects";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
+  };
+}

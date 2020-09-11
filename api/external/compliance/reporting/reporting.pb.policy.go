@@ -3,7 +3,7 @@
 
 package reporting
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListReports", "compliance:reporting:reports", "compliance:reports:list", "POST", "/api/v0/compliance/reporting/reports", func(unexpandedResource string, input interface{}) string {

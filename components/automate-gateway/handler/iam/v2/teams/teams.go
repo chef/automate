@@ -6,9 +6,9 @@ import (
 	"github.com/chef/automate/api/interservice/teams"
 
 	// Teams Service Gateway Requests/Response/Service definitions
-	gwcommon "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	gwreq "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	gwres "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	gwcommon "github.com/chef/automate/api/external/iam/v2/common"
+	gwreq "github.com/chef/automate/api/external/iam/v2/request"
+	gwres "github.com/chef/automate/api/external/iam/v2/response"
 )
 
 type Server struct {

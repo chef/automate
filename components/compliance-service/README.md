@@ -20,22 +20,13 @@ _Notes:_<br>
 
 ### Development
 
-Make sure you have Go installed!
-    https://golang.org/doc/install?download=go1.9.1.darwin-amd64.pkg
-
-Clone this repo to a logical place in your $GOPATH, i.e. `~/go/src/github.com/chef/automate/components/compliance-service`
+Make sure you have Go installed! https://golang.org/dl/
 
 Make some edits and run the binary with the commands provided in the Makefile. Tada!
 
-
 ### Dependency Management
 
-We use https://github.com/golang/dep for dependency management.
-```
-brew install dep
-```
-
-**The vendor folder for A2 is checked in to the repo; please refer to `a2/docs/development.md`**
+We use Go's module system for dependency management. See https://blog.golang.org/using-go-modules for an overview.
 
 ### Sample Data
 

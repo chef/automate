@@ -10,6 +10,10 @@ map(select(
          (.id != "secure_client_renego" or .port == "443") and
          (.id != "BREACH" or .port == "443") and
 
+         # The checker wants your certs to be valid for less than 398 days. We
+         # don't think this rule is valuable for the internal A2 CA
+         (.id != "cert_validityPeriod" or .port == "443" ) and
+
          # TODO notifications-service
          (.port != "10125") and
 

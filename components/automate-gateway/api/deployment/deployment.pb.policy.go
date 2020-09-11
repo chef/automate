@@ -3,7 +3,7 @@
 
 package deployment
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.deployment.Deployment/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/api/v0/version", func(unexpandedResource string, input interface{}) string {

@@ -137,13 +137,56 @@ function compile_go_protobuf_component() {
 # Adding auto tab complete
 complete -F _component_auto_complete compile_go_protobuf_component
 
+describe "check_breaking_for_all_proto_components" <<DOC
+  Run the \`buf\` breaking change detector against the automate protos
+DOC
+function check_breaking_for_all_proto_components() {
+  install_if_missing core/git git
+  install_protoc_toolchain || return 1
+  local ret
+  local main_branch_name
+
+  pushd /src/ > /dev/null || return 1
+
+  # This is here to keep things working when we eventually rename the main
+  # branch. It can be removed after that.
+  if git for-each-ref --format='%(refname:short)' "refs/heads/*" | grep -q "^main$"; then
+    main_branch_name="main"
+  else
+    main_branch_name="master"
+  fi
+
+  local breaking_check_cmd=("buf" "check" "breaking" "--against-input" ".git#branch=$main_branch_name")
+
+  echo "🔎 Checking protos for breaking changes with \`${breaking_check_cmd[*]}\`..."
+  "${breaking_check_cmd[@]}"
+  ret=$?
+  if [[ $ret -ne 0 ]]; then
+    echo "🚨 Command \`${breaking_check_cmd[*]}\` failed! Refer to the docs if you need help fixing:"
+    echo "- https://buf.build/docs/breaking-overview"
+    echo "- https://buf.build/docs/breaking-checkers"
+    echo "- https://buf.build/docs/breaking-configuration"
+    echo ""
+    echo "See also the config file \`buf.yaml\` in the repo root"
+    echo "🚨🚨🚨 If you NEED to get a breaking change through Ci: 🚨🚨🚨"
+    echo "add your file to the ignored files in buf.yaml and remove it in a subsequent pull request"
+  else
+    echo "😎 All good"
+  fi
+  popd > /dev/null || return 1
+  return "$ret"
+}
+
+document "lint_all_protobuf_components" <<DOC
+  Run the \`buf\` linter against all protos in the repo.
+DOC
 function lint_all_protobuf_components() {
   install_protoc_toolchain || return 1
 
   local ret
   local lintercmd="buf check lint"
   pushd /src/ > /dev/null || return 1
-  echo "Linting protos with \`${lintercmd}\`..."
+  echo "🧹 Linting protos with \`${lintercmd}\`..."
   $lintercmd
   ret=$?
   if [[ $ret -ne 0 ]]; then
@@ -151,6 +194,8 @@ function lint_all_protobuf_components() {
     echo "- https://buf.build/docs/style-guide/"
     echo "- https://buf.build/docs/lint-checkers"
     echo "- https://buf.build/docs/lint-configuration"
+    echo ""
+    echo "See also the config file \`buf.yaml\` in the repo root"
   else
     echo "😎 All good"
   fi
@@ -162,7 +207,7 @@ document "compile_all_protobuf_components" <<DOC
   Compile every protobuf file for every component in A2.
 DOC
 function compile_all_protobuf_components() {
-  lint_all_protobuf_components && compile_all_protobuf_components_nolint
+  lint_all_protobuf_components && check_breaking_for_all_proto_components && compile_all_protobuf_components_nolint
 }
 
 document "compile_all_protobuf_components_nolint" <<DOC

@@ -11,9 +11,9 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/lib/grpc/auth_context"
 
-	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	pb_common "github.com/chef/automate/api/external/iam/v2/common"
+	pb_req "github.com/chef/automate/api/external/iam/v2/request"
+	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
 	rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
 )
 

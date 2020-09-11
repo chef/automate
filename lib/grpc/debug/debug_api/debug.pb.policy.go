@@ -3,7 +3,7 @@
 
 package debug_api
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.debug.Debug/SetLogLevel", "system:service:logLevel", "system:serviceLogLevel:set", "", "", func(unexpandedResource string, input interface{}) string {

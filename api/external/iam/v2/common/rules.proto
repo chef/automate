@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/common";
+
+enum RuleType {
+    RULE_TYPE_UNSET = 0;
+    NODE = 1;
+    EVENT = 2;
+}
+
+enum ConditionAttribute {
+    CONDITION_ATTRIBUTE_UNSET = 0;
+    CHEF_SERVER = 1;
+    CHEF_ORGANIZATION = 2;
+    ENVIRONMENT = 3;
+    CHEF_ROLE = 4;
+    CHEF_TAG = 5;
+    CHEF_POLICY_GROUP = 6;
+    CHEF_POLICY_NAME = 7;
+}
+
+enum ConditionOperator {
+    CONDITION_OPERATOR_UNSET = 0;
+    MEMBER_OF = 1;
+    EQUALS = 2;
+}
+
+enum RuleStatus {
+    RULE_STATUS_UNSET = 0;
+    STAGED = 1;
+    APPLIED = 2;
+}
+
+enum ProjectRulesStatus {
+    PROJECT_RULES_STATUS_UNSET = 0;
+    RULES_APPLIED = 1;
+    EDITS_PENDING = 2;
+    NO_RULES = 3;
+}
+
+message Rule {
+    // Unique ID. Cannot be changed.
+    string id = 1;
+    // Unique ID of the project this rule belongs to. Cannot be changed.
+    string project_id = 2;
+    // Name for the project rule.
+    string name = 3;
+    // Whether the rule applies to ingested `NODE` or `EVENT resources.
+    // Cannot be changed.
+    RuleType type = 4;
+    // Conditions that ingested resources must match to belong to the project.
+    // Will contain one or more.
+    repeated Condition conditions = 5;
+    // Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect).
+    RuleStatus status = 6;
+}
+
+message Condition {
+    // Represents a property of an ingested resource. Depends on the rule type.
+    ConditionAttribute attribute = 1;
+    // The value(s) of the attribute that an ingested resource must match.
+    repeated string values = 2;
+    // Whether the attribute matches a single value (`EQUALS`) or
+    // matches at least one of a set of values (`MEMBER_OF`).
+    ConditionOperator operator = 3;
+}

@@ -17,12 +17,12 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 
 	// Gateway Requests/Response/Service definitions
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
-	gwAuthzReq "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	"github.com/chef/automate/api/external/iam/v2/pairs"
+	gwAuthzReq "github.com/chef/automate/api/external/iam/v2/request"
+	gwAuthzRes "github.com/chef/automate/api/external/iam/v2/response"
 
 	// other dependencies
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+	"github.com/chef/automate/api/external/iam/v2/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
@@ -129,22 +129,27 @@ func (a *AuthzServer) Introspect(
 		return nil, err
 	}
 
-	// Replace endpoint with realized path
-	// Note: For POST /introspect (this handler), it should be safe to assume
-	// that there's only ever one endpoint under consideration.
-	if len(endpointMap) == 1 {
-		var m *gwAuthzRes.MethodsAllowed
-		// Note (sr): haven't found a better way to take whatever is the
-		// first value and replace the key.
-		for _, v := range endpointMap {
-			m = v
-		}
-		endpointMap = map[string]*gwAuthzRes.MethodsAllowed{
-			realizedPath: m,
+	// Replace each endpoint key with realized path
+	inflatedEndpointMap := make(map[string]*gwAuthzRes.MethodsAllowed)
+	for _, methodsAllowed := range endpointMap {
+		if inflatedEndpointMap[realizedPath] == nil {
+			inflatedEndpointMap[realizedPath] = methodsAllowed
+		} else {
+			inflatedEndpointMap[realizedPath].Get =
+				inflatedEndpointMap[realizedPath].Get || methodsAllowed.Get
+			inflatedEndpointMap[realizedPath].Put =
+				inflatedEndpointMap[realizedPath].Put || methodsAllowed.Put
+			inflatedEndpointMap[realizedPath].Patch =
+				inflatedEndpointMap[realizedPath].Patch || methodsAllowed.Patch
+			inflatedEndpointMap[realizedPath].Delete =
+				inflatedEndpointMap[realizedPath].Delete || methodsAllowed.Delete
+			inflatedEndpointMap[realizedPath].Post =
+				inflatedEndpointMap[realizedPath].Post || methodsAllowed.Post
 		}
 	}
+
 	return &gwAuthzRes.IntrospectResp{
-		Endpoints: endpointMap,
+		Endpoints: inflatedEndpointMap,
 	}, nil
 }
 

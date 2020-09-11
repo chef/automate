@@ -18,7 +18,7 @@ deps:
 	mix deps.get
 .PHONY: deps
 
-ELIXIR_PROTOC=PATH=$(PATH):~/.mix/escripts protoc --elixir_out=plugins=grpc:./lib/pb -I ../../../ -I priv -I ../../../api/external/secrets -I ../../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/
+ELIXIR_PROTOC=PATH=$(PATH):~/.mix/escripts protoc --elixir_out=plugins=grpc:./lib/pb -I ../../../ -I priv -I ../../../api/external/secrets -I ../../../protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/
 BASE_PROTO_FILES=notifications.proto rules.proto server.proto health.proto slack_post.proto secrets.proto google/protobuf/struct.proto
 
 elixir_client:

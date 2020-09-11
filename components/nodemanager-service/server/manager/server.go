@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -22,7 +23,6 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/server/nodes"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -712,7 +712,7 @@ func (srv *Server) addNodeForEachVM(ctx context.Context, managerId string, manag
 
 // ProcessNode takes node metadata information and updates or adds the node reference accordingly
 func (srv *Server) ProcessNode(ctx context.Context, in *manager.NodeMetadata) (*manager.ProcessNodeResponse, error) {
-	logrus.Infof("ProcessNode processing node with uuid: %s and source_id: %s", in.Uuid, in.SourceId)
+	logrus.Debugf("ProcessNode processing node with uuid: %s and source_id: %s", in.Uuid, in.SourceId)
 
 	err := srv.DB.ProcessIncomingNode(in)
 	if err != nil {

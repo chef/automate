@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/request";
+
+message IntrospectAllReq {
+}
+
+message IntrospectSomeReq {
+    repeated string paths = 1;
+}
+
+message IntrospectReq {
+    string path = 1;
+    repeated string parameters = 2;
+}

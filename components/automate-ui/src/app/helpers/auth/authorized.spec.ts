@@ -223,7 +223,7 @@ describe('AuthorizedComponent setPermissions', () => {
 describe('AuthorizedComponent real round trip', () => {
 
   let authorizedChecker: AuthorizedChecker;
-  let visible = false;
+  let visible: boolean;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -232,21 +232,21 @@ describe('AuthorizedComponent real round trip', () => {
           userperms: () => ({
             status: Status.loadingSuccess,
             byId: <IndexedEntities<UserPermEntity>>{
+              '/apis/iam/v2/projects/project-1/rules': {
+                id: '/apis/iam/v2/projects/project-1/rules',
+                get: false, put: false, post: true, delete: false, patch: false
+              },
+               '/apis/iam/v2/projects/project-2/rules': {
+                id: '/apis/iam/v2/projects/project-2/rules',
+                get: false, put: false, post: false, delete: false, patch: false
+              },
               '/apis/iam/v2/users': {
                 id: '/apis/iam/v2/users',
-                get: false,
-                put: false,
-                post: false,
-                delete: false,
-                patch: false
+                get: false, put: false, post: false, delete: false, patch: false
               },
               '/apis/iam/v2/teams': {
                 id: '/apis/iam/v2/teams',
-                get: true,
-                put: false,
-                post: false,
-                delete: false,
-                patch: false
+                get: true, put: false, post: false, delete: false, patch: false
               }
             }
           })
@@ -257,10 +257,12 @@ describe('AuthorizedComponent real round trip', () => {
     .compileComponents();
     const store: Store<NgrxStateAtom> = TestBed.inject(Store);
     authorizedChecker = new AuthorizedChecker(store);
+    visible = false;
   }));
 
-  it('reflects changes from each setPermission call', done => {
+  it('reflects changes from successive setPermission calls', done => {
 
+    expect(visible).toBe(false);
     authorizedChecker.isAuthorized$.subscribe((isAuthorized: boolean) => {
       visible = isAuthorized;
     });
@@ -269,18 +271,45 @@ describe('AuthorizedComponent real round trip', () => {
       [<CheckObj>{ endpoint: '/apis/iam/v2/teams', verb: 'get' }], []);
     setTimeout(() => {
       expect(visible).toBe(true);
+
       authorizedChecker.setPermissions(
         [<CheckObj>{ endpoint: '/apis/iam/v2/users', verb: 'get' }], []);
       setTimeout(() => {
         expect(visible).toBe(false);
+
         authorizedChecker.setPermissions([<CheckObj>{
           endpoint: '/apis/iam/v2/teams', verb: 'get' }], []);
         setTimeout(() => {
           expect(visible).toBe(true);
+
           done();
         }, AuthorizedChecker.DebounceTime + 1);
       }, AuthorizedChecker.DebounceTime + 1);
     }, AuthorizedChecker.DebounceTime + 1);
+  });
+
+  it('reflects changes from successive setPermission calls for parameterized endpoint', done => {
+    expect(visible).toBe(false);
+    authorizedChecker.isAuthorized$.subscribe((isAuthorized: boolean) => {
+      visible = isAuthorized;
+    });
+
+    const endpoint = '/apis/iam/v2/projects/{project_id}/rules';
+    const verb = 'post';
+
+    authorizedChecker.setPermissions(
+      [<CheckObj>{ endpoint, verb, paramList: ['project-1'] }], []);
+    setTimeout(() => {
+      expect(visible).toBe(true);
+
+      authorizedChecker.setPermissions(
+        [<CheckObj>{ endpoint, verb, paramList: ['project-2'] }], []);
+      setTimeout(() => {
+        expect(visible).toBe(false);
+
+        done();
+      });
+    });
   });
 
 });
