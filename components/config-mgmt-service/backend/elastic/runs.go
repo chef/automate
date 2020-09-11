@@ -92,7 +92,7 @@ func (es Backend) GetDeletedCountsTimeSeries(
 	deletedNodePeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 
 	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.Timestamp).
-		Format("yyyy-MM-dd'T'HH:mm:ssZ")
+		Format("yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX")
 
 	for index := 0; index < len(deletedNodePeriods); index++ {
 		end := startTime.Add(time.Hour * 24 *
@@ -154,7 +154,7 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 
 	// This is using the custom_search_aggs_bucket_date_range because it need to set the missing option
 	dateRangeAgg := NewDateRangeAggregation().Field(backend.Created).
-		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		Format("yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX").
 		Missing(time.Time{}.Format(time.RFC3339)) // count all nodes that do not have a create date
 
 	for index := 0; index < len(createNodePeriods); index++ {
@@ -225,7 +225,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		MinDocCount(0).  // needed to return empty buckets
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
-		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		Format("yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX").
 		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
 		SubAggregation(innerAggTag,
 			elastic.NewCardinalityAggregation().Field(backend.Id)) // count how many unique nodes are in this bucket
@@ -498,7 +498,7 @@ func (es Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
 		MinDocCount(0).  // needed to return empty buckets
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
-		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		Format("yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX").
 		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
 		SubAggregation(statusAggTag, innerAgg)
 

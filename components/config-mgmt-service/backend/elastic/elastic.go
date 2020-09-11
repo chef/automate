@@ -154,7 +154,7 @@ func newRangeQuery(start string, end string, fieldTime string) (*elastic.RangeQu
 	var ok = false
 
 	rangeQuery := elastic.NewRangeQuery(fieldTime).
-		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ")
+		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX")
 
 	if start != "" {
 		ok = true
