@@ -5,6 +5,35 @@
 We're using Go's modules now. For an introduction, see:
 https://blog.golang.org/using-go-modules
 
+### How to add a new dependency
+
+When you want to use a new module in your code, just add an `import` statement for the module and use it:
+
+```go
+import "rsc.io/quote"
+. . .
+func Hello() string {
+    return quote.Hello()
+}
+```
+
+The next time you build, the module will be automatically downloaded and your go.mod/go.sum files updated.
+Be sure to commit the go.mod/go.sum changes.
+
+You can check that the imported module is in place with, for example:
+
+```shell
+go list -m rsc.io/q...
+```
+
+### How to remove a dependency
+
+It is important to be a good steward and clean up after yourself when you remove a dependency.
+Using `go build` can easily tell when something is missing and needs to be added, but not when it can safely be removed.
+The `go mod tidy` command is provided to do this extra work, but you must run it explicitly after you have removed uses of the no-longer-needed dependency from your code.
+If you run `go list -m all` before and after the tidy command, you should see that it has removed the unused dependency from both Go's cache and your go.mod/go.sum files.
+Be sure to commit the go.mod/go.sum changes.
+
 ### Components/Services
 
 Each component is self-contained and needs to ensure its stability. Think about a component that could also be an external solution. Each component has its own contracts like API or CLI interface. Those need to be tested with special care since any change will impact users of this components. A user may also be another component. Therefore it is essential that each component has strong interfaces and testing for those.
