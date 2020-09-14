@@ -4,8 +4,8 @@
 upstream: https://{{member.sys.ip}}:{{member.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
-grpc: {{cfg.service.host}}:{{cfg.service.port}}
-http1: {{cfg.http1.host}}:{{cfg.http1.port}}
+grpc: 127.0.0.1:{{cfg.service.port}}
+http1: 127.0.0.1:{{cfg.http1.port}}
 
 tls:
   cert_path: {{pkg.svc_config_path}}/service.crt
