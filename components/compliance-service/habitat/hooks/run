@@ -92,7 +92,7 @@ CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}
 addNoProxy {{authn.sys.ip}}
-CONFIG="$CONFIG --authn-target {{authn.sys.ip}}:{{authn.cfg.port}}"
+CONFIG="$CONFIG --authn-target 127.0.0.1:{{authn.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
