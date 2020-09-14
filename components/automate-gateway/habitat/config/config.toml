@@ -135,7 +135,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.teams-service.members as |teams|}}
 {{~#if @last}}
   [grpc_clients.endpoints.teams-service]
-    target = "{{teams.sys.ip}}:{{teams.cfg.port}}"
+    target = "127.0.0.1:{{teams.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

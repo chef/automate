@@ -19,7 +19,7 @@ users:
 
 {{~#eachAlive bind.teams-service.members as |teams-service|}}
 {{~#if @last}}
-teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
+teams_address: 127.0.0.1:{{teams-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 
