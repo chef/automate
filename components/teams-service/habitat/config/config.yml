@@ -20,6 +20,6 @@ authz-address: 127.0.0.1:{{authz-service.cfg.port}}
 
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
-cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
+cereal-address: 127.0.0.1:{{cereal-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}

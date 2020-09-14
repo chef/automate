@@ -36,7 +36,7 @@ default_purge_after_days = 7
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |member|}}
 {{~#if @last}}
-address = "{{member.sys.ip}}:{{member.cfg.port}}"
+address = "127.0.0.1:{{member.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

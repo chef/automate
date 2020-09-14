@@ -26,7 +26,7 @@ max_idle_conns = {{cfg.storage.max_idle_conns}}
 [jobs]
 {{~#eachAlive bind.cereal-service.members as |cereal|}}
 {{~#if @last}}
-host = "{{cereal.sys.ip}}"
+host = "127.0.0.1"
 port = {{cereal.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}

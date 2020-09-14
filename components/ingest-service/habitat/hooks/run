@@ -122,7 +122,7 @@ CONFIG="$CONFIG --config-mgmt-address {{config_mgmt.sys.ip}}:{{config_mgmt.cfg.p
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
 addNoProxy {{cereal-service.sys.ip}}
-CONFIG="$CONFIG --cereal-address {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+CONFIG="$CONFIG --cereal-address 127.0.0.1:{{cereal-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

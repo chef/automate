@@ -1,4 +1,10 @@
 {
-  "service": {{toJson cfg.service}},
-  "log": {{toJson cfg.log}}
+  "service": {
+    "host": "127.0.0.1",
+    "port": {{cfg.service.port}}
+  },
+  "log": {
+    "format": "{{cfg.log.format}}",
+    "level": "{{cfg.log.level}}"
+  }
 }

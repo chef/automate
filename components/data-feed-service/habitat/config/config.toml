@@ -53,6 +53,6 @@ target = "{{compliance-service.sys.ip}}:{{compliance-service.cfg.port}}"
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
-target = "{{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+target = "127.0.0.1:{{cereal-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
