@@ -58,7 +58,7 @@ func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 	albCert, _ := devCertToEncodedAndPeer(t, "automate-load-balancer")
 	_, agPeer := devCertToEncodedAndPeer(t, "automate-gateway")
 	otherServiceCert, otherServicePeer := devCertToEncodedAndPeer(t, "deployment-service")
-	hash := "f42fec42094a67caee0c485ee28ec03587170fabfa8a2d7d06188a5acbcee6f0"
+	hash := "7a8c5e72a532a7d2eef92f320bcae07f319abea5e1c19e8c23d2aec17089ed17"
 
 	cases := map[string]struct {
 		ctx           context.Context
