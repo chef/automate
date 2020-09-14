@@ -1,7 +1,7 @@
 ---
 {{~#eachAlive bind.automate-dex.members as |member|}}
   {{~#if @last}}
-upstream: https://{{member.sys.ip}}:{{member.cfg.port}}
+upstream: https://127.0.0.1:{{member.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
 grpc: 127.0.0.1:{{cfg.service.port}}

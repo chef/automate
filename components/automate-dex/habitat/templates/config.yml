@@ -1,7 +1,7 @@
 {{- if cfg.service.external_fqdn}}
 issuer: https://{{cfg.service.external_fqdn}}/dex
 {{- else}}
-issuer: http://{{cfg.service.host}}:{{cfg.service.port}}/dex
+issuer: http://localhost:{{cfg.service.port}}/dex
 {{- end}}
 enablePasswordDB: true
 storage:
@@ -36,11 +36,11 @@ storage:
 
 {{- end }}
 web:
-  https: {{cfg.service.host}}:{{cfg.service.port}}
+  https: 127.0.0.1:{{cfg.service.port}}
   tlsCert: {{svc_cert_path}}
   tlsKey: {{svc_key_path}}
 grpc:
-  addr: {{cfg.grpc.host}}:{{cfg.grpc.port}}
+  addr: 127.0.0.1:{{cfg.grpc.port}}
   tlsCert: {{svc_cert_path}}
   tlsKey: {{svc_key_path}}
   tlsClientCA: {{svc_root_ca_path}}
@@ -203,7 +203,9 @@ connectors:
       {{- if cfg.service.external_fqdn}}
       redirectURI: https://{{cfg.service.external_fqdn}}/dex/callback
       {{- else}}
-      redirectURI: http://{{cfg.service.host}}:{{cfg.service.port}}/dex/callback
+      # This is likely not the behavior you want. You should set external
+      # fqdn
+      redirectURI: http://localhost:{{cfg.service.port}}/dex/callback
       {{- end}}
       {{- if cfg.connectors.saml.entity_issuer}}
       entityIssuer: {{cfg.connectors.saml.entity_issuer}}

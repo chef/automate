@@ -13,7 +13,7 @@ users:
   config:
     {{~#eachAlive bind.automate-dex.members as |automate-dex|}}
       {{~#if @last}}
-    grpcHost: {{automate-dex.sys.ip}}:{{automate-dex.cfg.grpc-port}}
+    grpcHost: 127.0.0.1:{{automate-dex.cfg.grpc-port}}
       {{~/if}}
     {{~/eachAlive}}
 
