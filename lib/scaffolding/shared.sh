@@ -79,7 +79,7 @@ EOF
 "postgresql": {
 {{~#eachAlive bind.automate-pg-gateway.members as |postgresql|}}
   {{~#if @last}}
-"ip": "{{postgresql.sys.ip}}",
+"ip": "127.0.0.1",
 {{~#if postgresql.cfg }}
 "cfg": {{ toJson postgresql.cfg }},
 {{~/if}}
@@ -90,7 +90,7 @@ EOF
 "pg_sidecar": {
 {{~#eachAlive bind.pg-sidecar-service.members as |pgs|}}
   {{~#if @last}}
-"ip": "{{pgs.sys.ip}}",
+"ip": "127.0.0.1",
 {{~#if pgs.cfg }}
 "cfg": {{ toJson pgs.cfg }},
 {{~/if}}

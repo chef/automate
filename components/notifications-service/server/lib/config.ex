@@ -95,6 +95,7 @@ defmodule Notifications.Config do
       certfile: get_value("SERVICE_CERT", nil),
       keyfile: get_value("SERVICE_KEY", nil),
       cacertfile: get_value("ROOT_CA_CERT", nil),
+      server_name_indication: :disable, # TODO(jaym): lets get the right value in here
       fail_if_no_peer_cert: true,
       verify: :verify_peer,
       versions: [:'tlsv1.2'],

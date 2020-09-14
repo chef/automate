@@ -1,10 +1,6 @@
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{else~}}
-host = "{{sys.ip}}"
-{{~/if}}
+host = "127.0.0.1"
 port = "{{cfg.service.port}}"
 log_level = "{{cfg.log.level}}"
 
