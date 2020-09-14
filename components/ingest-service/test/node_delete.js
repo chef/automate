@@ -78,7 +78,7 @@ describe("/events/chef/nodedelete", function () {
             // Get all the node state index docs from elasticsearch
             return chakram.get(nodeStateUrl()).then(function(response) {
               expect(response).to.have.status(200)
-              expect(response.body.hits.total).to.equal(1);
+              expect(response.body.hits.total.value).to.equal(1);
 
               let source = response.body.hits.hits[0]._source
 
@@ -95,7 +95,7 @@ describe("/events/chef/nodedelete", function () {
 
                     return chakram.get(nodeStateUrl()).then(function(response) {
                     expect(response).to.have.status(200)
-                    expect(response.body.hits.total).to.equal(1);
+                    expect(response.body.hits.total.value).to.equal(1);
                     let source = response.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid);
                     expect(source.exists).to.equal(false);
@@ -143,7 +143,7 @@ describe("/events/chef/nodedelete", function () {
             // Wait for the get all docs request
             return chakram.get(nodeStateUrl()).then(function(response) {
               expect(response).to.have.status(200)
-              expect(response.body.hits.total).to.equal(1);
+              expect(response.body.hits.total.value).to.equal(1);
               let source = response.body.hits.hits[0]._source
               expect(source.entity_uuid).to.equal(entityUuid);
               expect(source.exists).to.equal(true);
@@ -152,7 +152,7 @@ describe("/events/chef/nodedelete", function () {
                 return helpers.NodeStateRefresh().then(function(response) {
                   return chakram.get(nodeStateUrl()).then(function(response) {
                     expect(response).to.have.status(200)
-                    expect(response.body.hits.total).to.equal(1);
+                    expect(response.body.hits.total.value).to.equal(1);
                     let source = response.body.hits.hits[0]._source
                     expect(source.entity_uuid).to.equal(entityUuid);
                     expect(source.exists).to.equal(false);
@@ -200,7 +200,7 @@ describe("/events/chef/nodedelete", function () {
               // Wait for the get all docs request
               return chakram.get(nodeStateUrl()).then(function(response) {
                 expect(response).to.have.status(200)
-                expect(response.body.hits.total).to.equal(2);
+                expect(response.body.hits.total.value).to.equal(2);
                 let source = response.body.hits.hits[0]._source
                 expect(source.exists).to.equal(true);
                 let source2 = response.body.hits.hits[1]._source
@@ -210,7 +210,7 @@ describe("/events/chef/nodedelete", function () {
                   return helpers.NodeStateRefresh().then(function(response) {
                     return chakram.get(nodeStateUrl()).then(function(response) {
                       expect(response).to.have.status(200)
-                      expect(response.body.hits.total).to.equal(2);
+                      expect(response.body.hits.total.value).to.equal(2);
                       let source = response.body.hits.hits[0]._source
                       expect(source.exists).to.equal(false);
                       let source2 = response.body.hits.hits[1]._source
