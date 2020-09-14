@@ -1,9 +1,12 @@
 cluster:
   name: ${es.cluster.name:chef-insights}
+  initial_master_nodes: ${es.cluster.name:cses}
   routing:
     allocation:
       disk:
         threshold_enabled: false
+
+node.name: cses
 
 network:
   host: ${es.network.host:0.0.0.0}

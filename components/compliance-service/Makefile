@@ -20,7 +20,7 @@ POSTGRES_PORT ?= 15432
 POSTGRES_USER ?= postgres
 POSTGRES_PASS ?= admin
 POSTGRES_URI  ?= postgresql://$(POSTGRES_USER):$(POSTGRES_PASS)@$(POSTGRES_HOST):$(POSTGRES_PORT)/chef_automate?sslmode=disable
-ES_VER ?= 6
+ES_VER ?= 7
 PACKAGE = "github.com/chef/automate/components/compliance-service"
 
 GIT_SHA ?= $(shell git rev-parse HEAD)
@@ -243,6 +243,11 @@ start-es6: create-es-data-dir
 	docker rm -f cc_es6 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es6 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 	@$(MAKE) wait-for-es
 
+start-es7: create-es-data-dir
+	@printf "\n===> ${yellow}Recreating the ElasticSearch 7 container...${reset}\n"
+	docker rm -f cc_es7 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es7 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+	@$(MAKE) wait-for-es
+
 create-es-data-dir:
 	@printf "\n===> ${blue}Creating the ES data directory...${reset}\n"
 	@mkdir -p "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)" && chmod 777 "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"
@@ -283,7 +288,7 @@ clear-es-templates:
 
 clean-all: clean
 	@printf "\n===> ${yellow}Clearing containers...${reset}\n"
-	@docker rm -f cc_pg cc_es5 cc_es6 cc_ssh_node 2> /dev/null || true
+	@docker rm -f cc_pg cc_es5 cc_es6 cc_es7 cc_ssh_node 2> /dev/null || true
 	@$(MAKE) purge-es-data
 	@printf "\n===> ${yellow}Clearing profiles directories...${reset}\n"
 	@rm -rf $(PROFILES_PATH)
@@ -344,7 +349,7 @@ wait-for-ingestion:
 	i=1; \
 	curl_output="-=init=-"; \
 	max_loops=50; \
-	es_docs=35; \
+	es_docs=7; \
 	healthy_match="\"total\":$$es_docs,\"successful\":$$es_docs"; \
 	printf "\n===> ${blue}Checking ElasticSearch to ensure it has ingested our reports${reset}\n"; \
 	curl -s -X GET "$(ELASTICSEARCH_URL)/comp-*-r-20*/_doc/_count" | grep $$healthy_match > /dev/null; \

@@ -598,7 +598,7 @@ steps:
       - /tmp/event-service.log
       - /tmp/compliance.log
     env:
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -626,7 +626,7 @@ steps:
       - /tmp/compliance.log
       - /tmp/nodemanager-service.log
     env:
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -654,7 +654,7 @@ steps:
       - /tmp/compliance.log
       - /tmp/nodemanager-service.log
     env:
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     soft_fail: true
@@ -683,7 +683,7 @@ steps:
       - /tmp/compliance.log
       - /tmp/nodemanager-service.log
     env:
-      ES_VER: 6
+      ES_VER: 7
     timeout_in_minutes: 30
     expeditor:
       executor:
@@ -709,7 +709,7 @@ steps:
       - /tmp/nodemanager-service.log
       - /tmp/secrets-service.log
     env:
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -736,7 +736,7 @@ steps:
     env:
       TEST: "60_A1_migration_spec.rb"
       A1_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -763,7 +763,7 @@ steps:
     env:
       TEST: "61_A2V1_migration_spec.rb"
       A2V1_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -790,7 +790,7 @@ steps:
     env:
       TEST: "62_A2V2_migration_spec.rb"
       A2V2_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -817,7 +817,7 @@ steps:
     env:
       TEST: "63_A2V3_migration_spec.rb"
       A2V3_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -844,7 +844,7 @@ steps:
     env:
       TEST: "64_A2V4_migration_spec.rb"
       A2V4_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -871,7 +871,7 @@ steps:
     env:
       TEST: "65_A2V5_migration_spec.rb"
       A2V5_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
@@ -899,7 +899,7 @@ steps:
     env:
       TEST: "66_A2V6_migration_spec.rb"
       A2V6_DATA: true
-      ES_VER: 6
+      ES_VER: 7
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
     expeditor:
