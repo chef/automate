@@ -74,9 +74,18 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 
 	var buffer bytes.Buffer
 	for _, message := range datafeedMessages {
-		data, _ := json.Marshal(message)
-		data = bytes.ReplaceAll(data, []byte("\n"), []byte("\f"))
-		buffer.Write(data)
+		data, err := json.Marshal(message)
+		if err != nil {
+			log.Errorf("Error marshaling json, %v", err)
+			continue
+		}
+		dataBuffer := new(bytes.Buffer)
+		if err := json.Compact(dataBuffer, data); err != nil {
+			log.Errorf("Error compacting json, %v", err)
+			continue
+		}
+		buffer.Write(dataBuffer.Bytes())
+
 		buffer.WriteString("\n")
 	}
 

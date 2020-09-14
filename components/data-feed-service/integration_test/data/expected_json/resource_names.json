@@ -1,0 +1,11 @@
+[
+  "/tmp/test.txt",
+  "test_resource_path",
+  "ls",
+  "/tmp/test.txt",
+  "ls -l",
+  "/tmp/test.txt",
+  "/tmp/always-updated.txt",
+  "/failed/file/resource",
+  "/tmp/do-not-write.txt"
+]

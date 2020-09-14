@@ -1,0 +1,9 @@
+{
+  "id": "_default",
+  "run_list": [
+    {
+      "type": "recipe",
+      "name": "insights-test::default"
+    }
+  ]
+}

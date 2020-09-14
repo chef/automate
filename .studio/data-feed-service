@@ -52,7 +52,7 @@ document "datafeed_run_integration_tests" <<DOC
   Run the data feed service's integration tests
 DOC
 function datafeed_run_integration_tests() {
-  chef-automate config patch components/data-feed-service/integration_test/patch.toml
+  chef-automate config patch components/data-feed-service/integration_test/data/patch.toml
   api_token=$(get_admin_token)
   export AUTOMATE_API_TOKEN="${api_token}"
   go_test -v github.com/chef/automate/components/data-feed-service/integration_test/...

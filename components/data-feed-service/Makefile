@@ -6,7 +6,7 @@ ci: review build
 
 review: lint
 
-hab_test: lint cover
+hab_test: cover
 
 test: cover
 
@@ -25,7 +25,7 @@ proto:
 
 cover:
 	mkdir -p .cover
-	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out ./...
+	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out `go list ./... | grep -v integration_test`
 	go tool cover -html=.cover/cover.out -o .cover/coverage.html
 
 imports:
