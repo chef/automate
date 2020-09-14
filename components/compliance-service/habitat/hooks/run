@@ -116,7 +116,7 @@ CONFIG="$CONFIG --secrets-host {{secrets.sys.ip}} --secrets-port {{secrets.cfg.p
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
 addNoProxy {{authz.sys.ip}}
-CONFIG="$CONFIG --authz-host {{authz.sys.ip}} --authz-port {{authz.cfg.port}}"
+CONFIG="$CONFIG --authz-host 127.0.0.1 --authz-port {{authz.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

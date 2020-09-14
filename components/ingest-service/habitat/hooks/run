@@ -98,7 +98,7 @@ CONFIG="$CONFIG --es-sidecar-address {{sidecar.sys.ip}}:{{sidecar.cfg.port}}"
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
   {{~#if @last}}
 addNoProxy {{authz-service.sys.ip}}
-CONFIG="$CONFIG --authz-address {{authz-service.sys.ip}}:{{authz-service.cfg.port}}"
+CONFIG="$CONFIG --authz-address 127.0.0.1:{{authz-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

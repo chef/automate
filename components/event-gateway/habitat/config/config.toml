@@ -41,7 +41,7 @@ authn_endpoint = "{{authn.sys.ip}}:{{authn.cfg.port}}"
 {{~/eachAlive}}
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
-authz_endpoint = "{{authz.sys.ip}}:{{authz.cfg.port}}"
+authz_endpoint = "127.0.0.1:{{authz.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

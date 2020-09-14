@@ -68,7 +68,7 @@ CONFIG="$CONFIG --cereal-endpoint {{cereal-service.sys.ip}}:{{cereal-service.cfg
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
   {{~#if @last}}
 addNoProxy {{authz-service.sys.ip}}
-CONFIG="$CONFIG --authz-endpoint {{authz-service.sys.ip}}:{{authz-service.cfg.port}}"
+CONFIG="$CONFIG --authz-endpoint 127.0.0.1:{{authz-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 
