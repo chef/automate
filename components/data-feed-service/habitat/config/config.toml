@@ -32,7 +32,7 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 [secrets]
 {{~#eachAlive bind.secrets-service.members as |secrets-service|}}
 {{~#if @last}}
-target = "{{secrets-service.cfg.host}}:{{secrets-service.cfg.port}}"
+target = "127.0.0.1:{{secrets-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

@@ -43,8 +43,7 @@ CONFIG="$CONFIG --host {{sys.ip}}"
 # get secrets service binding, used for storing secrets
 {{~#eachAlive bind.secrets-service.members as |secrets|}}
 {{~#if @last}}
-addNoProxy {{secrets.sys.ip}}
-CONFIG="$CONFIG --secrets-host {{secrets.sys.ip}} --secrets-port {{secrets.cfg.port}}"
+CONFIG="$CONFIG --secrets-host 127.0.0.1 --secrets-port {{secrets.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
