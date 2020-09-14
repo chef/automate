@@ -188,17 +188,6 @@ func (s *Suite) verifyIndices(indices ...string) []string {
 	return validIndices
 }
 
-// types returns the list of ES types registered in the Ingest service code base
-func (s *Suite) types() []string {
-	types := make([]string, len(mappings.AllMappings))
-
-	for i, esMap := range mappings.AllMappings {
-		types[i] = esMap.Type
-	}
-
-	return types
-}
-
 // Indices returns the list of ES indices registered in the Ingest service code base
 func (s *Suite) Indices() []string {
 	indices := make([]string, len(mappings.AllMappings))
@@ -237,7 +226,6 @@ func (s *Suite) DeleteAllDocuments() {
 
 	_, err := s.client.DeleteByQuery().
 		Index(indices...).
-		Type(s.types()...).
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").
