@@ -1,5 +1,5 @@
 ---
-grpc: {{cfg.service.host}}:{{cfg.service.port}}
+grpc: 127.0.0.1:{{cfg.service.port}}
 a1_user_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_data}}
 a1_user_roles_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_roles_data}}
 
