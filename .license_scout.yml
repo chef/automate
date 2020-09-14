@@ -119,7 +119,7 @@ fallbacks:
       license_content: https://raw.githubusercontent.com/lib/pq/master/LICENSE.md
     - name: github.com/magiconair/properties
       license_id: BSD-2-Clause
-      license_content: https://raw.githubusercontent.com/magiconair/properties/master/LICENSE
+      license_content: https://raw.githubusercontent.com/magiconair/properties/master/LICENSE.md
     - name: github.com/golang-migrate/migrate
       license_id: MIT
       license_content: https://raw.githubusercontent.com/golang-migrate/migrate/master/LICENSE
@@ -258,6 +258,15 @@ fallbacks:
     - name: honnef.co/go/tools
       license_id: MIT
       license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
+    - name: github.com/golang/groupcache
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/golang/groupcache/master/LICENSE
+    - name: github.com/smartystreets/go-aws-auth
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets-archives/go-aws-auth/master/LICENSE.md
+    - name: github.com/smartystreets/gunit
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/smartystreets/gunit/master/LICENSE.md
 
   habitat:
     - name: chef/mlsa
