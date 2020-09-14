@@ -47,7 +47,7 @@ teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
 
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
 {{~#if @last}}
-authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
+authz_address: 127.0.0.1:{{authz-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 

@@ -44,14 +44,14 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
   [grpc_clients.endpoints.authz-service]
-    target = "{{authz.sys.ip}}:{{authz.cfg.port}}"
+    target = "127.0.0.1:{{authz.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}
   [grpc_clients.endpoints.authn-service]
-    target = "localhost:{{authn.cfg.port}}"
+    target = "127.0.0.1:{{authn.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

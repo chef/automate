@@ -1,5 +1,5 @@
 ---
-grpc: {{ cfg.service.host }}:{{ cfg.service.port }}
+grpc: 127.0.0.1:{{ cfg.service.port }}
 log-level: {{ cfg.logger.level }}
 log-format: {{ cfg.logger.format }}
 
