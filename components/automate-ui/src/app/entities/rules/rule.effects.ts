@@ -91,7 +91,7 @@ export class RuleEffects {
       ofType(RuleActionTypes.CREATE_SUCCESS),
       map(({ payload: { rule } }: CreateRuleSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created rule ${rule.id}`
+      message: `Created rule ${rule.name}`
     })));
 
   @Effect()
