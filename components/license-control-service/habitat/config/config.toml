@@ -1,4 +1,4 @@
-host = "{{cfg.service.host}}"
+host = "127.0.0.1"
 port = "{{cfg.service.port}}"
 database = "chef_license_control_service"
 migrations_path = "{{pkg.path}}/migrations"

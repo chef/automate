@@ -107,7 +107,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.license-control-service.members as |license|}}
 {{~#if @last}}
   [grpc_clients.endpoints.license-control-service]
-    target = "{{license.sys.ip}}:{{license.cfg.port}}"
+    target = "127.0.0.1:{{license.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
