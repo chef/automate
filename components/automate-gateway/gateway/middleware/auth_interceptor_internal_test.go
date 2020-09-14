@@ -183,7 +183,7 @@ func TestComboAuth(t *testing.T) {
 
 		authInfo := auth_context.FromContext(returnedCtx)
 
-		expectedSubj := []string{"tls:service:deployment-service:f42fec42094a67caee0c485ee28ec03587170fabfa8a2d7d06188a5acbcee6f0"}
+		expectedSubj := []string{"tls:service:deployment-service:7a8c5e72a532a7d2eef92f320bcae07f319abea5e1c19e8c23d2aec17089ed17"}
 		expectedProjects := []string{"project1", "project2"}
 
 		assert.Equal(t, expectedSubj, authInfo.Subjects)
