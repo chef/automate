@@ -1,0 +1,473 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "9b9f4e51-b049-4b10-9555-10578916e111",
+  "report_uuid": "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+  "job_uuid": "74a54a28-c628-4f82-86df-333333333334",
+  "node_name": "redhat(2)-alpha-nginx(f)-apache(s)-failed",
+  "environment": "DevSec Prod Alpha",
+  "roles": ["base_linux", "apache_linux", "nginx-hardening-prod", "dot.role"],
+  "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],
+  "end_time": "2018-03-04T09:18:42Z",
+  "version": "3.1.3",
+  "platform": {
+    "name": "redhat",
+    "release": "6.11"
+  },
+  "statistics": {
+    "duration": 3.309065
+  },
+  "other_checks": [],
+  "policy_name": "",
+  "policy_group": "",
+  "organization_name": "",
+  "source_fqdn": "localhost",
+  "chef_tags": [],
+  "ipaddress": "8.8.8.2",
+  "fqdn": "web-rh2.example.com",
+  "profiles": [
+    {
+      "name": "nginx-baseline",
+      "title": "DevSec Nginx Baseline",
+      "version": "2.1.0",
+      "sha256": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+      "maintainer": "DevSec Hardening Framework Team",
+      "summary": "Test-suite for best-practice nginx hardening",
+      "license": "Apache-2.0",
+      "copyright": "DevSec Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "depends": [
+        {
+          "name": "myprofile1-new-name",
+          "path": "../myprofile1",
+          "status": "skipped",
+          "skip_message": "Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'."
+        }
+      ],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/nginx_spec.rb",
+          "controls": [
+            "nginx-01",
+            "nginx-02"
+          ],
+          "title": "NGINX server config"
+        }
+      ],
+      "controls": [
+        {
+          "id": "nginx-01",
+          "title": "Running worker process as non-privileged user",
+          "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
+          "impact": 1,
+          "refs": [],
+          "tags": {},
+          "code": "control 'nginx-01' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\nend\n",
+          "source_location": {
+            "line": 99,
+            "ref": "nginx-baseline-master/controls/nginx_spec.rb"
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "nginx worker process value should eq 0",
+              "run_time": 0.004171,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.forwarding value should eq 0",
+              "run_time": 0.004013,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "nginx-02",
+          "title": "Check NGINX config file owner, group and permissions.",
+          "desc": "The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.",
+          "impact": 1,
+          "refs": [],
+          "tags": {},
+          "code": "control 'nginx-02' do\n  impact 1.0\n  title 'Check NGINX config file owner, group and permissions.'\n  desc 'The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.'\n  describe file(nginx_conf) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
+          "source_location": {
+            "line": 115,
+            "ref": "nginx-baseline-master/controls/nginx_spec.rb"
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Worked like a charm baby!",
+              "run_time": 0.000194
+            }
+          ]
+        },
+        {
+          "id": "nginx-03",
+          "title": "Check NGINX three.",
+          "desc": "The NGINX three description.",
+          "impact": 1,
+          "refs": [],
+          "tags": {},
+          "code": "control 'nginx-03' do\n  impact 1.0\n  title 'Check NGINX config file owner, group and permissions.'\n  desc 'The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.'\n  describe file(nginx_conf) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
+          "source_location": {
+            "line": 115,
+            "ref": "nginx-baseline-master/controls/nginx_spec.rb"
+          },
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Worked like a charm baby!",
+              "run_time": 0.000194,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "nginx-04",
+          "title": "Check NGINX four",
+          "desc": "The NGINX four description.",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'nginx-04' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\nend\n",
+          "source_location": {
+            "line": 99,
+            "ref": "nginx-baseline-master/controls/nginx_spec.rb"
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "nginx worker process value should eq 0",
+              "run_time": 0.004171,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.forwarding value should eq 0",
+              "run_time": 0.004013,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        }
+      ],
+      "status": "loaded"
+    },
+    {
+      "name": "apache-baseline",
+      "title": "DevSec Apache Baseline",
+      "version": "2.0.1",
+      "sha256": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+      "summary": "Test-suite for best-practice apache hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "controls": [
+        {
+          "id": "apache-03",
+          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\nend\n",
+          "desc": "The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.",
+          "impact": 0.5,
+          "title": "Apache should start max. 1 root-task",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 49
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-01",
+          "code": "control 'apache-01' do\n  impact 1.0\n  title 'Apache should be running'\n  desc 'Apache should be running.'\n  describe service(apache.service) do\n    it { should be_installed }\n    it { should be_running }\n  end\nend\n",
+          "desc": "Apache should be running.",
+          "impact": 1,
+          "title": "Apache should be running",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 29
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 6e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-02",
+          "code": "control 'apache-02' do\n  impact 1.0\n  title 'Apache should be enabled'\n  desc 'Configure apache service to be automatically started at boot time'\n  only_if { os[:family] != 'ubuntu' && os[:release] != '16.04' } || only_if { os[:family] != 'debian' && os[:release] != '8' }\n  describe service(apache.service) do\n    it { should be_enabled }\n  end\nend\n",
+          "desc": "Configure apache service to be automatically started at boot time",
+          "impact": 1,
+          "title": "Apache should be enabled",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 39
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-04",
+          "code": "control 'apache-04' do\n  impact 1.0\n  title 'Check Apache config folder owner, group and permissions.'\n  desc 'The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.'\n  describe file(apache.conf_dir) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should be_executable.by('others') }\n  end\nend\n",
+          "desc": "The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.",
+          "impact": 1,
+          "title": "Check Apache config folder owner, group and permissions.",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 58
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-05",
+          "code": "control 'apache-05' do\n  impact 1.0\n  title 'Check Apache config file owner, group and permissions.'\n  desc 'The Apache config file should owned and grouped by root, only be writable and readable by owner and not write- and readable by others.'\n  describe file(apache.conf_path) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should_not be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\n  describe file(File.join(apache.conf_dir, '/conf-enabled/hardening.conf')) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should_not be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
+          "desc": "The Apache config file should owned and grouped by root, only be writable and readable by owner and not write- and readable by others.",
+          "impact": 1,
+          "title": "Check Apache config file owner, group and permissions.",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 77
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-06",
+          "code": "control 'apache-06' do\n  impact 1.0\n  title 'User and group should be set properly'\n  desc 'For security reasons it is recommended to run Apache in its own non-privileged account.'\n  describe apache_conf do\n    its('User') { should eq [apache.user] }\n    its('Group') { should eq [apache.user] }\n  end\nend\n",
+          "desc": "For security reasons it is recommended to run Apache in its own non-privileged account.",
+          "impact": 1,
+          "title": "User and group should be set properly",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 109
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-07",
+          "code": "control 'apache-07' do\n  impact 1.0\n  title 'Set the apache server token'\n  desc '\\'ServerTokens Prod\\' tells Apache to return only Apache as product in the server response header on the every page request'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/security.conf')) do\n    its('content') { should match(/^ServerTokens Prod/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('ServerTokens') { should eq 'Prod' }\n  # end\nend\n",
+          "desc": "'ServerTokens Prod' tells Apache to return only Apache as product in the server response header on the every page request",
+          "impact": 1,
+          "title": "Set the apache server token",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 119
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-08",
+          "code": "control 'apache-08' do\n  impact 1.0\n  title 'Should not load certain modules'\n  desc 'Apache HTTP should not load legacy modules'\n\n  module_path = File.join(apache.conf_dir, '/mods-enabled/')\n  loaded_modules = command('ls ' << module_path).stdout.split.keep_if { |file_name| /.load/.match(file_name) }\n\n  loaded_modules.each do |id|\n    describe file(File.join(module_path, id)) do\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?dav_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?cgid_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?cgi_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?include_module/) }\n    end\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('LoadModule') { should_not eq 'dav_module' }\n  #   its('LoadModule') { should_not eq 'cgid_module' }\n  #   its('LoadModule') { should_not eq 'cgi_module' }\n  #   its('LoadModule') { should_not eq 'include_module' }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?dav_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?cgid_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?cgi_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?include_module/) }\n  # end\nend\n",
+          "desc": "Apache HTTP should not load legacy modules",
+          "impact": 1,
+          "title": "Should not load certain modules",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 134
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-09",
+          "code": "control 'apache-09' do\n  impact 1.0\n  title 'Disable TRACE-methods'\n  desc 'The web server doesn’t allow TRACE request and help in blocking Cross Site Tracing attack.'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/security.conf')) do\n    its('content') { should match(/^\\s*?TraceEnable\\s+?Off/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('TraceEnable') { should eq 'Off' }\n  # end\nend\n",
+          "desc": "The web server doesn’t allow TRACE request and help in blocking Cross Site Tracing attack.",
+          "impact": 1,
+          "title": "Disable TRACE-methods",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 164
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-10",
+          "code": "control 'apache-10' do\n  impact 1.0\n  title 'Disable insecure HTTP-methods'\n  desc 'Disable insecure HTTP-methods and allow only necessary methods.'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/hardening.conf')) do\n    its('content') { should match(/^\\s*?<LimitExcept\\s+?GET\\s+?POST>/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('LimitExcept') { should eq ['GET','POST'] }\n  # end\nend\n",
+          "desc": "Disable insecure HTTP-methods and allow only necessary methods.",
+          "impact": 1,
+          "title": "Disable insecure HTTP-methods",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 179
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-11",
+          "code": "control 'apache-11' do\n  impact 1.0\n  title 'Disable Apache’s follows Symbolic Links for directories in alias.conf'\n  desc 'Should include -FollowSymLinks or +SymLinksIfOwnerMatch for directories in alias.conf'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/alias.conf')) do\n    its('content') { should match(/-FollowSymLinks/).or match(/\\+SymLinksIfOwnerMatch/) }\n  end\nend\n",
+          "desc": "Should include -FollowSymLinks or +SymLinksIfOwnerMatch for directories in alias.conf",
+          "impact": 1,
+          "title": "Disable Apache’s follows Symbolic Links for directories in alias.conf",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 194
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-12",
+          "code": "control 'apache-12' do\n  impact 1.0\n  title 'Disable Directory Listing for directories in alias.conf'\n  desc 'Should include -Indexes for directories in alias.conf'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/alias.conf')) do\n    its('content') { should match(/-Indexes/) }\n  end\nend\n",
+          "desc": "Should include -Indexes for directories in alias.conf",
+          "impact": 1,
+          "title": "Disable Directory Listing for directories in alias.conf",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 204
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-13",
+          "code": "control 'apache-13' do\n  impact 1.0\n  title 'SSL honor cipher order'\n  desc 'When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client\\'s preference is used. If this directive is enabled, the server\\'s preference will be used instead.'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/ssl.conf')) do\n    its('content') { should match(/^\\s*?SSLHonorCipherOrder\\s+?On/i) }\n  end\n\n  sites_enabled_path = File.join(apache.conf_dir, '/sites-enabled/')\n  loaded_sites = command('ls ' << sites_enabled_path).stdout.split.keep_if { |file_name| /.conf/.match(file_name) }\n\n  loaded_sites.each do |id|\n    virtual_host = file(File.join(sites_enabled_path, id)).content.gsub(/#.*$/, '').scan(%r{<virtualhost.*443(.*?)<\\/virtualhost>}im).flatten\n    next if virtual_host.empty?\n    describe virtual_host do\n      it { should include(/^\\s*?SSLHonorCipherOrder\\s+?On/i) }\n    end\n  end\nend\n",
+          "desc": "When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client's preference is used. If this directive is enabled, the server's preference will be used instead.",
+          "impact": 1,
+          "title": "SSL honor cipher order",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 214
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-14",
+          "code": "control 'apache-14' do\n  impact 1.0\n  title 'Enable Apache Logging'\n  desc 'Apache allows you to logging independently of your OS logging. It is wise to enable Apache logging, because it provides more information, such as the commands entered by users that have interacted with your Web server.'\n\n  sites_enabled_path = File.join(apache.conf_dir, '/sites-enabled/')\n  loaded_sites = command('ls ' << sites_enabled_path).stdout.split.keep_if { |file_name| /.conf/.match(file_name) }\n\n  loaded_sites.each do |id|\n    describe file(File.join(sites_enabled_path, id)).content.gsub(/#.*$/, '').scan(%r{<virtualhost(.*?)<\\/virtualhost>}im).flatten do\n      it { should include(/CustomLog.*$/i) }\n    end\n  end\nend\n",
+          "desc": "Apache allows you to logging independently of your OS logging. It is wise to enable Apache logging, because it provides more information, such as the commands entered by users that have interacted with your Web server.",
+          "impact": 1,
+          "title": "Enable Apache Logging",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 235
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        }
+      ],
+      "supports": null,
+      "attributes": null,
+      "groups": null,
+      "status": "loaded"
+    }
+  ]
+}

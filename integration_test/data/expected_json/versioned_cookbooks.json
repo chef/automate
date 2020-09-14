@@ -1,0 +1,10 @@
+[
+  {
+    "name": "apt",
+    "version": "2.9.2"
+  },
+  {
+    "name": "aws",
+    "version": "2.3.0"
+  }
+]

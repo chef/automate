@@ -1,0 +1,106 @@
+[
+  {
+    "type": "file",
+    "name": "/tmp/test.txt",
+    "id": "/tmp/test.txt",
+    "duration": "0",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "skipped",
+    "result": "nothing",
+    "conditional": "not_if { action == :nothing }",
+    "error": {}
+  },
+  {
+    "type": "custom_resource",
+    "name": "test_resource_path",
+    "id": "test_resource_path",
+    "duration": "16",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "updated",
+    "result": "run",
+    "error": {}
+  },
+  {
+    "type": "execute",
+    "name": "ls",
+    "id": "ls",
+    "duration": "16",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "updated",
+    "result": "run",
+    "error": {}
+  },
+  {
+    "type": "file",
+    "name": "/tmp/test.txt",
+    "id": "/tmp/test.txt",
+    "duration": "9",
+    "delta": "--- /tmp/test.txt\t2016-06-28 09:05:45.000000000 -0400\\n+++ /tmp/.chef-test.txt20160628-74223-lx2wnj\t2016-06-28 11:13:22.000000000 -0400\\n@@ -1,2 +1,2 @@\\n-5214b6f7-ee24-4202-9ff0-73fd4caca9dd\\n+5f8e07e8-b90f-4123-828a-5e9b2afbccfb",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "updated",
+    "result": "create",
+    "error": {}
+  },
+  {
+    "type": "execute",
+    "name": "ls -l",
+    "id": "ls -l",
+    "duration": "11",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "updated",
+    "result": "run",
+    "error": {}
+  },
+  {
+    "type": "file",
+    "name": "/tmp/test.txt",
+    "id": "/tmp/test.txt",
+    "duration": "10",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "up-to-date",
+    "result": "create",
+    "error": {}
+  },
+  {
+    "type": "file",
+    "name": "/tmp/always-updated.txt",
+    "id": "/tmp/always-updated.txt",
+    "duration": "8",
+    "delta": "--- /tmp/always-updated.txt\t2016-06-28 09:05:45.000000000 -0400\\n+++ /tmp/.chef-always-updated.txt20160628-74223-6pcmxs\t2016-06-28 11:13:22.000000000 -0400\\n@@ -1,2 +1,2 @@\\n-369adb69-87f6-44a1-b4d5-7aa4fafe45e2\\n+aaa6b8a6-a300-4a7a-a285-f4746ac716fe",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "updated",
+    "result": "create",
+    "error": {}
+  },
+  {
+    "type": "file",
+    "name": "/failed/file/resource",
+    "id": "/failed/file/resource",
+    "duration": "0",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "skipped",
+    "result": "create",
+    "conditional": "not_if { #code block }",
+    "error": {}
+  },
+  {
+    "type": "file",
+    "name": "/tmp/do-not-write.txt",
+    "id": "/tmp/do-not-write.txt",
+    "duration": "0",
+    "cookbook_name": "insights-test",
+    "cookbook_version": "0.1.1",
+    "status": "skipped",
+    "result": "create",
+    "conditional": "not_if { #code block }",
+    "error": {}
+  }
+]
