@@ -183,7 +183,7 @@ func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, erro
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := relaxting.ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				err := json.Unmarshal(hit.Source, &esInSpecReport)
 				if err != nil {
 					logrus.Errorf("GetAllReportsESInSpecReport unmarshal error: %s", err.Error())
 					return reports, err
