@@ -513,6 +513,9 @@ github.com/nats-io/stan.go v0.6.0/go.mod h1:eIcD5bi3pqbHT/xIIvXMwvzXYElgouBvaVRf
 github.com/nishanths/predeclared v0.0.0-20200524104333-86fad755b4d3/go.mod h1:nt3d53pc1VYcphSCIaYAJtnPYnr3Zyn8fMq2wvPGPso=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
+github.com/olivere/elastic v1.0.1 h1:UeafjZg+TifCVPhCJNPof0pUHig6vbXuJEbC/A+Ouo0=
+github.com/olivere/elastic v6.2.35+incompatible h1:MMklYDy2ySi01s123CB2WLBuDMzFX4qhFcA5tKWJPgM=
+github.com/olivere/elastic v6.2.35+incompatible/go.mod h1:J+q1zQJTgAz9woqsbVRqGeB5G1iqDKVBWLNSYW8yfJ8=
 github.com/olivere/elastic/v7 v7.0.20 h1:5FFpGPVJlBSlWBOdict406Y3yNTIpVpAiUvdFZeSbAo=
 github.com/olivere/elastic/v7 v7.0.20/go.mod h1:Kh7iIsXIBl5qRQOBFoylCsXVTtye3keQU2Y/YbR7HD8=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
