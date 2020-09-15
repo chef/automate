@@ -1508,6 +1508,8 @@ func (t *LocalTarget) ensureHabUserRemoved() error {
 	return nil
 }
 
+var localhost = net.IPv4(127, 0, 0, 1)
+
 func (t *LocalTarget) IPs() []net.IP {
 	// TODO(ssd) 2018-10-16: A bit of a hack to get us going.
 	//
@@ -1522,7 +1524,10 @@ func (t *LocalTarget) IPs() []net.IP {
 	ipFromEnv := os.Getenv("AUTOMATE_SYS_IP")
 	ip := net.ParseIP(ipFromEnv)
 	if ip != nil {
-		return []net.IP{ip}
+		if ip.Equal(localhost) {
+			return []net.IP{localhost}
+		}
+		return []net.IP{ip, localhost}
 	}
 	return []net.IP{}
 }

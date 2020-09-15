@@ -89,6 +89,6 @@ s3.client.{{ cfg.s3.client.name }}.max_retries: {{cfg.s3.client.max_retries}}
 s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_throttle_retries}}
 {{~#eachAlive bind.backup-gateway.members as |bgw|}}
 {{~#if @last}}
-s3.client.{{ cfg.s3.client.name }}.endpoint: {{bgw.sys.ip}}:{{bgw.cfg.port}}
+s3.client.{{ cfg.s3.client.name }}.endpoint: 127.0.0.1:{{bgw.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}

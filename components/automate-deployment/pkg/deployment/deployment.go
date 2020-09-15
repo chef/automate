@@ -444,15 +444,9 @@ func (d *Deployment) FQDN() string {
 	return d.Config.GetGlobal().GetV1().GetFqdn().GetValue()
 }
 
-// BackupGatewayEndpoint is the listen address of the backup-gateway. As the
-// backup-gateway has to listen on the public address for multi-node we'll use
-// the target IP address and pull the port from our config.
+// BackupGatewayEndpoint is the listen address of the backup-gateway.
 func (d *Deployment) BackupGatewayEndpoint() string {
-	// FIXME (jaym): This needs to be localhost. I think the comment is incorrect.
-	//               The nodes in multi-node do not communicate with each other in
-	//               in any way.
-	return fmt.Sprintf("%v:%d",
-		d.Target().IPs()[0],
+	return fmt.Sprintf("127.0.0.1:%d",
 		d.Config.GetBackupGateway().GetV1().GetSys().GetService().GetPort().GetValue(),
 	)
 }
