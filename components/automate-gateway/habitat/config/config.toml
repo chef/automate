@@ -100,7 +100,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.ingest-service.members as |ingest|}}
 {{~#if @last}}
   [grpc_clients.endpoints.ingest-service]
-    target = "{{ingest.sys.ip}}:{{ingest.cfg.port}}"
+    target = "127.0.0.1:{{ingest.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

@@ -51,15 +51,7 @@ if [ -n "$nodes_missing_running_default" ]; then
   CONFIG="$CONFIG --nodes-missing-running-default $nodes_missing_running_default"
 fi
 
-# If we have a config pointing to an specific host,
-# lets use it, otherwise use the ipaddress of the server
-#
-# Service Host
-{{~#if cfg.service.host}}
-CONFIG="$CONFIG --host {{cfg.service.host}}"
-{{else}}
-CONFIG="$CONFIG --host {{sys.ip}}"
-{{~/if}}
+CONFIG="$CONFIG --host 127.0.0.1"
 
 {{~#if cfg.log.level}}
 CONFIG="$CONFIG --log-level {{cfg.log.level}}"
