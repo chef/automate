@@ -4,7 +4,7 @@
 # potential curl exit codes are various, see https://ec.haxx.se/usingcurl-returns.html
 # we translate everything != 0 to exit code 2 ("critical")
 if ! output=$(curl --fail --cacert {{pkg.svc_config_path}}/root_ca.crt \
-  --resolve session-service:{{cfg.service.port}}:{{sys.ip}} \
+  --resolve session-service:{{cfg.service.port}}:127.0.0.1 \
   --noproxy session-service \
   --max-time 2 \
   https://session-service:{{cfg.service.port}}/health 2>&1); then

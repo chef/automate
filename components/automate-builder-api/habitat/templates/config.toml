@@ -19,8 +19,8 @@ ca_cert_path = "{{svc_root_ca_path}}"
 
 [oauth]
 provider       = "chef-automate"
-token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
-userinfo_url   = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/userinfo"
+token_url      = "https://127.0.0.1:{{cfg.binds.session.cfg.port}}/token"
+userinfo_url   = "https://127.0.0.1:{{cfg.binds.session.cfg.port}}/userinfo"
 redirect_url   = "/bldr"
 client_id      = "automate-builder-api"
 client_secret  = "{{getSecret "bldr.auth_client_secret"}}"

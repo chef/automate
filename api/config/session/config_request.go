@@ -27,7 +27,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Persistent = w.Bool(true)
 	c.V1.Sys.Service.Port = w.Int32(10115)
 	c.V1.Sys.Logger.Level = w.String("info")
