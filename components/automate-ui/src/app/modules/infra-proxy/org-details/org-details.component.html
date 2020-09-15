@@ -28,7 +28,7 @@
       <div class="main page-body">
         <app-tabs class="tabs-row" (tabChange)="tabChange($event)">
           <app-tab tabTitle="Cookbooks" #cookbooks_tab [active]="cookbooksTab">
-            <app-cookbooks *ngIf="cookbooks_tab.active" [serverId]="serverId" [orgId]="orgId"></app-cookbooks>
+            <app-cookbooks *ngIf="cookbooks_tab.active" [serverId]="serverId" [orgId]="orgId" (resetKeyRedirection)="resetAdminKeyRedirection($event)"></app-cookbooks>
           </app-tab>
           <app-tab tabTitle="Roles" #roles_tab  [active]="rolesTab">
             <app-infra-roles *ngIf="roles_tab.active" [serverId]="serverId" [orgId]="orgId"></app-infra-roles>

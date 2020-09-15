@@ -2,13 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Params } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
-import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-import { previousRoute } from '../../../route.selectors';
-import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { routeParams, previousRoute } from 'app/route.selectors';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { EntityStatus } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -16,6 +15,8 @@ import {
 } from 'app/entities/orgs/org.selectors';
 import { GetOrg } from 'app/entities/orgs/org.actions';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+
+const ORG_DETAILS_TAB_NAME = 'orgDetailsTab';
 
 @Component({
   selector: 'app-org-details',
@@ -46,7 +47,6 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     private telemetryService: TelemetryService
   ) {
       this.previousRoute$ = this.store.select(previousRoute);
-
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {
         const path: string[] = params.path;
@@ -66,21 +66,11 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('cookbooks')) {
           this.resetTabs();
           this.cookbooksTab = true;
-        }
-        if ( params.path.includes('resetkey') ) {
-          this.cookbooksTab = false;
-          this.clientsTab = false;
-          this.dataBagsTab = false;
-          this.rolesTab = false;
-          this.environmentsTab = false;
+        } else if (path.includes('resetkey')) {
+          this.resetTabs();
           this.resetKeyTab = true;
-        }
-
-        if ( params.path.includes('clients') ) {
-          this.cookbooksTab = false;
-          this.environmentsTab = false;
-          this.dataBagsTab = false;
-          this.rolesTab = false;
+        } else if (path.includes('clients')) {
+          this.resetTabs();
           this.clientsTab = true;
         }
       });
@@ -114,31 +104,41 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   }
 
   tabChange(tab: number) {
+    // Tab indices here correspond with the order of `<app-tab>` elements in the template.
     switch (tab) {
       case 0:
-        this.telemetryService.track('orgDetailsTab', 'cookbooks');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'cookbooks');
+        this.resetTabs();
+        this.cookbooksTab = true;
         break;
       case 1:
-        this.telemetryService.track('orgDetailsTab', 'roles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'roles');
         break;
       case 2:
-        this.telemetryService.track('orgDetailsTab', 'environments');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'environments');
         break;
       case 3:
-        this.telemetryService.track('orgDetailsTab', 'dataBags');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'dataBags');
         break;
       case 4:
-        this.telemetryService.track('orgDetailsTab', 'clients');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'clients');
         break;
       case 5:
-        this.telemetryService.track('orgDetailsTab', 'policyFiles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyFiles');
         break;
       case 6:
-        this.telemetryService.track('orgDetailsTab', 'orgEdit');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
         break;
       case 7:
-        this.telemetryService.track('orgDetailsTab', 'resetkey');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'resetkey');
         break;
+    }
+  }
+
+  resetAdminKeyRedirection(authFailure: boolean) {
+    if (authFailure) {
+      this.resetTabs();
+      this.resetKeyTab = authFailure;
     }
   }
 
@@ -148,6 +148,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.dataBagsTab = false;
     this.rolesTab = false;
     this.policyFilesTab = false;
+    this.resetKeyTab = false;
+    this.clientsTab = false;
   }
 
   ngOnDestroy(): void {
