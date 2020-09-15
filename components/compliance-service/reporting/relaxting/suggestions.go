@@ -553,23 +553,15 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		Query(boolQuery).
 		FetchSource(false).
 		Size(0) //setting size to 0 because we now use aggs to get this stuff and don't need the actual docs
-	//Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
-	// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
-
-	//default to 10 suggs
-	numOfSugg := 10
-	if size > 0 {
-		numOfSugg = size
-	}
 
 	controlsTitles := elastic.NewTermsAggregation().
 		Field("profiles.controls.title").
-		Size(numOfSugg).
+		Size(size).
 		Order("_count", false)
 
 	controlIds := elastic.NewTermsAggregation().
 		Field("profiles.controls.id").
-		Size(numOfSugg).
+		Size(size).
 		Order("_count", false)
 
 	controlsTitles.SubAggregation("ids", controlIds)
@@ -679,15 +671,9 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		FetchSource(false).
 		Size(0) //set to 0 because we do aggs now
 
-	//default to 10 suggs
-	numOfSugg := 10
-	if size > 0 {
-		numOfSugg = size
-	}
-
 	controlsTitles := elastic.NewTermsAggregation().
 		Field(target).
-		Size(numOfSugg).
+		Size(size).
 		Order("_count", false)
 
 	stringTagsAgg := elastic.NewFilterAggregation().Filter(finalInnerBoolQuery).
