@@ -25,7 +25,7 @@ export class IntegrationsListComponent {
   public managerStatus$: Observable<EntityStatus>;
   public automateManager$: Observable<Manager>;
   public deletePromptVisible = false;
-  public managerIdForDeletion: string;
+  public managerIdForDeletion = '';
   private sort: string;
   private order: string;
 
