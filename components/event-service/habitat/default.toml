@@ -26,4 +26,4 @@ level = "info"
 [handlers]
 feed = "127.0.0.1:10121"
 cfgingest = "127.0.0.1:10122"
-event_feed = "0.0.0.0:10134"
+event_feed = "127.0.0.1:10134"

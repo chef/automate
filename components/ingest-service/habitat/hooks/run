@@ -122,7 +122,7 @@ CONFIG="$CONFIG --cereal-address 127.0.0.1:{{cereal-service.cfg.port}}"
 {{~#eachAlive bind.event-feed-service.members as |service|}}
   {{~#if @last}}
 addNoProxy {{event-feed-service.sys.ip}}
-CONFIG="$CONFIG --event-feed-address {{service.sys.ip}}:{{service.cfg.port}}"
+CONFIG="$CONFIG --event-feed-address 127.0.0.1:{{service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

@@ -86,7 +86,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.event-feed-service.members as |event|}}
 {{~#if @last}}
   [grpc_clients.endpoints.event-feed-service]
-    target = "{{event.sys.ip}}:{{event.cfg.port}}"
+    target = "127.0.0.1:{{event.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
