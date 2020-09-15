@@ -1,16 +1,32 @@
 #!/bin/bash
 #
-# Creates the protovendor/ directory in this repository. Should be run from
-# the root of the repository.
+# This script wraps the golang and protobuf dependency maintenance/cleanup
+# tasks for the entire Automate repo.
 #
-grpcGatewayVendorPath=./protovendor/github.com/grpc-ecosystem/grpc-gateway/
-googleAPIsVendorPath=./protovendor/github.com/googleapis/googleapis/google/api
+# For the main automate module, it should suffice to use standard go
+# module-based dependency management commands. For the protovendor tree/module,
+# we use the go tooling to fetch protobuf repos that we have vendored. This use
+# case isn't currently supported directly by the go module system which we work
+# around with the code here.
+#
+# Originally Automate was one big go module and go dependencies were vendored
+# along with the protobufs. Any weirdness in this script might be a result of
+# the large changes in dependency management strategy since then.
+#
+grpcGatewayVendorPath=./github.com/grpc-ecosystem/grpc-gateway/
+googleAPIsVendorPath=./github.com/googleapis/googleapis/google/api
 googleAPIsSubsetToKeep=google/api
-envoyproxyVendorPath=./protovendor/github.com/envoyproxy/protoc-gen-validate
+envoyproxyVendorPath=./github.com/envoyproxy/protoc-gen-validate
 
 # This has the side effect of downloading all the modules, which needs to
 # happen before we can copy the protos from those modules to protovendor/
-echo "Tidying and Verifying Go Modules"
+echo "Tidying and Verifying Go Modules in Automate Main Module"
+go mod tidy
+go mod verify
+
+pushd protovendor > /dev/null || (echo "couldn't enter the protovendor dir from $(pwd)" && exit 1)
+
+echo "Tidying and Verifying Go Modules in Automate Protovendor Module"
 go mod tidy
 go mod verify
 
@@ -58,11 +74,13 @@ else
     exit 1
 fi
 
-echo "Cleaning up unnecessary files from protovendor/"
-find protovendor -not -name "*proto" -type f -exec rm '{}' \;
+echo "Cleaning up unnecessary files from protovendor/github.com/"
+find github.com -not -name "*proto" -type f -exec rm '{}' \;
 
 # Explicitly clean out grpc-gateway example folder
-rm -rf ./protovendor/github.com/grpc-ecosystem/grpc-gateway/examples/
+rm -rf ./github.com/grpc-ecosystem/grpc-gateway/examples/
+
+popd > /dev/null || exit 1
 
 # Update .bldr with new dep information
 echo "Regenerating .bldr configuration file"
