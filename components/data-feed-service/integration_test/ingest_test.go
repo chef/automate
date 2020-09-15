@@ -14,10 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/chef/automate/api/external/ingest/request"
-
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,6 +60,7 @@ func TestComplianceReport(t *testing.T) {
 		t.Log("waiting 90 seconds for datafeed loop to execute")
 		time.Sleep(90 * time.Second)
 	}
+
 	_, _ = deleteDestinationRequest(destinationId, 200)
 }
 
@@ -271,6 +270,7 @@ func verifyComplianceReport(t *testing.T, node map[string]interface{}) []error {
 	errs = testStringValue(t, platform, "name", "redhat", errs)
 	errs = testStringValue(t, platform, "release", "6.11", errs)
 	errs = testStringValue(t, platform, "full", "redhat 6.11", errs)
+
 	roles := report["roles"].([]interface{})
 	expectedRoles := []interface{}{"base_linux", "apache_linux", "nginx-hardening-prod", "dot.role"}
 	rolesError := fmt.Sprintf("expected roles %v, got %v", expectedRoles, roles)
@@ -297,6 +297,7 @@ func verifyComplianceReport(t *testing.T, node map[string]interface{}) []error {
 }
 
 func verifyJSONEquals(t *testing.T, filename string, actualJson interface{}, errs []error) []error {
+
 	data, err := ioutil.ReadFile(filename)
 	if !assert.Nil(t, err) {
 		errs = append(errs, errors.New(fmt.Sprintf("couldn't read file %s", filename)))

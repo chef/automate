@@ -167,6 +167,7 @@ func testFloatValue(t *testing.T, body map[string]interface{}, key string, expec
 	}
 	return errs
 }
+
 func addSecretRequest(data []byte, statusCode int) (string, error) {
 	add, err := http.NewRequest("POST", "https://127.0.0.1/api/v0/secrets", bytes.NewBuffer(data))
 	if err != nil {
