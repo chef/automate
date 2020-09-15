@@ -15,7 +15,7 @@ scrape_configs:
       server_name: "automate-gateway"
     static_configs:
 {{#each bind.automate-gateway.members as |target| }}
-      - targets: ['{{target.sys.ip}}:{{target.cfg.port}}']
+      - targets: ['127.0.0.1:{{target.cfg.port}}']
 {{/each }}
 {{/if }}
 

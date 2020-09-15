@@ -40,7 +40,7 @@ func TestSetGlobalConfig(t *testing.T) {
 
 func TestDefaultConfigRequestSupportsOldLogLevelConfig(t *testing.T) {
 	c := cr.DefaultConfigRequest()
-	assert.Equal(t, "0.0.0.0", c.V1.Sys.Service.Host.Value)
+	assert.Equal(t, "127.0.0.1", c.V1.Sys.Service.Host.Value)
 	assert.EqualValues(t, 2000, c.V1.Sys.Service.Port.Value)
 	assert.EqualValues(t, 2001, c.V1.Sys.Service.GrpcPort.Value)
 	assert.Equal(t, cr.ValidTrialLicenseURLs[0], c.V1.Sys.Service.TrialLicenseUrl.Value)

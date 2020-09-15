@@ -5,7 +5,7 @@
 health=$(curl --cacert {{pkg.svc_config_path}}/root_ca.crt \
   --max-time 2 \
   --noproxy {{sys.ip}} \
-  "https://{{sys.ip}}:{{cfg.service.port}}/api/v0/gateway/health" 2>/dev/null)
+  "https://127.0.0.1:{{cfg.service.port}}/api/v0/gateway/health" 2>/dev/null)
 status=$(echo "$health" | jq -r '.code // .status')
 
 # Inspect the health of the automate-gateway service

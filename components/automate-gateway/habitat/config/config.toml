@@ -1,4 +1,4 @@
-host = "{{cfg.service.host}}"
+host = "127.0.0.1"
 port = {{cfg.service.port}}
 grpc_port = {{cfg.service.grpc_port}}
 external_fqdn = "https://{{cfg.service.external_fqdn}}"
