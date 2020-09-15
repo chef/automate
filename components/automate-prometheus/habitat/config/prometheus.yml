@@ -29,6 +29,6 @@ scrape_configs:
       server_name: "applications-service"
     static_configs:
 {{#each bind.applications-service.members as |target| }}
-      - targets: ['{{target.sys.ip}}:{{target.cfg.metrics-port}}']
+      - targets: ['127.0.0.1:{{target.cfg.metrics-port}}']
 {{/each }}
 {{/if }}
