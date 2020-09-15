@@ -24,6 +24,8 @@ export class IntegrationsListComponent {
   public managers$: Observable<Manager[]>;
   public managerStatus$: Observable<EntityStatus>;
   public automateManager$: Observable<Manager>;
+  public deletePromptVisible = false;
+  public managerIdForDeletion: string;
   private sort: string;
   private order: string;
 
@@ -48,10 +50,22 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete($event: MatOptionSelectionChange, id: string) {
+  beginDelete($event: MatOptionSelectionChange, id: string): void {
     if ($event.isUserInput) {
-      this.store.dispatch(new DeleteManager({id}));
+      this.managerIdForDeletion = id;
+      this.deletePromptVisible = true;
     }
+  }
+
+  resetModal(): void {
+    this.managerIdForDeletion = '';
+    this.deletePromptVisible = false;
+  }
+
+  handleDelete() {
+    const id = this.managerIdForDeletion;
+    this.store.dispatch(new DeleteManager({ id }));
+    this.resetModal();
   }
 
   handleEdit(id) {
