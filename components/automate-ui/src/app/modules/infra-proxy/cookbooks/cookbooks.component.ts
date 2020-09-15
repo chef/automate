@@ -23,7 +23,7 @@ import {
 export class CookbooksComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
-  @Output() resetKeyRedirection: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   private isDestroyed$ = new Subject<boolean>();
   public cookbooks: Cookbook[] = [];

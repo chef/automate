@@ -16,6 +16,8 @@ import {
 import { GetOrg } from 'app/entities/orgs/org.actions';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
+const ORG_DETAILS_TAB_NAME = 'orgDetailsTab';
+
 @Component({
   selector: 'app-org-details',
   templateUrl: './org-details.component.html',
@@ -102,40 +104,41 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   }
 
   tabChange(tab: number) {
+    // Tab indices here correspond with the order of `<app-tab>` elements in the template.
     switch (tab) {
       case 0:
-        this.telemetryService.track('orgDetailsTab', 'cookbooks');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'cookbooks');
         this.resetTabs();
         this.cookbooksTab = true;
         break;
       case 1:
-        this.telemetryService.track('orgDetailsTab', 'roles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'roles');
         break;
       case 2:
-        this.telemetryService.track('orgDetailsTab', 'environments');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'environments');
         break;
       case 3:
-        this.telemetryService.track('orgDetailsTab', 'dataBags');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'dataBags');
         break;
       case 4:
-        this.telemetryService.track('orgDetailsTab', 'clients');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'clients');
         break;
       case 5:
-        this.telemetryService.track('orgDetailsTab', 'policyFiles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyFiles');
         break;
       case 6:
-        this.telemetryService.track('orgDetailsTab', 'orgEdit');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
         break;
       case 7:
-        this.telemetryService.track('orgDetailsTab', 'resetkey');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'resetkey');
         break;
     }
   }
 
-  resetAdminKeyRedirection(authFailuer: boolean) {
-    if (authFailuer) {
+  resetAdminKeyRedirection(authFailure: boolean) {
+    if (authFailure) {
       this.resetTabs();
-      this.resetKeyTab = authFailuer;
+      this.resetKeyTab = authFailure;
     }
   }
 

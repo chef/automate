@@ -3,8 +3,6 @@
   <chef-toolbar *ngIf="authFailure">
       <div class="empty-state">
         <p>Unable to show cookbooks because admin key is invalid.</p>
-      </div>
-      <div class="empty-state">
         <chef-button primary (click)="ResetKeyTabRedirection()">Reset Admin Key</chef-button>
       </div>
   </chef-toolbar>
