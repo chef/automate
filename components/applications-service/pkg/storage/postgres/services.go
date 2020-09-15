@@ -497,8 +497,11 @@ func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword 
 			whereConstraints = whereConstraints + buildORStatementFromValues("service_group_id", values)
 
 		case "status":
-			whereConstraints = whereConstraints + buildHealthStatementFromValues(values)
-
+			statement, err := buildHealthStatementFromValues(values)
+			if err != nil {
+				return "", errors.Wrapf(err, "invalid filter/value %q: %+v", filter, values)
+			}
+			whereConstraints = whereConstraints + statement
 		case "origin":
 			whereConstraints = whereConstraints + buildORStatementFromValues("origin", values)
 
@@ -575,7 +578,7 @@ func buildORStatementFromValues(field string, values []string) string {
 	return fmt.Sprintf(" (%s)", ORConstraint)
 }
 
-func buildHealthStatementFromValues(values []string) string {
+func buildHealthStatementFromValues(values []string) (string, error) {
 	var (
 		secondStatement = false
 		ORConstraint    = ""
@@ -585,17 +588,22 @@ func buildHealthStatementFromValues(values []string) string {
 		if secondStatement {
 			ORConstraint = ORConstraint + " OR "
 		}
-		if value == "disconnected" {
+		switch value {
+		case "disconnected":
 			ORConstraint = " disconnected"
-		} else {
+		case "connected":
+			ORConstraint = " disconnected = false"
+		case "CRITICAL", "WARNING", "UNKNOWN", "OK":
 			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", "health",
 				pgutils.EscapeLiteralForPG(strings.ToUpper(value)))
+		default:
+			return "", fmt.Errorf("unknown health statement value: %q", value)
 		}
 
 		secondStatement = true
 	}
 
-	return fmt.Sprintf(" (%s)", ORConstraint)
+	return fmt.Sprintf(" (%s)", ORConstraint), nil
 }
 
 // orderByStatementFromSortField returns the ORDER BY statement from the provided sort field,

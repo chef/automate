@@ -232,6 +232,13 @@ func TestGetServicesWithDisconnectedServices(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, res.Services, 0)
 
+	reqConnectedOnly := &applications.ServicesReq{
+		Filter: []string{"status:connected"},
+	}
+	connectedOnlyRes, err := suite.ApplicationsServer.GetServices(ctx, reqConnectedOnly)
+	assert.NoError(t, err)
+	assert.Len(t, connectedOnlyRes.Services, 6)
+
 	_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
 	require.NoError(t, err)
 
@@ -259,6 +266,10 @@ func TestGetServicesWithDisconnectedServices(t *testing.T) {
 	res2, err := suite.ApplicationsServer.GetServices(ctx, reqDisconnectedOnly)
 	assert.NoError(t, err)
 	assert.Len(t, res2.Services, 6)
+
+	connectedOnlyRes2, err := suite.ApplicationsServer.GetServices(ctx, reqConnectedOnly)
+	assert.NoError(t, err)
+	assert.Len(t, connectedOnlyRes2.Services, 0)
 }
 
 func TestGetServicesMultiServicaSortDESC(t *testing.T) {
