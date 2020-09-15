@@ -149,7 +149,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.automate-cds.members as |cds|}}
 {{~#if @last}}
   [grpc_clients.endpoints.automate-cds]
-    target = "{{cds.sys.ip}}:{{cds.cfg.port}}"
+    target = "127.0.0.1:{{cds.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
