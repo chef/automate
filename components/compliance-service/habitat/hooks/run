@@ -70,13 +70,7 @@ PG_BACKEND="--postgres-db {{cfg.storage.database}}"
 
 CONFIG="$CONFIG --automate-fqdn https://{{cfg.service.external_fqdn}}"
 
-# If we have a config pointing to an specific host,
-# lets use it, otherwise use the ipaddress of the server
-{{~#if cfg.service.host}}
-CONFIG="$CONFIG --host {{cfg.service.host}}"
-{{else}}
-CONFIG="$CONFIG --host {{sys.ip}}"
-{{~/if}}
+CONFIG="$CONFIG --host 127.0.0.1"
 
 # A data retention policy was configured
 {{~#if cfg.retention.compliance_report_days}}

@@ -58,7 +58,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.compliance-service.members as |compliance|}}
 {{~#if @last}}
   [grpc_clients.endpoints.compliance-service]
-    target = "{{compliance.sys.ip}}:{{compliance.cfg.port}}"
+    target = "127.0.0.1:{{compliance.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

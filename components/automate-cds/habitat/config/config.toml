@@ -10,5 +10,5 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
 [compliance-service]
 {{~#eachAlive bind.compliance-service.members as |member|}}
-address = "{{member.sys.ip}}:{{member.cfg.port}}"
+address = "127.0.0.1:{{member.cfg.port}}"
 {{~/eachAlive}}
