@@ -7,7 +7,7 @@ log_level = "{{cfg.log.level}}"
 [events]
 {{~#eachAlive bind.event-service.members as |events|}}
 {{~#if @last}}
-host = "{{events.sys.ip}}"
+host = "127.0.0.1"
 port = {{events.cfg.internal_messaging_port}}
 cluster_id = "{{events.cfg.cluster_id}}"
 {{~/if}}

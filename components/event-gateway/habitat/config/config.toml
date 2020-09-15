@@ -28,7 +28,7 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 [internal_event_service]
 {{~#eachAlive bind.event-service.members as |event_svc|}}
 {{~#if @last}}
-host = "{{event_svc.sys.ip}}"
+host = "127.0.0.1"
 gateway_port = {{event_svc.cfg.internal_messaging_gateway_port}}
 {{~/if}}
 {{~/eachAlive}}
@@ -36,7 +36,7 @@ gateway_port = {{event_svc.cfg.internal_messaging_gateway_port}}
 [auth]
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}
-authn_endpoint = "{{authn.sys.ip}}:{{authn.cfg.port}}"
+authn_endpoint = "127.0.0.1:{{authn.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 {{~#eachAlive bind.authz-service.members as |authz|}}

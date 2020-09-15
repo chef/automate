@@ -45,7 +45,7 @@ CONFIG="$CONFIG --secrets-host 127.0.0.1 --secrets-port {{secrets.cfg.port}}"
 {{~#eachAlive bind.event-service.members as |event|}}
 {{~#if @last}}
 addNoProxy {{event.sys.ip}}
-CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
+CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

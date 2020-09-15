@@ -116,8 +116,7 @@ CONFIG="$CONFIG --authz-host 127.0.0.1 --authz-port {{authz.cfg.port}}"
 # get event service binding, used for publishing event
 {{~#eachAlive bind.event-service.members as |event|}}
 {{~#if @last}}
-addNoProxy {{event.sys.ip}}
-CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
+CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

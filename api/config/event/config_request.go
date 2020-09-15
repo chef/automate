@@ -25,7 +25,7 @@ func NewConfigRequest() *ConfigRequest {
 // DefaultConfigRequest returns a new instance of ConfigRequest with default values.
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10132)
 	c.V1.Sys.Service.EventLimit = w.Int32(100000)
 	c.V1.Sys.Service.ListenerLimit = w.Int32(100000)
@@ -33,9 +33,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.InternalMessaging.GatewayPort = w.Int32(10147)
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
-	c.V1.Sys.Handlers.Feed = w.String("0.0.0.0:10121")
-	c.V1.Sys.Handlers.Cfgingest = w.String("0.0.0.0:10122")
-	c.V1.Sys.Handlers.Authz = w.String("0.0.0.0:10130")
+	c.V1.Sys.Handlers.Feed = w.String("127.0.0.1:10121")
+	c.V1.Sys.Handlers.Cfgingest = w.String("127.0.0.1:10122")
+	c.V1.Sys.Handlers.Authz = w.String("127.0.0.1:10130")
 	return c
 }
 
