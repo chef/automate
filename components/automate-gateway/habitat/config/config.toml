@@ -72,7 +72,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.data-feed-service.members as |datafeed|}}
 {{~#if @last}}
   [grpc_clients.endpoints.data-feed-service]
-    target = "{{datafeed.sys.ip}}:{{datafeed.cfg.port}}"
+    target = "127.0.0.1:{{datafeed.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
