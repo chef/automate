@@ -2056,6 +2056,7 @@ func (s *server) reloadBackupRunner() error {
 				Path: "/hab/svc/automate-pg-gateway",
 			},
 			Postgresql: &papi.Config_Postgresql{
+				// FIXME (jaym): GetHost is deprecated. This is always localhost
 				Ip: s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetHost().GetValue(),
 				Cfg: &papi.Config_Postgresql_Cfg{
 					Port: int64(s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetPort().GetValue()),
@@ -2092,6 +2093,7 @@ func (s *server) reloadBackupRunner() error {
 	}
 
 	esSidecarInfo := backup.ESSidecarConnInfo{
+		// FIXME (jaym): GetHost is deprecated. This is always localhost
 		Host: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetHost().GetValue(),
 		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
 	}

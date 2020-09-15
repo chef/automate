@@ -324,6 +324,7 @@ func (s *server) backupGatewayLocationSpec() (backup.LocationSpecification, erro
 }
 
 func (s *server) builderMinioLocationSpec() (backup.LocationSpecification, error) {
+	// FIXME (jaym): LOCALHOST PLZ
 	port := s.deployment.Config.GetMinio().GetV1().GetSys().GetService().GetPort().GetValue()
 	ips := s.target().IPs()
 	if len(ips) < 1 {
