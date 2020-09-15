@@ -623,18 +623,20 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 							logrus.Errorf("could not convert the value of titleBucket: %v, to a string!", titleBucket)
 						}
 						logrus.Debugf("%s titleBucket.Key: %s", myName, title)
-						if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
-							for _, idsBucket := range idsBuckets.Buckets {
-								id, ok := idsBucket.Key.(string)
-								if !ok {
-									logrus.Errorf("could not convert the value of idsBucket: %v, to a string!", idsBucket)
+						if len(title) > 0 {
+							if idsBuckets, found := titleBucket.Aggregations.Terms("ids"); found && len(idsBuckets.Buckets) > 0 {
+								for _, idsBucket := range idsBuckets.Buckets {
+									id, ok := idsBucket.Key.(string)
+									if !ok {
+										logrus.Errorf("could not convert the value of idsBucket: %v, to a string!", idsBucket)
+									}
+									if !singular || !addedControls[id] {
+										oneSugg := reportingapi.Suggestion{Id: id, Text: title}
+										suggs = append(suggs, &oneSugg)
+										addedControls[id] = true
+									}
+									logrus.Debugf("%s idsBucket.Key: %s", myName, id)
 								}
-								if !singular || !addedControls[id] {
-									oneSugg := reportingapi.Suggestion{Id: id, Text: title}
-									suggs = append(suggs, &oneSugg)
-									addedControls[id] = true
-								}
-								logrus.Debugf("%s idsBucket.Key: %s", myName, id)
 							}
 						}
 					}
