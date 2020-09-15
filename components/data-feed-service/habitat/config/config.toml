@@ -35,7 +35,7 @@ target = "127.0.0.1:{{secrets-service.cfg.port}}"
 [cfgmgmt]
 {{~#eachAlive bind.config-mgmt-service.members as |config-mgmt-service|}}
 {{~#if @last}}
-target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
+target = "127.0.0.1:{{config-mgmt-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 

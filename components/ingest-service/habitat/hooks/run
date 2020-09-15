@@ -114,7 +114,7 @@ CONFIG="$CONFIG --nodemanager-address 127.0.0.1:{{manager.cfg.port}}"
 {{~#eachAlive bind.config-mgmt-service.members as |config_mgmt|}}
   {{~#if @last}}
 addNoProxy {{config_mgmt.sys.ip}}
-CONFIG="$CONFIG --config-mgmt-address {{config_mgmt.sys.ip}}:{{config_mgmt.cfg.port}}"
+CONFIG="$CONFIG --config-mgmt-address 127.0.0.1:{{config_mgmt.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

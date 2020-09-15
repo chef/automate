@@ -65,7 +65,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.config-mgmt-service.members as |cfgmgmt|}}
 {{~#if @last}}
   [grpc_clients.endpoints.config-mgmt-service]
-    target = "{{cfgmgmt.sys.ip}}:{{cfgmgmt.cfg.port}}"
+    target = "127.0.0.1:{{cfgmgmt.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
