@@ -50,6 +50,11 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
+  resetModal(): void {
+    this.managerIdForDeletion = '';
+    this.deletePromptVisible = false;
+  }
+
   beginDelete($event: MatOptionSelectionChange, id: string): void {
     if ($event.isUserInput) {
       this.managerIdForDeletion = id;
@@ -57,14 +62,8 @@ export class IntegrationsListComponent {
     }
   }
 
-  resetModal(): void {
-    this.managerIdForDeletion = '';
-    this.deletePromptVisible = false;
-  }
-
-  handleDelete() {
-    const id = this.managerIdForDeletion;
-    this.store.dispatch(new DeleteManager({ id }));
+  handleDelete(): void {
+    this.store.dispatch(new DeleteManager({ id: this.managerIdForDeletion }));
     this.resetModal();
   }
 
