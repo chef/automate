@@ -106,7 +106,7 @@ CONFIG="$CONFIG --authz-address 127.0.0.1:{{authz-service.cfg.port}}"
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
   {{~#if @last}}
 addNoProxy {{manager.sys.ip}}
-CONFIG="$CONFIG --nodemanager-address {{manager.sys.ip}}:{{manager.cfg.port}}"
+CONFIG="$CONFIG --nodemanager-address 127.0.0.1:{{manager.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

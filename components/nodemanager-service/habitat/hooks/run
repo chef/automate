@@ -32,13 +32,7 @@ CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"
 CONFIG="$CONFIG --key {{pkg.svc_config_path}}/service.key"
 CONFIG="$CONFIG --root-cert {{pkg.svc_config_path}}/root_ca.crt"
 
-# If we have a config pointing to an specific host,
-# lets use it, otherwise use the ipaddress of the server
-{{~#if cfg.service.host}}
-CONFIG="$CONFIG --host {{cfg.service.host}}"
-{{else}}
-CONFIG="$CONFIG --host {{sys.ip}}"
-{{~/if}}
+CONFIG="$CONFIG --host 127.0.0.1"
 
 # get secrets service binding, used for storing secrets
 {{~#eachAlive bind.secrets-service.members as |secrets|}}

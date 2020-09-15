@@ -121,7 +121,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
 {{~#if @last}}
   [grpc_clients.endpoints.nodemanager-service]
-    target = "{{manager.sys.ip}}:{{manager.cfg.port}}"
+    target = "127.0.0.1:{{manager.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
