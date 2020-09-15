@@ -797,7 +797,7 @@ type SecretsServiceClient interface {
 	//Makes a list of secrets.
 	//Supports filtering, pagination, and sorting.
 	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
-	//Supported filters: type
+	//Supported filters: type, name
 	//Supported sort types: name, type, last modified
 	//
 	//Example:
@@ -960,7 +960,7 @@ type SecretsServiceServer interface {
 	//Makes a list of secrets.
 	//Supports filtering, pagination, and sorting.
 	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
-	//Supported filters: type
+	//Supported filters: type, name
 	//Supported sort types: name, type, last modified
 	//
 	//Example:
