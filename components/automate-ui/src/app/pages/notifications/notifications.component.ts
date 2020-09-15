@@ -1,30 +1,19 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
-
-import { Observable, combineLatest, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { filter, takeUntil, map } from 'rxjs/operators';
-import { isNil } from 'lodash/fp';
-
+import { map } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
 import { SortDirection } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { NotificationRuleRequests } from 'app/entities/notification_rules/notification_rule.requests';
 import {
-  allRules,
-  saveStatus,
-  saveError
+  allRules
 } from 'app/entities/notification_rules/notification_rule.selectors';
 import {
   GetNotificationRules,
-  DeleteNotificationRule,
-  CreateNotificationRule
+  DeleteNotificationRule
 } from 'app/entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
@@ -58,75 +47,25 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
 
-  public createModalVisible = false;
-  public createNotificationForm: FormGroup;
-  public creatingNotification = false;
-  public sendingNotification = false;
-  public conflictErrorEvent = new EventEmitter<boolean>();
   public notificationToDelete: NotificationRule;
   public deleteModalVisible = false;
   public hookStatus = UrlTestState.Inactive;
   public notificationObj = new NotificationRule('', '', null, '', null, '', false);
   private isDestroyed = new Subject<boolean>();
 
-  public targetKeys: string[];
-  public alertTypeKeys: string[];
+  public openNotificationModal = new EventEmitter<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
-    private notificationRuleRequests: NotificationRuleRequests,
     private telemetryService: TelemetryService
   ) {
     this.rules$ = store.pipe(select(allRules));
-    this.createNotificationForm = this.fb.group({
-      // Must stay in sync with error checks in create-notification-modal.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ruleType: ['', [Validators.required]],
-      targetType: ['', [Validators.required]],
-
-      // Note that URL here may be FQDN -or- IP!
-      targetUrl: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      username: [[]],
-      password: [[]]
-    });
-
-    this.targetKeys = this.notificationObj.getTargetTypeKeys();
-    this.alertTypeKeys = this.notificationObj.getAlertTypeKeys();
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetNotificationRules());
-    this.store.pipe(
-      select(saveStatus),
-      takeUntil(this.isDestroyed),
-      filter(state => this.createModalVisible && !pending(state)))
-      .subscribe(state => {
-        this.creatingNotification = false;
-        if (state === EntityStatus.loadingSuccess) {
-          this.closeCreateModal();
-          this.hookStatus = UrlTestState.Inactive;
-        }
-      });
-
-    combineLatest([
-      this.store.select(saveStatus),
-      this.store.select(saveError)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(() => this.createModalVisible),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-      .subscribe(([_, error]) => {
-        if (error.status === HttpStatus.CONFLICT) {
-          this.conflictErrorEvent.emit(true);
-        } else {
-          // Close the modal on any error other than conflict and display in banner.
-          this.closeCreateModal();
-          this.hookStatus = UrlTestState.Inactive;
-        }
-      });
 
     this.rules$.subscribe(rules => {
         this.sendCountToTelemetry(rules);
@@ -150,22 +89,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    this.createModalVisible = true;
-    this.resetCreateModal();
-  }
-
-  public closeCreateModal(): void {
-    this.createModalVisible = false;
-    this.resetCreateModal();
-  }
-
-  public createNotification(): void {
-    this.creatingNotification = true;
-    this.notificationObj.name = this.createNotificationForm.value.name.trim();
-    this.notificationObj.targetUrl = this.createNotificationForm.value.targetUrl.trim();
-    const username: string = this.createNotificationForm.value.username || '';
-    const password: string = this.createNotificationForm.value.password || '';
-    this.store.dispatch(new CreateNotificationRule(this.notificationObj, username, password));
+    this.openNotificationModal.emit(true);
   }
 
   toggleSort(field: string) {
@@ -218,13 +142,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
-  }
-
-  private resetCreateModal(): void {
-    this.hookStatus = UrlTestState.Inactive;
-    this.creatingNotification = false;
-    this.createNotificationForm.reset();
-    this.conflictErrorEvent.emit(false);
   }
 
   private updateSort(field: string, direction: string) {
@@ -291,46 +208,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       });
 
     this.telemetryService.track('notificationRuleCount', ruleCount);
-  }
-
-  public updateTargetType(): void {
-    if (this.createNotificationForm.value.targetType === 'ServiceNowAlert') {
-      this.createNotificationForm.get('username').setValidators([
-        Validators.required
-      ]);
-      this.createNotificationForm.get('password').setValidators([
-        Validators.required
-      ]);
-    } else {
-      this.createNotificationForm.get('username').clearValidators();
-      this.createNotificationForm.get('password').clearValidators();
-    }
-  }
-
-  public sendTestForNotification(): void {
-    this.sendingNotification = true;
-    this.hookStatus = UrlTestState.Loading;
-    const targetUrl: string =  this.createNotificationForm.controls['targetUrl'].value;
-    const targetUsername: string = this.createNotificationForm.controls['username'].value;
-    const targetPassword: string = this.createNotificationForm.controls['password'].value;
-    if (targetUrl && targetUsername && targetPassword) {
-      this.notificationRuleRequests.testHookWithUsernamePassword(targetUrl,
-        targetUsername, targetPassword).subscribe(
-          () => this.revealUrlStatus(UrlTestState.Success),
-          () => this.revealUrlStatus(UrlTestState.Failure)
-        );
-    } else {
-      this.notificationRuleRequests.testHookWithNoCreds(targetUrl)
-        .subscribe(
-          () => this.revealUrlStatus(UrlTestState.Success),
-          () => this.revealUrlStatus(UrlTestState.Failure)
-        );
-    }
-    this.sendingNotification = false;
-  }
-
-  private revealUrlStatus(status: UrlTestState) {
-    this.hookStatus = status;
   }
 
   // TODO - this was common in all three uses, but I'm not sure this is the best

@@ -1,4 +1,4 @@
-<chef-modal [visible]="visible" (closeModal)="closeEvent()">
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
   <h2 slot="title">Create Notification</h2>
     <div class="flex-container">
       <form [formGroup]="createForm">
@@ -27,7 +27,7 @@
                 formControlName="targetType"
                 placeholder="Webhook Type"
                 (selectionChange)="changeSelectionForWebhookType($event)">
-                <mat-option *ngFor="let key of targetKeysValue" [value]="key">
+                <mat-option *ngFor="let key of targetKeys" [value]="key">
                   <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo"/>
                   {{ notificationRule.TargetTypeLabels[key] }}
                 </mat-option>
@@ -44,7 +44,7 @@
                 formControlName="ruleType"
                 placeholder="Failure Type"
                 (selectionChange)="setFailureType($event)">
-                <mat-option *ngFor="let key of alertTypeKeysValue" [value]="key">
+                <mat-option *ngFor="let key of alertTypeKeys" [value]="key">
                   {{ notificationRule.AlertTypeLabels[key] }}
                 </mat-option>
               </mat-select>
@@ -119,7 +119,7 @@
             <span *ngIf="!sending">Test Notification</span>
             <span *ngIf="sending">Testing Notification...</span>
           </chef-button>
-          <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+          <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
         </div>
       </form>
     </div>
