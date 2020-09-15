@@ -2093,8 +2093,7 @@ func (s *server) reloadBackupRunner() error {
 	}
 
 	esSidecarInfo := backup.ESSidecarConnInfo{
-		// FIXME (jaym): GetHost is deprecated. This is always localhost
-		Host: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetHost().GetValue(),
+		Host: "127.0.0.1",
 		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
 	}
 

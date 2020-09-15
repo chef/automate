@@ -140,8 +140,7 @@ CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.compliance-service.toml"
 #
 #
 {{~#eachAlive bind.es-sidecar-service.members as |member|}}
-addNoProxy {{member.sys.ip}}
-CONFIG="$CONFIG --es-sidecar-address {{member.sys.ip}}:{{member.cfg.port}}"
+CONFIG="$CONFIG --es-sidecar-address 127.0.0.1:{{member.cfg.port}}"
 {{~/eachAlive}}
 
 # Elasticsearch

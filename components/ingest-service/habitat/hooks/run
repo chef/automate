@@ -81,8 +81,7 @@ BACKEND="--elasticsearch-url $ELASTICSEARCH_URL"
 # Bind to ES Sidecar if it's available
 {{~#eachAlive bind.es-sidecar-service.members as |sidecar|}}
   {{~#if @last}}
-addNoProxy {{sidecar.sys.ip}}
-CONFIG="$CONFIG --es-sidecar-address {{sidecar.sys.ip}}:{{sidecar.cfg.port}}"
+CONFIG="$CONFIG --es-sidecar-address 127.0.0.1:{{sidecar.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 
