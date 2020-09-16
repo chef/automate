@@ -10,6 +10,18 @@ import { IntegrationsListComponent } from './integrations-list.component';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { DeleteManager } from 'app/entities/managers/manager.actions';
 
+const mockManager = {
+  account_id: '',
+  credential_data: [],
+  credential_id: 'e1899b64-bc00-41d1-ae18-bdfd36460b11',
+  date_added: '2020-09-15T22:34:51Z',
+  id: '61f53683-11f8-4a06-99bf-e32afa373eca',
+  instance_credentials: [],
+  name: 'Duvall',
+  status: 'unreachable',
+  type: 'aws-ec2'
+};
+
 describe('IntegrationsListComponent', () => {
   let component: IntegrationsListComponent;
   let fixture: ComponentFixture<IntegrationsListComponent>;
@@ -62,24 +74,24 @@ describe('IntegrationsListComponent', () => {
 
   describe('deleting a node manager', () => {
     it('displays a modal prompt when user selects Delete Integration from the dropdown', () => {
-      component.beginDelete(MockSelectionEvent, '12345');
+      component.beginDelete(MockSelectionEvent, mockManager);
 
       expect(component.deletePromptVisible).toBe(true);
     });
 
     it('stores the id of the node manager to be deleted', () => {
-      expect(component.managerIdForDeletion).toBe('');
+      expect(component.managerForDeletion).toBe(null);
 
-      component.beginDelete(MockSelectionEvent, '12ebd34');
-      expect(component.managerIdForDeletion).toBe('12ebd34');
+      component.beginDelete(MockSelectionEvent, mockManager);
+      expect(component.managerForDeletion.id).toBe('61f53683-11f8-4a06-99bf-e32afa373eca');
     });
 
     it('deletes the selected node manaager', () => {
       spyOn(store, 'dispatch');
-      component.managerIdForDeletion = 'abcde';
+      component.beginDelete(MockSelectionEvent, mockManager);
       component.handleDelete();
 
-      expect(store.dispatch).toHaveBeenCalledWith(new DeleteManager({ id: 'abcde' }));
+      expect(store.dispatch).toHaveBeenCalledWith(new DeleteManager({ id: '61f53683-11f8-4a06-99bf-e32afa373eca' }));
     });
   });
 });

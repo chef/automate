@@ -56,7 +56,7 @@
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
                 <mat-option (onSelectionChange)="handleEdit(manager.id)">Edit Integration</mat-option>
-                <mat-option (onSelectionChange)="beginDelete($event, manager.id)">Delete Integration</mat-option>
+                <mat-option (onSelectionChange)="beginDelete($event, manager)">Delete Integration</mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>
@@ -68,16 +68,12 @@
   </div>
 </div>
 
-<chef-modal
-  id="delete-prompt"
+<app-delete-object-modal
   [visible]="deletePromptVisible"
-  (closeModal)="resetModal()">
-  <h2 id="delete-prompt-title" slot="title">Delete Integration?</h2>
-  <div>
-    <p>Deleting this node manager will also delete all of its associated nodes</p>
-    <div class="options">
-      <chef-button label="confirm" primary caution (click)="handleDelete()">Delete</chef-button>
-      <chef-button label="cancel" tertiary (click)="resetModal()">Cancel</chef-button>
-    </div>
-  </div>
-</chef-modal>
+  (close)="resetModal()"
+  (deleteClicked)="handleDelete()"
+  objectAction="Delete"
+  objectNoun="integration"
+  [objectName]="managerForDeletion?.name"
+  moreDetails="Deleting this node manager will also delete all of its associated nodes">
+</app-delete-object-modal>
