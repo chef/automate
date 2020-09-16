@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/external/nodes/nodes.proto",
+    "title": "external/nodes/nodes.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -15,12 +15,18 @@
       "post": {
         "summary": "Create a Node",
         "description": "Creates a node and adds it to the Chef Automate node manager.\nRequires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.\nUseful for creating nodes for the purpose of running compliance scan jobs.\n\nExample:\n```\n{\n\"name\": \"my-vagrant-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"host\":\"localhost\",\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is amazing\" }\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:create\n```",
-        "operationId": "Create",
+        "operationId": "NodesService_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.Id"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -43,12 +49,18 @@
       "post": {
         "summary": "Bulk Create Nodes",
         "description": "Creates multiple nodes from a list of node data.\n`hosts` field is required. Multiple hosts may be defined in this field.\n\nExample:\n```\n{\n\"name_prefix\": \"000-my-ssh-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"hosts\":[\"localhost\",\"127.0.0.1\"],\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is-amazing\" },\n]\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:create\n```",
-        "operationId": "BulkCreate",
+        "operationId": "NodesService_BulkCreate",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.Ids"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -71,12 +83,18 @@
       "post": {
         "summary": "Bulk Delete Nodes by Filter",
         "description": "Deletes a set of nodes that match a filter.\nAvailable filters: account_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n```\n{\"filters\": [{\"key\": \"name\", \"values\": [\"vj*\"]}]}'\n```\n\nAuthorization Action:\n```\ninfra:nodes:delete\n```",
-        "operationId": "BulkDelete",
+        "operationId": "NodesService_BulkDelete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.BulkDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -99,12 +117,18 @@
       "post": {
         "summary": "Bulk Delete Nodes by ID",
         "description": "Deletes a set of nodes given a list of IDs.\nInvalid IDs will be ignored.\n\nAuthorization Action:\n```\ninfra:nodes:delete\n```",
-        "operationId": "BulkDeleteById",
+        "operationId": "NodesService_BulkDeleteById",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.BulkDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -127,12 +151,18 @@
       "get": {
         "summary": "Show Node Details",
         "description": "Returns the details for a node given the node ID.\n\nAuthorization Action:\n```\ninfra:nodes:get\n```",
-        "operationId": "Read",
+        "operationId": "NodesService_Read",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.Node"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -152,12 +182,18 @@
       "delete": {
         "summary": "Delete a Node",
         "description": "Deletes the node with the node ID.\n\nAuthorization Action:\n```\ninfra:nodes:delete\n```",
-        "operationId": "Delete",
+        "operationId": "NodesService_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -177,12 +213,18 @@
       "put": {
         "summary": "Update Node",
         "description": "This PUT operation overwrites ALL node details and requires the complete set of node details,\nconsisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.\nSubstitute the desired values for the existing node details in the PUT message.\n\nAuthorization Action:\n```\ninfra:nodes:update\n```",
-        "operationId": "Update",
+        "operationId": "NodesService_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -212,12 +254,18 @@
       "get": {
         "summary": "List Node Status",
         "description": "Use this to run an `inspec detect` job on the node, which updates the status to reflect that the node is reachable or unreachable.\n\nAuthorization Action:\n```\ninfra:nodes:rerun\n```",
-        "operationId": "Rerun",
+        "operationId": "NodesService_Rerun",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.RerunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -239,12 +287,18 @@
       "post": {
         "summary": "List and Filter Nodes",
         "description": "Makes a list of nodes.\nSupports filtering, pagination, and sorting.\nAdding a filter narrows the list of nodes to only those that match the filter or filters.\nSupported filters:\naccount_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n```\n{\n\"filters\":[\n{\"key\": \"last_scan_status\", \"values\": [\"FAILED\"]},\n{\"key\": \"last_scan_penultimate_status\", \"values\": [\"PASSED\"]},\n{\"key\": \"name\", \"values\": [\"MyNode*\"]}\n],\n\"page\":1, \"per_page\":100,\n\"sort\":\"status\", \"order\":\"ASC\"\n}\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
-        "operationId": "List",
+        "operationId": "NodesService_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.v1.Nodes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -613,6 +667,39 @@
         }
       },
       "description": "Details for ssh/winrm access of the node."
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }
