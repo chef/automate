@@ -18,3 +18,21 @@ chef-td.controls {
 chef-card {
   margin-bottom: 35px;
 }
+
+#delete-prompt {
+  text-align: center;
+
+  #delete-prompt-title {
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .options {
+    margin-top: 30px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+}
