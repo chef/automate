@@ -591,8 +591,9 @@ var NodeState = Mapping{
 	Mapping: fmt.Sprintf(`
 	{
 		"settings": {
+			"number_of_shards": 5,
 			"index": {
-				"refresh_interval": "5s"
+				"refresh_interval": "5s",
 			},
 			 "analysis": {
 				"normalizer": {

@@ -8,6 +8,7 @@ var ComplianceSumDate = Mapping{
 {
   "index_patterns": ["` + IndexNameSum + `-20*"],
   "settings": {
+    "number_of_shards": 5,
     "analysis": {
       "analyzer": {
         "autocomplete": {

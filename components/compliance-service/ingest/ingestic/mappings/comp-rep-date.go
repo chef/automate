@@ -8,6 +8,7 @@ var ComplianceRepDate = Mapping{
 {
   "index_patterns": ["` + IndexNameRep + `-20*"],
   "settings": {
+    "number_of_shards": 5,
     "analysis": {
       "analyzer": {
         "autocomplete": {

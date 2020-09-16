@@ -8,6 +8,7 @@ var ConvergeHistory = Mapping{
 	{
 		"index_patterns": ["converge-history-*"],
 		"settings": {
+			"number_of_shards": 5,
 			"index": {
 				"refresh_interval": "5s"
 			}

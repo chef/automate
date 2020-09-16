@@ -163,6 +163,7 @@ var Feeds = Mapping{
 	Mapping: fmt.Sprintf(`
 			{
 				"settings":{
+					"number_of_shards": 5,
 					"analysis": {
 						"analyzer": {
 							"autocomplete": {
@@ -192,7 +193,7 @@ var Feeds = Mapping{
 						}
 					},
 					"index":{
-							"refresh_interval":"1s"
+						"refresh_interval":"1s"
 					}
 				},
 				"mappings":{

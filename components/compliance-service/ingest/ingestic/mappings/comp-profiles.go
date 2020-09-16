@@ -8,6 +8,7 @@ var ComplianceProfiles = Mapping{
 {
   "template": "` + IndexNameProf + `",
   "settings": {
+    "number_of_shards": 5,
     "index": {
       "refresh_interval": "1s"
     },
