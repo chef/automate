@@ -93,7 +93,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.infra-proxy-service.members as |infra|}}
 {{~#if @last}}
   [grpc_clients.endpoints.infra-proxy-service]
-    target = "{{infra.sys.ip}}:{{infra.cfg.port}}"
+    target = "127.0.0.1:{{infra.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
