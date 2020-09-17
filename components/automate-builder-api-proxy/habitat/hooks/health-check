@@ -1,7 +1,7 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 curlOpts="-sS --fail --max-time 2"
-curlOpts="$curlOpts --resolve automate-builder-api-proxy:{{cfg.service.port}}:{{sys.ip}}"
+curlOpts="$curlOpts --resolve automate-builder-api-proxy:{{cfg.service.port}}:127.0.0.1"
 curlOpts="$curlOpts --noproxy automate-builder-api-proxy"
 curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
 curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/service.crt"

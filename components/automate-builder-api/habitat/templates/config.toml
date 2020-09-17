@@ -9,7 +9,7 @@ build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 build_on_upload = true
 
 [http]
-listen = "{{cfg.conf.service.listen}}"
+listen = "127.0.0.1"
 port = {{cfg.conf.service.port}}
 
 [http.tls]
