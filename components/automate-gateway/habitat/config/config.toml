@@ -79,7 +79,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.deployment-service.members as |deployment|}}
 {{~#if @last}}
   [grpc_clients.endpoints.deployment-service]
-    target = "{{deployment.sys.ip}}:{{deployment.cfg.port}}"
+    target = "127.0.0.1:{{deployment.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
