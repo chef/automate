@@ -54,7 +54,7 @@ fi
 #{{else}}
 exec minio server \
   --config-dir "{{pkg.svc_var_path}}/config" \
-  --address ":{{cfg.service.port}}" \
+  --address "127.0.0.1:{{cfg.service.port}}" \
   --quiet \
   "{{pkg.svc_data_path}}"
 #{{/if ~}}

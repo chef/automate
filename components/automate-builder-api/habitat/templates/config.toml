@@ -26,7 +26,7 @@ client_id      = "automate-builder-api"
 client_secret  = "{{getSecret "bldr.auth_client_secret"}}"
 
 [s3]
-endpoint = "https://{{cfg.binds.minio.sys.ip}}:{{cfg.binds.minio.cfg.port}}"
+endpoint = "https://127.0.0.1:{{cfg.binds.minio.cfg.port}}"
 backend = "minio"
 key_id = "{{getSecret "minio.access_key"}}"
 secret_key = "{{getSecret "minio.secret_key"}}"
