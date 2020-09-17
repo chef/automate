@@ -38,11 +38,7 @@ root = "{{svc_static_path}}"
 [memcache]
 ttl = {{cfg.conf.memcache.ttl}}
 [[memcache.hosts]]
-{{- if cfg.binds.memcache.sys.ip }}
-host = "{{cfg.binds.memcache.sys.ip}}"
-{{- else }}
-{{ fail "missing memcache ip" }}
-{{- end }}
+host = "127.0.0.1"
 {{- if cfg.binds.memcache.cfg.port }}
 port = {{cfg.binds.memcache.cfg.port}}
 {{- else }}
