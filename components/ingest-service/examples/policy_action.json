@@ -609,7 +609,7 @@
     },
     "default_attributes": {
       "chef-apt-docker": {
-        "uri": "http://artifactory.chef.co/artifactory/docker-apt-remote/ubuntu"
+        "uri": "https://artifactory.chef.co/artifactory/docker-apt-remote/ubuntu"
       },
       "sensu": {
         "apt_repo_url": "http://repo.utility.chef.co/#{node['lsb']['codename']}/",
@@ -623,11 +623,11 @@
         ]
       },
       "telegraf": {
-        "apt_repo_url": "http://artifactory.chef.co/artifactory/influxdata-apt-remote/ubuntu/"
+        "apt_repo_url": "https://artifactory.chef.co/artifactory/influxdata-apt-remote/ubuntu/"
       },
       "vector": {
         "pcp": {
-          "apt_repo_url": "http://artifactory.chef.co/artifactory/performance-co-pilot-apt-remote/xenial/"
+          "apt_repo_url": "https://artifactory.chef.co/artifactory/performance-co-pilot-apt-remote/xenial/"
         }
       },
       "audit": {

@@ -193,4 +193,24 @@ describe File.basename(__FILE__) do
     ]
     assert_suggestions_text(expected, actual_data)
   end
+
+  it "list_suggestions controls, no date, 24h stuff" do
+    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+        type: 'control',
+        text: 'Profile 2 - Control 1',
+        size: 5,
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-01-01T00:00:00Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-06-06T23:59:59Z'])
+        ]
+    )
+    expected = [
+        "Profile 1 - Control 1--pro1-con1--",
+        "Profile 1 - Control 2--pro1-con2--",
+        "Profile 1 - Control 3--pro1-con3--",
+        "Profile 1 - Control 4--pro1-con4--",
+        "Profile 2 - Control 1--pro2-con1--"
+    ]
+    assert_suggestions_text_id_version(expected, actual_data)
+  end
 end

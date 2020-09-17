@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS service_full;
 CREATE TABLE IF NOT EXISTS service_full (
   id                        SERIAL    PRIMARY KEY,
 
@@ -49,17 +50,18 @@ CREATE TABLE IF NOT EXISTS service_full (
 -- case-insensitive LIKE queries with an index:
 -- https://www.postgresql.org/docs/9.6/indexes-expressional.html
 -- but if we do that, then we also need a not-lower one to do any case-sensitive stuff?
-CREATE INDEX service_full_name_idx ON service_full (name);
-CREATE INDEX service_full_origin_idx ON service_full (origin);
-CREATE INDEX service_full_service_group_name_suffix_idx ON service_full (service_group_name_suffix);
-CREATE INDEX service_full_version_idx ON service_full (version);
-CREATE INDEX service_full_release_idx ON service_full (release);
-CREATE INDEX service_full_environment_idx ON service_full (environment);
-CREATE INDEX service_full_application_idx ON service_full (application);
-CREATE INDEX service_full_channel_idx ON service_full (channel);
-CREATE INDEX service_full_site_idx ON service_full (site);
+CREATE INDEX IF NOT EXISTS service_full_name_idx ON service_full (name);
+CREATE INDEX IF NOT EXISTS service_full_origin_idx ON service_full (origin);
+CREATE INDEX IF NOT EXISTS service_full_service_group_name_suffix_idx ON service_full (service_group_name_suffix);
+CREATE INDEX IF NOT EXISTS service_full_version_idx ON service_full (version);
+CREATE INDEX IF NOT EXISTS service_full_release_idx ON service_full (release);
+CREATE INDEX IF NOT EXISTS service_full_environment_idx ON service_full (environment);
+CREATE INDEX IF NOT EXISTS service_full_application_idx ON service_full (application);
+CREATE INDEX IF NOT EXISTS service_full_channel_idx ON service_full (channel);
+CREATE INDEX IF NOT EXISTS service_full_site_idx ON service_full (site);
 
 
+DROP TRIGGER IF EXISTS update_service_full_updated_at ON service_full;
 CREATE TRIGGER update_service_full_updated_at BEFORE UPDATE
 ON service_full FOR EACH ROW EXECUTE PROCEDURE
 update_timestamp_updated_at_column();
@@ -80,6 +82,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS service_full_save_previous_health_on_state_change ON service_full;
 CREATE TRIGGER service_full_save_previous_health_on_state_change BEFORE UPDATE
 ON service_full FOR EACH ROW EXECUTE PROCEDURE
 save_previous_health_on_state_change();

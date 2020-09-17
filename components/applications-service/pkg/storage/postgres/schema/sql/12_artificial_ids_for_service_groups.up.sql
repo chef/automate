@@ -1,5 +1,6 @@
+ALTER TABLE service_full DROP COLUMN IF EXISTS service_group_id;
 ALTER TABLE service_full ADD COLUMN service_group_id text;
-CREATE INDEX service_full_service_group_id ON service_full (service_group_id);
+CREATE INDEX IF NOT EXISTS service_full_service_group_id ON service_full (service_group_id);
 
 --------------------------------------------------------------------------------
 -- Data Migration

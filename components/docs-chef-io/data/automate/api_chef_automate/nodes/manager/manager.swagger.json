@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/external/nodes/manager/manager.proto",
+    "title": "external/nodes/manager/manager.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -15,12 +15,18 @@
       "post": {
         "summary": "Create a Node Manager",
         "description": "Creates a node manager given a name, credential id *or* credential data, and type.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:create\n```",
-        "operationId": "Create",
+        "operationId": "NodeManagerService_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Ids"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -43,12 +49,18 @@
       "get": {
         "summary": "View a Node Manager",
         "description": "List the details of a node manager.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:get\n```",
-        "operationId": "Read",
+        "operationId": "NodeManagerService_Read",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -68,12 +80,18 @@
       "delete": {
         "summary": "Delete a Node Manager",
         "description": "Delete a single node manager. This deletes the node manager itself and\nreassigns its associated nodes to the Automate node manager.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
-        "operationId": "Delete",
+        "operationId": "NodeManagerService_Delete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -93,12 +111,18 @@
       "put": {
         "summary": "Update a Node Manager",
         "description": "Update a node manager's metadata, such as its name, associated credential id, or data.\nThis is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty (\"\").\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:update\n```",
-        "operationId": "Update",
+        "operationId": "NodeManagerService_Update",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -128,12 +152,18 @@
       "delete": {
         "summary": "Delete a Node Manager and Stop Nodes",
         "description": "Delete a node manager and update its associated nodes to `stopped`.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
-        "operationId": "DeleteWithNodeStateStopped",
+        "operationId": "NodeManagerService_DeleteWithNodeStateStopped",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -155,12 +185,18 @@
       "delete": {
         "summary": "Delete a Node Manager and Terminate Nodes",
         "description": "Delete a node manager and update its associated nodes to `terminated`.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
-        "operationId": "DeleteWithNodeStateTerminated",
+        "operationId": "NodeManagerService_DeleteWithNodeStateTerminated",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -182,12 +218,18 @@
       "delete": {
         "summary": "Delete a Node Manager and Delete Nodes",
         "description": "Delete a node manager and all of its associated nodes.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:delete\n```",
-        "operationId": "DeleteWithNodes",
+        "operationId": "NodeManagerService_DeleteWithNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Ids"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -209,12 +251,18 @@
       "post": {
         "summary": "Search Node Fields",
         "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",
-        "operationId": "SearchNodeFields",
+        "operationId": "NodeManagerService_SearchNodeFields",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Fields"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -244,12 +292,18 @@
       "post": {
         "summary": "Search nodes",
         "description": "Searches the available nodes for a single node manager by id.\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",
-        "operationId": "SearchNodes",
+        "operationId": "NodeManagerService_SearchNodes",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Nodes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -279,12 +333,18 @@
       "post": {
         "summary": "Connect",
         "description": "Attempts to reach the API for the given nodemanager id to validate the\ncredentials associated with the nodemanager.\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:rerun\n```",
-        "operationId": "Connect",
+        "operationId": "NodeManagerService_Connect",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.ConnectResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -314,12 +374,18 @@
       "post": {
         "summary": "List all Node Managers",
         "description": "Returns a list of node managers.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\n\nAuthorization Action:\n\n```\ninfra:nodeManagers:list\n```",
-        "operationId": "List",
+        "operationId": "NodeManagerService_List",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManagers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -641,6 +707,42 @@
       ],
       "default": "ASC",
       "description": "Sort the results in ascending or descending order."
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }
