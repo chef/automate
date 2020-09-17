@@ -128,7 +128,7 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#eachAlive bind.notifications-service.members as |notifications|}}
 {{~#if @last}}
   [grpc_clients.endpoints.notifications-service]
-    target = "{{notifications.sys.ip}}:{{notifications.cfg.port}}"
+    target = "127.0.0.1:{{notifications.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

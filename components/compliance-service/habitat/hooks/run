@@ -94,7 +94,7 @@ CONFIG="$CONFIG --authn-target 127.0.0.1:{{authn.cfg.port}}"
 {{~#eachAlive bind.notifications-service.members as |notifications|}}
 {{~#if @last}}
 addNoProxy {{notifications.sys.ip}}
-CONFIG="$CONFIG --notifications-target {{notifications.sys.ip}}:{{notifications.cfg.port}}"
+CONFIG="$CONFIG --notifications-target 127.0.0.1:{{notifications.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
