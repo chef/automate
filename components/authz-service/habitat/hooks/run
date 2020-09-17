@@ -13,10 +13,4 @@ pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 # cleanup old migration files
 rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
 
-{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
-{{~#if @last}}
-addNoProxy {{cereal-service.sys.ip}}
-{{~/if}}
-{{~/eachAlive}}
-
 exec authz-service {{pkg.svc_config_path}}/config.yml

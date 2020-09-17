@@ -85,7 +85,6 @@ CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
 # get auth binding, used for retrieving token for inspec reporting directly to automate
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}
-addNoProxy {{authn.sys.ip}}
 CONFIG="$CONFIG --authn-target 127.0.0.1:{{authn.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
@@ -93,7 +92,6 @@ CONFIG="$CONFIG --authn-target 127.0.0.1:{{authn.cfg.port}}"
 # get notifications binding, used for sending notifications on compliance report ingestion
 {{~#eachAlive bind.notifications-service.members as |notifications|}}
 {{~#if @last}}
-addNoProxy {{notifications.sys.ip}}
 CONFIG="$CONFIG --notifications-target 127.0.0.1:{{notifications.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
@@ -108,7 +106,6 @@ CONFIG="$CONFIG --secrets-host 127.0.0.1 --secrets-port {{secrets.cfg.port}}"
 # get authz service binding, used for getting project rules
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
-addNoProxy {{authz.sys.ip}}
 CONFIG="$CONFIG --authz-host 127.0.0.1 --authz-port {{authz.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
@@ -123,7 +120,6 @@ CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 # get nodemanager binding, used for getting nodes and nodemanager info
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
 {{~#if @last}}
-addNoProxy {{manager.sys.ip}}
 CONFIG="$CONFIG --manager-host 127.0.0.1 --manager-port {{manager.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
@@ -150,7 +146,6 @@ ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
 # Bind to cereal
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-addNoProxy {{cereal-service.sys.ip}}
 CONFIG="$CONFIG --cereal-endpoint 127.0.0.1:{{cereal-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}

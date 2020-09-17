@@ -44,7 +44,6 @@ CONFIG="$CONFIG --secrets-host 127.0.0.1 --secrets-port {{secrets.cfg.port}}"
 # get event service binding, used for publishing event
 {{~#eachAlive bind.event-service.members as |event|}}
 {{~#if @last}}
-addNoProxy {{event.sys.ip}}
 CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
@@ -52,7 +51,6 @@ CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 # Bind to cereal if it's available
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-addNoProxy {{cereal-service.sys.ip}}
 CONFIG="$CONFIG --cereal-endpoint 127.0.0.1:{{cereal-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
@@ -60,7 +58,6 @@ CONFIG="$CONFIG --cereal-endpoint 127.0.0.1:{{cereal-service.cfg.port}}"
 # Bind to Authz if it's available
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
   {{~#if @last}}
-addNoProxy {{authz-service.sys.ip}}
 CONFIG="$CONFIG --authz-endpoint 127.0.0.1:{{authz-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}

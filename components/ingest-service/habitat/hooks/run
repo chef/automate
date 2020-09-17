@@ -88,7 +88,6 @@ CONFIG="$CONFIG --es-sidecar-address 127.0.0.1:{{sidecar.cfg.port}}"
 # Bind to Authz if it's available
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
   {{~#if @last}}
-addNoProxy {{authz-service.sys.ip}}
 CONFIG="$CONFIG --authz-address 127.0.0.1:{{authz-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
@@ -96,7 +95,6 @@ CONFIG="$CONFIG --authz-address 127.0.0.1:{{authz-service.cfg.port}}"
 # Bind to nodemanager if it's available
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
   {{~#if @last}}
-addNoProxy {{manager.sys.ip}}
 CONFIG="$CONFIG --nodemanager-address 127.0.0.1:{{manager.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
@@ -104,7 +102,6 @@ CONFIG="$CONFIG --nodemanager-address 127.0.0.1:{{manager.cfg.port}}"
 # Bind to config-mgmt if it's available
 {{~#eachAlive bind.config-mgmt-service.members as |config_mgmt|}}
   {{~#if @last}}
-addNoProxy {{config_mgmt.sys.ip}}
 CONFIG="$CONFIG --config-mgmt-address 127.0.0.1:{{config_mgmt.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
@@ -112,7 +109,6 @@ CONFIG="$CONFIG --config-mgmt-address 127.0.0.1:{{config_mgmt.cfg.port}}"
 # Bind to cereal if it's available
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-addNoProxy {{cereal-service.sys.ip}}
 CONFIG="$CONFIG --cereal-address 127.0.0.1:{{cereal-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
@@ -120,7 +116,6 @@ CONFIG="$CONFIG --cereal-address 127.0.0.1:{{cereal-service.cfg.port}}"
 # Bind to event-feed-service if it's available
 {{~#eachAlive bind.event-feed-service.members as |service|}}
   {{~#if @last}}
-addNoProxy {{event-feed-service.sys.ip}}
 CONFIG="$CONFIG --event-feed-address 127.0.0.1:{{service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
