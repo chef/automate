@@ -38,7 +38,7 @@ describe File.basename(__FILE__) do
                 "ipaddress"=>"8.8.8.1",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => "2018-03-04T09:18:42Z",
+                "endTime" => "2018-03-04T09:19:42Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -154,6 +154,24 @@ describe File.basename(__FILE__) do
     expected_json = {
         "reports": [
             {
+                "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                "ipaddress"=>"8.8.8.2",
+                "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
+                "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
+                "endTime" => "2018-03-04T09:18:42Z",
+                "status" => "skipped",
+                "controls" => {
+                    "total" => 14,
+                    "passed" => {},
+                    "skipped" => {
+                        "total" => 14
+                    },
+                    "failed" => {
+                    },
+                    "waived"=>{}
+                }
+            },
+            {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
@@ -167,26 +185,6 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {},
-                    "waived"=>{}
-                }
-            },
-            {
-                "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                "ipaddress"=>"8.8.8.1",
-                "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
-                "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => "2018-03-04T09:18:42Z",
-                "status" => "failed",
-                "controls" => {
-                    "total" => 14,
-                    "passed" => {},
-                    "skipped" => {
-                        "total" => 13
-                    },
-                    "failed" => {
-                        "total" => 1,
-                        "critical" => 1
-                    },
                     "waived"=>{}
                 }
             }
@@ -429,23 +427,6 @@ describe File.basename(__FILE__) do
                     }
                 },
                 {
-                    "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                    "ipaddress"=>"8.8.8.1",
-                    "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
-                    "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                    "endTime" => "2018-03-04T09:18:42Z",
-                    "status" => "skipped",
-                    "controls" => {
-                        "total" => 1,
-                        "passed" => {},
-                        "skipped" => {
-                            "total" => 1
-                        },
-                        "failed" => {},
-                        "waived"=>{}
-                    }
-                },
-                {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                     "ipaddress"=>"8.8.8.2",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -468,6 +449,23 @@ describe File.basename(__FILE__) do
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:43Z",
+                    "status" => "skipped",
+                    "controls" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {
+                            "total" => 1
+                        },
+                        "failed" => {},
+                        "waived"=>{}
+                    }
+                },
+                {
+                    "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                    "ipaddress"=>"8.8.8.1",
+                    "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
+                    "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
+                    "endTime" => "2018-03-04T09:19:42Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -564,7 +562,7 @@ describe File.basename(__FILE__) do
                     "ipaddress"=>"8.8.8.1",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                    "endTime" => "2018-03-04T09:18:42Z",
+                    "endTime" => "2018-03-04T09:19:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 1,
