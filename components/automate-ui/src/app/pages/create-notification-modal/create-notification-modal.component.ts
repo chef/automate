@@ -43,7 +43,7 @@ enum UrlTestState {
   styleUrls: ['./create-notification-modal.component.scss']
 })
 export class CreateNotificationModalComponent implements OnInit, OnDestroy {
-  @Input() openEvent: EventEmitter<boolean>;
+  @Input() openEvent: EventEmitter<void>;
 
   public visible = false;
   public creating = false;
