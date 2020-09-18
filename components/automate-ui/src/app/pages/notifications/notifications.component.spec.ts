@@ -15,7 +15,6 @@ class MockTelemetryService {
 }
 
 describe('NotificationsComponent', () => {
-  let telemetryService: TelemetryService;
   let component: NotificationsComponent;
   let fixture: ComponentFixture<NotificationsComponent>;
 
@@ -67,21 +66,7 @@ describe('NotificationsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
-    telemetryService = TestBed.inject(TelemetryService);
     fixture.detectChanges();
-  });
-
-  describe('sending telemetry', () => {
-    beforeEach(() => {
-      spyOn(telemetryService, 'track');
-    });
-
-    it('ensure telemetry is sent on deleting a rule', () => {
-      component.deleteNotification();
-
-      expect(telemetryService.track).toHaveBeenCalled();
-    });
-
   });
 
   it('should create', () => {
