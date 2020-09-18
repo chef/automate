@@ -19,11 +19,16 @@ Desktop information populates this dashboard after a Chef Infra Client run has e
 ## Setting Up the Desktop Dashboard
 
 {{< warning >}}
-We recommend starting with a fresh installation of Chef Automate, Chef Infra Server, and Chef Desktop because the servers do not distinguish between the types of nodes that they manage when combining existing Chef Automate nodes with new Chef Desktop.
+We recommend starting with a fresh installation of Chef Automate, Chef Infra Server, and Chef Desktop because the servers do not distinguish between the types of managed nodes when combining existing Chef Automate nodes with a new Chef Desktop installation.
 {{< /warning >}}
 
 For guidance on installing Chef Desktop, see the [installing Chef Desktop documentation](https://docs.chef.io/desktop/desktop_setup_chef/#install-chef-automate-and-chef-infra-server).
-The Desktop dashboard has no supported compliance profiles, and installation with the `--product desktop` flag includes no compliance profiles.
+The Desktop dashboard has no supported compliance profiles, and Chef Desktop installation includes no compliance profiles.
+
+{{< note >}}
+When installing Chef Automate with Chef Desktop, _Data Lifecycle_ settings will not mark nodes as missing and not delete missing nodes by default.
+We encourage users to not change these specific settings and not defeat the monitoring purpose of the Desktop dashboard.
+{{< /note >}}
 
 ## Desktop Dashboard Display
 
