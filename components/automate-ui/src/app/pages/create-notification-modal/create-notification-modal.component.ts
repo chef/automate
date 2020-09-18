@@ -2,12 +2,13 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit
 } from '@angular/core';
 import { combineLatest, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
-import { filter, takeUntil } from 'rxjs/operators';
+import { first, filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -41,7 +42,7 @@ enum UrlTestState {
   templateUrl: './create-notification-modal.component.html',
   styleUrls: ['./create-notification-modal.component.scss']
 })
-export class CreateNotificationModalComponent implements OnInit {
+export class CreateNotificationModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<boolean>;
 
   public visible = false;
@@ -116,6 +117,11 @@ export class CreateNotificationModalComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
   public handleInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
@@ -148,16 +154,19 @@ export class CreateNotificationModalComponent implements OnInit {
     this.sending = true;
     this.hookStatus = UrlTestState.Loading;
     const targetUrl: string =  this.createForm.controls.targetUrl.value;
-    const targetUsername: string = this.createForm.controls.username.value;
-    const targetPassword: string = this.createForm.controls.password.value;
+    const targetUsername: string = this.createForm.controls.username.value || '';
+    const targetPassword: string = this.createForm.controls.password.value || '';
     if (targetUrl && targetUsername.length && targetPassword.length) {
-      this.notificationRuleRequests.testHookWithUsernamePassword(targetUrl,
-        targetUsername, targetPassword).subscribe(
+      this.notificationRuleRequests.testHookWithUsernamePassword(
+        targetUrl, targetUsername, targetPassword
+        ).pipe(first())
+        .subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)
         );
     } else {
       this.notificationRuleRequests.testHookWithNoCreds(targetUrl)
+        .pipe(first())
         .subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)

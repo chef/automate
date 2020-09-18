@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Observable, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { map } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
@@ -53,7 +53,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public notificationObj = new NotificationRule('', '', null, '', null, '', false);
   private isDestroyed = new Subject<boolean>();
 
-  public openNotificationModal = new EventEmitter<boolean>();
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -67,7 +67,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetNotificationRules());
 
-    this.rules$.subscribe(rules => {
+    this.rules$.pipe(
+      takeUntil(this.isDestroyed))
+      .subscribe(rules => {
         this.sendCountToTelemetry(rules);
       },
       error => {
@@ -89,7 +91,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    this.openNotificationModal.emit(true);
+    this.openNotificationModal.emit();
   }
 
   toggleSort(field: string) {
@@ -137,7 +139,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   public deleteNotification(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteNotificationRule(this.notificationToDelete));
-    this.refreshRules();
   }
 
   public closeDeleteModal(): void {
@@ -208,17 +209,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       });
 
     this.telemetryService.track('notificationRuleCount', ruleCount);
-  }
-
-  // TODO - this was common in all three uses, but I'm not sure this is the best
-  // way to do it - do we really need to refresh after the server confirms the action
-  // successful? Seem it should be possible to update the local model with the
-  // changes and have that trigger view updates?
-  refreshRules() {
-    this.rules$.subscribe(rules => {
-      this.sendCountToTelemetry(rules);
-      this.updateSort(this.sortField, this.sortDir[this.sortField]);
-    });
   }
 
 }
