@@ -190,14 +190,14 @@ describe File.basename(__FILE__) do
     # suggest control tag values with a tag key filter without text
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_value',
+      type_key: 'control_tag:scope',
       filters: [
         Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
         Reporting::ListFilter.new(type: 'control_tag:satisfies', values: ['apache-1', 'SRG-00006']),
-        Reporting::ListFilter.new(type: 'control_tag:scope', values: []),
       ]
     )
-    expected = ["apache-1", "apache-2", "NGX-1", "NGX-2", "SRG-00006", "SRG-00007"]
+    expected = ["Apache", "apalache", "NginX"]
     assert_suggestions_text(expected, actual_data)
   end
 end
