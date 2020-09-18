@@ -65,7 +65,7 @@ describe File.basename(__FILE__) do
                 {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
                 {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
-                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
+                {"endTime" => "2018-03-04T09:19:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
                 {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
                 {"endTime" => "2018-04-03T11:02:02Z", "id" => "zz93e1b2-36d6-439e-ac70-cccccccccckk"}
             ]
@@ -146,8 +146,8 @@ describe File.basename(__FILE__) do
             "reportData" => [
                 {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
                 {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
-                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
                 {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
+                {"endTime" => "2018-03-04T09:19:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
                 {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
                 {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
                 {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
@@ -244,7 +244,7 @@ describe File.basename(__FILE__) do
                     "ipaddress" => "8.8.8.1",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                    "endTime" => "2018-03-04T09:18:42Z",
+                    "endTime" => "2018-03-04T09:19:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -473,29 +473,6 @@ describe File.basename(__FILE__) do
         {
             "reports" => [
                 {
-                    "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                    "ipaddress" => "8.8.8.2",
-                    "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
-                    "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                    "endTime" => "2018-03-04T09:18:42Z",
-                    "status" => "failed",
-                    "controls" => {
-                        "total" => 18,
-                        "passed" => {
-                            "total" => 1
-                        },
-                        "skipped" => {
-                            "total" => 15
-                        },
-                        "failed" => {
-                            "total" => 2,
-                            "major" => 1,
-                            "critical" => 1
-                        },
-                        "waived" => {}
-                    }
-                },
-                {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                     "ipaddress" => "8.8.8.3",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -515,6 +492,29 @@ describe File.basename(__FILE__) do
                             "major" => 1,
                             "critical" => 1
                         },
+                        "waived" => {}
+                    }
+                },
+                {
+                    "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                    "ipaddress" => "8.8.8.1",
+                    "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
+                    "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
+                    "endTime" => "2018-03-04T09:19:42Z",
+                    "status" => "failed",
+                    "controls" => {
+                        "failed" => {
+                            "total" => 2,
+                            "critical" => 1,
+                            "major" => 1
+                        },
+                        "passed" => {
+                            "total" => 2
+                        },
+                        "skipped" => {
+                            "total" => 14
+                        },
+                        "total" => 18,
                         "waived" => {}
                     }
                 },

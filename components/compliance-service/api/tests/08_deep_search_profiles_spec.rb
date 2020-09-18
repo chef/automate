@@ -88,7 +88,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => "2018-03-04T09:18:42Z",
+                        "endTime" => "2018-03-04T09:19:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 1,

@@ -155,7 +155,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Alpha",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                    "endTime" => "2018-03-04T09:18:42Z",
+                    "endTime" => "2018-03-04T09:19:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -420,7 +420,7 @@ describe File.basename(__FILE__) do
     assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
     # Test pagination(per_page+page+order)
-    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(per_page: 1, page: 2, order: 1, filters: [
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(per_page: 1, page: 3, order: 1, filters: [
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
     ])
     expected_nodes = {
@@ -1064,7 +1064,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => "2018-03-04T09:18:42Z",
+                        "endTime" => "2018-03-04T09:19:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -1219,7 +1219,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => "2018-03-04T09:18:42Z",
+                        "endTime" => "2018-03-04T09:19:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
