@@ -5,15 +5,13 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from '../../../helpers/datetime/datetime';
-import { NgrxStateAtom } from '../../../ngrx.reducers';
-import { EntityStatus } from '../../../entities/entities';
-import { Manager } from '../../../entities/managers/manager.model';
-import {
-  automateManager, cloudManagers, managerStatus
-} from '../../../entities/managers/manager.selectors';
-import { DeleteManager } from '../../../entities/managers/manager.actions';
-import { routeParams } from '../../../route.selectors';
+import { DateTime } from 'app/helpers/datetime/datetime';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
+import { Manager } from 'app/entities/managers/manager.model';
+import { automateManager, cloudManagers, managerStatus } from 'app/entities/managers/manager.selectors';
+import { DeleteManager } from 'app/entities/managers/manager.actions';
+import { routeParams } from 'app/route.selectors';
 
 @Component({
   selector: 'app-integrations',
