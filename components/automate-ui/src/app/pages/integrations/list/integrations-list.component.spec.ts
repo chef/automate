@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { runtimeChecks, ngrxReducers, NgrxStateAtom } from 'app/ngrx.reducers';
-import { ChefPipesModule } from '../../../pipes/chef-pipes.module';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IntegrationsListComponent } from './integrations-list.component';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
@@ -62,6 +62,7 @@ describe('IntegrationsListComponent', () => {
 
   describe('deleting a node manager', () => {
     it('displays a modal prompt when user selects Delete Integration from the dropdown', () => {
+      expect(component.deletePromptVisible).toBe(false);
       component.beginDelete(MockSelectionEvent, '12345');
 
       expect(component.deletePromptVisible).toBe(true);
