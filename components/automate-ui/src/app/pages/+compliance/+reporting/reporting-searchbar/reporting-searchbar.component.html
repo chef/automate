@@ -66,11 +66,25 @@
       <chef-icon>filter_list</chef-icon>
       <span>{{ filters.length }}</span>
     </chef-button>
-    <chef-button class="calendar-btn" secondary (click)="toggleCalendar()">
-      <chef-icon>date_range</chef-icon>
-      <span>{{ date | datetime: CHEF_SHORT_DATE }}</span>
+    <chef-button class="calendar-menu-btn" secondary (click)="toggleCalendarMenu()">
+      <span *ngIf="last24h">Last 24 hours</span>
+      <ng-container *ngIf="!last24h">
+        <chef-icon>date_range</chef-icon>
+        <span>{{ date | datetime: CHEF_SHORT_DATE }}</span>
+      </ng-container>
     </chef-button>
-    <chef-dropdown [attr.visible]="calendarVisible">
+    <chef-dropdown class="calendar-menu-dropdown" [attr.visible]="calendarMenuVisible">
+      <chef-click-outside omit="calendar-menu-btn" (clickOutside)="hideCalendarMenu()">
+        <chef-button class="select-last-btn" secondary (click)="handleSelectLast24()">
+          Last 24 hours
+        </chef-button>
+        <chef-button class="calendar-btn" secondary (click)="showCalendar()">
+          <chef-icon>date_range</chef-icon>
+          <span>{{ date | datetime: CHEF_SHORT_DATE }}</span>
+        </chef-button>
+      </chef-click-outside>
+    </chef-dropdown>
+    <chef-dropdown class="calendar-dropdown" [attr.visible]="calendarVisible">
       <chef-click-outside omit="calendar-btn" (clickOutside)="hideCalendar()">
         <chef-calendar
           [selected]="date.toISOString()"

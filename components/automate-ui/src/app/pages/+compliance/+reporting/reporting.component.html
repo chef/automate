@@ -10,13 +10,15 @@
         <app-reporting-searchbar
           [date]="endDate$ | async"
           [filters]="filters$ | async"
+          [last24h]="(reportQuery.state | async).last24h"
           [filterTypes]="availableFilterTypes"
           [filterValues]="availableFilterValues"
           (suggestValues)="onSuggestValues($event)"
           (filtersCleared)="onFiltersClear($event)"
           (filterRemoved)="onFilterRemoved($event)"
           (filterAdded)="onFilterAdded($event)"
-          (dateChanged)="onEndDateChanged($event)">
+          (dateChanged)="onEndDateChanged($event)"
+          (last24Selected)="onLast24Selected()">
         </app-reporting-searchbar>
         <div class="download-report">
           <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()">

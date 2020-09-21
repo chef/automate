@@ -42,7 +42,8 @@ describe('SuggestionsService', () => {
         endDate: endDate,
         startDate: startDate,
         interval: 0,
-        filters: []
+        filters: [],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/suggestions`;
@@ -76,7 +77,8 @@ describe('SuggestionsService', () => {
         endDate: endDate,
         startDate: startDate,
         interval: 0,
-        filters: []
+        filters: [],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/suggestions`;
