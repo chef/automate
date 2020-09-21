@@ -137,7 +137,7 @@
                 </chef-toggle>
                 <ng-container [ngSwitch]="openControlPane(node)">
                   <div *ngSwitchCase="'results'">
-                    <div class="result-item" *ngFor="let result of scanResults.control.results">
+                    <div class="result-item" *ngFor="let result of scanResults.controls[node.id]?.results">
                       <div class="result-item-header">
                         <chef-icon [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
                         <p>{{ result.code_desc }}</p>
