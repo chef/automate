@@ -5,6 +5,7 @@
         <chef-heading>Notifications</chef-heading>
         <chef-subheading>Webhook notifications for Infra Client run failures and InSpec compliance scan failures.</chef-subheading>
       </chef-page-header>
+      <app-create-notification-modal [openEvent]="openNotificationModal"></app-create-notification-modal>
 
       <div class="page-body">
         <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
@@ -15,7 +16,7 @@
               <p>Create the first notification to get started!</p>
             </div>
             <div [ngClass]="(rules$ | async)?.length === 0 ? 'empty-state' : ''">
-              <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
+              <chef-button primary (click)="openCreateModal()">Create Notification</chef-button>
             </div>
           </app-authorized>
         </chef-toolbar>
@@ -59,7 +60,7 @@
               <chef-tr *ngFor="let rule of rules$ | async |
                 slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
                 <chef-td>
-                  <a [routerLink]="['/settings/notifications', rule.id]">{{ rule.name }}</a>
+                  <a [routerLink]="['/settings/notifications', rule.id]">{{ rule?.name }}</a>
                 </chef-td>
                 <chef-td class="{{rule.targetType}}">
                   <img src="assets/img/logo-{{rule.targetType}}.png" alt="{{rule.targetType}} logo" />

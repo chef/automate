@@ -1,0 +1,126 @@
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
+  <h2 slot="title">Create Notification</h2>
+    <div class="flex-container">
+      <form [formGroup]="createForm">
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Name <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            </label>
+            <chef-error
+            *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
+            Display Name is required.
+          </chef-error>
+          <chef-error *ngIf="conflictError">
+            Name "{{createForm.get('name').value}}" already exists.
+          </chef-error>
+          <span class="i-desc">Don't worry, notification names can be changed later.</span>
+          </chef-form-field>
+        </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Webhook type <span aria-hidden="true">*</span></span>
+              <mat-select
+                panelClass="chef-dropdown"
+                formControlName="targetType"
+                placeholder="Webhook Type"
+                (selectionChange)="changeSelectionForWebhookType($event)">
+                <mat-option *ngFor="let key of targetKeys" [value]="key">
+                  <img src="assets/img/logo-{{key}}.png" alt="{{key}} logo"/>
+                  {{ notificationRule.TargetTypeLabels[key] }}
+                </mat-option>
+              </mat-select>
+            </label>
+          </chef-form-field>
+        </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Failure type <span aria-hidden="true">*</span></span>
+              <mat-select
+                panelClass="chef-dropdown"
+                formControlName="ruleType"
+                placeholder="Failure Type"
+                (selectionChange)="setFailureType($event)">
+                <mat-option *ngFor="let key of alertTypeKeys" [value]="key">
+                  {{ notificationRule.AlertTypeLabels[key] }}
+                </mat-option>
+              </mat-select>
+              <div *ngIf="displayCriticalControlsCheckbox()">
+                <p class="small">
+                  <chef-checkbox
+                    (change)="updateCriticalControlsOnly($event.detail)"
+                    [checked]="notificationRule.criticalControlsOnly">
+                  </chef-checkbox>
+                  Only send notifications for critical control failures
+                </p>
+              </div>
+            </label>
+          </chef-form-field>
+        </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Webhook URL <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="targetUrl" type="text" id="targetUrl-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            </label>
+            <chef-error
+            *ngIf="(createForm.get('targetUrl').hasError('required') || createForm.get('targetUrl').hasError('pattern')) && createForm.get('targetUrl').dirty">
+            Webhook URL is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div *ngIf="createForm.value.targetType === 'ServiceNowAlert'">
+          <div class="margin">
+            <chef-form-field>
+              <label>
+                <span class="label">ServiceNow Username <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
+              </label>
+              <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
+                Username is required.
+              </chef-error>
+              <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
+            </chef-form-field>
+          </div>
+          <div class="margin">
+            <chef-form-field>
+              <label>
+                <span class="label">ServiceNow Password <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
+              </label>
+              <chef-error *ngIf="createForm.get('password').hasError('required') && createForm.get('password').dirty">
+                Password is required.
+              </chef-error>
+              <span class="i-desc">Encrypted, and only used to access the notification feed.</span>
+            </chef-form-field>
+          </div>
+        </div>
+
+        <div id="button-bar">
+          <div class="url-failed" *ngIf="hookStatus === urlState.Failure">
+            <chef-icon class="url-failed-icon">warning</chef-icon>
+            <span>Unable to connect: check URL, username and password.</span>
+          </div>
+
+          <div class="url-success" *ngIf="hookStatus === urlState.Success">
+            <chef-icon class="url-success-icon">done</chef-icon>
+            <span class="status-heading">Notification test connected successfully!</span>
+          </div>
+          <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createNotification()">
+            <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+            <span *ngIf="!creating">Create Notification</span>
+            <span *ngIf="creating">Creating Notification...</span>
+          </chef-button>
+          <chef-button secondary [disabled]="!urlPresent()" (click)="sendTest()">
+            <chef-loading-spinner *ngIf="sending"></chef-loading-spinner>
+            <span *ngIf="!sending">Test Notification</span>
+            <span *ngIf="sending">Testing Notification...</span>
+          </chef-button>
+          <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+        </div>
+      </form>
+    </div>
+</chef-modal>
