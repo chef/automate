@@ -11,6 +11,7 @@
   <body>
     <a class="return" href="/automate/">Return to Docs</a>
     <ReDoc spec-url="/automate-api-docs/all-apis.swagger.json" scroll-y-offset="34"></ReDoc>
-    <script src="{{ (resources.Get "js/vendor/redoc.standalone.js").Permalink }}"></script>
+    {{ $redocJs := resources.Get "js/vendor/redoc.standalone.js" }}
+    <script type="text/javascript" src="{{ $redocJs.Permalink }}"></script>
   </body>
 </html>
