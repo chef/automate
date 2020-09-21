@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+interface ControlsByNode {
+  [nodeId: string]: any
+}
+
 @Injectable()
 export class ScanResultsService {
 
@@ -12,6 +16,7 @@ export class ScanResultsService {
   node: any = {};
   profile: any = {};
   control: any = {};
+  controls: ControlsByNode = {};
 
   showNodesList = false;
   nodesList: any = {
