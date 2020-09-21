@@ -68,18 +68,13 @@
   </div>
 </div>
 
-<chef-modal
-  id="delete-prompt"
+<app-delete-object-modal
+  custom
   [visible]="deletePromptVisible"
-  (closeModal)="resetModal()">
-  <h2 id="delete-prompt-title" slot="title">Delete Integration?</h2>
-  <div>
-    <p>This will remove all of its associated nodes and they will not be able to be scanned by scan jobs. To add them back you
-    will need to create a new node integration.</p>
-    <p>Historical reported data on nodes will still be stored.</p>
-    <div class="options">
-      <chef-button label="confirm" primary caution (click)="handleDelete()">Delete Integration</chef-button>
-      <chef-button label="cancel" tertiary (click)="resetModal()">Cancel</chef-button>
-    </div>
-  </div>
-</chef-modal>
+  [objectAction]="'Delete'"
+  [objectNoun]="'integration'"
+  (close)="resetModal()"
+  (deleteClicked)="handleDelete()">
+  <p>This will remove all of its associated nodes and they will not be able to be scanned by scan jobs. To add them back you will need to create a new node integration.</p>
+  <p>Historical reported data on nodes will still be stored.</p>
+</app-delete-object-modal>

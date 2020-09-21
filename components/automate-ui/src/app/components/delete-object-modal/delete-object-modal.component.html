@@ -1,14 +1,18 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
   <h2 slot="title">{{objectAction}} {{objectNoun | titlecase}}?</h2>
-  <div>
-    {{ objectAction | continuous }} {{objectNoun}} {{objectName}}
-    <strong>cannot be undone</strong><span *ngIf="moreDetails"><br>{{moreDetails}}</span>.
-  </div>
+  <ng-content></ng-content>
 
-  <div class="options">
-    <chef-button primary caution (click)="deleteObject()">
-      {{objectAction}} {{objectNoun | titlecase}}
-    </chef-button>
-    <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
-  </div>
+  <ng-container *ngIf="custom === false">
+    <div>
+      {{ objectAction | continuous }} {{objectNoun}} {{objectName}}
+      <strong>cannot be undone</strong><span *ngIf="moreDetails"><br>{{moreDetails}}</span>.
+    </div>
+  </ng-container>
+
+    <div class="options">
+      <chef-button primary caution (click)="deleteObject()">
+        {{objectAction}} {{objectNoun | titlecase}}
+      </chef-button>
+      <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+    </div>
 </chef-modal>
