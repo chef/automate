@@ -9,10 +9,10 @@
     </div>
   </ng-container>
 
-    <div class="options">
-      <chef-button primary caution (click)="deleteObject()">
-        {{objectAction}} {{objectNoun | titlecase}}
-      </chef-button>
-      <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
-    </div>
+  <div class="options">
+    <chef-button primary caution (click)="deleteObject()">
+      {{objectAction}} {{objectNoun | titlecase}}
+    </chef-button>
+    <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+  </div>
 </chef-modal>
