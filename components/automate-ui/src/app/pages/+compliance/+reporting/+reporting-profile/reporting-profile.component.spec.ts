@@ -81,7 +81,8 @@ describe('ReportingProfileComponent', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [ ]
+        filters: [ ],
+        last24h: false
       };
       component.getNodes(reportQuery, {profileId: '123', controlId: '321'});
 
@@ -92,7 +93,8 @@ describe('ReportingProfileComponent', () => {
         filters: [
           {type: { name: 'profile_id' }, value: { text: '123'} },
           {type: { name: 'control_id' }, value: { text: '321'} }
-        ]
+        ],
+        last24h: false
       };
 
       expect(statsService.getNodes).toHaveBeenCalledWith(

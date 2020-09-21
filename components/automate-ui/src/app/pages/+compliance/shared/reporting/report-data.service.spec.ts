@@ -69,7 +69,8 @@ describe('ReportDataService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [ ]
+        filters: [ ],
+        last24h: false
       };
       const data = {stats: {}};
       spyOn(statsService, 'getSummary').and.returnValue(observableOf(data));
@@ -87,7 +88,8 @@ describe('ReportDataService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [ ]
+        filters: [ ],
+        last24h: false
       };
       const params = {};
       const data = [];
@@ -109,7 +111,8 @@ describe('ReportDataService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [ ]
+        filters: [ ],
+        last24h: false
       };
       const params = {};
       const data = [];
@@ -131,7 +134,8 @@ describe('ReportDataService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [ ]
+        filters: [ ],
+        last24h: false
       };
       const data = [];
       spyOn(statsService, 'getControls').and.returnValue(observableOf(data));

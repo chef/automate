@@ -19,7 +19,7 @@ export class SuggestionsService {
 
   getSuggestions(type: string, text: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/suggestions`;
-    const formatted = this.statsService.formatFilters(reportQuery);
+    const formatted = this.statsService.formatFilters(reportQuery, false);
         const body = {
           type,
           text,

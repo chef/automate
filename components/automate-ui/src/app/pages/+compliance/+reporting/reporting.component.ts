@@ -313,11 +313,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
     const endDate = moment.utc(event.detail);
 
-    if (moment().utc().format('YYYY-MM-DD') === moment(endDate).format('YYYY-MM-DD')) {
-      delete queryParams['end_time'];
-    } else {
-      queryParams['end_time'] = moment(endDate).format('YYYY-MM-DD');
-    }
+    queryParams['end_time'] = moment(endDate).format('YYYY-MM-DD');
+
+    this.router.navigate([], {queryParams});
+  }
+
+  onLast24Selected() {
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    delete queryParams['end_time'];
 
     this.router.navigate([], {queryParams});
   }
@@ -468,6 +472,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     reportQuery.endDate = this.getEndDate(urlFilters);
     reportQuery.startDate = this.reportQuery.findTimeIntervalStartDate(
       reportQuery.interval, reportQuery.endDate);
+    reportQuery.last24h = this.isLast24h(urlFilters);
 
     this.reportQuery.setState(reportQuery);
   }
@@ -516,5 +521,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   convertMomentToDate(m: moment.Moment): Date {
     return new Date(Date.UTC(m.year(), m.month(), m.date()));
+  }
+
+  isLast24h(urlFilters: Chicklet[]): boolean {
+    return !urlFilters.some((filter: Chicklet) => filter.type === 'end_time');
   }
 }

@@ -12,6 +12,7 @@ export interface ReportQuery {
   endDate: moment.Moment;
   interval: number;
   filters: FilterC[];
+  last24h: boolean;
 }
 
 interface TimeIntervals {
@@ -73,7 +74,8 @@ export class ReportQueryService {
       startDate: this.findTimeIntervalStartDate(0, endDate),
       endDate: endDate,
       interval: 0,
-      filters: []
+      filters: [],
+      last24h: false
     };
   }
 
@@ -83,7 +85,8 @@ export class ReportQueryService {
       startDate: reportQuery.startDate.clone(),
       endDate: reportQuery.endDate.clone(),
       interval: reportQuery.interval,
-      filters: [...reportQuery.filters]
+      filters: [...reportQuery.filters],
+      last24h: reportQuery.last24h
     };
   }
 

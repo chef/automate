@@ -66,7 +66,7 @@ export class StatsService {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
 
-    const formatted = this.formatFilters(reportQuery);
+    const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'nodes', interval, filters: formatted};
 
     return this.httpClient.post<any>(url, body).pipe(
@@ -77,7 +77,7 @@ export class StatsService {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
 
-    const formatted = this.formatFilters(reportQuery);
+    const formatted = this.formatFilters(reportQuery, false);
     const body = {type: 'controls', interval, filters: formatted};
 
     return this.httpClient.post<any>(url, body).pipe(
@@ -277,7 +277,7 @@ export class StatsService {
     return filters;
   }
 
-  formatFilters(reportQuery: ReportQuery) {
+  formatFilters(reportQuery: ReportQuery, requestsLast24h = true) {
     const apiFilters = reportQuery.filters.reduce((formatted, filter) => {
         let type = filter['type']['name'];
         let value = filter['value']['id'] || filter['value']['text'];
@@ -331,6 +331,12 @@ export class StatsService {
         }
       return formatted;
     }, []);
+
+    // If last 24 hour interval is selected, exclude start_time and end_time
+    // from requests that return data from 24h search index.
+    if (reportQuery.last24h && requestsLast24h) {
+      return apiFilters;
+    }
 
     if (reportQuery.startDate) {
       const value = reportQuery.startDate.clone().utc().startOf('day');
