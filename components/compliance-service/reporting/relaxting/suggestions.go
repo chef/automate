@@ -539,7 +539,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	var innerQuery elastic.Query
 	if len(text) >= 2 {
 		innerBoolQuery := elastic.NewBoolQuery()
-		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
 		innerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
 		innerBoolQuery.Should(elastic.NewTermQuery(target, text).Boost(100))
 		innerBoolQuery.Should(elastic.NewPrefixQuery(target, text).Boost(100))
