@@ -163,10 +163,6 @@ subscriptions:
     actions:
       - trigger_pipeline:nightly
       - trigger_pipeline:test-license-usage/dev
-  # When a new verification image is released, update the pinning
-  - workload: docker_image_published:chefes/buildkite:*
-    actions:
-      - bash:.expeditor/update_docker_image_version_in_verify_pipeline.sh
   - workload: schedule_triggered:{{agent_id}}:cleanup_abandoned_a2_instances:*
     actions:
       - bash:.expeditor/cleanup-abandoned-a2-instances.sh
