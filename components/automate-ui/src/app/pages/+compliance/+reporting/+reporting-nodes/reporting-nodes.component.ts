@@ -74,6 +74,12 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     return this.nodeFilterStatus === status;
   }
 
+  getTotalNodes() {
+    const nodes = this.reportData.nodesList.total;
+    const statusNodes = this.reportData.nodesList['total_' + this.nodeFilterStatus];
+    return statusNodes || nodes;
+  }
+
   onNodesListPageChanged(event) {
     const reportQuery = this.reportQuery.getReportQuery();
     this.reportData.nodesListParams.page = event;
