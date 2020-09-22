@@ -34,6 +34,12 @@ xxx
 This problem can be fixed by removing the `chef-automate` binary from the `/bin` directory. The binary
 should not be placed in the PATH manually as the deployment process will do it.
 
+## Compliance Report Display
+
+If the size of a Compliance Report is over 4MB, then the _Reports_ page (Compliance > Reports) may not display as expected.
+[Audit Cookbook 9.4.0 and later](https://github.com/chef-cookbooks/audit) supports some attribute options that trims a report to its smallest size when combined with latest Chef Automate version.
+Contact Chef Support to determine the best way to manage your Compliance Report size.
+
 ## Low Disk Space
 
 Chef Automate emits a warning when the available disk space on the system drops below 1 GB, for example:
