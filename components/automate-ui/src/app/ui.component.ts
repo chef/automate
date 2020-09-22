@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { GetAllUserPerms } from './entities/userperms/userperms.actions';
   templateUrl: './ui.component.html',
   styleUrls: ['./ui.component.scss']
 })
-export class UIComponent implements OnInit {
+export class UIComponent implements OnInit, AfterViewChecked {
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
   experimentalFeatures: Array<Feature> = [
@@ -36,7 +36,8 @@ export class UIComponent implements OnInit {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    public layoutFacade: LayoutFacadeService
+    public layoutFacade: LayoutFacadeService,
+    private cdRef: ChangeDetectorRef
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -52,6 +53,10 @@ export class UIComponent implements OnInit {
         this.layoutFacade.showFullPage();
       }
     });
+  }
+
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
   }
 
   ngOnInit(): void {
