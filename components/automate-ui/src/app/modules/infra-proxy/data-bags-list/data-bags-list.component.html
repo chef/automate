@@ -1,6 +1,7 @@
 <section class="databags">
   <chef-loading-spinner *ngIf="dataBagsListLoading" size="50"></chef-loading-spinner>
-  <ng-container  *ngIf="!dataBagsListLoading">
+  <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="ResetKeyTabRedirection($event)"></app-empty-state>
+  <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
     <chef-table>
       <chef-thead>
         <chef-tr>

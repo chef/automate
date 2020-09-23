@@ -1,11 +1,6 @@
 <section class="cookbooks">
   <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
-  <chef-toolbar *ngIf="authFailure">
-      <div class="empty-state">
-        <p>Unable to show cookbooks because admin key is invalid.</p>
-        <chef-button primary (click)="ResetKeyTabRedirection()">Reset Admin Key</chef-button>
-      </div>
-  </chef-toolbar>
+  <app-empty-state *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="ResetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
     <chef-table>
       <chef-thead>

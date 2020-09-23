@@ -28,7 +28,7 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public isLoading = true;
   public resetKeyForm: FormGroup;
-  private isDestroyed = new Subject<boolean>();
+  private isDestroyed$ = new Subject<boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -44,13 +44,13 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
     this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed)
+      takeUntil(this.isDestroyed$)
     ).subscribe(([status]) => {
       this.isLoading = status === EntityStatus.loading;
     });
 
     this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed),
+      takeUntil(this.isDestroyed$),
       filter(state => this.saveInProgress && !pending(state)))
       .subscribe((state) => {
         this.saveInProgress = false;
@@ -72,7 +72,7 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+    this.isDestroyed$.next(true);
+    this.isDestroyed$.complete();
   }
 }

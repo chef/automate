@@ -28,7 +28,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   public createChefServerForm: FormGroup;
   public creatingChefServer = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  private isDestroyed = new Subject<boolean>();
+  private isDestroyed$ = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
   public messageModalVisible = false;
@@ -66,7 +66,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetServers());
     this.store.select(saveStatus)
     .pipe(
-      takeUntil(this.isDestroyed),
+      takeUntil(this.isDestroyed$),
       filter(state => this.createModalVisible && !pending(state)))
       .subscribe(state => {
         this.creatingChefServer = false;
@@ -79,7 +79,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       this.store.select(saveStatus),
       this.store.select(saveError)
     ]).pipe(
-      takeUntil(this.isDestroyed),
+      takeUntil(this.isDestroyed$),
       filter(() => this.createModalVisible),
       filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
@@ -93,8 +93,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+    this.isDestroyed$.next(true);
+    this.isDestroyed$.complete();
   }
 
   public openCreateModal(): void {

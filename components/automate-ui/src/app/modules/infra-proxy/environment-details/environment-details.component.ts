@@ -37,7 +37,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public name: string;
   public show = false;
   public hasCookbookConstraints = false;
-  private isDestroyed = new Subject<boolean>();
+  private isDestroyed$ = new Subject<boolean>();
   environmentDetailsLoading = true;
 
   public attributes = new EnvironmentAttributes({
@@ -64,7 +64,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed$))
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
@@ -76,7 +76,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed)
+      takeUntil(this.isDestroyed$)
     ).subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -88,7 +88,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(environmentFromRoute).pipe(
       filter(identity),
-      takeUntil(this.isDestroyed)
+      takeUntil(this.isDestroyed$)
     ).subscribe(environment => {
       this.show = true;
       this.environment = environment;
@@ -141,7 +141,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+    this.isDestroyed$.next(true);
+    this.isDestroyed$.complete();
   }
 }

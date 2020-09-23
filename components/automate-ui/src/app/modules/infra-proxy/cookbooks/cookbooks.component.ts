@@ -57,10 +57,8 @@ export class CookbooksComponent implements OnInit, OnDestroy {
     });
   }
 
-  ResetKeyTabRedirection() {
-    if (this.authFailure) {
-      this.resetKeyRedirection.emit(true);
-    }
+  ResetKeyTabRedirection(resetLink: boolean) {
+    this.resetKeyRedirection.emit(resetLink);
   }
 
   ngOnDestroy(): void {
