@@ -17,11 +17,9 @@ const (
 			"number_of_shards":1,
 			"number_of_replicas":0
 		},
-		"mappings:": {
-			"test-data" : {
-				"properties" : {
-					"end_time": { "type" : "date" }
-				}
+		"mappings": {
+			"properties" : {
+				"end_time": { "type" : "date" }
 			}
 		}
 	}`

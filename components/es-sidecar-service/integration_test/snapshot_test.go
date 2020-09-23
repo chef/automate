@@ -199,6 +199,7 @@ func waitForRestoreSuccess(t *testing.T, serviceName, snapshotName string) {
 const (
 	includedIndex = "included-index"
 	excludedIndex = "excluded-index"
+	snapShotName  = "chef-automate-es7-example-service"
 )
 
 func TestCreateSnapshot(t *testing.T) {
@@ -223,15 +224,17 @@ func TestCreateSnapshot(t *testing.T) {
 
 	require.NoError(t, err)
 
-	require.Contains(t, repoMetadataMap, "chef-automate-es6-example-service")
+	t.Logf("where is this %v", repoMetadataMap)
 
-	expectedRepo := *repoMetadataMap["chef-automate-es6-example-service"]
+	require.Contains(t, repoMetadataMap, snapShotName)
+
+	expectedRepo := *repoMetadataMap[snapShotName]
 
 	assert.Equal(t, "fs", expectedRepo.Type)
 	assert.Equal(t, "100M", expectedRepo.Settings["max_snapshot_bytes_per_sec"])
 	assert.Equal(t, "200M", expectedRepo.Settings["max_restore_bytes_per_sec"])
 
-	snapshotList := listSnapshots(t, "chef-automate-es6-example-service")
+	snapshotList := listSnapshots(t, snapShotName)
 
 	require.NotEmpty(t, snapshotList["snapshots"])
 
@@ -239,7 +242,7 @@ func TestCreateSnapshot(t *testing.T) {
 	assert.Contains(t, snapshotList["snapshots"][0]["indices"], includedIndex)
 	assert.NotContains(t, snapshotList["snapshots"][0]["indices"], excludedIndex)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 }
 
 func TestCreateSnapshotStatus(t *testing.T) {
@@ -260,7 +263,7 @@ func TestCreateSnapshotStatus(t *testing.T) {
 	require.NoError(t, err)
 
 	// If we fail, wait for snapshot to finish so the cleanup can succeed
-	defer waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	defer waitForSnapshotSuccess(t, snapShotName)
 
 	status, err := suite.esSidecar.GetCreateSnapshotStatus(ctx, "example-service", "snap-1")
 	require.NoError(t, err)
@@ -272,7 +275,7 @@ func TestCreateSnapshotStatus(t *testing.T) {
 	require.True(t, status.ProgressPercentage >= 0.0)
 	require.True(t, status.ProgressPercentage <= 100.0)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 
 	status2, err := suite.esSidecar.GetCreateSnapshotStatus(ctx, "example-service", "snap-1")
 	require.NoError(t, err)
@@ -363,13 +366,13 @@ func TestRestoreWhenDataDeleted(t *testing.T) {
 	err := suite.esSidecar.CreateSnapshot(ctx, "example-service", "snap-1", includedIndex, bc)
 	require.NoError(t, err)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 
 	// Delete everything
 	for _, doc := range testDocs {
-		_, err = suite.esClient.Delete().Index(includedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(includedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
-		_, err = suite.esClient.Delete().Index(excludedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(excludedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
 	}
 
@@ -423,13 +426,13 @@ func TestRestoreWhenIndicesPresent(t *testing.T) {
 	err := suite.esSidecar.CreateSnapshot(ctx, "example-service", "snap-1", includedIndex, bc)
 	require.NoError(t, err)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 
 	// Delete everything
 	for _, doc := range testDocs {
-		_, err = suite.esClient.Delete().Index(includedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(includedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
-		_, err = suite.esClient.Delete().Index(excludedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(excludedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
 	}
 
@@ -482,13 +485,13 @@ func TestRestoreStatus(t *testing.T) {
 	err := suite.esSidecar.CreateSnapshot(ctx, "example-service", "snap-1", includedIndex, bc)
 	require.NoError(t, err)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 
 	// Delete everything
 	for _, doc := range testDocs {
-		_, err = suite.esClient.Delete().Index(includedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(includedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
-		_, err = suite.esClient.Delete().Index(excludedIndex).Type(testTypeName).Id(doc.id_for_search).Do(ctx)
+		_, err = suite.esClient.Delete().Index(excludedIndex).Id(doc.id_for_search).Do(ctx)
 		require.NoError(t, err)
 	}
 
@@ -522,7 +525,7 @@ func TestRestoreStatusForMissingSnapshot(t *testing.T) {
 
 	ctx := context.Background()
 
-	err := suite.esSidecar.CreateSnapshotRepository(ctx, "chef-automate-es6-example-service", bc)
+	err := suite.esSidecar.CreateSnapshotRepository(ctx, snapShotName, bc)
 	require.NoError(t, err)
 
 	_, err = suite.esSidecar.GetRestoreSnapshotStatus(ctx, "example-service", "snap-1")
@@ -544,12 +547,12 @@ func TestDeleteSnapshot(t *testing.T) {
 	err := suite.esSidecar.CreateSnapshot(ctx, "example-service", "snap-1", includedIndex, bc)
 	require.NoError(t, err)
 
-	waitForSnapshotSuccess(t, "chef-automate-es6-example-service")
+	waitForSnapshotSuccess(t, snapShotName)
 
 	err = suite.esSidecar.DeleteSnapshot(ctx, "example-service", "snap-1")
 	require.NoError(t, err)
 
-	list := listSnapshots(t, "chef-automate-es6-example-service")
+	list := listSnapshots(t, snapShotName)
 	assert.Empty(t, list["snapshots"])
 
 	// Make sure it's idempotent
