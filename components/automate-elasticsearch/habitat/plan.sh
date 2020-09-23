@@ -4,12 +4,12 @@
 pkg_name="automate-elasticsearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="7.9.0"
+pkg_version="7.9.1"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}-linux-x86_64.tar.gz"
-pkg_shasum=9f8ce7308cd0d0c691b0bd5b43716cf58e40f2cd54a7f4c36e9188aca199a379
+pkg_shasum=a1b43a6e29d3ca91d08366f64007ce812646e4775524214f66330d447a4c6e3c
 
 pkg_build_deps=(
   core/patchelf
