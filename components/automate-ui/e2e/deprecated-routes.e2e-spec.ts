@@ -27,8 +27,7 @@ describe('Deprecated routes redirect to the correct new route for backwards comp
     ['/integrations/add',                      '/settings/node-integrations/add'],
     ['/integrations/edit/my-object',           '/settings/node-integrations/edit/my-object'],
     ['/notifications',                         '/settings/notifications'],
-    ['/notifications/form',                    '/settings/notifications/form'],
-    ['/notifications/form/my-object',          '/settings/notifications/form/my-object'],
+    ['/notifications/my-object',               '/settings/notifications/my-object'],
     ['/compliance/credentials',                '/settings/node-credentials'],
     ['/compliance/credentials/add',            '/settings/node-credentials/add'],
     ['/compliance/credentials/my-object/edit', '/settings/node-credentials/my-object/edit']
