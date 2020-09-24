@@ -113,6 +113,7 @@ EOF
   provisioner "remote-exec" {
     inline = [
       "${var.hardened_security} && sudo /home/${var.ssh_username}/soften_mounts.sh",
+      "exit 0",
     ]
   }
 }
