@@ -75,7 +75,7 @@ describe('project rule management', () => {
     cy.get('app-pending-edits-bar').contains('Project edits pending');
 
     // verify success notification and then dismiss it
-    cy.get('app-notification.info').contains(`Created rule ${ruleID}`);
+    cy.get('app-notification.info').contains(`Created rule ${ruleName}`);
     cy.get('app-notification.info chef-icon').click();
   });
 
