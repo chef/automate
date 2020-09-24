@@ -94,11 +94,11 @@ resource "null_resource" "soften_mounts" {
     host        = "${element(var.instance_fqdn, count.index)}"
     user        = "${var.ssh_username}"
     private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
-    script_path = "/run_soften_mounts.sh"
+    script_path = "/home/${var.ssh_username}/run_soften_mounts.sh"
   }
 
   provisioner "file" {
-    destination = "/soften_mounts.sh"
+    destination = "/home/${var.ssh_username}/soften_mounts.sh"
 
     content = <<EOF
 #!/bin/sh
@@ -112,7 +112,7 @@ EOF
 
   provisioner "remote-exec" {
     inline = [
-      "${var.hardened_security} && sudo /soften_mounts.sh",
+      "${var.hardened_security} && sudo /home/${var.ssh_username}/soften_mounts.sh",
     ]
   }
 }
