@@ -1,11 +1,11 @@
 ---
 issuer-url: https://{{cfg.conf.service.external_fqdn}}/dex
-dex-url: https://{{cfg.binds.dex.ip}}:{{cfg.binds.dex.cfg.port}}
+dex-url: https://127.0.0.1:{{cfg.binds.dex.cfg.port}}
 redirect-url: {{ cfg.conf.oidc.redirect_url }}
 client-id: {{ cfg.conf.oidc.client_id }}
 client-secret: {{ cfg.conf.oidc.client_secret }}
 http-port: {{ cfg.conf.service.port }}
-http-listen: {{ cfg.conf.service.host }}
+http-listen: "127.0.0.1"
 signin-url: {{ cfg.conf.service.signin_url }}
 {{- if cfg.conf.service.bldr_signin_url }}
 bldr-signin-url: {{ cfg.conf.service.bldr_signin_url }}

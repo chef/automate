@@ -125,6 +125,7 @@ func (f *Factory) DialOptions(serviceName string) []grpc.DialOption {
 		RootCAs:      f.CertPool,
 	})
 	return []grpc.DialOption{
+		grpc.WithNoProxy(), // All grpc connection is on localhost
 		grpc.WithBackoffConfig(grpc.BackoffConfig{
 			MaxDelay: 10 * time.Second,
 		}),

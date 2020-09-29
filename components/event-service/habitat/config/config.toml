@@ -1,9 +1,5 @@
 [service]
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{~else}}
-host = "{{sys.ip}}"
-{{~/if}}
+host = "127.0.0.1"
 port = "{{cfg.service.port}}"
 event_limit = "{{cfg.service.event_limit}}"
 listener_limit = "{{cfg.service.listener_limit}}"

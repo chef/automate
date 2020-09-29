@@ -70,13 +70,7 @@ PG_BACKEND="--postgres-db {{cfg.storage.database}}"
 
 CONFIG="$CONFIG --automate-fqdn https://{{cfg.service.external_fqdn}}"
 
-# If we have a config pointing to an specific host,
-# lets use it, otherwise use the ipaddress of the server
-{{~#if cfg.service.host}}
-CONFIG="$CONFIG --host {{cfg.service.host}}"
-{{else}}
-CONFIG="$CONFIG --host {{sys.ip}}"
-{{~/if}}
+CONFIG="$CONFIG --host 127.0.0.1"
 
 # A data retention policy was configured
 {{~#if cfg.retention.compliance_report_days}}
@@ -91,48 +85,42 @@ CONFIG="$CONFIG --message-buffer-size {{cfg.service.message_buffer_size}}"
 # get auth binding, used for retrieving token for inspec reporting directly to automate
 {{~#eachAlive bind.authn-service.members as |authn|}}
 {{~#if @last}}
-addNoProxy {{authn.sys.ip}}
-CONFIG="$CONFIG --authn-target {{authn.sys.ip}}:{{authn.cfg.port}}"
+CONFIG="$CONFIG --authn-target 127.0.0.1:{{authn.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 # get notifications binding, used for sending notifications on compliance report ingestion
 {{~#eachAlive bind.notifications-service.members as |notifications|}}
 {{~#if @last}}
-addNoProxy {{notifications.sys.ip}}
-CONFIG="$CONFIG --notifications-target {{notifications.sys.ip}}:{{notifications.cfg.port}}"
+CONFIG="$CONFIG --notifications-target 127.0.0.1:{{notifications.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 # get secrets service binding, used for storing secrets
 {{~#eachAlive bind.secrets-service.members as |secrets|}}
 {{~#if @last}}
-addNoProxy {{secrets.sys.ip}}
-CONFIG="$CONFIG --secrets-host {{secrets.sys.ip}} --secrets-port {{secrets.cfg.port}}"
+CONFIG="$CONFIG --secrets-host 127.0.0.1 --secrets-port {{secrets.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 # get authz service binding, used for getting project rules
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
-addNoProxy {{authz.sys.ip}}
-CONFIG="$CONFIG --authz-host {{authz.sys.ip}} --authz-port {{authz.cfg.port}}"
+CONFIG="$CONFIG --authz-host 127.0.0.1 --authz-port {{authz.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 # get event service binding, used for publishing event
 {{~#eachAlive bind.event-service.members as |event|}}
 {{~#if @last}}
-addNoProxy {{event.sys.ip}}
-CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
+CONFIG="$CONFIG --event-endpoint 127.0.0.1:{{event.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 # get nodemanager binding, used for getting nodes and nodemanager info
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
 {{~#if @last}}
-addNoProxy {{manager.sys.ip}}
-CONFIG="$CONFIG --manager-host {{manager.sys.ip}} --manager-port {{manager.cfg.port}}"
+CONFIG="$CONFIG --manager-host 127.0.0.1 --manager-port {{manager.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
@@ -147,8 +135,7 @@ CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.compliance-service.toml"
 #
 #
 {{~#eachAlive bind.es-sidecar-service.members as |member|}}
-addNoProxy {{member.sys.ip}}
-CONFIG="$CONFIG --es-sidecar-address {{member.sys.ip}}:{{member.cfg.port}}"
+CONFIG="$CONFIG --es-sidecar-address 127.0.0.1:{{member.cfg.port}}"
 {{~/eachAlive}}
 
 # Elasticsearch
@@ -159,8 +146,7 @@ ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
 # Bind to cereal
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-addNoProxy {{cereal-service.sys.ip}}
-CONFIG="$CONFIG --cereal-endpoint {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+CONFIG="$CONFIG --cereal-endpoint 127.0.0.1:{{cereal-service.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 

@@ -27,7 +27,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Pg = DefaultPGConfig()
 	c.V1.Sys.Logger.Level = w.String("ERROR")
 	c.V1.Sys.Service.Port = w.Int32(5432)
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Superuser.Name = w.String("automate")
 
 	return c

@@ -6,7 +6,7 @@ curlOpts="-sS --fail --max-time 2"
 curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/public.crt"
 curlOpts="$curlOpts --key {{pkg.svc_config_path}}/private.key"
 curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
-curlOpts="$curlOpts --resolve automate-minio:{{cfg.service.port}}:{{sys.ip}}"
+curlOpts="$curlOpts --resolve automate-minio:{{cfg.service.port}}:127.0.0.1"
 curlOpts="$curlOpts --noproxy automate-minio"
 
 # shellcheck disable=SC2086

@@ -33,7 +33,6 @@ func TestSetGlobalConfig(t *testing.T) {
 
 func TestDefaultConfigRequest(t *testing.T) {
 	c := authn.DefaultConfigRequest()
-	assert.Equal(t, "0.0.0.0", c.V1.Sys.Service.Host.Value)
 	assert.EqualValues(t, 10113, c.V1.Sys.Service.Port.Value)
 	assert.Equal(t, "info", c.V1.Sys.Logger.Level.Value)
 }

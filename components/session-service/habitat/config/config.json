@@ -5,7 +5,6 @@
   "dex": {
 {{~#eachAlive bind.automate-dex.members as |dex|}}
   {{~#if @last}}
-    "ip": "{{dex.sys.ip}}",
     {{~#if dex.cfg }}
     "cfg": {{ toJson dex.cfg }},
     {{~/if}}

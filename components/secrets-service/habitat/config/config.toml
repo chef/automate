@@ -11,11 +11,7 @@ file = "{{pkg.svc_data_path}}/secrets_key"
 {{~/if}}
 
 [service]
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{~else}}
-host = "{{sys.ip}}"
-{{~/if}}
+host = "127.0.0.1"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
 

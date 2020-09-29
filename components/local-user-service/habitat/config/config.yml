@@ -1,5 +1,5 @@
 ---
-grpc: {{cfg.service.host}}:{{cfg.service.port}}
+grpc: 127.0.0.1:{{cfg.service.port}}
 a1_user_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_data}}
 a1_user_roles_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_roles_data}}
 
@@ -13,19 +13,19 @@ users:
   config:
     {{~#eachAlive bind.automate-dex.members as |automate-dex|}}
       {{~#if @last}}
-    grpcHost: {{automate-dex.sys.ip}}:{{automate-dex.cfg.grpc-port}}
+    grpcHost: 127.0.0.1:{{automate-dex.cfg.grpc-port}}
       {{~/if}}
     {{~/eachAlive}}
 
 {{~#eachAlive bind.teams-service.members as |teams-service|}}
 {{~#if @last}}
-teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
+teams_address: 127.0.0.1:{{teams-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
 {{~#if @last}}
-authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
+authz_address: 127.0.0.1:{{authz-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 

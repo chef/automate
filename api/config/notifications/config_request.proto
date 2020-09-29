@@ -32,7 +32,7 @@ message ConfigRequest {
 
 			message Service {
 				google.protobuf.StringValue external_fqdn = 1;
-				google.protobuf.StringValue host = 2;
+				google.protobuf.StringValue host = 2 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 3 [ (chef.automate.api.port) = { name: "service", default: 10125, protocol: "grpc" } ];
 				google.protobuf.Int32Value dedupe_window_seconds = 4;
 			}

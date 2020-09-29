@@ -36,7 +36,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(2000)
 	c.V1.Sys.Service.GrpcPort = w.Int32(2001)
 	c.V1.Sys.Service.TrialLicenseUrl = w.String(ValidTrialLicenseURLs[0])

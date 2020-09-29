@@ -503,7 +503,7 @@ func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientCon
 		} else {
 			conn, err = grpc.Dial(
 				endpoint.Target,
-				append(opts, grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
+				append(opts, grpc.WithNoProxy(), grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
 			)
 		}
 

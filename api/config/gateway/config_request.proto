@@ -29,7 +29,7 @@ message ConfigRequest {
 			DataCollector data_collector = 5;
 
 			message Service {
-				google.protobuf.StringValue host = 1;
+				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "http", default: 2000, protocol: "https" } ];
 				google.protobuf.StringValue external_fqdn = 3;
 				google.protobuf.Int32Value grpc_port = 4 [ (chef.automate.api.port) = { name: "service", default: 2001, protocol: "grpc" } ];

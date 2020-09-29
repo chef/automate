@@ -9,15 +9,4 @@ pg-helper ensure-service-database "{{cfg.storage.database}}"
 
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 
-{{~#eachAlive bind.automate-dex.members as |member|}}
-{{~#if @last}}
-addNoProxy {{member.sys.ip}}
-{{~/if}}
-{{~/eachAlive}}
-{{~#eachAlive bind.teams-service.members as |teams-service|}}
-{{~#if @last}}
-addNoProxy {{teams-service.sys.ip}}
-{{~/if}}
-{{~/eachAlive}}
-
 exec authn-service serve {{pkg.svc_config_path}}/config.yml

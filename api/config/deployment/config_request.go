@@ -36,7 +36,7 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Mlsa.Accept = w.Bool(true)
-	c.V1.Sys.Service.ListenAddress = w.String("0.0.0.0")
+	c.V1.Sys.Service.ListenAddress = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10160)
 	c.V1.Sys.Log.Level = w.String("info")
 
