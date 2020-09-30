@@ -61,6 +61,13 @@ CONFIG="$CONFIG --result-message-limit {{cfg.agent.result_message_limit}}"
 CONFIG="$CONFIG --control-results-limit {{cfg.agent.control_results_limit}}"
 CONFIG="$CONFIG --run-time-limit {{cfg.agent.run_time_limit}}"
 
+# Proxy configuration.
+{{~#if cfg.proxy.connection_string}}
+export https_proxy="{{cfg.proxy.connection_string}}"
+export http_proxy="{{cfg.proxy.connection_string}}"
+export no_proxy="{{cfg.proxy.no_proxy_string}}"
+{{~/if}}
+
 # Mutual TLS Configuration
 CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"
 CONFIG="$CONFIG --key {{pkg.svc_config_path}}/service.key"

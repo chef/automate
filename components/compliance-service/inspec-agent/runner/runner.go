@@ -767,6 +767,16 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 	timeout := time.Duration(job.Timeout) * time.Second
 	env, inputs, genericErr := cloudEnvVars(&job.TargetConfig)
+	if len(os.Getenv("http_proxy")) > 0 {
+		logrus.Debugf("using http_proxy: %s", os.Getenv("http_proxy"))
+		env["http_proxy"], env["https_proxy"] = os.Getenv("http_proxy"), os.Getenv("http_proxy")
+		env["HTTP_PROXY"], env["HTTPS_PROXY"] = os.Getenv("http_proxy"), os.Getenv("http_proxy")
+	}
+	if len(os.Getenv("no_proxy")) > 0 {
+		logrus.Debugf("using no_proxy: %s", os.Getenv("no_proxy"))
+		env["NO_PROXY"] = os.Getenv("no_proxy")
+	}
+
 	defer func() {
 		cleanupCreds(env)
 	}()

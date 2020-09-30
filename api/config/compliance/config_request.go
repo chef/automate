@@ -17,6 +17,7 @@ func NewConfigRequest() *ConfigRequest {
 				Logger:   &ConfigRequest_V1_System_Logger{},
 				Agent:    &ConfigRequest_V1_System_Agent{},
 				Profiles: &ConfigRequest_V1_System_Profiles{},
+				Proxy:    &config.Proxy{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -83,6 +84,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *config.TLSCredentials) (confi
 func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	c.V1.Sys.Mlsa = g.V1.Mlsa
 	c.V1.Sys.Service.ExternalFqdn = g.V1.GetFqdn()
+	c.V1.Sys.Proxy = g.V1.Proxy
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Logger.Level.Value = logLevel

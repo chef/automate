@@ -36,6 +36,7 @@ message ConfigRequest {
 			reserved 8;
 			reserved 9;
 			Agent agent = 10;
+			chef.automate.infra.config.Proxy proxy = 11;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
