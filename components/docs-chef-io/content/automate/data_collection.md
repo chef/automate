@@ -81,7 +81,7 @@ In order to have Chef Infra Server send run data from connected Chef Infra Clien
 
 This step sets up data collection from a standalone Chef Infra Server deployed with the Chef Automate Installer to a separate Chef Automate server.
 
-Open the config.toml and include the external automate configuration settings
+Open the `config.toml` file and include the external automate configuration settings:
 
 ```toml
 [global.v1.external.automate]
@@ -99,7 +99,7 @@ Open the config.toml and include the external automate configuration settings
    enabled = true
 ```
 
-Then run `chef-automate config patch config.toml`
+Then, run `chef-automate config patch config.toml`.
 
 ### Setting Up Data Collection on Chef Infra Server Versions 12.14 and Higher
 
