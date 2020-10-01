@@ -77,6 +77,30 @@ In addition to forwarding Chef run data to Chef Automate, Chef Infra Server will
 
 In order to have Chef Infra Server send run data from connected Chef Infra Clients, set the data collection proxy attribute to `true`.
 
+### Setting Up Data Collection on Chef Infra Server Deployed with the Chef Automate Installer
+
+This step sets up data collection from a standalone Chef Infra Server deployed with the Chef Automate Installer to a separate Chef Automate server.
+
+Open the `config.toml` file and include the external automate configuration settings:
+
+```toml
+[global.v1.external.automate]
+  enable = true
+  node = "https://<automate server url>"
+[global.v1.external.automate.auth]
+  token = "<data-collector token>"
+[global.v1.external.automate.ssl]
+  server_name = "<server name from the automate server ssl cert>"
+  root_cert = """<pem format root CA cert>
+"""
+[auth_n.v1.sys.service]
+  a1_data_collector_token = "<data-collector token>"
+[erchef.v1.sys.data_collector]
+   enabled = true
+```
+
+Then, run `chef-automate config patch config.toml`.
+
 ### Setting Up Data Collection on Chef Infra Server Versions 12.14 and Higher
 
 Instead of setting the token directly in `/etc/opscode/chef-server.rb` as was done in older versions of the Chef Infra Server, we'll use the `set-secret` command, so that your API token does not live in
