@@ -1,6 +1,6 @@
 <section class="policy-files">
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="ResetKeyTabRedirection($event)"></app-empty-state>
+  <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <chef-table>
       <chef-thead>

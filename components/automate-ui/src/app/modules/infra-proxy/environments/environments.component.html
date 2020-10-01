@@ -1,6 +1,6 @@
 <section class="environments">
   <chef-loading-spinner *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="ResetKeyTabRedirection($event)"></app-empty-state>
+  <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <chef-table>
       <chef-thead>

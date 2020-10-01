@@ -1,6 +1,6 @@
 <section class="clients">
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="ResetKeyTabRedirection($event)"></app-empty-state>
+  <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
     <chef-table>
       <chef-thead>

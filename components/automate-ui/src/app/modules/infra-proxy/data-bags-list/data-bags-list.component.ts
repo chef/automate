@@ -57,7 +57,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     });
   }
 
-  ResetKeyTabRedirection(resetLink: boolean) {
+  resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
   }
 

@@ -58,7 +58,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     });
   }
 
-  ResetKeyTabRedirection(resetLink: boolean) {
+  resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
   }
 
