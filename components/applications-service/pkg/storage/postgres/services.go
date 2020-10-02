@@ -588,12 +588,12 @@ func buildHealthStatementFromValues(values []string) (string, error) {
 		if secondStatement {
 			ORConstraint = ORConstraint + " OR "
 		}
-		switch value {
+		switch strings.ToLower(value) {
 		case "disconnected":
 			ORConstraint = " disconnected"
 		case "connected":
 			ORConstraint = " disconnected = false"
-		case "CRITICAL", "WARNING", "UNKNOWN", "OK":
+		case "critical", "warning", "unknown", "ok":
 			ORConstraint = ORConstraint + fmt.Sprintf("%s = '%s'", "health",
 				pgutils.EscapeLiteralForPG(strings.ToUpper(value)))
 		default:
