@@ -71,14 +71,14 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
   constructor(private control: NgControl) {}
 
   private originalValue: any;
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   ngOnInit(): void {
     this.setOriginalValue();
 
     this.control.valueChanges
       .pipe(
-        takeUntil(this.isDestroyed$),
+        takeUntil(this.isDestroyed),
         distinctUntilChanged()
       )
       .subscribe(newValue => {
@@ -96,8 +96,8 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

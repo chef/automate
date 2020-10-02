@@ -25,7 +25,7 @@ export class CookbooksComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public cookbooks: Cookbook[] = [];
   public cookbooksListLoading = true;
   public authFailure = false;
@@ -45,7 +45,7 @@ export class CookbooksComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllCookbooksForOrgStatus),
       this.store.select(allCookbooks)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getCookbooksSt, allCookbooksState]) => {
       if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
         this.cookbooks = allCookbooksState;
@@ -62,7 +62,7 @@ export class CookbooksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }
