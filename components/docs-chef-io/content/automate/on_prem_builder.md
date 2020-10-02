@@ -27,8 +27,7 @@ Bootstrapping Chef Habitat Builder requires:
 
 ## System requirements
 
-This guide demonstrates the ease of authenticating between Chef Automate and Chef Habitat Builder on-prem by installing both components on the same host.
-Outside the boundaries of this proof-of-concept, we recommend against running installations of Chef Automate and Chef Habitat Builder on the same host. Please contact your Chef representative before using this implementation in production
+This guide demonstrates setu of Chef Habitat Builder on-prem by installing the components with the Chef Automate deployment utility. Please contact your Chef representative before using this implementation in production for more specific scale recommendations. 
 
 ### Hardware Requirements
 
@@ -60,6 +59,11 @@ Chef Automate and Chef Habitat Builder require:
 * The shell that starts Chef Automate should have a max open files setting of at least 65535
 * Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
+### Supported Topologies
+
+* Chef Automate and Chef Habitat Builder on the same host
+* Chef Automate and Chef Habitat Builder on different hosts
+
 ### Unsupported Topologies
 
 * high-availability/DR/multinode Builder
@@ -84,9 +88,11 @@ If you are deploying Chef Habitat Builder with Chef Automate in an airgapped env
 
 You can deploy Chef Habitat Builder either with a full Chef Automate installation or with the Chef Automate auth stack only.
 
+When deploying Chef Habitat Builder on a the same host as Chef Automate authentication to Chef Automate will be configured as part of the deployment. 
+
 #### Deploy Chef Automate and Chef Habitat Builder
 
-To deploy Chef Automate and Chef Habitat Builder, specify both the `builder` and `automate` products on the command line.
+To deploy Chef Automate and Chef Habitat Builder on the same host, specify both the `builder` and `automate` products on the command line.
 For example:
 
 ```shell
@@ -97,7 +103,10 @@ Accept the license with `y`.
 
 #### Deploy Chef Habitat Builder with Chef Automate Auth
 
-To deploy Chef Habitat Builder with the Chef Automate UI and Auth services only, specify the `builder` product on the command line.
+To deploy Chef Habitat Builder on a different host than Chef Automate, specify only the `builder` product on the command line. Chef Automate UI and Auth services only will also be deployed to support authentication. 
+
+When deploying Chef Habitat Builder on a different host than Chef Automate the supported authentication options are LDAP or SAML. Follow the standard instructions for [Chef Automate LDAP]({{< relref "ldap.md" >}}) or [Chef Automate SAML]({{< relref "saml.md" >}}) configuration. 
+
 For example:
 
 ```shell
@@ -220,7 +229,6 @@ Patch an existing Chef Automate installation to add Chef Habitat Builder:
 1. Select **Sign in with Chef Automate**
 1. Sign into Chef Habitat Builder using the same credentials used with Chef Automate
 
-The Chef Automate-deployed Chef Habitat Builder supports authentication with local users only. We plan on adding more authentication methods in future releases.
 
 ### Generate a Chef Habitat on-prem Builder Personal Access Token
 
