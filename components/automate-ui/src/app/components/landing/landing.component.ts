@@ -1,6 +1,8 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Check, AuthorizedComponent } from 'app/components/authorized/authorized.component';
 import { AuthorizedChecker, CheckObj } from 'app/helpers/auth/authorized';
@@ -33,10 +35,11 @@ export interface RoutePerms {
   template: '', // no content
   styleUrls: []
 })
-export class LandingComponent implements OnInit {
+export class LandingComponent implements OnInit, OnDestroy {
 
   public authorizedChecker: AuthorizedChecker;
   private authComponent: AuthorizedComponent;
+  private isDestroyed = new Subject<boolean>();
   private index = 0;
 
   /**
@@ -67,14 +70,19 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authorizedChecker.isAuthorized$.subscribe(
-      isAuthorized => this.handlePerm(isAuthorized));
+    this.authorizedChecker.isAuthorized$
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe(isAuthorized => this.handlePerm(isAuthorized));
     this.setPerms();
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   private handlePerm(isAuthorized: boolean): void {
     if (isAuthorized) {
-      this.authorizedChecker.destroy();
       this.router.navigate(this.routeToSegmentList(this.route), { replaceUrl: true });
     } else if (++this.index < this.routePerms.length) {
       this.setPerms();

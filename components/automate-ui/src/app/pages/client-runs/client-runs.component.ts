@@ -388,9 +388,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-    if (this.authorizedChecker) {
-      this.authorizedChecker.destroy();
-    }
   }
 
   toggleFilters() {
