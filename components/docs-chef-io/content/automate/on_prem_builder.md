@@ -27,7 +27,7 @@ Bootstrapping Chef Habitat Builder requires:
 
 ## System requirements
 
-This guide demonstrates setu of Chef Habitat Builder on-prem by installing the components with the Chef Automate deployment utility. Please contact your Chef representative before using this implementation in production for more specific scale recommendations. 
+This guide demonstrates setup of Chef Habitat Builder on-prem by installing the components with the Chef Automate deployment utility. Please contact your Chef representative before using this implementation in production for more specific scale recommendations. 
 
 ### Hardware Requirements
 
