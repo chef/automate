@@ -5,6 +5,15 @@ expeditor:
         workdir: /go/src/github.com/chef/automate
 
 steps:
+
+  - label: ":semgrep: Semgrep"
+    expeditor:
+      executor:
+        docker:
+          image: returntocorp/semgrep:latest
+          entrypoint: semgrep
+          command: ["--error", "--config", "/workdir/semgrep" ]
+
   #
   # A2 protobufs - Detect if there is any component that has protobuf files that hasn't been compiled
   #
