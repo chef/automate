@@ -113,18 +113,28 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         break;
       case 1:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'roles');
+        this.resetTabs();
+        this.rolesTab = true;
         break;
       case 2:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'environments');
+        this.resetTabs();
+        this.environmentsTab = true;
         break;
       case 3:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'dataBags');
+        this.resetTabs();
+        this.dataBagsTab = true;
         break;
       case 4:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'clients');
+        this.resetTabs();
+        this.clientsTab = true;
         break;
       case 5:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyFiles');
+        this.resetTabs();
+        this.policyFilesTab = true;
         break;
       case 6:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');

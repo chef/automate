@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { RolesSuccessPayload } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
+import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
+
+const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
 @Injectable()
 export class InfraRoleRequests {
@@ -13,11 +16,11 @@ export class InfraRoleRequests {
   // tslint:disable-next-line: max-line-length
   public getRoles(server_id: string, org_id: string): Observable<RolesSuccessPayload> {
     return this.http.get<RolesSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles`);
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles`, {headers});
   }
 
   public getRole(server_id: string, org_id: string, name: string): Observable<InfraRole> {
     return this.http.get<InfraRole>(
-        `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`);
+        `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`, {headers});
   }
 }
