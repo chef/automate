@@ -56,7 +56,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public orgsListLoading = true;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(
@@ -80,7 +80,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     // Populate our tabValue from the fragment.
-    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed$))
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
@@ -96,7 +96,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.store.select(routeParams).pipe(
       pluck('id'),
       filter(identity),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
         this.id = id;
         this.store.dispatch(new GetServer({ id }));
@@ -107,7 +107,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getStatus),
       this.store.select(getAllOrgsForServerStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([getServerSt, getOrgsSt]) => {
       this.isLoading =
         !allLoaded([getServerSt, getOrgsSt]);
@@ -124,7 +124,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         getOrgsStatus === EntityStatus.loadingSuccess &&
         !isNil(serverState) &&
         !isNil(allOrgsState)),
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
       this.server = { ...ServerState };
       this.orgs = allOrgsState;
@@ -140,7 +140,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.store.select(createStatus),
       this.store.select(createError)
     ]).pipe(
-      takeUntil(this.isDestroyed$),
+      takeUntil(this.isDestroyed),
       filter(() => this.createModalVisible),
       filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
@@ -155,14 +155,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(deleteOrgStatus).pipe(
       filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.store.dispatch(new GetServer({ id: this.id })
       );
     });
 
     this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed$),
+      takeUntil(this.isDestroyed),
       filter(state => this.saveInProgress && !pending(state)))
     .subscribe((state) => {
       this.saveInProgress = false;
@@ -174,8 +174,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   onSelectedTab(event: { target: { value: ChefServerTabName } }) {

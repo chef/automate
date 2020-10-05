@@ -26,7 +26,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public environments: Environment[] = [];
   public environmentsListLoading = true;
   public authFailure = false;
@@ -46,7 +46,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllEnvironmentsForOrgStatus),
       this.store.select(allEnvironments)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getEnvironmentsSt, allEnvironmentsState]) => {
       if (getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(allEnvironmentsState)) {
         this.environments = allEnvironmentsState;
@@ -63,7 +63,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

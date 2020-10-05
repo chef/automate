@@ -36,7 +36,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public dataBagsTab = false;
   public clientsTab = false;
   public policyFilesTab = false;
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   previousRoute$: Observable<RouterState>;
@@ -84,7 +84,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -97,7 +97,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
     });
@@ -163,7 +163,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

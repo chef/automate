@@ -25,7 +25,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public dataBags: DataBags[];
   public dataBagsListLoading = true;
   public authFailure = false;
@@ -45,7 +45,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllDatabagsForOrgStatus),
       this.store.select(allDataBags)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getDataBagsSt, allDataBagsState]) => {
       if (getDataBagsSt === EntityStatus.loadingSuccess && !isNil(allDataBagsState)) {
         this.dataBags = allDataBagsState;
@@ -62,7 +62,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

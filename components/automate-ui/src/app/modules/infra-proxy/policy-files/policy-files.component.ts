@@ -26,7 +26,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public policyFiles: PolicyFile[] = [];
   public policyFilesListLoading = true;
   public authFailure = false;
@@ -46,7 +46,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllPolicyFilesForOrgStatus),
       this.store.select(allPolicyFiles)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
         this.policyFiles = allPolicyFilesState;
@@ -63,7 +63,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

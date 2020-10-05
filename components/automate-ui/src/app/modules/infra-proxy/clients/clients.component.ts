@@ -26,7 +26,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public clients: Client[] = [];
   public clientsListLoading = true;
   public authFailure = false;
@@ -46,7 +46,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllClientsForOrgStatus),
       this.store.select(allClients)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([getClientsSt, allClientsState]) => {
       if (getClientsSt === EntityStatus.loadingSuccess && !isNil(allClientsState)) {
         this.clients = allClientsState;
@@ -63,7 +63,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

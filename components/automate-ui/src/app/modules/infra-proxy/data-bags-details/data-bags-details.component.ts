@@ -22,7 +22,7 @@ export type DataBagsDetailsTab = 'details';
   styleUrls: ['./data-bags-details.component.scss']
 })
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public dataBagDetails: DataBags[];
   public dataBagItemDetails: DataBagsItemDetails;
   public serverId: string;
@@ -47,7 +47,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, dataBags_name]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -67,7 +67,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         getDataBagDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
         !isNil(dataBagDetailsState)),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
         this.dataBagDetails = dataBagDetailsState;
         // This code block is for selecting first item from the list by default.
@@ -85,7 +85,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         getDataBagItemDetailsSt === EntityStatus.loadingSuccess),
       filter(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) =>
         !isNil(dataBagItemDetailsState)),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         this.dataBagsItemDetailsLoading = false;
@@ -104,7 +104,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next();
-    this.isDestroyed$.complete();
+    this.isDestroyed.next();
+    this.isDestroyed.complete();
   }
 }

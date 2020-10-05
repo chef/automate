@@ -33,7 +33,7 @@ export type CookbookDetailsTab = 'content' | 'details';
   styleUrls: ['./cookbook-details.component.scss']
 })
 export class CookbookDetailsComponent implements OnInit, OnDestroy {
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public cookbook: CookbookVersions;
   public url: string;
   public serverId: string;
@@ -88,7 +88,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('cookbook-name'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, cookbook_name]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -108,7 +108,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         getCookbookVersionSt === EntityStatus.loadingSuccess),
       filter(([_getCookbookVersionSt, cookbookVersionState]) =>
         !isNil(cookbookVersionState)),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe(([_getCookbookVersionSt, cookbookVersionState]) => {
         this.cookbook = cookbookVersionState;
         this.cookbookVersionsLoading = false;
@@ -131,7 +131,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         getCookbooksSt === EntityStatus.loadingSuccess),
       filter(([_getCookbooksSt, cookbookDetailsState]) =>
         !isNil(cookbookDetailsState)),
-      takeUntil(this.isDestroyed$))
+      takeUntil(this.isDestroyed))
       .subscribe(([_getCookbooksSt, cookbookDetailsState]) => {
         this.cookbookDetails = cookbookDetailsState;
         this.menuList = CollapsibleListMapper.transform(cookbookDetailsState, this.listItem);
@@ -206,7 +206,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

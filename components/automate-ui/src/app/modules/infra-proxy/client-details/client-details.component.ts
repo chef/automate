@@ -29,7 +29,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
   public orgId: string;
   public name: string;
   public show = false;
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   clientDetailsLoading = true;
 
   constructor(
@@ -46,7 +46,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('orgid'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -58,7 +58,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(clientFromRoute).pipe(
       filter(identity),
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(client => {
       this.show = true;
       this.client = client;
@@ -72,7 +72,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

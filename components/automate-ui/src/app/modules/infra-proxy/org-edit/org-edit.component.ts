@@ -28,7 +28,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public isLoading = true;
   public updateOrgForm: FormGroup;
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
 
   constructor(
@@ -52,7 +52,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
       this.store.select(getStatus),
       this.store.select(updateStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([getOrgSt, updateSt]) => {
       this.isLoading =
         !allLoaded([getOrgSt]) || updateSt === EntityStatus.loading;
@@ -64,7 +64,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     ]).pipe(
       filter(([getOrgSt, orgState]) => getOrgSt ===
         EntityStatus.loadingSuccess && !isNil(orgState)),
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([_getOrgSt, orgState]) => {
       this.org = { ...orgState };
       this.updateOrgForm.controls['name'].setValue(this.org.name);
@@ -73,7 +73,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
     });
 
     this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed$),
+      takeUntil(this.isDestroyed),
       filter(state => this.saveInProgress && !pending(state)))
       .subscribe((state) => {
         this.saveInProgress = false;
@@ -109,7 +109,7 @@ export class OrgEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

@@ -26,7 +26,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public roles: InfraRole[] = [];
   public rolesListLoading = true;
   public authFailure = false;
@@ -46,7 +46,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllRolesForOrgStatus),
       this.store.select(allInfraRoles)
-    ]).pipe(takeUntil(this.isDestroyed$))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getRolesSt, allInfraRolesState]) => {
       if (getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState)) {
         this.roles = allInfraRolesState;
@@ -63,7 +63,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

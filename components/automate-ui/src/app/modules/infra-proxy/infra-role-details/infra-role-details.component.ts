@@ -41,7 +41,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public idList: string[] = [];
   public hasRun_List = true;
   public childNodes: Node<ChildList>[] = [];
-  private isDestroyed$ = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   arrayOfNodesTree: Node<ChildList>[];
   roleDetailsLoading = true;
   treeOptions: Options<ChildList> = {
@@ -75,7 +75,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     this.childNodes = [];
     this.idList = [];
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed$))
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
@@ -87,7 +87,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
@@ -99,7 +99,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(infraRoleFromRoute).pipe(
       filter(identity),
-      takeUntil(this.isDestroyed$)
+      takeUntil(this.isDestroyed)
     ).subscribe(role => {
       this.show = true;
       this.role = role;
@@ -217,7 +217,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }
