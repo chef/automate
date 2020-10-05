@@ -103,6 +103,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed))
         .subscribe((control) => {
           this.scanResults.control = control;
+          this.scanResults.controls[nodeId] = control;
           this.scanResults.controlDetail.item = control;
           this.scanResults.showControlDetail = true;
         });

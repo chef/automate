@@ -5,12 +5,6 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
-{{~#eachAlive bind.authz-service.members as |authz-service|}}
-{{~#if @last}}
-addNoProxy {{authz-service.sys.ip}}
-{{~/if}}
-{{~/eachAlive}}
-
 echo "Creating database"
 pg-helper ensure-service-database "{{cfg.storage.database}}"
 

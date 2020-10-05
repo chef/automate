@@ -1,9 +1,5 @@
 [service]
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{~else}}
-host = "{{sys.ip}}"
-{{~/if}}
+host = "127.0.0.1"
 port = {{cfg.service.port}}
 metrics_port = {{cfg.service.metrics_port}}
 log_level = "{{cfg.log.level}}"
@@ -11,7 +7,7 @@ log_level = "{{cfg.log.level}}"
 [events]
 {{~#eachAlive bind.event-service.members as |events|}}
 {{~#if @last}}
-host = "{{events.sys.ip}}"
+host = "127.0.0.1"
 port = {{events.cfg.internal_messaging_port}}
 cluster_id = "{{events.cfg.cluster_id}}"
 {{~/if}}
@@ -26,7 +22,7 @@ max_idle_conns = {{cfg.storage.max_idle_conns}}
 [jobs]
 {{~#eachAlive bind.cereal-service.members as |cereal|}}
 {{~#if @last}}
-host = "{{cereal.sys.ip}}"
+host = "127.0.0.1"
 port = {{cereal.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}

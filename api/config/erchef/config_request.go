@@ -34,7 +34,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
 	c.V1.Sys.Network.Port = w.Int32(10203)
-	c.V1.Sys.Network.ListenIp = w.String("0.0.0.0")
+	c.V1.Sys.Network.ListenIp = w.String("127.0.0.1")
 
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.RotationMaxBytes = w.Int64(104857600)

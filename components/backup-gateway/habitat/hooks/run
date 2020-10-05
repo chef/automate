@@ -61,14 +61,14 @@ export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
 {{#if cfg.gateway.backup.s3.bucket.name~}}
 exec minio gateway s3 {{cfg.gateway.backup.s3.bucket.endpoint}} \
   --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --address "127.0.0.1:{{cfg.service.port}}" \
   --quiet
 
 {{else}}
   {{#if cfg.gateway.backup.gcs.bucket.name~}}
 exec minio gateway gcs "{{cfg.gateway.backup.gcs.bucket.project_id}}" \
   --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --address "127.0.0.1:{{cfg.service.port}}" \
   --quiet
   {{else}}
 
@@ -96,7 +96,7 @@ fi
 
 exec minio server \
   --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --address "127.0.0.1:{{cfg.service.port}}" \
   --quiet \
   "{{pkg.svc_data_path}}"
   {{/if ~}}  

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -325,12 +324,8 @@ func (s *server) backupGatewayLocationSpec() (backup.LocationSpecification, erro
 
 func (s *server) builderMinioLocationSpec() (backup.LocationSpecification, error) {
 	port := s.deployment.Config.GetMinio().GetV1().GetSys().GetService().GetPort().GetValue()
-	ips := s.target().IPs()
-	if len(ips) < 1 {
-		return nil, errors.New("no IP address known for target")
-	}
 	return backup.NewMinioLocationSpec(
-		fmt.Sprintf("https://%s:%d", ips[0].String(), port),
+		fmt.Sprintf("https://127.0.0.1:%d", port),
 		"depot",
 		"",
 		"minio",

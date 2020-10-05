@@ -23,6 +23,7 @@ func NewConfigRequest() *ConfigRequest {
 // DefaultConfigRequest returns a new ConfigRequest instance with default values.
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10104)
 	c.V1.Sys.Log.Level = w.String("error")
 

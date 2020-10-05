@@ -2,7 +2,7 @@
 
 # query dex health check endpoint
 output=$(curl --fail --cacert {{pkg.svc_config_path}}/root_ca.crt \
-  --resolve automate-dex:{{cfg.service.port}}:{{sys.ip}} \
+  --resolve automate-dex:{{cfg.service.port}}:127.0.0.1 \
   --noproxy automate-dex \
   https://automate-dex:{{cfg.service.port}}/dex/healthz 2>&1)
 res=$?

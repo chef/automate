@@ -24,7 +24,7 @@ message ConfigRequest {
 			Timeouts timeouts = 5;
 
 			message Service {
-				google.protobuf.StringValue host = 1;
+				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10145, protocol: "tcp" } ];
 				reserved 3;
 				chef.automate.infra.config.External.Postgresql external_postgresql = 4;

@@ -25,10 +25,10 @@ defmodule Notifications.Application do
     cred = GRPC.Credential.new(Notifications.Config.ssl_options)
 
     secrets_channel = create_secrets_channel()
-
+    {:ok, localhost} = :inet.parse_address('127.0.0.1')
     children = [
       supervisor(GRPC.Server.Supervisor,
-                 [{Notifications.Service, port, cred: cred}]),
+                 [{Notifications.Service, port, cred: cred, ip: localhost}]),
       worker(Notifications.Dispatcher, [{Notifications.Dispatcher, []}]),
       worker(Notifications.WebhookSender, [{Notifications.WebhookSender, []}]),
       worker(Notifications.Data.TimedCache, [{Notifications.Data.TimedCache, []}]),

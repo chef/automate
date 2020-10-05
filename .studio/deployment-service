@@ -173,7 +173,7 @@ function deployment_service_config {
   accept = true
 
 [service]
-  listen_address = "0.0.0.0"
+  listen_address = "127.0.0.1"
   port = 10160
 
 [log]

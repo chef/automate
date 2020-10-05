@@ -30,7 +30,7 @@ message ConfigRequest {
 			Logger logger = 9;
 
 			message Service {
-				google.protobuf.StringValue host = 1;
+				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10115, protocol: "https" } ];
 				google.protobuf.StringValue signin_url = 3;
 				google.protobuf.StringValue external_fqdn = 4;

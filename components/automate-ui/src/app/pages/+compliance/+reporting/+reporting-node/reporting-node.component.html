@@ -240,6 +240,12 @@
                           <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
                         </div>
                       </div>
+                      <!-- display message when there are no results -->
+                      <div class="result-item" *ngIf="control.results.length === 0">
+                        <div class="result-item-header">
+                          <p>No tests were executed</p>
+                        </div>
+                      </div>
                     </div>
                     <chef-snippet
                       class="source"

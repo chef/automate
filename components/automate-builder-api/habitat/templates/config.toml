@@ -9,7 +9,7 @@ build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 build_on_upload = true
 
 [http]
-listen = "{{cfg.conf.service.listen}}"
+listen = "127.0.0.1"
 port = {{cfg.conf.service.port}}
 
 [http.tls]
@@ -19,14 +19,14 @@ ca_cert_path = "{{svc_root_ca_path}}"
 
 [oauth]
 provider       = "chef-automate"
-token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
-userinfo_url   = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/userinfo"
+token_url      = "https://127.0.0.1:{{cfg.binds.session.cfg.port}}/token"
+userinfo_url   = "https://127.0.0.1:{{cfg.binds.session.cfg.port}}/userinfo"
 redirect_url   = "/bldr"
 client_id      = "automate-builder-api"
 client_secret  = "{{getSecret "bldr.auth_client_secret"}}"
 
 [s3]
-endpoint = "https://{{cfg.binds.minio.sys.ip}}:{{cfg.binds.minio.cfg.port}}"
+endpoint = "https://127.0.0.1:{{cfg.binds.minio.cfg.port}}"
 backend = "minio"
 key_id = "{{getSecret "minio.access_key"}}"
 secret_key = "{{getSecret "minio.secret_key"}}"
@@ -38,11 +38,7 @@ root = "{{svc_static_path}}"
 [memcache]
 ttl = {{cfg.conf.memcache.ttl}}
 [[memcache.hosts]]
-{{- if cfg.binds.memcache.sys.ip }}
-host = "{{cfg.binds.memcache.sys.ip}}"
-{{- else }}
-{{ fail "missing memcache ip" }}
-{{- end }}
+host = "127.0.0.1"
 {{- if cfg.binds.memcache.cfg.port }}
 port = {{cfg.binds.memcache.cfg.port}}
 {{- else }}

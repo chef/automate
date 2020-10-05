@@ -27,7 +27,7 @@ message ConfigRequest {
 			Backup backup = 6;
 
 			message Service {
-				google.protobuf.StringValue listen_address = 1;
+				google.protobuf.StringValue listen_address = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10160, protocol: "grpc" } ];
 			}
 

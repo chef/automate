@@ -5,15 +5,13 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from '../../../helpers/datetime/datetime';
-import { NgrxStateAtom } from '../../../ngrx.reducers';
-import { EntityStatus } from '../../../entities/entities';
-import { Manager } from '../../../entities/managers/manager.model';
-import {
-  automateManager, cloudManagers, managerStatus
-} from '../../../entities/managers/manager.selectors';
-import { DeleteManager } from '../../../entities/managers/manager.actions';
-import { routeParams } from '../../../route.selectors';
+import { DateTime } from 'app/helpers/datetime/datetime';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
+import { Manager } from 'app/entities/managers/manager.model';
+import { automateManager, cloudManagers, managerStatus } from 'app/entities/managers/manager.selectors';
+import { DeleteManager } from 'app/entities/managers/manager.actions';
+import { routeParams } from 'app/route.selectors';
 
 @Component({
   selector: 'app-integrations',
@@ -24,6 +22,8 @@ export class IntegrationsListComponent {
   public managers$: Observable<Manager[]>;
   public managerStatus$: Observable<EntityStatus>;
   public automateManager$: Observable<Manager>;
+  public deletePromptVisible = false;
+  public managerIdForDeletion = '';
   private sort: string;
   private order: string;
 
@@ -48,10 +48,21 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete($event: MatOptionSelectionChange, id: string) {
+  resetModal(): void {
+    this.managerIdForDeletion = '';
+    this.deletePromptVisible = false;
+  }
+
+  beginDelete($event: MatOptionSelectionChange, id: string): void {
     if ($event.isUserInput) {
-      this.store.dispatch(new DeleteManager({id}));
+      this.managerIdForDeletion = id;
+      this.deletePromptVisible = true;
     }
+  }
+
+  handleDelete(): void {
+    this.store.dispatch(new DeleteManager({ id: this.managerIdForDeletion }));
+    this.resetModal();
   }
 
   handleEdit(id) {

@@ -13,6 +13,7 @@ map(select(
          # The checker wants your certs to be valid for less than 398 days. We
          # don't think this rule is valuable for the internal A2 CA
          (.id != "cert_validityPeriod" or .port == "443" ) and
+         (.id != "cert_extlifeSpan" or .port == "443") and
 
          # TODO notifications-service
          (.port != "10125") and
@@ -22,6 +23,7 @@ map(select(
          (.id != "cert_caIssuers" or .port != "443") and        # Test uses self-signed cert
          (.id != "cert_chain_of_trust" or .port != "443") and   # Test uses self-signed cert
          (.id != "cert_validityPeriod" or .port != "443") and   # Test uses self-signed cert
+         (.id != "cert_extlifeSpan" or .port != "443") and      # Test uses self-signed cert
 
          # automate-builder-memcache doesn't allow us to set server cipher order
          (.id != "cipher_order" or .port != "10102") and
