@@ -70,6 +70,7 @@ message ConfigRequest {
 			Ldap ldap = 2;
 			Saml saml = 3;
 			Msad_Ldap msad_ldap = 4;
+			google.protobuf.BoolValue disable_local_users = 5;
 		}
 
 		message Google {
