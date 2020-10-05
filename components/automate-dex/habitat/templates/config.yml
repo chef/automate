@@ -3,7 +3,9 @@ issuer: https://{{cfg.service.external_fqdn}}/dex
 {{- else}}
 issuer: http://localhost:{{cfg.service.port}}/dex
 {{- end}}
+{{- if not cfg.connectors.disable_local_users}}
 enablePasswordDB: true
+{{- end}}
 storage:
   type: postgres
   config:
