@@ -1,4 +1,4 @@
-<div class="content-container" [ngClass]="loading(loadedStatus$ | async) ? 'lock-scrolling' : ''">
+<div class="content-container" [ngStyle]="height" [ngClass]="loading(loadedStatus$ | async) ? 'lock-scrolling' : ''">
   <div class="container">
 
     <div class="sticky-notifications">
