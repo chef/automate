@@ -12,7 +12,11 @@ steps:
         docker:
           image: returntocorp/semgrep:latest
           entrypoint: semgrep
-          command: ["--error", "--config", "/go/src/github.com/chef/automate/semgrep" ]
+          command: [
+            "--error",
+            "--config", "/go/src/github.com/chef/automate/semgrep",
+            "/go/src/github.com/chef/automate"
+          ]
 
   #
   # A2 protobufs - Detect if there is any component that has protobuf files that hasn't been compiled
