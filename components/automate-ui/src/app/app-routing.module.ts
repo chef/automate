@@ -165,8 +165,9 @@ const routes: Routes = [
         },
         {
           path: 'node-credentials',
-          loadChildren: () => import('./pages/+compliance/+credentials/credentials.module')
-            .then(m => m.CredentialsModule)
+          loadChildren: () =>
+            import('./pages/+compliance/+node-credentials/node-credentials.module')
+              .then(m => m.NodeCredentialsModule)
         },
         {
           path: 'notifications',
