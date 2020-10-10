@@ -13,7 +13,7 @@ import { Notification } from 'app/entities/notifications/notification.model';
 })
 export class LicenseNotificationsComponent implements OnDestroy {
   @Output() triggerApplyLicense = new EventEmitter<LicenseApplyReason>();
-  private isDestroyed$: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   notifications: Notification[];
 
@@ -23,7 +23,7 @@ export class LicenseNotificationsComponent implements OnDestroy {
   ) {
     this.licenseFacade.notifications$
       .pipe(
-        takeUntil(this.isDestroyed$),
+        takeUntil(this.isDestroyed),
         distinctUntilChanged()
       ).subscribe(notifications => {
       this.notifications = notifications.filter((n) => n.type === 'license');
@@ -32,8 +32,8 @@ export class LicenseNotificationsComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.isDestroyed$.next(true);
-    this.isDestroyed$.complete();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   handleNotificationDismissal(id: string): void {

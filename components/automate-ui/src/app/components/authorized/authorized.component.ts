@@ -79,7 +79,6 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.cdr.detach();
     this.subscription.unsubscribe();
-    this.authorizedChecker.destroy();
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }

@@ -1,0 +1,116 @@
+rules:
+
+  - id: naming-for-isDestroyed
+    pattern: this.isDestroyed$.complete()
+    message: "'isDestroyed$' should be 'isDestroyed'"
+    languages: [ts]
+    severity: ERROR
+
+
+  - id: isDestroyed-needs-argument
+    pattern: this.isDestroyed.next()
+    message: must have a `true` argument
+    fix: this.isDestroyed.next(true)
+    languages: [ts]
+    severity: ERROR
+
+
+  - id: isDestroyed-used-but-not-triggered
+    patterns:
+    - pattern: $OBSERVABLE.pipe(...,takeUntil(this.isDestroyed),...).subscribe(...)
+    - pattern-inside: |
+        class $CLASS {
+          ...
+        }
+    - pattern-not-inside: |
+        class $CLASS {
+          ...
+          ngOnDestroy() {
+            ...
+          }
+          ...
+        }
+    message: isDestroyed never triggered from ngOnDestroy
+    languages: [ts]
+    severity: ERROR
+
+
+  - id: isDestroyed-triggered-but-not-used
+    patterns:
+    - pattern: this.isDestroyed.next(true);
+    - pattern-inside: |
+        class $CLASS {
+          ...
+        }
+    - pattern-not-inside: |
+        class $CLASS {
+          ...
+          $FUNC(...) {
+            ...
+            $OBSERVABLE.pipe(...,takeUntil(this.isDestroyed),...).subscribe(...);
+            ...
+          }
+          ...
+        }
+    message: isDestroyed never used with takeUntil()
+    metadata: {
+      falseNegative: will not catch multiple subscriptions with takeUntil missing on some
+      }
+    languages: [ts]
+    severity: ERROR
+
+
+  - id: ngOnDestroy-missing-next
+    patterns:
+    - pattern: |
+        class $CLASS {
+          ...
+          ngOnDestroy() {
+            ...
+            this.isDestroyed.complete(...);
+            ...
+          }
+        ...
+        }
+    - pattern-not: |
+        class $CLASS {
+          ...
+          ngOnDestroy() {
+            ...
+            this.isDestroyed.next(...);
+            this.isDestroyed.complete(...);
+            ...
+          }
+          ...
+        }
+    message: ngOnDestroy missing this.isDestroyed.next()
+    languages: [ts]
+    severity: ERROR
+
+
+  - id: ngOnDestroy-missing-complete
+    patterns:
+    - pattern: |
+        class $CLASS {
+          ...
+          ngOnDestroy() {
+            ...
+            this.isDestroyed.next(...);
+            ...
+          }
+        ...
+        }
+    - pattern-not: |
+        class $CLASS {
+          ...
+          ngOnDestroy() {
+            ...
+            this.isDestroyed.next(...);
+            this.isDestroyed.complete(...);
+            ...
+          }
+          ...
+        }
+    message: ngOnDestroy missing this.isDestroyed.complete()
+    languages: [ts]
+    severity: ERROR
