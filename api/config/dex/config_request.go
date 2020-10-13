@@ -41,8 +41,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10117)
 
-	c.V1.Sys.Expiry.IdTokens = w.String("3m")
-
 	c.V1.Sys.Bootstrap.InsecureAdmin = w.Bool(false)
 
 	c.V1.Sys.Log.Level = w.String("info")
@@ -168,6 +166,15 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 
 	// default name_id_policy_format (SAML)
 	c.V1.Sys.GetConnectors().GetSaml().setNameIDPolicyDefault()
+
+	if c.V1.Sys.GetExpiry().GetIdTokens() == nil {
+		// Different defaults when SAML is or isn't used
+		if c.V1.Sys.GetConnectors().GetSaml() != nil {
+			c.V1.Sys.Expiry.IdTokens = w.String("24h")
+		} else {
+			c.V1.Sys.Expiry.IdTokens = w.String("3m")
+		}
+	}
 
 	return c.V1.Sys, nil
 }
