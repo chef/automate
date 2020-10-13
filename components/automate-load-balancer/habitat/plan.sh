@@ -1,10 +1,14 @@
 pkg_name=automate-load-balancer
 pkg_origin=chef
-pkg_version=0.1.0
+pkg_version="0.1.0"
 pkg_description="internal and external load balancer and reverse proxy for Automate 2.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
-nginx_version=1.19.2
+nginx_version="1.19.2"
+headers_more_version="0.33"
+headers_more_filename="headers-more-nginx-module-${headers_more_version}.tar.gz"
+headers_more_source="https://github.com/openresty/headers-more-nginx-module/archive/v${headers_more_version}.tar.gz"
+headers_more_shasum=7c1f7bb13e79433ee930c597d272a64bc6e30c356a48524f38fd34fa88d62473
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
 pkg_dirname="nginx-${nginx_version}"
 pkg_upstream_url="https://www.chef.io/automate"
@@ -49,6 +53,15 @@ pkg_binds_optional=(
   [automate-builder-api-proxy]="port"
 )
 
+do_download() {
+  do_default_download
+  pushd "${HAB_CACHE_SRC_PATH}" || return 1
+  download_file "${headers_more_source}" "${headers_more_filename}" "${headers_more_shasum}"
+
+  tar zxvf ${headers_more_filename}
+  popd || return 1
+}
+
 do_build() {
   ./configure \
     --prefix="${pkg_prefix}" \
@@ -85,7 +98,8 @@ do_build() {
     --with-http_sub_module \
     --with-http_slice_module \
     --with-cc-opt="${CFLAGS}" \
-    --with-ld-opt="${LDFLAGS}"
+    --with-ld-opt="${LDFLAGS}" \
+    --add-module=${HAB_CACHE_SRC_PATH}/headers-more-nginx-module-${headers_more_version}
 
   make
 }
