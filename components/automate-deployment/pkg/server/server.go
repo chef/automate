@@ -744,7 +744,7 @@ func (s *server) ConfigureDeployment(ctx context.Context,
 	}
 
 	deploymentStatus := s.deployment.Status()
-	configSHA1 := sha1.Sum([]byte(overrideConfig.String()))
+	configSHA1 := sha1.Sum([]byte(overrideConfig.String())) // nosem
 
 	logrus.WithFields(logrus.Fields{
 		"config_sha1": fmt.Sprintf("%x", configSHA1),
