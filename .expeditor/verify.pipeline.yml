@@ -61,7 +61,7 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: ":semgrep: Semgrep"
+  - label: ":semgrep: Custom"
     expeditor:
       executor:
         docker:
@@ -70,6 +70,23 @@ steps:
           command: [
             "--error",
             "--config", "/go/src/github.com/chef/automate/semgrep",
+            "/go/src/github.com/chef/automate"
+          ]
+
+  - label: ":semgrep: Published"
+    expeditor:
+      executor:
+        docker:
+          image: returntocorp/semgrep:latest
+          entrypoint: semgrep
+          command: [
+            "--error",
+            "--exclude", "third_party",
+            "--exclude", "*_test.go",
+            "--exclude", "*.pb.go",
+            "--exclude", "*.spec.ts",
+            "--timeout", "120",
+            "--config", "https://semgrep.dev/p/r2c-ci",
             "/go/src/github.com/chef/automate"
           ]
 
