@@ -242,8 +242,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   downloadFailed = false;
   downloadStatusVisible = false;
 
-  scrolling = false;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -384,9 +382,9 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   }
 
   // prevent scrolling on tabs change
-  get height() {
+  get height(): { [cssClass: string]: string; }  {
     return {
-      'min-height': this.scrolling ? 'calc(100vh - 50px)' : 'calc(100vh - 49px)'
+      'min-height': 'calc(100vh - 49px)'
     };
   }
 
