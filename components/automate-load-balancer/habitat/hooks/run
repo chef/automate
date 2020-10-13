@@ -5,4 +5,4 @@ exec 2>&1
 
 source {{pkg.svc_config_path}}/render-certs.sh
 
-exec {{pkgPathFor "core/nginx"}}/bin/nginx -c {{pkg.svc_config_path}}/nginx.conf
+exec nginx -c {{pkg.svc_config_path}}/nginx.conf
