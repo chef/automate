@@ -35,10 +35,10 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Grpc.Host = w.String("0.0.0.0")
+	c.V1.Sys.Grpc.Host = w.String("127.0.0.1")
 	c.V1.Sys.Grpc.Port = w.Int32(10116)
 
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10117)
 
 	c.V1.Sys.Expiry.IdTokens = w.String("3m")
@@ -55,6 +55,12 @@ func (c *ConfigRequest) Validate() error {
 	cfgErr := shared.NewInvalidConfigError()
 
 	if conn := c.V1.Sys.Connectors; conn != nil {
+		// can only disable local users if one of the others is set
+		if conn.GetDisableLocalUsers().GetValue() == true &&
+			conn.MsadLdap == nil && conn.Ldap == nil && conn.Saml == nil {
+			cfgErr.AddInvalidValue("dex.v1.sys.connectors",
+				"disable_local_users can only be set if another connector is configured [ldap, msad_ldap, saml]")
+		}
 		// we can only have one connector: ldap, saml, or msad_ldap
 		if conn.MsadLdap != nil && conn.Ldap != nil {
 			cfgErr.AddInvalidValue("dex.v1.sys.connectors",

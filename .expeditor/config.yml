@@ -46,9 +46,6 @@ pipelines:
       definition: .expeditor/deploy.pipeline.yml
       env:
         - CHANNEL: acceptance
-  - deploy/automate-chef-io:
-      description: Deploy automate.chef.io
-      definition: .expeditor/deploy_automate_chef_io.pipeline.yml
   - deploy/ui-library:
       description: Deploy ui-library.cd.chef.co
       definition: .expeditor/deploy_ui_library.pipeline.yml
@@ -81,7 +78,6 @@ subscriptions:
     - bash:.expeditor/announce-acceptance.sh:
         post_commit: true
     - trigger_pipeline:deploy/acceptance
-    - trigger_pipeline:deploy/automate-chef-io
   # acceptance -> current promotion
   - workload: project_promoted:{{agent_id}}:acceptance:*
     actions:
@@ -95,7 +91,6 @@ subscriptions:
         post_commit: true
     - bash:.expeditor/push-git-tag.sh:
         post_commit: true
-    - trigger_pipeline:deploy/automate-chef-io
 
   # These actions are taken, in order they are specified, anytime a Pull Request is merged.
   - workload: staged_workload_released:chef/automate:master:post_merge:*
@@ -148,8 +143,6 @@ subscriptions:
           post_commit: true
       - trigger_pipeline:deploy/dev:
           post_commit: true
-      - trigger_pipeline:deploy/automate-chef-io:
-          post_commit: true
   # Update our compliance-profile pinnings when new profiles are released
   - workload: hab_package_published:unstable:chef/automate-compliance-profiles/*
     actions:
@@ -170,10 +163,6 @@ subscriptions:
     actions:
       - trigger_pipeline:nightly
       - trigger_pipeline:test-license-usage/dev
-  # When a new verification image is released, update the pinning
-  - workload: docker_image_published:chefes/buildkite:*
-    actions:
-      - bash:.expeditor/update_docker_image_version_in_verify_pipeline.sh
   - workload: schedule_triggered:{{agent_id}}:cleanup_abandoned_a2_instances:*
     actions:
       - bash:.expeditor/cleanup-abandoned-a2-instances.sh

@@ -86,10 +86,46 @@ XoB1V6vwQXRubclyH8Ei2+1j
 SAML
 }
 
+resource "null_resource" "soften_mounts" {
+  depends_on = ["module.chef_baseline"]
+
+  triggers = {
+    always_do = "${uuid()}"
+  }
+
+  connection {
+    type        = "ssh"
+    host        = "${element(var.instance_fqdn, count.index)}"
+    user        = "${var.ssh_username}"
+    private_key = "${data.aws_s3_bucket_object.aws_private_key.body}"
+    script_path = "/home/${var.ssh_username}/run_soften_mounts.sh"
+  }
+
+  provisioner "file" {
+    destination = "/home/${var.ssh_username}/soften_mounts.sh"
+
+    content = <<EOF
+#!/bin/sh
+if findmnt -n -o OPTIONS /tmp | grep noexec; then
+   echo "/tmp mounted with noexec, remounting"
+   mount -o remount,exec /tmp
+fi
+exit 0
+EOF
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hardened_security} && sudo /bin/sh /home/${var.ssh_username}/soften_mounts.sh",
+      "exit 0",
+    ]
+  }
+}
+
 resource "null_resource" "chef_automate_cli_deploy" {
   count = "${var.instance_count}"
 
-  depends_on = ["module.chef_baseline"]
+  depends_on = ["null_resource.soften_mounts"]
 
   triggers = {
     always_do = "${uuid()}"

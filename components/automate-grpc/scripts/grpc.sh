@@ -15,7 +15,7 @@ source "${BASH_SOURCE%/*}/bootstrap_protoc.sh"
 pushd lib
 
 printf 'GEN: %s\n' lib/grpc/debug/debug_api/*.proto
-protoc -I /src/components -I /src/lib --go_out=plugins=grpc,paths=source_relative:/src/lib \
+protoc -I /src/components -I /src/lib  -I /src/api --go_out=plugins=grpc,paths=source_relative:/src/lib \
   --policy_out=logtostderr=true,paths=source_relative:/src/lib \
   grpc/debug/debug_api/*.proto
 
@@ -24,7 +24,7 @@ popd
 pushd components
 
 printf 'GEN: %s\n' components/automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
-protoc -I /src/components -I /src/lib --go_out=logtostderr=true,paths=source_relative:/src/components \
+protoc -I /src/components -I /src/lib  -I /src/api --go_out=paths=source_relative:/src/components \
   automate-grpc/protoc-gen-a2-config/api/a2conf/*.proto
 
 popd

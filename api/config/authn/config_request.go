@@ -28,12 +28,12 @@ func NewConfigRequest() *ConfigRequest {
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10113)
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
 
-	c.V1.Sys.Http1.Host = w.String("0.0.0.0")
+	c.V1.Sys.Http1.Host = w.String("127.0.0.1")
 	c.V1.Sys.Http1.Port = w.Int32(10162)
 
 	return c

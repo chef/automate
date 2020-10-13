@@ -10,15 +10,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/iam/v2/pairs"
+	"github.com/chef/automate/api/external/iam/v2/policy"
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 type client struct {
-	client authz.AuthorizationClient
+	client authz.AuthorizationServiceClient
 }
 
 // Handle takes care of authorization in the gRPC middleware
@@ -147,6 +147,6 @@ func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, i
 	return respPairs, nil
 }
 
-func AuthorizationHandler(cl authz.AuthorizationClient) middleware.AuthorizationHandler {
+func AuthorizationHandler(cl authz.AuthorizationServiceClient) middleware.AuthorizationHandler {
 	return &client{client: cl}
 }

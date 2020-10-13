@@ -1,5 +1,5 @@
 ---
-grpc: {{ cfg.service.host }}:{{ cfg.service.port }}
+grpc: 127.0.0.1:{{ cfg.service.port }}
 log-level: {{ cfg.log.level }}
 log-format: {{ cfg.log.format }}
 
@@ -14,12 +14,12 @@ data-migrations-path: {{ pkg.path }}/data-migrations
 
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
 {{~#if @last}}
-authz-address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
+authz-address: 127.0.0.1:{{authz-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
-cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
+cereal-address: 127.0.0.1:{{cereal-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}

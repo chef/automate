@@ -11,6 +11,7 @@ import { routeParams } from 'app/route.selectors';
 import { HttpStatus } from 'app/types/types';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
+import { AuthorizedChecker } from 'app/helpers/auth/authorized';
 import { EntityStatus } from 'app/entities/entities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
@@ -51,7 +52,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
+  public authorizedChecker: AuthorizedChecker;
 
   // Whether the edit ID form is open or not.
   public modifyID = false;
@@ -83,6 +85,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         type: ['', Validators.required],
         conditions: this.fb.array(this.populateConditions())
       });
+      this.authorizedChecker = new AuthorizedChecker(this.store);
     }
 
   ngOnInit(): void {
@@ -111,13 +114,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         id: rule_id,
         project_id
       }));
-    });
+   });
 
     this.store.select(projectFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(project => {
       this.project = project;
+      this.authorizedChecker.setPermissions([
+        {
+          endpoint: '/apis/iam/v2/projects/{project_id}/rules/{id}',
+          paramList: [project.id, 'rule-any'], // specific rule is irrelevant
+          verb: 'put'
+        }
+      ], []);
     });
 
     this.store.select(ruleFromRoute).pipe(

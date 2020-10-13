@@ -1,6 +1,7 @@
 <section class="cookbooks">
   <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
-  <ng-container  *ngIf="!cookbooksListLoading">
+  <app-empty-state *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
     <chef-table>
       <chef-thead>
         <chef-tr>

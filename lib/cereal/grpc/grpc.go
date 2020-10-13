@@ -23,10 +23,10 @@ var errUnknownMessage = errors.New("Unknown message received")
 
 type GrpcBackend struct {
 	domain string
-	client grpccereal.CerealClient
+	client grpccereal.CerealServiceClient
 }
 
-func NewGrpcBackend(domain string, client grpccereal.CerealClient) *GrpcBackend {
+func NewGrpcBackend(domain string, client grpccereal.CerealServiceClient) *GrpcBackend {
 	return &GrpcBackend{
 		domain: domain,
 		client: client,
@@ -35,7 +35,7 @@ func NewGrpcBackend(domain string, client grpccereal.CerealClient) *GrpcBackend 
 func NewGrpcBackendFromConn(domain string, conn *grpc.ClientConn) *GrpcBackend {
 	return &GrpcBackend{
 		domain: domain,
-		client: grpccereal.NewCerealClient(conn),
+		client: grpccereal.NewCerealServiceClient(conn),
 	}
 }
 
@@ -65,7 +65,7 @@ func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *cereal.Work
 }
 
 type workflowCompleter struct {
-	s      grpccereal.Cereal_DequeueWorkflowClient
+	s      grpccereal.CerealService_DequeueWorkflowClient
 	tasks  []*grpccereal.Task
 	cancel context.CancelFunc
 }
@@ -274,7 +274,7 @@ func (g *GrpcBackend) KillWorkflow(ctx context.Context, instanceName string, wor
 }
 
 type taskCompleter struct {
-	s        grpccereal.Cereal_DequeueTaskClient
+	s        grpccereal.CerealService_DequeueTaskClient
 	ctx      context.Context
 	doneChan chan error
 }

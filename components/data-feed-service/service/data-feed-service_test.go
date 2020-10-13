@@ -40,6 +40,7 @@ var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}
 var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
 var mockConfig = &config.DataFeedConfig{}
 var acceptedStatusCodes []int32 = []int32{200, 201, 202, 203, 204}
+var mockCredentials = NewBasicAuthCredentials("user", "pass")
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +50,7 @@ func TestAssetCreated(t *testing.T) {
 
 	client := ts.Client()
 	dataClient := DataClient{client: *client, acceptedStatusCodes: acceptedStatusCodes}
-	notification := datafeedNotification{url: ts.URL}
+	notification := datafeedNotification{credentials: mockCredentials, url: ts.URL}
 	err := send(dataClient, notification)
 	if err != nil {
 		t.Errorf("error got: %s, want nil", err)
@@ -64,7 +65,7 @@ func TestSendError(t *testing.T) {
 
 	client := ts.Client()
 	dataClient := DataClient{client: *client}
-	notification := datafeedNotification{url: ts.URL}
+	notification := datafeedNotification{credentials: mockCredentials, url: ts.URL}
 	err := send(dataClient, notification)
 	if err == nil {
 		t.Error("error got: nil, wanted an error")
@@ -131,7 +132,7 @@ func TestGetHostAttributes(t *testing.T) {
 func TestGetNodeAttributesMissing(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetAttributes(
 		context.Background(),
 		gomock.Any(),
@@ -152,7 +153,7 @@ func TestGetNodeAttributes(t *testing.T) {
 	nodeAttributes := getAttributeResponse(automaticAttrs)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetAttributes(
 		context.Background(),
 		gomock.Any(),
@@ -172,7 +173,7 @@ func TestGetNodeAttributes(t *testing.T) {
 func TestGetNodeAttributesError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetAttributes(
 		context.Background(),
 		gomock.Any(),
@@ -195,7 +196,7 @@ func TestGetNodeAttributesError(t *testing.T) {
 func TestGetNodeFieldsEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -228,7 +229,7 @@ func TestGetNodeFields(t *testing.T) {
 	node := &structpb.Struct{Fields: fields}
 	values := []*structpb.Value{&structpb.Value{Kind: &structpb.Value_StructValue{StructValue: node}}}
 	nodeResponse := &structpb.ListValue{Values: values}
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -252,7 +253,7 @@ func TestGetNodeFields(t *testing.T) {
 func TestGetNodeFieldsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -276,7 +277,7 @@ func TestGetNodeFieldsError(t *testing.T) {
 func TestGetNodeHostFieldsEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -308,7 +309,7 @@ func TestGetNodeHostFieldsEmpty(t *testing.T) {
 func TestGetNodeHostFieldsNodeError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -336,7 +337,7 @@ func TestGetNodeHostFieldsNodeError(t *testing.T) {
 func TestGetNodeHostFieldsAttrError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -547,7 +548,7 @@ func TestAddDataContentNotWindowsEmpty(t *testing.T) {
 func TestGetNodeDataEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -602,7 +603,7 @@ func TestGetNodeDataEmpty(t *testing.T) {
 func TestGetNodeDataFieldsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -622,7 +623,7 @@ func TestGetNodeDataFieldsError(t *testing.T) {
 func TestGetNodeDataAttrsError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -646,7 +647,7 @@ func TestGetNodeDataAttrsError(t *testing.T) {
 func TestGetNodeDataRunError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -675,7 +676,7 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 	defer ctrl.Finish()
 	nodeAttributes := getAttributeResponse(automaticAttrs)
 	run := getNodeRun()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -689,7 +690,8 @@ func TestGetNodeDataNotWindows(t *testing.T) {
 		gomock.Any(),
 	).Return(run, nil)
 	aggTask := &DataFeedAggregateTask{cfgMgmt: mockCfgMgmtClient, externalFqdn: externalFqdn}
-	nodeData, err := aggTask.getNodeData(context.Background(), []string{})
+	filters := []string{"ipaddress:" + ipAttr}
+	nodeData, err := aggTask.safeGetNodeData(context.Background(), filters)
 	if nodeData["attributes"] == nil {
 		t.Log("expected attributes, got nil")
 		t.Fail()
@@ -733,7 +735,7 @@ func TestGetNodeDataWindows(t *testing.T) {
 	defer ctrl.Finish()
 	nodeAttributes := getAttributeResponse(automaticAttrsWin)
 	run := getNodeRun()
-	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cfgmgmt.NewMockCfgMgmtServiceClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetNodes(
 		context.Background(),
 		gomock.Any(),
@@ -892,22 +894,19 @@ func verifyEmptyMap(m map[string]interface{}, k string, t *testing.T) {
 
 func getAttributeResponse(automaticAttributes string) *cfgmgmtResponse.NodeAttribute {
 	nodeAttributes := &cfgmgmtResponse.NodeAttribute{
-		NodeId:               attrNodeId,
-		Name:                 attrNodeName,
-		RunList:              attrRunList,
-		ChefEnvironment:      attrChefEnv,
-		Normal:               mockAttrString,
-		Default:              mockAttrString,
-		Override:             mockAttrString,
-		NormalValueCount:     1,
-		DefaultValueCount:    2,
-		OverrideValueCount:   3,
-		AllValueCount:        10,
-		Automatic:            automaticAttributes,
-		AutomaticValueCount:  4,
-		XXX_NoUnkeyedLiteral: struct{}{},
-		XXX_unrecognized:     nil,
-		XXX_sizecache:        0,
+		NodeId:              attrNodeId,
+		Name:                attrNodeName,
+		RunList:             attrRunList,
+		ChefEnvironment:     attrChefEnv,
+		Normal:              mockAttrString,
+		Default:             mockAttrString,
+		Override:            mockAttrString,
+		NormalValueCount:    1,
+		DefaultValueCount:   2,
+		OverrideValueCount:  3,
+		AllValueCount:       10,
+		Automatic:           automaticAttributes,
+		AutomaticValueCount: 4,
 	}
 	return nodeAttributes
 }
@@ -962,9 +961,6 @@ func getNodeRun() *cfgmgmtResponse.Run {
 		KernelVersion:         "",
 		KernelRelease:         "",
 		CloudProvider:         "",
-		XXX_NoUnkeyedLiteral:  struct{}{},
-		XXX_unrecognized:      nil,
-		XXX_sizecache:         0,
 	}
 	return run
 }

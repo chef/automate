@@ -63,8 +63,8 @@ func ReadHealthCheckCredentials(c *config.EventGatewayConfig) (string, error) {
 }
 
 type automateAuthenticator struct {
-	authnClient      authn.AuthenticationClient
-	authzClient      authz.AuthorizationClient
+	authnClient      authn.AuthenticationServiceClient
+	authzClient      authz.AuthorizationServiceClient
 	healthCheckToken string
 }
 
@@ -93,8 +93,8 @@ func newAutomateAuthenticator(c *config.EventGatewayConfig) (*automateAuthentica
 	}
 
 	return &automateAuthenticator{
-		authnClient:      authn.NewAuthenticationClient(authnConn),
-		authzClient:      authz.NewAuthorizationClient(authzConn),
+		authnClient:      authn.NewAuthenticationServiceClient(authnConn),
+		authzClient:      authz.NewAuthorizationServiceClient(authzConn),
 		healthCheckToken: healthCheckToken,
 	}, nil
 }

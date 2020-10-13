@@ -24,7 +24,7 @@ var (
 )
 
 type DataFeedPollTask struct {
-	cfgMgmt           cfgmgmt.CfgMgmtClient
+	cfgMgmt           cfgmgmt.CfgMgmtServiceClient
 	reporting         reporting.ReportingServiceClient
 	db                *dao.DB
 	disableCIDRFilter bool
@@ -58,7 +58,7 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grp
 		return nil, err
 	}
 	return &DataFeedPollTask{
-		cfgMgmt:           cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		cfgMgmt:           cfgmgmt.NewCfgMgmtServiceClient(cfgMgmtConn),
 		reporting:         reporting.NewReportingServiceClient(complianceConn),
 		db:                db,
 		disableCIDRFilter: dataFeedConfig.ServiceConfig.DisableCIDRFilter,
@@ -191,7 +191,7 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 		Start:    feedStartString,
 		End:      feedEndString,
 		Sorting: &cfgmgmtRequest.Sorting{
-			Order: cfgmgmtRequest.Order_desc,
+			Order: cfgmgmtRequest.Order_DESC,
 		},
 	}
 
@@ -275,19 +275,18 @@ func (d *DataFeedPollTask) listReports(ctx context.Context, pageSize int32, feed
 	for page <= pages {
 		log.Debugf("report query %v", query)
 		for report := range reports.Reports {
-			ipaddress := reports.Reports[report].Ipaddress
-			log.Debugf("report has ipaddress %v", ipaddress)
-			if _, ok := nodeIDs[ipaddress]; ok {
+			resourceId := resolveResourceId(reports.Reports[report])
+			if _, ok := nodeIDs[resourceId]; ok {
 				// We must have a client run in the interval for the node with this ip
-				log.Debugf("node data already exists for %v", ipaddress)
-				nodeID := nodeIDs[ipaddress]
+				log.Debugf("node data already exists for %v", resourceId)
+				nodeID := nodeIDs[resourceId]
 				// set the NodeId.ComplianceID for this ip to the report ID
 				nodeID.ComplianceID = reports.Reports[report].Id
-				nodeIDs[ipaddress] = nodeID
+				nodeIDs[resourceId] = nodeID
 			} else {
-				// ipaddress not in the mao so we add a new map entry with the report ID as ComplianceID
-				nodeIDs[ipaddress] = NodeIDs{ComplianceID: reports.Reports[report].Id}
-				log.Debugf("nodeID added %v", nodeIDs[ipaddress])
+				// key not in the map, so we add a new map entry with the report ID as ComplianceID
+				nodeIDs[resourceId] = NodeIDs{ComplianceID: reports.Reports[report].Id}
+				log.Debugf("nodeID added %v", nodeIDs[resourceId])
 			}
 		}
 		page++
@@ -300,4 +299,13 @@ func (d *DataFeedPollTask) listReports(ctx context.Context, pageSize int32, feed
 			log.Errorf("Error getting reporting/ListReports %v", err)
 		}
 	}
+}
+
+func resolveResourceId(report *reporting.Report) string {
+	resourceId := report.Ipaddress
+	log.Debugf("report has ipaddress %v", resourceId)
+	if resourceId == "" {
+		resourceId = report.NodeId
+	}
+	return resourceId
 }

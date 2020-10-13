@@ -3,7 +3,7 @@
 if ! output=$(curl --fail --head \
   --cacert {{pkg.svc_config_path}}/root_ca.crt \
   --noproxy automate-ui \
-  --resolve automate-ui:{{cfg.service.port}}:{{sys.ip}} \
+  --resolve automate-ui:{{cfg.service.port}}:127.0.0.1 \
   --max-time 2 \
   https://automate-ui:{{cfg.service.port}} 2>&1); then
   echo "health check curl command returned exit code $?:"

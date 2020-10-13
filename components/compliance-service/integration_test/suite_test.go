@@ -37,7 +37,7 @@ type Suite struct {
 	elasticClient          *elastic.Client
 	ingesticESClient       *ingestic.ESClient
 	ComplianceIngestServer *server.ComplianceIngestServer
-	ProjectsClientMock     *authz.MockProjectsClient
+	ProjectsClientMock     *authz.MockProjectsServiceClient
 	NodeManagerMock        *NodeManagerMock
 	NotifierMock           *NotifierMock
 	EventServiceClientMock *event.MockEventServiceClient
@@ -64,7 +64,7 @@ func NewGlobalSuite() *Suite {
 	s.ingesticESClient = ingestic.NewESClient(esclient)
 	s.ingesticESClient.InitializeStore(context.Background())
 
-	s.ProjectsClientMock = authz.NewMockProjectsClient(gomock.NewController(nil))
+	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(nil))
 	s.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&authz.ListRulesForAllProjectsResp{}, nil)
 	s.NodeManagerMock = &NodeManagerMock{}
@@ -97,7 +97,7 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.ingesticESClient = ingestic.NewESClient(esclient)
 	s.ingesticESClient.InitializeStore(context.Background())
 
-	s.ProjectsClientMock = authz.NewMockProjectsClient(gomock.NewController(t))
+	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))

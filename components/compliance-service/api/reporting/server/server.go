@@ -12,11 +12,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
@@ -113,7 +113,12 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.SuggestionRequest) (*reporting.Suggestions, error) {
 	var suggestions reporting.Suggestions
 	if in.Size == 0 {
-		in.Size = 100
+		if strings.HasPrefix(in.Type, "control") {
+			//for control or control_tag_key or control_tag_value, we only want 10 back by default
+			in.Size = 10
+		} else {
+			in.Size = 100
+		}
 	}
 	if in.Type == "" {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("Parameter 'type' not specified"))

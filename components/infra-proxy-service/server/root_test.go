@@ -15,7 +15,7 @@ import (
 func TestVersion(t *testing.T) {
 	ctx := context.Background()
 	_, _, conn, close, _, _ := test.SetupInfraProxyService(ctx, t)
-	cl := infra_proxy.NewInfraProxyClient(conn)
+	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 
 	defer close()
 

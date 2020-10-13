@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { Observable, Subject } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { takeUntil, map } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NotificationRule, ServiceActionType } from 'app/entities/notification_rules/notification_rule.model';
-import { SortDirection } from 'app/types/types';
-import { RulesService } from 'app/services/rules/rules.service';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { SortDirection } from '../../types/types';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import {
- allRules
+  allRules
 } from 'app/entities/notification_rules/notification_rule.selectors';
 import {
-  GetNotificationRules
+  GetNotificationRules,
+  DeleteNotificationRule
 } from 'app/entities/notification_rules/notification_rule.action';
 
 export interface FieldDirection {
@@ -23,12 +23,19 @@ export interface FieldDirection {
   webhook_url: SortDirection;
 }
 
+enum UrlTestState {
+  Inactive,
+  Loading,
+  Success,
+  Failure
+}
+
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   rules$: Observable<NotificationRule[]>;
   errorLoading = false;
   currentPage = 1;
@@ -39,13 +46,18 @@ export class NotificationsComponent implements OnInit {
   permissionDenied = false; // not currently used
   // This is exposed here to allow the component HTML access to ServiceActionType
   serviceActionType = ServiceActionType;
+
   public notificationToDelete: NotificationRule;
   public deleteModalVisible = false;
+  public hookStatus = UrlTestState.Inactive;
+  public notificationObj = new NotificationRule('', '', null, '', null, '', false);
+  private isDestroyed = new Subject<boolean>();
+
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private service: RulesService,
     private telemetryService: TelemetryService
   ) {
     this.rules$ = store.pipe(select(allRules));
@@ -54,7 +66,10 @@ export class NotificationsComponent implements OnInit {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetNotificationRules());
-    this.rules$.subscribe(rules => {
+
+    this.rules$.pipe(
+      takeUntil(this.isDestroyed))
+      .subscribe(rules => {
         this.sendCountToTelemetry(rules);
       },
       error => {
@@ -68,6 +83,15 @@ export class NotificationsComponent implements OnInit {
 
     this.resetSortDir();
     this.toggleSort('name');
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  public openCreateModal(): void {
+    this.openNotificationModal.emit();
   }
 
   toggleSort(field: string) {
@@ -114,9 +138,7 @@ export class NotificationsComponent implements OnInit {
 
   public deleteNotification(): void {
     this.closeDeleteModal();
-    this.service.deleteRule(this.notificationToDelete).subscribe(_res => {
-      this.refreshRules();
-    });
+    this.store.dispatch(new DeleteNotificationRule(this.notificationToDelete));
   }
 
   public closeDeleteModal(): void {
@@ -187,18 +209,6 @@ export class NotificationsComponent implements OnInit {
       });
 
     this.telemetryService.track('notificationRuleCount', ruleCount);
-  }
-
-  // TODO - this was common in all three uses, but I'm not sure this is the best
-  // way to do it - do we really need to refresh after the server confirms the action
-  // successful? Seem it should be possible to update the local model with the
-  // changes and have that trigger view updates?
-  refreshRules() {
-    this.rules$ = this.service.fetchRules();
-    this.rules$.subscribe(rules => {
-      this.sendCountToTelemetry(rules);
-      this.updateSort(this.sortField, this.sortDir[this.sortField]);
-    });
   }
 
 }

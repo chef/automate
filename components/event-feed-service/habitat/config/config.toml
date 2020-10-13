@@ -1,9 +1,5 @@
 [service]
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{~else}}
-host = "{{sys.ip}}"
-{{~/if}}
+host = "127.0.0.1"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
 
@@ -22,7 +18,7 @@ url = "http://127.0.0.1:{{member.cfg.http-port}}"
 [elasticsearch_sidecar]
 {{~#eachAlive bind.es-sidecar-service.members as |member|}}
 {{~#if @last}}
-address = "{{member.sys.ip}}:{{member.cfg.port}}"
+address = "127.0.0.1:{{member.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
@@ -36,13 +32,13 @@ default_purge_after_days = 7
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |member|}}
 {{~#if @last}}
-address = "{{member.sys.ip}}:{{member.cfg.port}}"
+address = "127.0.0.1:{{member.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
 [authz]
 {{~#eachAlive bind.authz-service.members as |member|}}
 {{~#if @last}}
-address = "{{member.sys.ip}}:{{member.cfg.port}}"
+address = "127.0.0.1:{{member.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}

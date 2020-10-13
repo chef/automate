@@ -1,7 +1,6 @@
 import { Params, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import * as router from '@ngrx/router-store';
 import { set, get, pipe, map } from 'lodash/fp';
-import * as credentials from './pages/+compliance/+credentials/credentials.state';
 import * as destinationEntity from './entities/destinations/destination.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
@@ -16,6 +15,7 @@ import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
+import * as credential from './entities/credentials/credential.reducer';
 import * as dataBagsEntity from './entities/data-bags/data-bags.reducer';
 import * as dataBagDetailsEntity from './entities/data-bags/data-bag-details.reducer';
 import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
@@ -27,16 +27,16 @@ import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-detai
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
-import * as license from './entities/license/license.reducer';
 import * as layout from './entities/layout/layout.reducer';
-import * as notificationEntity from './entities/notifications/notification.reducer';
-import * as credential from './entities/credentials/credential.reducer';
+import * as license from './entities/license/license.reducer';
 import * as jobAdd from './pages/job-add/job-add.reducer';
 import * as jobEdit from './pages/job-edit/job-edit.reducer';
 import * as jobEntity from './entities/jobs/job.reducer';
 import * as jobList from './pages/job-list/job-list.reducer';
 import * as manager from './entities/managers/manager.reducer';
+import * as notificationEntity from './entities/notifications/notification.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
+import * as orgEntity from './entities/orgs/org.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
@@ -45,9 +45,11 @@ import * as projectEntity from './entities/projects/project.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
-import * as orgEntity from './entities/orgs/org.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as nodesEntity from './entities/nodes/nodes.reducer';
+import * as nodeCredentialEntity from './entities/node-credentials/node-credential.reducer';
+import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-credential-details.reducer';
+import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
@@ -55,7 +57,6 @@ import * as userSelfEntity from './entities/users/userself.reducer';
 // AOT likely won't allow dynamic object property names here even when the underlying
 // typescript bug preventing it is fixed
 export interface NgrxStateAtom {
-  credentials: credentials.CredentialsState;
   event_feed: eventFeed.EventFeedState;
   router: RouterReducerState;
   scanner: scanner.ScannerState;
@@ -69,6 +70,7 @@ export interface NgrxStateAtom {
   job_add: jobAdd.JobAddState;
   job_edit: jobEdit.JobEditState;
   job_list: jobList.JobListState;
+  nodeCredential_list: nodeCredentialList.NodeCredentialListState;
 
   // Entities
   adminKey: adminKeyEntity.AdminKeyEntityState;
@@ -81,9 +83,12 @@ export interface NgrxStateAtom {
   clientDetail: clientDetailsEntity.ClientDetailsEntityState;
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityState;
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityState;
+  // Named credentialEntity until we refactor the credentials page
+  credentialEntity: credential.CredentialState;
   dataBags: dataBagsEntity.DataBagsEntityState;
   dataBagDetails: dataBagDetailsEntity.DataBagDetailsEntityState;
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
+  desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
@@ -95,6 +100,7 @@ export interface NgrxStateAtom {
   nodes: nodesEntity.NodesEntityState;
   notifications: notificationEntity.NotificationEntityState;
   notificationRules: NotificationRuleEntity.NotificationRuleEntityState;
+  orgs: orgEntity.OrgEntityState;
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
   profiles: profileEntity.ProfileEntityState;
@@ -102,15 +108,13 @@ export interface NgrxStateAtom {
   roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
   servers: serverEntity.ServerEntityState;
-  orgs: orgEntity.OrgEntityState;
+  nodeCredential: nodeCredentialEntity.NodeCredentialEntityState;
+  nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialDetailsEntityState;
   serviceGroups: serviceGroups.ServiceGroupsEntityState;
   teams: teamEntity.TeamEntityState;
-  desktops: desktopEntity.DesktopEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
   userSelf: userSelfEntity.UserSelfEntityState;
-  // Named credentialEntity until we refactor the credentials page
-  credentialEntity: credential.CredentialState;
 }
 
 export interface RouterReducerState {
@@ -181,7 +185,6 @@ export function routerReducer(state = defaultRouterState, action) {
 // it needs to mirror the ngrxReducers.
 export const defaultInitialState = {
   router: defaultRouterState,
-  credentials: credentials.initialState,
   event_feed: eventFeed.initialState,
   scanner: scanner.initialState,
   layout: layout.InitialState,
@@ -194,6 +197,8 @@ export const defaultInitialState = {
   job_add: jobAdd.JobAddInitialState,
   job_edit: jobEdit.JobEditInitialState,
   job_list: jobList.JobListInitialState,
+  nodeCredential_list: nodeCredentialList.NodeCredentialListInitialState,
+
 
   // Entities
   adminKey: adminKeyEntity.AdminKeyEntityInitialState,
@@ -226,6 +231,8 @@ export const defaultInitialState = {
   projects: projectEntity.ProjectEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
+  nodeCredential: nodeCredentialEntity.NodeCredentialEntityInitialState,
+  nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
   orgs: orgEntity.OrgEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
@@ -238,7 +245,6 @@ export const defaultInitialState = {
 
 export const ngrxReducers = {
   // AOT doesn't like dynamic object property names here
-  credentials: credentials.credentialsReducer,
   scanner: scanner.scannerReducer,
   router: routerReducer,
   event_feed: eventFeed.eventFeedReducer,
@@ -252,6 +258,8 @@ export const ngrxReducers = {
   integrations_add: integrationsAdd.integrationsAddReducer,
   integrations_detail: integrationsDetail.integrationsDetailReducer,
   integrations_edit: integrationsEdit.integrationsEditReducer,
+  nodeCredential_list: nodeCredentialList.nodeCredentialListReducer,
+
 
   // Entities
   adminKey: adminKeyEntity.adminKeyEntityReducer,
@@ -287,6 +295,8 @@ export const ngrxReducers = {
   rules: ruleEntity.ruleEntityReducer,
   servers: serverEntity.serverEntityReducer,
   orgs: orgEntity.orgEntityReducer,
+  nodeCredential: nodeCredentialEntity.nodeCredentialEntityReducer,
+  nodeCredentialDetails: nodeCredentialDetailsEntity.nodeCredentialDetailsEntityReducer,
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
   desktops: desktopEntity.desktopEntityReducer,

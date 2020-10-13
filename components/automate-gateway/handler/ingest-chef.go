@@ -17,12 +17,12 @@ import (
 )
 
 type ChefIngestServer struct {
-	ingesterClient ingest.ChefIngesterClient
+	ingesterClient ingest.ChefIngesterServiceClient
 	notifierClient notifier.Notifier
 	automateURL    string
 }
 
-func NewChefIngestServer(automateUrl *url.URL, ingesterClient ingest.ChefIngesterClient, notifierClient notifier.Notifier) *ChefIngestServer {
+func NewChefIngestServer(automateUrl *url.URL, ingesterClient ingest.ChefIngesterServiceClient, notifierClient notifier.Notifier) *ChefIngestServer {
 	return &ChefIngestServer{
 		ingesterClient: ingesterClient,
 		notifierClient: notifierClient,

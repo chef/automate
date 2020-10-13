@@ -19,6 +19,7 @@ export interface ServiceGroupsEntityState {
   selectedGroup: SelectedServiceGroup;
   status: EntityStatus;
   suggestions: ServiceGroupsSuggestions;
+  serviceDeletionStatus: EntityStatus;
 }
 
 export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
@@ -59,7 +60,8 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
   suggestions: {
     values: [],
     status: EntityStatus.notLoaded
-  }
+  },
+  serviceDeletionStatus: EntityStatus.notLoaded
 };
 
 export function serviceGroupsEntityReducer(
@@ -137,6 +139,15 @@ export function serviceGroupsEntityReducer(
         set('suggestions.values', []),
         set('suggestions.status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as ServiceGroupsEntityState;
+
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID:
+      return set('serviceDeletionStatus', EntityStatus.loading, state);
+
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS:
+      return set('serviceDeletionStatus', EntityStatus.loadingSuccess, state);
+
+    case ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE:
+      return set('serviceDeletionStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;

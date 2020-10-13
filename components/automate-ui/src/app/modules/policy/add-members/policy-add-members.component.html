@@ -77,7 +77,7 @@
                   {{ nameOrId }} may contain a single wildcard or a {{ nameOrId }} without colons or wildcards.
                 </chef-error>
                 <chef-error *ngIf="!ldapOrSaml && expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
-                  {{ nameOrId }} may contain text and hyphens or a wildcard but not both.
+                  {{ nameOrId }} may contain text, hyphens and underscores, or may be a single wildcard.
                 </chef-error>
               </chef-form-field>
 

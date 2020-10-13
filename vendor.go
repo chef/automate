@@ -16,6 +16,9 @@ import (
 	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger"
 	_ "github.com/kevinburke/go-bindata/go-bindata"
 	_ "golang.org/x/perf/cmd/benchstat"
+	_ "github.com/bufbuild/buf/cmd/buf"
+	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-check-breaking"
+	_ "github.com/bufbuild/buf/cmd/protoc-gen-buf-check-lint"
 )
 
 func main() {}

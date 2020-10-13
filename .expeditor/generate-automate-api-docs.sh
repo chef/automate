@@ -2,20 +2,19 @@
 
 set -eou pipefail
 
-mkdir -p /go/src/github.com/chef
-ln -s /workspace /go/src/github.com/chef/automate
-
 branch="expeditor/generate-automate-api-docs"
-git checkout -b "$branch"
+git checkout -B "$branch"
 
-pushd /go/src/github.com/chef/automate/components/automate-chef-io
+git submodule update --init --recursive
+
+pushd components/docs-chef-io
   make sync_swagger_files
   make generate_swagger
 popd
 
 if [[ $(git status --porcelain) ]]; then
-  git add components/automate-chef-io/data/docs/api_chef_automate
-  git add components/automate-chef-io/static/api-docs/all-apis.swagger.json
+  git add components/docs-chef-io/data/automate/api_chef_automate
+  git add components/docs-chef-io/static/automate-api-docs/all-apis.swagger.json
 
   git commit --message "Sync swagger files for Automate docs." --message "This pull request was triggered automatically via Expeditor." --message "This change falls under the obvious fix policy so no Developer Certificate of Origin (DCO) sign-off is required."
 

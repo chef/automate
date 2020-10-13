@@ -67,7 +67,7 @@ type displayNode struct {
 // VersionedCookbooks
 
 // NodeExport streams a json or csv export
-func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.CfgMgmt_NodeExportServer) error {
+func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.CfgMgmtService_NodeExportServer) error {
 	var sendResult exportHandler
 	switch request.OutputType {
 	case "", "json":
@@ -155,7 +155,7 @@ func (s *CfgMgmtServer) nodePager(ctx context.Context, sortField string, sortAsc
 	}
 }
 
-func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
+func jsonExport(stream service.CfgMgmtService_NodeExportServer) exportHandler {
 	initialRun := true
 	return func(nodes []backend.Node) error {
 		// If this is the first set of nodes to export, prepend "[" to start a JSON document.
@@ -213,7 +213,7 @@ func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
 	}
 }
 
-func csvExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
+func csvExport(stream service.CfgMgmtService_NodeExportServer) exportHandler {
 	initialRun := true
 	return func(data []backend.Node) error {
 		res, err := nodesToCSV(data)

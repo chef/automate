@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -349,6 +350,20 @@ func TestIndexDatesNonLeapYear(t *testing.T) {
 			"%[1]s2015.08*,%[1]s2015.09*,%[1]s2015.10*,%[1]s2015.11*,%[1]s2015.12*,%[1]s2015.02.21*,%[1]s2015.02.22*,"+
 			"%[1]s2015.02.23*,%[1]s2015.02.24*,%[1]s2015.02.25*,%[1]s2015.02.26*,%[1]s2015.02.27*,%[1]s2015.02.28*,"+
 			"%[1]s2016.01*,%[1]s2016.02*,%[1]s2016.03.01*,%[1]s2016.03.02*", relaxting.CompDailySumIndexPrefix),
+			esIndex)
+	}
+}
+
+func TestIndexDatesSingleFullYearRightUpToFinal59Seconds(t *testing.T) {
+	// Let debug logs show up when running tests
+	logrus.SetLevel(logrus.DebugLevel)
+	startTime := "2018-01-01T00:00:00Z"
+	endTime := "2018-12-31T23:59:59Z"
+	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, fmt.Sprintf("%[1]s2018.01*,%[1]s2018.02*,%[1]s2018.03*,%[1]s2018.04*,%[1]s2018.05*,"+
+			"%[1]s2018.06*,%[1]s2018.07*,%[1]s2018.08*,%[1]s2018.09*,%[1]s2018.10*,%[1]s2018.11*,%[1]s2018.12*", relaxting.CompDailySumIndexPrefix),
 			esIndex)
 	}
 }

@@ -4,7 +4,7 @@ syntax = "proto3";
 package chef.automate.domain.deployment;
 option go_package = "github.com/chef/automate/api/interservice/deployment";
 
-service CertificateAuthority {
+service CertificateAuthorityService {
 	rpc GetRootCert(RootCertRequest) returns (RootCertResponse);
 	rpc RegenerateRoot(RegenerateRootRequest) returns (RegenerateRootResponse);
 }

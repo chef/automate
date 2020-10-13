@@ -24,7 +24,7 @@ func NewConfigRequest() *ConfigRequest {
 // DefaultConfigRequest returns a new instance of ConfigRequest with default values.
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
-	c.V1.Sys.Service.Host = w.String("0.0.0.0")
+	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10124)
 	// do not default the OptOut field because it is need to be blank for migration
 	// c.V1.Sys.Telemetry.OptOut = w.Bool(true)

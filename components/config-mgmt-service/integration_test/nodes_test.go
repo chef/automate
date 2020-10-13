@@ -130,7 +130,7 @@ func TestNodesWithSorting(t *testing.T) {
 		})
 
 	// Sorting DESC by name
-	req.Sorting.Order = request.Order_desc
+	req.Sorting.Order = request.Order_DESC
 
 	t.Run(fmt.Sprintf("with sorting '%v' should sort the nodes DESC", req.Sorting),
 		func(t *testing.T) {
@@ -4048,7 +4048,7 @@ func TestNodesWithTableDriven(t *testing.T) {
 			request.Nodes{
 				Sorting: &request.Sorting{
 					Field: "name",
-					Order: request.Order_asc,
+					Order: request.Order_ASC,
 				},
 				Pagination: &request.Pagination{Size: int32(index)},
 			},
@@ -4057,7 +4057,7 @@ func TestNodesWithTableDriven(t *testing.T) {
 			request.Nodes{
 				Sorting: &request.Sorting{
 					Field: "name",
-					Order: request.Order_desc,
+					Order: request.Order_DESC,
 				},
 				Pagination: &request.Pagination{Size: int32(index)},
 			},
@@ -4067,7 +4067,7 @@ func TestNodesWithTableDriven(t *testing.T) {
 				Filter: []string{"status:success"},
 				Sorting: &request.Sorting{
 					Field: "name",
-					Order: request.Order_desc,
+					Order: request.Order_DESC,
 				},
 				Pagination: &request.Pagination{Size: int32(index)},
 			},

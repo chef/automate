@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package chef.automate.api.event_feed.request;
+option go_package = "github.com/chef/automate/api/external/event_feed/request";
+
+message GetEventStringBucketsRequest {
+    // Earliest events to return.
+    string start = 1;
+    // Latest events to return.
+    string end = 2;
+    // User timezone to apply to request.
+    string timezone = 3;
+    // Interval for returned results, for example: 1 hour buckets.
+    int32 hours_between = 4;
+    // Filters to be applied to the request.
+    repeated string filter = 5;
+}
+

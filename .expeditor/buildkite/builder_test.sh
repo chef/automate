@@ -13,7 +13,7 @@ do
   test_bldr_url="https://$instance/bldr/v1"
 
   echo "--- Logging Into Builder"
-  test_token="$(go run -mod=vendor ./tools/builder-scaffolding login --url "$test_bldr_url" \
+  test_token="$(go run ./tools/builder-scaffolding login --url "$test_bldr_url" \
       --user admin --password chefautomate)"
 
   test_origin="testorigin-${RANDOM}${RANDOM}"

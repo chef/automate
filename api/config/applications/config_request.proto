@@ -25,7 +25,7 @@ message ConfigRequest {
 			Storage storage = 5;
 
 			message Service {
-				google.protobuf.StringValue host = 1;
+				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10133, protocol: "grpc" } ];
 				google.protobuf.Int32Value metrics_port = 3 [ (chef.automate.api.port) = { name: "prometheus", default: 20133, protocol: "http" } ];
 				reserved 4;

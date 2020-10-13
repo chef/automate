@@ -1,24 +1,384 @@
+################################################################################
+# Protocol Buffers Linter Configuration
+################################################################################
+#
+# This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
+# use `lint_all_protobuf_components` in the habitat studio.
+#
+# ## References:
+# 
+# - Style Guide: https://buf.build/docs/style-guide/
+# - Docs for individual checkers: https://buf.build/docs/lint-checkers
+# - Config docs: https://buf.build/docs/lint-configuration
+#
+# ## Rationale For Exceptions
+#
+# We've adopted linting for protobufs for the same reason we have it for other
+# kinds of code: avoid dangerous legal constructions, encourage consistent
+# style, etc.
+#
+# This linter was adopted only after Automate was a mature product with
+# compatibility constraints. Automate uses protocol buffers to generate the
+# external REST API along with gRPC client and server code, the configuration
+# data structures exposed to end users, &etc. Thus, some portions of the
+# protocol buffer codebase are constrained to remain compatible:
+# - At the protobuf message level
+# - At the JSON representation level
+# - At the JSON generation/consumption level (e.g., golang struct tags)
+# - At the generated code level
+# To maintain compatibility at all of these layers, we must keep some of the
+# protobuf code as-is, in violation of the style guide. This applies broadly to
+# all of the pre-existing code in api/external, some API code in
+# components/automate-gateway, the configuration protobufs, and a handful of
+# special cases. Unless noted otherwise, the style guide exceptions configured
+# here are intended only to cover older code. Follow the style guide whenever
+# you can do so without breaking things.
+
 build:
   roots:
     - api
     - components
     - lib
-    - vendor/github.com/googleapis/googleapis
-    - vendor/github.com/grpc-ecosystem/grpc-gateway
-    - vendor/github.com/envoyproxy/protoc-gen-validate
+    - protovendor/github.com/googleapis/googleapis
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway
+    - protovendor/github.com/envoyproxy/protoc-gen-validate
   excludes:
     - components/notifications-service/
     - components/automate-grpc/protoc-gen-policy/testdata
-    - vendor/github.com/googleapis/googleapis/google/api/expr
-    - vendor/github.com/googleapis/googleapis/google/api/servicecontrol
-    - vendor/github.com/googleapis/googleapis/google/api/servicemanagement
-    - vendor/github.com/envoyproxy/protoc-gen-validate/license
-    - vendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+    - protovendor/github.com/googleapis/googleapis/google/api/expr
+    - protovendor/github.com/googleapis/googleapis/google/api/servicecontrol
+    - protovendor/github.com/googleapis/googleapis/google/api/servicemanagement
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/license
+    - protovendor/github.com/envoyproxy/protoc-gen-validate/java/
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party
+    - protovendor/github.com/grpc-ecosystem/grpc-gateway/runtime/internal/examplepb
 lint:
+  allow_comment_ignores: true
   use:
     - DEFAULT
   except:
-    - PACKAGE_VERSION_SUFFIX # we can adopt this with .v2 if we should need that
+    # This linter requires your proto package names to end with .v1 or similar. 
+    # Adopting this for existing code would break anyone using our protos
+    - PACKAGE_VERSION_SUFFIX 
+    # buf wants you to use a file hierarchy that matches your proto package
+    # names, but this is difficult and probably breaking to adopt now
+    - PACKAGE_SAME_DIRECTORY 
+    - PACKAGE_DIRECTORY_MATCH
+  ignore_only:
+    SERVICE_SUFFIX:
+      # The automate-cli accesses the `Deployment` service directly; making
+      # changes to it makes the CLI unable to install older versions of
+      # Automate, which is breaking.
+      - interservice/deployment/automate_deployment.proto
+      # The automate-cli diagnostics accesses the `Purge` service directly; making
+      # changes to it makes upgrade tests fail. This is less breaking, but hard
+      # to change.
+      - interservice/data_lifecycle/purge.proto
+      # /api/
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/data_lifecycle/data_lifecycle.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    RPC_REQUEST_STANDARD_NAME:
+      # /api/
+      - external/applications/applications.proto
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment interservice is exposed to automate-cli, we treat it like an external API
+      - interservice/deployment/automate_deployment.proto
+      # These interservice protos could be changed but the churn is very large:
+      - interservice/authn/tokens.proto
+      - interservice/authz/authz.proto
+      - interservice/authz/policy.proto
+      - interservice/authz/project.proto
+      - interservice/cds/service/cds.proto
+      - interservice/cfgmgmt/service/cfgmgmt.proto
+      - interservice/compliance/ingest/ingest/compliance.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/reporting/reporting.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/compliance/version/version.proto
+      - interservice/deployment/certificate_authority.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/event_feed/event_feed.proto
+      - interservice/infra_proxy/service/infra_proxy.proto
+      - interservice/ingest/automate_event.proto
+      - interservice/ingest/chef.proto
+      - interservice/ingest/job_scheduler.proto
+      - interservice/ingest/status.proto
+      - interservice/local_user/users.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      - interservice/teams/teams.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      # /api/
+      - external/applications/applications.proto
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment interservice is exposed to automate-cli, we treat it like an external API
+      - interservice/deployment/automate_deployment.proto
+      # These interservice protos could be changed but the churn is very large:
+      - interservice/authn/tokens.proto
+      - interservice/authz/authz.proto
+      - interservice/authz/policy.proto
+      - interservice/authz/project.proto
+      - interservice/cds/service/cds.proto
+      - interservice/cfgmgmt/service/cfgmgmt.proto
+      - interservice/compliance/ingest/ingest/compliance.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/reporting/reporting.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/compliance/version/version.proto
+      - interservice/deployment/certificate_authority.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/event_feed/event_feed.proto
+      - interservice/infra_proxy/service/infra_proxy.proto
+      - interservice/ingest/automate_event.proto
+      - interservice/ingest/chef.proto
+      - interservice/ingest/job_scheduler.proto
+      - interservice/ingest/status.proto
+      - interservice/local_user/users.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      - interservice/teams/teams.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      # /api/
+      - external/applications/applications.proto
+      - external/cds/cds.proto
+      - external/cfgmgmt/cfgmgmt.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/data_feed/data_feed.proto
+      - external/iam/v2/introspect.proto
+      - external/iam/v2/policy.proto
+      - external/iam/v2/rules.proto
+      - external/iam/v2/teams.proto
+      - external/iam/v2/tokens.proto
+      - external/iam/v2/users.proto
+      - external/infra_proxy/infra_proxy.proto
+      - external/ingest/chef.proto
+      - external/ingest/job_scheduler.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment interservice is exposed to automate-cli, we treat it like an external API
+      - interservice/deployment/automate_deployment.proto
+      # These interservice protos could be changed but the churn is very large:
+      - interservice/authn/tokens.proto
+      - interservice/authz/authz.proto
+      - interservice/authz/policy.proto
+      - interservice/authz/project.proto
+      - interservice/cds/service/cds.proto
+      - interservice/cfgmgmt/service/cfgmgmt.proto
+      - interservice/compliance/ingest/ingest/compliance.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/reporting/reporting.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/compliance/version/version.proto
+      - interservice/deployment/certificate_authority.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/event_feed/event_feed.proto
+      - interservice/infra_proxy/service/infra_proxy.proto
+      - interservice/ingest/automate_event.proto
+      - interservice/ingest/chef.proto
+      - interservice/ingest/job_scheduler.proto
+      - interservice/ingest/status.proto
+      - interservice/local_user/users.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      - interservice/teams/teams.proto
+      # /components/
+      - automate-gateway/api/deployment/deployment.proto
+      - automate-gateway/api/event_feed/event_feed.proto
+      - automate-gateway/api/gateway/gateway.proto
+      - automate-gateway/api/legacy/legacy.proto
+      - automate-gateway/api/license/license.proto
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-gateway/api/telemetry/telemetry.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    PACKAGE_SAME_GO_PACKAGE:
+      # /api/
+      - external/iam/v2
+      - config
+      - interservice/authz
+      - interservice/authn
+      - interservice/cereal
+      - interservice/deployment
+      - interservice/es_sidecar
+      - interservice/ingest
+      - interservice/license_control
+      - interservice/local_user
+      - interservice/pg_sidecar
+      - interservice/teams
+      # /components/
+      - automate-gateway/api/gateway
+      - automate-grpc/protoc-gen-a2-config/api/a2conf
+    FIELD_LOWER_SNAKE_CASE:
+      - external/infra_proxy/response/policyfiles.proto
+      # /component/
+      - automate-gateway/api/notifications/notifications.proto
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+    ENUM_VALUE_UPPER_SNAKE_CASE:
+      - automate-gateway/api/notifications/notifications.proto
+    ENUM_VALUE_PREFIX:
+      # /api/
+      - external/applications/applications.proto
+      - external/common/query/parameters.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/iam/v2/common/policy.proto
+      - external/iam/v2/common/rules.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment interservice is exposed to automate-cli, we treat it like an external API
+      - interservice/deployment/automate_deployment.proto
+      # Used to parse external JSON:
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/reporting/reporting.proto
+      # The following interservice proto APIs could (should?) be updated to
+      # follow the style guide, but the churn impact is large.
+      - interservice/authz/policy.proto
+      - interservice/authz/project.proto
+      - interservice/authz/type.proto
+      - interservice/cfgmgmt/request/parameters.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      # /components/
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+      - automate-gateway/api/notifications/notifications.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      # /api/
+      - external/applications/applications.proto
+      - external/common/query/parameters.proto
+      - external/compliance/profiles/profiles.proto
+      - external/compliance/reporting/reporting.proto
+      - external/compliance/reporting/stats/stats.proto
+      - external/compliance/scanner/jobs/jobs.proto
+      - external/iam/v2/common/policy.proto
+      - external/iam/v2/common/rules.proto
+      - external/nodes/manager/manager.proto
+      - external/nodes/nodes.proto
+      - external/secrets/secrets.proto
+      # deployment protos are used by the CLI and can't be changed
+      - interservice/authz/policy.proto
+      # compliance protos used to parse external JSON:
+      - interservice/compliance/jobs/jobs.proto
+      - interservice/compliance/profiles/profiles.proto
+      - interservice/compliance/reporting/reporting.proto
+      # These could be changed
+      - interservice/authz/project.proto
+      - interservice/authz/type.proto
+      - interservice/cfgmgmt/request/parameters.proto
+      - interservice/compliance/stats/stats.proto
+      - interservice/compliance/status/status.proto
+      - interservice/deployment/automate_deployment.proto
+      - interservice/es_sidecar/service.proto
+      - interservice/nodemanager/manager/manager.proto
+      - interservice/nodemanager/nodes/nodes.proto
+      - interservice/pg_sidecar/service.proto
+      # /components/
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
+      - automate-gateway/api/notifications/notifications.proto
+      # /lib/
+      - grpc/debug/debug_api/debug.proto
+    MESSAGE_PASCAL_CASE:
+      - config/dex/config_request.proto
+    PACKAGE_DEFINED:
+      - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
   ignore:
     - protoc-gen-swagger # grpc gateway
     - internal # grpc gateway
@@ -26,6 +386,15 @@ lint:
     - google # googleapis
     - validate # envoyproxy/protoc-gen-validate
     - gogoproto # envoyproxy/protoc-gen-validate
+    - external/habitat/event.proto # this file is owned by habitat and copied here
 breaking:
   use:
-    - WIRE_JSON
+    - PACKAGE
+  ignore:
+    # Changes to interservice APIs are okay until (if ever) we support clusters
+    # of interconnected internal services that would not upgrade in unison
+    - interservice
+    # If you NEED to make just one change to something else and have consensus
+    # it's the best/least bad option, you can add it here and remove it in a
+    # later PR:
+    # - external/oops/oops.proto

@@ -3,7 +3,7 @@
 
 package jobs
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Create", "compliance:scanner:jobs", "compliance:scannerJobs:create", "POST", "/api/v0/compliance/scanner/jobs", func(unexpandedResource string, input interface{}) string {

@@ -24,7 +24,7 @@
       <span *ngIf="resource.delta && resource.delta.length" class="link" (click)="toggleDelta()">
         <span>diff</span><chef-icon>expand_{{ showDelta === true ? 'more' : 'less' }}</chef-icon>
       </span>
-      <span *ngIf="resource.status === 'failed'" class="link" (click)="showModal()">
+      <span *ngIf="resource.status === 'failed'" class="link" (click)="showModal(resource.id)">
         <span>error log</span>
       </span>
       <span *ngIf="(!resource.delta || resource.delta.length === 0) && resource.status !== 'failed'"

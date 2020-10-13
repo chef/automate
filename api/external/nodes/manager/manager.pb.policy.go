@@ -3,7 +3,7 @@
 
 package manager
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.nodes.manager.v1.NodeManagerService/Create", "infra:nodeManagers", "infra:nodeManagers:create", "POST", "/api/v0/nodemanagers", func(unexpandedResource string, input interface{}) string {

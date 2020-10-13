@@ -1,10 +1,10 @@
-grpc = "{{cfg.service.host}}:{{cfg.service.port}}"
+grpc = "127.0.0.1:{{cfg.service.port}}"
 log-format = "{{cfg.log.format}}"
 log-level = "{{cfg.log.level}}"
 database = "{{cfg.storage.database}}"
 migrations-path = "{{pkg.path}}/migrations"
-authz-address = "{{cfg.authz.host}}:{{cfg.authz.port}}"
-secrets-address = "{{cfg.secrets.host}}:{{cfg.secrets.port}}"
+authz-address = "127.0.0.1:{{cfg.authz.port}}"
+secrets-address = "127.0.0.1:{{cfg.secrets.port}}"
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"

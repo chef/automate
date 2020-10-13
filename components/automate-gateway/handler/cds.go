@@ -13,11 +13,11 @@ import (
 
 // CdsServer stores inter-service automate-cds client
 type CdsServer struct {
-	client inter_service.AutomateCdsClient
+	client inter_service.AutomateCdsServiceClient
 }
 
 // NewCdsServer initializes CdsServer with client
-func NewCdsServer(client inter_service.AutomateCdsClient) *CdsServer {
+func NewCdsServer(client inter_service.AutomateCdsServiceClient) *CdsServer {
 	return &CdsServer{client}
 }
 

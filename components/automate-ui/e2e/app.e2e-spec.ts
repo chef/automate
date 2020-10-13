@@ -31,17 +31,16 @@ xdescribe('Welcome Modal', () => {
     browser.waitForAngularEnabled(false);
     browser.get('/');
 
-    // This test is temporarily disabled until automate.chef.io/docs is live
-    // element(by.css('.help-link')).click().then(function () {
-    //   browser.getAllWindowHandles().then(function (handles) {
-    //     browser.switchTo().window(handles[handles.length - 1]).then(function () {
-    //         expect(browser.getCurrentUrl()).toEqual('https://automate.chef.io/docs');
-    //     });
+    element(by.css('.help-link')).click().then(function () {
+      browser.getAllWindowHandles().then(function (handles) {
+        browser.switchTo().window(handles[handles.length - 1]).then(function () {
+            expect(browser.getCurrentUrl()).toEqual('https://docs.chef.io/automate');
+        });
 
-    //     // switch back to the main window
-    //     browser.switchTo().window(handles[0]);
-    //   });
-    // });
+        // switch back to the main window
+        browser.switchTo().window(handles[0]);
+      });
+    });
 
     element(by.css('.teach-link')).click().then(function () {
       browser.getAllWindowHandles().then(function (handles) {

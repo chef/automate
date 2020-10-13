@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -20,12 +20,15 @@ import {
   styleUrls: ['./data-bags-list.component.scss']
 })
 
-export class DataBagsListComponent implements OnInit {
+export class DataBagsListComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
+  @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  private isDestroyed = new Subject<boolean>();
   public dataBags: DataBags[];
   public dataBagsListLoading = true;
+  public authFailure = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -42,12 +45,24 @@ export class DataBagsListComponent implements OnInit {
     combineLatest([
       this.store.select(getAllDatabagsForOrgStatus),
       this.store.select(allDataBags)
-    ]).pipe(
-      filter(([getDataBagsSt, allDataBagsState]) =>
-      getDataBagsSt === EntityStatus.loadingSuccess && !isNil(allDataBagsState))
-    ).subscribe(([ _getDataBagsSt, allDataBagsState]) => {
-      this.dataBags = allDataBagsState;
-      this.dataBagsListLoading = false;
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([ getDataBagsSt, allDataBagsState]) => {
+      if (getDataBagsSt === EntityStatus.loadingSuccess && !isNil(allDataBagsState)) {
+        this.dataBags = allDataBagsState;
+        this.dataBagsListLoading = false;
+      } else if (getDataBagsSt === EntityStatus.loadingFailure) {
+        this.dataBagsListLoading = false;
+        this.authFailure = true;
+      }
     });
+  }
+
+  resetKeyTabRedirection(resetLink: boolean) {
+    this.resetKeyRedirection.emit(resetLink);
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

@@ -104,8 +104,7 @@ fixup_testssl() {
 
 write_host_file() {
     HOSTFILE=$(mktemp)
-    IP=$(hab pkg exec core/curl curl -v http://localhost:9631/services/deployment-service/default | hab pkg exec core/jq-static jq -r .sys.ip)
     # temporarily remove port 10120 from list until it is a running service
-    chef-automate dev ports list | awk "/https|grpc/ { print \"$IP:\" \$3 }" > "$HOSTFILE"
+    chef-automate dev ports list | awk "/https|grpc/ { print \"127.0.0.1:\" \$3 }" > "$HOSTFILE"
     echo "$HOSTFILE"
 }

@@ -11,6 +11,7 @@ install_automate() {
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
         --upgrade-strategy "$test_upgrade_strategy" \
+        --manifest-dir "$test_manifest_path" \
         --product automate \
         --product builder \
         --accept-terms-and-mlsa \

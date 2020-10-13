@@ -12,6 +12,10 @@ services can use in their run-scripts for common tasks:
   service and return an exit code compatible with Habitat's
   health_check hook.
 
-- secrets-helper: A tool for managing on-disk shared-secrets. This is
-  to support legacy applications. New services should instead use the
-  secrets-service for managing user-provided secrets.
+- secrets-helper: A tool for managing on-disk shared-data. This is to
+  support legacy applications. It is called secrets-helper because it
+  provides data using the same API that is expected by the Erlang
+  chef_secrets library. It does NOT handle secrets securely and is
+  simply intended for giving processes that expect data via the
+  chef_secrets interface access to on-disk data. New services should
+  instead use the secrets-service for managing user-provided secrets.

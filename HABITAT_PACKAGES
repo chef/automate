@@ -67,7 +67,6 @@ automate-workflow-web components/automate-workflow-web
 # automate-workflow-server components/automate-workflow-server
 # automate-workflow-ctl components/automate-workflow-ctl
 # Not managed by our generator yet
-# automate-chef-io components/automate-chef-io
 data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
 cereal-service components/cereal-service

@@ -32,7 +32,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 9;
 
 			message Service {
-				google.protobuf.StringValue host = 1;
+				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10116, protocol: "https" } ];
 				google.protobuf.StringValue external_fqdn = 3;
 			}
@@ -52,7 +52,7 @@ message ConfigRequest {
 		}
 
 		message Grpc {
-			google.protobuf.StringValue host = 1;
+			google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "grpc", default: 10117, protocol: "grpc" } ];
 		}
 
@@ -70,6 +70,7 @@ message ConfigRequest {
 			Ldap ldap = 2;
 			Saml saml = 3;
 			Msad_Ldap msad_ldap = 4;
+			google.protobuf.BoolValue disable_local_users = 5;
 		}
 
 		message Google {

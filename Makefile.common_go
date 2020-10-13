@@ -20,8 +20,6 @@ GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
 
 LINTERARGS?=./...
 
-export GOFLAGS=-mod=vendor
-
 $(REPOROOT)/cache/$(GOLANGCILINTTARBALL):
 	curl --output $(REPOROOT)/cache/$(GOLANGCILINTTARBALL) -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINTVERSION)/$(GOLANGCILINTTARBALL)
 
@@ -48,4 +46,17 @@ spell:
 	popd > /dev/null; \
 	exit $$EXIT_CODE
 
-.PHONY: lint fmt fmt-check golang_version_check
+#: Security validation via semgrep
+# NB: "third_party" only exists for automate-gateway, but no harm having it for other dirs here.
+semgrep:
+# uncomment if custom rules beyond automate-ui ever get added
+#	semgrep --config $(REPOROOT)/semgrep --exclude third_party
+	semgrep --config https://semgrep.dev/p/r2c-ci --exclude third_party --autofix
+
+#: Security validation via semgrep; autofix where possible
+semgrep-and-fix:
+# uncomment if custom rules beyond automate-ui ever get added
+#	semgrep --config $(REPOROOT)/semgrep --exclude third_party --autofix
+	semgrep --config https://semgrep.dev/p/r2c-ci --exclude third_party --autofix
+
+.PHONY: lint fmt fmt-check golang_version_check semgrep semgrep-and-fix

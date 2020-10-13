@@ -64,5 +64,5 @@ function replayBuffer(){
 # Next, need to update *.pb.go, *_swagger.json, and *.pb.swagger.go (in hab studio):
 #   with `compile_go_protobuf_component automate-gateway` or `compile_go_protobuf_component api`
 #
-# Finally, update *.swagger.json in automate-chef-io/data/docs/api_chef_automate (in automate-chef-io dir):
+# Finally, update *.swagger.json in docs-chef-io/data/docs/api_chef_automate (in docs-chef-io dir):
 #    make sync_swagger_files

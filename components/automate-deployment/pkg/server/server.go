@@ -63,11 +63,11 @@ import (
 )
 
 type server struct {
-	deployment           *deployment.Deployment      // set in NewDeployment, read for access to target and channel config
-	deploymentStore      persistence.DeploymentStore // A place to load the deployment from
-	serverConfig         *Config                     // set in StartServer, read for access in NewDeployment
-	convergeLoop         *Looper                     // set in StartServer,
-	lcClient             lc.LicenseControlClient     // set when cachedLCClient is called
+	deployment           *deployment.Deployment         // set in NewDeployment, read for access to target and channel config
+	deploymentStore      persistence.DeploymentStore    // A place to load the deployment from
+	serverConfig         *Config                        // set in StartServer, read for access in NewDeployment
+	convergeLoop         *Looper                        // set in StartServer,
+	lcClient             lc.LicenseControlServiceClient // set when cachedLCClient is called
 	umClient             usermgmt.UserMgmt
 	converger            converge.Converger
 	senderStore          eventSenderStore
@@ -1066,7 +1066,7 @@ func StartServer(config *Config) error {
 
 	// register grpc services
 	api.RegisterDeploymentServer(grpcServer, server)
-	api.RegisterCertificateAuthorityServer(grpcServer, server)
+	api.RegisterCertificateAuthorityServiceServer(grpcServer, server)
 
 	reflection.Register(grpcServer)
 
@@ -2056,6 +2056,7 @@ func (s *server) reloadBackupRunner() error {
 				Path: "/hab/svc/automate-pg-gateway",
 			},
 			Postgresql: &papi.Config_Postgresql{
+				// FIXME (jaym): GetHost is deprecated. This is always localhost
 				Ip: s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetHost().GetValue(),
 				Cfg: &papi.Config_Postgresql_Cfg{
 					Port: int64(s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetPort().GetValue()),
@@ -2092,7 +2093,7 @@ func (s *server) reloadBackupRunner() error {
 	}
 
 	esSidecarInfo := backup.ESSidecarConnInfo{
-		Host: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetHost().GetValue(),
+		Host: "127.0.0.1",
 		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
 	}
 

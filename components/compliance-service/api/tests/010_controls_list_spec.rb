@@ -52,7 +52,7 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "version" => "2.0.1"
                 }, "impact" => 1,
-                "endTime" => "2018-03-04T09:18:42Z",
+                "endTime" => "2018-03-04T09:18:41Z",
                 "controlSummary" => {
                     "total" => 5,
                     "passed" => {},
@@ -72,7 +72,7 @@ describe File.basename(__FILE__) do
                     "version" => "2.0.1"
                 },
                 "impact" => 1,
-                "endTime" => "2018-03-04T09:18:42Z",
+                "endTime" => "2018-03-04T09:18:41Z",
                 "controlSummary" => {
                     "total" => 5,
                     "passed" => {},
@@ -201,7 +201,7 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "version" => "2.0.1"
                 }, "impact" => 1,
-                "endTime" => "2018-03-04T09:18:42Z",
+                "endTime" => "2018-03-04T09:18:41Z",
                 "controlSummary" => {
                     "total" => 5,
                     "passed" => {},
@@ -270,7 +270,7 @@ describe File.basename(__FILE__) do
                     "version" => "2.0.1"
                 },
                 "impact" => 1,
-                "endTime" => "2018-03-04T09:18:42Z",
+                "endTime" => "2018-03-04T09:19:42Z",
                 "controlSummary" => {
                     "total" => 1,
                     "passed" => {},

@@ -48,7 +48,7 @@ export class NotificationRule implements RuleInterface {
 
   AlertTypeLabels = {
     CCRFailure: 'Infra Client run failures',
-    ComplianceFailure: 'InSpec compliance scan failure'
+    ComplianceFailure: 'InSpec compliance scan failures'
   };
 
   TargetTypeLabels = {

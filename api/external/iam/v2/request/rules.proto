@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/api/external/iam/v2/request";
+
+import "external/iam/v2/common/rules.proto";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+message CreateRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id", "name", "type", "conditions"]
+    },
+    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'}
+  };
+  // Unique ID. Cannot be changed.
+  string id = 1;
+  // Unique ID of the project this rule belongs to. Cannot be changed.
+  string project_id = 2;
+  // Name for the project rule.
+  string name = 3;
+  // Whether the rule affects nodes (`NODE`) or events (`EVENT`).
+  RuleType type = 4;
+  // Conditions that ingested resources must match to belong to the project.
+  // Will contain one or more.
+  repeated Condition conditions = 5;
+}
+
+message UpdateRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id", "name", "type", "conditions"]
+    },
+    example: { value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'}
+  };
+  // Unique ID. Cannot be changed.
+  string id = 1;
+  // Unique ID of the project this rule belongs to. Cannot be changed.
+  string project_id = 2;
+  // Name for the project rule.
+  string name = 3;
+  // Whether the rule applies to ingested `NODE` or `EVENT` resources.
+  // Cannot be changed.
+  RuleType type = 4;
+  // Conditions that ingested resources must match to belong to the project.
+  // Will contain one or more.
+  repeated Condition conditions = 5;
+}
+
+message GetRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id" ]
+    }
+  };
+  // ID of the project rule.
+  string id = 1;
+  // ID of the project the rule belongs to.
+  string project_id = 2;
+}
+
+message ListRulesReq {}
+
+message ListRulesForProjectReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+  // ID of the project.
+  string id = 1;
+}
+
+message DeleteRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id" ]
+    }
+  };
+  // ID of the project rule.
+  string id = 1;
+  // ID of the project the rule belongs to.
+  string project_id = 2;
+}
+
+message ApplyRulesStartReq {}
+
+message ApplyRulesCancelReq {}
+
+message ApplyRulesStatusReq {}

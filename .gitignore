@@ -88,8 +88,8 @@ components/automate-deployment/basic-a1/delivery.license
 
 backups
 
-# never ignore anything below vendor/
-!/vendor/**
+# never ignore anything below protovendor/
+!/protovendor/**
 
 # Do not add automate credentials files.
 components/automate-deployment/automate-credentials-*.toml

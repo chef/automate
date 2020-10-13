@@ -75,6 +75,7 @@ message Resource {
   google.protobuf.Value ignore_failure = 13;
   string conditional = 16;
   string result = 17;
+  Error  error = 18;
 }
 
 message Error {

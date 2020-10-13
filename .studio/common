@@ -12,98 +12,6 @@ function run_studio_repo_health_checks() {
   verify_components_have_platform_config || return 1
 }
 
-document "clean_all_compiled_protos" <<DOC
-  Delete all the files with extensions matching '*pb*go' in the repo (except in vendor/)
-DOC
-function clean_all_compiled_protos() {
-  find /src/{api,components,lib} -name '*pb*go' -exec rm '{}' \;
-}
-
-document "bootstrap_proto_compilers" <<DOC
-  Builds everything you need to start recompiling protos from scratch (e.g.,
-  after running clean_all_compiled_protos). Our custom protoc-gen-* tools have
-  to be built in a certain order or else they will fail on circular dependencies.
-DOC
-function bootstrap_proto_compilers() {
-  compile_go_protobuf components/automate-grpc/scripts/bootstrap_protoc.sh
-  install_go_tool github.com/chef/automate/components/automate-grpc/protoc-gen-policy
-  install_go_tool github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock
-  compile_go_protobuf components/automate-grpc/scripts/grpc.sh
-}
-
-# TODO (tc) Please take a pass @afiune and Infra Auto team to see if some of these other helpers
-# can be deleted in the new world.
-# Compile protobuf definitions
-document "compile_go_protobuf_component" <<DOC
-  A wrapper around the compile_go_protobuf to compile the protobuf definitions of a specific component.
-DOC
-function compile_go_protobuf_component() {
-  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
-
-  # NOTE: To (re)build the world from scratch, automate-grpc must first be
-  # bootstrapped so that our custom protoc-gen-* commands can be used in later
-  # build steps. See `bootstrap_proto_compilers` above.
-
-  local path
-  if [ "$1" == "api" ]; then
-    path=api
-  elif [ "$1" == "config" ]; then
-    path=api/config
-  elif [ "$1" == "license" ]; then
-    path=lib/license
-  else
-    path="components/$1"
-    if [ ! -f "/src/$path/scripts/grpc.sh" ]; then
-      error "Compile go protobuf target is invalid."
-      display_valid_protobuf_targets
-      return 1
-    fi
-  fi
-
-  local proto_go_tools=(
-    github.com/chef/automate/components/automate-grpc/protoc-gen-policy
-    github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
-    github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
-    github.com/envoyproxy/protoc-gen-validate
-    github.com/ckaznocha/protoc-gen-lint
-  )
-  install_go_tool "${proto_go_tools[@]}"
-
-  # For handling faux GOPATH copying for non-module aware protoc extensions
-  install_if_missing core/rsync rsync
-
-  # "api" doesn't compile the config directory so let's not delete the config directory in that case
-  if [ "$path" == "api" ]; then
-      find "$path" -not -path 'api/config/*' \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' -o -name '*pb.client_mock.go' \) -delete
-  else
-      find "$path" \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
-  fi
-
-  local proto_script="$path/scripts/grpc.sh"
-  if [ -x "$proto_script" ]; then
-      compile_go_protobuf "$proto_script" || return $?
-  else
-      error "$proto_script doesn't exist or is not executable!"
-      case $path in
-          # NOTE: Don't warn for services that haven't been moved or
-          # which still have some protos that they use internally
-          api|api/config|automate-deployment|automate-gateway|notifications-service)
-              return 1
-              ;;
-          *)
-              log_warning "Most internal protobufs have moved into the api folder."
-              log_warning "Did you mean: compile_go_protobuf_component api"
-              return 1
-      esac
-  fi
-
-  if [ "$1" == "api" ]; then
-    log_line "compiling client mocks"
-    compile_client_mocks
-  fi
-}
-# Adding auto tab complete
-complete -F _component_auto_complete compile_go_protobuf_component
 
 function mockgen_debug() {
     echo "mockgen $*"
@@ -120,15 +28,20 @@ function compile_client_mocks() {
       mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
       mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
-      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
+      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt and event_feed because of
       # an issue with source-mode's ability to parse interfaces from the
       # grpc package. Details here:
       #
       # https://github.com/golang/mock/issues/156#issuecomment-586213812
       #
-      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
+      mockgen_debug -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed github.com/chef/automate/api/interservice/event_feed EventFeedServiceClient,EventFeedService_EventExportClient,EventFeedServiceServer,EventFeedService_EventExportServer
+      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go \
+        -package service \
+        -self_package \
+        github.com/chef/automate/api/interservice/cfgmgmt/service \
+        github.com/chef/automate/api/interservice/cfgmgmt/service \
+        CfgMgmtServiceClient,CfgMgmtService_NodeExportClient,CfgMgmtService_ReportExportClient,CfgMgmtServiceServer,CfgMgmtService_NodeExportServer,CfgMgmtService_ReportExportServer
       mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
-      mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
       mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
       mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
     popd || return 1
@@ -142,41 +55,6 @@ function compile_client_mocks() {
       mockgen_debug -source secrets/secrets.pb.go -destination secrets/secrets.pb.client_mock.go -package secrets -self_package github.com/chef/automate/api/external/secrets
     popd || return 1
   )
-}
-
-document "compile_all_protobuf_components" <<DOC
-  Compile every protobuf file for every component in A2.
-DOC
-function compile_all_protobuf_components() {
-  local components
-
-  install_if_missing core/git git
-  # Note 2019/02/05 (sr): "api" doesn't fit in the folder structure, so it's
-  # added to the list manually, same goes for "api/config".
-  components=($(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}') "config" "api")
-  for component in "${components[@]}"; do
-    log_line "Compiling protobuf files for ${YELLOW}'$component'${NC}"
-    if ! compile_go_protobuf_component "$component"; then
-      log_line "${RED}ERROR:${NC} Unable to compile protobuf files for '$component'"
-      return 1
-    fi
-  done
-}
-
-document "verify_all_protobuf_components" <<DOC
-  Verify that all protobuf are up to date
-DOC
-function verify_all_protobuf_components() {
-  install_if_missing core/git git
-
-  clean_all_compiled_protos || return $?
-  bootstrap_proto_compilers || return $?
-  compile_all_protobuf_components || return $?
-
-  git add .
-  git diff --staged --exit-code --ignore-submodules=all || return $?
-
-  go_component_make api lint unit
 }
 
 document "verify_products_generation" <<DOC
@@ -485,19 +363,20 @@ function build_all_changed_components() {
   pushd /src >/dev/null
     for component in $(./scripts/changed_components.rb)
     do
-      if [[ -n "$AUTOMATE_OSS_BUILD" ]] && [[ "$component" = "components/automate-chef-io" ]]; then
-        log_line "$component has changed but AUTOMATE_OSS_BUILD is set."
-        continue
-      fi
-
       if [[ -n "$whitelist" ]]; then
         if [[ "$whitelist" == *"$(basename "$component")"* ]]; then
           log_line "Building $component"
-          build "$component"
+          if ! build "$component"; then
+            popd
+            return 1
+          fi
         fi
       else
         log_line "Building $component"
-        build "$component"
+        if ! build "$component"; then
+          popd
+          return 1
+        fi
       fi
     done
   popd >/dev/null

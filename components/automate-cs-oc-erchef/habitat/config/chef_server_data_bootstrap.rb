@@ -410,7 +410,7 @@ class ChefServerDataBootstrap
     bifrost={}
 {{#eachAlive bind.automate-cs-oc-bifrost.members as |member|}}
   {{#if @last}}
-    bifrost['vip']="{{member.sys.ip}}"
+    bifrost['vip']="127.0.0.1"
     bifrost['port']="{{member.cfg.http-port}}"
   {{/if}}
 {{/eachAlive}}

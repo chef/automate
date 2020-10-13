@@ -8,17 +8,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	pb_common "github.com/chef/automate/api/external/iam/v2/common"
+	pb_req "github.com/chef/automate/api/external/iam/v2/request"
+	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
 	"github.com/chef/automate/api/interservice/authz"
-	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 type Server struct {
-	projects authz.ProjectsClient
+	projects authz.ProjectsServiceClient
 }
 
-func NewServer(projects authz.ProjectsClient) *Server {
+func NewServer(projects authz.ProjectsServiceClient) *Server {
 	return &Server{
 		projects: projects,
 	}

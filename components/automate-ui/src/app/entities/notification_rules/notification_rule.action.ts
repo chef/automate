@@ -9,12 +9,18 @@ export enum NotificationRuleActionTypes {
   GET               = 'NOTIFICATION_RULES::GET',
   GET_SUCCESS       = 'NOTIFICATION_RULES::GET::SUCCESS',
   GET_FAILURE       = 'NOTIFICATION_RULES::GET::FAILURE',
+  CREATE            = 'NOTIFICATION_RULES::CREATE',
+  CREATE_SUCCESS    = 'NOTIFICATION_RULES::CREATE::SUCCESS',
+  CREATE_FAILURE    = 'NOTIFICATION_RULES::CREATE::FAILURE',
   UPDATE            = 'NOTIFICATION_RULES::UPDATE',
   UPDATE_SUCCESS    = 'NOTIFICATION_RULES::UPDATE::SUCCESS',
   UPDATE_FAILURE    = 'NOTIFICATION_RULES::UPDATE::FAILURE',
   SEND_TEST         = 'NOTIFICATION_RULES::SEND_TEST',
   SEND_TEST_SUCCESS = 'NOTIFICATION_RULES::SEND_TEST::SUCCESS',
-  SEND_TEST_FAILURE = 'NOTIFICATION_RULES::SEND_TEST::FAILURE'
+  SEND_TEST_FAILURE = 'NOTIFICATION_RULES::SEND_TEST::FAILURE',
+  DELETE            = 'NOTIFICATION_RULES::DELETE',
+  DELETE_SUCCESS    = 'NOTIFICATION_RULES::DELETE::SUCCESS',
+  DELETE_FAILURE    = 'NOTIFICATION_RULES::DELETE::FAILURE'
 }
 
 export interface NotificationRuleSuccessPayload {
@@ -43,6 +49,22 @@ export class GetNotification implements Action {
 export class GetNotificationSuccess implements Action {
   readonly type = NotificationRuleActionTypes.GET_SUCCESS;
   constructor(public payload: NotificationRule) { }
+}
+
+export class CreateNotificationRule implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE;
+  constructor(public payload: NotificationRule,
+    public username: string, public password: string ) { }
+}
+
+export class CreateNotificationRuleSuccess implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE_SUCCESS;
+  constructor(public payload) { }
+}
+
+export class CreateNotificationRuleFailure implements Action {
+  readonly type = NotificationRuleActionTypes.CREATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class GetNotificationFailure implements Action {
@@ -80,6 +102,20 @@ export class TestNotificationFailure implements Action {
   constructor(public payload: { name: string }) { }
 }
 
+export class DeleteNotificationRule implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE;
+  constructor(public payload: { id: string, name: string }) { }
+}
+
+export class DeleteNotificationRuleSuccess implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { id: string, name: string }) { }
+}
+
+export class DeleteNotificationRuleFailure implements Action {
+  readonly type = NotificationRuleActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
 
 export type NotificationRuleActions =
   | GetNotificationRules
@@ -88,9 +124,15 @@ export type NotificationRuleActions =
   | GetNotification
   | GetNotificationSuccess
   | GetNotificationFailure
+  | CreateNotificationRule
+  | CreateNotificationRuleSuccess
+  | CreateNotificationRuleFailure
   | UpdateNotification
   | UpdateNotificationSuccess
   | UpdateNotificationFailure
   | TestNotification
   | TestNotificationSuccess
-  | TestNotificationFailure;
+  | TestNotificationFailure
+  | DeleteNotificationRule
+  | DeleteNotificationRuleSuccess
+  | DeleteNotificationRuleFailure;

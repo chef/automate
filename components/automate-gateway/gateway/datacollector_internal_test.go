@@ -19,6 +19,7 @@ import (
 	mock_compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/ingest"
 	mock_notifier "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_notifier"
+	"github.com/chef/automate/lib/pcmp/passert"
 	"github.com/golang/mock/gomock"
 	gp "github.com/golang/protobuf/ptypes/empty"
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -64,7 +65,7 @@ func TestDataCollectorHandlerChefActionMsgOk(t *testing.T) {
 	for a, body := range rawactions {
 		t.Run("action_type: "+a, func(t *testing.T) {
 			// Mock the IngestClient
-			mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
+			mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 			// Assert that we will call the ProcessChefAction() func
 			mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any())
 
@@ -87,7 +88,7 @@ func TestDataCollectorHandlerChefActionMsgOk(t *testing.T) {
 
 func TestDataCollectorHandlerMsgErrorWithNonGRPCError(t *testing.T) {
 	// Mock the IngestClient to test  the behavior when we've got a Non GRPC Error
-	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, errors.New("A Non GRPC Error")
@@ -114,7 +115,7 @@ func TestDataCollectorHandlerMsgErrorWithNonGRPCError(t *testing.T) {
 
 func TestDataCollectorHandlerChefActionMsgError(t *testing.T) {
 	// Mock the IngestClient to assert that we've got an error calling ProcessChefAction() func
-	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, status.Error(codes.Internal, "Something happened")
@@ -170,7 +171,7 @@ func TestDataCollectorHandlerChefRunConvergeMsgOk(t *testing.T) {
 		t.Run("JSON file"+r, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			// Mock the IngestClient
-			mockIngest := ingest.NewMockChefIngesterClient(ctrl)
+			mockIngest := ingest.NewMockChefIngesterServiceClient(ctrl)
 			// Assert that we will call the ProcessChefRun() func
 			mockIngest.EXPECT().ProcessChefRun(gomock.Any(), gomock.Any())
 
@@ -199,7 +200,7 @@ func TestDataCollectorHandlerChefRunConvergeMsgOk(t *testing.T) {
 func TestDataCollectorHandlerChefRunMsgError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	// Mock the IngestClient
-	mockIngest := ingest.NewMockChefIngesterClient(ctrl)
+	mockIngest := ingest.NewMockChefIngesterServiceClient(ctrl)
 	// Assert that we've got an error calling ProcessChefRun() func
 	mockIngest.EXPECT().ProcessChefRun(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Run) (*gp.Empty, error) {
@@ -234,7 +235,7 @@ func TestDataCollectorHandlerChefRunMsgError(t *testing.T) {
 
 func TestDataCollectorHandlerLivenessAgentMsg(t *testing.T) {
 	// Mock the IngestClient
-	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	// Assert that we will call the ProcessLivenessPing() func
 	mockIngest.EXPECT().ProcessLivenessPing(gomock.Any(), gomock.Any())
 
@@ -263,7 +264,7 @@ func TestDataCollectorHandlerComplianceReportMsg(t *testing.T) {
 		t.Run("compliance_report: "+r, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			// Mock the ComplianceIngester
-			mockComplianceIngester := mock_compliance_ingest.NewMockComplianceIngesterClient(ctrl)
+			mockComplianceIngester := mock_compliance_ingest.NewMockComplianceIngesterServiceClient(ctrl)
 			// Assert that we will call the ProcessComplianceReport() func
 			mockComplianceIngester.EXPECT().ProcessComplianceReport(gomock.Any(), gomock.Any())
 
@@ -319,7 +320,7 @@ func TestDataCollectorHandlerWithPartialMalformedJSON(t *testing.T) {
 	}`)
 
 	// Mock the IngestClient
-	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterServiceClient(gomock.NewController(t))
 	// Assert that we will call the ProcessChefAction() func and return and error
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
@@ -362,7 +363,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAStringWithScapedChars(t *test
 			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
-	assert.Equal(t, expectedDataField, pbStruct)
+	passert.Equal(t, expectedDataField, pbStruct)
 }
 
 func TestDataCollectorGetStructIfExistsWhenFieldIsAJSONObject(t *testing.T) {
@@ -374,7 +375,7 @@ func TestDataCollectorGetStructIfExistsWhenFieldIsAJSONObject(t *testing.T) {
 			"id": {Kind: &structpb.Value_StringValue{StringValue: "1"}},
 		},
 	}
-	assert.Equal(t, expectedDataField, pbStruct)
+	passert.Equal(t, expectedDataField, pbStruct)
 }
 
 func TestDataCollectorGetStructIfExistsWhenFieldIsSomethingElseReturnEmptyStruct(t *testing.T) {
@@ -420,7 +421,7 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreObjects(t *testing.T) {
 		},
 	}
 	assert.Len(t, arrayStruct, 2)
-	assert.ElementsMatch(t, expectedDataField, arrayStruct)
+	passert.Equal(t, expectedDataField, arrayStruct)
 }
 
 func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
@@ -440,5 +441,5 @@ func TestDataCollectorGetStructArrayWhenTheArrayAreStrings(t *testing.T) {
 		},
 	}
 	assert.Len(t, arrayStruct, 2)
-	assert.ElementsMatch(t, expectedDataField, arrayStruct)
+	passert.Equal(t, expectedDataField, arrayStruct)
 }

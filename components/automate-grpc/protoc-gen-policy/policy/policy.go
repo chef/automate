@@ -9,12 +9,11 @@ import (
 	"github.com/dave/jennifer/jen"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
 	pgs "github.com/lyft/protoc-gen-star"
 	pgsgo "github.com/lyft/protoc-gen-star/lang/go"
 	options "google.golang.org/genproto/googleapis/api/annotations"
 
-	"github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
+	"github.com/chef/automate/api/external/annotations/iam"
 )
 
 const (
@@ -47,7 +46,7 @@ type policyBundle struct {
 }
 
 var policyVersion = policyBundle{
-	pkg:       "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy",
+	pkg:       "github.com/chef/automate/api/external/iam/v2/policy",
 	extension: iam.E_Policy,
 	convert: func(x interface{}) *policyInfo {
 		if y, ok := x.(*iam.PolicyInfo); ok {
@@ -344,7 +343,7 @@ func generateExtractionFunction(policyPkg string, fields []string) *jen.Statemen
 				jen.Switch(jen.Id("want")).BlockFunc(func(g *jen.Group) {
 					for _, f := range fields {
 						g.Case(jen.Lit(f)).Block(
-							jen.Return(jen.Id("m").Dot(generator.CamelCase(f))),
+							jen.Return(jen.Id("m").Dot(goCamelCase(f))),
 						)
 					}
 					g.Default().Block(
@@ -354,6 +353,59 @@ func generateExtractionFunction(policyPkg string, fields []string) *jen.Statemen
 			),
 		),
 	)
+}
+
+// Copied from https://github.com/protocolbuffers/protobuf-go/blob/a709e31e5d1271279a3aa850cc5d6d1b64fee2a3/internal/strs/strings.go#L32
+// Originally we directly called the CamelCase function from
+// "github.com/golang/protobuf/protoc-gen-go/generator", but then that package
+// was deprecated, and its functionality moved to an internal package in the
+// protobuf repo. If there is a supported way to re-use the functionality from
+// the upstream that would be preferred to this copypasta.
+func goCamelCase(s string) string {
+	// Invariant: if the next letter is lower case, it must be converted
+	// to upper case.
+	// That is, we process a word at a time, where words are marked by _ or
+	// upper case letter. Digits are treated as words.
+	var b []byte
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c == '.' && i+1 < len(s) && isASCIILower(s[i+1]):
+			// Skip over '.' in ".{{lowercase}}".
+		case c == '.':
+			b = append(b, '_') // convert '.' to '_'
+		case c == '_' && (i == 0 || s[i-1] == '.'):
+			// Convert initial '_' to ensure we start with a capital letter.
+			// Do the same for '_' after '.' to match historic behavior.
+			b = append(b, 'X') // convert '_' to 'X'
+		case c == '_' && i+1 < len(s) && isASCIILower(s[i+1]):
+			// Skip over '_' in "_{{lowercase}}".
+		case isASCIIDigit(c):
+			b = append(b, c)
+		default:
+			// Assume we have a letter now - if not, it's a bogus identifier.
+			// The next word is a sequence of characters that must start upper case.
+			if isASCIILower(c) {
+				c -= 'a' - 'A' // convert lowercase to uppercase
+			}
+			b = append(b, c)
+
+			// Accept lower case sequence that follows.
+			for ; i+1 < len(s) && isASCIILower(s[i+1]); i++ {
+				b = append(b, s[i+1])
+			}
+		}
+	}
+	return string(b)
+}
+
+// isASCIILower and isASCIIDigit come along for the ride with goCamelCase.
+
+func isASCIILower(c byte) bool {
+	return 'a' <= c && c <= 'z'
+}
+func isASCIIDigit(c byte) bool {
+	return '0' <= c && c <= '9'
 }
 
 type IsAuthorizedReq struct {

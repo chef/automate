@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/pcmp/prequire"
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
@@ -43,24 +44,24 @@ func TestTeamsGRPC(t *testing.T) {
 
 	if migrationConfig == nil {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsServiceClient(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
 			t, l, migrationConfig)
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsServiceClient(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true" {
 			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
-			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
+			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsServiceClient(conn), close)
 		}
 	}
 }
 
 func runAllServerTests(
 	t *testing.T, serv *team_serv.TeamServer, serviceRef *service.Service,
-	authzMock *authz.PoliciesServerMock, cl teams.TeamsClient, close func()) {
+	authzMock *authz.PoliciesServiceServerMock, cl teams.TeamsServiceClient, close func()) {
 
 	t.Helper()
 	defer close()
@@ -80,7 +81,7 @@ func runAllServerTests(
 			Sha:     "eaf1f3553eb64fb9f393366e8ba4ee61e515727e",
 		}
 
-		require.Equal(t, expectedVersion, resp)
+		prequire.Equal(t, expectedVersion, resp)
 	})
 
 	t.Run("GetTeam", func(t *testing.T) {
@@ -2039,7 +2040,7 @@ func runAllServerTests(
 
 }
 
-func cleanupTeam(t *testing.T, cl teams.TeamsClient, id string) {
+func cleanupTeam(t *testing.T, cl teams.TeamsServiceClient, id string) {
 	t.Helper()
 
 	deleteReq := teams.DeleteTeamReq{Id: id}
@@ -2050,7 +2051,7 @@ func cleanupTeam(t *testing.T, cl teams.TeamsClient, id string) {
 // Pass nil for migrationConfig if you want in-memory server.
 func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	migrationConfig *migration.Config) (*team_serv.TeamServer, *service.Service,
-	*grpc.ClientConn, func(), *authz.PoliciesServerMock) {
+	*grpc.ClientConn, func(), *authz.PoliciesServiceServerMock) {
 
 	t.Helper()
 
@@ -2061,20 +2062,20 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 
-	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies := authz.NewPoliciesServiceServerMock()
 	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterPoliciesServer(grpcAuthz, mockPolicies)
+	authz.RegisterPoliciesServiceServer(grpcAuthz, mockPolicies)
 
-	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz.RegisterAuthorizationServer(grpcAuthz, mockAuthz)
+	authz.RegisterAuthorizationServiceServer(grpcAuthz, mockAuthz)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	authzPoliciesClient := authz.NewPoliciesClient(authzConn)
-	authzAuthorizationClient := authz.NewAuthorizationClient(authzConn)
+	authzPoliciesClient := authz.NewPoliciesServiceClient(authzConn)
+	authzAuthorizationClient := authz.NewAuthorizationServiceClient(authzConn)
 
 	var serviceRef *service.Service
 	if migrationConfig == nil {
@@ -2088,7 +2089,7 @@ func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 	teamServer := team_serv.NewTeamServer(serviceRef)
-	teams.RegisterTeamsServer(grpcServ, teamServer)
+	teams.RegisterTeamsServiceServer(grpcServ, teamServer)
 
 	resetState(ctx, t, serviceRef)
 

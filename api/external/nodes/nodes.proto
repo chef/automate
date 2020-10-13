@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 import "external/common/query/parameters.proto";
 

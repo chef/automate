@@ -1,7 +1,6 @@
 run:
   deadline: 5m
   tests: false
-  modules-download-mode: vendor
 
 issues:
   exclude-use-default: false

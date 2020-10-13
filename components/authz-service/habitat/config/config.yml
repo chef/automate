@@ -1,5 +1,5 @@
 ---
-grpc: {{ cfg.service.host }}:{{ cfg.service.port }}
+grpc: 127.0.0.1:{{ cfg.service.port }}
 log-level: {{ cfg.logger.level }}
 log-format: {{ cfg.logger.format }}
 
@@ -17,7 +17,7 @@ project-limit: {{cfg.service.project_limit}}
 
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
+cereal-address: 127.0.0.1:{{cereal-service.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
 

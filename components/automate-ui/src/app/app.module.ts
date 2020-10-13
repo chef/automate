@@ -55,11 +55,13 @@ import { NodeDetailsService } from './services/node-details/node-details.service
 import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
+import {
+  NodeNoRunIdResolverService
+} from './services/node-details/node-norunid-resolver.service';
 import { NodeRunsService } from './services/node-details/node-runs.service';
 import { ProjectService } from './entities/projects/project.service';
 import { ProductDeployedService } from './services/product-deployed/product-deployed.service';
 import { ProjectsFilterService } from './services/projects-filter/projects-filter.service';
-import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
@@ -91,6 +93,7 @@ import { ProjectRequests } from './entities/projects/project.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { ServerRequests } from './entities/servers/server.requests';
+import { NodeCredentialRequests } from './entities/node-credentials/node-credential.requests';
 import { OrgRequests } from './entities/orgs/org.requests';
 import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
@@ -111,6 +114,7 @@ import { AttributesComponent } from './page-components/attributes/attributes.com
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { CreateDataFeedModalComponent } from './pages/create-data-feed-modal/create-data-feed-modal.component';
+import { CreateNotificationModalComponent } from './pages/create-notification-modal/create-notification-modal.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -123,9 +127,6 @@ import { DateSelectorComponent } from './page-components/date-selector/date-sele
 import {
   DeletableNodeControlComponent
 } from './page-components/deletable-node-control/deletable-node-control.component';
-import {
-  DeleteNotificationDialogComponent
-} from './page-components/delete-notification-dialog/delete-notification-dialog.component';
 import { DeltaViewerComponent } from './page-components/delta-viewer/delta-viewer.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';
 import {
@@ -158,7 +159,6 @@ import {
 } from './pages/node-noruns-details/node-noruns-details.component';
 import { NodeRollupComponent } from './page-components/node-rollup/node-rollup.component';
 import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
-import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import {
   ProjectsFilterComponent
@@ -210,11 +210,11 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     CreateDataFeedModalComponent,
+    CreateNotificationModalComponent,
     DataFeedComponent,
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
-    DeleteNotificationDialogComponent,
     DeltaViewerComponent,
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
@@ -235,7 +235,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeNoRunsDetailsComponent,
     NodeRollupComponent,
     NotificationDetailsComponent,
-    NotificationFormComponent,
     NotificationsComponent,
     ProjectsFilterComponent,
     ProjectsFilterDropdownComponent,
@@ -258,9 +257,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent
-  ],
-  entryComponents: [
-    DeleteNotificationDialogComponent
   ],
   imports: [
     ApiTokenModule,
@@ -327,6 +323,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NotificationRuleRequests,
     NodeDetailsResolverService,
     NodeNoRunsDetailsResolverService,
+    NodeNoRunIdResolverService,
     NodeDetailsService,
     NodeRunsService,
     PolicyRequests,
@@ -338,9 +335,9 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterService,
     RoleRequests,
     RuleRequests,
-    RulesService,
     RunHistoryStore,
     ServerRequests,
+    NodeCredentialRequests,
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,

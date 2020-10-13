@@ -7,7 +7,6 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/external/data_lifecycle"
-	datalifecycle "github.com/chef/automate/api/interservice/data_lifecycle"
 )
 
 const (
@@ -56,13 +55,13 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 				Disabled:   true,
 				Recurrence: testRecurrence,
 				PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-					Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-						&datalifecycle.EsPolicyUpdate{
+					Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+						&data_lifecycle.EsPolicyUpdate{
 							PolicyName:    complianceReportsPolicyName,
 							OlderThanDays: complianceReportsOlderThanDays,
 							Disabled:      true,
 						},
-						&datalifecycle.EsPolicyUpdate{
+						&data_lifecycle.EsPolicyUpdate{
 							PolicyName:    complianceScansPolicyName,
 							OlderThanDays: complianceScansOlderThanDays,
 							Disabled:      true,
@@ -80,8 +79,8 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 				Disabled:   true,
 				Recurrence: testRecurrence,
 				PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-					Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-						&datalifecycle.EsPolicyUpdate{
+					Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+						&data_lifecycle.EsPolicyUpdate{
 							PolicyName:    eventFeedPurgePolicyName,
 							OlderThanDays: eventFeedOlderThanDays,
 							Disabled:      true,
@@ -99,13 +98,13 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 				Disabled:   true,
 				Recurrence: testRecurrence,
 				PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-					Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-						&datalifecycle.EsPolicyUpdate{
+					Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+						&data_lifecycle.EsPolicyUpdate{
 							PolicyName:    infraActionsPurgePolicyName,
 							OlderThanDays: infraActionsOlderThanDays,
 							Disabled:      true,
 						},
-						&datalifecycle.EsPolicyUpdate{
+						&data_lifecycle.EsPolicyUpdate{
 							PolicyName:    infraConvergePurgePolicyName,
 							OlderThanDays: infraConvergeOlderThanDays,
 							Disabled:      true,
@@ -264,12 +263,12 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 					Disabled:   false,
 					Recurrence: r,
 					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-							&datalifecycle.EsPolicyUpdate{
+						Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+							&data_lifecycle.EsPolicyUpdate{
 								PolicyName: complianceReportsPolicyName,
 								Disabled:   true,
 							},
-							&datalifecycle.EsPolicyUpdate{
+							&data_lifecycle.EsPolicyUpdate{
 								PolicyName: complianceScansPolicyName,
 								Disabled:   true,
 							},
@@ -285,8 +284,8 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 					Disabled:   false,
 					Recurrence: r,
 					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-							&datalifecycle.EsPolicyUpdate{
+						Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+							&data_lifecycle.EsPolicyUpdate{
 								PolicyName: eventFeedPurgePolicyName,
 								Disabled:   true,
 							},
@@ -302,12 +301,12 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 					Disabled:   false,
 					Recurrence: r,
 					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-							&datalifecycle.EsPolicyUpdate{
+						Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+							&data_lifecycle.EsPolicyUpdate{
 								PolicyName: infraActionsPurgePolicyName,
 								Disabled:   true,
 							},
-							&datalifecycle.EsPolicyUpdate{
+							&data_lifecycle.EsPolicyUpdate{
 								PolicyName: infraConvergePurgePolicyName,
 								Disabled:   true,
 							},
@@ -582,13 +581,13 @@ func (suite *GatewayTestSuite) TestConvertJobStatusToJobSetting() {
 			Disabled:   true,
 			Recurrence: "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=400",
 			PurgePolicies: &data_lifecycle.PurgePolicies{
-				Elasticsearch: []*datalifecycle.EsPolicy{
-					&datalifecycle.EsPolicy{
+				Elasticsearch: []*data_lifecycle.EsPolicy{
+					&data_lifecycle.EsPolicy{
 						Name:          "policy1",
 						OlderThanDays: 123,
 						Disabled:      true,
 					},
-					&datalifecycle.EsPolicy{
+					&data_lifecycle.EsPolicy{
 						Name:          "policy2",
 						OlderThanDays: 456,
 						Disabled:      false,
@@ -610,13 +609,13 @@ func (suite *GatewayTestSuite) TestConvertJobStatusToJobSetting() {
 			Disabled:   true,
 			Recurrence: "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=400",
 			PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
-				Elasticsearch: []*datalifecycle.EsPolicyUpdate{
-					&datalifecycle.EsPolicyUpdate{
+				Elasticsearch: []*data_lifecycle.EsPolicyUpdate{
+					&data_lifecycle.EsPolicyUpdate{
 						PolicyName:    "policy1",
 						OlderThanDays: 123,
 						Disabled:      true,
 					},
-					&datalifecycle.EsPolicyUpdate{
+					&data_lifecycle.EsPolicyUpdate{
 						PolicyName:    "policy2",
 						OlderThanDays: 456,
 						Disabled:      false,
@@ -646,11 +645,11 @@ func jobStatusesToJobSettings(in []*data_lifecycle.JobStatus) []*data_lifecycle.
 
 		if esPolicies := status.GetPurgePolicies().GetElasticsearch(); esPolicies != nil && len(esPolicies) > 0 {
 			setting.PurgePolicies = &data_lifecycle.PurgePolicyUpdate{
-				Elasticsearch: []*datalifecycle.EsPolicyUpdate{},
+				Elasticsearch: []*data_lifecycle.EsPolicyUpdate{},
 			}
 
 			for _, policy := range esPolicies {
-				setting.PurgePolicies.Elasticsearch = append(setting.PurgePolicies.Elasticsearch, &datalifecycle.EsPolicyUpdate{
+				setting.PurgePolicies.Elasticsearch = append(setting.PurgePolicies.Elasticsearch, &data_lifecycle.EsPolicyUpdate{
 					PolicyName:    policy.Name,
 					Disabled:      policy.Disabled,
 					OlderThanDays: policy.OlderThanDays,

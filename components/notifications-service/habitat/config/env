@@ -11,8 +11,7 @@ export EVENT_DEDUP_WINDOW_SECONDS="{{cfg.service.dedup_window_seconds}}"
 
 {{~#eachAlive bind.secrets-service.members as |secrets|}}
   {{~#if @last}}
-#export SECRETS_URL="{{secrets.sys.ip}}:{{secrets.cfg.port}}"
-export SECRETS_URL="localhost:{{secrets.cfg.port}}"
+export SECRETS_URL="127.0.0.1:{{secrets.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 export SECRETS_SERVICE_CERT="/hab/svc/secrets-service/config/service.crt"

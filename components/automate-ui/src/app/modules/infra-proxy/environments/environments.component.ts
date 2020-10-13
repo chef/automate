@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { filter } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
+
 import { EntityStatus } from 'app/entities/entities';
 import { GetEnvironments } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
@@ -20,12 +21,15 @@ import {
   styleUrls: ['./environments.component.scss']
 })
 
-export class EnvironmentsComponent implements OnInit {
+export class EnvironmentsComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
+  @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  private isDestroyed = new Subject<boolean>();
   public environments: Environment[] = [];
   public environmentsListLoading = true;
+  public authFailure = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -42,12 +46,24 @@ export class EnvironmentsComponent implements OnInit {
     combineLatest([
       this.store.select(getAllEnvironmentsForOrgStatus),
       this.store.select(allEnvironments)
-    ]).pipe(
-      filter(([getEnvironmentsSt, _allEnvironmentsState]) =>
-      getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(_allEnvironmentsState))
-    ).subscribe(([ _getEnvironmentsSt, allEnvironmentsState]) => {
-      this.environments = allEnvironmentsState;
-      this.environmentsListLoading = false;
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([ getEnvironmentsSt, allEnvironmentsState]) => {
+      if (getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(allEnvironmentsState)) {
+        this.environments = allEnvironmentsState;
+        this.environmentsListLoading = false;
+      } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
+        this.environmentsListLoading = false;
+        this.authFailure = true;
+      }
     });
+  }
+
+  resetKeyTabRedirection(resetLink: boolean) {
+    this.resetKeyRedirection.emit(resetLink);
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 }

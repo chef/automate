@@ -118,7 +118,7 @@ describe('WelcomeModalComponent', () => {
       it('links to "how to learn chef" page in a new tab', () => {
         const link = element.query((By.css('li:nth-child(1) a')));
         const { href, target } = link.attributes;
-        expect(href).toEqual('https://automate.chef.io/docs');
+        expect(href).toEqual('https://docs.chef.io/automate');
         expect(target).toEqual('_blank');
       });
     });

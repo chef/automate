@@ -63,7 +63,21 @@ include_controls 'cis-rhel7-level1-server' do
   skip_control "xccdf_org.cisecurity.benchmarks_rule_6.1.10_Ensure_no_world_writable_files_exist"
   skip_control "xccdf_org.cisecurity.benchmarks_rule_6.2.6_Ensure_root_PATH_Integrity"
 
-  # NOTE(ssd) 2019-06-12: These started failing and we still looking into what changed.
   skip_control "xccdf_org.cisecurity.benchmarks_rule_1.2.3_Ensure_GPG_keys_are_configured"
   skip_control "xccdf_org.cisecurity.benchmarks_rule_6.2.10_Ensure_users_dot_files_are_not_group_or_world_writable"
+
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.4.1_Ensure_TCP_Wrappers_is_installed"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.5.1_Ensure_DCCP_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_5.4.2_Ensure_system_accounts_are_non-login"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.2_Ensure_mounting_of_freevxfs_filesystems_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.5.2_Ensure_SCTP_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.3_Ensure_mounting_of_jffs2_filesystems_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.4.3_Ensure_etchosts.deny_is_configured"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.5.3_Ensure_RDS_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.4_Ensure_mounting_of_hfs_filesystems_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_3.5.4_Ensure_TIPC_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.5_Ensure_mounting_of_hfsplus_filesystems_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.6_Ensure_mounting_of_squashfs_filesystems_is_disabled"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_6.2.7_Ensure_all_users_home_directories_exist"
+  skip_control "xccdf_org.cisecurity.benchmarks_rule_1.1.1.8_Ensure_mounting_of_FAT_filesystems_is_disabled"
 end

@@ -1,7 +1,8 @@
 import { Store } from '@ngrx/store';
-import { Subject, Observable } from 'rxjs';
-import { takeUntil, map as rxjsMap, filter, debounceTime } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map as rxjsMap, filter, debounceTime } from 'rxjs/operators';
 import {
+  isArray,
   isEmpty,
   identity,
   every,
@@ -21,6 +22,7 @@ import { allPerms } from 'app/entities/userperms/userperms.selectors';
 
 export interface CheckObj {
   endpoint: string;
+  inflatedEndpoint?: string;
   verb: string;
   paramList?: string | string[];
 }
@@ -32,12 +34,10 @@ export class AuthorizedChecker {
   private placeholderRE = /\{[^{]+\}/;
   private allOf: CheckObj[] = [];
   private anyOf: CheckObj[] = [];
-  private isDestroyed = new Subject<boolean>();
 
   constructor(private store: Store<NgrxStateAtom>) {
     this.isAuthorized$ =
       this.store.select(allPerms).pipe(
-        takeUntil(this.isDestroyed),
         debounceTime(AuthorizedChecker.DebounceTime),
         filter(perms => !isEmpty(perms)),
         filter(() => !isEmpty(this.allOf) || !isEmpty(this.anyOf)),
@@ -47,8 +47,8 @@ export class AuthorizedChecker {
 
   public setPermissions(allOf: CheckObj[], anyOf: CheckObj[]): void {
     // store these for handling the async responses
-    this.allOf = allOf;
-    this.anyOf = anyOf;
+    this.allOf = this.inflate(allOf);
+    this.anyOf = this.inflate(anyOf);
 
     // dispatch requests for the specified permissions
     const nonParameterizedEndpoints = this.toUserPermsPayload(allOf, anyOf);
@@ -60,14 +60,23 @@ export class AuthorizedChecker {
       this.store.dispatch(new GetUserParamPerms(payload)));
   }
 
-  destroy() {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+  private inflate(inputs: CheckObj[]): CheckObj[] {
+    inputs.forEach(check => {
+      if (this.placeholderRE.test(check.endpoint)) {
+        let newEndpoint = check.endpoint;
+        const list = isArray(check.paramList) ? check.paramList : [check.paramList];
+        list.forEach(val => newEndpoint = newEndpoint.replace(this.placeholderRE, val));
+        check.inflatedEndpoint = newEndpoint;
+      }
+    });
+    return inputs;
   }
 
+  // For a parameterized endpoint, we need to check the inflated endpoint--
+  // with parameters filled in--so we know permissions for the endpoint with particular values.
   private permsPopulated(perms: IndexedEntities<UserPermEntity>): boolean {
     return every(
-      (check: CheckObj) => has(check.endpoint, perms),
+      (check: CheckObj) => has(check.inflatedEndpoint || check.endpoint, perms),
       concat(this.allOf, this.anyOf));
   }
 

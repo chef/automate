@@ -1,4 +1,4 @@
-listen_address = "{{cfg.service.listen_address}}"
+listen_address = "127.0.0.1"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
 

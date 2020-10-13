@@ -31,13 +31,14 @@ import (
 // * An Elasticsearch client for ES queries to build up and tear down test cases
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	feedClient  *server.EventFeedServer
-	feedBackend persistence.FeedStore
-	purgeClient data_lifecycle.PurgeClient
-	esClient    *olivere.Client
-	indices     []string
-	types       []string
-	cleanup     func() error
+	feedClient       *server.EventFeedServer
+	feedBackend      persistence.FeedStore
+	purgeClient      data_lifecycle.PurgeClient
+	esClient         *olivere.Client
+	indices          []string
+	types            []string
+	cleanup          func() error
+	elasticsearchUrl string
 }
 
 // Initialize the test suite
@@ -48,8 +49,10 @@ type Suite struct {
 func NewSuite(url string) (*Suite, error) {
 	s := new(Suite)
 
+	s.elasticsearchUrl = url
+
 	esClient, err := olivere.NewClient(
-		olivere.SetURL(url),
+		olivere.SetURL(s.elasticsearchUrl),
 		olivere.SetSniff(false),
 	)
 	if err != nil {

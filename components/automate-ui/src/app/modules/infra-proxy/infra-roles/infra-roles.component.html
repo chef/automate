@@ -1,6 +1,7 @@
 <section class="infra-roles">
   <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
-  <ng-container *ngIf="!rolesListLoading">
+  <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <ng-container *ngIf="!rolesListLoading && !authFailure">
     <chef-table>
       <chef-thead>
         <chef-tr>

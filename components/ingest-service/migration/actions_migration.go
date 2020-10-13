@@ -1,59 +1,60 @@
 package migration
 
 import (
+	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/ingest-service/backend"
 )
 
-func (ms *Status) migrateAction() error {
-	ms.total = 2
-
+func (ms *Status) migrateAction() {
+	ms.total = 1
 	err := ms.SendAllActionsThroughPipeline()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to re-insert actions")
-		return err
-	}
-	ms.taskCompleted()
-
-	err = ms.DeleteAllActionsIndexes()
-	if err != nil {
-		ms.updateErr(err.Error(), "Unable to delete action indexes")
-		return err
 	}
 	ms.taskCompleted()
 
 	ms.finish("Migration Actions to current finished successfully")
-
-	return nil
-}
-
-func (ms *Status) DeleteAllActionsIndexes() error {
-	ms.update("Delete all the actions indices")
-	return ms.client.DeleteAllIndexesWithPrefix(actionPrefixIndexName, ms.ctx)
 }
 
 func (ms *Status) SendAllActionsThroughPipeline() error {
 	ms.update("loop through each action and send it though the pipeline")
-	pager := &actionsPaginationContext{
-		pageSize: 300,
-		client:   ms.client,
-	}
+	// Get all actions-* indexes
+	actionIndices, _ := ms.client.GetAllTimeseriesIndiceNames(ms.ctx, actionPrefixIndexName)
+	ctx := context.Background()
 
-	for err := pager.Start(); !pager.IsDone(); err = pager.Next() {
-		if err != nil {
-			ms.updateErr(err.Error(), "Unable to retrieve actions")
-			return err
+	// sort the actionIndices to have the eariest first
+	sort.Sort(sort.Reverse(sort.StringSlice(actionIndices)))
+
+	// loop through each index and re-ingest all the actions then delete the index.
+	for _, fullActionIndexName := range actionIndices {
+		ms.update(fmt.Sprintf("loop through each action in the %q index", fullActionIndexName))
+		pager := &actionsPaginationContext{
+			pageSize:  300,
+			client:    ms.client,
+			indexName: fullActionIndexName,
 		}
 
-		for _, action := range pager.results {
-			err = ms.sendActionThroughPipeline(action)
+		for err := pager.Start(); !pager.IsDone(); err = pager.Next() {
 			if err != nil {
-				logWarning(err.Error(), fmt.Sprintf("Unable re-insert actions: %v", action))
+				ms.updateErr(err.Error(), "Unable to retrieve actions")
+				return err
+			}
+
+			for _, action := range pager.results {
+				err = ms.sendActionThroughPipeline(action)
+				if err != nil {
+					logWarning(err.Error(), fmt.Sprintf("Unable re-insert actions: %v", action))
+				}
 			}
 		}
+
+		ms.update(fmt.Sprintf("Deleting the %q index", fullActionIndexName))
+		ms.client.DeleteIndex(ctx, fullActionIndexName)
 	}
 
 	return nil
@@ -105,10 +106,11 @@ type actionsPaginationContext struct {
 	pageSize   int
 	results    []backend.InternalChefAction
 	client     backend.Client
+	indexName  string
 }
 
 func (p *actionsPaginationContext) Start() error {
-	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, time.Time{}, "", false)
+	actions, _, err := p.client.GetActions(p.indexName, p.pageSize, time.Time{}, "", false)
 	if err != nil {
 		return err
 	}
@@ -118,7 +120,7 @@ func (p *actionsPaginationContext) Start() error {
 }
 
 func (p *actionsPaginationContext) Next() error {
-	actions, _, err := p.client.GetActions(actionsIndexName, p.pageSize, p.cursorDate, p.cursorID, true)
+	actions, _, err := p.client.GetActions(p.indexName, p.pageSize, p.cursorDate, p.cursorID, true)
 	if err != nil {
 		return err
 	}

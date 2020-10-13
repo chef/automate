@@ -83,27 +83,27 @@ func createEvent(msg message.ChefAction) (*automate_event.EventMsg, error) {
 	}
 
 	return &automate_event.EventMsg{
-		EventID: uuid.Must(uuid.NewV4()).String(),
+		EventId: uuid.Must(uuid.NewV4()).String(),
 		Type:    &automate_event.EventType{Name: event.EventFeedEventName},
 		Producer: &automate_event.Producer{
-			ID:           msg.InternalChefAction.EntityType,
+			Id:           msg.InternalChefAction.EntityType,
 			ProducerName: msg.InternalChefAction.EntityType,
 			ProducerType: "chef_server",
 		},
 		Published: timestamp,
 		Actor: &automate_event.Actor{
-			ID:          msg.InternalChefAction.RemoteRequestId,
+			Id:          msg.InternalChefAction.RemoteRequestId,
 			ObjectType:  msg.InternalChefAction.RequestorType,
 			DisplayName: msg.InternalChefAction.RequestorName,
 		},
 		Verb: msg.Action.Task,
 		Object: &automate_event.Object{
-			ID:          msg.InternalChefAction.Id,
+			Id:          msg.InternalChefAction.Id,
 			ObjectType:  msg.InternalChefAction.EntityType,
 			DisplayName: msg.InternalChefAction.EntityName,
 		},
 		Target: &automate_event.Target{
-			ID:          "",
+			Id:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: msg.InternalChefAction.ServiceHostname,
 		},

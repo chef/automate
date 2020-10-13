@@ -90,19 +90,19 @@ type ConnectionOptions struct {
 
 // ClientsFactory is the interface for grpc client connections
 type ClientsFactory interface {
-	CfgMgmtClient() (cfgmgmt.CfgMgmtClient, error)
-	IngestStatusClient() (chef_ingest.IngestStatusClient, error)
-	ChefIngesterClient() (chef_ingest.ChefIngesterClient, error)
-	ChefIngesterJobSchedulerClient() (chef_ingest.JobSchedulerClient, error)
-	ComplianceIngesterClient() (cc_ingest.ComplianceIngesterClient, error)
+	CfgMgmtClient() (cfgmgmt.CfgMgmtServiceClient, error)
+	IngestStatusClient() (chef_ingest.IngestStatusServiceClient, error)
+	ChefIngesterClient() (chef_ingest.ChefIngesterServiceClient, error)
+	ChefIngesterJobSchedulerClient() (chef_ingest.JobSchedulerServiceClient, error)
+	ComplianceIngesterClient() (cc_ingest.ComplianceIngesterServiceClient, error)
 	NotificationsClient() (notifications.NotificationsClient, error)
-	AuthenticationClient() (authn.AuthenticationClient, error)
-	AuthorizationClient() (authz.AuthorizationClient, error)
-	PoliciesClient() (authz.PoliciesClient, error)
-	ProjectsClient() (authz.ProjectsClient, error)
-	TeamsClient() (teams.TeamsClient, error)
-	TokensMgmtClient() (authn.TokensMgmtClient, error)
-	UsersMgmtClient() (local_user.UsersMgmtClient, error)
+	AuthenticationClient() (authn.AuthenticationServiceClient, error)
+	AuthorizationClient() (authz.AuthorizationServiceClient, error)
+	PoliciesClient() (authz.PoliciesServiceClient, error)
+	ProjectsClient() (authz.ProjectsServiceClient, error)
+	TeamsClient() (teams.TeamsServiceClient, error)
+	TokensMgmtClient() (authn.TokensMgmtServiceClient, error)
+	UsersMgmtClient() (local_user.UsersMgmtServiceClient, error)
 	Notifier() (notifier.Notifier, error)
 	ApplicationsClient() (applications.ApplicationsServiceClient, error)
 	SecretClient() (secrets.SecretsServiceClient, error)
@@ -114,12 +114,12 @@ type ClientsFactory interface {
 	ComplianceStatsServiceClient() (cc_stats.StatsServiceClient, error)
 	ComplianceVersionServiceClient() (cc_version.VersionServiceClient, error)
 	NodeManagerClient() (manager.NodeManagerServiceClient, error)
-	LicenseControlClient() (license_control.LicenseControlClient, error)
+	LicenseControlClient() (license_control.LicenseControlServiceClient, error)
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
-	InfraProxyClient() (infra_proxy.InfraProxyClient, error)
-	CdsClient() (cds.AutomateCdsClient, error)
+	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
+	CdsClient() (cds.AutomateCdsServiceClient, error)
 	Close() error
 }
 
@@ -179,62 +179,62 @@ func NewClientsFactory(config ClientConfig, connFactory *secureconn.Factory) (Cl
 
 // CfgMgmtClient returns a client for the CfgMgmt service.
 // It requires the `cfgmgmt` endpoint to be configured
-func (c *clientsFactory) CfgMgmtClient() (cfgmgmt.CfgMgmtClient, error) {
+func (c *clientsFactory) CfgMgmtClient() (cfgmgmt.CfgMgmtServiceClient, error) {
 	conn, err := c.connectionByName("config-mgmt-service")
 	if err != nil {
 		return nil, err
 	}
-	return cfgmgmt.NewCfgMgmtClient(conn), nil
+	return cfgmgmt.NewCfgMgmtServiceClient(conn), nil
 }
 
 // CdsClient returns a client for the automate-cds service.
 // It requires the `automate-cds` endpoint to be configured
-func (c *clientsFactory) CdsClient() (cds.AutomateCdsClient, error) {
+func (c *clientsFactory) CdsClient() (cds.AutomateCdsServiceClient, error) {
 	conn, err := c.connectionByName("automate-cds")
 	if err != nil {
 		return nil, err
 	}
-	return cds.NewAutomateCdsClient(conn), nil
+	return cds.NewAutomateCdsServiceClient(conn), nil
 }
 
 // IngestStatusClient returns a client for the IngestStatus service.
 // It requires the `ingest` endpoint to be configured
-func (c *clientsFactory) IngestStatusClient() (chef_ingest.IngestStatusClient, error) {
+func (c *clientsFactory) IngestStatusClient() (chef_ingest.IngestStatusServiceClient, error) {
 	conn, err := c.connectionByName("ingest-service")
 	if err != nil {
 		return nil, err
 	}
-	return chef_ingest.NewIngestStatusClient(conn), nil
+	return chef_ingest.NewIngestStatusServiceClient(conn), nil
 }
 
 // ChefIngesterClient returns a client for the ChefIngester service.
 // It requires the `ingest` endpoint to be configured
-func (c *clientsFactory) ChefIngesterClient() (chef_ingest.ChefIngesterClient, error) {
+func (c *clientsFactory) ChefIngesterClient() (chef_ingest.ChefIngesterServiceClient, error) {
 	conn, err := c.connectionByName("ingest-service")
 	if err != nil {
 		return nil, err
 	}
-	return chef_ingest.NewChefIngesterClient(conn), nil
+	return chef_ingest.NewChefIngesterServiceClient(conn), nil
 }
 
 // ChefIngesterJobSchedulerClient returns a client for the ChefIngesterJobScheduler service.
 // It requires the `ingest` endpoint to be configured
-func (c *clientsFactory) ChefIngesterJobSchedulerClient() (chef_ingest.JobSchedulerClient, error) {
+func (c *clientsFactory) ChefIngesterJobSchedulerClient() (chef_ingest.JobSchedulerServiceClient, error) {
 	conn, err := c.connectionByName("ingest-service")
 	if err != nil {
 		return nil, err
 	}
-	return chef_ingest.NewJobSchedulerClient(conn), nil
+	return chef_ingest.NewJobSchedulerServiceClient(conn), nil
 }
 
 // ComplianceIngesterClient returns a client for the InspecIngester service.
 // It requires the `ingest` endpoint to be configured
-func (c *clientsFactory) ComplianceIngesterClient() (cc_ingest.ComplianceIngesterClient, error) {
+func (c *clientsFactory) ComplianceIngesterClient() (cc_ingest.ComplianceIngesterServiceClient, error) {
 	conn, err := c.connectionByName("compliance-service")
 	if err != nil {
 		return nil, err
 	}
-	return cc_ingest.NewComplianceIngesterClient(conn), nil
+	return cc_ingest.NewComplianceIngesterServiceClient(conn), nil
 }
 
 // NotificationsClient returns a client for the Notifications service.
@@ -249,72 +249,72 @@ func (c *clientsFactory) NotificationsClient() (notifications.NotificationsClien
 
 // AuthenticationClient returns a client for the Authentication service.
 // It requires the `auth` endpoint to be configured
-func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationClient, error) {
+func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationServiceClient, error) {
 	conn, err := c.connectionByName("authn-service")
 	if err != nil {
 		return nil, err
 	}
-	return authn.NewAuthenticationClient(conn), nil
+	return authn.NewAuthenticationServiceClient(conn), nil
 }
 
 // AuthorizationClient returns a client for the Authorization service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
+func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationServiceClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return authz.NewAuthorizationClient(conn), nil
+	return authz.NewAuthorizationServiceClient(conn), nil
 }
 
 // PoliciesClient returns a client for the Policies service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) PoliciesClient() (authz.PoliciesClient, error) {
+func (c *clientsFactory) PoliciesClient() (authz.PoliciesServiceClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return authz.NewPoliciesClient(conn), nil
+	return authz.NewPoliciesServiceClient(conn), nil
 }
 
 // ProjectsClient returns a client for the Projects service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) ProjectsClient() (authz.ProjectsClient, error) {
+func (c *clientsFactory) ProjectsClient() (authz.ProjectsServiceClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return authz.NewProjectsClient(conn), nil
+	return authz.NewProjectsServiceClient(conn), nil
 }
 
 // TeamsClient returns a client for the Teams Mgmt service.
 // It requires the `teams` endpoint to be configured
-func (c *clientsFactory) TeamsClient() (teams.TeamsClient, error) {
+func (c *clientsFactory) TeamsClient() (teams.TeamsServiceClient, error) {
 	conn, err := c.connectionByName("teams-service")
 	if err != nil {
 		return nil, err
 	}
-	return teams.NewTeamsClient(conn), nil
+	return teams.NewTeamsServiceClient(conn), nil
 }
 
 // TokensMgmtClient returns a client for the Tokens Mgmt service.
 // It requires the `auth` endpoint to be configured
-func (c *clientsFactory) TokensMgmtClient() (authn.TokensMgmtClient, error) {
+func (c *clientsFactory) TokensMgmtClient() (authn.TokensMgmtServiceClient, error) {
 	conn, err := c.connectionByName("authn-service")
 	if err != nil {
 		return nil, err
 	}
-	return authn.NewTokensMgmtClient(conn), nil
+	return authn.NewTokensMgmtServiceClient(conn), nil
 }
 
 // UsersMgmtClient returns a client for the Users Mgmt service.
 // It requires the `local-user-service` endpoint to be configured
-func (c *clientsFactory) UsersMgmtClient() (local_user.UsersMgmtClient, error) {
+func (c *clientsFactory) UsersMgmtClient() (local_user.UsersMgmtServiceClient, error) {
 	conn, err := c.connectionByName("local-user-service")
 	if err != nil {
 		return nil, err
 	}
-	return local_user.NewUsersMgmtClient(conn), nil
+	return local_user.NewUsersMgmtServiceClient(conn), nil
 }
 
 // Notifier returns the unique client for the Notifications service.
@@ -407,12 +407,12 @@ func (c *clientsFactory) NodeManagerClient() (manager.NodeManagerServiceClient, 
 	return manager.NewNodeManagerServiceClient(conn), nil
 }
 
-func (c *clientsFactory) LicenseControlClient() (license_control.LicenseControlClient, error) {
+func (c *clientsFactory) LicenseControlClient() (license_control.LicenseControlServiceClient, error) {
 	conn, err := c.connectionByName("license-control-service")
 	if err != nil {
 		return nil, err
 	}
-	return license_control.NewLicenseControlClient(conn), nil
+	return license_control.NewLicenseControlServiceClient(conn), nil
 }
 
 func (c *clientsFactory) DeploymentServiceClient() (deployment.DeploymentClient, error) {
@@ -440,12 +440,12 @@ func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient
 	return data_lifecycle.NewPurgeClient(conn), nil
 }
 
-func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyClient, error) {
+func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error) {
 	conn, err := c.connectionByName("infra-proxy-service")
 	if err != nil {
 		return nil, err
 	}
-	return infra_proxy.NewInfraProxyClient(conn), nil
+	return infra_proxy.NewInfraProxyServiceClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {
@@ -503,7 +503,7 @@ func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientCon
 		} else {
 			conn, err = grpc.Dial(
 				endpoint.Target,
-				append(opts, grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
+				append(opts, grpc.WithNoProxy(), grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
 			)
 		}
 

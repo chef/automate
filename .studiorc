@@ -3,7 +3,7 @@
 
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring studio-common to life
-RECOMMENDED_HAB_VERSION="1.6.56"
+RECOMMENDED_HAB_VERSION="1.6.139"
 
 GOLANGCILINTVERSION=1.21.0
 
@@ -39,9 +39,9 @@ export GO111MODULE=on
 setup_gobin() {
     local vendor_hash
     vendor_hash=$(cat \
-      /src/vendor/modules.txt \
+      /src/go.sum \
       /src/components/automate-grpc/protoc-gen-policy/policy/policy.go \
-      /src/components/automate-grpc/protoc-gen-policy/iam/policy.proto \
+      /src/api/external/annotations/iam/policy.proto \
     | sha256sum | cut -c1-16)
     export GOBIN_BASE="/src/bin"
     GOBIN="${GOBIN_BASE}/${vendor_hash}"
@@ -53,8 +53,8 @@ setup_gobin
 # Make 'go installed' binaries available in the PATH
 export PATH=$PATH:$GOBIN
 
-# Enable vendor mode by default
-export GOFLAGS=-mod=vendor
+# Disable vendor mode
+export GOFLAGS=""
 
 # Delve Server port for remote debugging
 export GO_DEBUG_PORT=2345

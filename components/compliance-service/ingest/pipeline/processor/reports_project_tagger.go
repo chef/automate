@@ -15,7 +15,7 @@ import (
 const maxDropOnError = 128
 
 // BundleReportProjectTagger - Build a project tagger processor for InSpec reports
-func BundleReportProjectTagger(authzClient authz.ProjectsClient) message.CompliancePipe {
+func BundleReportProjectTagger(authzClient authz.ProjectsServiceClient) message.CompliancePipe {
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
 		return reportProjectTagger(in, authzClient)
 	}
@@ -26,7 +26,7 @@ func BundleReportProjectTagger(authzClient authz.ProjectsClient) message.Complia
 // comes in, we make a call to the authz-service for the rules. We use these rules for all the messages that are
 // currently in the queue. The 'bundleSize' is the number of messages that can use the current project rules from authz.
 // When the bundleSize zero or less we need to refetch the project rules.
-func reportProjectTagger(in <-chan message.Compliance, authzClient authz.ProjectsClient) <-chan message.Compliance {
+func reportProjectTagger(in <-chan message.Compliance, authzClient authz.ProjectsServiceClient) <-chan message.Compliance {
 	if authzClient == nil {
 		logrus.Error("no authz client found for project tagging; skipping project tagging")
 		return in
@@ -92,7 +92,7 @@ func dropComplianceMessages(in <-chan message.Compliance, err error, numToDrop i
 	logrus.Warnf("Dropped %d chef run messages", numDropped)
 }
 
-func getProjectRulesFromAuthz(authzClient authz.ProjectsClient) (map[string]*authz.ProjectRules, error) {
+func getProjectRulesFromAuthz(authzClient authz.ProjectsServiceClient) (map[string]*authz.ProjectRules, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &authz.ListRulesForAllProjectsReq{})

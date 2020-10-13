@@ -3,19 +3,19 @@ package tokens
 import (
 	"context"
 
+	pb_common "github.com/chef/automate/api/external/iam/v2/common"
+	pb_req "github.com/chef/automate/api/external/iam/v2/request"
+	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
 	"github.com/chef/automate/api/interservice/authn"
-	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 // Server is the server interface
 type Server struct {
-	client authn.TokensMgmtClient
+	client authn.TokensMgmtServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(client authn.TokensMgmtClient) *Server {
+func NewServer(client authn.TokensMgmtServiceClient) *Server {
 	return &Server{client: client}
 }
 

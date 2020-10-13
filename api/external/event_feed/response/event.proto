@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package chef.automate.api.event_feed.response;
+option go_package = "github.com/chef/automate/api/external/event_feed/response";
+
+import "google/protobuf/timestamp.proto";
+
+message GetEventFeedResponse {
+  // List of events.
+  repeated Event events = 1;
+  // Total count of events.
+  int64 total_events = 2;
+}
+
+message Event {
+  // Type of event (cookbook, role, etc).
+  string event_type = 1;
+  // Type of event task (create, update, delete).
+  string task = 2;
+  // Event start time.
+  google.protobuf.Timestamp start_time = 3;
+  string entity_name = 4;
+  // Event record requestor type.
+  string requestor_type = 5;
+  // Event record requestor name.
+  string requestor_name = 6;
+  // Hostname from which the record was gathered.
+  string service_hostname = 7;
+  // Used for grouping events together.
+  string start_id = 8;
+  // Used for grouping events together.
+  int32 event_count = 9;
+  // Used for grouping events together.
+  string parent_name = 16;
+  // Used for grouping events together.
+  string parent_type = 17;
+  // Used for grouping events together; equal to start_time if not grouped
+  google.protobuf.Timestamp end_time = 18; 
+  // Used for grouping events together; equal to start_id if not grouped
+  string end_id = 19;
+  // Event's Chef Organization
+  string chef_organization = 20;
+  // Event's Chef Infra Server
+  string chef_infra_server = 21;
+}
+
+message GetEventTypeCountsResponse {
+  // Total count of events.
+  int64 total = 1;
+  // Total count of events per type.
+  repeated EventCount counts = 2;
+}
+
+message GetEventTaskCountsResponse {
+  // Total count of events.
+  int64 total = 1;
+  // Total count of events per type.
+  repeated EventCount counts = 2;
+}
+
+message EventCount {
+  // Event name.
+  string name = 1;
+  // Count of events.
+  int64 count = 2;
+}
+
+message EventExportResponse {
+	// Exported reports in JSON or CSV.
+	bytes content = 1;
+}

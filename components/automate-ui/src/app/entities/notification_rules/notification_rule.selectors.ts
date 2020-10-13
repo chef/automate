@@ -33,7 +33,22 @@ export const notificationFromRoute = createSelector(
   (state, { id }) => find({ id }, state)
 );
 
+export const saveStatus = createSelector(
+  notificationRuleState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  notificationRuleState,
+  (state) => state.saveError
+);
+
 export const updateStatus = createSelector(
   notificationRuleState,
   (state) => state.updateStatus
+);
+
+export const deleteStatus = createSelector(
+  notificationRuleState,
+  (state) => state.deleteStatus
 );

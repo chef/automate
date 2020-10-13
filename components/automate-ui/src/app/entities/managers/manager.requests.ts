@@ -76,7 +76,7 @@ export class ManagerRequests {
   }
 
   public delete({id}) {
-    return this.http.delete(`${env.nodemgrs_url}/id/${id}`);
+    return this.http.delete(`${env.nodemgrs_url}/id/${id}/with-nodes`);
   }
 
   public create(managerData) {

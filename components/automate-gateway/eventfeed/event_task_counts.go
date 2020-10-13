@@ -3,14 +3,14 @@ package eventfeed
 import (
 	"context"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
+	agRes "github.com/chef/automate/api/external/event_feed/response"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
-	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 )
 
 // CollectEventTaskCounts - collect the event task counts from all the components
 func (eventFeedAggregate *EventFeedAggregate) CollectEventTaskCounts(
-	ctx context.Context, request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
+	ctx context.Context, request *agReq.GetEventTaskCountsRequest) (*agRes.GetEventTaskCountsResponse, error) {
 	eventFilter := &event_feed_api.FeedSummaryRequest{
 		Filters:       request.GetFilter(),
 		Start:         request.GetStart(),
@@ -20,7 +20,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventTaskCounts(
 
 	feedEntryCounts, err := eventFeedAggregate.feedServiceClient.GetFeedSummary(ctx, eventFilter)
 	if err != nil {
-		return &agRes.EventCounts{}, err
+		return &agRes.GetEventTaskCountsResponse{}, err
 	}
 
 	// convert csEventTypeCounts to agEventTypeCounts
@@ -32,7 +32,7 @@ func (eventFeedAggregate *EventFeedAggregate) CollectEventTaskCounts(
 		}
 	}
 
-	return &agRes.EventCounts{
+	return &agRes.GetEventTaskCountsResponse{
 		Total:  feedEntryCounts.TotalEntries,
 		Counts: agEventCounts,
 	}, nil

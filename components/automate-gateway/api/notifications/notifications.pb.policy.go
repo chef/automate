@@ -3,7 +3,7 @@
 
 package notifications
 
-import policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
+import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.notifications.Notifications/AddRule", "notifications:rules", "notifications:notifyRules:create", "POST", "/api/v0/notifications/rules", func(unexpandedResource string, input interface{}) string {

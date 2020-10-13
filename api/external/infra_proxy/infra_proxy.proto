@@ -26,7 +26,7 @@ import "external/infra_proxy/response/nodes.proto";
 import "external/infra_proxy/response/policyfiles.proto";
 
 import "external/common/version/version.proto";
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 service InfraProxy {
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {

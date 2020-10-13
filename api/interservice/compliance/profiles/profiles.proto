@@ -40,6 +40,8 @@ message ProfilePostRequest {
 message Metadata {
     string name = 2;
     string version = 3;
+    // The field must be `contentType` in the JSON representation
+    // buf:lint:ignore FIELD_LOWER_SNAKE_CASE
     string contentType =4;
 }
 message Chunk {

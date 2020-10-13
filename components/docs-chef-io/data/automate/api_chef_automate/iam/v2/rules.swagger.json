@@ -1,0 +1,710 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "external/iam/v2/rules.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/apis/iam/v2/apply-rules": {
+      "get": {
+        "summary": "Get the status of a project update",
+        "description": "Returns details about a project update operation.\n\nYou can poll this endpoint during a project update to monitor progress.\nQuerying this endpoint when there is no update in progress will return details\nabout the completion status of the most recent update.\n\nAuthorization Action:\n```\niam:rules:status\n```",
+        "operationId": "Rules_ApplyRulesStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ApplyRulesStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "rules"
+        ]
+      },
+      "delete": {
+        "summary": "Cancel project update",
+        "description": "Cancels an ongoing project update.\n\nWarning! This action leaves the system in an unknown state that only another\nsuccessful project update can rectify.\n\nThis command exists really just for one scenario: you started a project update\nbut shortly thereafter discovered that you had one more change to include in the\nbatch of updates to be done.\n\nAuthorization Action:\n```\niam:rules:cancel\n```",
+        "operationId": "Rules_ApplyRulesCancel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ApplyRulesCancelResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "rules"
+        ]
+      },
+      "post": {
+        "summary": "Start project update",
+        "description": "Any changes to a project's rules are staged first. They do not take effect until\nall projects are updated.\n\nUpdating all projects begins an operation that applies all pending rule edits\nand then moves ingested resources into the correct projects according to those latest changes.\n\nWith a large amount of historical compliance data, rule application can take a considerable amount of time.\nIt’s best to batch up rule changes and apply them all at once.\n\nAuthorization Action:\n```\niam:rules:apply\n```",
+        "operationId": "Rules_ApplyRulesStart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ApplyRulesStartResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/apis/iam/v2/projects/{id}/rules": {
+      "get": {
+        "summary": "List a project's rules",
+        "description": "Lists all of the project rules of a specific project.\n\nAuthorization Action:\n```\niam:projects:get\n```",
+        "operationId": "Rules_ListRulesForProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.ListRulesForProjectResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/apis/iam/v2/projects/{project_id}/rules": {
+      "post": {
+        "summary": "Create a project rule",
+        "description": "Creates a new project rule to move ingested resources into projects.\n\nA project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.\n\nEach condition specifies one or more values to match for a particular attribute on an ingested resource.\n\nThe choice of attributes depends on the rule type.\nFor NODE type, specify any of the available attributes.\nFor EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.\n\nThe choice of operator depends on how many values you provide.\nIf you wish to match one among a group of values, set the operator to MEMBER_OF.\nFor a single value, use EQUALS.\n\nAuthorization Action:\n```\niam:projects:update\n```",
+        "operationId": "Rules_CreateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateRuleResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "description": "Unique ID of the project this rule belongs to. Cannot be changed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateRuleReq"
+            }
+          }
+        ],
+        "tags": [
+          "rules"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
+          }
+        ]
+      }
+    },
+    "/apis/iam/v2/projects/{project_id}/rules/{id}": {
+      "get": {
+        "summary": "Get a project rule",
+        "description": "Returns the details for a project rule.\n\nAuthorization Action:\n```\niam:projects:get\n```",
+        "operationId": "Rules_GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.GetRuleResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "description": "ID of the project the rule belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "ID of the project rule.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "rules"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a project rule",
+        "description": "The resulting change to the project's resources does not take effect immediately.\nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n```\niam:projects:update\n```",
+        "operationId": "Rules_DeleteRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.DeleteRuleResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "description": "ID of the project the rule belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "ID of the project rule.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "rules"
+        ]
+      },
+      "put": {
+        "summary": "Update a project rule",
+        "description": "Updates the name and conditions of an existing project rule.\nNew conditions can be added. Existing conditions can be updated or removed.\n\nThis operation overwrites all fields excluding ID and Type,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nThe resulting change to the project's resources does not take effect immediately.\nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n```\niam:projects:update\n```",
+        "operationId": "Rules_UpdateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateRuleResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project_id",
+            "description": "Unique ID of the project this rule belongs to. Cannot be changed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Unique ID. Cannot be changed.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateRuleReq"
+            }
+          }
+        ],
+        "tags": [
+          "rules"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "chef.automate.api.iam.v2.ApplyRulesCancelResp": {
+      "type": "object"
+    },
+    "chef.automate.api.iam.v2.ApplyRulesStartResp": {
+      "type": "object"
+    },
+    "chef.automate.api.iam.v2.ApplyRulesStatusResp": {
+      "type": "object",
+      "example": {
+        "state": "running",
+        "estimated_time_complete": "2020-03-20T19:24:55Z",
+        "percentage_complete": 0.5,
+        "failed": false,
+        "failure_message": "",
+        "cancelled": false
+      },
+      "properties": {
+        "state": {
+          "type": "string",
+          "description": "One of two states: `not_running` and `running`."
+        },
+        "estimated_time_complete": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Estimated time when the project update will complete."
+        },
+        "percentage_complete": {
+          "type": "number",
+          "format": "float",
+          "description": "The percentage complete in decimal format from 0 to 1."
+        },
+        "failed": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether or not the project update has failed."
+        },
+        "failure_message": {
+          "type": "string",
+          "description": "The error message from the failure."
+        },
+        "cancelled": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Whether or not the project update was canceled."
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.Condition": {
+      "type": "object",
+      "properties": {
+        "attribute": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionAttribute",
+          "description": "Represents a property of an ingested resource. Depends on the rule type."
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The value(s) of the attribute that an ingested resource must match."
+        },
+        "operator": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionOperator",
+          "description": "Whether the attribute matches a single value (`EQUALS`) or\nmatches at least one of a set of values (`MEMBER_OF`)."
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.ConditionAttribute": {
+      "type": "string",
+      "enum": [
+        "CONDITION_ATTRIBUTE_UNSET",
+        "CHEF_SERVER",
+        "CHEF_ORGANIZATION",
+        "ENVIRONMENT",
+        "CHEF_ROLE",
+        "CHEF_TAG",
+        "CHEF_POLICY_GROUP",
+        "CHEF_POLICY_NAME"
+      ],
+      "default": "CONDITION_ATTRIBUTE_UNSET"
+    },
+    "chef.automate.api.iam.v2.ConditionOperator": {
+      "type": "string",
+      "enum": [
+        "CONDITION_OPERATOR_UNSET",
+        "MEMBER_OF",
+        "EQUALS"
+      ],
+      "default": "CONDITION_OPERATOR_UNSET"
+    },
+    "chef.automate.api.iam.v2.CreateRuleReq": {
+      "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Example Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "MEMBER_OF",
+            "values": [
+              "example.co",
+              "example.io"
+            ]
+          }
+        ]
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "project_id": {
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the project rule."
+        },
+        "type": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule affects nodes (`NODE`) or events (`EVENT`)."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
+          },
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "name",
+        "type",
+        "conditions"
+      ]
+    },
+    "chef.automate.api.iam.v2.CreateRuleResp": {
+      "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Example Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "MEMBER_OF",
+            "values": [
+              "example.co",
+              "example.io"
+            ]
+          }
+        ],
+        "status": "STAGED"
+      },
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.DeleteRuleResp": {
+      "type": "object"
+    },
+    "chef.automate.api.iam.v2.GetRuleResp": {
+      "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Applied Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ],
+        "status": "APPLIED"
+      },
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.ListRulesForProjectResp": {
+      "type": "object",
+      "example": {
+        "rules": [
+          {
+            "id": "example-rule",
+            "project-id": "example-project",
+            "name": "My Applied Rule",
+            "type": "NODE",
+            "conditions": [
+              {
+                "attribute": "CHEF_SERVER",
+                "operator": "EQUALS",
+                "values": [
+                  "example.co"
+                ]
+              }
+            ],
+            "status": "APPLIED"
+          },
+          {
+            "id": "example-rule-2",
+            "project-id": "example-project",
+            "name": "My 2nd Example Rule",
+            "type": "EVENT",
+            "conditions": [
+              {
+                "attribute": "CHEF_ORGANIZATION",
+                "operator": "MEMBER_OF",
+                "values": [
+                  "east",
+                  "west"
+                ]
+              }
+            ],
+            "status": "APPLIED"
+          }
+        ],
+        "status": "APPLIED"
+      },
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ProjectRulesStatus"
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.ProjectRulesStatus": {
+      "type": "string",
+      "enum": [
+        "PROJECT_RULES_STATUS_UNSET",
+        "RULES_APPLIED",
+        "EDITS_PENDING",
+        "NO_RULES"
+      ],
+      "default": "PROJECT_RULES_STATUS_UNSET"
+    },
+    "chef.automate.api.iam.v2.Rule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "project_id": {
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the project rule."
+        },
+        "type": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule applies to ingested `NODE` or `EVENT resources.\nCannot be changed."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
+          },
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
+        },
+        "status": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleStatus",
+          "description": "Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect)."
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.RuleStatus": {
+      "type": "string",
+      "enum": [
+        "RULE_STATUS_UNSET",
+        "STAGED",
+        "APPLIED"
+      ],
+      "default": "RULE_STATUS_UNSET"
+    },
+    "chef.automate.api.iam.v2.RuleType": {
+      "type": "string",
+      "enum": [
+        "RULE_TYPE_UNSET",
+        "NODE",
+        "EVENT"
+      ],
+      "default": "RULE_TYPE_UNSET"
+    },
+    "chef.automate.api.iam.v2.UpdateRuleReq": {
+      "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Updated Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ]
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
+        },
+        "project_id": {
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the project rule."
+        },
+        "type": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule applies to ingested `NODE` or `EVENT` resources.\nCannot be changed."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
+          },
+          "description": "Conditions that ingested resources must match to belong to the project.\nWill contain one or more."
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "name",
+        "type",
+        "conditions"
+      ]
+    },
+    "chef.automate.api.iam.v2.UpdateRuleResp": {
+      "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Updated Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ],
+        "status": "STAGED"
+      },
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    }
+  }
+}

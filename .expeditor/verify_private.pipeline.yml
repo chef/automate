@@ -6,7 +6,6 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 18ead979bf43d70b47209078eb24d232a9f639dc843547c0bbeb49c0bcad3aad
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -16,7 +15,7 @@ steps:
   - label: lint hugo site
     command:
       - .expeditor/buildkite/hugo_lint.sh
-      - cd components/automate-chef-io && make lint
+      - cd components/docs-chef-io && make lint
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -45,8 +44,7 @@ steps:
       executor:
         docker:
 
-  # The build depends on GitHub access to build
-  # automate-chef-io. Further we need to build in order to run the
+  # We need to build in order to run the
   # integration tests.
   - label: build
     command:
@@ -133,6 +131,22 @@ steps:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_set_service_seq_to_int_max && applications_integration"
     timeout_in_minutes: 20
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "data-feed-service"
+    command:
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
     expeditor:
       executor:
         docker:

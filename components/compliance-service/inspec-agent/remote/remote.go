@@ -22,8 +22,8 @@ import (
 )
 
 type RemoteJob struct {
-	TokensMgmtClient authn.TokensMgmtClient
-	PoliciesClient   authz.PoliciesClient
+	TokensMgmtClient authn.TokensMgmtServiceClient
+	PoliciesClient   authz.PoliciesServiceClient
 	AutomateFQDN     string
 }
 

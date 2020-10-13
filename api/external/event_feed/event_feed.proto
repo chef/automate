@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package chef.automate.api.event_feed;
+option go_package = "github.com/chef/automate/api/external/event_feed";
+
+import "external/event_feed/request/event.proto";
+import "external/event_feed/request/eventstrings.proto";
+import "external/event_feed/response/event.proto";
+import "external/event_feed/response/eventstrings.proto";
+import "external/common/response.proto";
+
+import "google/api/annotations.proto";
+import "external/annotations/iam/annotations.proto";
+
+service EventFeedService {
+  /*
+  List Events
+
+  Returns a list of recorded events in Chef Automate, such as Infra Server events (cookbook creation, policyfile updates, and node creation) and Chef Automate internal events (profile installs and scan job creation).
+  Adding a filter makes a list of all events that meet the filter criteria.
+
+  Example:
+  ```
+  eventfeed?collapse=true&filter=organization:The%2520Watchmen&page_size=100&start=1592546400000&end=1593151199999
+  ```
+
+	Authorization Action:
+	```
+	event:events:list
+	```
+	*/
+  rpc GetEventFeed(event_feed.request.GetEventFeedRequest) returns (event_feed.response.GetEventFeedResponse) {
+    option (google.api.http).get =  "/api/v0/eventfeed";
+    option (chef.automate.api.iam.policy).resource = "event:events";
+    option (chef.automate.api.iam.policy).action = "event:events:list";
+  };
+  /*
+  List Count of Event Type Occurrence
+  
+  Returns totals for role, cookbook, and organization event types.
+
+  Example:
+  ```
+  event_type_counts?start=1592546400000&end=1593151199999
+  ```
+
+	Authorization Action:
+	```
+	event:events:list
+	```
+	*/
+  rpc GetEventTypeCounts(request.GetEventTypeCountsRequest) returns (response.GetEventTypeCountsResponse) {
+    option (google.api.http).get =  "/api/v0/event_type_counts";
+    option (chef.automate.api.iam.policy).resource = "event:events";
+    option (chef.automate.api.iam.policy).action = "event:events:list";
+  };
+  /*
+  List Counts Per Event Task Occurrence 
+  
+  Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
+
+  Example:
+  ```
+  event_task_counts?start=1592546400000&end=1593151199999
+  ```
+
+	Authorization Action:
+	```
+	event:events:list
+	```
+	*/
+  rpc GetEventTaskCounts(request.GetEventTaskCountsRequest) returns (response.GetEventTaskCountsResponse) {
+    option (google.api.http).get =  "/api/v0/event_task_counts";
+    option (chef.automate.api.iam.policy).resource = "event:events";
+    option (chef.automate.api.iam.policy).action = "event:events:list";
+  };
+  /*
+  List Summary Stats About Events
+
+  Returns data that populates the guitar strings visual on the top of the event feed.
+
+  Example:
+  ```
+  eventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25
+  ```
+
+	Authorization Action:
+	```
+	event:events:list
+	```
+	*/
+  rpc GetEventStringBuckets(request.GetEventStringBucketsRequest) returns (response.GetEventStringBucketsResponse) {
+    option (google.api.http).get = "/api/v0/eventstrings";
+    option (chef.automate.api.iam.policy).resource = "event:events";
+    option (chef.automate.api.iam.policy).action = "event:events:list";
+  };
+
+  rpc EventExport(request.EventExportRequest) returns (stream response.EventExportResponse) {};
+}

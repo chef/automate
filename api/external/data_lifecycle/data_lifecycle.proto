@@ -4,11 +4,10 @@ package chef.automate.api.data_lifecycle;
 option go_package = "github.com/chef/automate/api/external/data_lifecycle";
 
 import "google/api/annotations.proto";
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-import "interservice/data_lifecycle/purge.proto";
 
 // DataLifecycle allows accessing the status of the data lifecycle job scheduler,
 // and configuring and running jobs.
@@ -182,14 +181,38 @@ message JobStatus {
 
 // PurgePolicies are data lifecycle purge policies
 message PurgePolicies {
-	repeated chef.automate.infra.data_lifecycle.api.EsPolicy elasticsearch = 1;
-	repeated chef.automate.infra.data_lifecycle.api.PgPolicy postgres = 2;
+	repeated EsPolicy elasticsearch = 1;
+	repeated PgPolicy postgres = 2;
 }
 
 // PurgePolicyUpdate is purge policy configuration update
 message PurgePolicyUpdate {
-	repeated chef.automate.infra.data_lifecycle.api.EsPolicyUpdate elasticsearch = 1;
-	repeated chef.automate.infra.data_lifecycle.api.PgPolicyUpdate postgres = 2;
+	repeated EsPolicyUpdate elasticsearch = 1;
+	repeated PgPolicyUpdate postgres = 2;
+}
+
+message EsPolicy {
+	string name = 1;
+	string index = 2;
+	int32 older_than_days = 3;
+	string custom_purge_field = 4;
+	bool disabled = 5;
+}
+
+message EsPolicyUpdate {
+	string policy_name = 1;
+	bool disabled = 2;
+	int32 older_than_days = 3;
+}
+
+message PgPolicy {
+	string name = 1;
+	bool disabled = 2;
+}
+
+message PgPolicyUpdate {
+	string policy_name = 1;
+	bool disabled = 2;
 }
 
 // JobSettings are a job configuration setting update

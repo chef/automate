@@ -246,18 +246,29 @@ describe('ProjectRulesComponent', () => {
       expect(component.showDelete()).toBeTruthy();
     });
 
-    it('should show "Save Rule" Button by default', () => {
+    it('should show "Save Rule" button by default', () => {
+      component.authorizedChecker.isAuthorized$ = observableOf(true);
+      fixture.detectChanges();
       const element = fixture.nativeElement;
       const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
       expect(confirmBtnText).toEqual('Save Rule');
     });
 
-    it('should show "Saving Rules" Button when saving', () => {
+    it('should show "Saving Rules" button when saving', () => {
       component.saving = true;
+      component.authorizedChecker.isAuthorized$ = observableOf(true);
       fixture.detectChanges();
       const element = fixture.nativeElement;
       const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
       expect(confirmBtnText).toEqual('Saving Rule...');
+    });
+
+    it('should not show save/saving button if not authorized', () => {
+      component.authorizedChecker.isAuthorized$ = observableOf(false);
+      fixture.detectChanges();
+      const element = fixture.nativeElement;
+      const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
+      expect(confirmBtnText).toEqual('');
     });
   });
 });

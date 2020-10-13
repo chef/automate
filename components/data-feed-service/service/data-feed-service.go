@@ -17,7 +17,6 @@ import (
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	rrule "github.com/teambition/rrule-go"
 
-	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
@@ -29,10 +28,10 @@ import (
 const version = "1"
 
 type datafeedNotification struct {
-	username string
-	password string
-	url      string
-	data     bytes.Buffer
+	credentials Credentials
+	url         string
+	data        bytes.Buffer
+	contentType string
 }
 
 type DataClient struct {
@@ -136,26 +135,6 @@ func handleSendErr(notification datafeedNotification, startTime time.Time, endTi
 	log.Errorf("Failed to send notification to %v. Start: %v, End: %v. %v", notification.url, startTime, endTime, err)
 }
 
-func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (string, string, error) {
-	secret, err := client.Read(ctx, &secrets.Id{Id: secretID})
-	if err != nil {
-		return "", "", err
-	}
-
-	username := ""
-	password := ""
-	data := secret.GetData()
-	for kv := range data {
-		if data[kv].Key == "username" {
-			username = data[kv].Value
-		} else if data[kv].Key == "password" {
-			password = data[kv].Value
-		}
-	}
-
-	return username, password, nil
-}
-
 func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
@@ -179,10 +158,10 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		log.Error("Error creating request")
 		return err
 	}
-	request.SetBasicAuth(notification.username, notification.password)
-	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
+	request.Header.Add("Content-Type", notification.contentType)
 	request.Header.Add("Content-Encoding", "gzip")
-	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Accept", notification.contentType)
 	request.Header.Add("Chef-Data-Feed-Message-Version", version)
 
 	response, err := client.client.Do(request)
@@ -244,7 +223,7 @@ func addDataContent(nodeDataContent map[string]interface{}, attributes map[strin
 	}
 }
 
-func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, filters []string) (string, string, error) {
 
 	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
 	nodes, err := client.GetNodes(ctx, nodeFilters)
@@ -265,7 +244,7 @@ func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []
 
 }
 
-func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId string) (map[string]interface{}, error) {
+func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, nodeId string) (map[string]interface{}, error) {
 
 	attributesJson := make(map[string]interface{})
 
@@ -301,7 +280,7 @@ func getAttributesAsJson(attributes string, attributeType string) map[string]int
 	return attributesJson
 }
 
-func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, string, error) {
+func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtServiceClient, filters []string) (string, string, string, error) {
 	nodeId, _, err := getNodeFields(ctx, client, filters)
 	if err != nil {
 		return "", "", "", err

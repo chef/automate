@@ -10,24 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// verify that the mock satisfies the TokensMgmtServer interface (at compile time)
-var _ TokensMgmtServer = &TokensMgmtServerMock{}
+// verify that the mock satisfies the TokensMgmtServiceServer interface (at compile time)
+var _ TokensMgmtServiceServer = &TokensMgmtServiceServerMock{}
 
-// NewTokensMgmtServerMock gives you a fresh instance of TokensMgmtServerMock.
-func NewTokensMgmtServerMock() *TokensMgmtServerMock {
-	return &TokensMgmtServerMock{validateRequests: true}
+// NewTokensMgmtServiceServerMock gives you a fresh instance of TokensMgmtServiceServerMock.
+func NewTokensMgmtServiceServerMock() *TokensMgmtServiceServerMock {
+	return &TokensMgmtServiceServerMock{validateRequests: true}
 }
 
-// NewTokensMgmtServerMockWithoutValidation gives you a fresh instance of
-// TokensMgmtServerMock which does not attempt to validate requests before passing
+// NewTokensMgmtServiceServerMockWithoutValidation gives you a fresh instance of
+// TokensMgmtServiceServerMock which does not attempt to validate requests before passing
 // them to their respective '*Func'.
-func NewTokensMgmtServerMockWithoutValidation() *TokensMgmtServerMock {
-	return &TokensMgmtServerMock{}
+func NewTokensMgmtServiceServerMockWithoutValidation() *TokensMgmtServiceServerMock {
+	return &TokensMgmtServiceServerMock{}
 }
 
-// TokensMgmtServerMock is the mock-what-you-want struct that stubs all not-overridden
+// TokensMgmtServiceServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
-type TokensMgmtServerMock struct {
+type TokensMgmtServiceServerMock struct {
 	validateRequests         bool
 	GetTokensFunc            func(context.Context, *GetTokensReq) (*Tokens, error)
 	CreateTokenFunc          func(context.Context, *CreateTokenReq) (*Token, error)
@@ -37,7 +37,7 @@ type TokensMgmtServerMock struct {
 	DeleteTokenFunc          func(context.Context, *DeleteTokenReq) (*DeleteTokenResp, error)
 }
 
-func (m *TokensMgmtServerMock) GetTokens(ctx context.Context, req *GetTokensReq) (*Tokens, error) {
+func (m *TokensMgmtServiceServerMock) GetTokens(ctx context.Context, req *GetTokensReq) (*Tokens, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -49,7 +49,7 @@ func (m *TokensMgmtServerMock) GetTokens(ctx context.Context, req *GetTokensReq)
 	return nil, status.Error(codes.Internal, "mock: 'GetTokens' not implemented")
 }
 
-func (m *TokensMgmtServerMock) CreateToken(ctx context.Context, req *CreateTokenReq) (*Token, error) {
+func (m *TokensMgmtServiceServerMock) CreateToken(ctx context.Context, req *CreateTokenReq) (*Token, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -61,7 +61,7 @@ func (m *TokensMgmtServerMock) CreateToken(ctx context.Context, req *CreateToken
 	return nil, status.Error(codes.Internal, "mock: 'CreateToken' not implemented")
 }
 
-func (m *TokensMgmtServerMock) CreateTokenWithValue(ctx context.Context, req *CreateTokenWithValueReq) (*Token, error) {
+func (m *TokensMgmtServiceServerMock) CreateTokenWithValue(ctx context.Context, req *CreateTokenWithValueReq) (*Token, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -73,7 +73,7 @@ func (m *TokensMgmtServerMock) CreateTokenWithValue(ctx context.Context, req *Cr
 	return nil, status.Error(codes.Internal, "mock: 'CreateTokenWithValue' not implemented")
 }
 
-func (m *TokensMgmtServerMock) UpdateToken(ctx context.Context, req *UpdateTokenReq) (*Token, error) {
+func (m *TokensMgmtServiceServerMock) UpdateToken(ctx context.Context, req *UpdateTokenReq) (*Token, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -85,7 +85,7 @@ func (m *TokensMgmtServerMock) UpdateToken(ctx context.Context, req *UpdateToken
 	return nil, status.Error(codes.Internal, "mock: 'UpdateToken' not implemented")
 }
 
-func (m *TokensMgmtServerMock) GetToken(ctx context.Context, req *GetTokenReq) (*Token, error) {
+func (m *TokensMgmtServiceServerMock) GetToken(ctx context.Context, req *GetTokenReq) (*Token, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -97,7 +97,7 @@ func (m *TokensMgmtServerMock) GetToken(ctx context.Context, req *GetTokenReq) (
 	return nil, status.Error(codes.Internal, "mock: 'GetToken' not implemented")
 }
 
-func (m *TokensMgmtServerMock) DeleteToken(ctx context.Context, req *DeleteTokenReq) (*DeleteTokenResp, error) {
+func (m *TokensMgmtServiceServerMock) DeleteToken(ctx context.Context, req *DeleteTokenReq) (*DeleteTokenResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -110,7 +110,7 @@ func (m *TokensMgmtServerMock) DeleteToken(ctx context.Context, req *DeleteToken
 }
 
 // Reset resets all overridden functions
-func (m *TokensMgmtServerMock) Reset() {
+func (m *TokensMgmtServiceServerMock) Reset() {
 	m.GetTokensFunc = nil
 	m.CreateTokenFunc = nil
 	m.CreateTokenWithValueFunc = nil

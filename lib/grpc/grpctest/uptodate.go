@@ -100,7 +100,17 @@ func AssertAllProtoMethodsAnnotated(t *testing.T, file string, vsnIdentifier str
 		t.Fatalf("parse proto file %q: %s", file, err)
 	}
 	publicRE := regexp.MustCompile(`google.api.http`)
-	policyRE := regexp.MustCompile(fmt.Sprintf(`\[%s\]:\<([^>]+)\>`, vsnIdentifier))
+	// Matching string examples:
+	//   A simpler method.GetOptions is like:
+	//
+	// [chef.automate.api.iam.policy]:{resource:"system:config" action:"system:telemetryConfig:get"} [google.api.http]:{get:"/api/v0/telemetry/config"}
+	//
+	//   A more complicated one is like:
+	//
+	// [chef.automate.api.iam.policy]:{resource:"iam:policies:{id}" action:"iam:policies:update"} [google.api.http]:{put:"/apis/iam/v2/policies/{id}" body:"*"} [grpc.gateway.protoc_gen_swagger.options.openapiv2_operation]:{tags:"policies" extensions:{key:"x-code-samples" value:{list_value:{values:{struct_value:{fields:{key:"lang" value:{string_value:"JSON"}} fields:{key:"source" value:{string_value:"{\"name\": \"My Updated Viewer Policy\", \"members\": [\"user:ldap:newuser\", \"team:ldap:newteam\"], \"statements\": [{\"role\": \"viewer\",\"projects\":[\"project1\", \"project2\"], \"effect\": \"ALLOW\"},{\"role\": \"qa\",\"projects\": [\"acceptanceProject\"], \"effect\": \"ALLOW\"}],\"projects\": []}"}}}}}}}}
+	//
+	// NOTE that in the older version of the golang protobuf toolchain, angle brackets (`<>`) were used instead of curly braces (`{}`)
+	policyRE := regexp.MustCompile(fmt.Sprintf(`\[%s\]:\{([^>]+)\}`, vsnIdentifier))
 	resourceRE := regexp.MustCompile(`resource:"([^"]+)"`)
 	actionRE := regexp.MustCompile(`action:"([^"]+)"`)
 	for _, svc := range fds[0].GetServices() {
@@ -281,11 +291,11 @@ func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {
 			// top-level of protos that are located within the components
 			filepath.Join(topLevel, "components"),
 			// for google/api/{annotations,http}.proto
-			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
+			filepath.Join(topLevel, "protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
 			// for validate/validate.proto
-			filepath.Join(topLevel, "vendor/github.com/envoyproxy/protoc-gen-validate/"),
+			filepath.Join(topLevel, "protovendor/github.com/envoyproxy/protoc-gen-validate/"),
 			// for protoc-gen-swagger/options/annotations.proto
-			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/"),
+			filepath.Join(topLevel, "protovendor/github.com/grpc-ecosystem/grpc-gateway/"),
 		},
 	}
 	return parser.ParseFiles(files...)

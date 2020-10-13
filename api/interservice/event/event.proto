@@ -13,50 +13,50 @@ service EventService {
     rpc Stop(StopRequest) returns (StopResponse);
 }
 
-message EventType { string Name = 1; }
+message EventType { string name = 1; }
 
 message Producer {
-    string  ID              = 1;
-    string ProducerName     = 2;
-    string ProducerType     = 3;
-    repeated string Tags    = 4;
+    string id              = 1;
+    string producer_name     = 2;
+    string producer_type     = 3;
+    repeated string tags    = 4;
 }
 
 message Actor {
-    string ID           = 1;
-    string ObjectType   = 2;
-    string DisplayName  = 3;
+    string id           = 1;
+    string object_type   = 2;
+    string display_name  = 3;
 }
 
 message Object {
-    string ID           = 1;
-    string ObjectType   = 2;
-    string DisplayName  = 3;
+    string id           = 1;
+    string object_type   = 2;
+    string display_name  = 3;
 }
 
 message Target {
-    string ID           = 1;
-    string ObjectType   = 2;
-    string DisplayName  = 3;
+    string id           = 1;
+    string object_type   = 2;
+    string display_name  = 3;
 }
 
 message EventMsg {
-    string EventID                         = 1;
-    EventType Type                         = 2;
-    Producer Producer                      = 3;
-    repeated string Tags                   = 4;
-    google.protobuf.Timestamp Published    = 5;
-    Actor Actor                            = 6;
-    string Verb                            = 7;
-    Object Object                          = 8;
-    Target Target                          = 9;
+    string event_id                         = 1;
+    EventType type                         = 2;
+    Producer producer                      = 3;
+    repeated string tags                   = 4;
+    google.protobuf.Timestamp published    = 5;
+    Actor actor                            = 6;
+    string verb                            = 7;
+    Object object                          = 8;
+    Target target                          = 9;
     google.protobuf.Struct data            = 10;
-    repeated string Projects               = 11;
+    repeated string projects               = 11;
 }
 
-message EventResponse { bool Success = 1; }
-message PublishRequest { EventMsg Msg = 1; }
-message PublishResponse { bool Success = 1; }
+message EventResponse { bool success = 1; }
+message PublishRequest { EventMsg msg = 1; }
+message PublishResponse { bool success = 1; }
 message SubscribeRequest {}
 message SubscribeResponse {}
 message StartRequest {}

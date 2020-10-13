@@ -5404,7 +5404,7 @@
           "jmx_port": 9010
         },
         "artifactory": {
-          "endpoint": "http://artifactory.chef.co"
+          "endpoint": "https://artifactory.chef.co/artifactory"
         },
         "omnibus-cache": {
           "profile_name": "omnibus-cache"
@@ -5417,7 +5417,7 @@
     "override": {
       "opscode-ci": {
         "artifactory": {
-          "endpoint": "http://artifactory.chef.co:8081"
+          "endpoint": "https://artifactory.chef.co/artifactory"
         },
         "omnitruck": {
           "packages_bucket": "opscode-omnibus-packages",

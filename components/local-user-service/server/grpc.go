@@ -36,7 +36,7 @@ func (s *Server) NewGRPCServer() *grpc.Server {
 			),
 		),
 	)
-	local_user.RegisterUsersMgmtServer(g, s)
+	local_user.RegisterUsersMgmtServiceServer(g, s)
 	health.RegisterHealthServer(g, s.health)
 	reflection.Register(g)
 	return g

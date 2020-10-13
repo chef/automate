@@ -18,7 +18,7 @@ import (
 )
 
 type LicenseServer struct {
-	client       license_control.LicenseControlClient
+	client       license_control.LicenseControlServiceClient
 	deployClient deployment_service.DeploymentClient
 	tlClient     tlc.Client
 }
@@ -26,7 +26,7 @@ type LicenseServer struct {
 // NewLicenseServer returns the initialized state of the license handlers: a
 // client to license-control-service and the URL of trial-license-service
 func NewLicenseServer(
-	client license_control.LicenseControlClient,
+	client license_control.LicenseControlServiceClient,
 	deployClient deployment_service.DeploymentClient,
 	trialLicenseURL *url.URL) *LicenseServer {
 	var tlClient tlc.Client
@@ -75,10 +75,13 @@ func (t *LicenseServer) GetStatus(ctx context.Context,
 	}
 
 	resp := license.GetStatusResp{
-		LicenseId:      lcResp.LicenseId,
-		ConfiguredAt:   lcResp.ConfiguredAt,
-		CustomerName:   lcResp.CustomerName,
-		LicensedPeriod: (*license.GetStatusResp_DateRange)(lcResp.LicensedPeriod),
+		LicenseId:    lcResp.LicenseId,
+		ConfiguredAt: lcResp.ConfiguredAt,
+		CustomerName: lcResp.CustomerName,
+		LicensedPeriod: &license.GetStatusResp_DateRange{
+			Start: lcResp.LicensedPeriod.Start,
+			End:   lcResp.LicensedPeriod.End,
+		},
 	}
 	return &resp, nil
 }

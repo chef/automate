@@ -3,19 +3,19 @@ package users
 import (
 	"context"
 
+	pb_common "github.com/chef/automate/api/external/iam/v2/common"
+	pb_req "github.com/chef/automate/api/external/iam/v2/request"
+	pb_resp "github.com/chef/automate/api/external/iam/v2/response"
 	"github.com/chef/automate/api/interservice/local_user"
-	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
-	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 // Server is the server interface
 type Server struct {
-	users local_user.UsersMgmtClient
+	users local_user.UsersMgmtServiceClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(users local_user.UsersMgmtClient) *Server {
+func NewServer(users local_user.UsersMgmtServiceClient) *Server {
 	return &Server{users: users}
 }
 

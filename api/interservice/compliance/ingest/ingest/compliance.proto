@@ -9,7 +9,7 @@ import "google/protobuf/empty.proto";
 import "interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
-service ComplianceIngester {
+service ComplianceIngesterService {
 	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			post: "/api/v0/events/compliance/report"

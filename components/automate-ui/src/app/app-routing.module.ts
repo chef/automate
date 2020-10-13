@@ -23,7 +23,6 @@ import { DataFeedComponent } from './pages/data-feed/data-feed.component';
 import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { NotificationDetailsComponent } from './pages/notification-details/notification-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
-import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
@@ -58,6 +57,9 @@ import { NodeDetailsResolverService } from './services/node-details/node-details
 import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
+import {
+  NodeNoRunIdResolverService
+} from './services/node-details/node-norunid-resolver.service';
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
@@ -163,8 +165,9 @@ const routes: Routes = [
         },
         {
           path: 'node-credentials',
-          loadChildren: () => import('./pages/+compliance/+credentials/credentials.module')
-            .then(m => m.CredentialsModule)
+          loadChildren: () =>
+            import('./pages/+compliance/+node-credentials/node-credentials.module')
+              .then(m => m.NodeCredentialsModule)
         },
         {
           path: 'notifications',
@@ -172,14 +175,6 @@ const routes: Routes = [
             {
               path: '',
               component: NotificationsComponent
-            },
-            {
-              path: 'form',
-              component: NotificationFormComponent
-            },
-            {
-              path: 'form/:id',
-              component: NotificationFormComponent
             },
             {
               path: ':id',
@@ -226,6 +221,13 @@ const routes: Routes = [
             {
               path: '',
               component: ClientRunsComponent
+            },
+            {
+              path: ':node-id',
+              component: NodeNoRunsDetailsComponent,
+              resolve: {
+                node: NodeNoRunIdResolverService
+              }
             },
             {
               path: ':node-id/missing-runs',

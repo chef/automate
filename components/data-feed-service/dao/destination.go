@@ -7,7 +7,7 @@ import (
 	"github.com/lib/pq"
 
 	datafeed "github.com/chef/automate/api/external/data_feed"
-	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/pkg/errors"
 )
 

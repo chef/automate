@@ -27,7 +27,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 		),
 	)
 	health.RegisterHealthServer(g, health.NewService())
-	grpc_s.RegisterInfraProxyServer(g, NewServer(s))
+	grpc_s.RegisterInfraProxyServiceServer(g, NewServer(s))
 	reflection.Register(g)
 	return g
 }

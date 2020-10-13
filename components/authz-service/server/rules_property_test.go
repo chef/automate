@@ -13,6 +13,7 @@ import (
 	"github.com/leanovate/gopter/prop"
 	"golang.org/x/text/unicode/rangetable"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	api "github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants"
@@ -755,7 +756,7 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 	return true
 }
 
-func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error {
+func createSystemRoles(ctx context.Context, polClient api.PoliciesServiceClient) error {
 	_, err := polClient.CreateRole(ctx,
 		&api.CreateRoleReq{Id: constants.ProjectOwnerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
 	if err != nil {
@@ -776,8 +777,8 @@ func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error 
 
 func createProjectAndRule(
 	ctx context.Context,
-	projClient api.ProjectsClient,
-	polClient api.PoliciesClient,
+	projClient api.ProjectsServiceClient,
+	polClient api.PoliciesServiceClient,
 	reqs projectAndRuleReq) (*api.ProjectRule, error) {
 	if err := createSystemRoles(ctx, polClient); err != nil {
 		return nil, err
@@ -794,7 +795,7 @@ func createProjectAndRule(
 	return rule.Rule, nil
 }
 
-func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
+func createRules(ctx context.Context, cl api.ProjectsServiceClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
 	for _, rule := range rules {
 
 		_, err := cl.CreateRule(ctx, &rule)
@@ -815,7 +816,7 @@ func reportRules(t *testing.T, rules []api.CreateRuleReq) {
 	valueBytes := 0
 	for _, rule := range rules {
 		condCount += len(rule.Conditions)
-		ruleBytes += rule.XXX_Size()
+		ruleBytes += proto.Size(&rule)
 		for _, c := range rule.Conditions {
 			valueCount += len(c.Values)
 			for _, v := range c.Values {

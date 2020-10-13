@@ -18,8 +18,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -333,6 +333,7 @@ func (secretsDb *DB) GetSecrets(sortField string, insortOrder secrets.Query_Orde
 
 var secretsFilterField = map[string]string{
 	"type": "type",
+	"name": "name",
 }
 
 func validateSecretFilters(filters []*query.Filter) error {
@@ -351,7 +352,7 @@ func validateSecretFilters(filters []*query.Filter) error {
 
 func isValidSecretType(secretType string) bool {
 	switch secretType {
-	case "ssh", "winrm", "sudo", "aws", "azure", "service_now":
+	case "ssh", "winrm", "sudo", "aws", "azure", "service_now", "data_feed":
 		return true
 	default:
 		return false

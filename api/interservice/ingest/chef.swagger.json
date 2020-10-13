@@ -13,12 +13,18 @@
   "paths": {
     "/api/v0/events/chef/action": {
       "post": {
-        "operationId": "ProcessChefAction",
+        "operationId": "ChefIngesterService_ProcessChefAction",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefActionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -33,18 +39,24 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/liveness": {
       "post": {
-        "operationId": "ProcessLivenessPing",
+        "operationId": "ChefIngesterService_ProcessLivenessPing",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessLivenessResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -59,18 +71,24 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/nodedelete": {
       "post": {
-        "operationId": "ProcessNodeDelete",
+        "operationId": "ChefIngesterService_ProcessNodeDelete",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessNodeDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -85,18 +103,24 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/events/chef/run": {
       "post": {
-        "operationId": "ProcessChefRun",
+        "operationId": "ChefIngesterService_ProcessChefRun",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefRunResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
             }
           }
         },
@@ -111,23 +135,29 @@
           }
         ],
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     },
     "/api/v0/ingest/version": {
       "get": {
-        "operationId": "GetVersion",
+        "operationId": "ChefIngesterService_GetVersion",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.domain.ingest.Version"
             }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
           }
         },
         "tags": [
-          "ChefIngester"
+          "ChefIngesterService"
         ]
       }
     }
@@ -360,6 +390,9 @@
         },
         "result": {
           "type": "string"
+        },
+        "error": {
+          "$ref": "#/definitions/chef.automate.api.ingest.request.Error"
         }
       }
     },
@@ -515,6 +548,18 @@
       "description": "The ingest-service version constructed with:\n* Service name\n* Built time\n* Semantic version\n* Git SHA",
       "title": "Version message"
     },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "google.protobuf.NullValue": {
       "type": "string",
       "enum": [
@@ -522,6 +567,27 @@
       ],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

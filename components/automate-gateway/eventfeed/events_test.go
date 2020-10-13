@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	agReq "github.com/chef/automate/api/external/event_feed/request"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
-	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
@@ -32,7 +32,7 @@ func TestEventFeedEmpty(t *testing.T) {
 
 	eventCounts, err := eventFeedAggregate.CollectEventFeed(
 		context.Background(),
-		&agReq.EventFilter{
+		&agReq.GetEventFeedRequest{
 			PageSize: 1000,
 		},
 	)
@@ -56,7 +56,7 @@ func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockFeedServiceClient)
 	events, err := eventFeedAggregate.CollectEventFeed(context.Background(),
-		&agReq.EventFilter{
+		&agReq.GetEventFeedRequest{
 			Collapse: false,
 			PageSize: 1000,
 		},
@@ -70,7 +70,7 @@ func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 // TestEventFeedCollectEventFeedCollapseTrue Sending collapse=true
 func TestEventFeedCollectEventFeedCollapseNonoverlapping(t *testing.T) {
 	// Enable event grouping
-	request := &agReq.EventFilter{Collapse: true, PageSize: 1000}
+	request := &agReq.GetEventFeedRequest{Collapse: true, PageSize: 1000}
 
 	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
@@ -95,11 +95,11 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 	)
 	cases := []struct {
 		description string
-		request     agReq.EventFilter
+		request     agReq.GetEventFeedRequest
 	}{
 		{
 			description: "The Start date is after the End date",
-			request: agReq.EventFilter{
+			request: agReq.GetEventFeedRequest{
 				End:      date.AddDate(0, 0, -6).Unix() * 1000,
 				Start:    date.Unix() * 1000,
 				PageSize: 10,
@@ -107,7 +107,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 		},
 		{
 			description: "Before and After parameters should not both be set",
-			request: agReq.EventFilter{
+			request: agReq.GetEventFeedRequest{
 				End:      date.Unix() * 1000,
 				Start:    date.AddDate(0, 0, -6).Unix() * 1000,
 				PageSize: 10,
@@ -117,7 +117,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 		},
 		{
 			description: "If the Before param is set the Cursor param needs to be set also",
-			request: agReq.EventFilter{
+			request: agReq.GetEventFeedRequest{
 				End:      date.Unix() * 1000,
 				Start:    date.AddDate(0, 0, -6).Unix() * 1000,
 				PageSize: 10,
@@ -126,7 +126,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 		},
 		{
 			description: "When the After is set without the Cursor, After must be equal to End",
-			request: agReq.EventFilter{
+			request: agReq.GetEventFeedRequest{
 				End:      date.Unix() * 1000,
 				Start:    date.AddDate(0, 0, -6).Unix() * 1000,
 				PageSize: 10,
@@ -135,7 +135,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 		},
 		{
 			description: "The Page size is set to zero",
-			request: agReq.EventFilter{
+			request: agReq.GetEventFeedRequest{
 				End:      date.Unix() * 1000,
 				Start:    date.AddDate(0, 0, -6).Unix() * 1000,
 				PageSize: 0,
@@ -198,7 +198,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 				SourceEventPublished: timestamp1,
 				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
-					ID:   "scanjob",
+					Id:   "scanjob",
 				},
 				Actor: &event_feed_api.Actor{
 					Name:       "golang",
@@ -217,7 +217,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 			SourceEventPublished: timestamp2,
 			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
-				ID:   "profile",
+				Id:   "profile",
 			},
 			Actor: &event_feed_api.Actor{
 				Name:       "golang",
@@ -235,7 +235,7 @@ func fixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 			SourceEventPublished: timestamp3,
 			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
-				ID:   "profile",
+				Id:   "profile",
 			},
 			Actor: &event_feed_api.Actor{
 				Name:       "golang",

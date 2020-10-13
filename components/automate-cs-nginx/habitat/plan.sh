@@ -7,7 +7,7 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="13.0.47"
+pkg_version="14.0.25"
 pkg_deps=(
   core/coreutils
   chef/mlsa
@@ -17,21 +17,11 @@ pkg_deps=(
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  # Currently, the chef-server-* packages we are pinned to were
-  # hand-built and any update to any of these three packages will
-  # require them to be re-built.
-  #
-  # We cannot follow the latest chef-server-* packages until the
-  # following issue is resolved:
-  #
-  # https://github.com/chef/automate/pull/2002#issuecomment-600343881
-  #
-  core/bundler/1.17.3/20200404130802
-  core/curl/7.68.0/20200319191535
-  core/ruby/2.5.7/20200404130135
+  core/curl/7.68.0/20200601114640
+  core/ruby26/2.6.5/20200404043345
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/13.0.47/20200421235836"
-  "${vendor_origin}/chef-server-ctl/13.0.47/20200421235903"
+  "${vendor_origin}/chef-server-nginx/14.0.25/20200828082112"
+  "${vendor_origin}/chef-server-ctl/14.0.25/20200828081545"
 )
 
 pkg_bin_dirs=(bin)
@@ -73,8 +63,7 @@ scaffolding_go_binary_list=(
 chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
-  GO_LDFLAGS="-X main.BundlePath=$(pkg_path_for core/bundler)"
-  GO_LDFLAGS="$GO_LDFLAGS -X main.RubyPath=$(pkg_path_for core/ruby)"
+  GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby26)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
   GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
@@ -90,5 +79,5 @@ do_install() {
   install "$PLAN_CONTEXT/bin/knife" "$wrapper_bin_path/knife"
 
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for chef/chef-server-ctl)!g" "$wrapper_bin_path/knife"
-  sed -i "s!__BUILDTIME_HAB_PKG_PATH_BUNDLER__!$(pkg_path_for core/bundler)!g" "$wrapper_bin_path/knife"
+  sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby26)!g" "$wrapper_bin_path/knife"
 }

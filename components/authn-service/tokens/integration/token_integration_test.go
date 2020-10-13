@@ -135,8 +135,8 @@ func TestChefClientAuthn(t *testing.T) {
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	authClient := authn.NewAuthenticationClient(conn)
-	tokenClient := authn.NewTokensMgmtClient(conn)
+	authClient := authn.NewAuthenticationServiceClient(conn)
+	tokenClient := authn.NewTokensMgmtServiceClient(conn)
 
 	tests := []struct {
 		authHeader string
@@ -231,24 +231,24 @@ func TestChefClientAuthn(t *testing.T) {
 	}
 }
 
-func newAuthzMock(t *testing.T) (authz.AuthorizationClient, authz.PoliciesClient, func()) {
+func newAuthzMock(t *testing.T) (authz.AuthorizationServiceClient, authz.PoliciesServiceClient, func()) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	mockAuthz := authz.NewAuthorizationServerMock()
+	mockAuthz := authz.NewAuthorizationServiceServerMock()
 	mockAuthz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
-	authz.RegisterAuthorizationServer(g, mockAuthz)
+	authz.RegisterAuthorizationServiceServer(g, mockAuthz)
 
-	mockPolicies := authz.NewPoliciesServerMock()
+	mockPolicies := authz.NewPoliciesServiceServerMock()
 	mockPolicies.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-	authz.RegisterPoliciesServer(g, mockPolicies)
+	authz.RegisterPoliciesServiceServer(g, mockPolicies)
 
 	authzServer := grpctest.NewServer(g)
 	conn, err := connFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	return authz.NewAuthorizationClient(conn), authz.NewPoliciesClient(conn), authzServer.Close
+	return authz.NewAuthorizationServiceClient(conn), authz.NewPoliciesServiceClient(conn), authzServer.Close
 }
 
 func defaultMockPurgeFunc(context.Context,

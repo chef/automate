@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/api/external/compliance/profiles";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "automate-grpc/protoc-gen-policy/iam/annotations.proto";
+import "external/annotations/iam/annotations.proto";
 
 service ProfilesService {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410

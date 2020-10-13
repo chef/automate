@@ -15,13 +15,13 @@
     "chef.automate.domain.event.api.Actor": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }
@@ -29,7 +29,7 @@
     "chef.automate.domain.event.api.EventResponse": {
       "type": "object",
       "properties": {
-        "Success": {
+        "success": {
           "type": "boolean",
           "format": "boolean"
         }
@@ -38,7 +38,7 @@
     "chef.automate.domain.event.api.EventType": {
       "type": "object",
       "properties": {
-        "Name": {
+        "name": {
           "type": "string"
         }
       }
@@ -46,13 +46,13 @@
     "chef.automate.domain.event.api.Object": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }
@@ -60,16 +60,16 @@
     "chef.automate.domain.event.api.Producer": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ProducerName": {
+        "producer_name": {
           "type": "string"
         },
-        "ProducerType": {
+        "producer_type": {
           "type": "string"
         },
-        "Tags": {
+        "tags": {
           "type": "array",
           "items": {
             "type": "string"
@@ -80,13 +80,13 @@
     "chef.automate.domain.event.api.Target": {
       "type": "object",
       "properties": {
-        "ID": {
+        "id": {
           "type": "string"
         },
-        "ObjectType": {
+        "object_type": {
           "type": "string"
         },
-        "DisplayName": {
+        "display_name": {
           "type": "string"
         }
       }
@@ -107,6 +107,18 @@
         }
       }
     },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "google.protobuf.NullValue": {
       "type": "string",
       "enum": [
@@ -114,6 +126,27 @@
       ],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "grpc.gateway.runtime.Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   }
 }

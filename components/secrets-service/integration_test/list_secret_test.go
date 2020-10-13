@@ -301,3 +301,142 @@ func TestListSecretPaging(t *testing.T) {
 
 	deleteAllSecrets()
 }
+
+func TestListSecretFilterByName(t *testing.T) {
+	ctx := context.Background()
+
+	testData := struct {
+		order         secrets.Query_OrderType
+		sort          string
+		inputSecrets  []*secrets.Secret
+		outputSecrets []*secrets.Secret
+		message       string
+	}{
+
+		order: secrets.Query_ASC,
+		sort:  "name",
+		inputSecrets: []*secrets.Secret{
+			{
+				Name: "data feed secret",
+				Type: "data_feed",
+				Data: appendKvs(
+					&query.Kv{Key: "username", Value: "username"},
+					&query.Kv{Key: "password", Value: "password"}),
+			},
+			{
+				Name: "service now secret",
+				Type: "service_now",
+				Data: appendKvs(
+					&query.Kv{Key: "username", Value: "username"},
+					&query.Kv{Key: "password", Value: "password"}),
+			},
+		},
+		outputSecrets: []*secrets.Secret{
+			{
+				Name: "data feed secret",
+				Type: "data_feed",
+			},
+		},
+		message: "Order asc",
+	}
+
+	for _, secret := range testData.inputSecrets {
+		id, err := secretsServer.Create(ctx, secret)
+		assert.NoError(t, err)
+		assert.NotNil(t, id)
+	}
+
+	nameFilter := &query.Filter{
+		Key:    "name",
+		Values: []string{"data feed secret"},
+	}
+	req := &secrets.Query{
+		Order:   testData.order,
+		Sort:    testData.sort,
+		Filters: []*query.Filter{nameFilter},
+	}
+
+	responseSecrets, err := secretsServer.List(ctx, req)
+	assert.NoError(t, err, testData.message)
+	assert.NotNil(t, responseSecrets)
+	assert.Equal(t, len(testData.outputSecrets), int(responseSecrets.Total), testData.message)
+
+	for index, actualSecret := range responseSecrets.Secrets {
+		expectedSecret := testData.outputSecrets[index]
+		assert.Equal(t, actualSecret.Name, expectedSecret.Name, testData.message)
+		assert.Equal(t, actualSecret.Type, expectedSecret.Type, testData.message)
+	}
+
+	deleteAllSecrets()
+
+}
+
+
+func TestListSecretFilterByType(t *testing.T) {
+	ctx := context.Background()
+
+	testData := struct {
+		order         secrets.Query_OrderType
+		sort          string
+		inputSecrets  []*secrets.Secret
+		outputSecrets []*secrets.Secret
+		message       string
+	}{
+
+		order: secrets.Query_ASC,
+		sort:  "name",
+		inputSecrets: []*secrets.Secret{
+			{
+				Name: "data feed secret",
+				Type: "data_feed",
+				Data: appendKvs(
+					&query.Kv{Key: "username", Value: "username"},
+					&query.Kv{Key: "password", Value: "password"}),
+			},
+			{
+				Name: "service now secret",
+				Type: "service_now",
+				Data: appendKvs(
+					&query.Kv{Key: "username", Value: "username"},
+					&query.Kv{Key: "password", Value: "password"}),
+			},
+		},
+		outputSecrets: []*secrets.Secret{
+			{
+				Name: "data feed secret",
+				Type: "data_feed",
+			},
+		},
+		message: "Order asc",
+	}
+
+	for _, secret := range testData.inputSecrets {
+		id, err := secretsServer.Create(ctx, secret)
+		assert.NoError(t, err)
+		assert.NotNil(t, id)
+	}
+
+	typeFilter := &query.Filter{
+		Key:    "type",
+		Values: []string{"data_feed"},
+	}
+	req := &secrets.Query{
+		Order:   testData.order,
+		Sort:    testData.sort,
+		Filters: []*query.Filter{typeFilter},
+	}
+
+	responseSecrets, err := secretsServer.List(ctx, req)
+	assert.NoError(t, err, testData.message)
+	assert.NotNil(t, responseSecrets)
+	assert.Equal(t, len(testData.outputSecrets), int(responseSecrets.Total), testData.message)
+
+	for index, actualSecret := range responseSecrets.Secrets {
+		expectedSecret := testData.outputSecrets[index]
+		assert.Equal(t, actualSecret.Name, expectedSecret.Name, testData.message)
+		assert.Equal(t, actualSecret.Type, expectedSecret.Type, testData.message)
+	}
+
+	deleteAllSecrets()
+
+}

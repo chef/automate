@@ -31,6 +31,10 @@ import (
 	pb_cc_jobs "github.com/chef/automate/api/external/compliance/scanner/jobs"
 	pb_data_feed "github.com/chef/automate/api/external/data_feed"
 	pb_data_lifecycle "github.com/chef/automate/api/external/data_lifecycle"
+	pb_eventfeed "github.com/chef/automate/api/external/event_feed"
+	eventfeed_Req "github.com/chef/automate/api/external/event_feed/request"
+	pb_iam "github.com/chef/automate/api/external/iam/v2"
+	policy "github.com/chef/automate/api/external/iam/v2/policy"
 	pb_infra_proxy "github.com/chef/automate/api/external/infra_proxy"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
@@ -41,12 +45,10 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
+	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
-	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
-	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
-	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"
@@ -139,7 +141,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		}).Fatal("Could not create client")
 	}
 
-	pb_eventfeed.RegisterEventFeedServer(grpcServer,
+	pb_eventfeed.RegisterEventFeedServiceServer(grpcServer,
 		handler.NewEventFeedServer(eventFeedClient))
 
 	notifier, err := clients.Notifier()
@@ -340,7 +342,7 @@ type registerFunc func(context.Context, *runtime.ServeMux, string, []grpc.DialOp
 // unversionedRESTMux returns all endpoints for the GRPC rest gateway
 func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, func(), error) {
 	return muxFromRegisterMap(grpcURI, dopts, map[string]registerFunc{
-		"event feed":               pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
+		"event feed":               pb_eventfeed.RegisterEventFeedServiceHandlerFromEndpoint,
 		"content delivery service": pb_cds.RegisterCdsHandlerFromEndpoint,
 		"config management":        pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
 		"chef ingestion":           pb_ingest.RegisterChefIngesterHandlerFromEndpoint,
@@ -763,6 +765,57 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	stream, err := cfgMgmtClient.NodeExport(ctx, &nodeExportRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		w.Write(data.GetContent()) // nolint: errcheck
+	}
+}
+
+func (s *Server) eventFeedExportHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		action   = "event:events:list"
+		resource = "event:events"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var exportRequest eventfeed_Req.EventExportRequest
+	if err := decoder.Decode(&exportRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	eventFeedClient, err := s.clientsFactory.FeedClient()
+	if err != nil {
+		http.Error(w, "grpc service for config mgmt unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	interRequst := inter_eventfeed_Req.EventExportRequest{
+		OutputType: exportRequest.OutputType,
+		Filter:     exportRequest.Filter,
+		Start:      exportRequest.Start,
+		End:        exportRequest.End,
+		Order:      exportRequest.Order,
+	}
+
+	stream, err := eventFeedClient.EventExport(ctx, &interRequst)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
