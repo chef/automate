@@ -1,6 +1,6 @@
 cluster.name: {{cfg.cluster.name}}
 
-cluster.initial_master_nodes: {{cfg.node.name}}
+discovery.type: single-node
 
 cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
 cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
