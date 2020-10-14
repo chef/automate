@@ -86,7 +86,7 @@ func (f *Factory) DialContext(
 // the factory's root CA
 func (f *Factory) NewServer(opt ...grpc.ServerOption) *grpc.Server {
 	// f.ServerOptions() includes TLS settings, so this is not insecure (semgrep thinks so)
-	s := grpc.NewServer(append(f.ServerOptions(), opt...)...) // nosem
+	s := grpc.NewServer(append(f.ServerOptions(), opt...)...) // nosem: go.grpc.security.grpc-server-insecure-connection.grpc-server-insecure-connection
 
 	if !f.DisableDebugServer {
 		debug_api.RegisterDebugServer(s, debug.NewDebugServer(f.DebugServerOpts...))
