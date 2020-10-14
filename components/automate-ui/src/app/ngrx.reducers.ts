@@ -1,7 +1,6 @@
 import { Params, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import * as router from '@ngrx/router-store';
 import { set, get, pipe, map } from 'lodash/fp';
-import * as credentials from './pages/+compliance/+credentials/credentials.state';
 import * as destinationEntity from './entities/destinations/destination.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
@@ -48,6 +47,9 @@ import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as nodesEntity from './entities/nodes/nodes.reducer';
+import * as nodeCredentialEntity from './entities/node-credentials/node-credential.reducer';
+import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-credential-details.reducer';
+import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
@@ -55,7 +57,6 @@ import * as userSelfEntity from './entities/users/userself.reducer';
 // AOT likely won't allow dynamic object property names here even when the underlying
 // typescript bug preventing it is fixed
 export interface NgrxStateAtom {
-  credentials: credentials.CredentialsState;
   event_feed: eventFeed.EventFeedState;
   router: RouterReducerState;
   scanner: scanner.ScannerState;
@@ -69,6 +70,7 @@ export interface NgrxStateAtom {
   job_add: jobAdd.JobAddState;
   job_edit: jobEdit.JobEditState;
   job_list: jobList.JobListState;
+  nodeCredential_list: nodeCredentialList.NodeCredentialListState;
 
   // Entities
   adminKey: adminKeyEntity.AdminKeyEntityState;
@@ -106,6 +108,8 @@ export interface NgrxStateAtom {
   roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
   servers: serverEntity.ServerEntityState;
+  nodeCredential: nodeCredentialEntity.NodeCredentialEntityState;
+  nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialDetailsEntityState;
   serviceGroups: serviceGroups.ServiceGroupsEntityState;
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
@@ -181,7 +185,6 @@ export function routerReducer(state = defaultRouterState, action) {
 // it needs to mirror the ngrxReducers.
 export const defaultInitialState = {
   router: defaultRouterState,
-  credentials: credentials.initialState,
   event_feed: eventFeed.initialState,
   scanner: scanner.initialState,
   layout: layout.InitialState,
@@ -194,6 +197,8 @@ export const defaultInitialState = {
   job_add: jobAdd.JobAddInitialState,
   job_edit: jobEdit.JobEditInitialState,
   job_list: jobList.JobListInitialState,
+  nodeCredential_list: nodeCredentialList.NodeCredentialListInitialState,
+
 
   // Entities
   adminKey: adminKeyEntity.AdminKeyEntityInitialState,
@@ -226,6 +231,8 @@ export const defaultInitialState = {
   projects: projectEntity.ProjectEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
+  nodeCredential: nodeCredentialEntity.NodeCredentialEntityInitialState,
+  nodeCredentialDetails: nodeCredentialDetailsEntity.NodeCredentialEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
   orgs: orgEntity.OrgEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
@@ -238,7 +245,6 @@ export const defaultInitialState = {
 
 export const ngrxReducers = {
   // AOT doesn't like dynamic object property names here
-  credentials: credentials.credentialsReducer,
   scanner: scanner.scannerReducer,
   router: routerReducer,
   event_feed: eventFeed.eventFeedReducer,
@@ -252,6 +258,8 @@ export const ngrxReducers = {
   integrations_add: integrationsAdd.integrationsAddReducer,
   integrations_detail: integrationsDetail.integrationsDetailReducer,
   integrations_edit: integrationsEdit.integrationsEditReducer,
+  nodeCredential_list: nodeCredentialList.nodeCredentialListReducer,
+
 
   // Entities
   adminKey: adminKeyEntity.adminKeyEntityReducer,
@@ -287,6 +295,8 @@ export const ngrxReducers = {
   rules: ruleEntity.ruleEntityReducer,
   servers: serverEntity.serverEntityReducer,
   orgs: orgEntity.orgEntityReducer,
+  nodeCredential: nodeCredentialEntity.nodeCredentialEntityReducer,
+  nodeCredentialDetails: nodeCredentialDetailsEntity.nodeCredentialDetailsEntityReducer,
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
   desktops: desktopEntity.desktopEntityReducer,

@@ -93,6 +93,7 @@ import { ProjectRequests } from './entities/projects/project.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { ServerRequests } from './entities/servers/server.requests';
+import { NodeCredentialRequests } from './entities/node-credentials/node-credential.requests';
 import { OrgRequests } from './entities/orgs/org.requests';
 import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
@@ -336,6 +337,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RuleRequests,
     RunHistoryStore,
     ServerRequests,
+    NodeCredentialRequests,
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,

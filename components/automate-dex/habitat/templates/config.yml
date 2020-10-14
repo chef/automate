@@ -3,7 +3,9 @@ issuer: https://{{cfg.service.external_fqdn}}/dex
 {{- else}}
 issuer: http://localhost:{{cfg.service.port}}/dex
 {{- end}}
+{{- if not cfg.connectors.disable_local_users}}
 enablePasswordDB: true
+{{- end}}
 storage:
   type: postgres
   config:
@@ -51,12 +53,6 @@ frontend:
 logger:
   level: {{cfg.log.level}}
   format: text
-oauth2:
-  responseTypes:
-    - code
-    - token
-    - id_token
-  skipApprovalScreen: true
 staticClients:
   - id: automate-api # public, no secret, used by a2-api tests and l-u-s
     name: Automate API
@@ -222,6 +218,15 @@ connectors:
       {{- end}}
       nameIDPolicyFormat: {{cfg.connectors.saml.name_id_policy_format}}
   {{- end}}
+{{- end}}
+oauth2:
+  responseTypes:
+    - code
+    - token
+    - id_token
+  skipApprovalScreen: true
+{{- if cfg.connectors.saml}}
+  alwaysShowLoginScreen: true
 {{- end}}
 
 {{- if cfg.bootstrap.insecure_admin}}

@@ -30,6 +30,12 @@ func TestValidate(t *testing.T) {
 		assert.NoError(t, cfg.Validate())
 	})
 
+	t.Run("Fails when there are no connectors and local users are disabled", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Connectors.DisableLocalUsers = w.Bool(true)
+		assert.Error(t, cfg.Validate())
+	})
+
 	devCert, err := ioutil.ReadFile(helpers.DevRootCACert())
 	require.NoError(t, err)
 

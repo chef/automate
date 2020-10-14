@@ -10,7 +10,6 @@ import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { CookbookDetailsEffects } from './entities/cookbooks/cookbook-details.effects';
 import { CookbookVersionsEffects } from './entities/cookbooks/cookbook-versions.effects';
 import { ClientEffects } from './entities/clients/client.effects';
-import { CredentialsEffects } from './pages/+compliance/+credentials/credentials.state';
 // CredentialEffect is for the credential entities. Don't confuse it with CredentialsEffects.
 // CredentialsEffects will be removed when the credentials page is refactored.
 import { CredentialEffects } from './entities/credentials/credential.effects';
@@ -26,6 +25,7 @@ import { JobEffects } from './entities/jobs/job.effects';
 import { LicenseStatusEffects } from './entities/license/license.effects';
 import { ManagerEffects } from './entities/managers/manager.effects';
 import { NodesEffects } from './entities/nodes/nodes.effects';
+import { NodeCredentialEffects } from './entities/node-credentials/node-credential.effects';
 import { NotificationRuleEffects } from './entities/notification_rules/notification_rule.effects';
 import { OrgEffects } from './entities/orgs/org.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
@@ -55,7 +55,6 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       CookbookDetailsEffects,
       CookbookVersionsEffects,
       ClientEffects,
-      CredentialsEffects,
       CredentialEffects,
       DataBagsEffects,
       DataBagDetailsEffects,
@@ -69,6 +68,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       LicenseStatusEffects,
       ManagerEffects,
       NodesEffects,
+      NodeCredentialEffects,
       NotificationRuleEffects,
       OrgEffects,
       PolicyEffects,

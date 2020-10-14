@@ -8,6 +8,7 @@ COMPONENT_FLAGS := --prefix $(COMPONENT_PREFIX) --export true
 DEMO_DIR := pages/component-library/demos
 DEMO_FLAGS := --spec false
 NG_CMD := npm run ng --
+REPOROOT=../..
 
 install:
 	npm install
@@ -37,6 +38,16 @@ lint-html:
 
 lint-typescript:
 	npm run lint
+
+#: Security validation via semgrep
+semgrep:
+	semgrep --config $(REPOROOT)/semgrep
+	semgrep --config https://semgrep.dev/p/r2c-ci --autofix
+
+#: Security validation via semgrep; autofix where possible
+semgrep-and-fix:
+	semgrep --config $(REPOROOT)/semgrep --autofix
+	semgrep --config https://semgrep.dev/p/r2c-ci --autofix
 
 pr-ready: unit-all-browsers lint e2e
 
@@ -86,10 +97,10 @@ page-component/%:
 
 # Adapted from Makefile.common_go
 spell:
-	@pushd ../.. > /dev/null; \
+	@pushd $(REPOROOT) > /dev/null; \
 	./scripts/spellcheck.sh components/automate-ui; \
 	EXIT_CODE=$$?; \
 	popd > /dev/null; \
 	exit $$EXIT_CODE
 
-.PHONY: build install test lint unit e2e lint-sass lint-typescript license_scout peer-dependencies e2e-aot unit-all-browsers pr-ready start
+.PHONY: build install test lint lint-html lint-sass lint-typescript semgrep semgrep-and-fix unit e2e license_scout peer-dependencies e2e-aot unit-all-browsers pr-ready start

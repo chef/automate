@@ -1,6 +1,6 @@
 import { Store } from '@ngrx/store';
-import { Subject, Observable } from 'rxjs';
-import { takeUntil, map as rxjsMap, filter, debounceTime } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map as rxjsMap, filter, debounceTime } from 'rxjs/operators';
 import {
   isArray,
   isEmpty,
@@ -34,12 +34,10 @@ export class AuthorizedChecker {
   private placeholderRE = /\{[^{]+\}/;
   private allOf: CheckObj[] = [];
   private anyOf: CheckObj[] = [];
-  private isDestroyed = new Subject<boolean>();
 
   constructor(private store: Store<NgrxStateAtom>) {
     this.isAuthorized$ =
       this.store.select(allPerms).pipe(
-        takeUntil(this.isDestroyed),
         debounceTime(AuthorizedChecker.DebounceTime),
         filter(perms => !isEmpty(perms)),
         filter(() => !isEmpty(this.allOf) || !isEmpty(this.anyOf)),
@@ -72,11 +70,6 @@ export class AuthorizedChecker {
       }
     });
     return inputs;
-  }
-
-  destroy() {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
   }
 
   // For a parameterized endpoint, we need to check the inflated endpoint--
