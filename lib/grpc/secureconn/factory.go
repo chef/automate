@@ -85,7 +85,8 @@ func (f *Factory) DialContext(
 // NewServer is a wrapper for grpc.NewServer that adds server options to verify clients using
 // the factory's root CA
 func (f *Factory) NewServer(opt ...grpc.ServerOption) *grpc.Server {
-	s := grpc.NewServer(append(f.ServerOptions(), opt...)...)
+	// f.ServerOptions() includes TLS settings, so this is not insecure (semgrep thinks so)
+	s := grpc.NewServer(append(f.ServerOptions(), opt...)...) // nosem
 
 	if !f.DisableDebugServer {
 		debug_api.RegisterDebugServer(s, debug.NewDebugServer(f.DebugServerOpts...))
