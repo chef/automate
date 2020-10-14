@@ -84,6 +84,7 @@ steps:
             "--exclude", "third_party",
             "--exclude", "*_test.go",
             "--exclude", "*.pb.go",
+            "--exclude", "*.bindata.go",
             "--exclude", "*.spec.ts",
             "--timeout", "120",
             "--config", "https://semgrep.dev/p/r2c-ci",
