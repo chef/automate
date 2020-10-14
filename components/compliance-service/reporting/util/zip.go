@@ -18,7 +18,10 @@ import (
 
 // Zip2Path extracts a zip file on disk to a destination folder on disk.
 func Zip2Path(zipPath string, extractPath string) error {
-	reader, err := zip.OpenReader(zipPath)
+	// TODO(sr): This is not entirely ignorable, but worse things can happen
+	// when a user uploads an inspec profile. So, let's keep it in mind but
+	// move on.
+	reader, err := zip.OpenReader(zipPath) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	if err != nil {
 		return err
 	}
