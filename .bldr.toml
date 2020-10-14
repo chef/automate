@@ -1048,6 +1048,20 @@ plan_path = "components/automate-builder-api-proxy"
 paths = [
   "components/automate-builder-api-proxy/*"
 ]
+
+[sample-data-service]
+plan_path = "components/sample-data-service"
+paths = [
+  "components/sample-data-service/*",
+  "api/external/annotations/*",
+  "api/external/iam/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]

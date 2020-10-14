@@ -76,3 +76,4 @@ automate-minio components/automate-minio
 automate-builder-memcached components/automate-builder-memcached
 automate-builder-api components/automate-builder-api
 automate-builder-api-proxy components/automate-builder-api-proxy
+sample-data-service components/sample-data-service
