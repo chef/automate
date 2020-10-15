@@ -234,7 +234,7 @@ func runResetDB(_ *cobra.Command, args []string) error {
 
 func getBackend() cereal.Driver {
 	if opts.Endpoint != "" {
-		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
+		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024)) // nosem: go.grpc.security.grpc-client-insecure-connection.grpc-client-insecure-connection
 		if err != nil {
 			panic(err)
 		}

@@ -174,6 +174,6 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 //  Digest::MD5.base64digest
 //
 func CalculateContentMD5(data []byte) string {
-	md5sum := md5.Sum(data)
+	md5sum := md5.Sum(data) // nosem
 	return base64.StdEncoding.EncodeToString(md5sum[:])
 }
