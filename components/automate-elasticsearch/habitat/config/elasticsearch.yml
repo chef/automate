@@ -46,6 +46,7 @@ indices.recovery.max_bytes_per_sec: {{cfg.indices.recovery.max_bytes_per_sec}}
 indices.fielddata.cache.size: {{cfg.indices.fielddata.cache_size}}
 {{/if ~}}
 
+indices.breaker.total.use_real_memory: false
 indices.breaker.total.limit: {{cfg.indices.breaker.total_limit}}
 indices.breaker.fielddata.limit: {{cfg.indices.breaker.fielddata_limit}}
 indices.breaker.fielddata.overhead: {{cfg.indices.breaker.fielddata_overhead}}
