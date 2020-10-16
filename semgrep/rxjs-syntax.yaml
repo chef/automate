@@ -9,4 +9,26 @@ rules:
       }
     languages: [ts]
     severity: WARNING
- 
+
+  - id: observables-from-select-or-pipe-not-ending-with-dollar-sign
+    patterns:
+    - pattern-regex: '\w+\s*(:.+?)?=.*?(select|pipe)'
+    - pattern-either:
+      - pattern-inside: $VAR = $EXPR.select(...);
+      - pattern-inside: $VAR = $EXPR.pipe(...);
+    - pattern-not-inside: $VAR = d3.select(...);
+    message: |
+      Observable variable should end with a dollar sign.
+    languages: [ts]
+    severity: ERROR
+
+  - id: observables-from-values-not-ending-with-dollar-sign
+    patterns:
+    - pattern-regex: '\w+\s*(:.+?)?=\s*(observableOf|of)'
+    - pattern-either:
+      - pattern-inside: $VAR = observableOf(...)
+      - pattern-inside: $VAR = of(...)
+    message: |
+      Observable variable should end with a dollar sign.
+    languages: [ts]
+    severity: ERROR
