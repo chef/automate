@@ -191,15 +191,6 @@ clean:
 start-es-pg: start-pg create-es-data-dir
 	@printf "\n===> ${blue}Running start-es-pg...${reset}\n"; \
 	data_dir="$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"; \
-	if [ "$(A1_DATA)" = "true" ]; then \
-	  printf "\n===> ${yellow}Loading test a1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-	  tar -xzvf test_data/es-pg/es5-a1-data.tar.gz -C "$$data_dir"; \
-	  printf "===> ${yellow}Loading test a1 data into Postgres${reset}...\n"; \
-	  docker cp test_data/es-pg/a1-pg-dump.sql.gz cc_pg:/tmp/; \
-	  docker exec cc_pg rm -f /tmp/a1-pg-dump.sql; \
-	  docker exec cc_pg gunzip /tmp/a1-pg-dump.sql.gz; \
-	  docker exec cc_pg psql -Upostgres chef_automate -f /tmp/a1-pg-dump.sql; \
-	fi; \
 	if [ "$(A2V1_DATA)" = "true" ]; then \
 		printf "\n===> ${yellow}Loading test A2v1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 		tar -xzvf test_data/es-pg/es6-a2v1-data.tar.gz -C "$$data_dir"; \
@@ -232,11 +223,6 @@ start-es-pg: start-pg create-es-data-dir
 	@$(MAKE) start-es
 
 start-es: start-es$(ES_VER)
-
-start-es5: create-es-data-dir
-	@printf "\n===> ${yellow}Recreating the ElasticSearch 5 container...${reset}\n"
-	docker rm -f cc_es5 2> /dev/null; sleep 1; docker run -d -v "$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)":/usr/share/elasticsearch/data -v "$(PWD)/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml" --name cc_es5 -p $(ELASTICSEARCH_PORT):9200 -p 9305:9300 elasticsearch:5.4.0
-	@$(MAKE) wait-for-es
 
 start-es6: create-es-data-dir
 	@printf "\n===> ${yellow}Recreating the ElasticSearch 6 container...${reset}\n"
@@ -288,7 +274,7 @@ clear-es-templates:
 
 clean-all: clean
 	@printf "\n===> ${yellow}Clearing containers...${reset}\n"
-	@docker rm -f cc_pg cc_es5 cc_es6 cc_es7 cc_ssh_node 2> /dev/null || true
+	@docker rm -f cc_pg cc_es6 cc_es7 cc_ssh_node 2> /dev/null || true
 	@$(MAKE) purge-es-data
 	@printf "\n===> ${yellow}Clearing profiles directories...${reset}\n"
 	@rm -rf $(PROFILES_PATH)
@@ -421,8 +407,8 @@ test-integration-scanner: start-es start-pg start-ssh-node download-sample-marke
 
 test-automate-upgrade: clean-all
 	printf "\n===> Running Automate upgrade integration tests with TEST=$(TEST)\n"
-	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
-	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA, A2V3_DATA, A2V4_DATA, A2V5_DATA, A2V6_DATA${reset}\n"; \
+	@if [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
+	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A2V1_DATA, A2V2_DATA, A2V3_DATA, A2V4_DATA, A2V5_DATA, A2V6_DATA${reset}\n"; \
 	  exit 2; \
 	fi;
 	if ! [[ $(TEST) == 6* ]]; then \
@@ -546,7 +532,7 @@ download-sample-market-profiles: $(MARKET_PATH)
 # in order to tunnel to a remote ES, we must trust the certificate that the remote instance is offering.  get this from your browser and add it to the keychain on the respective OS.
 ingest-reports-into-es:
 	@printf "\n===> ${blue}Ingesting reports into ES...${reset}\n"
-	@if  [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
+	@if  [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ] && [ "$(A2V5_DATA)" != "true" ] && [ "$(A2V6_DATA)" != "true" ]; then \
 	  printf "\n===> PROCESSING REPORTS FROM ${blue}test_data/audit_reports${reset}\n"; \
 	  FILES=$$(ls -1 test_data/audit_reports | grep '\.json'); \
 	  for file in $$FILES; do \
