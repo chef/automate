@@ -42,7 +42,7 @@ lint-typescript:
 #: Security validation via semgrep
 semgrep:
 	semgrep --config $(REPOROOT)/semgrep
-	semgrep --config https://semgrep.dev/p/r2c-ci --autofix
+	semgrep --config https://semgrep.dev/p/r2c-ci
 
 #: Security validation via semgrep; autofix where possible
 semgrep-and-fix:
