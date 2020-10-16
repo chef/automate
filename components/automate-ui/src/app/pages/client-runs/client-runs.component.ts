@@ -381,13 +381,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     ], []);
   }
 
-  // prevent scrolling on tabs change
-  get height(): { [cssClass: string]: string; }  {
-    return {
-      'min-height': 'calc(100vh - 49px)'
-    };
-  }
-
   hideNotification() {
     this.notificationVisible = false;
   }
