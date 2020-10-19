@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Helper methods specific for the sample-data-service
+
+document "start_sample_data_service" <<DOC
+  Build and start the local sample-data-service
+DOC
+function start_sample_data_service() {
+  install_if_missing core/jq-static jq
+  install_if_missing core/grpcurl grpcurl
+
+  build components/sample-data-service/
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/sample-data-service --with-deps
+}

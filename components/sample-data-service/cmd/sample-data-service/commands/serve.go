@@ -8,6 +8,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/chef/automate/components/sample-data-service/server"
+	"github.com/chef/automate/components/sample-data-service/service"
+
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tls/certs"
@@ -53,8 +56,12 @@ func serve(cmd *cobra.Command, args []string) {
 	}
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	fmt.Print(connFactory)
-	fmt.Print(l)
+	service, err := service.Start(l, connFactory)
+	if err != nil {
+		fail(errors.Wrap(err, "could not initialize storage"))
+	}
+
+	fail(server.GRPC(cfg.GRPC, service))
 }
 
 // fail outputs the error and exits with a non-zero code
