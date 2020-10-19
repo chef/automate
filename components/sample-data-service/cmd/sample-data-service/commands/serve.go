@@ -58,7 +58,7 @@ func serve(cmd *cobra.Command, args []string) {
 
 	service, err := service.Start(l, connFactory)
 	if err != nil {
-		fail(errors.Wrap(err, "could not initialize storage"))
+		fail(errors.Wrap(err, "could not initialize service"))
 	}
 
 	fail(server.GRPC(cfg.GRPC, service))

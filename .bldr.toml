@@ -1057,6 +1057,7 @@ plan_path = "components/sample-data-service"
 paths = [
   "components/sample-data-service/*",
   "api/external/annotations/*",
+  "api/external/common/*",
   "api/external/iam/*",
   "lib/grpc/*",
   "lib/io/*",
