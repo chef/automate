@@ -41,12 +41,12 @@ lint-typescript:
 
 #: Security validation via semgrep
 semgrep:
-	semgrep --config $(REPOROOT)/semgrep
+	semgrep --config $(REPOROOT)/semgrep --exclude *.spec.ts
 	semgrep --config https://semgrep.dev/p/r2c-ci
 
 #: Security validation via semgrep; autofix where possible
 semgrep-and-fix:
-	semgrep --config $(REPOROOT)/semgrep --autofix
+	semgrep --config $(REPOROOT)/semgrep --exclude *.spec.ts --autofix
 	semgrep --config https://semgrep.dev/p/r2c-ci --autofix
 
 pr-ready: unit-all-browsers lint e2e
