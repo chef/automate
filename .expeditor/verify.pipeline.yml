@@ -912,7 +912,6 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-
   - label: "compliance-service upgrade from Automate v2v6"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
@@ -939,3 +938,16 @@ steps:
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
+
+  - label: "[unit] sample-data-service"
+    command:
+      - scripts/install_golang.sh
+      - cd components/sample-data-service
+      - make static unit
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:

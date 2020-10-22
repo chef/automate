@@ -13,3 +13,12 @@ function start_sample_data_service() {
   start_deployment_service
   chef-automate dev deploy-some $HAB_ORIGIN/sample-data-service --with-deps
 }
+
+document "enable_sample_data_service" <<DOC
+  Enable the Sample data service
+DOC
+function enable_sample_data_service() {
+  check_if_deployinate_started || return 1
+  printf "[deployment.v1.svc]\n products = [\"sample-data\"]\n" > /tmp/enable_sample_data_patch.toml
+  chef-automate config patch /tmp/enable_sample_data_patch.toml
+}

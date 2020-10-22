@@ -20,9 +20,6 @@ pkg_exports=(
 pkg_exposes=(
   port
 )
-pkg_binds=(
-  [automate-cli]="port"
-)
 
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"

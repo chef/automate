@@ -80,7 +80,6 @@ notifications-service REQUIRED automate-pg-gateway pg-sidecar-service secrets-se
 notifications-service BINDING_MODE strict
 pg-sidecar-service REQUIRED automate-pg-gateway
 pg-sidecar-service BINDING_MODE strict
-sample-data-service REQUIRED automate-cli
 sample-data-service BINDING_MODE strict
 secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
 secrets-service BINDING_MODE strict
