@@ -30,7 +30,7 @@ rules:
           }
           ...
         }
-    message: isDestroyed never triggered from ngOnDestroy
+    message: subscriptions never complete because isDestroyed never triggered from ngOnDestroy
     languages: [ts]
     severity: ERROR
 
@@ -52,7 +52,7 @@ rules:
           }
           ...
         }
-    message: isDestroyed never used with takeUntil()
+    message: subscriptions never complete because they are not instrumented with takeUntil(this.isDestroyed)
     metadata: {
       falseNegative: will not catch multiple subscriptions with takeUntil missing on some
       }

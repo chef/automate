@@ -3,7 +3,7 @@ rules:
   - id: combineLatest-not-combining
     pattern: combineLatest([$SINGLE_EXPRESSION])
     fix:  $SINGLE_EXPRESSION.
-    message: replace combineLatest with a single operand is not useful
+    message: combineLatest is not needed with a single argument
     metadata: {
       todo: "remove dot in fix once bug is fixed (https://github.com/returntocorp/semgrep/issues/1721)"
       }
