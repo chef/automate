@@ -168,10 +168,16 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 	c.V1.Sys.GetConnectors().GetSaml().setNameIDPolicyDefault()
 
 	if c.V1.Sys.GetExpiry().GetIdTokens() == nil {
-		// Different defaults when SAML is or isn't used
+		// Different defaults when SAML is or isn't used: id token expiry is a global
+		// setting, not per-connector. So, if you're using SAML, you cannot have a
+		// shorter-lived token for local or LDAP users. Unfortunately.
 		if c.V1.Sys.GetConnectors().GetSaml() != nil {
 			c.V1.Sys.Expiry.IdTokens = w.String("24h")
 		} else {
+			// Only LDAP and local users -- so we can turn this down. Close to expiry,
+			// session-service will fetch a new token using the stored refresh token,
+			// so that we learn about the users continuing existence in LDAP, and
+			// eventual group membership changes.
 			c.V1.Sys.Expiry.IdTokens = w.String("3m")
 		}
 	}
