@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"strings"
+	"time"
 
 	google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
@@ -51,6 +52,18 @@ func DefaultConfigRequest() *ConfigRequest {
 // Validate validates that the config is sufficient to start the service and returns true.
 func (c *ConfigRequest) Validate() error {
 	cfgErr := shared.NewInvalidConfigError()
+
+	if e := c.V1.Sys.Expiry.IdTokens; e != nil {
+		exp := e.GetValue()
+		dur, err := time.ParseDuration(exp)
+		if err != nil {
+			cfgErr.AddInvalidValue("dex.v1.sys.expiry.id_tokens", "invalid expiry: "+exp)
+		}
+		if dur < 3*time.Minute {
+			cfgErr.AddInvalidValue("dex.v1.sys.expiry.id_tokens",
+				"expiry "+exp+" too short, must be at least \"3m\"")
+		}
+	}
 
 	if conn := c.V1.Sys.Connectors; conn != nil {
 		// can only disable local users if one of the others is set
