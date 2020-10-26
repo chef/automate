@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"strings"
+	"time"
 
 	google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
@@ -41,8 +42,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Service.Port = w.Int32(10117)
 
-	c.V1.Sys.Expiry.IdTokens = w.String("3m")
-
 	c.V1.Sys.Bootstrap.InsecureAdmin = w.Bool(false)
 
 	c.V1.Sys.Log.Level = w.String("info")
@@ -53,6 +52,18 @@ func DefaultConfigRequest() *ConfigRequest {
 // Validate validates that the config is sufficient to start the service and returns true.
 func (c *ConfigRequest) Validate() error {
 	cfgErr := shared.NewInvalidConfigError()
+
+	if e := c.V1.Sys.Expiry.IdTokens; e != nil {
+		exp := e.GetValue()
+		dur, err := time.ParseDuration(exp)
+		if err != nil {
+			cfgErr.AddInvalidValue("dex.v1.sys.expiry.id_tokens", "invalid expiry: "+exp)
+		}
+		if dur < 3*time.Minute {
+			cfgErr.AddInvalidValue("dex.v1.sys.expiry.id_tokens",
+				"expiry "+exp+" too short, must be at least \"3m\"")
+		}
+	}
 
 	if conn := c.V1.Sys.Connectors; conn != nil {
 		// can only disable local users if one of the others is set
@@ -168,6 +179,21 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 
 	// default name_id_policy_format (SAML)
 	c.V1.Sys.GetConnectors().GetSaml().setNameIDPolicyDefault()
+
+	if c.V1.Sys.GetExpiry().GetIdTokens() == nil {
+		// Different defaults when SAML is or isn't used: id token expiry is a global
+		// setting, not per-connector. So, if you're using SAML, you cannot have a
+		// shorter-lived token for local or LDAP users. Unfortunately.
+		if c.V1.Sys.GetConnectors().GetSaml() != nil {
+			c.V1.Sys.Expiry.IdTokens = w.String("24h")
+		} else {
+			// Only LDAP and local users -- so we can turn this down. Close to expiry,
+			// session-service will fetch a new token using the stored refresh token,
+			// so that we learn about the users continuing existence in LDAP, and
+			// eventual group membership changes.
+			c.V1.Sys.Expiry.IdTokens = w.String("3m")
+		}
+	}
 
 	return c.V1.Sys, nil
 }

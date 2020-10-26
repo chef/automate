@@ -239,9 +239,4 @@ staticPasswords:
 
 expiry:
   signingKeys: {{cfg.expiry.signing_keys}}
-  {{- if cfg.connectors.saml}}
-  # SAML is being used, so we cannot tweak ID token expiry
-  idTokens: 24h
-  {{- else}}
   idTokens: {{cfg.expiry.id_tokens}}
-  {{- end}}
