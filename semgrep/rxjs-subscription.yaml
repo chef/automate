@@ -62,7 +62,8 @@ rules:
 
   - id: ngOnDestroy-missing-next
     patterns:
-    - pattern: |
+    - pattern: this.isDestroyed.complete(...)
+    - pattern-inside: |
         class $CLASS {
           ...
           ngOnDestroy() {
@@ -72,7 +73,7 @@ rules:
           }
         ...
         }
-    - pattern-not: |
+    - pattern-not-inside: |
         class $CLASS {
           ...
           ngOnDestroy() {
@@ -90,7 +91,8 @@ rules:
 
   - id: ngOnDestroy-missing-complete
     patterns:
-    - pattern: |
+    - pattern: this.isDestroyed.next(...)
+    - pattern-inside: |
         class $CLASS {
           ...
           ngOnDestroy() {
@@ -100,7 +102,7 @@ rules:
           }
         ...
         }
-    - pattern-not: |
+    - pattern-not-inside: |
         class $CLASS {
           ...
           ngOnDestroy() {

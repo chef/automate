@@ -146,7 +146,7 @@ func serve(*cobra.Command, []string) error {
 	}
 
 	if C.Service.DisableTLS {
-		grpcServer = grpc.NewServer(grpcServerOpts...)
+		grpcServer = grpc.NewServer(grpcServerOpts...) // nosem: go.grpc.security.grpc-server-insecure-connection.grpc-server-insecure-connection
 	} else {
 		serviceCerts, err := C.TLS.ReadCerts()
 		if err != nil {

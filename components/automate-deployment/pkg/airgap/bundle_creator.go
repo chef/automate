@@ -100,13 +100,14 @@ func (dl *netHabDownloader) DownloadHabBinary(version string, release string, w 
 		return errors.Errorf("Could not get hab binary. Got status %s", resp.Status)
 	}
 
-	gzipReader, err := gzip.NewReader(resp.Body)
-
+	// NOTE: We're downloading this via HTTPS from a location that's trusted.
+	gzipReader, err := gzip.NewReader(resp.Body) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	if err != nil {
 		return errors.Wrap(err, "Failed to download hab binary. Could not open gzip")
 	}
 
-	tarReader := tar.NewReader(gzipReader)
+	// NOTE: See above.
+	tarReader := tar.NewReader(gzipReader) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	for {
 		hdr, err := tarReader.Next()
 		if err == io.EOF {

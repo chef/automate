@@ -34,7 +34,9 @@ import (
 
 // NewServer returns a pointer to a new instance of the null backend server
 func NewServer() *grpc.Server {
-	s := grpc.NewServer()
+	// The nullbackend only listens on a unix socket. And it doesn't deal with interesting data,
+	// but only "no implemented" responses.
+	s := grpc.NewServer() // nosem: go.grpc.security.grpc-server-insecure-connection.grpc-server-insecure-connection
 
 	applications.RegisterApplicationsServiceServer(s, &applications.UnimplementedApplicationsServiceServer{})
 	cds.RegisterCdsServer(s, &cds.UnimplementedCdsServer{})

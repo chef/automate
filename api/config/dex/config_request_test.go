@@ -30,6 +30,18 @@ func TestValidate(t *testing.T) {
 		assert.NoError(t, cfg.Validate())
 	})
 
+	t.Run("Validates when the id_token expiry is too short", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Expiry.IdTokens = w.String("2m59s")
+		assert.Error(t, cfg.Validate())
+	})
+
+	t.Run("Validates when the id_token expiry is invalid", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Expiry.IdTokens = w.String("never")
+		assert.Error(t, cfg.Validate())
+	})
+
 	t.Run("Fails when there are no connectors and local users are disabled", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
 		cfg.V1.Sys.Connectors.DisableLocalUsers = w.Bool(true)
