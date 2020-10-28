@@ -297,6 +297,12 @@
               </div>
             </li>
           </ul>
+          <app-page-picker
+            [perPage]="pageSize"
+            [total]="totalReports"
+            [page]="page"
+            (pageChanged)="onPageChanged($event)">
+          </app-page-picker>
         </div>
       </chef-side-panel>
 
