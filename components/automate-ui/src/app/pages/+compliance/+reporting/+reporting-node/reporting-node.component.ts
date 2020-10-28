@@ -24,6 +24,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   reportLoading = false;
   RFC2822 = DateTime.RFC2822;
   returnParams: ReturnParams = {};
+  page$: Subject<number> = new Subject<number>();
+  page = 1;
+  pageSize = 10;
+  totalReports = 0;
+  firstReportIsLoaded = false;
 
   openControls = {};
 
@@ -46,19 +51,35 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const reportQuery = this.reportQueryService.getReportQuery();
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
-    this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
-    .pipe(takeUntil(this.isDestroyed))
-    .subscribe(reports => {
-      this.reports = reports;
-      const queryForReport = this.reportQueryService.getReportQueryForReport(reports[0]);
-      this.statsService.getSingleReport(reports[0].id, queryForReport)
-        .pipe(takeUntil(this.isDestroyed))
-        .subscribe(data => {
-          this.reportLoading = false;
-          this.layoutFacade.ShowPageLoading(false);
-          this.activeReport = Object.assign(reports[0], data);
-        });
+    this.page$.subscribe(page => {
+      this.page = page;
+      this.statsService.getReportsWithPages(reportQuery,
+        {sort: 'latest_report.end_time', order: 'DESC'}, page, this.pageSize)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe(reportCollection => {
+        this.totalReports = reportCollection.totalReports;
+        this.reports = reportCollection.reports;
+
+        // load the first report only when first loading the page
+        if (!this.firstReportIsLoaded) {
+          this.firstReportIsLoaded = true;
+          const queryForReport = this.reportQueryService.getReportQueryForReport(this.reports[0]);
+          this.statsService.getSingleReport(this.reports[0].id, queryForReport)
+            .pipe(takeUntil(this.isDestroyed))
+            .subscribe(data => {
+              this.reportLoading = false;
+              this.layoutFacade.ShowPageLoading(false);
+              this.activeReport = Object.assign(this.reports[0], data);
+            });
+        }
+      });
     });
+
+    this.page$.next(1);
+  }
+
+  onPageChanged(event: number) {
+    this.page$.next(event);
   }
 
   ngOnDestroy() {
