@@ -61,6 +61,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: ":semgrep: New Image Test"
+    command:
+      - python --version
+ 
   - label: ":semgrep: Custom"
     expeditor:
       executor:
