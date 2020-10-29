@@ -91,7 +91,9 @@ func newRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "chef-automate COMMAND",
 		Short: "Chef Automate CLI",
-		Long:  "A helpful utility to deploy and manage Chef Automate.",
+		Long:  "A helpful utility to deploy and manage Chef Automate.\n\n" +
+			"Docs: https://docs.chef.io/automate/cli_chef_automate/\n" +
+			"Patents: https://www.chef.io/patents",
 		Annotations: map[string]string{
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 		},
