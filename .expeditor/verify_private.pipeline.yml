@@ -44,6 +44,18 @@ steps:
       executor:
         docker:
 
+  - label: ":semgrep: New Image Test"
+    command:
+      - python --version
+      - echo "$A2_LICENSE"
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        docker:
+
   # We need to build in order to run the
   # integration tests.
   - label: build
