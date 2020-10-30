@@ -70,7 +70,7 @@
       <chef-icon>date_range</chef-icon>
       <span>{{ date | datetime: CHEF_SHORT_DATE }}</span>
     </chef-button>
-    <chef-dropdown [attr.visible]="calendarVisible">
+    <chef-dropdown class="calendar-dropdown" [attr.visible]="calendarVisible">
       <chef-click-outside omit="calendar-btn" (clickOutside)="hideCalendar()">
         <chef-calendar
           [selected]="date.toISOString()"
