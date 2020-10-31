@@ -46,13 +46,15 @@ steps:
 
   - label: ":semgrep: New Image Test"
     command:
-      - python --version
-      - echo "$A2_LICENSE"
+      - python -m pip install semgrep
+      - python -m pip install semgrep_agent
+      - echo "starting semgrep_agent"
+      - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment 48
     expeditor:
       secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
+        SEMGREP_TOKEN:
+          path: secret/semgrep
+          field: token
       executor:
         docker:
 
