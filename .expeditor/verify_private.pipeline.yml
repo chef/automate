@@ -46,6 +46,8 @@ steps:
 
   - label: ":semgrep: New Image Test"
     command:
+      - pwd
+      - ls
       - python -m pip install semgrep
       - python -m pip install semgrep_agent
       - echo "starting semgrep_agent"
