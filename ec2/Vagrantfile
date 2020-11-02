@@ -3,6 +3,7 @@ require 'open-uri'
 require 'vagrant-aws'
 require 'resolv'
 require 'mkmf'
+require_relative 'temp-patch.rb'
 
 home_dir="/home/ubuntu"
 current_branch=`git rev-parse --abbrev-ref HEAD`
