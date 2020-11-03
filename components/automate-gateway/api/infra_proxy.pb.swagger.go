@@ -2688,14 +2688,6 @@ func init() {
           "type": "string",
           "description": "Node name."
         },
-        "fqdn": {
-          "type": "string",
-          "description": "Node FQDN."
-        },
-        "ip_address": {
-          "type": "string",
-          "description": "Node IP address."
-        },
         "check_in": {
           "type": "string",
           "description": "Node last checkin."
@@ -2715,6 +2707,14 @@ func init() {
         "policy_group": {
           "type": "string",
           "description": "Node policy group."
+        },
+        "fqdn": {
+          "type": "string",
+          "description": "Node FQDN."
+        },
+        "ip_address": {
+          "type": "string",
+          "description": "Node IP address."
         }
       }
     },

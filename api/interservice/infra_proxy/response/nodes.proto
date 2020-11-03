@@ -18,20 +18,20 @@ message NodeAttribute {
     string id = 1;
     // Node name.
     string name = 2;
-    // Node FQDN.
-    string fqdn = 3;
-    // Node IP address.
-    string ip_address = 4;
     // Node last checkin.
-    string check_in = 5;
+    string check_in = 3;
     // Node uptime.
-    string uptime = 6;
+    string uptime = 4;
     // Node platform.
-    string platform = 7;
+    string platform = 5;
     // Node environment name.
-    string environment = 8;
+    string environment = 6;
     // Node policy group.
-    string policy_group = 9;
+    string policy_group = 7;
+    // Node FQDN.
+    string fqdn = 8;
+    // Node IP address.
+    string ip_address = 9;
 }
 
 message DeleteNode {
