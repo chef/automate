@@ -9,6 +9,22 @@ import (
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
+// GetNodes get the nodes
+func (a *InfraProxyServer) GetNodes(ctx context.Context, r *gwreq.Nodes) (*gwres.Nodes, error) {
+	req := &infra_req.Nodes{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+	}
+	res, err := a.client.GetNodes(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Nodes{
+		Nodes: parseNodeAttributeFromRes(res.Nodes),
+	}, nil
+}
+
 // GetAffectedNodes get the nodes using resource
 func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.AffectedNodes) (*gwres.AffectedNodes, error) {
 
@@ -79,6 +95,8 @@ func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAt
 		nl[i] = &gwres.NodeAttribute{
 			Id:          node.Id,
 			Name:        node.Name,
+			Fqdn:        node.Fqdn,
+			IpAddress:   node.IpAddress,
 			CheckIn:     node.CheckIn,
 			Environment: node.Environment,
 			Platform:    node.Platform,

@@ -1256,6 +1256,44 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
+      "get": {
+        "operationId": "InfraProxy_GetNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Nodes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "delete": {
         "operationId": "InfraProxy_DeleteNode",
@@ -2650,6 +2688,14 @@ func init() {
           "type": "string",
           "description": "Node name."
         },
+        "fqdn": {
+          "type": "string",
+          "description": "Node FQDN."
+        },
+        "ip_address": {
+          "type": "string",
+          "description": "Node IP address."
+        },
         "check_in": {
           "type": "string",
           "description": "Node last checkin."
@@ -2669,6 +2715,18 @@ func init() {
         "policy_group": {
           "type": "string",
           "description": "Node policy group."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Nodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
+          },
+          "description": "Node list."
         }
       }
     },

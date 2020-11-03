@@ -5,6 +5,13 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/reque
 
 import "google/protobuf/struct.proto";
 
+message Nodes {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+}
+
 message AffectedNodes {
     // Chef organization ID.
     string org_id = 1;

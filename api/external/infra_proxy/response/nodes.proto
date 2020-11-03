@@ -3,6 +3,11 @@ syntax = "proto3";
 package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
+message Nodes {
+    // Node list.
+    repeated NodeAttribute nodes = 1;
+}
+
 message AffectedNodes {
     // List of the nodes which are affected by the chef object.
     repeated NodeAttribute nodes = 1;
@@ -13,16 +18,20 @@ message NodeAttribute {
     string id = 1;
     // Node name.
     string name = 2;
+    // Node FQDN.
+    string fqdn = 3;
+    // Node IP address.
+    string ip_address = 4;
     // Node last checkin.
-    string check_in = 3;
+    string check_in = 5;
     // Node uptime.
-    string uptime = 4;
+    string uptime = 6;
     // Node platform.
-    string platform = 5;
+    string platform = 7;
     // Node environment name.
-    string environment = 6;
+    string environment = 8;
     // Node policy group.
-    string policy_group = 7;
+    string policy_group = 9;
 }
 
 message DeleteNode {

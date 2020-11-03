@@ -12,6 +12,23 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
+// GetNodes fetches the nodes from chef infra server
+func (s *Server) GetNodes(ctx context.Context, req *request.Nodes) (*response.Nodes, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.fetchAffectedNodes(ctx, "*:*")
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.Nodes{
+		Nodes: fromSearchAPIToAffectedNodes(*res),
+	}, nil
+}
+
 // GetAffectedNodes get the nodes using chef object
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
@@ -19,7 +36,14 @@ func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNode
 		return nil, err
 	}
 
-	res, err := c.fetchAffectedNodes(ctx, req.ChefType, req.Name, req.Version)
+	var url string
+	if req.Version != "" {
+		url = fmt.Sprintf("%s_%s_version:%s", req.ChefType, req.Name, req.Version)
+	} else {
+		url = fmt.Sprintf("%s:%s", req.ChefType, req.Name)
+	}
+
+	res, err := c.fetchAffectedNodes(ctx, url)
 	if err != nil {
 		return nil, err
 	}
@@ -115,22 +139,17 @@ func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*resp
 // roles: it would be 'roles:ROLE_NAME'
 // environments: it would be 'chef_environment:ENVIRONMENT_NAME'
 // policyfiles: it would be 'chef_environment:POLICY_FILES_GROUP_NAME'
-func (c *ChefClient) fetchAffectedNodes(ctx context.Context, chefType, name, version string) (*chef.SearchResult, error) {
+func (c *ChefClient) fetchAffectedNodes(ctx context.Context, url string) (*chef.SearchResult, error) {
 	query := map[string]interface{}{
 		"name":             []string{"name"},
+		"fqdn":             []string{"fqdn"},
+		"ipaddress":        []string{"ipaddress"},
 		"platform":         []string{"platform"},
 		"chef_environment": []string{"chef_environment"},
 		"policy_group":     []string{"policy_group"},
 		"chef_guid":        []string{"chef_guid"},
 		"uptime":           []string{"uptime"},
 		"ohai_time":        []string{"ohai_time"},
-	}
-
-	var url string
-	if version != "" {
-		url = fmt.Sprintf("%s_%s_version:%s", chefType, name, version)
-	} else {
-		url = fmt.Sprintf("%s:%s", chefType, name)
 	}
 
 	res, err := c.client.Search.PartialExec("node", url, query)
@@ -151,6 +170,8 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 		results[index] = &response.NodeAttribute{
 			Id:          safeStringFromMap(m, "chef_guid"),
 			Name:        safeStringFromMap(m, "name"),
+			Fqdn:        safeStringFromMap(m, "fqdn"),
+			IpAddress:   safeStringFromMap(m, "ipaddress"),
 			CheckIn:     safeStringFromMapFloat(m, "ohai_time"),
 			Environment: safeStringFromMap(m, "chef_environment"),
 			Platform:    safeStringFromMap(m, "platform"),
