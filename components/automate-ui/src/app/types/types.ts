@@ -654,10 +654,7 @@ export class GuitarStringItem {
     if (this.eventTypeCount.length > 1) {
       return true;
     }
-    if (this.eventTypeCount.length === 1 && this.eventTypeCount[0].count > 1) {
-      return true;
-    }
-    return false;
+    return this.eventTypeCount.length === 1 && this.eventTypeCount[0].count > 1;
   }
 
   getEventType(): string {
