@@ -4,7 +4,6 @@ import (
 	"context"
 	"net"
 
-	ver_api "github.com/chef/automate/api/external/common/version"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,7 +13,6 @@ import (
 	"github.com/chef/automate/components/sample-data-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
-	"github.com/chef/automate/lib/version"
 )
 
 // Server is an sample-data server
@@ -68,16 +66,4 @@ func InputValidationInterceptor() grpc.UnaryServerInterceptor {
 		}
 		return handler(ctx, req)
 	}
-}
-
-// GetVersion returns the version of SampleData GRPC API
-func (s *Server) GetVersion(
-	ctx context.Context,
-	_ *ver_api.VersionInfoRequest) (*ver_api.VersionInfo, error) {
-	return &ver_api.VersionInfo{
-		Name:    "sapme-data-service",
-		Version: version.Version,
-		Sha:     version.GitSHA,
-		Built:   version.BuildTime,
-	}, nil
 }
