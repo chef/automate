@@ -78,9 +78,12 @@ export class UserPermEffects {
   @Effect()
   fetchParameterizedPerms$ = this.actions$.pipe(
     ofType(UserPermsTypes.GET_PARAMETERIZED),
-    mergeMap((action: GetUserParamPerms) => this.requests.fetchParameterized(action.payload).pipe(
+    mergeMap((action: GetUserParamPerms) => {
+      const response$ = this.requests.fetchParameterized(action.payload);
+       return response$.pipe(
       map((resp: UserPermsResponsePayload) => new GetUserParamPermsSuccess(resp.endpoints)),
-      catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))))));
+      catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))));
+    }));
 
   private stale(lastTime: Date): boolean {
     return moment().diff(moment(lastTime)) > this.freshLimitPlusANudge;
