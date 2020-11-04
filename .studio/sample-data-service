@@ -15,7 +15,7 @@ function start_sample_data_service() {
 }
 
 document "enable_sample_data_service" <<DOC
-  Enable the Sample data service
+  Enable the sample-data-service
 DOC
 function enable_sample_data_service() {
   check_if_deployinate_started || return 1

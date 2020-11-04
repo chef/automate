@@ -15,17 +15,17 @@ import (
 	"github.com/chef/automate/lib/tracing"
 )
 
-// Server is an sample-data server
+// Server is a sample-data server
 type Server struct {
 	service *service.Service
 }
 
-// NewServer returns an sample-data server
+// NewServer returns a sample-data server
 func NewServer(service *service.Service) *Server {
 	return &Server{service: service}
 }
 
-// NewGRPCServer creates a grpc server that serves all Teams GRPC APIs
+// NewGRPCServer creates a grpc server that serves all sample-data GRPC APIs
 func NewGRPCServer(s *service.Service) *grpc.Server {
 	g := s.ConnFactory.NewServer(
 		grpc.UnaryInterceptor(
