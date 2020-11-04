@@ -147,7 +147,7 @@ steps:
       - docker#v3.7.0:
           image: returntocorp/semgrep-agent:v1
           propogate-environment: true
-          # workdir: /chef-cloud
+          workdir: /go/src/github.com/chef/automate
           environment:
             - SEMGREP_TOKEN
             - SEMGREP_ID
