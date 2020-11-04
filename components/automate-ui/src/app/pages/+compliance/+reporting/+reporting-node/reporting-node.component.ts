@@ -55,7 +55,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)).
       subscribe(page => {
       this.page = page;
-      this.getReports(reportQuery).subscribe(reportCollection => {
+      this.getReports(reportQuery).pipe(first()).subscribe(reportCollection => {
         this.totalReports = reportCollection.totalReports;
         this.reports = reportCollection.reports;
 
@@ -192,8 +192,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   private getReports(reportQuery: ReportQuery): Observable<ReportCollection>  {
     return this.statsService.getReportsWithPages(reportQuery,
-      {sort: 'latest_report.end_time', order: 'DESC'}, this.page, this.pageSize)
-    .pipe(first());
+      {sort: 'latest_report.end_time', order: 'DESC'}, this.page, this.pageSize);
   }
 
   private setActiveReport(report: any) {
