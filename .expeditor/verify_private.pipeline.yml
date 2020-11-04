@@ -101,6 +101,39 @@ steps:
       executor:
         docker:
 
+  - label: ":semgrep: Custom"
+    expeditor:
+      executor:
+        docker:
+          image: returntocorp/semgrep:0.29.0
+          entrypoint: semgrep
+          command: [
+            "--error",
+            "--exclude", "*.spec.ts",
+            "--config", "/go/src/github.com/chef/automate/semgrep",
+            "/go/src/github.com/chef/automate"
+          ]
+
+  - label: ":semgrep: Published"
+    command:
+    - echo "running in $(pwd)"
+    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID
+    expeditor:
+      secrets: true
+    plugins:
+      # Temporary workaround per @tduffield; do not propagate this solution too much!
+      - chef/step-hook#v0.1.1:
+          pre-command:
+            - .expeditor/export_semgrep_token.sh
+      - docker#v3.7.0:
+          image: returntocorp/semgrep-agent:v1
+          propogate-environment: true
+          workdir: /go/src/github.com/chef/automate
+          environment:
+            - SEMGREP_TOKEN
+            - SEMGREP_ID
+    soft_fail: true
+
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
   # or take a long time.
