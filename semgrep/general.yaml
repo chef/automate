@@ -1,0 +1,15 @@
+rules:
+- id: verbose-booleans
+  patterns:
+    - pattern-either: 
+      - pattern: if ($EXPR) { return true; } else { return false; }
+      - pattern: if (!$EXPR) { return false; } else { return true; }
+      - pattern: if ($EXPR) { return true; } return false;
+      - pattern: if (!$EXPR) { return false; } return true;
+  message: returning exhaustive booleans should just return the expression instead
+  metadata: {
+      todo: "as of 0.29.0, the autofix sometimes works, and sometimes goes haywire"
+      }
+  languages: [ts]
+  severity: ERROR
+  fix: return $EXPR;

@@ -9,7 +9,7 @@ module DataGenerator
       @uri = URI.parse(url)
       @http = Net::HTTP.new(@uri.host, @uri.port)
       if @uri.scheme == 'https'
-        @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        @http.verify_mode = OpenSSL::SSL::VERIFY_NONE # nosem: ruby.lang.security.ssl-mode-no-verify.ssl-mode-no-verify
         @http.use_ssl = true
       end
 

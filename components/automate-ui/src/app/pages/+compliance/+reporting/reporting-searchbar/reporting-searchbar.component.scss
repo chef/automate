@@ -44,10 +44,11 @@
       }
     }
 
-    chef-dropdown {
+    .calendar-dropdown {
       top: 100%;
       right: 0;
       padding: 0.5em;
+      z-index: 1;
     }
   }
 }
