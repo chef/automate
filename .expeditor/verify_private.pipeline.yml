@@ -118,6 +118,7 @@ steps:
     command:
     - echo "running in $(pwd)"
     - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID
+    timeout_in_minutes: 20
     expeditor:
       secrets: true
     plugins:
