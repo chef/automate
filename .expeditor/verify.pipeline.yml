@@ -74,23 +74,42 @@ steps:
             "/go/src/github.com/chef/automate"
           ]
 
+  # - label: ":semgrep: Published"
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         image: returntocorp/semgrep:latest
+  #         entrypoint: semgrep
+  #         command: [
+  #           "--error",
+  #           "--exclude", "third_party",
+  #           "--exclude", "*_test.go",
+  #           "--exclude", "*.pb.go",
+  #           "--exclude", "*.bindata.go",
+  #           "--exclude", "*.spec.ts",
+  #           "--timeout", "120",
+  #           "--config", "https://semgrep.dev/p/r2c-ci",
+  #           "/go/src/github.com/chef/automate"
+          # ]
+
   - label: ":semgrep: Published"
+    command:
+    - pwd
+    - ls
+    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID
     expeditor:
-      executor:
-        docker:
-          image: returntocorp/semgrep:latest
-          entrypoint: semgrep
-          command: [
-            "--error",
-            "--exclude", "third_party",
-            "--exclude", "*_test.go",
-            "--exclude", "*.pb.go",
-            "--exclude", "*.bindata.go",
-            "--exclude", "*.spec.ts",
-            "--timeout", "120",
-            "--config", "https://semgrep.dev/p/r2c-ci",
-            "/go/src/github.com/chef/automate"
-          ]
+      secrets: true
+    plugins:
+      - chef/step-hook#v0.1.1:
+          pre-command:
+            - .expeditor/export_semgrep_token.sh
+      - docker#v3.7.0:
+          image: returntocorp/semgrep-agent:v1
+          propogate-environment: true
+          # workdir: /chef-cloud
+          environment:
+            - SEMGREP_TOKEN
+            - SEMGREP_ID
 
   #
   # Static & Unit tests
