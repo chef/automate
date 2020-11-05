@@ -943,7 +943,7 @@ steps:
     command:
       - scripts/install_golang.sh
       - cd components/sample-data-service
-      - make static unit
+      - make static
     timeout_in_minutes: 10
     retry:
       automatic:
