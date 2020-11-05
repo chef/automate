@@ -16,6 +16,7 @@ do_deploy() {
         --product automate-dev \
         --product chef-server \
         --product builder \
+        --product sample-data \
         --accept-terms-and-mlsa \
         --debug
 }
