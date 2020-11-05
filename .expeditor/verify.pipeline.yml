@@ -65,7 +65,7 @@ steps:
     expeditor:
       executor:
         docker:
-          image: returntocorp/semgrep:latest
+          image: returntocorp/semgrep:0.29.0
           entrypoint: semgrep
           command: [
             "--error",
