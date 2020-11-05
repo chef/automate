@@ -123,5 +123,5 @@ app-client-runs-search-filters {
 }
 
 .lock-scrolling {
-  overflow: hidden;
+  min-height: calc(100vh - 49px);
 }

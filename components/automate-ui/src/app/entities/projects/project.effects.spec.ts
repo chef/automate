@@ -17,7 +17,7 @@ import { ProjectRequests } from './project.requests';
 
 describe('ProjectEffects', () => {
   let effects: ProjectEffects;
-  let actions: Observable<any>;
+  let actions$: Observable<any>;
   const initialState = { };
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('ProjectEffects', () => {
       providers: [
         ProjectEffects,
         ProjectRequests,
-        provideMockActions(() => actions)
+        provideMockActions(() => actions$)
       ]
     });
 
@@ -45,7 +45,7 @@ describe('ProjectEffects', () => {
       message: `Deleted project ${id}.`
     });
 
-    actions = of(new DeleteProjectSuccess({id}));
+    actions$ = of(new DeleteProjectSuccess({id}));
 
     let loadOptionSeen = false;
     let createNotificationSeen = false;

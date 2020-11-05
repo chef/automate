@@ -25,9 +25,9 @@ export class NodesAddComponent implements OnInit {
 
   addTypeControl: FormGroup;
   backendControl: FormGroup;
-  backendValue: Observable<string>;
+  backendValue$: Observable<string>;
   sslControl: FormGroup;
-  sslValue: Observable<boolean>;
+  sslValue$: Observable<boolean>;
 
   // Array of secrets available for user to select
   // TODO make ngrx/store selection
@@ -48,8 +48,9 @@ export class NodesAddComponent implements OnInit {
 
     // Swap fields based on selected "backend" value (ssh, winrm)
     this.backendControl = this.form.get('wizardStep2').get('backend') as FormGroup;
-    this.backendValue = this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
-    this.backendValue.subscribe(backend => {
+    this.backendValue$ =
+      this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
+    this.backendValue$.subscribe(backend => {
       const step = this.form.get('wizardStep2') as FormGroup;
       step.get('secrets').setValue([]);
       switch (backend) {
@@ -71,7 +72,7 @@ export class NodesAddComponent implements OnInit {
     // Switch selectable secrets based on selected "backend" value (ssh, winrm)
     this.secrets$ = combineLatest([
       this.fetchSecrets(),
-      this.backendValue
+      this.backendValue$
     ]).pipe(
       map(([secrets, backend]: [{ type: string }[], string]) =>
         secrets.filter(s => s.type === backend || s.type === 'sudo'))
@@ -80,8 +81,8 @@ export class NodesAddComponent implements OnInit {
 
   setWinRmPort(): void {
     this.sslControl = this.form.get('wizardStep2').get('ssl') as FormGroup;
-    this.sslValue = this.sslControl.valueChanges.pipe(startWith(this.sslControl.value));
-    this.sslValue.subscribe(ssl => {
+    this.sslValue$ = this.sslControl.valueChanges.pipe(startWith(this.sslControl.value));
+    this.sslValue$.subscribe(ssl => {
       if (ssl && this.backendControl.value === 'winrm') {
         this.form.get('wizardStep2').get('port').patchValue(5986);
       } else {

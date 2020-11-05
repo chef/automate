@@ -3,7 +3,12 @@ title = "Chef Automate API"
 
 date = 2019-03-06T17:25:30-07:00
 draft = false
+
 layout = "data-api"
+style_sheet = "/automate-api-styles.css"
+api_file_path = "/automate-api-docs/all-apis.swagger.json"
+return_page = "/automate/"
+
 [menu]
   [menu.automate]
     title = "Chef Automate API"

@@ -116,17 +116,11 @@ export class ReportDataService {
   }
 
   isEmpty(data) {
-    if (data === undefined || data.length === 0 || (data.length === 1 && data[0] === 'passed')) {
-      return true;
-    }
-    return false;
+    return data === undefined || data.length === 0 || (data.length === 1 && data[0] === 'passed');
   }
 
   isZero(count: number): boolean {
-    if (count === 0) {
-      return true;
-    }
-    return false;
+    return count === 0;
   }
 
   isAllZeros(data) {

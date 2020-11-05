@@ -30,7 +30,7 @@ rules:
           }
           ...
         }
-    message: isDestroyed never triggered from ngOnDestroy
+    message: subscriptions never complete because isDestroyed never triggered from ngOnDestroy
     languages: [ts]
     severity: ERROR
 
@@ -52,7 +52,7 @@ rules:
           }
           ...
         }
-    message: isDestroyed never used with takeUntil()
+    message: subscriptions never complete because they are not instrumented with takeUntil(this.isDestroyed)
     metadata: {
       falseNegative: will not catch multiple subscriptions with takeUntil missing on some
       }
@@ -114,5 +114,13 @@ rules:
           ...
         }
     message: ngOnDestroy missing this.isDestroyed.complete()
+    languages: [ts]
+    severity: ERROR
+
+  - id: onDestroy-not-implemented-in-class
+    patterns:
+    - pattern: this.isDestroyed.complete()
+    - pattern-not-inside: class $CLASS implements OnDestroy { ... }
+    message: subscriptions never complete because class does not implement OnDestroy Lifecycle hook
     languages: [ts]
     severity: ERROR
