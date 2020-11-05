@@ -1,0 +1,24 @@
+# Copied from https://github.com/returntocorp/semgrep-action/blob/develop/src/semgrep_agent/templates/.semgrepignore
+
+# Ignore git items
+.gitignore
+.git/
+:include .gitignore
+
+# Common large directories
+node_modules/
+build/
+dist/
+vendor/
+env/
+.env/
+venv/
+.venv/
+*.min.js
+
+# Common test directories
+test/
+tests/
+
+# Semgrep rules folder
+.semgrep
