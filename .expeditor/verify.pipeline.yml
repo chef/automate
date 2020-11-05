@@ -621,7 +621,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-db
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-db
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -648,7 +648,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -676,7 +676,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -705,7 +705,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-reporting
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-reporting
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -731,7 +731,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/nodemanager-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-db
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-db
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -759,7 +759,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -786,7 +786,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -813,7 +813,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -840,7 +840,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -867,7 +867,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -894,7 +894,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -921,7 +921,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
