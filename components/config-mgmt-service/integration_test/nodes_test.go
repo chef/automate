@@ -4103,7 +4103,7 @@ func TestNodesMissingRunsBeforeIndex(t *testing.T) {
 
 	// create a node with the checkin time before the run time
 	node := iBackend.Node{
-		Checkin:     time.Now().AddDate(-1, 0, 0), // a checkin time for a year ago
+		Checkin:     parseTime(t, "1977-10-23T15:00:00Z"), // ensure this is before all other created indexes
 		Exists:      true,
 		LatestRunID: "f97039e0-3f2f-11e8-b467-0ed5f89f718b",
 		NodeInfo: iBackend.NodeInfo{
@@ -4155,7 +4155,7 @@ func TestLastCCRBeforeIndex(t *testing.T) {
 		Checkin:         time.Now(),
 		Exists:          true,
 		LatestRunID:     "f97039e0-3f2f-11e8-b467-0ed5f89f718b",
-		LastCCRReceived: time.Now().AddDate(-1, 0, 0), // a year ago
+		LastCCRReceived: parseTime(t, "1977-10-23T15:00:00Z"), // 200 years ago
 		NodeInfo: iBackend.NodeInfo{
 			EntityUuid:       uuid,
 			NodeName:         "node_name",
