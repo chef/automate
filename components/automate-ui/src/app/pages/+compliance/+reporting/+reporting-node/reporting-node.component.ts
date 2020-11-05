@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { StatsService } from '../../shared/reporting/stats.service';
-import { Subject } from 'rxjs';
-import { ReportQueryService, ReturnParams } from '../../shared/reporting/report-query.service';
+import { StatsService, ReportCollection } from '../../shared/reporting/stats.service';
+import { Subject, Observable } from 'rxjs';
+import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reporting-node',
@@ -24,6 +24,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   reportLoading = false;
   RFC2822 = DateTime.RFC2822;
   returnParams: ReturnParams = {};
+  page$ = new Subject<number>();
+  page = 1;
+  pageSize = 10;
+  totalReports = 0;
+  firstReportIsLoaded = false;
 
   openControls = {};
 
@@ -46,19 +51,27 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const reportQuery = this.reportQueryService.getReportQuery();
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
-    this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
-    .pipe(takeUntil(this.isDestroyed))
-    .subscribe(reports => {
-      this.reports = reports;
-      const queryForReport = this.reportQueryService.getReportQueryForReport(reports[0]);
-      this.statsService.getSingleReport(reports[0].id, queryForReport)
-        .pipe(takeUntil(this.isDestroyed))
-        .subscribe(data => {
-          this.reportLoading = false;
-          this.layoutFacade.ShowPageLoading(false);
-          this.activeReport = Object.assign(reports[0], data);
-        });
+    this.page$.pipe(
+      takeUntil(this.isDestroyed)).
+      subscribe(page => {
+      this.page = page;
+      this.getReports(reportQuery).pipe(first()).subscribe(reportCollection => {
+        this.totalReports = reportCollection.totalReports;
+        this.reports = reportCollection.reports;
+
+        // load the first report only when first loading the page
+        if (!this.firstReportIsLoaded) {
+          this.firstReportIsLoaded = true;
+          this.setActiveReport(this.reports[0]);
+        }
+      });
     });
+
+    this.onPageChanged(1);
+  }
+
+  onPageChanged(page: number) {
+    this.page$.next(page);
   }
 
   ngOnDestroy() {
@@ -69,14 +82,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   onReportItemClick(_event, report) {
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
-    const reportQuery = this.reportQueryService.getReportQueryForReport(report);
-    this.statsService.getSingleReport(report.id, reportQuery)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe(data => {
-        this.reportLoading = false;
-        this.layoutFacade.ShowPageLoading(false);
-        this.activeReport = Object.assign(report, data);
-      });
+
+    this.setActiveReport(report);
   }
 
   onHistoryOpenClick(_event) {
@@ -181,5 +188,21 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   formatDaysAgo(timestamp) {
     return moment(timestamp).fromNow();
+  }
+
+  private getReports(reportQuery: ReportQuery): Observable<ReportCollection>  {
+    return this.statsService.getReportsWithPages(reportQuery,
+      {sort: 'latest_report.end_time', order: 'DESC'}, this.page, this.pageSize);
+  }
+
+  private setActiveReport(report: any) {
+    const reportQuery = this.reportQueryService.getReportQueryForReport(report);
+    this.statsService.getSingleReport(report.id, reportQuery)
+      .pipe(first())
+      .subscribe(data => {
+        this.reportLoading = false;
+        this.layoutFacade.ShowPageLoading(false);
+        this.activeReport = Object.assign(report, data);
+      });
   }
 }
