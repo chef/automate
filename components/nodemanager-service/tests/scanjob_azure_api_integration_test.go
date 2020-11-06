@@ -82,7 +82,7 @@ func TestAzureAPIScanJob(t *testing.T) {
 		Name:          "my job for azure-api node manager",
 		Tags:          []*common.Kv{},
 		Type:          "exec",
-		Profiles:      []string{"https://github.com/vjeffrey/try-azure-profile/archive/master.tar.gz"},
+		Profiles:      []string{"https://github.com/chef/automate/raw/0d2fc575a63fbd3d191834906ffb1e9d3a08f615/components/compliance-service/test_data/inspec_profiles/test-azure-profile-2.0.0.tar.gz"},
 		NodeSelectors: []*jobs.ManagerFilter{&mgrFilter},
 	}
 	t.Log("Creating job for node manager, to execute azure api scan")
