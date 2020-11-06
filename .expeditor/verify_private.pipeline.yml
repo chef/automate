@@ -114,24 +114,6 @@ steps:
             "/go/src/github.com/chef/automate"
           ]
 
-  # - label: ":semgrep: Published"
-  #   expeditor:
-  #     executor:
-  #       docker:
-  #         image: returntocorp/semgrep:latest
-  #         entrypoint: semgrep
-  #         command: [
-  #           "--error",
-  #           "--exclude", "third_party",
-  #           "--exclude", "*_test.go",
-  #           "--exclude", "*.pb.go",
-  #           "--exclude", "*.bindata.go",
-  #           "--exclude", "*.spec.ts",
-  #           "--timeout", "120",
-  #           "--config", "https://semgrep.dev/p/r2c-ci",
-  #           "/go/src/github.com/chef/automate"
-          # ]
-
   - label: ":semgrep: Published"
     command:
     - pwd
@@ -152,6 +134,7 @@ steps:
           environment:
             - SEMGREP_TOKEN
             - SEMGREP_ID
+    soft_fail: true
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
