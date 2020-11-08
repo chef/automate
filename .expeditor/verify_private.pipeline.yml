@@ -110,7 +110,7 @@ steps:
           command: [
             "--error",
             "--exclude", "*.spec.ts",
-            "--config", "/go/src/github.com/chef/automate/semgrep",
+            "--config", "/go/src/github.com/chef/automate/.semgrep",
             "/go/src/github.com/chef/automate"
           ]
 
