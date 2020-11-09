@@ -1,0 +1,10 @@
+---
+grpc: "127.0.0.1:10155"
+log-level: "info"
+log-format: "text"
+
+tls:
+  cert_path: ../../../dev/certs/sample-data-service.crt
+  key_path: ../../../dev/certs/sample-data-service.key
+  root_ca_path: ../../../dev/certs/Chef_Automate_FAKE_Dev.crt
+

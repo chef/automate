@@ -413,6 +413,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/sample-data-service",
+      "metadata": {
+        "name": "chef/sample-data-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-cli",
       "metadata": {
         "name": "chef/automate-cli",
@@ -640,6 +650,19 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [],
+      "packages": null,
+      "dependencies": [
+        "automate"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "sample-data",
+      "aliases": null,
+      "type": "product",
+      "services": [
+        "chef/sample-data-service"
+      ],
       "packages": null,
       "dependencies": [
         "automate"

@@ -48,6 +48,7 @@ import "config/builder_api/config_request.proto";
 import "config/builder_api_proxy/config_request.proto";
 import "config/minio/config_request.proto";
 import "config/builder_memcached/config_request.proto";
+import "config/sample_data/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
@@ -100,4 +101,5 @@ message AutomateConfig {
 	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
 	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
 	chef.automate.domain.cds.ConfigRequest cds = 46;
+	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 }

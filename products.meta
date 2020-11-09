@@ -43,6 +43,7 @@
     "chef/automate-builder-api",
     "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
+    "chef/sample-data-service",
     "chef/automate-cli",
     "core/rsync"
   ],
@@ -197,6 +198,14 @@
       "type": "product",
       "dependencies": ["automate"],
       "services": []
+    },
+    {
+      "name": "sample-data",
+      "type": "product",
+      "dependencies": ["automate"],
+      "services": [
+          "chef/sample-data-service"
+      ]
     }
   ]
 }
