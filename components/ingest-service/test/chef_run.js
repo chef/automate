@@ -61,7 +61,7 @@ describe("/events/chef/run", function () {
         return helpers.ConvergeHistoryRefresh().then(function(response) {
           return chakram.get(convergeHistoryUrlWithId(runId)).then(function(convergeHistoryResponse) {
             expect(convergeHistoryResponse).to.have.status(200);
-            expect(convergeHistoryResponse.body.hits.total).to.equal(1);
+            expect(convergeHistoryResponse.body.hits.total.value).to.equal(1);
             expect(convergeHistoryResponse.body.hits.hits[0]._source.error.description.title).to.equal("Error Resolving Cookbooks for Run List.");
           });
         });
@@ -96,7 +96,7 @@ describe("/events/chef/run", function () {
         return helpers.ConvergeHistoryRefresh().then(function(response) {
           return chakram.get(convergeHistoryUrlWithId(runId)).then(function(convergeHistoryResponse) {
             expect(convergeHistoryResponse).to.have.status(200);
-            expect(convergeHistoryResponse.body.hits.total).to.equal(1);
+            expect(convergeHistoryResponse.body.hits.total.value).to.equal(1);
             expect(convergeHistoryResponse.body.hits.hits[0]._source.error.description.title).to.equal("Error Resolving Cookbooks for Run List.");
           });
         });

@@ -27,6 +27,7 @@ describe("/events/chef/liveness", function () {
   });
 
   describe("posting example message", function () {
+    before(function () { return helpers.ESCleanupDocuments() });
 
     it("should return 200 with new index created", function () {
       this.timeout(4000);

@@ -31,7 +31,6 @@ var AllMappings = []Mapping{
 type Mapping struct {
 	Index      string
 	Alias      string
-	Type       string
 	Timeseries bool
 	Mapping    string
 	Properties string

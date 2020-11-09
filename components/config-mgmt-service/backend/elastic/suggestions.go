@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/schollz/closestmatch"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/lib/stringutils"
 
@@ -114,8 +114,6 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 	myagg := "myagg"
 	filters["exists"] = []string{"true"}
 	boolQuery := newBoolQueryFromFilters(filters)
-	typeQuery := elastic.NewTypeQuery(IndexNodeState)
-	boolQuery = boolQuery.Must(typeQuery)
 	lowerText := strings.ToLower(text)
 
 	// return all unless text has at least 2 chars
@@ -176,11 +174,8 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 }
 
 func (es Backend) getArrayAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
-	typeQuery := elastic.NewTypeQuery(IndexNodeState)
 	filters["exists"] = []string{"true"}
 	boolQuery := newBoolQueryFromFilters(filters)
-
-	boolQuery = boolQuery.Must(typeQuery)
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {

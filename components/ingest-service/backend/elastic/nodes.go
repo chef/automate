@@ -11,7 +11,7 @@ import (
 	"errors"
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/ingest-service/backend"
@@ -66,7 +66,6 @@ func (es *Backend) MarkForDeleteMultipleNodesByID(ctx context.Context, nodeIDs [
 
 	bulkResponse, err := elastic.NewUpdateByQueryService(es.client).
 		Index(mappings.NodeState.Alias).
-		Type(mappings.NodeState.Type).
 		Query(query).
 		Script(script).
 		Refresh("true").
@@ -230,7 +229,6 @@ func (es *Backend) UpdateNodeProjectTags(ctx context.Context, projectTaggingRule
 
 	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
 		Index(mappings.NodeState.Alias).
-		Type(mappings.NodeState.Type).
 		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
@@ -270,7 +268,6 @@ func (es *Backend) deleteNodeByDocID(ctx context.Context, docIds []string) (int,
 	for _, docID := range docIds {
 		updateReq := elastic.NewBulkUpdateRequest().
 			Index(mappings.NodeState.Alias).
-			Type(mappings.NodeState.Type).
 			Id(docID).
 			Doc(struct {
 				Exists    bool      `json:"exists"`
@@ -314,8 +311,8 @@ func (es *Backend) FindNodeIDByInstanceId(ctx context.Context, instanceId string
 		return nil, err
 	}
 
-	if searchResult.Hits.TotalHits > 0 {
-		docIDs = make([]string, searchResult.Hits.TotalHits)
+	if searchResult.TotalHits() > 0 {
+		docIDs = make([]string, searchResult.TotalHits())
 		for i, hit := range searchResult.Hits.Hits {
 			docIDs[i] = hit.Id
 		}
@@ -347,8 +344,8 @@ func (es *Backend) findDocIDByFields(ctx context.Context, filters map[string]str
 		return nil, err
 	}
 
-	if searchResult.Hits.TotalHits > 0 {
-		docIDs = make([]string, searchResult.Hits.TotalHits)
+	if searchResult.TotalHits() > 0 {
+		docIDs = make([]string, searchResult.TotalHits())
 		for i, hit := range searchResult.Hits.Hits {
 			docIDs[i] = hit.Id
 		}
@@ -382,11 +379,11 @@ func (es *Backend) FindNodeIDsByFields(ctx context.Context, filters map[string]s
 		return nil, err
 	}
 
-	if searchResult.Hits.TotalHits > 0 {
-		nodeIDs = make([]string, searchResult.Hits.TotalHits)
+	if searchResult.TotalHits() > 0 {
+		nodeIDs = make([]string, searchResult.TotalHits())
 		var nodeID nodeUUID
 		for i, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(*hit.Source, &nodeID)
+			err := json.Unmarshal(hit.Source, &nodeID)
 			if err != nil {
 				return nil, err
 			}

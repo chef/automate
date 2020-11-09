@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 const (
@@ -17,11 +17,9 @@ const (
 			"number_of_shards":1,
 			"number_of_replicas":0
 		},
-		"mappings:": {
-			"test-data" : {
-				"properties" : {
-					"end_time": { "type" : "date" }
-				}
+		"mappings": {
+			"properties" : {
+				"end_time": { "type" : "date" }
 			}
 		}
 	}`

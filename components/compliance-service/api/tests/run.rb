@@ -34,7 +34,17 @@ module VulcanoTest
 
   def assert_suggestions_text(expected, suggestions)
     actual = suggestions['suggestions'].flat_map {|s| s['text']}
-    assert_equal(expected, actual, caller)
+
+    assert_equal(true, is_desending_order(suggestions['suggestions'], 1000), caller)
+
+    assert_equal(expected.sort, actual.sort, caller)
+  end
+
+  def is_desending_order(suggestions, previous_score)
+    return true if suggestions.empty?
+    return false if suggestions.first.score > previous_score
+
+    is_desending_order(suggestions[1..-1], suggestions.first.score)
   end
 
   def assert_suggestions_text_id_version(expected, suggestions)

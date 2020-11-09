@@ -3,12 +3,12 @@ package mappings
 // Compliance mapping used to create the `comp-<version>-s-<date>` index
 var ComplianceSumDate = Mapping{
 	Index:      IndexNameSum,
-	Type:       DocType,
 	Timeseries: true,
 	Mapping: `
 {
   "index_patterns": ["` + IndexNameSum + `-20*"],
   "settings": {
+    "number_of_shards": 5,
     "analysis": {
       "analyzer": {
         "autocomplete": {
@@ -58,359 +58,357 @@ var ComplianceSumDate = Mapping{
     }
   },
   "mappings": {
-    "` + DocType + `": {
-      "properties": {
-        "controls_sums": {
-          "properties": {
-            "failed": {
-              "properties": {
-                "critical": {
-                  "type": "integer"
-                },
-                "major": {
-                  "type": "integer"
-                },
-                "minor": {
-                  "type": "integer"
-                },
-                "total": {
-                  "type": "integer"
-                }
+    "properties": {
+      "controls_sums": {
+        "properties": {
+          "failed": {
+            "properties": {
+              "critical": {
+                "type": "integer"
               },
-              "type": "object"
-            },
-            "passed": {
-              "properties": {
-                "total": {
-                  "type": "integer"
-                }
+              "major": {
+                "type": "integer"
               },
-              "type": "object"
-            },
-            "skipped": {
-              "properties": {
-                "total": {
-                  "type": "integer"
-                }
+              "minor": {
+                "type": "integer"
               },
-              "type": "object"
-            },
-            "waived": {
-              "properties": {
-                "total": {
-                  "type": "integer"
-                }
-              },
-              "type": "object"
-            },
-            "total": {
-              "type": "integer"
-            }
-          },
-          "type": "object"
-        },
-        "daily_latest": {
-          "type": "boolean"
-        },
-        "doc_version": {
-          "type": "keyword"
-        },
-        "end_time": {
-          "type": "date"
-        },
-        "environment": {
-          "fields": {
-            "engram": {
-              "analyzer": "autocomplete",
-              "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
-            }
-          },
-          "type": "keyword"
-        },
-        "job_uuid": {
-          "type": "keyword"
-        },
-        "node_name": {
-          "fields": {
-            "engram": {
-              "analyzer": "autocomplete",
-              "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
-            }
-          },
-          "type": "keyword"
-        },
-        "node_uuid": {
-          "type": "keyword"
-        },
-        "platform": {
-          "properties": {
-            "name": {
-              "fields": {
-                "engram": {
-                  "analyzer": "autocomplete",
-                  "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
-                }
-              },
-              "type": "keyword"
-            },
-            "release": {
-              "fields": {
-                "engram": {
-                  "analyzer": "autocomplete",
-                  "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
-                }
-              },
-              "type": "keyword"
-            },
-            "full": {
-              "fields": {
-                "engram": {
-                  "analyzer": "autocomplete_version_numbers",
-                  "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
-                }
-              },
-              "type": "keyword"
-            }
-          }
-        },
-        "profiles": {
-          "properties": {
-            "controls_sums": {
-              "properties": {
-                "failed": {
-                  "properties": {
-                    "critical": {
-                      "type": "integer"
-                    },
-                    "major": {
-                      "type": "integer"
-                    },
-                    "minor": {
-                      "type": "integer"
-                    },
-                    "total": {
-                      "type": "integer"
-                    }
-                  },
-                  "type": "object"
-                },
-                "passed": {
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    }
-                  },
-                  "type": "object"
-                },
-                "skipped": {
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    }
-                  },
-                  "type": "object"
-                },
-                "waived": {
-                  "properties": {
-                    "total": {
-                      "type": "integer"
-                    }
-                  },
-                  "type": "object"
-                },
-                "total": {
-                  "type": "integer"
-                }
-              },
-              "type": "object"
-            },
-            "profile": {
-              "type": "keyword"
-            },
-            "name": {
-              "type": "keyword"
-            },
-            "title": {
-              "type": "keyword",
-              "fields": {
-                "engram": {
-                  "type": "text",
-                  "analyzer": "autocomplete"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
-                }
+              "total": {
+                "type": "integer"
               }
             },
-            "sha256": {
-              "type": "keyword"
+            "type": "object"
+          },
+          "passed": {
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
             },
-            "version": {
-              "type": "keyword"
+            "type": "object"
+          },
+          "skipped": {
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
             },
-            "status": {
-              "type": "keyword"
+            "type": "object"
+          },
+          "waived": {
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
             },
-            "full": {
-              "fields": {
-                "engram": {
-                  "analyzer": "autocomplete_version_numbers",
-                  "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
-                }
+            "type": "object"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "daily_latest": {
+        "type": "boolean"
+      },
+      "doc_version": {
+        "type": "keyword"
+      },
+      "end_time": {
+        "type": "date"
+      },
+      "environment": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "job_uuid": {
+        "type": "keyword"
+      },
+      "node_name": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "node_uuid": {
+        "type": "keyword"
+      },
+      "platform": {
+        "properties": {
+          "name": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
               },
-              "type": "keyword"
-            }
-          },
-          "type": "nested"
-        },
-        "recipes": {
-          "fields": {
-            "engram": {
-              "analyzer": "autocomplete",
-              "type": "text"
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
             },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
-            }
+            "type": "keyword"
           },
-          "type": "keyword"
-        },
-        "report_uuid": {
-          "type": "keyword"
-        },
-        "roles": {
-          "fields": {
-            "engram": {
-              "analyzer": "autocomplete",
-              "type": "text"
+          "release": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
             },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
+            "type": "keyword"
+          },
+          "full": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete_version_numbers",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
+          }
+        }
+      },
+      "profiles": {
+        "properties": {
+          "controls_sums": {
+            "properties": {
+              "failed": {
+                "properties": {
+                  "critical": {
+                    "type": "integer"
+                  },
+                  "major": {
+                    "type": "integer"
+                  },
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "passed": {
+                "properties": {
+                  "total": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "skipped": {
+                "properties": {
+                  "total": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "waived": {
+                "properties": {
+                  "total": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "profile": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "keyword",
+            "fields": {
+              "engram": {
+                "type": "text",
+                "analyzer": "autocomplete"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
             }
           },
-          "type": "keyword"
-        },
-        "status": {
-          "type": "keyword"
-        },
-        "status_message": {
-          "type": "keyword"
-        },
-        "projects": {
-          "type": "keyword"
-        },
-        "statistics": {
-          "properties": {
-            "duration": {
-              "type": "double"
-            }
+          "sha256": {
+            "type": "keyword"
+          },
+          "version": {
+            "type": "keyword"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "full": {
+            "fields": {
+              "engram": {
+                "analyzer": "autocomplete_version_numbers",
+                "type": "text"
+              },
+              "lower": {
+                "normalizer": "case_insensitive",
+                "type": "keyword"
+              }
+            },
+            "type": "keyword"
           }
         },
-        "version": {
-          "type": "keyword",
-          "fields": {
-            "engram": {
-              "type": "text",
-              "analyzer": "autocomplete_version_numbers"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
-            }
+        "type": "nested"
+      },
+      "recipes": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
           }
         },
-				"policy_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"policy_group": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"organization_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"source_fqdn": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				},
-				"chef_tags": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
-				}
+        "type": "keyword"
+      },
+      "report_uuid": {
+        "type": "keyword"
+      },
+      "roles": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "status": {
+        "type": "keyword"
+      },
+      "status_message": {
+        "type": "keyword"
+      },
+      "projects": {
+        "type": "keyword"
+      },
+      "statistics": {
+        "properties": {
+          "duration": {
+            "type": "double"
+          }
+        }
+      },
+      "version": {
+        "type": "keyword",
+        "fields": {
+          "engram": {
+            "type": "text",
+            "analyzer": "autocomplete_version_numbers"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        }
+      },
+      "policy_name": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "policy_group": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "organization_name": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "source_fqdn": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
+      },
+      "chef_tags": {
+        "fields": {
+          "engram": {
+            "analyzer": "autocomplete",
+            "type": "text"
+          },
+          "lower": {
+            "normalizer": "case_insensitive",
+            "type": "keyword"
+          }
+        },
+        "type": "keyword"
       }
     }
   }

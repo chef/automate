@@ -5,6 +5,12 @@ test_name="backup"
 test_backup_restore=true
 test_diagnostics_opts="--opt compliance-report.days:120 --opt cfgmgmt-actions.days:120 --opt cfgmgmt-ccr.days:120"
 
+do_create_config() {
+    do_create_config_default
+    #shellcheck disable=SC2154
+    echo -e "[elasticsearch.v1.sys.cluster]\nmax_shards_per_node = 5000" >> "$test_config_path"
+}
+
 do_deploy() {
     do_deploy_default
     log_info "applying dev license"

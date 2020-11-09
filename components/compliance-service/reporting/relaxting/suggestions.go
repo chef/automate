@@ -8,11 +8,11 @@ import (
 	"sort"
 	"strings"
 
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
-	elastic "gopkg.in/olivere/elastic.v6"
 
 	"google.golang.org/grpc/codes"
 
@@ -243,7 +243,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 					if target == "node_name" {
 						var p SummarySource
 						if hit.Source != nil {
-							err := json.Unmarshal(*hit.Source, &p)
+							err := json.Unmarshal(hit.Source, &p)
 							if err == nil {
 								oneSugg.Id = p.NodeID
 							}
@@ -411,7 +411,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 						for _, hit2 := range inner_hit.Hits.Hits {
 							var c ProfileSource
 							if hit2.Source != nil {
-								err := json.Unmarshal(*hit2.Source, &c)
+								err := json.Unmarshal(hit2.Source, &c)
 								if err == nil {
 									if !addedProfiles[c.Sha256] {
 										oneSugg := reportingapi.Suggestion{Id: c.Sha256, Text: c.Full, Version: c.Version, Score: float32(*hit2.Score)}
@@ -507,7 +507,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 						for _, hit2 := range inner_hit.Hits.Hits {
 							var c ProfileSource
 							if hit2.Source != nil {
-								err := json.Unmarshal(*hit2.Source, &c)
+								err := json.Unmarshal(hit2.Source, &c)
 								if err == nil {
 									if !addedProfiles[c.Sha256] {
 										oneSugg := reportingapi.Suggestion{Id: c.Sha256, Text: c.Title, Version: c.Version, Score: float32(*hit2.Score)}
@@ -539,7 +539,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 	var innerQuery elastic.Query
 	if len(text) >= 2 {
 		innerBoolQuery := elastic.NewBoolQuery()
-		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
 		innerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
 		innerBoolQuery.Should(elastic.NewTermQuery(target, text).Boost(100))
 		innerBoolQuery.Should(elastic.NewPrefixQuery(target, text).Boost(100))

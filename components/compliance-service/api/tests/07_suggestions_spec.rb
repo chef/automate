@@ -31,7 +31,7 @@ describe File.basename(__FILE__) do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'environment', text: 'devsec zeT', size: 10
     )
-    assert_suggestions_text(["DevSec Prod Zeta", "DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Omega"], actual_data)
+    assert_suggestions_text(["DevSec Prod Zeta", "DevSec Prod Alpha", "DevSec Prod Omega", "DevSec Prod beta"], actual_data)
 
     # suggest environment, text with space and size limit
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
@@ -75,8 +75,8 @@ describe File.basename(__FILE__) do
       type: 'node', text: 'beta'
     )
     assert_suggestions_text_id_version( [
-      "RedHat(2)-beta-nginx(f)-apache(s)-failed--9b9f4e51-b049-4b10-9555-10578916e222--",
-      "centos-beta--9b9f4e51-b049-4b10-9555-10578916e149--"
+      "centos-beta--9b9f4e51-b049-4b10-9555-10578916e149--",
+      "RedHat(2)-beta-nginx(f)-apache(s)-failed--9b9f4e51-b049-4b10-9555-10578916e222--"
     ], actual_data )
 
     # suggest profiles, no text given
@@ -84,8 +84,8 @@ describe File.basename(__FILE__) do
       type: 'profile'
     )
     expected = ["A fake one--41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9--2.0.1",
-      "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9--2.0.1",
       "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8--2.0.0",
+      "DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9--2.0.1",
       "DevSec Linux Security Baseline--b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015--2.0.1",
       "DevSec Nginx Baseline--09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988--2.1.0",
       "My Faily Profile title--5596bb07ef4f11fd2e03a0a80c4adb7c61fc0b4d0aa6c1410b3c715c94b36888--1.0.0",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	elastic "github.com/olivere/elastic/v7"
 
 	"github.com/chef/automate/api/interservice/authz"
 	project_update_lib "github.com/chef/automate/lib/authz"

@@ -7,8 +7,8 @@ import (
 
 	es_sidecar "github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
 	"github.com/chef/automate/components/es-sidecar-service/pkg/server"
+	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 const (

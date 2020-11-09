@@ -586,14 +586,12 @@ var nodeProps = `
 var NodeState = Mapping{
 	Index:      "node-state-7",
 	Alias:      "node-state",
-	Type:       "node-state",
 	Timeseries: false,
 	Properties: fmt.Sprintf(`{ %s }`, nodeProps),
 	Mapping: fmt.Sprintf(`
 	{
-		"template": "node-state",
-		"index_patterns": ["node-state"],
 		"settings": {
+			"number_of_shards": 5,
 			"index": {
 				"refresh_interval": "5s"
 			},
@@ -628,10 +626,8 @@ var NodeState = Mapping{
 			}
 		},
 		"mappings": {
-			"node-state": {
-				"dynamic": false,
-				%s
-			}
+			"dynamic": false,
+			%s
 		}
 	}
 	`, nodeProps),

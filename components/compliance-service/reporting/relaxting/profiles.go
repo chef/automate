@@ -8,17 +8,16 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	ingestinspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/compliance/stats"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 type ESInspecControl struct {
@@ -263,7 +262,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 		return profile, errors.Wrap(err, "GetProfile, cannot connect to ElasticSearch")
 	}
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(hash)
 
 	searchSource := elastic.NewSearchSource().
@@ -291,11 +290,11 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 	// LogQueryPartMin(CompProfilesIndex, searchResult, "GetProfile query results")
 
 	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var esProfile ESInspecProfile
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esProfile)
+				err := json.Unmarshal(hit.Source, &esProfile)
 				if err == nil {
 					return esProfile.convertToInspecProfile()
 				}
@@ -430,7 +429,7 @@ func (backend *ES2Backend) getProfileMetadata(profileID string) (*stats.ProfileS
 	}
 	esIndex := CompProfilesIndex
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(profileID)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
@@ -473,13 +472,13 @@ func (backend *ES2Backend) getProfileMetadata(profileID string) (*stats.ProfileS
 	logrus.Debugf("getProfileMetadata got %d profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
 
 	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		hit := searchResult.Hits.Hits[0]
 
 		//for _, hit := range searchResult.Hits.Hits {
 		prof := &stats.ProfileSummary{Stats: &stats.ProfileSummaryStats{}}
 		unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
-		if err = unmarshaler.Unmarshal(bytes.NewReader(*hit.Source), prof); err != nil {
+		if err = unmarshaler.Unmarshal(bytes.NewReader(hit.Source), prof); err != nil {
 			logrus.Errorf("getProfileMetadata unmarshal error: %s", err.Error())
 		}
 
@@ -500,7 +499,7 @@ func (backend *ES2Backend) getControlsMetadata(profileId string) (map[string]Con
 		return nil, errors.Wrap(err, "getControlsMetadata, cannot connect to ElasticSearch")
 	}
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(profileId)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
@@ -535,11 +534,11 @@ func (backend *ES2Backend) getControlsMetadata(profileId string) (map[string]Con
 	logrus.Debugf("getControlsMetadata got %d profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
 
 	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var esProfile ESInspecProfile
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esProfile)
+				err := json.Unmarshal(hit.Source, &esProfile)
 				if err != nil {
 					logrus.Errorf("getControlsMetadata unmarshal error: %s", err.Error())
 				} else {
@@ -584,7 +583,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 	}
 
 	logrus.Debugf("%s querying the profiles index with ids: %v", myName, profileIDs)
-	query := elastic.NewIdsQuery(mappings.DocType)
+	query := elastic.NewIdsQuery()
 	query.Ids(profileIDs...)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
@@ -623,12 +622,12 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 	LogQueryPartMin(esIndex, searchResult, fmt.Sprintf("%s - search result", myName))
 
 	profiles := make([]*reportingapi.ProfileMin, 0)
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		// Loop over the data from the compliance-profiles metadata index
 		for _, hit := range searchResult.Hits.Hits {
 			var profile reportingapi.ProfileMin
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &profile)
+				err := json.Unmarshal(hit.Source, &profile)
 				if err == nil {
 					profile.Id = hit.Id
 					profile.Status = profileIDsStatusMap[profile.Id]
@@ -727,7 +726,6 @@ func (backend ES2Backend) StoreProfile(profile inspec.Profile) error {
 	// Add a document to the index
 	_, err = client.Index().
 		Index(CompProfilesIndex).
-		Type(mappings.DocType).
 		Id(esProfile.Sha256).
 		BodyJson(esProfile).
 		Refresh("true").

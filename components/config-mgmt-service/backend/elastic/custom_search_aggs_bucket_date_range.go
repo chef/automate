@@ -1,12 +1,16 @@
+// Copyright 2012-present Oliver Eilhard. All rights reserved.
+// Use of this source code is governed by a MIT-license.
+// See http://olivere.mit-license.org/license.txt for details.
+
 package elastic
 
 import (
 	"time"
 
-	elastic "gopkg.in/olivere/elastic.v6"
+	"github.com/olivere/elastic"
 )
 
-// This is a copy from https://github.com/olivere/elastic/blob/release-branch.v6/search_aggs_bucket_date_range.go
+// This is a copy from https://raw.githubusercontent.com/olivere/elastic/release-branch.v7/search_aggs_bucket_date_range.go
 // This adds the "missing" option that defines how documents that are missing a value should be treated.
 
 // DateRangeAggregation is a range aggregation that is dedicated for
@@ -14,9 +18,9 @@ import (
 // normal range aggregation is that the from and to values can be expressed
 // in Date Math expressions, and it is also possible to specify a
 // date format by which the from and to response fields will be returned.
-// Note that this aggregation includes the from value and excludes the to
+// Note that this aggregration includes the from value and excludes the to
 // value for each range.
-// See: https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-daterange-aggregation.html
+// See: https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-aggregations-bucket-daterange-aggregation.html
 type DateRangeAggregation struct {
 	field           string
 	script          *elastic.Script
@@ -158,7 +162,6 @@ func (a *DateRangeAggregation) Source() (interface{}, error) {
 	//             "date_range": {
 	//                 "field": "date",
 	//                 "format": "MM-yyy",
-	//                 "missing": "1976/11/30",
 	//                 "ranges": [
 	//                     { "to": "now-10M/M" },
 	//                     { "from": "now-10M/M" }

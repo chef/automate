@@ -10,18 +10,17 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
+	elastic "github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -115,7 +114,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
-	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
+	if searchResult.TotalHits() == 0 {
 		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
 		// no matching report IDs is not an error, just return an empty array
 		return &repIds, nil
@@ -130,7 +129,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			for _, hit := range topHits.Hits.Hits {
 				var et EndTimeSource
 				if hit.Source != nil {
-					err = json.Unmarshal(*hit.Source, &et)
+					err = json.Unmarshal(hit.Source, &et)
 					if err != nil {
 						logrus.Errorf("could not get the end_time for runid: %s %v", hit.Id, err)
 						continue
@@ -177,7 +176,7 @@ func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]stri
 }
 
 func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []string) ([]string, error) {
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(ids...)
 	termsQuery := elastic.NewTermsQuery("profiles.controls.id", stringArrayToInterfaceArray(controls)...)
 	reportIdsAndControlIdQuery := elastic.NewBoolQuery()
@@ -282,11 +281,11 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 	logrus.Debugf("GetReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
 		searchResult.TookInMillis)
 	reports := make([]*reportingapi.Report, 0)
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			item := ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &item)
+				err := json.Unmarshal(hit.Source, &item)
 				if err == nil {
 					t := item.EndTime.Round(1 * time.Second)
 					timestamp, _ := ptypes.TimestampProto(t)
@@ -387,11 +386,11 @@ func (backend *ES2Backend) GetReport(reportId string,
 		searchResult.TookInMillis)
 
 	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+	if searchResult.TotalHits() > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := ESInSpecReport{}
 			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				err := json.Unmarshal(hit.Source, &esInSpecReport)
 				if err == nil {
 					//TODO: FIX Unmarshal error(json: cannot unmarshal array into Go struct field
 					// ESInSpecReportControl.results) and move the read all profiles section here
@@ -1062,10 +1061,7 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
 	utils.DeDupFilters(filters)
 
-	typeQuery := elastic.NewTypeQuery(mappings.DocType)
-
 	boolQuery := elastic.NewBoolQuery()
-	boolQuery = boolQuery.Must(typeQuery)
 
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
@@ -1321,12 +1317,10 @@ func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
 	filters map[string][]string) *elastic.BoolQuery {
 
 	utils.DeDupFilters(filters)
-	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
 	boolQuery := elastic.NewBoolQuery()
-	boolQuery = boolQuery.Must(typeQuery)
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery := elastic.NewIdsQuery()
 	idsQuery.Ids(reportId)
 	boolQuery = boolQuery.Must(idsQuery)
 
