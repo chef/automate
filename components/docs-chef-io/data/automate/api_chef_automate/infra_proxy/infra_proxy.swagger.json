@@ -1659,48 +1659,9 @@
           "InfraProxy"
         ]
       }
-    },
-    "/api/v0/infra/version": {
-      "get": {
-        "operationId": "InfraProxy_GetVersion",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "tags": [
-          "InfraProxy"
-        ]
-      }
     }
   },
   "definitions": {
-    "chef.automate.api.common.version.VersionInfo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "sha": {
-          "type": "string"
-        },
-        "built": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.request.CreateDataBag": {
       "type": "object",
       "properties": {

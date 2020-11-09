@@ -25,16 +25,9 @@ import "external/infra_proxy/response/environments.proto";
 import "external/infra_proxy/response/nodes.proto";
 import "external/infra_proxy/response/policyfiles.proto";
 
-import "external/common/version/version.proto";
 import "external/annotations/iam/annotations.proto";
 
 service InfraProxy {
-  rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
-    option (google.api.http).get = "/api/v0/infra/version";
-    option (chef.automate.api.iam.policy).resource = "system:service:version";
-    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
-  };
-
   rpc GetServers (infra_proxy.request.GetServers) returns (infra_proxy.response.GetServers) {
     option (google.api.http).get = "/api/v0/infra/servers";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";

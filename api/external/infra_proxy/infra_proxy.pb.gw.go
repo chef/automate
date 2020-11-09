@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/api/external/infra_proxy/request"
 	"github.com/golang/protobuf/descriptor"
 	"github.com/golang/protobuf/proto"
@@ -32,24 +31,6 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
-
-func request_InfraProxy_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq version.VersionInfoRequest
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.GetVersion(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_InfraProxy_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq version.VersionInfoRequest
-	var metadata runtime.ServerMetadata
-
-	msg, err := server.GetVersion(ctx, &protoReq)
-	return msg, metadata, err
-
-}
 
 func request_InfraProxy_GetServers_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetServers
@@ -3522,26 +3503,6 @@ func local_request_InfraProxy_GetPolicyfile_0(ctx context.Context, marshaler run
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 func RegisterInfraProxyHandlerServer(ctx context.Context, mux *runtime.ServeMux, server InfraProxyServer) error {
 
-	mux.Handle("GET", pattern_InfraProxy_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_InfraProxy_GetVersion_0(rctx, inboundMarshaler, server, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_InfraProxy_GetServers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -4343,26 +4304,6 @@ func RegisterInfraProxyHandler(ctx context.Context, mux *runtime.ServeMux, conn 
 // "InfraProxyClient" to call the correct interceptors.
 func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux, client InfraProxyClient) error {
 
-	mux.Handle("GET", pattern_InfraProxy_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_InfraProxy_GetVersion_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_InfraProxy_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_InfraProxy_GetServers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -5127,8 +5068,6 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_InfraProxy_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "version"}, "", runtime.AssumeColonVerbOpt(true)))
-
 	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
@@ -5207,8 +5146,6 @@ var (
 )
 
 var (
-	forward_InfraProxy_GetVersion_0 = runtime.ForwardResponseMessage
-
 	forward_InfraProxy_GetServers_0 = runtime.ForwardResponseMessage
 
 	forward_InfraProxy_GetServer_0 = runtime.ForwardResponseMessage
