@@ -124,3 +124,13 @@ rules:
     message: subscriptions never complete because class does not implement OnDestroy Lifecycle hook
     languages: [ts]
     severity: ERROR
+
+  # TODO: cleanup results of this rule before activating it
+  # - id: subscription-lifecycle-not-managed
+  #   patterns:
+  #   - pattern: $EXPR.subscribe(...)
+  #   - pattern-not-inside: $EXPR2.pipe(..., takeUntil(...),...).subscribe(...)
+  #   - pattern-not-inside: $EXPR2.pipe(..., take(...),...).subscribe(...)
+  #   message: subscription lifecycle not managed: typically needs takeUntil(this.isDestroeyd)
+  #   languages: [ts]
+  #   severity: ERROR
