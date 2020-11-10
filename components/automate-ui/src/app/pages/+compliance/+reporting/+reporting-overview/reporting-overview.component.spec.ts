@@ -98,8 +98,10 @@ describe('ReportingOverviewComponent', () => {
       startDate: moment(endDate).subtract(10, 'days'),
       endDate: endDate,
       interval: 0,
-      filters: [ {type: { name: 'node'}, value: { id: '1231'}},
-          {type: { name: 'platform'}, value: { text: 'ubuntu'}} ],
+      filters: [
+        {type: { name: 'node'}, value: { id: '1231'}},
+        {type: { name: 'platform'}, value: { text: 'ubuntu'}}
+      ],
       last24h: false
     };
 
