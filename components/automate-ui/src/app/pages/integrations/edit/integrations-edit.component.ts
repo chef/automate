@@ -69,7 +69,7 @@ export class IntegrationsEditComponent implements OnDestroy {
     this.subs.forEach((sub) => sub.unsubscribe());
   }
 
-  createForm(fb) {
+  private createForm(fb) {
     this.integrationsForm = fb.group({
       name: ['', Validators.required],
       type: 'aws',

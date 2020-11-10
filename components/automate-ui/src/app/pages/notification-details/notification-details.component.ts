@@ -112,7 +112,7 @@ export class NotificationDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.targetKeys = this.notification.getTargetTypeKeys();
     this.alertTypeKeys = this.notification.getAlertTypeKeys();

@@ -91,7 +91,7 @@ export class NodesAddComponent implements OnInit {
     });
   }
 
-  createForm(): FormGroup {
+  private createForm(): FormGroup {
     const wizardStep1 = this.fb.group({
       hosts: ['', Validators.required],
       customPrefix: ''
