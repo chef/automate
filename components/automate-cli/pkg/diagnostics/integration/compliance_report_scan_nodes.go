@@ -181,8 +181,6 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				assert.Equal(tstCtx, 0, resp.ErrorCode)
 
 				containsEntity := false
-				fmt.Printf("!!!!!!!!1 resp.Result.ScannedNodes: %+v", resp.Result.ScannedNodes)
-				fmt.Printf("!!!!!!!!2 loaded: %+v", loaded)
 				for _, node := range resp.Result.ScannedNodes {
 					if node.ID == loaded.ID {
 						containsEntity = true

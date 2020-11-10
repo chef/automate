@@ -427,7 +427,7 @@ describe File.basename(__FILE__) do
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, n, 'last_contact'))
       n.scan_data.end_time = Google::Protobuf::Timestamp.new()
       n.scan_data.id = "some-id"
-      if n.connection_error.is_a?(String) && n.connection_error.include?("No such container: cc_pggggggggg (Docker::Error::NotFoundError)")
+      if n.connection_error.is_a?(String) && n.connection_error.include?("No such container: cc_pggggggggg")
         n.connection_error = "No such container: cc_pggggggggg. (TRUNCATED IN TESTS)"
       end
     }

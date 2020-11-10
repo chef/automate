@@ -526,7 +526,7 @@ func (backend ES2Backend) getLatestReportIds(sumDailyToday string, reportTime ti
 	formattedFilters := make(map[string][]string)
 	// Setting end_time filter to the end of the index day to avoid any end_time filters from excluding our report
 	formattedFilters["end_time"] = []string{ reportTime.UTC().Format("2006-01-02") + "T23:59:59Z" }
-	logrus.Debugf("!!!!!!!!!!!getLatestReportIds %+v", formattedFilters)
+	logrus.Debugf("getLatestReportIds called with filters: %+v", formattedFilters)
 	reportIds, err := backend.getNodeReportIdsFromTimeseries(sumDailyToday, formattedFilters, false)
 	if err != nil {
 		logrus.Errorf("%s no report ids for this day: %s. Will still reindex yesterday's latest though", myName, sumDailyToday)
