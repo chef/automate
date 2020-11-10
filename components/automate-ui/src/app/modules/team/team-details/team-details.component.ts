@@ -5,6 +5,7 @@ import { Store, select } from '@ngrx/store';
 import { keyBy, at, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { tag } from 'rxjs-spy/operators/tag';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -91,11 +92,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       filter(([id, url]) => TEAM_DETAILS_ROUTE.test(url) && id !== undefined),
       // Remove the url because we only need to check if the id has changed
       map(([id, _url]) => id),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      tag('team-init-then-dispatch')
     ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
 
-    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
-      .subscribe((url: string) => {
+    this.store.select(routeURL).pipe(
+      takeUntil(this.isDestroyed),
+      tag('team-routeUrl')
+    ).subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
@@ -107,7 +111,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(updateStatus),
       this.store.select(getTeamUsersStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed)
+      takeUntil(this.isDestroyed),
+      tag('team-loaded')
     ).subscribe(([gStatus, uStatus, usersStatus]) => {
       this.isLoadingTeam =
         (gStatus === EntityStatus.loading) ||
@@ -122,7 +127,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(teamFromRoute).pipe(
       takeUntil(this.isDestroyed),
-      filter(identity)
+      filter(identity),
+      tag('team-fromRoute')
     ).subscribe((team) => {
       this.teamId = team.id;
       this.team = team;
@@ -138,14 +144,16 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getTeamUsersStatus)]).pipe(
         takeUntil(this.isDestroyed),
         filter(([_allUsers, uStatus, _teamUsers, tuStatus]) =>
-            uStatus === EntityStatus.loadingSuccess &&
-            tuStatus === EntityStatus.loadingSuccess),
+          uStatus === EntityStatus.loadingSuccess &&
+          tuStatus === EntityStatus.loadingSuccess),
         // Map UUID membership to user records and remove any entries that don't
         // map to user records.
         map(([users, _uStatus, teamUserIds, _tuStatus]) => {
-            return at(teamUserIds, keyBy('membership_id', users))
-              .filter(userRecord => userRecord !== undefined);
-      })).subscribe((users: User[]) => {
+          return at(teamUserIds, keyBy('membership_id', users))
+            .filter(userRecord => userRecord !== undefined);
+        }),
+        tag('team-users')
+      ).subscribe((users: User[]) => {
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
@@ -154,14 +162,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.store.pipe(
       select(updateStatus),
       takeUntil(this.isDestroyed),
-      filter(state => this.saveInProgress && !pending(state)))
-      .subscribe((state) => {
-        this.saveInProgress = false;
-        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-        if (this.saveSuccessful) {
-          this.updateForm.markAsPristine();
-        }
-      });
+      filter(state => this.saveInProgress && !pending(state)),
+      tag('team-save')
+    ).subscribe((state) => {
+      this.saveInProgress = false;
+      this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+      if (this.saveSuccessful) {
+        this.updateForm.markAsPristine();
+      }
+    });
  }
 
   ngOnDestroy(): void {
