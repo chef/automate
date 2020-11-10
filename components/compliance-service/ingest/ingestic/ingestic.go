@@ -242,7 +242,7 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 		Id(id).
 		Type(mappings.DocType).
 		BodyJson(*data).
-		Refresh("false").
+		Refresh("true").
 		Do(ctx)
 	if err != nil {
 		return errors.Wrap(err, "InsertInspecSummary")
@@ -263,7 +263,7 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 		Id(id).
 		Type(docType).
 		BodyJson(*data).
-		Refresh("false").
+		Refresh("true").
 		Do(ctx)
 	if err != nil {
 		return errors.Wrap(err, "InsertInspecReport")
