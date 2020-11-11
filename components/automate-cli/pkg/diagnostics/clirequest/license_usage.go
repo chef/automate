@@ -2,7 +2,6 @@ package clirequest
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
