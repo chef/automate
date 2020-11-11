@@ -300,7 +300,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		Index(index).
 		Query(boolQueryDailyLatestThisNodeNotThisReport).
 		Script(script).
-		Refresh("false").
+		Refresh("true").
 		Do(ctx)
 
 	return errors.Wrap(err, "setDailyLatestToFalse")
