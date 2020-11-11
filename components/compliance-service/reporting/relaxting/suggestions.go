@@ -160,7 +160,7 @@ func suggestionFieldArray(field string) bool {
 }
 
 func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
-	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
 	}
@@ -258,7 +258,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 }
 
 func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
-	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
 	}
@@ -335,7 +335,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 	filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
-	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
@@ -433,7 +433,7 @@ func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
 func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
-	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
@@ -528,7 +528,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 
 func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
 	myName := "getControlSuggestions"
-	esIndex, err := GetEsIndex(filters, false, true)
+	esIndex, err := GetEsIndex(filters, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
 	}
@@ -644,7 +644,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
 	}
-	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
 	}

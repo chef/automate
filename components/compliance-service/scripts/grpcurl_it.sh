@@ -122,6 +122,9 @@ fi
 # }
 # EOM
 
+# List all reporting nodes for the last 24 hours
+# echo '{ "filters": [] }' | grpcurl -d @ $CURL_OPTS_COMP.reporting.ReportingService/ListNodes
+
 # List all reporting nodes with deep profile filtering
 # grpcurl -d @ $CURL_OPTS_COMP.reporting.ReportingService/ListNodes <<EOM
 # {

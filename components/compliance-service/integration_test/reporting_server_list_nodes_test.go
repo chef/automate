@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,15 +26,17 @@ func TestListNodesFiltering(t *testing.T) {
 	}{
 		// organization
 		{
-			description: "Filter out one of the nodes by 'organization'",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes by 'organization'",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -47,15 +50,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by 'organization'",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by 'organization'",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -71,15 +76,17 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// chef_server
 		{
-			description: "Filter out one of the nodes by chef servers",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes by chef servers",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -93,15 +100,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by chef servers",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by chef servers",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -117,15 +126,17 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// inspec_version
 		{
-			description: "Filter out one of the nodes by chef servers",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes by chef servers",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -139,15 +150,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by chef servers",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by chef servers",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -163,15 +176,17 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// chef tags
 		{
-			description: "Filter out one of the nodes with chef tags",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with chef tags",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -185,15 +200,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out one of the nodes with multiple tags use chef tags",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with multiple tags use chef tags",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org3"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -207,15 +224,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by chef tags",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by chef tags",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org4"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -231,15 +250,17 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// policy_group
 		{
-			description: "Filter out one of the nodes with the policy group",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with the policy group",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -253,15 +274,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by policy group",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by policy group",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -277,15 +300,17 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// policy_name
 		{
-			description: "Filter out one of the nodes with the policy name",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with the policy name",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -299,15 +324,17 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by policy name",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by policy name",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -323,7 +350,7 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// platform
 		{
-			description: "Filter out one of the nodes with platform",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with platform",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -334,6 +361,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Name: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -344,6 +372,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Name: "org2",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -357,7 +386,7 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by platform",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by platform",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -368,6 +397,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Name: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -378,6 +408,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Name: "org2",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -393,7 +424,7 @@ func TestListNodesFiltering(t *testing.T) {
 
 		// platform_with_version
 		{
-			description: "Filter out one of the nodes with platform_with_version",
+			description: "reporting_server_list_nodes_test.go => Filter out one of the nodes with platform_with_version",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -404,6 +435,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Full: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -414,6 +446,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Full: "org2",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -427,7 +460,7 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{"1"},
 		},
 		{
-			description: "Filter out all of the nodes by platform_with_version",
+			description: "reporting_server_list_nodes_test.go => Filter out all of the nodes by platform_with_version",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -438,6 +471,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Full: "org1",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -448,6 +482,7 @@ func TestListNodesFiltering(t *testing.T) {
 					}{
 						Full: "org2",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -495,19 +530,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// inspec_version
 		{
-			description: "inspec_version: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => inspec_version: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.3",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -521,19 +559,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "inspec_version: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => inspec_version: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.3",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -549,19 +590,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// chef server
 		{
-			description: "chef server: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => chef server: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					SourceFQDN: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -575,19 +619,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "chef server: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => chef server: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "4",
 					SourceFQDN: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -601,19 +648,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "chef server: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => chef server: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					SourceFQDN: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -627,19 +677,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "chef_server: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => chef_server: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					SourceFQDN: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -655,19 +708,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// chef tags
 		{
-			description: "chef tags: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => chef tags: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"a2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"a1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -681,19 +737,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "chef tags: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => chef tags: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"a1-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "4",
 					ChefTags: []string{"b1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -707,19 +766,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "chef_tags: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => chef_tags: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -733,19 +795,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "chef_tags: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => chef_tags: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					ChefTags: []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -761,19 +826,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// environment
 		{
-			description: "environment: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => environment: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					Environment: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -787,19 +855,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "environment: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => environment: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "2",
 					Environment: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "4",
 					Environment: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -813,19 +884,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "environment: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => environment: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					Environment: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -839,19 +913,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "environment: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => environment: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					Environment: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -867,19 +944,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// node
 		{
-			description: "node: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => node: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					NodeName: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -893,19 +973,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "node: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => node: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "2",
 					NodeName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "4",
 					NodeName: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -919,19 +1002,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "node: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => node: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					NodeName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -945,19 +1031,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "node: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => node: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:   "1",
 					NodeName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -973,19 +1062,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// organization
 		{
-			description: "organization: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => organization: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "1",
 					OrganizationName: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -999,19 +1091,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "organization: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => organization: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "4",
 					OrganizationName: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1025,19 +1120,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "organization: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => organization: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "1",
 					OrganizationName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1051,19 +1149,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "organization: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => organization: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:           "1",
 					OrganizationName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1079,7 +1180,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// platform
 		{
-			description: "platform: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => platform: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1090,6 +1191,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1100,6 +1202,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a2-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1110,6 +1213,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1123,7 +1227,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "platform: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => platform: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "2",
@@ -1134,6 +1238,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a2-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1144,6 +1249,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a1-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "4",
@@ -1154,6 +1260,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "b1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1167,7 +1274,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "platform: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => platform: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1178,6 +1285,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "A2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1188,6 +1296,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a2-Dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1198,6 +1307,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "A1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1211,7 +1321,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "platform: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => platform: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1222,6 +1332,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "A2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1232,6 +1343,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "a2-Dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1242,6 +1354,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Name: "A1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1257,7 +1370,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// platform_with_version
 		{
-			description: "platform_with_version: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => platform_with_version: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1268,6 +1381,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1278,6 +1392,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a2-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1288,6 +1403,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1301,7 +1417,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "platform_with_version: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => platform_with_version: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "2",
@@ -1312,6 +1428,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a2-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1322,6 +1439,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a1-dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "4",
@@ -1332,6 +1450,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "b1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1345,7 +1464,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "platform_with_version: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => platform_with_version: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1356,6 +1475,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "A2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1366,6 +1486,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a2-Dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1376,6 +1497,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "A1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1389,7 +1511,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "platform_with_version: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => platform_with_version: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1400,6 +1522,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "A2-prod",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1410,6 +1533,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "a2-Dev",
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1420,6 +1544,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					}{
 						Full: "A1-dev",
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1435,19 +1560,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// Policy group
 		{
-			description: "policy_group: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => policy_group: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					PolicyGroup: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1461,19 +1589,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "policy_group: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => policy_group: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "4",
 					PolicyGroup: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1487,19 +1618,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "policy_group: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => policy_group: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					PolicyGroup: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1513,19 +1647,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "policy_group: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => policy_group: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:      "1",
 					PolicyGroup: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1541,19 +1678,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// Policy Name
 		{
-			description: "policy_name: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => policy_name: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					PolicyName: "a2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "a1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1567,19 +1707,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "policy_name: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => policy_name: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "2",
 					PolicyName: "a2-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "a1-dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "4",
 					PolicyName: "b1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1593,19 +1736,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "policy_name: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => policy_name: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					PolicyName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1619,19 +1765,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "policy_name: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => policy_name: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
 					PolicyName: "A2-prod",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-Dev",
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "A1-dev",
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1647,19 +1796,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// Recipe
 		{
-			description: "recipe: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => recipe: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:  "1",
 					Recipes: []string{"a2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "2",
 					Recipes: []string{"a2-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "3",
 					Recipes: []string{"a1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1673,19 +1825,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "recipe: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => recipe: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:  "2",
 					Recipes: []string{"a2-dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "3",
 					Recipes: []string{"a1-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "4",
 					Recipes: []string{"b1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1699,19 +1854,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "recipe: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => recipe: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:  "1",
 					Recipes: []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "2",
 					Recipes: []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "3",
 					Recipes: []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1725,19 +1883,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "recipe: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => recipe: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:  "1",
 					Recipes: []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "2",
 					Recipes: []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID:  "3",
 					Recipes: []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1753,19 +1914,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// Roles
 		{
-			description: "roles: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => roles: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
 					Roles:  []string{"a2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
 					Roles:  []string{"a2-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
 					Roles:  []string{"a1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1779,19 +1943,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "roles: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => roles: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "2",
 					Roles:  []string{"a2-dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
 					Roles:  []string{"a1-dev", "chef-server"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "4",
 					Roles:  []string{"b1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1805,19 +1972,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "role: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => role: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
 					Roles:  []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
 					Roles:  []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
 					Roles:  []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1831,19 +2001,22 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "role: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => role: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
 					Roles:  []string{"A2-prod"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
 					Roles:  []string{"a2-Dev"},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
 					Roles:  []string{"A1-dev"},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1859,7 +2032,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// Profile
 		{
-			description: "Profile: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => Profile: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1868,6 +2041,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a2-prod",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1876,6 +2050,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a2-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1884,6 +2059,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a1-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1897,7 +2073,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "Profile: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => Profile: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1906,6 +2082,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "A2-prod",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1914,6 +2091,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "A2-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1922,6 +2100,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a1-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1935,7 +2114,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "Profile: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => Profile: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1944,6 +2123,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "A2-prod",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -1952,6 +2132,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a2-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -1960,6 +2141,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							Title: "a1-dev",
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1975,7 +2157,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 
 		// control
 		{
-			description: "control: '*' wildcard",
+			description: "reporting_server_list_nodes_test.go => control: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -1988,6 +2170,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -2000,6 +2183,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -2012,6 +2196,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -2025,7 +2210,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "control: case insensitive wildcard 1",
+			description: "reporting_server_list_nodes_test.go => control: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -2038,6 +2223,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -2050,6 +2236,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -2062,6 +2249,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -2075,7 +2263,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "control: case insensitive wildcard 2",
+			description: "reporting_server_list_nodes_test.go => control: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -2088,6 +2276,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -2100,6 +2289,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -2112,6 +2302,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -2125,7 +2316,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "control: '*' wildcard one node with two matching controls",
+			description: "reporting_server_list_nodes_test.go => control: '*' wildcard one node with two matching controls",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "1",
@@ -2141,6 +2332,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "2",
@@ -2153,6 +2345,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -2165,6 +2358,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -2178,7 +2372,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"1", "2"},
 		},
 		{
-			description: "control: '?' wildcard",
+			description: "reporting_server_list_nodes_test.go => control: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID: "2",
@@ -2191,6 +2385,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "3",
@@ -2203,6 +2398,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 				{
 					NodeID: "4",
@@ -2215,6 +2411,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 							},
 						},
 					},
+					EndTime: time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -2256,26 +2453,32 @@ func TestListNodesProjectFiltering(t *testing.T) {
 		{
 			NodeID:   nodeIds[0],
 			Projects: []string{},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[1],
 			Projects: []string{"project1"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[2],
 			Projects: []string{"project1", "project2"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[3],
 			Projects: []string{"project2"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[4],
 			Projects: []string{"project2", "project3"},
+			EndTime: time.Now(),
 		},
 		{
 			NodeID:   nodeIds[5],
 			Projects: []string{"project3"},
+			EndTime: time.Now(),
 		},
 	}
 
@@ -2292,42 +2495,42 @@ func TestListNodesProjectFiltering(t *testing.T) {
 		expectedIds     []string
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			expectedIds:     nodeIds,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 			expectedIds:     nodeIds[1:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 			expectedIds:     nodeIds[1:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 			expectedIds:     []string{},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			expectedIds:     nodeIds[:3],
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 			expectedIds:     nodeIds[:5],
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 			expectedIds:     nodeIds[:1],
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "reporting_server_list_nodes_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 			expectedIds:     nodeIds[:1],
 		},

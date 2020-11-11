@@ -34,7 +34,7 @@ func TestReadReportSummary(t *testing.T) {
 		expectedStatus         string
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			//report summary
@@ -45,7 +45,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			//report summary
@@ -56,7 +56,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			//report summary
@@ -67,7 +67,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			//report summary
@@ -78,7 +78,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "unknown",
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			//report summary
@@ -89,7 +89,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			//report summary
@@ -100,7 +100,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			//report summary
@@ -111,7 +111,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedStatus:         "passed",
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			//report summary
@@ -167,21 +167,21 @@ func TestReadNodeSummary(t *testing.T) {
 		expectedSkippedCnt      int32
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			//nodes summary
 			expectedCompliantCnt: 5,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			//nodes summary
 			expectedCompliantCnt: 2,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			//nodes summary
@@ -189,7 +189,7 @@ func TestReadNodeSummary(t *testing.T) {
 			expectedNonCompliantCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			//nodes summary
@@ -197,7 +197,7 @@ func TestReadNodeSummary(t *testing.T) {
 			expectedNonCompliantCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			//nodes summary
@@ -205,7 +205,7 @@ func TestReadNodeSummary(t *testing.T) {
 			expectedNonCompliantCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			//nodes summary
@@ -213,7 +213,7 @@ func TestReadNodeSummary(t *testing.T) {
 			expectedNonCompliantCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			//nodes summary
@@ -221,7 +221,7 @@ func TestReadNodeSummary(t *testing.T) {
 			expectedNonCompliantCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			//nodes summary
@@ -272,56 +272,56 @@ func TestReadControlSummary(t *testing.T) {
 		expectedPassedCnt int32
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			//controls summary
 			expectedPassedCnt: 5,
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			//controls summary
 			expectedPassedCnt: 2,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			//controls summary
 			expectedPassedCnt: 4,
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			//controls summary
 			expectedPassedCnt: 0,
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			//controls summary
 			expectedPassedCnt: 3,
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			//controls summary
 			expectedPassedCnt: 5,
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			//controls summary
 			expectedPassedCnt: 1,
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_summary_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			//controls summary
@@ -385,7 +385,11 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 	}
 
 	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
+		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{
+			Filters: []*apiReporting.ListFilter{
+				{Type: "end_time", Values: []string{"2018-10-25T23:18:41Z"}},
+			},
+		})
 
 		return response != nil && len(response.Reports) == n
 	})

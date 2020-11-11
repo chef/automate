@@ -260,11 +260,30 @@ func (srv *Server) Rerun(ctx context.Context, in *jobs.Id) (*jobs.RerunResponse,
 // ListInitiatedScans returns a list of ids for all scans with an end_time after or equal to the time
 // provided or status 'running'. This is used for scan jobs auditing purposes.
 func (srv *Server) ListInitiatedScans(ctx context.Context, in *jobs.TimeQuery) (*jobs.Ids, error) {
-	jobIDList, err := srv.db.ListInitiatedScans(ctx, in.StartTime)
+	jobsList, err := srv.db.ListInitiatedScans(ctx, in.StartTime)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list owca scans")
 	}
-	return &jobs.Ids{Ids: jobIDList}, nil
+
+	ids := make([]string, len(jobsList))
+	idsWithTime := make([]*jobs.IdsWithTime, len(jobsList))
+
+	for i, job := range jobsList {
+		translatedTime, err := ptypes.TimestampProto(job.Endtime)
+		if err != nil {
+			return nil, errors.Wrap(err, "ListInitiatedScans: unable to translate job end_time")
+		}
+		ids[i] = job.ID
+		idsWithTime[i] = &jobs.IdsWithTime{
+			Id: job.ID,
+			EndTime: translatedTime,
+		}
+	}
+
+	return &jobs.Ids{
+		Ids: ids,
+		IdsWithTime: idsWithTime,
+	}, nil
 }
 
 // hand over the event to the event-service

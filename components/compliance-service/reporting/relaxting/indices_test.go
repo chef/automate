@@ -2,13 +2,9 @@ package relaxting_test
 
 import (
 	"testing"
-
 	"fmt"
-
 	"time"
-
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,8 +68,16 @@ func TestIndexDatesNoEndTimeYesStartTime(t *testing.T) {
 func TestIndexDatesYesEndTimeNoStartTime(t *testing.T) {
 	emptyStartTime := ""
 	endTime := "2018-01-02T15:04:05Z"
-
 	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, emptyStartTime, endTime)
+	assert.EqualError(t, err,  "start_time must be defined", err)
+	assert.Equal(t, "", esIndex)
+}
+
+func TestIndexDatesYesEndTimeAnd2017StartTime(t *testing.T) {
+	startTime := "2017-01-01T00:00:00Z"
+	endTime := "2018-01-02T15:04:05Z"
+
+	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)
 
 	if assert.NoError(t, err) {
 		assert.Equal(t, fmt.Sprintf("%[1]s2017*,%[1]s2018.01.01*,%[1]s2018.01.02*",
@@ -82,23 +86,9 @@ func TestIndexDatesYesEndTimeNoStartTime(t *testing.T) {
 }
 
 func TestIndexDatesNoEndTimeNoStartTime(t *testing.T) {
-	emptyStartTime := ""
-	endTime := ""
-
-	defer relaxting.ResetClockImplementation()
-
-	relaxting.NowFunc = func() time.Time {
-		return time.Date(2017, 11, 17, 0, 0, 00, 0, time.UTC)
-	}
-
-	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, emptyStartTime, endTime)
-
-	if assert.NoError(t, err) {
-		assert.Equal(t, fmt.Sprintf("%[1]s2017.01*,%[1]s2017.02*,%[1]s2017.03*,%[1]s2017.04*,%[1]s2017.05*,"+
-			"%[1]s2017.06*,%[1]s2017.07*,%[1]s2017.08*,%[1]s2017.09*,%[1]s2017.10*,%[1]s2017.11.0*,%[1]s2017.11.10*,"+
-			"%[1]s2017.11.11*,%[1]s2017.11.12*,%[1]s2017.11.13*,%[1]s2017.11.14*,%[1]s2017.11.15*,%[1]s2017.11.16*,"+
-			"%[1]s2017.11.17*", relaxting.CompDailySumIndexPrefix), esIndex)
-	}
+	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, "", "")
+	assert.EqualError(t, err,  "start_time must be defined", err)
+	assert.Equal(t, "", esIndex)
 }
 
 func TestIndexDatesSameDay(t *testing.T) {
@@ -160,17 +150,6 @@ func TestIndexDatesEndsWithWholeMonthAndNoMoreAfter(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%[1]s2017.12.28*,%[1]s2017.12.29*,%[1]s2017.12.3*,%[1]s2018.01*",
 			relaxting.CompDailySumIndexPrefix),
 			esIndex)
-	}
-}
-
-func TestIndexDatesNoStartDateAndEndsWithWholeMonthAndNoMoreAfter(t *testing.T) {
-	startTime := ""
-	endTime := "2018-01-31T15:04:05Z"
-
-	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)
-
-	if assert.NoError(t, err) {
-		assert.Equal(t, fmt.Sprintf("%[1]s2017*,%[1]s2018.01*", relaxting.CompDailySumIndexPrefix), esIndex)
 	}
 }
 
@@ -356,7 +335,7 @@ func TestIndexDatesNonLeapYear(t *testing.T) {
 
 func TestIndexDatesSingleFullYearRightUpToFinal59Seconds(t *testing.T) {
 	// Let debug logs show up when running tests
-	logrus.SetLevel(logrus.DebugLevel)
+	//logrus.SetLevel(logrus.DebugLevel)
 	startTime := "2018-01-01T00:00:00Z"
 	endTime := "2018-12-31T23:59:59Z"
 	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)

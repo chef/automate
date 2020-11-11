@@ -35,55 +35,55 @@ func TestReadProfilesList(t *testing.T) {
 		expectedProfileList []*stats.ProfileList
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 5}},
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 2}},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 4}},
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			expectedProfileList: []*stats.ProfileList{},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 3}},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 5}},
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
 				Id: "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", Passed: 1}},
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			expectedProfileList: []*stats.ProfileList{{Name: "mylinux-success",
@@ -118,7 +118,7 @@ func TestReadProfileSummary(t *testing.T) {
 		expectedProfileSummary *stats.ProfileSummary
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -134,7 +134,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -150,7 +150,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -166,7 +166,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to projects without reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -182,7 +182,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -198,7 +198,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -214,7 +214,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -230,7 +230,7 @@ func TestReadProfileSummary(t *testing.T) {
 			},
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			expectedProfileSummary: &stats.ProfileSummary{
@@ -280,7 +280,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 		expectedControlStats []*stats.ControlStats
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -293,7 +293,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:     "Projects: user has access to one project with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -306,7 +306,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -319,12 +319,12 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:          "Projects: user has access to projects without reports",
+			description:          "stats_server_read_profiles_test.go => Projects: user has access to projects without reports",
 			allowedProjects:      []string{"project4", "project5"},
 			expectedControlStats: []*stats.ControlStats{},
 		},
 		{
-			description:     "Projects: user has access to one project with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -337,7 +337,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -350,7 +350,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:     "Projects: user has access to projects without reports and unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -363,7 +363,7 @@ func TestReadProfilesControlStats(t *testing.T) {
 			}},
 		},
 		{
-			description:     "Projects: user has access to unassigned reports",
+			description:     "stats_server_read_profiles_test.go => Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
 
 			expectedControlStats: []*stats.ControlStats{{
@@ -426,7 +426,11 @@ func setupReadProfiles(t *testing.T) *statsServer.Server {
 		require.NoError(t, err)
 	}
 	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
+		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{
+			Filters: []*apiReporting.ListFilter{
+				{Type: "end_time", Values: []string{"2018-10-25T23:18:41Z"}},
+			},
+		})
 
 		return response != nil && len(response.Reports) == n
 	})
