@@ -40,7 +40,8 @@ describe('StatsService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [{type: {name: 'platform'}, value: {text: 'centos'}}]
+        filters: [{type: {name: 'platform'}, value: {text: 'centos'}}],
+        last24h: false
       };
       const listParams = {perPage: 10, page: 1};
 
@@ -86,7 +87,8 @@ describe('StatsService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}],
+        last24h: false
       };
       const listParams = {perPage: 10, page: 1};
 
@@ -134,7 +136,8 @@ describe('StatsService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [{type: {name: 'control_id'}, value: {id: 'sshd-1'}}]
+        filters: [{type: {name: 'control_id'}, value: {id: 'sshd-1'}}],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/controls`;
@@ -161,7 +164,8 @@ describe('StatsService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
@@ -187,7 +191,8 @@ describe('StatsService', () => {
         startDate: moment(endDate).subtract(10, 'days'),
         endDate: endDate,
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
@@ -217,7 +222,8 @@ describe('StatsService', () => {
           {type: {name: 'profile'}, value: {id: '456'}},
           {type: {name: 'node'}, value: {id: '1223'}},
           {type: {name: 'platform'}, value: {text: 'centos'}},
-          {type: {name: 'environment'}, value: {text: 'Dev Sec'}}]
+          {type: {name: 'environment'}, value: {text: 'Dev Sec'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -242,7 +248,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: []
+        filters: [],
+        last24h: false
       };
       const startDateBefore = reportQuery.startDate.clone();
       const endDateBefore = reportQuery.endDate.clone();
@@ -258,7 +265,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {text: '123'}}]
+        filters: [{type: {name: 'profile'}, value: {text: '123'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -280,7 +288,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {id: '123', text: '456'}}]
+        filters: [{type: {name: 'profile'}, value: {id: '123', text: '456'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -302,7 +311,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'node'}, value: {text: '123'}}]
+        filters: [{type: {name: 'node'}, value: {text: '123'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -324,7 +334,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'node'}, value: {id: '123', text: '456'}}]
+        filters: [{type: {name: 'node'}, value: {id: '123', text: '456'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -346,7 +357,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'control'}, value: {text: '123'}}]
+        filters: [{type: {name: 'control'}, value: {text: '123'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -368,7 +380,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'control'}, value: {id: '123', text: '456'}}]
+        filters: [{type: {name: 'control'}, value: {id: '123', text: '456'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -390,7 +403,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'control_id'}, value: {id: '123', text: '456'}}]
+        filters: [{type: {name: 'control_id'}, value: {id: '123', text: '456'}}],
+        last24h: false
       };
 
       const expectedUrlFilters = [
@@ -429,7 +443,8 @@ describe('StatsService', () => {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
         endDate: moment('2017-11-15T23:59:59Z').utc(),
         interval: 0,
-        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}],
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/failures`;
@@ -458,7 +473,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
@@ -492,7 +508,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
@@ -525,7 +542,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
@@ -553,7 +571,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
 
       const params = {sort: 'end_time', order: 'ASC'};
@@ -584,7 +603,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/profiles`;
       const expectedData = {};
@@ -612,7 +632,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/reports/id/${reportID}`;
@@ -640,7 +661,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/profiles`;
       const expectedData = [];
@@ -669,7 +691,8 @@ describe('StatsService', () => {
         startDate: endDate,
         endDate: startDate,
         interval: 0,
-        filters: filters
+        filters: filters,
+        last24h: false
       };
       const text = 'report';
 

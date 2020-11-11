@@ -50,6 +50,19 @@
       padding: 0.5em;
       z-index: 1;
     }
+
+    .calendar-menu-dropdown {
+      top: calc(100% - 0.5em);
+      right: 1em;
+      padding: 0;
+
+      chef-button {
+        margin: 0;
+        width: 100%;
+        border: none;
+        border-radius: 0;
+      }
+    }
   }
 }
 

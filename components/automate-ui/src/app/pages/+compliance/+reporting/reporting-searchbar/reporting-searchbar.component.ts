@@ -29,6 +29,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 })
 export class ReportingSearchbarComponent implements OnInit {
   @Input() date = moment().utc();
+  @Input() last24h = true;
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
@@ -38,6 +39,7 @@ export class ReportingSearchbarComponent implements OnInit {
   @Output() filterRemoved = new EventEmitter();
   @Output() filterAdded = new EventEmitter();
   @Output() dateChanged = new EventEmitter();
+  @Output() last24Selected = new EventEmitter();
 
   @ViewChild('keyInput', { static: true }) keyInput: ElementRef;
   @ViewChild('valInput', { static: true }) valInput: ElementRef;
@@ -48,6 +50,7 @@ export class ReportingSearchbarComponent implements OnInit {
   public CHEF_SHORT_DATE = DateTime.CHEF_SHORT_DATE;
 
   filterTypesCategories = [];
+  calendarMenuVisible = false;
   calendarVisible = false;
   keyInputVisible = true;
   valInputVisible = false;
@@ -116,6 +119,18 @@ export class ReportingSearchbarComponent implements OnInit {
     this.filtersVisible = true;
   }
 
+  toggleCalendarMenu() {
+    this.calendarMenuVisible = !this.calendarMenuVisible;
+  }
+
+  hideCalendarMenu() {
+    this.calendarMenuVisible = false;
+  }
+
+  showCalendarMenu() {
+    this.calendarMenuVisible = true;
+  }
+
   toggleCalendar() {
     this.calendarVisible = !this.calendarVisible;
   }
@@ -126,6 +141,10 @@ export class ReportingSearchbarComponent implements OnInit {
 
   showCalendar() {
     this.calendarVisible = true;
+  }
+
+  handleSelectLast24() {
+    this.last24Selected.emit();
   }
 
   handleFocus(event: Event): void {

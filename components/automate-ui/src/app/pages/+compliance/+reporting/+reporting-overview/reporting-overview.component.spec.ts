@@ -98,8 +98,11 @@ describe('ReportingOverviewComponent', () => {
       startDate: moment(endDate).subtract(10, 'days'),
       endDate: endDate,
       interval: 0,
-      filters: [ {type: { name: 'node'}, value: { id: '1231'}},
-          {type: { name: 'platform'}, value: { text: 'ubuntu'}} ]
+      filters: [
+        {type: { name: 'node'}, value: { id: '1231'}},
+        {type: { name: 'platform'}, value: { text: 'ubuntu'}}
+      ],
+      last24h: false
     };
 
     describe('when selected tab is "Node Status"', () => {
@@ -418,7 +421,8 @@ describe('ReportingOverviewComponent', () => {
       startDate: moment(endDate).subtract(10, 'days'),
       endDate: endDate,
       interval: 0,
-      filters: [ {type: { name: 'node'}, value: { id: '1231'}}]
+      filters: [ {type: { name: 'node'}, value: { id: '1231'}}],
+      last24h: false
     };
     const data = [
       {
@@ -449,7 +453,8 @@ describe('ReportingOverviewComponent', () => {
       startDate: moment(endDate).subtract(10, 'days'),
       endDate: endDate,
       interval: 0,
-      filters: [ {type: { name: 'node'}, value: { id: '1231'}}]
+      filters: [ {type: { name: 'node'}, value: { id: '1231'}}],
+      last24h: false
     };
     const data = [
       {

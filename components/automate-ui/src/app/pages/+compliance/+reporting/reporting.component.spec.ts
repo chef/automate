@@ -92,7 +92,8 @@ describe('ReportingComponent', () => {
         startDate: start,
         endDate: originalDate,
         interval: 0,
-        filters: []
+        filters: [],
+        last24h: false
       } as ReportQuery);
       fixture.detectChanges();
 
@@ -150,21 +151,6 @@ describe('ReportingComponent', () => {
   });
 
   describe('onEndDateChanged', () => {
-    it('no date set when today is selected with date object', () => {
-      spyOn(router, 'navigate');
-      const endDate = new Date();
-      const event = {detail: endDate};
-      component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
-    });
-
-    it('no date set when today is selected with string', () => {
-      spyOn(router, 'navigate');
-      const event = {detail: moment().utc().format('YYYY-MM-DD')};
-      component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
-    });
-
     it('specific string date', () => {
       spyOn(router, 'navigate');
       const event = {detail: '2017-10-23'};
@@ -180,6 +166,14 @@ describe('ReportingComponent', () => {
     });
   });
 
+  describe('onLast24Selected', () => {
+    it('no date set when last 24 hours is selected', () => {
+      spyOn(router, 'navigate');
+      component.onLast24Selected();
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: {}});
+    });
+  });
+
   describe('getSuggestions()', () => {
     describe('when the item has a version', () => {
       it('sets the title to text, version values to display to the user', () => {
@@ -189,7 +183,8 @@ describe('ReportingComponent', () => {
           endDate: moment(0).utc().startOf('day'),
           startDate: moment(0).utc().startOf('day'),
           interval: 0,
-          filters: []
+          filters: [],
+          last24h: false
         };
         spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([
           {text: 'dev sec baseline, v2.0', version: '2.0'}
@@ -210,7 +205,8 @@ describe('ReportingComponent', () => {
           endDate: moment(0).utc().startOf('day'),
           startDate: moment(0).utc().startOf('day'),
           interval: 0,
-          filters: []
+          filters: [],
+          last24h: false
         };
         spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([
           {text: 'teal-spohn'}
@@ -233,7 +229,8 @@ describe('ReportingComponent', () => {
       filters: [
         {type: {name: 'Node'}, value: { id: '1231' }},
         {type: {name: 'Platform'}, value: { id: 'ubuntu'}}
-      ]
+      ],
+      last24h: false
     };
     const reportingSummaryData: ReportingSummary = {
       'stats': {
@@ -292,7 +289,8 @@ describe('ReportingComponent', () => {
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }},
           {type: {name: 'chef_tags'}, value: { text: '456'}}
-        ]
+        ],
+        last24h: true
       };
       component.applyParamFilters([
         {type: 'chef_tags', text: '123', type_key: ''},
@@ -309,7 +307,8 @@ describe('ReportingComponent', () => {
         interval: 0,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: true
       };
 
       component.applyParamFilters([{type: 'chef_tags', text: '123', type_key: ''}]);
@@ -331,7 +330,8 @@ describe('ReportingComponent', () => {
         interval: interval,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: false
       };
 
       component.applyParamFilters([
@@ -354,7 +354,8 @@ describe('ReportingComponent', () => {
         interval: interval,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: true
       };
 
       component.applyParamFilters([
@@ -377,7 +378,8 @@ describe('ReportingComponent', () => {
         interval: interval,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: true
       };
 
       component.applyParamFilters([
@@ -400,7 +402,8 @@ describe('ReportingComponent', () => {
         interval: interval,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: true
       };
 
       component.applyParamFilters([
@@ -423,7 +426,8 @@ describe('ReportingComponent', () => {
         interval: interval,
         filters: [
           {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
+        ],
+        last24h: true
       };
 
       component.applyParamFilters([
