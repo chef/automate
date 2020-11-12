@@ -113,7 +113,7 @@ func (es Backend) GetSuggestions(term string, text string, filters map[string][]
 func (es Backend) getAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	myagg := "myagg"
 	filters["exists"] = []string{"true"}
-	boolQuery := newBoolQueryFromFilters(filters)
+	boolQuery := es.newBoolQueryFromFilters(filters)
 	lowerText := strings.ToLower(text)
 
 	// return all unless text has at least 2 chars
@@ -144,7 +144,7 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 		Aggregation(myagg, aggs).
 		Size(0)
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		SearchSource(searchSource).
 		Index(IndexNodeState).
 		FilterPath(
@@ -175,7 +175,7 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 
 func (es Backend) getArrayAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	filters["exists"] = []string{"true"}
-	boolQuery := newBoolQueryFromFilters(filters)
+	boolQuery := es.newBoolQueryFromFilters(filters)
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {
@@ -223,7 +223,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	//	},
 	//	"size": 0
 	//}
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		SearchSource(searchSource).
 		Index(IndexNodeState).
 		FilterPath(

@@ -8,16 +8,16 @@ package elastic
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
-	elastic "github.com/olivere/elastic/v7"
 	log "github.com/sirupsen/logrus"
+
+	olivere "github.com/olivere/elastic/v7"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
+	wrapper "github.com/chef/automate/components/config-mgmt-service/backend/elastic/wrapper"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -46,8 +46,9 @@ const (
 // The elasticsearch backend model that implements
 // the 'backend.Client' interface
 type Backend struct {
-	Url    string `json:"url"`
-	client *elastic.Client
+	Url string `json:"url"`
+	// client  *olivere.Client
+	client2 wrapper.ElasticClient
 }
 
 // Initialize an Elastic instance
@@ -58,22 +59,7 @@ func New(url string) *Backend {
 	es := Default()
 	es.Url = url
 
-	// Create a new elastic Client
-	esClient, err := elastic.NewClient(
-		// In the future we will need to create a custom http.Client to pass headers.
-		// => (ent? user? token?)
-		// elastic.SetHttpClient(httpClient),
-		// elastic.SetTraceLog(log.New(os.Stdout, "olivere: ", log.Lshortfile)),
-		elastic.SetURL(es.Url),
-		elastic.SetSniff(false),
-	)
-
-	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from '%s': %s\n", es.Url, err)
-		os.Exit(1)
-	}
-
-	es.client = esClient
+	es.client2 = wrapper.NewElasticClient(url)
 	return &es
 }
 
@@ -96,15 +82,15 @@ func Default() Backend {
 //          ]
 //       }
 //    }
-func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
-	boolQuery := elastic.NewBoolQuery()
+func (es Backend) newBoolQueryFromFilters(filters map[string][]string) wrapper.BoolQuery {
+	boolQuery := es.client2.NewBoolQuery()
 	for field, values := range filters {
-		filterQuery := elastic.NewBoolQuery()
+		filterQuery := es.client2.NewBoolQuery()
 		refinedValues := make([]string, 0, 0)
 		if field == backend.Project {
 			if stringutils.SliceContains(values, authzConstants.UnassignedProjectID) {
-				emptyProjectQuery := elastic.NewBoolQuery()
-				emptyProjectQuery.MustNot(elastic.NewExistsQuery(field))
+				emptyProjectQuery := es.client2.NewBoolQuery()
+				emptyProjectQuery.MustNot(olivere.NewExistsQuery(field))
 				filterQuery = filterQuery.Should(emptyProjectQuery)
 			}
 
@@ -115,7 +101,7 @@ func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 			for _, value := range values {
 				// Determine if the filters contain any wildcards
 				if strings.Contains(value, "*") || strings.Contains(value, "?") {
-					wildQuery := elastic.NewWildcardQuery(field, value)
+					wildQuery := olivere.NewWildcardQuery(field, value)
 					filterQuery = filterQuery.Should(wildQuery)
 				} else {
 					refinedValues = append(refinedValues, value)
@@ -126,7 +112,7 @@ func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 		// Even if there is a wildcard value found, we still want to narrow down by any other values.
 		// This would probably negate anything found with wildcards but using should brings back extra results
 		if len(refinedValues) > 0 {
-			termQuery := elastic.NewTermsQuery(field, stringArrayToInterfaceArray(refinedValues)...)
+			termQuery := olivere.NewTermsQuery(field, stringArrayToInterfaceArray(refinedValues)...)
 			filterQuery = filterQuery.Should(termQuery)
 		}
 		boolQuery = boolQuery.Filter(filterQuery)
@@ -150,10 +136,10 @@ func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 //         }
 //     }
 // }
-func newRangeQuery(start string, end string, fieldTime string) (*elastic.RangeQuery, bool) {
+func newRangeQuery(start string, end string, fieldTime string) (*olivere.RangeQuery, bool) {
 	var ok = false
 
-	rangeQuery := elastic.NewRangeQuery(fieldTime).
+	rangeQuery := olivere.NewRangeQuery(fieldTime).
 		Format("yyyy-MM-dd||yyyy-MM-dd-HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssX||yyyy-MM-dd'T'HH:mm:ssXXX")
 
 	if start != "" {
@@ -167,7 +153,7 @@ func newRangeQuery(start string, end string, fieldTime string) (*elastic.RangeQu
 	return rangeQuery, ok
 }
 
-func newRangeQueryTime(startTime time.Time, endTime time.Time, fieldTime string) (*elastic.RangeQuery, bool) {
+func newRangeQueryTime(startTime time.Time, endTime time.Time, fieldTime string) (*olivere.RangeQuery, bool) {
 
 	var start, end string
 	if !startTime.IsZero() {
@@ -190,16 +176,17 @@ func stringArrayToInterfaceArray(array []string) []interface{} {
 	return interfaceArray
 }
 
-func (es Backend) getAggregationBucket(boolQuery *elastic.BoolQuery, indexName string, searchTerm string) ([]*elastic.AggregationBucketKeyItem, error) {
+func (es Backend) getAggregationBucket(
+	boolQuery wrapper.BoolQuery, indexName string, searchTerm string) ([]wrapper.AggregationBucketKeyItem, error) {
 	var aggregationTerm = "counts"
 
-	agg := elastic.NewFilterAggregation().
+	agg := olivere.NewFilterAggregation().
 		Filter(boolQuery).
 		SubAggregation(aggregationTerm,
-			elastic.NewTermsAggregation().Field(searchTerm).
+			es.client2.NewTermsAggregation().Field(searchTerm).
 				Size(1000)) // Set the maximum number of results returned. Without this line only 10 items will be returned
 
-	searchSource := elastic.NewSearchSource().
+	searchSource := es.client2.NewSearchSource().
 		Aggregation(searchTerm, agg)
 
 	// Search Elasticsearch body
@@ -228,7 +215,7 @@ func (es Backend) getAggregationBucket(boolQuery *elastic.BoolQuery, indexName s
 	// 		 }
 	// 	}
 	// }
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		SearchSource(searchSource).
 		Index(indexName).
 		Do(context.Background())
@@ -239,7 +226,7 @@ func (es Backend) getAggregationBucket(boolQuery *elastic.BoolQuery, indexName s
 	}
 
 	if searchResult.TotalHits() == 0 {
-		return []*elastic.AggregationBucketKeyItem{}, nil
+		return []wrapper.AggregationBucketKeyItem{}, nil
 	}
 
 	// Now that we have executed the Search(), we need to extract the buckets
@@ -258,18 +245,18 @@ func (es Backend) getAggregationBucket(boolQuery *elastic.BoolQuery, indexName s
 	//   }
 	// }
 	// First aggregation `searchTerm`
-	statusResult, found := searchResult.Aggregations.Terms(searchTerm)
+	statusResult, found := searchResult.Aggregations().Terms(searchTerm)
 	if !found {
 		return nil, errors.NewBackendError("Aggregation term '%s' not found", searchTerm)
 	}
 
 	// Second aggregation `status_counts` (tag)
-	statusCounts, found := statusResult.Aggregations.Terms(aggregationTerm)
+	statusCounts, found := statusResult.Terms(aggregationTerm)
 	if !found {
 		return nil, errors.NewBackendError("Aggregation term '%s' not found", aggregationTerm)
 	}
 
-	return statusCounts.Buckets, nil
+	return statusCounts.Buckets(), nil
 }
 
 // GetListForField - collect a set of unique field values
@@ -295,7 +282,7 @@ func (es Backend) GetListForField(searchTerm string, filters map[string][]string
 	fieldValues := make([]string, 0)
 
 	filters["exists"] = []string{"true"}
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	fieldValueBuckets, err := es.getAggregationBucket(mainQuery, IndexNodeState, searchTerm)
 	// Return an error if the search was not successful
@@ -304,7 +291,7 @@ func (es Backend) GetListForField(searchTerm string, filters map[string][]string
 	}
 
 	for _, bucket := range fieldValueBuckets {
-		fieldValues = append(fieldValues, bucket.Key.(string))
+		fieldValues = append(fieldValues, bucket.Key().(string))
 	}
 
 	return fieldValues, nil

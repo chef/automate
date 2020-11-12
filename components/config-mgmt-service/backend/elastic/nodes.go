@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
+	wrapper "github.com/chef/automate/components/config-mgmt-service/backend/elastic/wrapper"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
 )
@@ -32,9 +33,9 @@ func init() {
 func (es Backend) NodeExists(nodeID string, filters map[string][]string) (bool, error) {
 	filters["exists"] = []string{"true"}
 	filters["entity_uuid"] = []string{nodeID}
-	filtersQuery := newBoolQueryFromFilters(filters)
+	filtersQuery := es.newBoolQueryFromFilters(filters)
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Query(filtersQuery).
 		Index(IndexNodeState).
 		Do(context.Background())
@@ -56,7 +57,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	cursorID string, pageSize int, _ string,
 	ascending bool) ([]backend.InventoryNode, error) {
 
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQueryTime(start, end, backend.CheckIn)
 
@@ -64,9 +65,9 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	fetchSource := elastic.NewFetchSourceContext(true).Include(getInventoryNodesFieldsToFetch...)
+	fetchSource := es.client2.NewFetchSourceContext(true).Include(getInventoryNodesFieldsToFetch...)
 
-	searchService := es.client.Search().
+	searchService := es.client2.Search().
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
@@ -89,9 +90,9 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	var nodes []backend.InventoryNode
 	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
-		for _, hit := range searchResult.Hits.Hits {
+		for _, hit := range searchResult.HitsHits() {
 			var n backend.InventoryNode
-			err := json.Unmarshal(hit.Source, &n)
+			err := json.Unmarshal(hit.Source(), &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -108,7 +109,7 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 	cursorID string, pageSize int, sortField string,
 	ascending bool) ([]backend.Node, error) {
 
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	if sortField == "" {
 		sortField = backend.CheckIn
@@ -120,7 +121,7 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	searchService := es.client.Search().
+	searchService := es.client2.Search().
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
@@ -152,9 +153,9 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 	var nodes []backend.Node
 	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
-		for _, hit := range searchResult.Hits.Hits {
+		for _, hit := range searchResult.HitsHits() {
 			var n backend.Node
-			err := json.Unmarshal(hit.Source, &n)
+			err := json.Unmarshal(hit.Source(), &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -201,7 +202,7 @@ func (es Backend) GetNodes(page int, perPage int, sortField string,
 	// even after the node no longer exists
 	filters["exists"] = []string{"true"}
 
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
 
@@ -209,7 +210,7 @@ func (es Backend) GetNodes(page int, perPage int, sortField string,
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Sort(sortField, ascending).    // sort by 'sortField', in 'ascending' [true, false]
@@ -223,9 +224,9 @@ func (es Backend) GetNodes(page int, perPage int, sortField string,
 	var nodes []backend.Node
 	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
-		for _, hit := range searchResult.Hits.Hits {
+		for _, hit := range searchResult.HitsHits() {
 			var n backend.Node
-			err := json.Unmarshal(hit.Source, &n)
+			err := json.Unmarshal(hit.Source(), &n)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -247,7 +248,7 @@ func (es Backend) GetNodesCounts(filters map[string][]string,
 	// even after the node no longer exists
 	filters["exists"] = []string{"true"}
 
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
 
@@ -263,13 +264,13 @@ func (es Backend) GetNodesCounts(filters map[string][]string,
 	}
 
 	for _, bucket := range statusNodesBuckets {
-		switch bucket.Key {
+		switch bucket.Key() {
 		case "success":
-			ns.Success = bucket.DocCount
+			ns.Success = bucket.DocCount()
 		case "failure":
-			ns.Failure = bucket.DocCount
+			ns.Failure = bucket.DocCount()
 		case "missing":
-			ns.Missing = bucket.DocCount
+			ns.Missing = bucket.DocCount()
 		}
 	}
 
@@ -289,12 +290,12 @@ func (es Backend) GetNodeMetadataCounts(filters map[string][]string,
 	types []string, startDate, endDate string) ([]backend.TypeCount, error) {
 	var aggregationTerm = "inner_filter"
 
-	searchSource := createTypeAggs(filters, types, startDate, endDate, aggregationTerm)
+	searchSource := es.createTypeAggs(filters, types, startDate, endDate, aggregationTerm)
 
 	source, _ := searchSource.Source()
 	LogQueryPartMin(IndexNodeState, source, "GetNodeMetadataCounts request")
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		SearchSource(searchSource).
 		Index(IndexNodeState).
 		Do(context.Background())
@@ -316,23 +317,23 @@ func (es Backend) GetNodeMetadataCounts(filters map[string][]string,
 
 	fieldCountCollection := make([]backend.TypeCount, len(types))
 	for index, searchTerm := range types {
-		outerAgg, found := searchResult.Aggregations.Terms(searchTerm)
+		outerAgg, found := searchResult.Aggregations().Terms(searchTerm)
 		if !found {
 			return nil, errors.NewBackendError("Aggregation term %q not found", searchTerm)
 		}
 		terms := make([]backend.ValueCount, 0)
-		for _, bucket := range outerAgg.Buckets {
-			filterCounts, found := bucket.Aggregations.Filter(aggregationTerm)
+		for _, bucket := range outerAgg.Buckets() {
+			filterCounts, found := bucket.Filter(aggregationTerm)
 			if !found {
 				return []backend.TypeCount{},
 					errors.NewBackendError("Aggregation term %q not found", aggregationTerm)
 			}
 
 			// Are all the found values filtered out
-			if filterCounts.DocCount > 0 {
+			if filterCounts.DocCount() > 0 {
 				terms = append(terms, backend.ValueCount{
-					Count: int(filterCounts.DocCount),
-					Value: bucket.Key.(string),
+					Count: int(filterCounts.DocCount()),
+					Value: bucket.Key().(string),
 				})
 			}
 		}
@@ -350,7 +351,7 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(elastic.NewTermQuery("entity_uuid", nodeID))
 
-	getResult, err := es.client.Search().
+	getResult, err := es.client2.Search().
 		Query(boolQuery).
 		Index(IndexNodeAttribute).
 		Do(context.Background())
@@ -363,7 +364,7 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 		return nodeAttribute, errors.New(errors.NodeAttributeNotFound, "No attributes found")
 	}
 
-	source := getResult.Hits.Hits[0].Source // We only want one attribute
+	source := getResult.HitsHits()[0].Source() // We only want one attribute
 	err = json.Unmarshal(source, &nodeAttribute)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -417,7 +418,7 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 	//   }
 	// }
 	// '
-	queryWithFilters := newBoolQueryFromFilters(filters)
+	queryWithFilters := es.newBoolQueryFromFilters(filters)
 	queryWithFilters.Must(elastic.NewTermQuery("status", "failure"))
 
 	agg := elastic.NewCompositeAggregation()
@@ -438,7 +439,7 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 			return nil, fmt.Errorf("attempted too many queries to fetch top Chef error counts")
 		}
 
-		result, err := es.client.Search().
+		result, err := es.client2.Search().
 			Query(queryWithFilters).
 			Index(IndexNodeState).
 			Aggregation("group_by_error_type_and_message", agg).
@@ -451,31 +452,31 @@ func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend
 
 		totalQueriesRan++
 
-		aggs := result.Aggregations
+		aggs := result.Aggregations()
 
 		c, aggFound := aggs.Composite("group_by_error_type_and_message")
 		if !aggFound {
 			return nil, fmt.Errorf("elasticsearch result for 'group_by_error_type_and_message' query did not contain the expected aggregation information")
 		}
 
-		if len(c.AfterKey) == 0 {
+		if len(c.AfterKey()) == 0 {
 			allResultsCollected = true
 		} else {
-			agg.AggregateAfter(c.AfterKey)
+			agg.AggregateAfter(c.AfterKey())
 		}
 
-		for _, chefErrItem := range c.Buckets {
-			errorType, ok := chefErrItem.Key["error_type"].(string)
+		for _, chefErrItem := range c.Buckets() {
+			errorType, ok := chefErrItem.Key()["error_type"].(string)
 			if !ok {
 				return nil, fmt.Errorf("invalid elasticsearch response for 'group_by_error_type_and_message' aggregation query")
 			}
-			errorMessage, ok := chefErrItem.Key["error_message"].(string)
+			errorMessage, ok := chefErrItem.Key()["error_message"].(string)
 			if !ok {
 				return nil, fmt.Errorf("invalid elasticsearch response for 'group_by_error_type_and_message' aggregation query")
 			}
 
 			chefErrs = append(chefErrs, &backend.ChefErrorCount{
-				Count:   int32(chefErrItem.DocCount),
+				Count:   int32(chefErrItem.DocCount()),
 				Type:    errorType,
 				Message: errorMessage,
 			})
@@ -509,7 +510,7 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 	filters := map[string][]string{
 		"exists": {"true"},
 	}
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.CheckIn)
 
@@ -517,7 +518,7 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 		dateRangeAgg.AddUnboundedFromWithKey(duration, "now-"+duration)
 	}
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Index(IndexNodeState).
 		Query(mainQuery).
 		Aggregation(aggTag, dateRangeAgg).
@@ -526,7 +527,7 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 		return []backend.CountedDuration{}, err
 	}
 
-	rangeAggRes, found := searchResult.Aggregations.Range(aggTag)
+	rangeAggRes, found := searchResult.Aggregations().Range(aggTag)
 	if !found {
 		// This case is if there are no nodes for all the durations
 		// We are creating the buckets manually with zero count
@@ -540,15 +541,15 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 		return countedDurations, nil
 	}
 
-	if len(rangeAggRes.Buckets) != len(durations) {
+	if len(rangeAggRes.Buckets()) != len(durations) {
 		return []backend.CountedDuration{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
-			len(durations), len(rangeAggRes.Buckets))
+			len(durations), len(rangeAggRes.Buckets()))
 	}
 
-	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets))
+	countedDurations := make([]backend.CountedDuration, len(rangeAggRes.Buckets()))
 	for index, duration := range durations {
-		countedDurations[index].Count = findMatchingDurationCount(duration, rangeAggRes.Buckets)
+		countedDurations[index].Count = findMatchingDurationCount(duration, rangeAggRes.Buckets())
 		countedDurations[index].Duration = duration
 	}
 
@@ -556,10 +557,10 @@ func (es Backend) GetMissingNodeDurationCounts(durations []string) ([]backend.Co
 }
 
 func findMatchingDurationCount(key string,
-	buckets []*elastic.AggregationBucketRangeItem) int32 {
+	buckets []wrapper.AggregationBucketRangeItem) int32 {
 	for _, bucket := range buckets {
-		if key == bucket.Key {
-			return int32(bucket.DocCount)
+		if key == bucket.Key() {
+			return int32(bucket.DocCount())
 		}
 	}
 	return 0
@@ -645,9 +646,9 @@ func findMatchingDurationCount(key string,
 // 		 }
 // 	}
 // }
-func createTypeAggs(filters map[string][]string,
-	types []string, startDate, endDate string, aggregationTerm string) *elastic.SearchSource {
-	searchSource := elastic.NewSearchSource()
+func (es Backend) createTypeAggs(filters map[string][]string,
+	types []string, startDate, endDate string, aggregationTerm string) wrapper.SearchSource {
+	searchSource := es.client2.NewSearchSource()
 	for _, fieldType := range types {
 		// Copy the filters
 		localFilters := map[string][]string{}
@@ -661,7 +662,7 @@ func createTypeAggs(filters map[string][]string,
 		// remove the filter for the current search term
 		delete(localFilters, params.ConvertParamToNodeStateBackendLowerFilter(fieldType))
 
-		mainQuery := newBoolQueryFromFilters(localFilters)
+		mainQuery := es.newBoolQueryFromFilters(localFilters)
 
 		rangeQuery, ok := newRangeQuery(startDate, endDate, NodeCheckin)
 

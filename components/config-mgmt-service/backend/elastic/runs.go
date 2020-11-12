@@ -46,7 +46,7 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 		index = IndexConvergeHistoryBase + endTime.Format("2006.01.02")
 	}
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Query(boolQuery).
 		Index(index).
 		Do(context.Background())
@@ -60,7 +60,7 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 		return run, errors.New(errors.RunNotFound, "Invalid ID")
 	}
 
-	source := searchResult.Hits.Hits[0].Source
+	source := searchResult.HitsHits()[0].Source()
 	err = json.Unmarshal(source, &run)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -87,7 +87,7 @@ func (es Backend) GetDeletedCountsTimeSeries(
 		copiedFilters[index] = element
 	}
 	copiedFilters["exists"] = []string{"false"}
-	mainQuery := newBoolQueryFromFilters(copiedFilters)
+	mainQuery := es.newBoolQueryFromFilters(copiedFilters)
 
 	deletedNodePeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 
@@ -101,7 +101,7 @@ func (es Backend) GetDeletedCountsTimeSeries(
 		dateRangeAgg.AddUnboundedFromWithKey(strconv.Itoa(index), end.Format(time.RFC3339))
 	}
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Index(IndexNodeState).
 		Query(mainQuery).
 		Aggregation(aggTag, dateRangeAgg).
@@ -147,7 +147,7 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CountPeroid, error) {
 	var (
 		aggTag    = "date_range"
-		mainQuery = newBoolQueryFromFilters(filters)
+		mainQuery = es.newBoolQueryFromFilters(filters)
 	)
 
 	createNodePeriods := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
@@ -164,7 +164,7 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 		dateRangeAgg.AddUnboundedFromWithKey(strconv.Itoa(index), to.Format(time.RFC3339))
 	}
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Index(IndexNodeState).
 		Query(mainQuery).
 		Aggregation(aggTag, dateRangeAgg).
@@ -210,7 +210,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CountPeroid, error) {
 	var (
 		dateHistoTag = "dateHisto"
-		mainQuery    = newBoolQueryFromFilters(filters)
+		mainQuery    = es.newBoolQueryFromFilters(filters)
 		innerAggTag  = "inneragg"
 	)
 
@@ -230,7 +230,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		SubAggregation(innerAggTag,
 			elastic.NewCardinalityAggregation().Field(backend.Id)) // count how many unique nodes are in this bucket
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Index(IndexConvergeHistory).
 		Query(mainQuery).
 		Aggregation(dateHistoTag, bucketHist).
@@ -280,7 +280,7 @@ func (es Backend) GetRunsCounts(filters map[string][]string, nodeID string, star
 	end string) (backend.RunsCounts, error) {
 	var ns = *new(backend.RunsCounts)
 
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQuery(start, end, RunFieldTimestamp)
 
@@ -303,14 +303,14 @@ func (es Backend) GetRunsCounts(filters map[string][]string, nodeID string, star
 
 	var totalRuns int64
 	for _, bucket := range statusRunsBuckets {
-		switch bucket.Key {
+		switch bucket.Key() {
 		case "success":
-			ns.Success = bucket.DocCount
+			ns.Success = bucket.DocCount()
 		case "failure":
-			ns.Failure = bucket.DocCount
+			ns.Failure = bucket.DocCount()
 		}
 
-		totalRuns += bucket.DocCount
+		totalRuns += bucket.DocCount()
 	}
 
 	ns.Total = totalRuns
@@ -328,7 +328,7 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 	startPage := perPage * page
 
 	filters["entity_uuid"] = []string{nodeID}
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQuery(start, end, RunFieldTimestamp)
 
@@ -337,7 +337,7 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 	}
 
 	sortAscending := false
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Query(mainQuery).
 		Index(IndexConvergeHistory). // search in indexes "converge-history-*"
 		Sort("end_time", sortAscending).
@@ -351,8 +351,8 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 
 	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Node
-		for _, hit := range searchResult.Hits.Hits {
-			err := json.Unmarshal(hit.Source, &r)
+		for _, hit := range searchResult.HitsHits() {
+			err := json.Unmarshal(hit.Source(), &r)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -369,7 +369,7 @@ func (es Backend) GetRunsPageByCursor(ctx context.Context, nodeID string, start 
 	cursorID string, pageSize int, ascending bool) ([]backend.Run, error) {
 
 	filters["entity_uuid"] = []string{nodeID}
-	mainQuery := newBoolQueryFromFilters(filters)
+	mainQuery := es.newBoolQueryFromFilters(filters)
 
 	rangeQuery, ok := newRangeQueryTime(start, end, RunFieldEndTimestamp)
 
@@ -377,7 +377,7 @@ func (es Backend) GetRunsPageByCursor(ctx context.Context, nodeID string, start 
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	searchService := es.client.Search().
+	searchService := es.client2.Search().
 		Query(mainQuery).
 		Index(IndexConvergeHistory).
 		Size(pageSize).
@@ -400,9 +400,9 @@ func (es Backend) GetRunsPageByCursor(ctx context.Context, nodeID string, start 
 	var runs []backend.Run
 	if searchResult.TotalHits() > 0 {
 		// Iterate through every Hit and unmarshal the Source into a backend.Run
-		for _, hit := range searchResult.Hits.Hits {
+		for _, hit := range searchResult.HitsHits() {
 			var run backend.Run
-			err := json.Unmarshal(hit.Source, &run)
+			err := json.Unmarshal(hit.Source(), &run)
 			if err != nil {
 				log.WithError(err).Error("Error unmarshalling the node object")
 			} else {
@@ -449,7 +449,7 @@ func (es Backend) GetDateOfOldestConvergeIndices() (time.Time, bool, error) {
 }
 
 func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
-	res, err := es.client.IndexGetSettings().Index(IndexConvergeHistory).Do(context.Background())
+	res, err := es.client2.IndexGetSettings().Index(IndexConvergeHistory).Do(context.Background())
 	if err != nil {
 		return []string{}, err
 	}
@@ -502,7 +502,7 @@ func (es Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
 		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
 		SubAggregation(statusAggTag, innerAgg)
 
-	searchResult, err := es.client.Search().
+	searchResult, err := es.client2.Search().
 		Index(IndexConvergeHistory).
 		Query(mainQuery).
 		Aggregation(outerAggTag, bucketHist).

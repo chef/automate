@@ -145,13 +145,11 @@ func (es Backend) getNextRollouts(pctx *paginationContext) error {
 	policyRevsAgg.SubAggregation(statusField, runStatusAgg)
 	nodeSegmentsAgg.SubAggregation(pRevField, policyRevsAgg)
 
-	var result *elastic.SearchResult
-
 	if len(pctx.afterKey) != 0 {
 		nodeSegmentsAgg.AggregateAfter(pctx.afterKey)
 	}
 
-	result, err := es.client.Search().
+	result, err := es.client2.Search().
 		Index(IndexNodeState).
 		Aggregation(nodeSegmentsField, nodeSegmentsAgg).
 		Size(0).

@@ -130,6 +130,7 @@ require (
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/olivere/elastic.v6 v6.2.35
 )
 
 // https://github.com/dexidp/dex/issues/1578
