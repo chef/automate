@@ -157,7 +157,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
         return [
           moment.utc(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
           moment.utc(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
-        ].join(' - ');
+        ].join(' - ') + ' (UTC)';
       });
 
     this.axisXSelection.select('.domain')
@@ -285,7 +285,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     update
       .attr('for', (_d, i) => `dot-group-bg-${i}`);
     update.select('.tip-name')
-      .text(d => d3.timeFormat('%a %B %e %Y')(d.report_time));
+      .text(d => d3.timeFormat('%a %B %e %Y (UTC)')(d.report_time));
 
     statuses.forEach(status => {
       update.select(`.tip-legend-item.${status}`)
