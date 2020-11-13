@@ -204,6 +204,7 @@ func mTLSConf(c *config.EventGatewayConfig) (*tls.Config, error) {
 		KeyFile:  c.TLSConfig.KeyPath,
 		CaFile:   c.TLSConfig.RootCACertPath,
 		Verify:   true,
+		Ciphers:  secureconn.DefaultCipherSuites(),
 	}
 
 	natsTLSConf, err := natsd.GenTLSConfig(natsTLSOpts)

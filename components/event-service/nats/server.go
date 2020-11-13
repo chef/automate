@@ -6,14 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/components/event-service/config"
-
 	natsd "github.com/nats-io/gnatsd/server"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
 	stores "github.com/nats-io/nats-streaming-server/stores"
 	nats "github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/event-service/config"
+	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
 type shutdowner interface {
@@ -71,6 +72,7 @@ func mTLSConfFor(c *config.EventConfig, service string) *tls.Config {
 		KeyFile:  c.TLSConfig.KeyPath,
 		CaFile:   c.TLSConfig.RootCACertPath,
 		Verify:   true,
+		Ciphers:  secureconn.DefaultCipherSuites(),
 	}
 
 	natsTLSConf, err := natsd.GenTLSConfig(natsTLSOpts)

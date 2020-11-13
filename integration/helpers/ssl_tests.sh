@@ -105,6 +105,6 @@ fixup_testssl() {
 write_host_file() {
     HOSTFILE=$(mktemp)
     # temporarily remove port 10120 from list until it is a running service
-    chef-automate dev ports list | awk "/https|grpc/ { print \"127.0.0.1:\" \$3 }" > "$HOSTFILE"
+    chef-automate dev ports list | awk "/https|grpc|nats-gateway/ { print \"127.0.0.1:\" \$3 }" > "$HOSTFILE"
     echo "$HOSTFILE"
 }
