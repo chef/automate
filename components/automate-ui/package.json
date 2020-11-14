@@ -93,6 +93,7 @@
     "ng2-mock-component": "^0.2.0",
     "node-sass": "^4.14.0",
     "protractor": "^5.4.4",
+    "rxjs-spy": "^7.5.1",
     "rxjs-tslint": "^0.1.8",
     "sass-lint": "^1.13.1",
     "ts-node": "^8.10.1",
