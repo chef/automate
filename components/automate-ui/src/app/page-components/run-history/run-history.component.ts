@@ -147,7 +147,6 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   }
 
   onStatusChange(status) {
-    this.updatePageNumber(1);
     this.selected = status;
     switch (status) {
       case SelectedStatus.Failure:
@@ -165,7 +164,6 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   // react on click events for history items
   onSelect(history) {
     if (history && this.activeRunId !== history.runId) {
-      this.updatePageNumber(1);
       this.activeRunId = history.runId;
       this.on_run_change.emit(new RunInfo(history.runId, history.endTime));
     }

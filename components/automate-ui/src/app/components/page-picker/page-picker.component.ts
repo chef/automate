@@ -54,6 +54,7 @@ export class PagePickerComponent implements OnChanges {
 
   ngOnChanges() {
     this.last = Math.ceil(this.total / this.perPage) || 1;
+    this.page = this.page > this.last ? this.last : this.page;
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
 
