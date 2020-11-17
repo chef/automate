@@ -54,7 +54,8 @@ func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
 
 		log.WithFields(log.Fields{
 			"number_of_publishers": len(pipeInChannels),
-		}).Error("All elasticsearch publishers are full")
+		}).Error("All elasticsearch publishers are full. " +
+			"Increase the max number of bundled messages and/or number of publishers")
 		time.Sleep(time.Millisecond * 10)
 	}
 }
