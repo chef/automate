@@ -13,7 +13,7 @@ export class PagePickerComponent implements OnChanges {
   @Input() total: number;
   @Input() perPage: number;
   @Input() page: number;
-  @Input() maxPageItems = 10;
+  @Input() maxSelectablePages = 10;
   @Input() @HostBinding('class.forDesktop') forDesktop = false;
   @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
@@ -59,7 +59,7 @@ export class PagePickerComponent implements OnChanges {
     this.next = (this.page === this.last) ? null : this.page + 1;
 
     const pages = [];
-    const selectedIndex = ((this.page - 1) % this.maxPageItems);
+    const selectedIndex = ((this.page - 1) % this.maxSelectablePages);
 
     for (let pageIndex = selectedIndex; pageIndex >= 0; --pageIndex) {
       const prev = this.page + (pageIndex - selectedIndex);
@@ -68,7 +68,7 @@ export class PagePickerComponent implements OnChanges {
 
     pages[selectedIndex] = this.page;
 
-    for (let pageIndex = selectedIndex; pageIndex < this.maxPageItems; ++pageIndex) {
+    for (let pageIndex = selectedIndex; pageIndex < this.maxSelectablePages; ++pageIndex) {
       const next = this.page + (pageIndex - selectedIndex);
       if (next <= this.last) {
         pages[pageIndex] = next;
