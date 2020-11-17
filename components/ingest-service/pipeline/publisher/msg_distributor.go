@@ -54,7 +54,7 @@ func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
 
 		log.WithFields(log.Fields{
 			"number_of_publishers": len(pipeInChannels),
-		}).Warn("All elasticsearch publishers are full")
+		}).Error("All elasticsearch publishers are full")
 		time.Sleep(time.Millisecond * 10)
 	}
 }
