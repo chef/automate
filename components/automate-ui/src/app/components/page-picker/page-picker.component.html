@@ -1,4 +1,4 @@
-<ng-container *ngIf="selectablePages.length > 1">
+<ng-container *ngIf="selectablePages.length > 1 || last > 1">
   <ng-container *ngIf="!forDesktop">
     <chef-button secondary
       class="page-picker-item page-picker-first"
@@ -17,7 +17,7 @@
       class="page-picker-item"
       [attr.primary]="item === page"
       [attr.secondary]="item !== page"
-      [attr.disabled]="selectablePages.length <= 1"
+      [attr.disabled]="selectablePages.length <= 1 && last <= 1"
       (click)="onItemTap(item)">
       {{ item }}
     </chef-button>

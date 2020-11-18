@@ -107,6 +107,51 @@ describe('PagePickerComponent', () => {
         });
       });
     });
+
+    describe('page set calculations', () => {
+
+      using([
+        [ 1, 1, 1, [1], 'just one item and one allowed page'],
+        [ 1, 3, 1, [1], 'just one item with multiple allowed pages'],
+        [10, 3, 1, [1], 'one full page of items'],
+        [25, 5, 1, [1, 2, 3], 'multiple pages less than one full view'],
+        [46, 5, 1, [1, 2, 3, 4, 5],
+          'multiple pages of exactly one full view but last page not full'],
+        [50, 5, 1, [1, 2, 3, 4, 5],
+          'multiple pages of exactly one full view and last page full'],
+        [46, 5, 3, [1, 2, 3, 4, 5],
+          'multiple pages of exactly one full view, on middle page'],
+        [46, 5, 5, [1, 2, 3, 4, 5],
+          'multiple pages of exactly one full view, on last page'],
+        [105, 5, 6, [6, 7, 8, 9, 10],
+          'visit first page beyond the first full view'],
+        [105, 5, 11, [11],
+          'visit last view'],
+        [105, 3, 1, [1, 2, 3],
+          'different pages per view, first view'],
+        [105, 3, 4, [4, 5, 6],
+          'different pages per view, second view'],
+        [105, 3, 10, [10, 11],
+          'different pages per view, last view']
+      ], function (
+        totalItems: number,
+        pagesPerView: number,
+        currentPage: number,
+        expected: number[],
+        description: string
+        ) {
+        it(`with ${description}, expect ${expected}`, () => {
+          component.perPage = 10; // just easier for mentally munging the data above
+          component.total = totalItems;
+          component.maxSelectablePages = pagesPerView;
+          component.page = currentPage;
+
+          component.ngOnChanges();
+
+          expect(component.selectablePages).toEqual(expected);
+        });
+      });
+    });
   });
 
 });

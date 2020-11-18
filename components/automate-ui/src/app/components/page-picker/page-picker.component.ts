@@ -13,7 +13,7 @@ export class PagePickerComponent implements OnChanges {
   @Input() total: number;
   @Input() perPage: number;
   @Input() page: number;
-  @Input() maxPageItems = 10;
+  @Input() maxSelectablePages = 10;
   @Input() @HostBinding('class.forDesktop') forDesktop = false;
   @Input() @HostBinding('class.fullScreened') fullScreened = false;
 
@@ -54,24 +54,17 @@ export class PagePickerComponent implements OnChanges {
 
   ngOnChanges() {
     this.last = Math.ceil(this.total / this.perPage) || 1;
+    this.page = Math.min(this.page, this.last);
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
 
-    const pages = [];
-    const selectedIndex = ((this.page - 1) % this.maxPageItems);
+    const pages: number[] = [];
+    const selectedIndex = ((this.page - 1) % this.maxSelectablePages);
 
-    for (let pageIndex = selectedIndex; pageIndex >= 0; --pageIndex) {
-      const prev = this.page + (pageIndex - selectedIndex);
-      pages[pageIndex] = prev;
-    }
-
-    pages[selectedIndex] = this.page;
-
-    for (let pageIndex = selectedIndex; pageIndex < this.maxPageItems; ++pageIndex) {
-      const next = this.page + (pageIndex - selectedIndex);
-      if (next <= this.last) {
-        pages[pageIndex] = next;
-      }
+    for (let pageIndex = 0, pg = this.page - selectedIndex;
+      pageIndex < this.maxSelectablePages && pg <= this.last;
+      ++pageIndex, pg = this.page + pageIndex - selectedIndex) {
+      pages[pageIndex] = pg;
     }
     this.selectablePages = pages;
 
