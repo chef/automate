@@ -58,21 +58,13 @@ export class PagePickerComponent implements OnChanges {
     this.prev = (this.page === this.first) ? null : this.page - 1;
     this.next = (this.page === this.last) ? null : this.page + 1;
 
-    const pages = [];
+    const pages: number[] = [];
     const selectedIndex = ((this.page - 1) % this.maxSelectablePages);
 
-    for (let pageIndex = selectedIndex; pageIndex >= 0; --pageIndex) {
-      const prev = this.page + (pageIndex - selectedIndex);
-      pages[pageIndex] = prev;
-    }
-
-    pages[selectedIndex] = this.page;
-
-    for (let pageIndex = selectedIndex; pageIndex < this.maxSelectablePages; ++pageIndex) {
-      const next = this.page + (pageIndex - selectedIndex);
-      if (next <= this.last) {
-        pages[pageIndex] = next;
-      }
+    for (let pageIndex = 0, pg = this.page - selectedIndex;
+      pageIndex < this.maxSelectablePages && pg <= this.last;
+      ++pageIndex, pg = this.page + pageIndex - selectedIndex) {
+      pages[pageIndex] = pg;
     }
     this.selectablePages = pages;
 
