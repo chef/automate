@@ -13,6 +13,7 @@
                 <chef-thead>
                   <chef-tr>
                     <chef-th class="name-column">Name</chef-th>
+                    <chef-th class="id-column">ID</chef-th>
                     <chef-th class="type-column">Type</chef-th>
                     <chef-th class="status-column">Status</chef-th>
                     <chef-th class="three-dot-column"></chef-th>
@@ -23,6 +24,7 @@
                       <chef-td class="name-column">
                         <a [routerLink]="['/settings/policies', policy.id]">{{ policy.name }}</a>
                       </chef-td>
+                      <chef-td class="id-column">{{ policy.id }}</chef-td>
                       <chef-td class="type-column">{{ policy.type | iamType }}</chef-td>
                       <chef-td class="status-column">{{ status(policy) | capitalize }}</chef-td>
                       <chef-td class="three-dot-column">

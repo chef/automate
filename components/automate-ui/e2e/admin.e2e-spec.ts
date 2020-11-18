@@ -118,7 +118,7 @@ describe('Admin pages', () => {
           {
             policies: [
               {
-                id: 'some-policy-id',
+                id: 'Custom',
                 name: 'Some policy whose name does not start with A',
                 members: [],
                 type: 'CUSTOM',
@@ -128,7 +128,7 @@ describe('Admin pages', () => {
                 projects: []
               },
               {
-                id: 'chef-managed-administrator',
+                id: 'Chef-managed',
                 name: 'Administrator All Access',
                 members: ['team:local:admins'],
                 statements: [
