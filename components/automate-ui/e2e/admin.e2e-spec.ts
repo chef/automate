@@ -118,7 +118,7 @@ describe('Admin pages', () => {
           {
             policies: [
               {
-                id: 'Custom',
+                id: 'some-policy-id',
                 name: 'Some policy whose name does not start with A',
                 members: [],
                 type: 'CUSTOM',
@@ -128,7 +128,7 @@ describe('Admin pages', () => {
                 projects: []
               },
               {
-                id: 'Chef-managed',
+                id: 'chef-managed-administrator',
                 name: 'Administrator All Access',
                 members: ['team:local:admins'],
                 statements: [
@@ -164,12 +164,12 @@ describe('Admin pages', () => {
             expect(name.getText()).toBe('Administrator All Access');
           });
 
-        waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)')
+        waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
           .then((policyType) => {
             expect(policyType.getText()).toBe('Chef-managed');
           });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:nth-child(4)')
           .then((members) => {
             expect(members.getText()).toBe('In use');
           });
@@ -181,12 +181,12 @@ describe('Admin pages', () => {
             expect(name.getText()).toBe('Some policy whose name does not start with A');
           });
 
-        waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)')
+        waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
         .then(policyType => {
           expect(policyType.getText()).toBe('Custom');
         });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:nth-child(4)')
           .then(members => {
             expect(members.getText()).toBe('No members');
           });
