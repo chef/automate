@@ -117,6 +117,8 @@ steps:
   - label: ":semgrep: Published"
     command:
     - echo "running in $(pwd)"
+    - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
+    - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
     - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID
     timeout_in_minutes: 20
     expeditor:
