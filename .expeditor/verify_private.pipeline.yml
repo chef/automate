@@ -105,7 +105,7 @@ steps:
     expeditor:
       executor:
         docker:
-          image: returntocorp/semgrep:0.29.0
+          image: returntocorp/semgrep:0.32.0
           entrypoint: semgrep
           command: [
             "--error",
