@@ -136,10 +136,9 @@ func (f *Factory) DialOptions(serviceName string) []grpc.DialOption {
 }
 
 // The following is a re-implementation of some of what is in the
-// Golang standard library to construct the default cipher suite list
-// with minor modifications.
+// Golang standard library to construct the default cipher suite list.
 //
-// We re-implement it here to disable 3DES cipher suites while still
+// We re-implement it here to disable many cipher suites while still
 // getting the hardware-capability-based cipher ordering selection.
 var (
 	once                sync.Once
@@ -155,12 +154,38 @@ func DefaultCipherSuites() []uint16 {
 // defaultCipherSuites are ordered by preference. We attempt to detect
 // the presence of CPU features that make AES-GCM ciphers faster and
 // prefer those if present.
+//
+// This configuration is currently in line with the "Intermediate"
+// advice from Mozilla.
+//
+// These ciphers only impact TLS1.2 connection. TLS1.3 does not allow
+// for configurable cipher suites and most of our Go-to-Go
+// interactions are likely using TLS1.3.
+//
+// HTTP/2 imposes additional cipher-suite restrictions which would
+// have disallowed the majority of the cipher suites we are excluding.
+//
+// Currently, the effectively disables:
+//
+// tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+// tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+// tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+// tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+// tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+// tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+// tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+// tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+// tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
+// tls.TLS_RSA_WITH_AES_128_CBC_SHA256,
+// tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+// tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+// tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA
+//
 func initCipherSuites() {
-	var topCipherSuites []uint16
 	if HasAESNI() {
 		// If AES-GCM hardware is provided then prioritize AES-GCM
 		// cipher suites.
-		topCipherSuites = []uint16{
+		defaultCipherSuites = []uint16{
 			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -171,7 +196,7 @@ func initCipherSuites() {
 	} else {
 		// Without AES-GCM hardware, we put the ChaCha20-Poly1305
 		// cipher suites first.
-		topCipherSuites = []uint16{
+		defaultCipherSuites = []uint16{
 			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
@@ -180,29 +205,4 @@ func initCipherSuites() {
 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
 		}
 	}
-	commonCiphers := []uint16{
-		tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-		// Disabled since our new SSL scanner disallows anything with CBC
-		//
-		// tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-		// tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		// tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		// tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-		// tls.TLS_RSA_WITH_AES_128_CBC_SHA,
-		// tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		//
-		// Golang enables these but we disable them
-		// because 3DES makes scanners unhappy
-		//
-		// tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-		// tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
-		//
-		// Disabled in Golang since only SHA1 CBC has Lucky13 mitigations
-		// tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
-		// tls.TLS_RSA_WITH_AES_128_CBC_SHA256,
-		// tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
-	}
-
-	defaultCipherSuites = append(topCipherSuites, commonCiphers...)
 }
