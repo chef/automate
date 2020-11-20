@@ -24,7 +24,7 @@ export class NodesEditComponent implements OnInit {
 
   form: FormGroup;
   backendControl: FormGroup;
-  backendValue: Observable<string>;
+  backendValue$: Observable<string>;
   // Array of secrets available for user to select
   // TODO make ngrx/store selection
   secrets$: Observable<any[]>;
@@ -56,10 +56,10 @@ export class NodesEditComponent implements OnInit {
 
         // Swap fields based on selected "backend" value (ssh, winrm)
         this.backendControl = this.form.get('target_config').get('backend') as FormGroup;
-        this.backendValue = this.backendControl
+        this.backendValue$ = this.backendControl
           .valueChanges
           .pipe(startWith(this.backendControl.value));
-        this.backendValue.subscribe(backend => {
+        this.backendValue$.subscribe(backend => {
           const step = this.form.get('target_config') as FormGroup;
           // step.get('secrets').setValue([]);
           switch (backend) {
@@ -78,7 +78,7 @@ export class NodesEditComponent implements OnInit {
 
         this.secrets$ = combineLatest([
           this.fetchSecrets(),
-          this.backendValue
+          this.backendValue$
         ]).pipe(
           map(([secrets, backend]: [any[], string]) =>
             secrets.filter(s => s.type === backend || s.type === 'sudo'))

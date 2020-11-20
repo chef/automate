@@ -1,0 +1,32 @@
+# Copied from https://github.com/returntocorp/semgrep-action/blob/develop/src/semgrep_agent/templates/.semgrepignore
+# Note that these are for semgrep-agent ONLY; command line semgrep does NOT use this file.
+
+# Ignore git items
+.gitignore
+.git/
+:include .gitignore
+
+# Common large directories
+node_modules/
+build/
+dist/
+vendor/
+env/
+.env/
+venv/
+.venv/
+*.min.js
+
+# Common test directories
+test/
+tests/
+
+# Semgrep rules folder
+.semgrep
+
+# Chef customizations
+third_party/
+*_test.go
+*.pb.go
+*.bindata.go
+*.spec.ts

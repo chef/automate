@@ -10,6 +10,11 @@ DEMO_FLAGS := --spec false
 NG_CMD := npm run ng --
 REPOROOT=../..
 
+# Semgrep by default respects .gitignore; these are additive:
+SEMGREP_IGNORE := --exclude *.spec.ts
+SEMGREP_CONFIG := https://semgrep.dev/p/r2c-ci
+
+
 install:
 	npm install
 	npm run install:ui-library
@@ -40,14 +45,18 @@ lint-typescript:
 	npm run lint
 
 #: Security validation via semgrep
-semgrep:
-	semgrep --config $(REPOROOT)/semgrep --exclude *.spec.ts
-	semgrep --config https://semgrep.dev/p/r2c-ci
+semgrep: semgrep-custom semgrep-published
+
+semgrep-custom:
+	semgrep --config $(REPOROOT)/.semgrep $(SEMGREP_IGNORE)
+
+semgrep-published:
+	semgrep --config $(SEMGREP_CONFIG) $(SEMGREP_IGNORE)
 
 #: Security validation via semgrep; autofix where possible
 semgrep-and-fix:
-	semgrep --config $(REPOROOT)/semgrep --exclude *.spec.ts --autofix
-	semgrep --config https://semgrep.dev/p/r2c-ci --autofix
+	semgrep --config $(REPOROOT)/.semgrep $(SEMGREP_IGNORE) --autofix
+	semgrep --config $(SEMGREP_CONFIG) $(SEMGREP_IGNORE) --autofix
 
 pr-ready: unit-all-browsers lint e2e
 
@@ -103,4 +112,4 @@ spell:
 	popd > /dev/null; \
 	exit $$EXIT_CODE
 
-.PHONY: build install test lint lint-html lint-sass lint-typescript semgrep semgrep-and-fix unit e2e license_scout peer-dependencies e2e-aot unit-all-browsers pr-ready start
+.PHONY: build install test lint lint-html lint-sass lint-typescript semgrep semgrep-and-fix semgrep-custom semgrep-published unit e2e license_scout peer-dependencies e2e-aot unit-all-browsers pr-ready start
