@@ -14,6 +14,20 @@ rules:
     languages: [ts]
     severity: ERROR
 
+  - id: lifecycle-hook-not-used
+    patterns:
+    - pattern-either: 
+      - pattern: ngOnInit() { }
+      - pattern: ngOnDestroy() { }
+      - pattern: ngOnChanges() { }
+      - pattern: ngDoCheck() { }
+      - pattern: ngAfterContentInit() { }
+      - pattern: ngAfterContentChecked() { }
+      - pattern: ngAfterViewInit() { }
+      - pattern: ngAfterViewChecked() { }
+    message: lifecycle hook is not used; should be removed
+    languages: [ts]
+    severity: ERROR
 
   - id: isDestroyed-used-but-not-triggered
     patterns:
