@@ -348,6 +348,10 @@ chef-option.filter.unknown {
   chef-button {
     margin: 0 8px;
   }
+
+  &.hidden {
+    visibility: hidden;
+  }
 }
 
 chef-modal[label="delete-services-modal"] {
