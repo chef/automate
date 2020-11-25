@@ -31,8 +31,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
     warning: 0,
     critical: 0,
     unknown: 0,
-    disconnected: 0,
-    connected: 0
+    disconnected: 0
   },
   list: [],
   selectedGroup: {
@@ -51,8 +50,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
         warning: 0,
         critical: 0,
         unknown: 0,
-        disconnected: 0,
-        connected: 0
+        disconnected: 0
       },
       list: [],
       status: EntityStatus.notLoaded

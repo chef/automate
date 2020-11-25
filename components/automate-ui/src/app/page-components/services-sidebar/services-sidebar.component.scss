@@ -38,6 +38,14 @@ chef-alert {
   justify-content: left;
 }
 
+.filter.connected {
+
+  &::before {
+    content: '\A'
+    
+  }
+}
+
 .filter.disconnected chef-icon {
   // This is set in chef-ui-library but automate-ui's copy is in a slightly
   // different path:

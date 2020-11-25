@@ -46,10 +46,11 @@
           <div class="filter-label">Unknown</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.unknown }}</div>
         </chef-option>
+        <br />
         <chef-option class="filter connected" value='connected' (click)="updateHealthFilter('connected')" (keyup.enter)="updateHealthFilter('connected')">
           <chef-icon class="filter-icon">link</chef-icon>
           <div class="filter-label">Connected</div>
-          <div class="filter-total">{{ serviceGroupsHealthSummary.connected }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.total - serviceGroupsHealthSummary.disconnected }}</div>
         </chef-option>
         <chef-option class="filter disconnected" value='disconnected' (click)="updateHealthFilter('disconnected')" (keyup.enter)="updateHealthFilter('disconnected')">
           <chef-icon class="filter-icon"></chef-icon>

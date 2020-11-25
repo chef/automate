@@ -80,8 +80,7 @@ describe('ServiceGroupsComponent', () => {
           warning: 5,
           critical: 5,
           unknown: 1,
-          disconnected: 0,
-          connected: 0
+          disconnected: 0
         }));
       });
 
