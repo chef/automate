@@ -46,9 +46,8 @@
           <div class="filter-label">Unknown</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.unknown }}</div>
         </chef-option>
-        <chef-option class="filter connected" value='connected' (click)="updateHealthFilter('connected')"
-        (keyup.enter)="updateHealthFilter('connected')">
-          <chef-icon class="filter-icon"></chef-icon>
+        <chef-option class="filter connected" value='connected' (click)="updateHealthFilter('connected')" (keyup.enter)="updateHealthFilter('connected')">
+          <chef-icon class="filter-icon">link</chef-icon>
           <div class="filter-label">Connected</div>
           <div class="filter-total">{{ serviceGroupsHealthSummary.connected }}</div>
         </chef-option>
