@@ -38,12 +38,8 @@ chef-alert {
   justify-content: left;
 }
 
-.filter.connected {
-
-  &::before {
-    content: '\A'
-    
-  }
+chef-option.filter.unknown {
+  margin-right: 50px; // forces remaining filters into new row
 }
 
 .filter.disconnected chef-icon {
