@@ -58,7 +58,7 @@
         </chef-option>
       </chef-status-filter-group>
     </div>
-    <div class="bulk-action-bar" *ngIf="(services$ | async)?.length !== 0">
+    <div class="bulk-action-bar">
       <chef-checkbox
         [checked]="hasAllSelected"
         [indeterminate]="isIndeterminate"
