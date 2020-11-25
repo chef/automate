@@ -34,6 +34,7 @@ export interface ServiceGroupsHealthSummary {
   critical: number;
   unknown: number;
   disconnected: number;
+  connected: number;
 }
 
 export interface ServiceGroupsSuggestions {

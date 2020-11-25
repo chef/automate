@@ -44,7 +44,7 @@ export class ServiceGroupsFacadeService {
   public currentServicesFilters$: Observable<GroupServicesFilters>;
 
   // The collection of allowable status
-  public allowedStatus = ['ok', 'critical', 'warning', 'unknown', 'disconnected'];
+  public allowedStatus = ['ok', 'critical', 'warning', 'unknown', 'disconnected', 'connected'];
 
   constructor(
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
