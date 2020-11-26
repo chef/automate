@@ -36,14 +36,14 @@ func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNode
 		return nil, err
 	}
 
-	var url string
+	var statement string
 	if req.Version != "" {
-		url = fmt.Sprintf("%s_%s_version:%s", req.ChefType, req.Name, req.Version)
+		statement = fmt.Sprintf("%s_%s_version:%s", req.ChefType, req.Name, req.Version)
 	} else {
-		url = fmt.Sprintf("%s:%s", req.ChefType, req.Name)
+		statement = fmt.Sprintf("%s:%s", req.ChefType, req.Name)
 	}
 
-	res, err := c.fetchAffectedNodes(ctx, url)
+	res, err := c.fetchAffectedNodes(ctx, statement)
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +139,8 @@ func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*resp
 // roles: it would be 'roles:ROLE_NAME'
 // environments: it would be 'chef_environment:ENVIRONMENT_NAME'
 // policyfiles: it would be 'chef_environment:POLICY_FILES_GROUP_NAME'
-func (c *ChefClient) fetchAffectedNodes(ctx context.Context, url string) (*chef.SearchResult, error) {
-	query := map[string]interface{}{
+func (c *ChefClient) fetchAffectedNodes(ctx context.Context, statement string) (*chef.SearchResult, error) {
+	params := map[string]interface{}{
 		"name":             []string{"name"},
 		"fqdn":             []string{"fqdn"},
 		"ipaddress":        []string{"ipaddress"},
@@ -152,7 +152,7 @@ func (c *ChefClient) fetchAffectedNodes(ctx context.Context, url string) (*chef.
 		"ohai_time":        []string{"ohai_time"},
 	}
 
-	res, err := c.client.Search.PartialExec("node", url, query)
+	res, err := c.client.Search.PartialExec("node", statement, params)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
