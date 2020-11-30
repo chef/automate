@@ -11,7 +11,8 @@ import { ServiceGroupsFacadeService } from '../../entities/service-groups/servic
 import {
   ServiceGroupsHealthSummary,
   GroupService,
-  GroupServicesFilters
+  GroupServicesFilters,
+  AllowedHealthStatus
 } from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -121,7 +122,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public updateHealthFilter(health: string) {
+  public updateHealthFilter(health: AllowedHealthStatus) {
     this.currentPage = 1;
     this.selectedHealth = this.serviceGroupsFacade
       .updateHealthFilter(health, 'applicationsStatusFilter');

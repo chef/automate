@@ -13,7 +13,9 @@ import {
   ServiceGroup,
   ServiceGroupsHealthSummary,
   GroupService,
-  GroupServicesFilters
+  GroupServicesFilters,
+  allowedStatus,
+  AllowedHealthStatus
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupsStatus,
@@ -44,13 +46,21 @@ export class ServiceGroupsFacadeService {
   public currentServicesFilters$: Observable<GroupServicesFilters>;
 
   // The collection of allowable status
-  public allowedStatus = ['ok', 'critical', 'warning', 'unknown', 'disconnected', 'connected'];
+  public allowedHealthStatus: AllowedHealthStatus[] = [
+    allowedStatus.OK,
+    allowedStatus.CRITICAL,
+    allowedStatus.WARNING,
+    allowedStatus.UNKNOWN,
+    allowedStatus.DISCONNECTED,
+    allowedStatus.CONNECTED,
+    allowedStatus.TOTAL
+  ];
 
   constructor(
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
       private telemetryService: TelemetryService
     ) {
-    // this.allBooks$ = store.pipe(select(fromBooks.getAllBooks));
+    // this.allBOKs$ = store.pipe(select(fromBooks.getAllBooks));
     this.services$ = store.select(selectedServiceGroupList);
     this.serviceGroupsStatus$ = store.select(serviceGroupsStatus);
     this.serviceGroupsError$ = store.select(serviceGroupsError);
@@ -83,8 +93,8 @@ export class ServiceGroupsFacadeService {
     });
   }
 
-  public updateHealthFilter(health: string, trackEvent: string): string {
-    health = includes(health, this.allowedStatus) ? health : 'total';
+  public updateHealthFilter(health: AllowedHealthStatus, trackEvent: string): AllowedHealthStatus {
+    health = includes(health, this.allowedHealthStatus) ? health : allowedStatus.TOTAL;
     this.telemetryService.track(trackEvent, {
         entity: 'service', statusFilter: health
     });
