@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { includes } from 'lodash/fp';
 import * as moment from 'moment/moment';
 
 import { EntityStatus } from '../../entities/entities';
@@ -14,8 +13,7 @@ import {
   ServiceGroupsHealthSummary,
   GroupService,
   GroupServicesFilters,
-  allowedStatus,
-  AllowedHealthStatus
+  AllowedStatus
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupsStatus,
@@ -44,17 +42,6 @@ export class ServiceGroupsFacadeService {
   public serviceGroupsName$: Observable<string>;
   public svcHealthSummary$: Observable<ServiceGroupsHealthSummary>;
   public currentServicesFilters$: Observable<GroupServicesFilters>;
-
-  // The collection of allowable status
-  public allowedHealthStatus: AllowedHealthStatus[] = [
-    allowedStatus.OK,
-    allowedStatus.CRITICAL,
-    allowedStatus.WARNING,
-    allowedStatus.UNKNOWN,
-    allowedStatus.DISCONNECTED,
-    allowedStatus.CONNECTED,
-    allowedStatus.TOTAL
-  ];
 
   constructor(
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
@@ -92,8 +79,7 @@ export class ServiceGroupsFacadeService {
     });
   }
 
-  public updateHealthFilter(health: AllowedHealthStatus, trackEvent: string): AllowedHealthStatus {
-    health = includes(health, this.allowedHealthStatus) ? health : allowedStatus.TOTAL;
+  public updateHealthFilter(health: AllowedStatus, trackEvent: string): AllowedStatus {
     this.telemetryService.track(trackEvent, {
         entity: 'service', statusFilter: health
     });

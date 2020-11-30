@@ -27,7 +27,7 @@ export interface ServiceGroupsFilters {
   sortDirection?: SortDirection;
 }
 
-export enum allowedStatus {
+export enum AllowedStatus {
   OK = 'ok',
   CRITICAL = 'critical',
   WARNING = 'warning',
@@ -36,11 +36,6 @@ export enum allowedStatus {
   DISCONNECTED = 'disconnected',
   CONNECTED = 'connected'
 }
-
-// Used when filtering in the services sidebar component
-export type AllowedHealthStatus = allowedStatus.OK | allowedStatus.CRITICAL | allowedStatus.WARNING
-  | allowedStatus.UNKNOWN | allowedStatus.DISCONNECTED | allowedStatus.TOTAL
-  | allowedStatus.CONNECTED;
 
 export interface ServiceGroupsHealthSummary {
   total: number;

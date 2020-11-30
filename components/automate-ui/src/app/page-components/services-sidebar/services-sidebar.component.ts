@@ -12,7 +12,7 @@ import {
   ServiceGroupsHealthSummary,
   GroupService,
   GroupServicesFilters,
-  AllowedHealthStatus
+  AllowedStatus
 } from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -122,7 +122,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public updateHealthFilter(health: AllowedHealthStatus) {
+  public updateHealthFilter(health: AllowedStatus) {
     this.currentPage = 1;
     this.selectedHealth = this.serviceGroupsFacade
       .updateHealthFilter(health, 'applicationsStatusFilter');
