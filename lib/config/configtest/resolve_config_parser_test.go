@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/lib/config"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseNameServers(t *testing.T) {
@@ -27,8 +28,11 @@ func TestParseNameServersWithMultipleNameServers(t *testing.T) {
 
 	ns := config.ParseNameServers(filecontent)
 	expectedResult := []string{"10.0.0.3", "10.0.0.4"}
-	if !reflect.DeepEqual(expectedResult, ns) {
-		t.Fatalf("Expect %v but received %v", expectedResult, ns)
+
+	require.Equal(t, len(expectedResult), len(ns))
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
 	}
 }
 
@@ -40,8 +44,11 @@ func TestParseNameServersWithNewLineComment(t *testing.T) {
 
 	ns := config.ParseNameServers(filecontent)
 	expectedResult := []string{"10.0.0.3"}
-	if !reflect.DeepEqual(expectedResult, ns) {
-		t.Fatalf("Expect %v but received %v", expectedResult, ns)
+
+	require.Equal(t, len(expectedResult), len(ns))
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
 	}
 }
 
@@ -52,8 +59,11 @@ func TestParseNameServersWithInLineComment(t *testing.T) {
 
 	ns := config.ParseNameServers(filecontent)
 	expectedResult := []string{"10.0.0.3"}
-	if !reflect.DeepEqual(expectedResult, ns) {
-		t.Fatalf("Expect %v but received %v", expectedResult, ns)
+
+	require.Equal(t, len(expectedResult), len(ns))
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
 	}
 }
 
@@ -67,7 +77,9 @@ func TestGetNameServersFromResolveConfig(t *testing.T) {
 
 	var expectedResult = []string{"255.0.0.1"}
 
-	if !reflect.DeepEqual(expectedResult, ns) {
-		t.Fatalf("Expected %v, received %v", expectedResult, ns)
+	require.Equal(t, len(expectedResult), len(ns))
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
 	}
 }
