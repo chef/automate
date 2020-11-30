@@ -29,6 +29,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() serviceGroupsId: string;
   @Input() visible: boolean;
 
+  public allowedStatus = AllowedStatus;
   public selectedHealth = 'total';
   public currentPage = 1;
   public pageSize = 25;
