@@ -60,7 +60,6 @@ export class ServiceGroupsFacadeService {
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
       private telemetryService: TelemetryService
     ) {
-    // this.allBOKs$ = store.pipe(select(fromBooks.getAllBooks));
     this.services$ = store.select(selectedServiceGroupList);
     this.serviceGroupsStatus$ = store.select(serviceGroupsStatus);
     this.serviceGroupsError$ = store.select(serviceGroupsError);
