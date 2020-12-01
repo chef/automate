@@ -1,7 +1,6 @@
-package configtest
+package config_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/chef/automate/lib/config"
@@ -15,8 +14,22 @@ func TestParseNameServers(t *testing.T) {
 
 	ns := config.ParseNameServers(filecontent)
 	expectedResult := []string{"10.0.0.3"}
-	if !reflect.DeepEqual(expectedResult, ns) {
-		t.Fatalf("Expect 10.0.0.3 but received %s", ns[0])
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
+	}
+}
+
+func TestParseNameServersWithIPv6Address(t *testing.T) {
+	filecontent := []byte(`
+	nameserver 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+	`)
+
+	ns := config.ParseNameServers(filecontent)
+	expectedResult := []string{"2001:0db8:85a3:0000:0000:8a2e:0370:7334"}
+
+	for _, m := range expectedResult {
+		require.Contains(t, ns, m)
 	}
 }
 
@@ -68,7 +81,7 @@ func TestParseNameServersWithInLineComment(t *testing.T) {
 }
 
 func TestGetNameServersFromResolveConfig(t *testing.T) {
-	var filePath = "./sample_resolv_conf"
+	var filePath = "./testdata/sample_resolv_conf"
 	ns, e := config.GetNameServersFromResolveConfig(filePath)
 
 	if e != nil {

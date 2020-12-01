@@ -40,7 +40,7 @@ func ParseNameServers(fileContent []byte) []string {
 		}
 		server := nameServerRegex.FindSubmatch([]byte(contentToParse))
 
-		if len(server) > 0 {
+		if len(server) == 2 {
 			nameservers = append(nameservers, string(server[1]))
 		}
 	}
