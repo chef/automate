@@ -20,7 +20,7 @@ func TestParseNameServers(t *testing.T) {
 			content: []byte(`
 nameserver 10.0.0.3
 	`),
-			expected: []string{"10.0.0.2"},
+			expected: []string{"10.0.0.3"},
 		},
 		{
 			desc: "parses IPv6 nameserver",
