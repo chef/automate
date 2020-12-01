@@ -27,6 +27,16 @@ export interface ServiceGroupsFilters {
   sortDirection?: SortDirection;
 }
 
+export enum AllowedStatus {
+  OK = 'ok',
+  CRITICAL = 'critical',
+  WARNING = 'warning',
+  UNKNOWN = 'unknown',
+  TOTAL = 'total',
+  DISCONNECTED = 'disconnected',
+  CONNECTED = 'connected'
+}
+
 export interface ServiceGroupsHealthSummary {
   total: number;
   ok: number;

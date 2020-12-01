@@ -11,7 +11,8 @@ import { ServiceGroupsFacadeService } from '../../entities/service-groups/servic
 import {
   ServiceGroupsHealthSummary,
   GroupService,
-  GroupServicesFilters
+  GroupServicesFilters,
+  AllowedStatus
 } from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG, DeleteServicesById } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -28,6 +29,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() serviceGroupsId: string;
   @Input() visible: boolean;
 
+  public allowedStatus = AllowedStatus;
   public selectedHealth = 'total';
   public currentPage = 1;
   public pageSize = 25;
@@ -121,7 +123,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public updateHealthFilter(health: string) {
+  public updateHealthFilter(health: AllowedStatus) {
     this.currentPage = 1;
     this.selectedHealth = this.serviceGroupsFacade
       .updateHealthFilter(health, 'applicationsStatusFilter');

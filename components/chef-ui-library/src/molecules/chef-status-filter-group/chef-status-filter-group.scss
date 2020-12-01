@@ -72,6 +72,13 @@ chef-status-filter-group {
       }
     }
 
+    &.connected {
+      chef-icon {
+        color: var(--chef-success);
+        transform: rotate(-45deg);
+      }
+    }
+
     &.disconnected {
       chef-icon {
         color: var(--chef-dark-grey);
@@ -109,7 +116,8 @@ chef-status-filter-group {
         box-shadow: 0px 0px 0px 1px var(--chef-primary) inset;
       }
 
-      &.success {
+      &.success,
+      &.connected {
         background: #CFE8FF;
         box-shadow: 0px 0px 0px 1px var(--chef-success) inset;
       }
@@ -140,7 +148,8 @@ chef-status-filter-group {
         background: #FFE5D4;
       }
 
-      &.success {
+      &.success,
+      &.connected {
         background: #CFE8FF;
       }
 

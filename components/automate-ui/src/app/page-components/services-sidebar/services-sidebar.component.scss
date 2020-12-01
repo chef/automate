@@ -26,6 +26,11 @@ chef-tooltip {
 
 chef-status-filter-group {
   padding-top: 5px;
+
+  .spacer {
+    width: 100%;
+    height: 0;
+  }
 }
 
 app-page-picker {
@@ -343,6 +348,10 @@ chef-alert {
 
   chef-button {
     margin: 0 8px;
+  }
+
+  &.hidden {
+    visibility: hidden;
   }
 }
 
