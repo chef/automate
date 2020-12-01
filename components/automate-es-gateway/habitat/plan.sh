@@ -10,7 +10,19 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
-# TODO FIXME ??? (dan): can we do this?
+
+jdomain_version="1.1.5"
+jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
+jdomain_source="https://github.com/nicholaschiasson/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
+jdomain_shasum=e7346dac41d473ea02995b7626bd0660115538c2c784dfe683e235c58dbc2c2c
+
+nginx_version="1.19.2"
+pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
+pkg_dirname="nginx-${nginx_version}"
+pkg_upstream_url="https://www.chef.io/automate"
+pkg_shasum=7c1f7bb13e79433ee930c597d272a64bc6e30c356a48524f38fd34fa88d62473
+
+
 chef_automate_hab_binding_mode="relaxed"
 
 # TODO(ssd) 2018-07-27: This instance of nginx should not have to run
@@ -26,13 +38,31 @@ chef_automate_hab_binding_mode="relaxed"
 pkg_svc_user="root"
 
 pkg_deps=(
+  core/glibc
+  core/libedit
+  core/ncurses
+  core/zlib
+  core/bzip2
+  core/openssl
+  core/pcre
+
   core/coreutils
   chef/mlsa
   core/bash
   core/curl # health_check
-  core/nginx
   chef/automate-platform-tools
 )
+
+pkg_build_deps=(
+  core/gcc
+  core/make
+  core/coreutils
+)
+
+pkg_lib_dirs=(lib)
+pkg_bin_dirs=(sbin)
+pkg_include_dirs=(include)
+
 
 pkg_exports=(
   [http-port]=service.port
@@ -45,13 +75,58 @@ pkg_binds=(
 pkg_exposes=(http-port)
 
 do_download() {
-    return 0
+  do_default_download
+  pushd "${HAB_CACHE_SRC_PATH}" || return 1
+  download_file "${jdomain_source}" "${jdomain_filename}" "${jdomain_shasum}"
+
+  tar zxvf ${jdomain_filename}
+  popd || return 1
 }
 
 do_build() {
-    return 0
+  ./configure \
+    --prefix="${pkg_prefix}" \
+    --conf-path="${pkg_svc_config_path}/nginx.conf" \
+    --sbin-path="${pkg_prefix}/bin/nginx" \
+    --pid-path="${pkg_svc_var_path}/nginx.pid" \
+    --lock-path="${pkg_svc_var_path}/nginx.lock" \
+    --user=hab \
+    --group=hab \
+    --http-log-path=/dev/stdout \
+    --error-log-path=stderr \
+    --http-client-body-temp-path="${pkg_svc_var_path}/client-body" \
+    --http-proxy-temp-path="${pkg_svc_var_path}/proxy" \
+    --http-fastcgi-temp-path="${pkg_svc_var_path}/fastcgi" \
+    --http-scgi-temp-path="${pkg_svc_var_path}/scgi" \
+    --http-uwsgi-temp-path="${pkg_svc_var_path}/uwsgi" \
+    --with-pcre \
+    --with-pcre-jit \
+    --with-file-aio \
+    --with-stream=dynamic \
+    --with-stream_ssl_module \
+    --with-mail=dynamic \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_realip_module \
+    --with-http_v2_module \
+    --with-http_ssl_module \
+    --with-http_stub_status_module \
+    --with-http_addition_module \
+    --with-http_degradation_module \
+    --with-http_flv_module \
+    --with-http_mp4_module \
+    --with-http_secure_link_module \
+    --with-http_sub_module \
+    --with-http_slice_module \
+    --with-cc-opt="${CFLAGS}" \
+    --with-ld-opt="${LDFLAGS}" \
+    --add-module=${HAB_CACHE_SRC_PATH}/ngx_upstream_jdomain-${jdomain_version}
+
+  make
 }
 
 do_install() {
-    return 0
+  make install
+  mkdir -p "${pkg_prefix}/sbin"
+  cp "${HAB_CACHE_SRC_PATH}/${pkg_dirname}/objs/nginx" "${pkg_prefix}/sbin"
 }

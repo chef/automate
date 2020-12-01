@@ -43,6 +43,7 @@ message ConfigRequest {
 				message Main {
 					google.protobuf.Int32Value worker_processes = 1;
 					google.protobuf.Int32Value max_fails = 2;
+					google.protobuf.StringValue resolvers = 3;
 				}
 
 				message Events {
@@ -79,11 +80,19 @@ message ConfigRequest {
 			message External {
 				google.protobuf.BoolValue enable = 1;
 				google.protobuf.BoolValue ssl_upstream = 2;
+				// TODO(ssd) 2020-12-01: Mark as deprecated?
 				repeated google.protobuf.StringValue endpoints = 3;
 				google.protobuf.StringValue basic_auth_credentials = 4;
 				google.protobuf.StringValue root_cert = 5;
 				google.protobuf.StringValue server_name = 6;
 				google.protobuf.StringValue root_cert_file = 7;
+				repeated Endpoint parsed_endpoints = 8;
+			}
+
+			message Endpoint {
+				google.protobuf.BoolValue is_domain = 1;
+				google.protobuf.StringValue address = 2;
+				google.protobuf.StringValue port = 3;
 			}
 		} // System
 
