@@ -3,18 +3,23 @@ package config
 import (
 	"bytes"
 	"io/ioutil"
+	"net"
 	"regexp"
 )
 
 var (
-	nameServerRegex = regexp.MustCompile(`^\s*nameserver\s*(.+?)\s*$`)
+	defaultResolvConf = "/etc/resolv.conf"
+	nameServerRegex   = regexp.MustCompile(`^\s*nameserver\s*(.+?)\s*$`)
 )
 
-/*GetNameServersFromResolveConfig parses a file in the format of /etc/resolv.conf
-  The resolve.conf format can be seen by looking at `man resolv.conf`.
-  This function looks up at the lines starting with `nameserver`.
-  There can be a single nameserver each line and maximum 3 in the file.
-*/
+// GetNameServersFromResolveConfig parses a file in the format of /etc/resolv.conf
+// The resolve.conf format is described in resolv.conf(5):
+//
+//    https://man7.org/linux/man-pages/man5/resolv.conf.5.html
+//
+// This function looks up at the lines starting with `nameserver`.
+// There can be a single nameserver each line and maximum 3 (defined
+// my MAXNS in resolv.h) in the file.
 func GetNameServersFromResolveConfig(filePath string) ([]string, error) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -25,7 +30,7 @@ func GetNameServersFromResolveConfig(filePath string) ([]string, error) {
 	return nameservers, nil
 }
 
-//ParseNameServers parses an array of bytes and returns the nameservers
+// ParseNameServers parses an array of bytes and returns the nameservers
 // The content should be of format of /etc/resolv.conf i.e.
 // nameserver 12.0.0.3
 func ParseNameServers(fileContent []byte) []string {
@@ -38,12 +43,26 @@ func ParseNameServers(fileContent []byte) []string {
 			// Only check the content before the comment section
 			contentToParse = currentLine[:commentIndicatorIndex]
 		}
-		server := nameServerRegex.FindSubmatch([]byte(contentToParse))
 
+		server := nameServerRegex.FindSubmatch(contentToParse)
 		if len(server) == 2 {
-			nameservers = append(nameservers, string(server[1]))
+			address := string(server[1])
+			if net.ParseIP(address) != nil {
+				nameservers = append(nameservers, address)
+			}
 		}
 	}
 
 	return nameservers
+}
+
+// GetSystemResolvers returns resolvers discovered via
+// /etc/resolv.conf. If not valid resolvers are found, an empty array
+// is returned.
+func GetSystemResolvers() []string {
+	resolvers, err := GetNameServersFromResolveConfig(defaultResolvConf)
+	if err != nil {
+		return []string{}
+	}
+	return resolvers
 }
