@@ -76,7 +76,12 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   get domainY() {
     const min = 0;
-    const max = d3.max(this.trendData, (d: TrendData) => d3.max([d.failed, d.passed, d.skipped, d.waived]));
+    const max = d3.max(this.trendData, (d: TrendData) => d3.max([
+      d.failed,
+      d.passed, 
+      d.skipped, 
+      d.waived
+    ]));
     return [min, max];
   }
 
@@ -116,7 +121,12 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   get linesSelection() {
     return this.svgSelection.selectAll('.status-line')
-      .data(['skipped', 'passed', 'failed', 'waived'].map(status => ({ status, values: this.trendData })));
+      .data([
+        'skipped',
+        'passed',
+        'failed',
+        'waived'
+      ].map(status => ({ status, values: this.trendData })));
   }
 
   ngOnChanges() {
@@ -251,8 +261,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('r', d => {
         if (d.passed === d.skipped && d.passed === d.waived) { return 8; }
         if (d.passed === d.skipped || d.passed === d.waived) { return 6; }
-        return 4;  
-      })
+        return 4;
+      });
 
     update.select('.status-dot.skipped')
       .attr('r', d => d.skipped === d.waived ? 6 : 4);
