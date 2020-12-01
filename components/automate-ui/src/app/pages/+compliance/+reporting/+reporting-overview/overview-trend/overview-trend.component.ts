@@ -78,8 +78,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     const min = 0;
     const max = d3.max(this.trendData, (d: TrendData) => d3.max([
       d.failed,
-      d.passed, 
-      d.skipped, 
+      d.passed,
+      d.skipped,
       d.waived
     ]));
     return [min, max];
