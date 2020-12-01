@@ -119,7 +119,10 @@ steps:
     - echo "running in $(pwd)"
     - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
     - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
-    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID
+    - export SEMGREP_REPO_NAME=chef/automate
+    - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
+    - if [ -z "$BUILDKITE_PULL_REQUEST_BASE_BRANCH" ] ; then echo "manual build; using 'master' as base branch"; fi
+    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}
     timeout_in_minutes: 20
     expeditor:
       secrets: true
