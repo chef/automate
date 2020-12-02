@@ -10,7 +10,7 @@
         <chef-heading>Update cloud management service</chef-heading>
         <chef-subheading>Select a cloud management service and add your credentials for the account.</chef-subheading>
         <div slot="header-buttons">
-          <chef-button primary [disabled]="!integrationsForm.valid || isUpdating()" (click)="handleSave()">Save Integration</chef-button>
+          <chef-button primary [disabled]="!integrationsForm.valid || integrationsForm.pristine || isUpdating()" (click)="handleSave()">Save Integration</chef-button>
           <chef-button tertiary [routerLink]="['/settings/node-integrations']">Cancel</chef-button>
         </div>
       </chef-page-header>
@@ -18,7 +18,7 @@
       <div class="page-body">
         <chef-loading-spinner *ngIf="isUpdating()" size="50"></chef-loading-spinner>
 
-        <app-integrations-form [integrationsForm]="integrationsForm"></app-integrations-form>
+        <app-integrations-form [integrationsForm]="integrationsForm" [resetOrigin]="formLoaded"></app-integrations-form>
       </div>
 
     </main>

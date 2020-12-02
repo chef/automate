@@ -1,7 +1,7 @@
 <form [formGroup]="integrationsForm">
   <div class="integration-services form-field">
     <span class="label">Select a node management service</span>
-    <chef-phat-radio ngDefaultControl formControlName="type">
+    <chef-phat-radio ngDefaultControl formControlName="type" [resetOrigin]="resetOrigin">
       <chef-option value="aws"><img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws" />
       </chef-option>
       <chef-option value="azure"><img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure" />
@@ -15,7 +15,7 @@
 
     <label class="form-field">
       <span class="label">Name</span>
-      <input chefInput formControlName="name" />
+      <input chefInput formControlName="name" [resetOrigin]="resetOrigin"/>
     </label>
 
     <ng-container [ngSwitch]="integrationsForm.controls.type.value">
@@ -38,11 +38,11 @@
 
     <div *ngFor="let cred of instance_credentials.controls; let i=index" [formGroupName]="i" class="cred">
       <span>Where</span>
-      <input chefInput placeholder="Tag Key" formControlName="tag_key" />
-      <input chefInput placeholder="Value" formControlName="tag_value" />
+      <input chefInput placeholder="Tag Key" formControlName="tag_key" [resetOrigin]="resetOrigin"/>
+      <input chefInput placeholder="Value" formControlName="tag_value" [resetOrigin]="resetOrigin"/>
       <span>use</span>
 
-      <select multiple formControlName="credential_ids" class="credential-ids">
+      <select multiple formControlName="credential_ids" class="credential-ids" [resetOrigin]="resetOrigin">
         <option *ngFor="let credential of instanceCredentials$ | async" [value]="credential.id">
           {{ credential.name }}
         </option>

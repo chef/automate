@@ -18,6 +18,7 @@ export class IntegrationsFormComponent {
   instanceCredentials$: Observable<Credential[]>;
 
   @Input() integrationsForm: FormGroup;
+  @Input() resetOrigin = false;
 
   constructor(store: Store<NgrxStateAtom>,
     private fb: FormBuilder) {

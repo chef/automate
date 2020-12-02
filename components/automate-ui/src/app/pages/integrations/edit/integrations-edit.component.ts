@@ -34,6 +34,7 @@ export class IntegrationsEditComponent implements OnDestroy {
   managerID: string;
   credentialId: string;
   status = Status.notUpdated;
+  formLoaded = false;
 
   private subs: Subscription[];
 
@@ -102,6 +103,8 @@ export class IntegrationsEditComponent implements OnDestroy {
   }
 
   loadForm(state, fb) {
+    this.formLoaded = false;
+
     const name = get('name', state);
     const type = split('-', get('type', state))[0];
     const service_type = get('type', state);
@@ -125,6 +128,8 @@ export class IntegrationsEditComponent implements OnDestroy {
         no_creds
       }
     });
+
+    this.formLoaded = true;
   }
 
   isUpdating() {
