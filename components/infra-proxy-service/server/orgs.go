@@ -3,15 +3,13 @@ package server
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // CreateOrg creates a new org
@@ -19,29 +17,15 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply org ID")
-	}
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
 
-	if req.Name == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org name")
-		return nil, status.Error(codes.InvalidArgument, "must supply org name")
-	}
-
-	if req.AdminUser == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org admin user")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin user")
-	}
-
-	if req.AdminKey == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org admin key")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin key")
-	}
-
-	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete create org request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
+	if err != nil {
+		return nil, err
 	}
 
 	newSecret := &secrets.Secret{
@@ -72,8 +56,15 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.ServerId == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, req.ServerId)
@@ -91,8 +82,15 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply org ID")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	org, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
@@ -110,8 +108,15 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply org ID")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	org, err := s.service.Storage.DeleteOrg(ctx, req.Id, req.ServerId)
@@ -134,21 +139,15 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if req.Id == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply org ID")
-	}
-	if req.Name == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org name")
-		return nil, status.Error(codes.InvalidArgument, "must supply org name")
-	}
-	if req.AdminUser == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org admin user")
-		return nil, status.Error(codes.InvalidArgument, "must supply org admin user")
-	}
-	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete update org request: missing server ID")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
 	}
 
 	org, err := s.service.Storage.EditOrg(ctx, req.Id, req.Name, req.AdminUser, req.ServerId, req.Projects)
@@ -165,6 +164,17 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:          "org",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
 
 	org, err := s.service.Storage.GetOrg(ctx, req.Id, req.ServerId)
 	if err != nil {
