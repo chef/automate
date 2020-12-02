@@ -9,9 +9,6 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/api/v0/infra/version", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServers", "infra:infraServers", "infra:infraServers:list", "GET", "/api/v0/infra/servers", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
