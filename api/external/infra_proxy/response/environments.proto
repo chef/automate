@@ -29,3 +29,8 @@ message Environment {
     // Environment override attributes JSON.
     string override_attributes = 7;
 }
+
+message EnvironmentRecipesList {
+    // Recipes list.
+    repeated string name = 1;
+}

@@ -109,6 +109,23 @@ func (a *InfraProxyServer) UpdateEnvironment(ctx context.Context, r *gwreq.Updat
 	}, nil
 }
 
+// GetEnvironmentRecipes fetches an array of environment based recipes
+func (a *InfraProxyServer) GetEnvironmentRecipes(ctx context.Context, r *gwreq.Environment) (*gwres.EnvironmentRecipesList, error) {
+	req := &infra_req.Environment{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.GetEnvironmentRecipes(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.EnvironmentRecipesList{
+		Name: res.GetName(),
+	}, nil
+}
+
 func fromUpstreamEnvironments(environments []*infra_res.EnvironmentListItem) []*gwres.EnvironmentListItem {
 	ts := make([]*gwres.EnvironmentListItem, len(environments))
 

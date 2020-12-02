@@ -218,6 +218,33 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 	}, nil
 }
 
+// GetEnvironmentRecipes get environment based recipes list
+func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environment) (*response.EnvironmentRecipesList, error) {
+	err := validation.New(validation.Options{
+		Target:          "environment",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	recipes, err := c.client.Environments.ListRecipes(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.EnvironmentRecipesList{
+		Name: recipes,
+	}, nil
+}
+
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
 func fromAPIToListEnvironments(al chef.EnvironmentResult) []*response.EnvironmentListItem {
 	cl := make([]*response.EnvironmentListItem, len(al))
