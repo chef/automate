@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
 import { Subject, Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
@@ -14,7 +14,7 @@ const ENTITY_TYPE_TAG = 'event-type';
   styleUrls: ['./event-feed-table.component.scss']
 })
 
-export class EventFeedTableComponent implements OnDestroy, OnInit {
+export class EventFeedTableComponent implements OnDestroy {
   @Input() events: ChefEvent[];
   // The currently set collection of searchbar filters
   @Input() searchBarFilters: Chicklet[];
@@ -31,10 +31,6 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   constructor(
     private eventFeedService: EventFeedService
   ) { }
-
-  ngOnInit() {
-
-  }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);

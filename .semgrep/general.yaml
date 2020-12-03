@@ -13,3 +13,39 @@ rules:
   languages: [ts]
   severity: ERROR
   fix: return $EXPR;
+
+- id: cyclomatic-complexity-whole-element
+  pattern: |
+    for (const $ITEM of $COLLECTION) {
+      if ($EXPR) {
+        return $ITEM;
+      }
+    }
+    return $DEFAULT_EXPR;
+  message: lookup-with-default loop can be simplified with the find method
+  languages: [ts]
+  severity: ERROR
+  fix: |
+    const retval = $COLLECTION.find($ITEM => $EXPR);
+    return retval !== undefined ? retval : $DEFAULT_EXPR;
+  metadata: {
+    edge-case: supports all falsy values EXCEPT undefined
+  }
+
+- id: cyclomatic-complexity-element-field
+  pattern: |
+    for (const $ITEM of $COLLECTION) {
+      if ($EXPR) {
+        return $ITEM.$FIELD;
+      }
+    }
+    return $DEFAULT_EXPR;
+  message: lookup-field-with-default loop can be simplified with the find method
+  languages: [ts]
+  severity: ERROR
+  fix: |
+    const retval = $COLLECTION.find($ITEM => $EXPR);
+    return retval ? retval.$FIELD : $DEFAULT_EXPR;
+  metadata: {
+    edge-case: supports all falsy values
+  }

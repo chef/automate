@@ -14,6 +14,20 @@ rules:
     languages: [ts]
     severity: ERROR
 
+  - id: lifecycle-hook-not-used
+    patterns:
+    - pattern-either: 
+      - pattern: ngOnInit() { }
+      - pattern: ngOnDestroy() { }
+      - pattern: ngOnChanges() { }
+      - pattern: ngDoCheck() { }
+      - pattern: ngAfterContentInit() { }
+      - pattern: ngAfterContentChecked() { }
+      - pattern: ngAfterViewInit() { }
+      - pattern: ngAfterViewChecked() { }
+    message: lifecycle hook is not used; should be removed
+    languages: [ts]
+    severity: ERROR
 
   - id: isDestroyed-used-but-not-triggered
     patterns:
@@ -30,7 +44,7 @@ rules:
           }
           ...
         }
-    message: subscriptions never complete because isDestroyed never triggered from ngOnDestroy
+    message: subscription never completes because isDestroyed never triggered from ngOnDestroy
     languages: [ts]
     severity: ERROR
 
@@ -52,7 +66,7 @@ rules:
           }
           ...
         }
-    message: subscriptions never complete because they are not instrumented with takeUntil(this.isDestroyed)
+    message: subscription completion is not utilized with takeUntil(this.isDestroyed)
     metadata: {
       falseNegative: will not catch multiple subscriptions with takeUntil missing on some
       }
@@ -124,3 +138,13 @@ rules:
     message: subscriptions never complete because class does not implement OnDestroy Lifecycle hook
     languages: [ts]
     severity: ERROR
+
+  # TODO: cleanup results of this rule before activating it
+  # - id: subscription-lifecycle-not-managed
+  #   patterns:
+  #   - pattern: $EXPR.subscribe(...)
+  #   - pattern-not-inside: $EXPR2.pipe(..., takeUntil(...),...).subscribe(...)
+  #   - pattern-not-inside: $EXPR2.pipe(..., take(...),...).subscribe(...)
+  #   message: subscription lifecycle not managed: typically needs takeUntil(this.isDestroeyd)
+  #   languages: [ts]
+  #   severity: ERROR
