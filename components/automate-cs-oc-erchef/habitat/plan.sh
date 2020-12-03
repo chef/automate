@@ -4,10 +4,10 @@
 
 pkg_name="automate-cs-oc-erchef"
 pkg_description="Wrapper package for chef/oc_erchef"
-pkg_origin="chef"
+pkg_origin="prajaktapurohit"
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.0.25"
-vendor_origin="chef"
+pkg_version="14.0.40"
+vendor_origin="prajaktapurohit"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
@@ -16,7 +16,7 @@ pkg_deps=(
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/oc_erchef/14.0.25/20200828081545"
+  "${vendor_origin}/oc_erchef/14.0.40/20201203135658"
 )
 
 pkg_build_deps=(
