@@ -69,6 +69,7 @@ func (s *Server) GRPC(addr string) error {
 
 // GetUsers fetches hash of users, implemented without wrapping usersAPI struct
 func (s *Server) GetUsers(ctx context.Context, _ *local_user.GetUsersReq) (*local_user.Users, error) {
+    s.logger.Info("Hello World from go!")
 	us, err := s.users.GetUsers(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
