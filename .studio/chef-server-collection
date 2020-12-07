@@ -134,6 +134,27 @@ EOH
   berks upload -b ${chef_server_berksfile_path} -c ${chef_server_berksfile_config_path}
 }
 
+document "push_policy_update" <<DOC
+  Pushes a policyfile update to chef server with a cookbook. This also creates a policyfile update 
+  in the event feed. 
+DOC
+function push_example_policyfile() {
+  bootstrap_chef_user_data || return 1
+
+  pushd /tmp &> /dev/null
+
+  hab pkg install chef/chef-dk -bf
+  CHEF_LICENSE=accept-no-persist chef generate cookbook examplecb
+
+  cd examplecb
+
+  CHEF_LICENSE=accept-no-persist chef install
+
+  CHEF_LICENSE=accept-no-persist chef push test_policy_group -c ${chef_server_client_rb_path}
+
+  popd &> /dev/null
+}
+
 document "converge_chef_client" <<DOC
   Converges a test chef-client
 DOC
