@@ -1,8 +1,4 @@
-import { async,
-  ComponentFixtureAutoDetect,
-  ComponentFixture,
-  TestBed
-} from '@angular/core/testing';
+import { ComponentFixtureAutoDetect, ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { OrgDetailsComponent } from './org-details.component';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -20,7 +16,7 @@ describe('OrgDetailsComponent', () => {
   let component: OrgDetailsComponent;
   let fixture: ComponentFixture<OrgDetailsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),

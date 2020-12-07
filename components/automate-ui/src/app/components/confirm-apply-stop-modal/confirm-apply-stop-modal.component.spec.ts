@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { using } from 'app/testing/spec-helpers';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal.component';
 import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
@@ -8,7 +8,7 @@ describe('ConfirmApplyStopModalComponent', () => {
   let component: ConfirmApplyStopModalComponent;
   let fixture: ComponentFixture<ConfirmApplyStopModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [
