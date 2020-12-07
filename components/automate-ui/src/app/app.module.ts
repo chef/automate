@@ -347,6 +347,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     UserPermsRequests,
     UserRequests
   ],
+  bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
 
