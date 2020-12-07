@@ -16,14 +16,14 @@ import {
 } from './infra-nodes.actions';
 
 import {
-  NodeRequests
+  InfraNodeRequests
 } from './infra-nodes.requests';
 
 @Injectable()
 export class InfraNodeEffects {
   constructor(
     private actions$: Actions,
-    private requests: NodeRequests
+    private requests: InfraNodeRequests
   ) { }
 
   @Effect()

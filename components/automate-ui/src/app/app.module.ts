@@ -81,6 +81,7 @@ import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
 import { EnvironmentRequests } from './entities/environments/environment.requests';
+import { InfraNodeRequests } from './entities/infra-nodes/infra-nodes.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
@@ -313,6 +314,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
       useClass: HttpClientAuthInterceptor,
       multi: true
     },
+    InfraNodeRequests,
     InfraRoleRequests,
     JobRequests,
     LayoutSidebarService,

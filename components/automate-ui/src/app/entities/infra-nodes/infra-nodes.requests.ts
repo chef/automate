@@ -6,7 +6,7 @@ import { NodesSuccessPayload } from './infra-nodes.actions';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 @Injectable()
-export class NodeRequests {
+export class InfraNodeRequests {
 
   constructor(private http: HttpClient) { }
 
