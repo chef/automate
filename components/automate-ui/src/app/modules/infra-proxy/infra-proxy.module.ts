@@ -17,6 +17,7 @@ import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
+import { InfraNodesComponent } from './infra-nodes/infra-nodes.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.component';
@@ -43,6 +44,7 @@ import { EmptyStateComponent } from './empty-state/empty-state.component';
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
     JsonTreeTableComponent,
+    InfraNodesComponent,
     InfraRolesComponent,
     InfraRoleDetailsComponent,
     OrgDetailsComponent,

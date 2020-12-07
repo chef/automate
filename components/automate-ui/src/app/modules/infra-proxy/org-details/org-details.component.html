@@ -45,6 +45,9 @@
           <app-tab tabTitle="Policyfiles" #policyFiles_tab  [active]="policyFilesTab">
             <app-policy-files *ngIf="policyFiles_tab.active" [serverId]="serverId" [orgId]="orgId" (resetKeyRedirection)="resetAdminKeyRedirection($event)"></app-policy-files>
           </app-tab>
+          <app-tab tabTitle="Nodes" #nodes_tab  [active]="nodesTab">
+            <app-infra-nodes *ngIf="nodes_tab.active" [serverId]="serverId" [orgId]="orgId" (resetKeyRedirection)="resetAdminKeyRedirection($event)"></app-infra-nodes>
+          </app-tab>
           <app-tab tabTitle="Details" #details_tab [active]="false">
             <app-org-edit *ngIf="details_tab.active" [serverId]="serverId" [orgId]="orgId"></app-org-edit> 
           </app-tab>
