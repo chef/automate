@@ -4,6 +4,18 @@
 test_name="proxy"
 test_proxy="true"
 
+
+do_create_config() {
+    do_create_config_default
+    #shellcheck disable=SC2154
+    cat <<EOF >> "$test_config_path"
+[global.v1.proxy]
+host = "xyz.abc.com"
+port = 8080
+EOF
+}
+
+
 do_deploy() {
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \

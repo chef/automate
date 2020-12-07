@@ -172,9 +172,24 @@ func sanitizeEnv(env map[string]string) map[string]string {
 	return outEnv
 }
 
+// sets the proxy configurations if set in the environment (https_proxy and no_proxy)
+func setProxyEnv(env map[string]string) {
+	httpsProxyValue := os.Getenv("https_proxy")
+	if len(httpsProxyValue) == 0 {
+		env["https_proxy"] = httpsProxyValue
+	}
+	noProxyValue := os.Getenv("no_proxy")
+	if len(noProxyValue) == 0 {
+		env["no_proxy"] = noProxyValue
+	}
+	fmt.Println("updated env(s)", env)
+}
+
 func run(args []string, conf *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
+	setProxyEnv(env)
 
 	which, _ := exec.LookPath(args[0]) // nolint: errcheck
 	logrus.WithFields(logrus.Fields{
