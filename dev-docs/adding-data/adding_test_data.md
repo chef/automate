@@ -88,7 +88,7 @@ from hab studio:
 
 ensure you have `jq` installed
 
-there are three options...
+there are four options...
 1. `infra_service_load_sample_data`
     
     By default, 50 records of the infra servers and orgs will be added with the prefix `chef-server` and `chef-org` respectively.
@@ -105,6 +105,11 @@ there are three options...
     This will spin up the local chef infra server and it will add the data resides at [chef-repo](./infra/chef-repo) folder using `knife upload` method.
 
 ----------------------------------------------------------------------------------
+
+## Adding a policyfile node
+1. Ensure Chef Infra Server is running. If it is not start it with `start_chef_server`
+1. Then run `converge_policyfile_chef_client`
+
 # DELETING DATA
 
 to delete the postgres scanjobs data:
