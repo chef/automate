@@ -27,7 +27,6 @@ function set_up_chef_server_test_environment() {
   chef_server_first_boot_json_path="/tmp/.first_boot.json"
   chef_server_compliance_profiles_test_path="/hab/svc/compliance-service/data/profiles/test"
   chef_server_test_node_name="test-admin"
-  chef_server_policyfile_test_node_name="test-policyfile"
   chef_server_test_admin_user_name="test-admin"
   chef_server_test_admin_user_email="admin@test.com"
   chef_server_test_user_name="test-user"
@@ -77,7 +76,7 @@ EOH
   cat << EOH > ${chef_server_policyfile_rb_path}
 log_location           STDOUT
 chef_server_url        'https://${chef_server_hostname}/organizations/${chef_server_test_org_name}'
-node_name              '${chef_server_policyfile_test_node_name}'
+node_name              '${chef_server_test_node_name}'
 ssl_verify_mode        :verify_none
 client_key             '${chef_server_test_admin_key_path_path}'
 validation_client_name 'test-validator'
