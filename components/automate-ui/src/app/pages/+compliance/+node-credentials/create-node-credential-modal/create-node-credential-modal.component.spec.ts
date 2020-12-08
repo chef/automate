@@ -1,5 +1,5 @@
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -16,7 +16,7 @@ describe('CreateNodeCredentialModalComponent', () => {
   let fixture: ComponentFixture<CreateNodeCredentialModalComponent>;
   let component: CreateNodeCredentialModalComponent;
 
-  beforeEach(waitForAsync () => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         CreateNodeCredentialModalComponent,
@@ -39,7 +39,7 @@ describe('CreateNodeCredentialModalComponent', () => {
     }).compileComponents();
     store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNodeCredentialModalComponent);

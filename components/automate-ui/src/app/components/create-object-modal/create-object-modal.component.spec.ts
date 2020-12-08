@@ -1,6 +1,6 @@
 import { EventEmitter, SimpleChange } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -15,7 +15,7 @@ describe('CreateObjectModalComponent', () => {
   let component: CreateObjectModalComponent;
   let store: Store<NgrxStateAtom>;
 
-  beforeEach(waitForAsync () => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         CreateObjectModalComponent,
@@ -37,7 +37,7 @@ describe('CreateObjectModalComponent', () => {
       ]
     }).compileComponents();
     store = TestBed.inject(Store);
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateObjectModalComponent);
