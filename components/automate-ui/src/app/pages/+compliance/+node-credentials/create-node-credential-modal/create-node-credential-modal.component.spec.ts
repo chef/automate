@@ -16,7 +16,7 @@ describe('CreateNodeCredentialModalComponent', () => {
   let fixture: ComponentFixture<CreateNodeCredentialModalComponent>;
   let component: CreateNodeCredentialModalComponent;
 
-  beforeEach(async () => {
+  beforeEach(waitForAsync () => {
     TestBed.configureTestingModule({
       declarations: [
         CreateNodeCredentialModalComponent,

@@ -10,7 +10,7 @@ describe('CreateChefServerModalComponent', () => {
   let component: CreateDataFeedModalComponent;
   let fixture: ComponentFixture<CreateDataFeedModalComponent>;
 
-  beforeEach(async () => {
+  beforeEach(waitForAsync () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),

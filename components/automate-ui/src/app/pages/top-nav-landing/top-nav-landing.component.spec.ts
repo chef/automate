@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -30,7 +30,7 @@ describe('TopNavLandingComponent', () => {
   let fixture: ComponentFixture<TopNavLandingComponent>;
 
   describe('non Desktop view', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })
@@ -67,7 +67,7 @@ describe('TopNavLandingComponent', () => {
   });
 
   describe('Desktop view', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           StoreModule.forRoot(ngrxReducers, { runtimeChecks })

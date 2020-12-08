@@ -1,12 +1,12 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal.component';
 
 describe('ConfirmApplyStartModalComponent', () => {
   let component: ConfirmApplyStartModalComponent;
   let fixture: ComponentFixture<ConfirmApplyStartModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [
@@ -40,7 +40,7 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when confirm-button is clicked', () => {
-    it('emits a confirm event', async () => {
+    it('emits a confirm event', waitForAsync () => {
       spyOn(component.confirm, 'emit');
 
       const button = fixture.nativeElement.querySelector('#confirm-button');
@@ -57,7 +57,7 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when cancel-button is clicked', () => {
-    it('emits a cancel event', async () => {
+    it('emits a cancel event', waitForAsync () => {
       spyOn(component.cancel, 'emit');
 
       const button = fixture.nativeElement.querySelector('#cancel-button');

@@ -1,4 +1,4 @@
-import { async,
+import { waitForAsync,
   ComponentFixtureAutoDetect,
   ComponentFixture,
   TestBed
@@ -20,7 +20,7 @@ describe('OrgDetailsComponent', () => {
   let component: OrgDetailsComponent;
   let fixture: ComponentFixture<OrgDetailsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),

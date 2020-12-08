@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { MockComponent } from 'ng2-mock-component';
@@ -16,7 +16,7 @@ describe('NodeCredentialListComponent', () => {
   let component: NodeCredentialListComponent;
   let fixture: ComponentFixture<NodeCredentialListComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),

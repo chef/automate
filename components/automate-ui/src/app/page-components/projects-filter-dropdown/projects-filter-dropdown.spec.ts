@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { using } from 'app/testing/spec-helpers';
@@ -9,7 +9,7 @@ describe('ProjectsFilterDropdownComponent', () => {
   let component: ProjectsFilterDropdownComponent;
   let fixture: ComponentFixture<ProjectsFilterDropdownComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [

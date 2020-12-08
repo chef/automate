@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ChefStatusIconPipe } from '../../pipes/chef-status-icon.pipe';
 import { NodeRollupComponent } from './node-rollup.component';
@@ -7,7 +7,7 @@ describe('NodeRollupComponent', () => {
   let component: NodeRollupComponent;
   let fixture: ComponentFixture<NodeRollupComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         ChefStatusIconPipe,

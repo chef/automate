@@ -1,6 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { MessageModalComponent } from './message-modal.component';
 
@@ -26,7 +26,7 @@ describe('HostedMessageModalComponent', () => {
   let modalComponent: MessageModalComponent;
   let modalElement: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TestHostComponent, MessageModalComponent ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
@@ -74,7 +74,7 @@ describe('HostedMessageModalComponent', () => {
     expect(modalComponent.visible).toBe(false);
   });
 
-  it('should be hidden when selecting close (by DOM)', async () => {
+  it('should be hidden when selecting close (by DOM)', waitForAsync () => {
     modalComponent.visible = true;
     await fixture.nativeElement.querySelector('chef-button').click();
     fixture.detectChanges();
@@ -87,7 +87,7 @@ describe('MessageModalComponent', () => {
   let component: MessageModalComponent;
   let fixture: ComponentFixture<MessageModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MessageModalComponent,

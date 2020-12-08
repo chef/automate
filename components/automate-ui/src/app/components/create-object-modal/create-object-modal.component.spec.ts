@@ -15,7 +15,7 @@ describe('CreateObjectModalComponent', () => {
   let component: CreateObjectModalComponent;
   let store: Store<NgrxStateAtom>;
 
-  beforeEach(async () => {
+  beforeEach(waitForAsync () => {
     TestBed.configureTestingModule({
       declarations: [
         CreateObjectModalComponent,

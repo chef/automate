@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { TelemetryCheckboxComponent } from './telemetry-checkbox.component';
@@ -31,7 +31,7 @@ describe('TelemetryCheckboxComponent when telemetry enabled', () => {
   let fixture: ComponentFixture<TelemetryCheckboxComponent>;
   let element;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         TelemetryCheckboxComponent
@@ -78,7 +78,7 @@ describe('TelemetryCheckboxComponent when telemetry disabled', () => {
   let component: TelemetryCheckboxComponent;
   let fixture: ComponentFixture<TelemetryCheckboxComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         TelemetryCheckboxComponent

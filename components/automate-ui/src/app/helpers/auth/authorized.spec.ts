@@ -1,4 +1,4 @@
-import { async, TestBed } from '@angular/core/testing';
+import { waitForAsync, TestBed } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { concat } from 'lodash/fp';
 import * as faker from 'faker';
@@ -16,7 +16,7 @@ describe('AuthorizedComponent setPermissions', () => {
   let authorizedChecker: AuthorizedChecker;
   let dispatchSpy: jasmine.Spy;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot({
@@ -225,7 +225,7 @@ describe('AuthorizedComponent real round trip', () => {
   let authorizedChecker: AuthorizedChecker;
   let visible: boolean;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot({
@@ -317,7 +317,7 @@ describe('AuthorizedComponent real round trip', () => {
 describe('AuthorizedComponent evalPerms', () => {
   let ac: AuthorizedChecker;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot({

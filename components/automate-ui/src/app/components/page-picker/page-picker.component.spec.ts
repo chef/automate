@@ -12,7 +12,7 @@ describe('PagePickerComponent', () => {
   let store: Store<NgrxStateAtom>;
   const MockSelectionEvent: MatOptionSelectionChange = { isUserInput: true, source: null };
 
-  beforeEach(async() => {
+  beforeEach(waitForAsync() => {
     TestBed.configureTestingModule({
       declarations: [ PagePickerComponent ],
       imports: [ StoreModule.forRoot(ngrxReducers, { runtimeChecks })],

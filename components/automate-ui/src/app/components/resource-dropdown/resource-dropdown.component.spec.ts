@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter, SimpleChange } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
 import { using } from 'app/testing/spec-helpers';
@@ -12,7 +12,7 @@ describe('ResourceDropdownComponent', () => {
   let component: ResourceDropdownComponent;
   let fixture: ComponentFixture<ResourceDropdownComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResourceDropdownComponent],
       imports: [ChefPipesModule, FormsModule],

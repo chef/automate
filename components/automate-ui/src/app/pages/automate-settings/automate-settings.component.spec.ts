@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -64,7 +64,7 @@ describe('AutomateSettingsComponent', () => {
   let fixture: ComponentFixture<AutomateSettingsComponent>;
 
   describe('Desktop view', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           FormsModule,
@@ -119,7 +119,7 @@ describe('AutomateSettingsComponent', () => {
   });
 
   describe('non Desktop view', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           FormsModule,
