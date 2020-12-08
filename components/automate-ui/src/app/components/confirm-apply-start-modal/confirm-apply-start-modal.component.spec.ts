@@ -40,7 +40,7 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when confirm-button is clicked', () => {
-    it('emits a confirm event', waitForAsync () => {
+    it('emits a confirm event', async() => {
       spyOn(component.confirm, 'emit');
 
       const button = fixture.nativeElement.querySelector('#confirm-button');
@@ -57,7 +57,7 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when cancel-button is clicked', () => {
-    it('emits a cancel event', waitForAsync () => {
+    it('emits a cancel event', async() => {
       spyOn(component.cancel, 'emit');
 
       const button = fixture.nativeElement.querySelector('#cancel-button');
