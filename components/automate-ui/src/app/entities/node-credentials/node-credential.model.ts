@@ -1,3 +1,4 @@
+import { Injectable } from "@angular/core";
 export interface KVData {
   key?: string;
   value?: string;
@@ -37,6 +38,7 @@ export interface NodeObject {
   sudo: {password: string, options: string};
 }
 
+@Injectable()
 export class SaveNodeCredential {
 
   getNodeCredentialCreate(data: NodeObject): NodeCredential {
