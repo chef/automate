@@ -19,6 +19,7 @@ function set_up_chef_server_test_environment() {
   chef_server_pivotal_key_path="/hab/svc/automate-cs-oc-erchef/data/pivotal.pem"
   chef_server_pivotal_rb_path="/tmp/.pivotal.rb"
   chef_server_client_rb_path="/tmp/.client.rb"
+  chef_server_policyfile_rb_path="/tmp/.policyfile.rb"
   chef_server_test_admin_key_path_path="/tmp/.admin_key.pem"
   chef_server_berksfile_path="/tmp/.Berksfile"
   chef_server_berksfile_config_path="/tmp/.berks.config.json"
@@ -26,6 +27,7 @@ function set_up_chef_server_test_environment() {
   chef_server_first_boot_json_path="/tmp/.first_boot.json"
   chef_server_compliance_profiles_test_path="/hab/svc/compliance-service/data/profiles/test"
   chef_server_test_node_name="test-admin"
+  chef_server_policyfile_test_node_name="test-policyfile"
   chef_server_test_admin_user_name="test-admin"
   chef_server_test_admin_user_email="admin@test.com"
   chef_server_test_user_name="test-user"
@@ -70,6 +72,19 @@ ssl_verify_mode        :verify_none
 client_key             '${chef_server_test_admin_key_path_path}'
 validation_client_name 'test-validator'
 validation_key         '${chef_server_test_validator_path}'
+EOH
+
+  cat << EOH > ${chef_server_policyfile_rb_path}
+log_location           STDOUT
+chef_server_url        'https://${chef_server_hostname}/organizations/${chef_server_test_org_name}'
+node_name              '${chef_server_policyfile_test_node_name}'
+ssl_verify_mode        :verify_none
+client_key             '${chef_server_test_admin_key_path_path}'
+validation_client_name 'test-validator'
+validation_key         '${chef_server_test_validator_path}'
+policy_group           'test_policy_group'
+policy_name            'examplecb'
+use_policyfile         true
 EOH
 
   cat << EOH > ${chef_server_berksfile_config_path}
@@ -141,18 +156,27 @@ DOC
 function push_example_policyfile() {
   bootstrap_chef_user_data || return 1
 
-  pushd /tmp &> /dev/null
+  pushd /tmp &> /dev/null || exit
 
   hab pkg install chef/chef-dk -bf
   CHEF_LICENSE=accept-no-persist chef generate cookbook examplecb
 
-  cd examplecb
+  cd examplecb || exit
 
   CHEF_LICENSE=accept-no-persist chef install
 
-  CHEF_LICENSE=accept-no-persist chef push test_policy_group -c ${chef_server_client_rb_path}
+  CHEF_LICENSE=accept-no-persist chef push test_policy_group -c ${chef_server_policyfile_rb_path}
 
-  popd &> /dev/null
+  popd &> /dev/null || exit
+}
+
+document "converge_policyfile_chef_client" <<DOC
+  Converges a test chef-client with a policyfile
+DOC
+function converge_policyfile_chef_client() {
+  push_example_policyfile || return 1
+
+  CHEF_LICENSE=accept-no-persist chef-client -c ${chef_server_policyfile_rb_path}
 }
 
 document "converge_chef_client" <<DOC
