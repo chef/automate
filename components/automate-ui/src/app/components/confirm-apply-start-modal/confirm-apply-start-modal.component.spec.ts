@@ -40,14 +40,14 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when confirm-button is clicked', () => {
-    it('emits a confirm event', async() => {
+    it('emits a confirm event', waitForAsync(() => {
       spyOn(component.confirm, 'emit');
 
       const button = fixture.nativeElement.querySelector('#confirm-button');
-      await button.click();
+      button.click();
 
       expect(component.confirm.emit).toHaveBeenCalled();
-    });
+    }));
   });
 
   it('displays a cancel-button', () => {
@@ -57,13 +57,13 @@ describe('ConfirmApplyStartModalComponent', () => {
   });
 
   describe('when cancel-button is clicked', () => {
-    it('emits a cancel event', async() => {
+    it('emits a cancel event', waitForAsync(() => {
       spyOn(component.cancel, 'emit');
 
       const button = fixture.nativeElement.querySelector('#cancel-button');
-      await button.click();
+      button.click();
 
       expect(component.cancel.emit).toHaveBeenCalled();
-    });
+    }));
   });
 });

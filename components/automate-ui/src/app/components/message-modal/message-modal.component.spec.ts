@@ -74,12 +74,12 @@ describe('HostedMessageModalComponent', () => {
     expect(modalComponent.visible).toBe(false);
   });
 
-  it('should be hidden when selecting close (by DOM)', async() => {
+  it('should be hidden when selecting close (by DOM)', waitForAsync(() => {
     modalComponent.visible = true;
-    await fixture.nativeElement.querySelector('chef-button').click();
+    fixture.nativeElement.querySelector('chef-button').click();
     fixture.detectChanges();
     expect(modalComponent.visible).toBe(false);
-  });
+  }));
 });
 
 describe('MessageModalComponent', () => {
