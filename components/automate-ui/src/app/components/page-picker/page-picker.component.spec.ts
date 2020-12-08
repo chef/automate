@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { PagePickerComponent } from './page-picker.component';
@@ -12,14 +12,14 @@ describe('PagePickerComponent', () => {
   let store: Store<NgrxStateAtom>;
   const MockSelectionEvent: MatOptionSelectionChange = { isUserInput: true, source: null };
 
-  beforeEach(waitForAsync() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ PagePickerComponent ],
       imports: [ StoreModule.forRoot(ngrxReducers, { runtimeChecks })],
       providers: [],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     store = TestBed.inject(Store);
