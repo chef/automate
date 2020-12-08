@@ -17,7 +17,7 @@ describe('CreateNodeCredentialModalComponent', () => {
   let fixture: ComponentFixture<CreateNodeCredentialModalComponent>;
   let component: CreateNodeCredentialModalComponent;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         CreateNodeCredentialModalComponent,
@@ -42,16 +42,16 @@ describe('CreateNodeCredentialModalComponent', () => {
     spyOn(store, 'dispatch').and.callThrough();
   }));
 
-  beforeEach(() => {
+  beforeEach( () => {
     fixture = TestBed.createComponent(CreateNodeCredentialModalComponent);
     component = fixture.componentInstance;
     component.createNodeCredForm = new FormBuilder().group({
       id: [''],
       name: [''],
       type: [''],
-      ssh: this.sshForms,
-      winrm: this.winrmForms,
-      sudo: this.sudoForms
+      ssh: component.sshForms,
+      winrm: component.winrmForms,
+      sudo: component.sudoForms
     });
   });
 
@@ -79,23 +79,29 @@ describe('CreateNodeCredentialModalComponent', () => {
       }]
     };
 
-  it('closes create modal resets id, name, type, last_modified,tags and data to empty string',
+  it('closes create modal resets all values to empty strings',
     () => {
       expect(component.creatingUser).toBe(false);
       expect(component.createNodeCredForm.controls['id'].value).toEqual('');
       expect(component.createNodeCredForm.controls['name'].value).toEqual('');
       expect(component.createNodeCredForm.controls['type'].value).toEqual('');
-      expect(component.createNodeCredForm.controls['ssh'].value).toEqual(null);
-      expect(component.createNodeCredForm.controls['winrm'].value).toEqual(null);
-      expect(component.createNodeCredForm.controls['sudo'].value).toEqual(null);
+      expect(component.createNodeCredForm.controls['ssh'].value)
+        .toEqual({username: '', password: '', key: ''});
+      expect(component.createNodeCredForm.controls['winrm'].value).toEqual({ username: '', password: ''});
+      expect(component.createNodeCredForm.controls['sudo'].value).toEqual({ password: '', options: '' });
     });
 
   // looking for a solution for ths test case.
-  xit('on conflict error, modal remains open and displays conflict error', () => {
+  it('on conflict error, modal remains open and displays conflict error', () => {
     component.createNodeCredForm.controls['id'].setValue(nodeCredential.id);
     component.createNodeCredForm.controls['name'].setValue(nodeCredential.name);
     component.createNodeCredForm.controls['type'].setValue(nodeCredential.type);
-    component.createNodeCredForm.controls.ssh.setValue(nodeCredential.data[0]);
+    component.createNodeCredForm.controls.ssh.setValue({
+      username: nodeCredential.data[0].value,
+      password: nodeCredential.data[1].value,
+      key: nodeCredential.data[2].value
+    });
+
 
     component.createUser();
 
@@ -112,7 +118,11 @@ describe('CreateNodeCredentialModalComponent', () => {
     component.createNodeCredForm.controls['id'].setValue(nodeCredential.id);
     component.createNodeCredForm.controls['name'].setValue(nodeCredential.name);
     component.createNodeCredForm.controls['type'].setValue(nodeCredential.type);
-    component.createNodeCredForm.controls.ssh.setValue(nodeCredential.data[0]);
+    component.createNodeCredForm.controls.ssh.setValue({
+      username: nodeCredential.data[0].value,
+      password: nodeCredential.data[1].value,
+      key: nodeCredential.data[2].value
+    });
 
     component.createUser();
 
@@ -126,7 +136,12 @@ describe('CreateNodeCredentialModalComponent', () => {
     component.createNodeCredForm.controls['id'].setValue(nodeCredential.id);
     component.createNodeCredForm.controls['name'].setValue(nodeCredential.name);
     component.createNodeCredForm.controls['type'].setValue(nodeCredential.type);
-    component.createNodeCredForm.controls.ssh.setValue(nodeCredential.data[0]);
+    component.createNodeCredForm.controls.ssh.setValue({
+      username: nodeCredential.data[0].value,
+      password: nodeCredential.data[1].value,
+      key: nodeCredential.data[2].value
+    });
+
     component.createUser();
 
     const error = <HttpErrorResponse>{
