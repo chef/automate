@@ -193,6 +193,28 @@ describe('EventFeedTableComponent', () => {
       expect(label).toEqual(
         'Cookbooks <b>nginx</b>, version <b>1.2.3</b> deleted by <b>requestor_name</b>');
     });
+
+    it('cookbook_artifact_version event type', () => {
+      const event = new ChefEvent({
+        event_type: 'cookbook_artifact_version',
+        task: 'update',
+        start_time: new Date(1566457200000),
+        entity_name: 'ed458ff53f19c306484cb1f23e6d76f937a32ad6',
+        requestor_type: 'user',
+        requestor_name: 'delivery',
+        service_hostname: 'chef-server.chef.co',
+        parent_name: 'rabbitmq',
+        parent_type: 'cookbook_artifact',
+        event_count: 1,
+        end_time: new Date(1566975540000),
+        end_id: 'bd76527e-39a7-11eb-adc1-0242ac120002',
+        start_id: 'bd76527e-39a7-11eb-adc1-0242ac120002'
+      });
+
+      const label = component.getEventDescription(event);
+      expect(label).toEqual(
+        'Cookbook <b>rabbitmq</b>, version <b>ed458ff53f19c306484cb1f23e6d76f937a32ad6</b> updated by <b>delivery</b>');
+    });
   });
 
   describe('getEventGroupText', () => {

@@ -151,6 +151,9 @@ export class EventFeedTableComponent implements OnDestroy {
         break;
       // TODO @afiune format other event types like a data bag item
       // case 'item':
+      case 'cookbook_artifact_version':
+        text += `<b>${event.parentName}</b>, version <b>${event.entityName}</b>`;
+        break;
       default:
         text += `<b>${event.entityName}</b>`;
     }
@@ -174,6 +177,8 @@ export class EventFeedTableComponent implements OnDestroy {
         return `${event.parentName}: v${event.entityName}`;
       // TODO @afiune format other event types like a data bag item
       // case 'item':
+      case 'cookbook_artifact_version':
+        return `${event.parentName}: v${event.entityName}`;
       default:
         return event.entityName;
     }
