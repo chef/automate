@@ -10,11 +10,8 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
-
-jdomain_version="1.1.5"
-jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
-jdomain_source="https://github.com/nicholaschiasson/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
-jdomain_shasum=e7346dac41d473ea02995b7626bd0660115538c2c784dfe683e235c58dbc2c2c
+jdomain_branch="kallol/set_max_tries_for_instances"
+jdomain_source="https://github.com/chef/ngx_upstream_jdomain.git"
 
 nginx_version="1.19.2"
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
@@ -55,6 +52,7 @@ pkg_deps=(
 
 pkg_build_deps=(
   core/gcc
+  core/git
   core/make
   core/coreutils
 )
@@ -77,9 +75,9 @@ pkg_exposes=(http-port)
 do_download() {
   do_default_download
   pushd "${HAB_CACHE_SRC_PATH}" || return 1
-  download_file "${jdomain_source}" "${jdomain_filename}" "${jdomain_shasum}"
 
-  tar zxvf ${jdomain_filename}
+  git clone --depth 1 "$jdomain_source" --branch "$jdomain_branch" --single-branch
+
   popd || return 1
 }
 
@@ -120,7 +118,7 @@ do_build() {
     --with-http_slice_module \
     --with-cc-opt="${CFLAGS}" \
     --with-ld-opt="${LDFLAGS}" \
-    --add-module=${HAB_CACHE_SRC_PATH}/ngx_upstream_jdomain-${jdomain_version}
+    --add-module=${HAB_CACHE_SRC_PATH}/ngx_upstream_jdomain
 
   make
 }
