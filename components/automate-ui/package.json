@@ -52,7 +52,7 @@
     "immutable": "^3.8.2",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.20",
-    "moment": "^2.25.1",
+    "moment": "^2.29.1",
     "ngx-cookie": "^4.1.2",
     "path": "^0.12.7",
     "process": "^0.11.10",
