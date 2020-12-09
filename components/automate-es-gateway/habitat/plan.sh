@@ -76,6 +76,7 @@ do_download() {
   do_default_download
   pushd "${HAB_CACHE_SRC_PATH}" || return 1
 
+  rm -rf ngx_upstream_jdomain
   git clone --depth 1 "$jdomain_source" --branch "$jdomain_branch" --single-branch
 
   popd || return 1
