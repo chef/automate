@@ -148,7 +148,7 @@ EOH
   berks upload -b ${chef_server_berksfile_path} -c ${chef_server_berksfile_config_path}
 }
 
-document "push_policy_update" <<DOC
+document "push_example_policyfile" <<DOC
   Pushes a policyfile update to chef server with a cookbook. This also creates a policyfile update 
   in the event feed. 
 DOC
