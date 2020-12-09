@@ -12,6 +12,15 @@ message Nodes {
     string server_id = 2;
 }
 
+message Node {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Node name.
+    string name = 3;
+}
+
 message AffectedNodes {
     // Chef organization ID.
     string org_id = 1;

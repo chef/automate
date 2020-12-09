@@ -43,3 +43,28 @@ message UpdateNode {
     // Node name.
     string name = 1;
 }
+
+message Node {
+    // Node ID.
+    string node_id = 1;
+    // Node name.
+    string name = 2;
+    // Node environment.
+    string environment = 3;
+    // Node policy name.
+    string policy_name = 4;
+    // Node policy group.
+    string policy_group = 5;
+    // Node run-list.
+    repeated string run_list = 6;
+    // Node tags.
+    repeated string tags = 7;
+    // Node automatic attributes JSON.
+    string automatic_attributes = 8;
+    // Node default attributes JSON.
+    string default_attributes = 9;
+    // Node normal attributes JSON.
+    string normal_attributes = 10;
+    // Node override attributes JSON.
+    string override_attributes = 11;
+}

@@ -63,6 +63,33 @@ func (a *InfraProxyServer) DeleteNode(ctx context.Context, r *gwreq.DeleteNode) 
 	}, nil
 }
 
+// GetNode get the node
+func (a *InfraProxyServer) GetNode(ctx context.Context, r *gwreq.Node) (*gwres.Node, error) {
+	req := &infra_req.Node{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.GetNode(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Node{
+		NodeId:              res.GetNodeId(),
+		Name:                res.GetName(),
+		Environment:         res.GetEnvironment(),
+		RunList:             res.GetRunList(),
+		Tags:                res.GetTags(),
+		AutomaticAttributes: res.GetAutomaticAttributes(),
+		DefaultAttributes:   res.GetDefaultAttributes(),
+		NormalAttributes:    res.GetNormalAttributes(),
+		OverrideAttributes:  res.GetOverrideAttributes(),
+		PolicyName:          res.GetPolicyName(),
+		PolicyGroup:         res.GetPolicyGroup(),
+	}, nil
+}
+
 // UpdateNode updates the node attributes
 func (a *InfraProxyServer) UpdateNode(ctx context.Context, r *gwreq.UpdateNode) (*gwres.UpdateNode, error) {
 	req := &infra_req.UpdateNode{

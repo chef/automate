@@ -1292,6 +1292,49 @@
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
+      "get": {
+        "operationId": "InfraProxy_GetNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Node"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
       "delete": {
         "operationId": "InfraProxy_DeleteNode",
         "responses": {
@@ -2671,6 +2714,61 @@
             "type": "string"
           },
           "description": "Run list associated with the policy."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Node": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "Node ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Node environment."
+        },
+        "policy_name": {
+          "type": "string",
+          "description": "Node policy name."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Node policy group."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node run-list."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node tags."
+        },
+        "automatic_attributes": {
+          "type": "string",
+          "description": "Node automatic attributes JSON."
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Node default attributes JSON."
+        },
+        "normal_attributes": {
+          "type": "string",
+          "description": "Node normal attributes JSON."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Node override attributes JSON."
         }
       }
     },
