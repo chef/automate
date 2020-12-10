@@ -8,6 +8,7 @@ import (
 	"io"
 	sorter "sort"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,7 +21,6 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -304,6 +304,8 @@ func getExportHandler(format string, stream reporting.ReportingService_ExportSer
 		return jsonExport(stream), nil
 	case "csv":
 		return csvExport(stream), nil
+	case "xml":
+		return xmlExport(stream), nil
 	default:
 		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(format+" export is not supported"))
 	}
@@ -315,6 +317,34 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		raw, err := json.Marshal(data)
 		if err != nil {
 			return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+		}
+
+		if initialRun {
+			initialRun = false
+		} else {
+			raw = append([]byte(","), raw...)
+		}
+		reader := bytes.NewReader(raw)
+		buf := make([]byte, streamBufferSize)
+
+		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
+			return stream.Send(&reporting.ExportData{Content: p})
+		})
+		_, err = io.CopyBuffer(writer, reader, buf)
+		if err != nil {
+			return fmt.Errorf("Failed to export JSON: %+v", err)
+		}
+
+		return nil
+	}
+}
+
+func xmlExport(stream reporting.ReportingService_ExportServer) exportHandler {
+	initialRun := true
+	return func(data *reporting.Report) error {
+		raw, err := util.ReportToXML(data)
+		if err != nil {
+			return fmt.Errorf("Failed to marshal XML export data: %+v", err)
 		}
 
 		if initialRun {
@@ -410,8 +440,8 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 func (srv *Server) ReadNode(ctx context.Context, in *reporting.Id) (*reporting.Node, error) {
 	formattedFilters := formatFilters([]*reporting.ListFilter{})
 	// This method takes no filters, setting the widest start->end time range to find this node
-	formattedFilters["start_time"] = []string{ "2017-01-01T00:00:00Z" }
-	formattedFilters["end_time"] = []string{	time.Now().UTC().Format(time.RFC3339) }
+	formattedFilters["start_time"] = []string{"2017-01-01T00:00:00Z"}
+	formattedFilters["end_time"] = []string{time.Now().UTC().Format(time.RFC3339)}
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
