@@ -22,7 +22,7 @@ pkg_deps=(
   core/ruby27
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/14.15.10/20220516084446"
-  "${vendor_origin}/chef-server-ctl/14.15.10/20220516082536"
+  "prajaktapurohit/chef-server-ctl/14.15.10/20220516082536"
 )
 
 pkg_bin_dirs=(bin)
@@ -65,7 +65,7 @@ chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
   GO_LDFLAGS="-X main.RubyPath=$(pkg_path_for core/ruby27)"
-  GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
+  GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for prajaktapurohit/chef-server-ctl)"
   GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
   GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
   export GO_LDFLAGS
@@ -79,6 +79,6 @@ do_install() {
   wrapper_bin_path="${pkg_prefix}/bin"
   install "$PLAN_CONTEXT/bin/knife" "$wrapper_bin_path/knife"
 
-  sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for chef/chef-server-ctl)!g" "$wrapper_bin_path/knife"
+  sed -i "s!__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__!$(pkg_path_for prajaktapurohit/chef-server-ctl)!g" "$wrapper_bin_path/knife"
   sed -i "s!__BUILDTIME_HAB_PKG_PATH_RUBY__!$(pkg_path_for core/ruby27)!g" "$wrapper_bin_path/knife"
 }
