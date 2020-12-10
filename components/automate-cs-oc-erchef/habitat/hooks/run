@@ -24,8 +24,8 @@ render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
 pg-helper rename-if-exists opscode_chef "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "prajaktapurohit/oc_erchef"}}/schema/baseline"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "prajaktapurohit/oc_erchef"}}/schema/"
 pg-helper fix-permissions "$DBNAME"
 
 # chef_server_data_bootstrap relies on the webui keys so create that first
@@ -41,15 +41,15 @@ cd {{pkg.path}} || exit
 exec 0<&-
 
 source "{{pkg.svc_var_path}}/etc/pg.env"
-HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
+HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "prajaktapurohit/oc_erchef"}}/Gemfile" \
   secrets-helper exec --secret oc_bifrost.superuser_id -- \
     bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
 
 # ruby vars are needed in order to make depselector start up
 export PATH={{pkgPathFor "core/ruby26"}}/bin:${PATH}
 export LD_LIBRARY_PATH={{pkgPathFor "core/libffi"}}/lib:${LD_LIBRARY_PATH}
-export GEM_HOME={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
-export GEM_PATH={{pkgPathFor "core/oc_erchef"}}/vendor/bundle
+export GEM_HOME={{pkgPathFor "prajaktapurohit/oc_erchef"}}/vendor/bundle
+export GEM_PATH={{pkgPathFor "prajaktapurohit/oc_erchef"}}/vendor/bundle
 
 # non root svc user and we need write access to the file
 cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}

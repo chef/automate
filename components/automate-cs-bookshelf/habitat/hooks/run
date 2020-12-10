@@ -18,7 +18,7 @@ render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
 pg-helper rename-if-exists bookshelf "$DBNAME"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper create-extension "$DBNAME" "uuid-ossp"
-pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/bookshelf"}}/schema"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "prajaktapurohit/bookshelf"}}/schema"
 pg-helper fix-permissions "$DBNAME"
 
 secrets-helper generate bookshelf.access_key_id 16 --if-not-exists
