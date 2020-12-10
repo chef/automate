@@ -8,7 +8,7 @@ port = 10201
 listen_ip="0.0.0.0"
 
 [log]
-level="info"
+level="debug"
 rotation_max_bytes = 104857600
 rotation_max_files = 10
 max_error_logs_per_second = 1000
