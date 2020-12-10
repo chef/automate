@@ -89,6 +89,7 @@ external/secrets/secrets_*
 external/common/
 
 backups
+logs
 
 # never ignore anything below protovendor/
 !/protovendor/**
