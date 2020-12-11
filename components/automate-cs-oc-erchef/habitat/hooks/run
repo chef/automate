@@ -49,7 +49,7 @@ HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gem
 export PATH={{pkgPathFor "core/ruby26"}}/bin:${PATH}
 export LD_LIBRARY_PATH={{pkgPathFor "core/libffi"}}/lib:${LD_LIBRARY_PATH}
 export GEM_HOME={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
-export GEM_PATH={{pkgPathFor "core/oc_erchef"}}/vendor/bundle
+export GEM_PATH={{pkgPathFor "chef/oc_erchef"}}/vendor/bundle
 
 # non root svc user and we need write access to the file
 cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
