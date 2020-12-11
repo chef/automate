@@ -54,9 +54,6 @@ generate_swagger: $(SWAGGER_RESULT_FILE)
 		jq -es 'if . == [] then null else .[] | .paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) ) end' \
 		> $(SWAGGER_RESULT_FILE)
 
-lint: assets
-	hugo -D
-
 # Consult scripts/spellcheck.sh in the root Automate directory for notes on using cspell.
 # This does files in docs-chef-io plus exposed proto files.
 spellcheck:
