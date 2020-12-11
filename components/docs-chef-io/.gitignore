@@ -1,11 +1,1 @@
-# Cypress
-cypress.json
-cypress/
-
-# Node
-package.json
-
-public/
-/resources/
-.DS_Store
-/.vscode
+chef-web-docs/

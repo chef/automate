@@ -15,7 +15,6 @@ steps:
   - label: lint hugo site
     command:
       - .expeditor/buildkite/hugo_lint.sh
-      - cd components/docs-chef-io && make lint
     timeout_in_minutes: 10
     retry:
       automatic:
