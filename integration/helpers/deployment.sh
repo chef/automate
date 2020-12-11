@@ -76,6 +76,9 @@ wait_for_upgrade() {
             0)
                 :
                 ;;
+            90)
+                log_warning "File access error for chef-automate upgrade status: likely cause deploymet-service certificate regen"
+                ;;
             98|99)
                 log_warning "Error calling deployment service"
                 ;;
