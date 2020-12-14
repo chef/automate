@@ -164,6 +164,11 @@ describe('Admin pages', () => {
             expect(name.getText()).toBe('Administrator All Access');
           });
 
+        waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)')
+          .then((id) => {
+            expect(id.getText()).toBe('chef-managed-administrator');
+          });
+
         waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
           .then((policyType) => {
             expect(policyType.getText()).toBe('Chef-managed');
@@ -179,6 +184,11 @@ describe('Admin pages', () => {
         waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:first-child a')
           .then(name => {
             expect(name.getText()).toBe('Some policy whose name does not start with A');
+          });
+
+        waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)')
+          .then((id) => {
+            expect(id.getText()).toBe('some-policy-id');
           });
 
         waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
