@@ -221,6 +221,9 @@ func (m *A2ServiceConfigModule) applyTemplate(
 
 	f.Comment("ListSecrets lists all the secrets exposed by the config")
 	f.Add(m.generateListSecrets(message, acc))
+	f.Comment("GetSecret gets a secret by name. Returns nil if it is not set")
+	f.Add(m.generateGetSecretMethod(message, acc))
+
 	m.CheckErr(f.Render(buf))
 }
 
@@ -428,6 +431,68 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 			}
 			sg.Default().Block(
 				jen.Return(jen.Lit(0), jen.Qual(a2ConfPkg, "ErrPortNotFound")),
+			)
+		})
+	})
+
+	return f
+}
+
+func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
+	f := jen.Func().Params(
+		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
+	).Id("GetSecret").Params(
+		jen.Id("name").String(),
+	).Params(jen.Op("*").Qual("github.com/golang/protobuf/ptypes/wrappers", "StringValue")).BlockFunc(func(g *jen.Group) {
+		// switch name {
+		g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
+			for _, secretInfo := range acc.secretInfo {
+				// Example:
+				// case "ldap_password":
+				sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
+					// Example:
+					// v0 := m.V1
+					// if v0 == nil {
+					//   return nil
+					// }
+					cg.Id("v0").Op(":=").Id("m").Dot(m.ctx.Name(secretInfo.Path[0]).String())
+					cg.If(jen.Id("v0").Op("==").Nil()).Block(
+						jen.Return(jen.Nil()),
+					)
+
+					for i, path := range secretInfo.Path {
+						if i == 0 {
+							continue
+						}
+						cur := fmt.Sprintf("v%d", i)
+						prev := fmt.Sprintf("v%d", i-1)
+
+						// Example:
+						// v1 := v0.Sys
+						cg.Id(cur).Op(":=").Id(prev).Dot(m.ctx.Name(path).String())
+
+						if i == len(secretInfo.Path)-1 {
+							switch path.Type().Embed().FullyQualifiedName() {
+							case ".google.protobuf.StringValue":
+								cg.Return(jen.Id(cur))
+							default:
+								m.Failf("unsupported message type for port")
+							}
+						} else {
+							// Example:
+							// if v1 == nil {
+							//   return nil
+							// }
+							cg.If(jen.Id(cur).Op("==").Nil()).Block(
+								jen.Return(jen.Nil()),
+							)
+						}
+					}
+				})
+			}
+			sg.Default().Block(
+				jen.Return(jen.Nil()),
 			)
 		})
 	})

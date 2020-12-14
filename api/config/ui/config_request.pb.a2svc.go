@@ -73,3 +73,11 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
 	return []a2conf.SecretInfo{}
 }
+
+// GetSecret gets a secret by name. Returns nil if it is not set
+func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
+	switch name {
+	default:
+		return nil
+	}
+}

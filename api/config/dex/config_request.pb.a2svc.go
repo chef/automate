@@ -113,3 +113,49 @@ func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
 		Name:                "msad_password",
 	}}
 }
+
+// GetSecret gets a secret by name. Returns nil if it is not set
+func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
+	switch name {
+	case "ldap_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Connectors
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Ldap
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.BindPassword
+		return v4
+	case "msad_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Connectors
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.MsadLdap
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.BindPassword
+		return v4
+	default:
+		return nil
+	}
+}
