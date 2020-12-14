@@ -58,6 +58,7 @@ habitat:
     - origin: chef
       channel: dev
 allowed_licenses:
+  - 0BSD
   - Apache-1.0
   - Apache-1.1
   - Apache-2.0
