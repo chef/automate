@@ -82,7 +82,7 @@ message ConfigRequest {
 			google.protobuf.StringValue ca_contents = 1;
 			google.protobuf.StringValue host = 2;
 			google.protobuf.StringValue bind_dn = 3;
-			google.protobuf.StringValue bind_password = 4 [(chef.automate.api.secret) = { name: "LDAP_PASSWORD" }];
+			google.protobuf.StringValue bind_password = 4 [(chef.automate.api.secret) = { name: "ldap_password" }];
 			google.protobuf.StringValue base_user_search_dn = 5;
 			google.protobuf.StringValue user_query_filter = 6;
 			google.protobuf.StringValue username_attr = 7;
@@ -101,7 +101,7 @@ message ConfigRequest {
 			google.protobuf.StringValue ca_contents = 1;
 			google.protobuf.StringValue host = 2;
 			google.protobuf.StringValue bind_dn = 3;
-			google.protobuf.StringValue bind_password = 4 [(chef.automate.api.secret) = { name: "MSAD_PASSWORD" }];
+			google.protobuf.StringValue bind_password = 4 [(chef.automate.api.secret) = { name: "msad_password" }];
 			google.protobuf.StringValue base_user_search_dn = 5;
 			google.protobuf.StringValue base_group_search_dn = 6;
 			google.protobuf.StringValue user_query_filter = 7;

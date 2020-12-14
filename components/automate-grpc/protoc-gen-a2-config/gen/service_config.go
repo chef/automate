@@ -3,6 +3,8 @@ package gen
 import (
 	"bytes"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/dave/jennifer/jen"
 	"github.com/golang/protobuf/proto"
@@ -66,6 +68,7 @@ OUTER:
 
 type Acc struct {
 	portInfo   []PortInfo
+	secretInfo []SecretInfo
 	fieldStack []pgs.Field
 }
 
@@ -88,6 +91,14 @@ type PortInfo struct {
 	SourceLoc string
 	Path      []pgs.Field
 }
+
+type SecretInfo struct {
+	Secret    *a2conf.Secret
+	SourceLoc string
+	Path      []pgs.Field
+}
+
+var secretNameValid = regexp.MustCompile(`^[a-z][a-z0-9_]+$`).MatchString
 
 func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *Acc) {
 	if msg == nil {
@@ -142,6 +153,37 @@ func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *Acc) {
 			consumed = true
 		}
 
+		if proto.HasExtension(descriptor.GetOptions(), a2conf.E_Secret) {
+			iext, err := proto.GetExtension(descriptor.GetOptions(), a2conf.E_Secret)
+			m.CheckErr(err)
+			ext := iext.(*a2conf.Secret)
+			if !secretNameValid(ext.Name) {
+				m.Failf("Secret name %q is invalid. Must be alphanumeric", ext.Name)
+			}
+
+			fieldMsg := fieldType.Embed()
+
+			m.Debugf("Field %s is a port", fieldMsg.FullyQualifiedName())
+			switch fieldMsg.FullyQualifiedName() {
+			case ".google.protobuf.Int32Value", ".google.protobuf.StringValue":
+			default:
+				m.Failf("%s is not a supported Message type for Port", fieldMsg.FullyQualifiedName())
+			}
+
+			for _, secretInfo := range acc.secretInfo {
+				if secretInfo.Secret.Name == ext.Name {
+					m.Failf("%s secret name %q already in use by previous annotation at %s",
+						sourceLoc, secretInfo.Secret.Name, secretInfo.SourceLoc)
+				}
+			}
+			acc.secretInfo = append(acc.secretInfo, SecretInfo{
+				Secret:    ext,
+				SourceLoc: sourceLoc,
+				Path:      acc.SnapshotFields(),
+			})
+			consumed = true
+		}
+
 		if !consumed {
 			next := fieldType.Embed()
 			m.visit(next, acc)
@@ -176,6 +218,9 @@ func (m *A2ServiceConfigModule) applyTemplate(
 	f.Add(m.generateListPorts(message, acc))
 	f.Comment("GetPort gets the port tagged with the given name. If the value is not set, it returns 0.")
 	f.Add(m.generateGetPortMethod(message, acc))
+
+	f.Comment("ListSecrets lists all the secrets exposed by the config")
+	f.Add(m.generateListSecrets(message, acc))
 	m.CheckErr(f.Render(buf))
 }
 
@@ -387,5 +432,30 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 		})
 	})
 
+	return f
+}
+
+func (m *A2ServiceConfigModule) generateListSecrets(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) ListSecrets() []api.SecretInfo
+	f := jen.Func().Params(
+		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
+	).Id("ListSecrets").Params().Params(jen.Index().Qual(a2ConfPkg, "SecretInfo")).BlockFunc(func(g *jen.Group) {
+		// Example:
+		// return []api.SecretInfo {
+		//   api.SecretInfo{
+		//	   Name: "ldap_password",
+		//     EnvironmentVariable: "AUTOMATE_SECRET_LDAP_PASSWORD"
+		//   },
+		// }
+		ret := jen.Index().Qual(a2ConfPkg, "SecretInfo").ValuesFunc(func(vg *jen.Group) {
+			for _, s := range acc.secretInfo {
+				vg.Add(jen.Qual(a2ConfPkg, "SecretInfo").Values(jen.Dict{
+					jen.Id("Name"):                jen.Lit(s.Secret.Name),
+					jen.Id("EnvironmentVariable"): jen.Lit(fmt.Sprintf("AUTOMATE_SECRET_%s", strings.ToUpper(s.Secret.Name))),
+				}))
+			}
+		})
+		g.Return(ret)
+	})
 	return f
 }

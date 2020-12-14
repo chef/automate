@@ -110,3 +110,8 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 		return 0, a2conf.ErrPortNotFound
 	}
 }
+
+// ListSecrets lists all the secrets exposed by the config
+func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
+	return []a2conf.SecretInfo{}
+}
