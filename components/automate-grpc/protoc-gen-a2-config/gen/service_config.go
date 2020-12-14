@@ -37,7 +37,7 @@ func (m *A2ServiceConfigModule) Execute(targets map[string]pgs.File, pkgs map[st
 OUTER:
 	for _, f := range targets {
 		messages := f.AllMessages()
-		acc := &PortAcc{}
+		acc := &Acc{}
 
 		for _, msg := range messages {
 			if !proto.HasExtension(msg.Descriptor().GetOptions(), a2conf.E_ServiceConfig) {
@@ -64,32 +64,32 @@ OUTER:
 	return m.Artifacts()
 }
 
-type PortAcc struct {
+type Acc struct {
 	portInfo   []PortInfo
 	fieldStack []pgs.Field
 }
 
-func (acc *PortAcc) PushField(f pgs.Field) {
+func (acc *Acc) PushField(f pgs.Field) {
 	acc.fieldStack = append(acc.fieldStack, f)
 }
 
-func (acc *PortAcc) PopField() {
+func (acc *Acc) PopField() {
 	acc.fieldStack = acc.fieldStack[:len(acc.fieldStack)-1]
 }
 
-func (acc *PortAcc) SnapshotFields() []pgs.Field {
+func (acc *Acc) SnapshotFields() []pgs.Field {
 	fields := make([]pgs.Field, len(acc.fieldStack))
 	copy(fields, acc.fieldStack)
 	return fields
 }
 
 type PortInfo struct {
-	Port      a2conf.Port
+	Port      *a2conf.Port
 	SourceLoc string
 	Path      []pgs.Field
 }
 
-func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
+func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *Acc) {
 	if msg == nil {
 		return
 	}
@@ -103,6 +103,7 @@ func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
 		sourceLoc := fmt.Sprintf("%s:%d", file, line)
 		fieldType := field.Type()
 		descriptor := field.Descriptor()
+		consumed := false
 
 		if proto.HasExtension(descriptor.GetOptions(), a2conf.E_Port) {
 			iext, err := proto.GetExtension(descriptor.GetOptions(), a2conf.E_Port)
@@ -134,11 +135,14 @@ func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
 				}
 			}
 			acc.portInfo = append(acc.portInfo, PortInfo{
-				Port:      *ext,
+				Port:      ext,
 				SourceLoc: sourceLoc,
 				Path:      acc.SnapshotFields(),
 			})
-		} else {
+			consumed = true
+		}
+
+		if !consumed {
 			next := fieldType.Embed()
 			m.visit(next, acc)
 		}
@@ -156,7 +160,7 @@ func (m *A2ServiceConfigModule) applyTemplate(
 	protoFileName string,
 	message pgs.Message,
 	serviceConfigInfo *a2conf.ServiceConfig,
-	acc *PortAcc) {
+	acc *Acc) {
 
 	importPath := m.ctx.ImportPath(message).String()
 	pkgName := m.ctx.PackageName(message).String()
@@ -185,7 +189,7 @@ func (m *A2ServiceConfigModule) generateServiceNameFunc(message pgs.Message, nam
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) ListPorts() []api.PortInfo
 	f := jen.Func().Params(
 		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
@@ -212,7 +216,7 @@ func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *Port
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) BindPort(name string, value uint16) error
 	f := jen.Func().Params(
 		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
@@ -307,7 +311,7 @@ func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc 
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
 	f := jen.Func().Params(
 		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
