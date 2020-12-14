@@ -266,7 +266,13 @@ download the mostly commonly needed secrets:
 
 1. Connect to the Chef VPN.
 
-2. Run the `get_secrets` script as below:
+2. Log into our Hashicorp Vault instance (you can download vault [here](https://www.vaultproject.io/downloads))
+
+```
+vault login -method=okta username=your-chef-ad-username
+```
+
+3. Run the `get_secrets` script as below:
 
 ``` console
 CHEF_USERNAME=your-chef-ad-username scripts/get_secrets.sh
