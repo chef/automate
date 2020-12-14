@@ -1981,6 +1981,7 @@ func (s *server) readOrGenDeploymentServiceCerts() (*certs.ServiceCerts, bool, e
 	if fileExist(constants.CertPath) && fileExist(constants.KeyPath) && fileExist(constants.RootCertPath) {
 		tlsCerts, err := s.readAndValidate(req)
 		if err != nil {
+			logrus.WithError(err).Info("deployment-service certificate regeneration required")
 			cleanupOldCerts()
 		} else {
 			return tlsCerts, false, nil
