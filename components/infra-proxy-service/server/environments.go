@@ -241,7 +241,7 @@ func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environ
 	}
 
 	return &response.EnvironmentRecipesList{
-		Name: recipes,
+		Recipes: recipes,
 	}, nil
 }
 

@@ -122,7 +122,7 @@ func (a *InfraProxyServer) GetEnvironmentRecipes(ctx context.Context, r *gwreq.E
 	}
 
 	return &gwres.EnvironmentRecipesList{
-		Name: res.GetName(),
+		Recipes: res.GetRecipes(),
 	}, nil
 }
 

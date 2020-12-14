@@ -32,5 +32,5 @@ message Environment {
 
 message EnvironmentRecipesList {
     // Recipes list.
-    repeated string name = 1;
+    repeated string recipes = 1;
 }

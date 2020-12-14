@@ -2665,7 +2665,7 @@ func init() {
     "chef.automate.api.infra_proxy.response.EnvironmentRecipesList": {
       "type": "object",
       "properties": {
-        "name": {
+        "recipes": {
           "type": "array",
           "items": {
             "type": "string"
