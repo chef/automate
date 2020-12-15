@@ -82,6 +82,17 @@ Reason: Later releases are release candidates; should only be using production-r
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
+### Package @nguniversal/express-engine: 9.0.0-rc.2	
+
+Reason: `ng build` reported this error:	
+
+```text	
+ERROR in The target entry-point "ngx-cookie" has missing dependencies:	
+ - express-serve-static-core	
+```	
+
+Reference: https://github.com/salemdar/ngx-cookie/issues/106
+
 ## Angular Module Architecture
 
 As a very brief introduction to the Angular architecture, it all starts with app.module.ts,
