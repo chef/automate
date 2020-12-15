@@ -26,6 +26,9 @@
             ],
             "scripts": [
               "src/modernizr-custom.js"
+            ],
+            "allowedCommonJsDependencies": [
+              "hogan.js"
             ]
           },
           "configurations": {
