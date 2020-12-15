@@ -30,6 +30,8 @@ A credential name may be reused, even when it contains different usernames or ke
 
 ## Add a Credential
 
+Select _Add Credential_ and a dialog box appears as shown below. Select the _Credential Type_ drop box to choose the desired credential type.
+
 ### Add a SSH Credential
 
 ![SSH Credential Form](/images/automate/credentials-ssh.png)
