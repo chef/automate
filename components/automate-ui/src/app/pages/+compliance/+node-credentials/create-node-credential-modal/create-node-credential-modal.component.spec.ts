@@ -91,7 +91,6 @@ describe('CreateNodeCredentialModalComponent', () => {
       expect(component.createNodeCredForm.controls['sudo'].value).toEqual({ password: '', options: '' });
     });
 
-  // looking for a solution for ths test case.
   it('on conflict error, modal remains open and displays conflict error', () => {
     component.createNodeCredForm.controls['id'].setValue(nodeCredential.id);
     component.createNodeCredForm.controls['name'].setValue(nodeCredential.name);
