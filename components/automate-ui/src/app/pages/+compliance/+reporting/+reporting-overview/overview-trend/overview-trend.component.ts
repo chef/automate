@@ -33,6 +33,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     private el: ElementRef,
     @Inject(DOCUMENT) private document: Document
   ) {}
+  treandDataCache = [];
 
   @Input() data = [];
 
@@ -51,9 +52,13 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   }
 
   get trendData(): TrendData[] {
-    return this.data.map(d => {
-      return { ...d, report_time: this.createUtcDate(d.report_time) };
-    });
+    if(this.treandDataCache === undefined || this.treandDataCache.length == 0) {
+      console.log("trendDataCache..!")
+      this.treandDataCache = this.data.map(d => {
+        return { ...d, report_time: this.createUtcDate(d.report_time) };
+      });
+    }
+    return this.treandDataCache
   }
 
   get domainX() {
@@ -128,8 +133,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
         'waived'
       ].map(status => ({ status, values: this.trendData })));
   }
-
   ngOnChanges() {
+    this.treandDataCache = [];
     this.resize();
     this.draw();
   }
@@ -317,12 +322,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   }
 
   createUtcDate(time: string): Date {
-    const utcDate = moment(time).utc();
-    if (utcDate.isValid) {
-      return new Date(utcDate.year(), utcDate.month(), utcDate.date());
-    } else {
-      console.error('Not a valid date ' + time);
-      return new Date();
-    }
+    const utcDate = moment(time);
+    return new Date(utcDate.year(), utcDate.month(), utcDate.date());
   }
 }
