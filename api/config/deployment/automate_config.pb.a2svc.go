@@ -48,6 +48,7 @@ import (
 	ui "github.com/chef/automate/api/config/ui"
 	workflownginx "github.com/chef/automate/api/config/workflow_nginx"
 	workflowserver "github.com/chef/automate/api/config/workflow_server"
+	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 )
 
 // NewAutomateConfig returns a new instance of AutomateConfig with zero values.
@@ -170,6 +171,11 @@ func (c *AutomateConfig) Validate() error {
 		}
 	}
 	return err
+}
+
+// ListA2ServiceConfigs returns a slice of AutomateConfigs per service
+func (c *AutomateConfig) ListA2ServiceConfigs() []a2conf.A2ServiceConfig {
+	return []a2conf.A2ServiceConfig{c.AuthN, c.AuthZ, c.Compliance, c.ConfigMgmt, c.Deployment, c.Dex, c.Elasticsearch, c.Esgateway, c.EsSidecar, c.Gateway, c.Ingest, c.LoadBalancer, c.LocalUser, c.LicenseControl, c.Notifications, c.Postgresql, c.Session, c.Teams, c.UI, c.Secrets, c.BackupGateway, c.PgSidecar, c.PgGateway, c.Applications, c.Bookshelf, c.Bifrost, c.Erchef, c.CsNginx, c.Workflow, c.WorkflowNginx, c.EventService, c.Nodemanager, c.EventGateway, c.Prometheus, c.DataFeedService, c.EventFeedService, c.Cereal, c.BuilderApi, c.BuilderApiProxy, c.Minio, c.BuilderMemcached, c.InfraProxy, c.Cds, c.SampleData}
 }
 
 // SetGlobalConfig iterates over the AutomateConfig and applies global configuration

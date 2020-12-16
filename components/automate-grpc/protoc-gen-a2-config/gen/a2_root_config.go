@@ -107,6 +107,8 @@ and enforces other invariants on configuration option values.
 
 If the configuration is valid, the returned error is nil.`)
 	f.Add(m.generateValidateFunc(msgName, importPath, acc))
+	f.Comment("ListA2ServiceConfigs returns a slice of AutomateConfigs per service")
+	f.Add(m.generateListA2ServiceConfigsFunc(msgName, importPath, acc))
 	f.Comment("SetGlobalConfig iterates over the AutomateConfig and applies global configuration")
 	f.Add(m.generateSetGlobalConfigFunc(msgName, importPath, acc))
 	f.Comment("PlatformServiceConfigForService gets the config for the service by name")
@@ -166,6 +168,22 @@ func (m *A2RootConfigModule) generateValidateFunc(
 			})
 		})
 		g.Return(jen.Id("err"))
+	})
+}
+
+func (m *A2RootConfigModule) generateListA2ServiceConfigsFunc(
+	msgName string, importPath string, acc []rootMember) *jen.Statement {
+	return jen.Func().Params(jen.Id("c").Qual(importPath, "*"+msgName)).Id("ListA2ServiceConfigs").Params().Params(
+		jen.Index().Qual(a2ConfPkg, "A2ServiceConfig")).BlockFunc(func(g *jen.Group) {
+
+		ret := jen.Index().Qual(a2ConfPkg, "A2ServiceConfig").ValuesFunc(func(vg *jen.Group) {
+			for _, member := range acc {
+				if member.fieldName != "Global" {
+					vg.Add(jen.Id("c").Dot(member.fieldName))
+				}
+			}
+		})
+		g.Return(ret)
 	})
 }
 

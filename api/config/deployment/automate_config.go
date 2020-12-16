@@ -41,12 +41,29 @@ func LoadUserOverrideConfigFile(file string, options ...AutomateConfigOpt) (*Aut
 		return nil, errors.Wrap(err, "Config file must be a valid automate config")
 	}
 
+	// iterate over all configs for secrets and set them
+	cfg.PopulateSecretsFromEnvironment()
+
 	err = WithConfigOptions(cfg, options...)
 	if err != nil {
 		return nil, err
 	}
 
 	return cfg, nil
+}
+
+func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
+	for _, svc := range c.ListA2ServiceConfigs() {
+		for _, secret := range svc.ListSecrets() {
+			if svc.GetSecret(secret.Name) == nil {
+				envVal := os.Getenv(secret.EnvironmentVariable)
+				if envVal != "" {
+					// nolint errcheck
+					svc.SetSecret(secret.Name, w.String(envVal))
+				}
+			}
+		}
+	}
 }
 
 // WithConfigOptions applies the given AutomateConfigOpts to an AutomateConfig
