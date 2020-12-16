@@ -223,7 +223,8 @@ func (m *A2ServiceConfigModule) applyTemplate(
 	f.Add(m.generateListSecrets(message, acc))
 	f.Comment("GetSecret gets a secret by name. Returns nil if it is not set")
 	f.Add(m.generateGetSecretMethod(message, acc))
-
+	f.Comment("SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist")
+	f.Add(m.generateSetSecrets(message, acc))
 	m.CheckErr(f.Render(buf))
 }
 
@@ -439,7 +440,7 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 }
 
 func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc *Acc) *jen.Statement {
-	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
+	// func (m *ConfigRequest) GetSecret(name string) (uint16, error)
 	f := jen.Func().Params(
 		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
 	).Id("GetSecret").Params(
@@ -480,7 +481,7 @@ func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc
 								case ".google.protobuf.StringValue":
 									cg.Return(jen.Id(cur))
 								default:
-									m.Failf("unsupported message type for port")
+									m.Failf("unsupported message type for secret")
 								}
 							} else {
 								// Example:
@@ -527,4 +528,81 @@ func (m *A2ServiceConfigModule) generateListSecrets(message pgs.Message, acc *Ac
 		g.Return(ret)
 	})
 	return f
+}
+
+func (m *A2ServiceConfigModule) generateSetSecrets(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
+	f := jen.Func().Params(
+		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
+	).Id("SetSecret").Params(
+		jen.Id("name").String(),
+		jen.Id("value").Op("*").Qual("github.com/golang/protobuf/ptypes/wrappers", "StringValue"),
+	).Params(jen.Error()).BlockFunc(func(g *jen.Group) {
+		if len(acc.secretInfo) == 0 {
+			g.Return(jen.Qual(a2ConfPkg, "ErrSecretNotFound"))
+		} else {
+			// switch name {
+			g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
+				for _, secretInfo := range acc.secretInfo {
+					// Example:
+					// case "ldap_password":
+					sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
+						m.generatePathForSetting(cg, secretInfo.Path, func(cg *jen.Group, cur string, field pgs.Field) {
+							switch field.Type().Embed().FullyQualifiedName() {
+							case ".google.protobuf.StringValue":
+								cg.Op("*").Id(cur).Op("=").Id("value")
+							default:
+								m.Failf("unsupported message type for secret")
+							}
+						})
+					})
+				}
+				sg.Default().Block(
+					jen.Return(jen.Qual(a2ConfPkg, "ErrSecretNotFound")),
+				)
+			})
+			g.Return(jen.Nil())
+		}
+	})
+	return f
+}
+
+func (m *A2ServiceConfigModule) generatePathForSetting(cg *jen.Group, fieldPath []pgs.Field, cb func(cg *jen.Group, cur string, field pgs.Field)) {
+	// Create first struct on the ConfigRequest object
+	// Example:
+	// v0 := &m.V1
+	// if *v0 == nil {
+	//   *v0 = &ConfigRequest_V1{}
+	// }
+	cg.Id("v0").Op(":=").Op("&").Id("m").Dot(m.ctx.Name(fieldPath[0]).String())
+	cg.If(jen.Op("*").Id("v0").Op("==").Nil()).Block(
+		jen.Op("*").Id("v0").Op("=").Op("&").Qual(
+			m.ctx.ImportPath(fieldPath[0].Type().Embed()).String(),
+			m.ctx.Name(fieldPath[0].Type().Embed()).String()).Values(),
+	)
+
+	// Continue creating structs where nil is found
+	cur := ""
+	for i, p := range fieldPath {
+		if i == 0 {
+			continue
+		}
+		cur = fmt.Sprintf("v%d", i)
+		prev := fmt.Sprintf("v%d", i-1)
+
+		// Example:
+		// v1 := &(*v0).Sys
+		cg.Id(cur).Op(":=").Op("&").Parens(jen.Op("*").Id(prev)).Dot(m.ctx.Name(p).String())
+		// Example:
+		// if *v1 == nil {
+		//   *v1 = &ConfigRequest_V1_System{}
+		// }
+		cg.If(jen.Op("*").Id(cur).Op("==").Nil()).Block(
+			jen.Op("*").Id(cur).Op("=").Op("&").Qual(
+				m.ctx.ImportPath(p.Type().Embed()).String(),
+				m.ctx.Name(p.Type().Embed()).String()).Values(),
+		)
+	}
+
+	cb(cg, cur, fieldPath[len(fieldPath)-1])
 }

@@ -1,17 +1,25 @@
 package a2conf
 
-import "github.com/golang/protobuf/ptypes/wrappers"
+import (
+	"errors"
+
+	"github.com/golang/protobuf/ptypes/wrappers"
+)
 
 type SecretBind interface {
 	ListSecrets() []SecretInfo
 	GetSecret(name string) *wrappers.StringValue
-	// PopulateSecret sets the secret based on the value from the
-	// environment if it is not present in the config
-	// PopulateSecret() (bool, error)
+	SetSecret(name string, value *wrappers.StringValue) error
 }
 
-// PortInfo describes a bindable port
+// SecretInfo describes a bindable secret
 type SecretInfo struct {
 	Name                string
 	EnvironmentVariable string
+}
+
+var ErrSecretNotFound = errors.New("secret not found")
+
+func IsErrSecretNotFound(err error) bool {
+	return errors.Is(err, ErrPortNotFound)
 }

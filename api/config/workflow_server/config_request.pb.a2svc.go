@@ -104,3 +104,8 @@ func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
 func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
 	return nil
 }
+
+// SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
+func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) error {
+	return a2conf.ErrSecretNotFound
+}
