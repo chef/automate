@@ -6,12 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	reflect "reflect"
 
 	"github.com/pkg/errors"
 
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 )
 
 // NewUserOverrideConfig returns a completely blank config struct onto which we
@@ -41,12 +43,47 @@ func LoadUserOverrideConfigFile(file string, options ...AutomateConfigOpt) (*Aut
 		return nil, errors.Wrap(err, "Config file must be a valid automate config")
 	}
 
+	// iterate over all configs for secrets and set them
+	cfg.PopulateSecretsFromEnvironment()
+
 	err = WithConfigOptions(cfg, options...)
 	if err != nil {
 		return nil, err
 	}
 
 	return cfg, nil
+}
+
+func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
+	a2ServiceConfigType := reflect.TypeOf((*a2conf.A2ServiceConfig)(nil)).Elem()
+	a := reflect.ValueOf(c)
+	for i := 0; i < a.NumField(); i++ {
+		f := a.Field(i)
+
+		if f.Type().Implements(a2ServiceConfigType) {
+			var v a2conf.A2ServiceConfig
+			isNew := false
+			var reflectVal reflect.Value
+			if f.IsNil() {
+				reflectVal = reflect.New(f.Type().Elem())
+				v = (reflectVal.Interface()).(a2conf.A2ServiceConfig)
+				isNew = true
+			} else {
+				v = (f.Elem().Interface()).(a2conf.A2ServiceConfig)
+			}
+			for _, secret := range v.ListSecrets() {
+				if v.GetSecret(secret.Name) == nil {
+					envSecret := os.Getenv(secret.EnvironmentVariable)
+					if envSecret != "" {
+						v.SetSecret(secret.Name, w.String(envSecret)) // nolint: errcheck
+						if isNew {
+							f.Set(reflectVal)
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 // WithConfigOptions applies the given AutomateConfigOpts to an AutomateConfig
