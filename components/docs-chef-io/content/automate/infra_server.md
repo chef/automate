@@ -305,7 +305,7 @@ On the workstation:
     ```
 
     For airgapped installations, [create a bootstrap
-    template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}) and [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`.
+    template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}}) and [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`.
 
 1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
 
