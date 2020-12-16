@@ -56,7 +56,7 @@ func LoadUserOverrideConfigFile(file string, options ...AutomateConfigOpt) (*Aut
 
 func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
 	a2ServiceConfigType := reflect.TypeOf((*a2conf.A2ServiceConfig)(nil)).Elem()
-	a := reflect.ValueOf(c)
+	a := reflect.ValueOf(c).Elem()
 	for i := 0; i < a.NumField(); i++ {
 		f := a.Field(i)
 
