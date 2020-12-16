@@ -119,9 +119,12 @@ export class ServiceGroupsRequests {
     fieldName: string,
     queryFragment: string,
     filters: ServiceGroupsFilters): Observable<any[]> {
+
       // This api requires different filter names for group and service, should it?
-      fieldName = fieldName === 'group' ? 'group_name' : fieldName;
-      fieldName = fieldName === 'service' ? 'service_name' : fieldName;
+      fieldName =
+          fieldName === 'group' ? 'group_name'
+        : fieldName === 'service' ? 'service_name'
+        : fieldName;
       const params = this.formatFilters(filters)
         .set('field_name', fieldName)
         .set('query_fragment', queryFragment);
