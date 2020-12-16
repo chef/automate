@@ -28,7 +28,7 @@ with Chef Automate.
 {{% /warning %}}
 
 Use Chef Automate to install Chef Infra Server either for a single-host installation that contains both Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance.
-See the [Chef Infra Server documentation](https://docs.chef.io/server_overview/) for instructions and guidance on using and managing your Chef Infra Server.
+See the [Chef Infra Server documentation]({{< relref "server.md" >}}) for instructions and guidance on using and managing your Chef Infra Server.
 
 ## System Requirements and Prerequisites
 
@@ -63,7 +63,7 @@ Install Chef Automate and Chef Infra Server on the same host with this command:
 sudo chef-automate deploy --product automate --product infra-server
 ```
 
-Then, [set up `knife`](https://docs.chef.io/workstation/knife_setup) for use with Chef Infra Server.
+Then, [set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 ### Configuration File Install of Chef Automate and Infra Server
 
@@ -91,13 +91,13 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate deploy config.toml
     ```
 
-1. [Set up `knife`](https://docs.chef.io/workstation/knife_setup) for use with Chef Infra Server.
+1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 ## Install A Standalone Chef Infra Server
 
 Use either a command line interface or a configuration file to install Chef Infra Server using the Chef Automate `deploy` command.
 
-Refer to the Chef Infra Server [hardware requirements](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
+Refer to the Chef Infra Server [hardware requirements]({{< relref "install_server_pre.md" >}}) for guidance on memory and number of CPUs.
 
 ### Command Line Install of Standalone Chef Infra Server
 
@@ -124,7 +124,7 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate deploy --product infra-server <configuration_file>
     ```
 
-1. [Set up `knife`](https://docs.chef.io/workstation/knife_setup) for use with Chef Infra Server.
+1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
@@ -177,7 +177,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate deploy config.toml
     ```
 
-1. [Set up `knife`](https://docs.chef.io/workstation/knife_setup) for use with Chef Infra Server.
+1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
@@ -211,7 +211,7 @@ Patch an existing Chef Automate installation to add Chef Infra Server:
        products=["automate", "infra-server"]
     ```
 
-2. Apply the patch to the Chef Automate installation:
+1. Apply the patch to the Chef Automate installation:
 
     ```shell
        sudo chef-automate config patch ./patch.toml
@@ -237,7 +237,7 @@ Patch an existing Chef Automate installation to add Chef Infra Server:
 
 ## Set Up the Chef Infra Server
 
-The [`knife` command-line utility](https://docs.chef.io/workstation/knife/) provides an interface to interact with a Chef Infra Server from a workstation.
+The [`knife` command-line utility]({{< relref "workstation/knife.md" >}}) provides an interface to interact with a Chef Infra Server from a workstation.
 
 On the Chef Infra Server host:
 
@@ -269,7 +269,7 @@ On the Chef Infra Server host:
 
 On the workstation:
 
-1. Install [Chef Workstation](https://docs.chef.io/workstation/install_workstation/).
+1. Install [Chef Workstation]({{< relref "workstation/install_workstation.md" >}}).
 
 1. Create a Chef repository by using the `chef generate repo` subcommand.
      For example, create a Chef repository named `chef-repo` by running:
@@ -305,9 +305,8 @@ On the workstation:
     ```
 
     For airgapped installations, [create a bootstrap
-    template](https://docs.chef.io/install_chef_air_gap/#create-a-bootstrap-template) and
-    [add it](https://docs.chef.io/install_chef_air_gap/#configure-knife) to your `config.rb`.
+    template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}}) and [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`.
 
 1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
 
-For more information on how to set up the workstation, see [the Chef Workstation documentation](https://docs.chef.io/workstation/getting_started/).
+For more information on how to set up the workstation, see [the Chef Workstation documentation]({{< relref "workstation/getting_started.md" >}}).
