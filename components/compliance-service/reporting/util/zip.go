@@ -21,7 +21,7 @@ func Zip2Path(zipPath string, extractPath string) error {
 	// TODO(sr): This is not entirely ignorable, but worse things can happen
 	// when a user uploads an inspec profile. So, let's keep it in mind but
 	// move on.
-	reader, err := zip.OpenReader(zipPath) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
+	reader, err := zip.OpenReader(zipPath) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	if err != nil {
 		return err
 	}
