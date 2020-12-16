@@ -7,8 +7,11 @@ package secrets
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,6 +22,7 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
+	"github.com/chef/toml"
 )
 
 // Commonly used secrets names. When accessing this library from
@@ -34,6 +38,12 @@ var BifrostSuperuserIDName = SecretName{
 type SecretName struct {
 	Group string
 	Name  string
+}
+
+type SecretKeyToml struct {
+	Algorithm  string `toml:"algorithm"`
+	IV         string `toml:"iv"`
+	Ciphertext string `toml:"ciphertext"`
 }
 
 // SecretNameFromString returns parses the string according to the
@@ -147,6 +157,18 @@ func (d *diskStore) Initialize() error {
 		return errors.Wrap(err, "could now chown shared data directory for secrets store")
 	}
 
+	// creates encryption key if it does not exist
+	keyExists, err := keyExists(d.basePath)
+	if err != nil {
+		return err
+	}
+	if !keyExists {
+		_, err := createEncryptionKey(d.basePath)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -155,19 +177,41 @@ func (d *diskStore) Exists(secret SecretName) (bool, error) {
 	return fileutils.PathExists(path)
 }
 
+// checks if encryption key exists or not
+func keyExists(basePath string) (bool, error) {
+	path := filepath.Join(basePath, "key")
+	return fileutils.PathExists(path)
+}
+
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
-	path := filepath.Join(d.basePath, secret.Group, secret.Name)
-	ret, err := ioutil.ReadFile(path)
+	var ret []byte
+	// checks if the encrypted secret exists
+	pathToEncryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name+".enc")
+	encryptedSecretExists, err := fileutils.PathExists(pathToEncryptedSecret)
+	if encryptedSecretExists {
+		ret, err = ioutil.ReadFile(pathToEncryptedSecret)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
+		}
+		// decrypts and returns the secret value
+		retE, err := getDecryptedData(d.basePath, ret)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not decrypt secret with existing key)")
+		}
+		return retE, err
+	}
+	// else return normal secret
+	pathToUnencryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name)
+	ret, err = ioutil.ReadFile(pathToUnencryptedSecret)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
 	}
-
 	return ret, err
 }
 
 func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 	parentDir := filepath.Join(d.basePath, secret.Group)
-	secretPath := filepath.Join(parentDir, secret.Name)
+	secretPath := filepath.Join(parentDir, secret.Name+".enc")
 	err := os.MkdirAll(parentDir, 0700)
 	if err != nil {
 		return errors.Wrap(err, "could not create directory for secrets data")
@@ -177,8 +221,14 @@ func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 		return errors.Wrap(err, "could not chown directory for secrets data")
 	}
 
-	r := bytes.NewReader(data)
-	err = fileutils.AtomicWrite(secretPath, r, fileutils.WithAtomicWriteFileMode(0700))
+	// created encrypted data from input data
+	encryptedData, iv, err := getEncryptedData(data, d.basePath)
+	if err != nil {
+		return err
+	}
+
+	// writes as toml file
+	err = writeToml("AES256 CTR mode", string(iv), string(encryptedData), secretPath)
 	if err != nil {
 		return errors.Wrap(err, "could not write secrets data to disk")
 	}
@@ -228,4 +278,96 @@ func PrepareSSHPrivateKey(keyContent string) (string, error) {
 		return "", errors.New("Failed to write inspec private key " + keyPath.Name() + ": " + err.Error())
 	}
 	return keyPath.Name(), nil
+}
+
+func encrypt(block cipher.Block, value []byte, iv []byte) []byte {
+	stream := cipher.NewCTR(block, iv)
+	ciphertext := make([]byte, len(value))
+	stream.XORKeyStream(ciphertext, value)
+	return ciphertext
+}
+
+func decrypt(block cipher.Block, ciphertext []byte, iv []byte) []byte {
+	stream := cipher.NewCTR(block, iv)
+	plain := make([]byte, len(ciphertext))
+	// XORKeyStream is used to decrypt too!
+	stream.XORKeyStream(plain, ciphertext)
+	return plain
+}
+
+func writeToml(algorithm string, iv string, ciphertext string, path string) error {
+	str := fmt.Sprintf(
+		`algorithm = "%s"
+iv = "%s"
+ciphertext = "%s"`, algorithm, iv, ciphertext)
+
+	s := bytes.NewReader([]byte(str))
+	// writing the key to a file
+	err := fileutils.AtomicWrite(path, s, fileutils.WithAtomicWriteFileMode(0700))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getEncryptedData(data []byte, basePath string) ([]byte, []byte, error) {
+	// generating the secret
+	var secretKey []byte
+	keyExists, err := keyExists(basePath)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !keyExists {
+		secretKey, err = createEncryptionKey(basePath)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		path := filepath.Join(basePath, "key")
+		secretKey, err = ioutil.ReadFile(path)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "could not read secrets key (unexpected error)")
+		}
+	}
+
+	block, err := aes.NewCipher(secretKey)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error creating secret key for encryption")
+	}
+
+	iv, _ := GenerateRandomBytes(block.BlockSize())
+
+	return encrypt(block, data, iv), iv, nil
+}
+
+func getDecryptedData(basePath string, ret []byte) ([]byte, error) {
+	keyPath := filepath.Join(basePath, "key")
+	key, err := ioutil.ReadFile(keyPath)
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	var secretData SecretKeyToml
+	_, err = toml.Decode(string(ret), &secretData)
+	if err != nil {
+		return nil, err
+	}
+	return decrypt(block, []byte(secretData.Ciphertext), []byte(secretData.IV)), nil
+}
+
+func createEncryptionKey(basePath string) ([]byte, error) {
+	secretKey, err := GenerateRandomBytes(32)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not generate random secret for encryption")
+	}
+
+	// creating path to store the secret key
+	secretKeyPath := filepath.Join(basePath, "key")
+	s := bytes.NewReader(secretKey)
+	// writing the key to a file
+	err = fileutils.AtomicWrite(secretKeyPath, s, fileutils.WithAtomicWriteFileMode(0700))
+	if err != nil {
+		return nil, errors.Wrap(err, "could not write secret to disk")
+	}
+	return secretKey, nil
 }
