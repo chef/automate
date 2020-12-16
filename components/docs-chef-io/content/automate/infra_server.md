@@ -211,7 +211,7 @@ Patch an existing Chef Automate installation to add Chef Infra Server:
        products=["automate", "infra-server"]
     ```
 
-2. Apply the patch to the Chef Automate installation:
+1. Apply the patch to the Chef Automate installation:
 
     ```shell
        sudo chef-automate config patch ./patch.toml
@@ -251,7 +251,7 @@ On the Chef Infra Server host:
     Save this RSA private key to a safe location.
     The `--filename` option will save the RSA private key to the specified absolute path.
 
-2. Run the following command to create an organization, generate its validator key, and assign the user created in the previous step as an administrator:
+1. Run the following command to create an organization, generate its validator key, and assign the user created in the previous step as an administrator:
 
     ```shell
       sudo chef-server-ctl org-create SHORT_NAME 'FULL_ORGANIZATION_NAME' --association_user USER_NAME --filename ORGANIZATION-validator.pem
@@ -271,7 +271,7 @@ On the workstation:
 
 1. Install [Chef Workstation]({{< relref "install_workstation.md" >}}).
 
-2. Create a Chef repository by using the `chef generate repo` subcommand.
+1. Create a Chef repository by using the `chef generate repo` subcommand.
      For example, create a Chef repository named `chef-repo` by running:
 
      ```shell
@@ -280,15 +280,15 @@ On the workstation:
 
      Replace `chef-repo` with your desired repository name.
 
-3. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example:
+1. Within your named Chef repository, create a `.chef` directory with the `mkdir` command. For example:
 
     ```shell
       mkdir /chef-repo/.chef
     ```
 
-4. Copy `ORGANIZATION-validator.pem` and `USER_NAME.pem` to the `.chef` directory.
+1. Copy `ORGANIZATION-validator.pem` and `USER_NAME.pem` to the `.chef` directory.
 
-5. In the `.chef` directory, create a `config.rb` file that contains:
+1. In the `.chef` directory, create a `config.rb` file that contains:
 
     ```shell
       current_dir = File.dirname(__FILE__)
@@ -308,6 +308,6 @@ On the workstation:
     template]({{< relref "install_chef_air_gap.md#create-a-bootstrap-template" >}}) and
     [add it]({{< relref "install_chef_air_gap.md#configure-knife" >}}) to your `config.rb`.
 
-6. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
+1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
 
 For more information on how to set up the workstation, see [the Chef Workstation documentation]({{< relref "getting_started.md" >}}).
