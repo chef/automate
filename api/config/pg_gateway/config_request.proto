@@ -22,12 +22,19 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 3;
 			chef.automate.infra.config.Log log = 4;
 			Timeouts timeouts = 5;
+			repeated google.protobuf.StringValue resolvers = 6;
+
+			message Endpoint {
+				google.protobuf.BoolValue is_domain = 1;
+				google.protobuf.StringValue address = 2;
+			}
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10145, protocol: "tcp" } ];
 				reserved 3;
 				chef.automate.infra.config.External.Postgresql external_postgresql = 4;
+				repeated Endpoint parsed_nodes = 5;
 			}
 
 			message Timeouts {

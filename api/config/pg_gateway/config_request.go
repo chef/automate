@@ -1,8 +1,12 @@
 package pg_gateway
 
 import (
+	"net"
+
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/lib/config"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -28,6 +32,25 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Timeouts.Connect = w.Int32(5)
 	c.V1.Sys.Timeouts.Idle = w.Int32(43200)
+
+	c.V1.Sys.Resolvers = getSystemResolvers()
+
+	if externalPG := c.GetV1().GetSys().Service.GetExternalPostgresql(); externalPG.GetEnable().GetValue() {
+		nodes := externalPG.GetNodes()
+
+		if len(nodes) > 0 {
+			endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
+
+			for _, node := range nodes {
+				host, _, _ := net.SplitHostPort(node.GetValue())
+				n := &ConfigRequest_V1_System_Endpoint{Address: node}
+				n.IsDomain = w.Bool(!isIPAddress(host))
+				endpoints = append(endpoints, n)
+			}
+
+			c.V1.Sys.Service.ParsedNodes = endpoints
+		}
+	}
 	return c
 }
 
@@ -51,4 +74,18 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.PreparedSystemConfig, error) {
 	c.V1.Sys.Tls = creds
 	return c.V1.Sys, nil
+}
+
+func getSystemResolvers() []*wrappers.StringValue {
+	ns := config.GetSystemResolvers()
+	resolvers := make([]*wrappers.StringValue, 0, len(ns))
+
+	for _, n := range ns {
+		resolvers = append(resolvers, w.String(n))
+	}
+	return resolvers
+}
+
+func isIPAddress(addr string) bool {
+	return net.ParseIP(addr) != nil
 }
