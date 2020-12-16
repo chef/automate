@@ -445,56 +445,60 @@ func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc
 	).Id("GetSecret").Params(
 		jen.Id("name").String(),
 	).Params(jen.Op("*").Qual("github.com/golang/protobuf/ptypes/wrappers", "StringValue")).BlockFunc(func(g *jen.Group) {
-		// switch name {
-		g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
-			for _, secretInfo := range acc.secretInfo {
-				// Example:
-				// case "ldap_password":
-				sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
+		if len(acc.secretInfo) == 0 {
+			g.Return(jen.Nil())
+		} else {
+			// switch name {
+			g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
+				for _, secretInfo := range acc.secretInfo {
 					// Example:
-					// v0 := m.V1
-					// if v0 == nil {
-					//   return nil
-					// }
-					cg.Id("v0").Op(":=").Id("m").Dot(m.ctx.Name(secretInfo.Path[0]).String())
-					cg.If(jen.Id("v0").Op("==").Nil()).Block(
-						jen.Return(jen.Nil()),
-					)
-
-					for i, path := range secretInfo.Path {
-						if i == 0 {
-							continue
-						}
-						cur := fmt.Sprintf("v%d", i)
-						prev := fmt.Sprintf("v%d", i-1)
-
+					// case "ldap_password":
+					sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
 						// Example:
-						// v1 := v0.Sys
-						cg.Id(cur).Op(":=").Id(prev).Dot(m.ctx.Name(path).String())
+						// v0 := m.V1
+						// if v0 == nil {
+						//   return nil
+						// }
+						cg.Id("v0").Op(":=").Id("m").Dot(m.ctx.Name(secretInfo.Path[0]).String())
+						cg.If(jen.Id("v0").Op("==").Nil()).Block(
+							jen.Return(jen.Nil()),
+						)
 
-						if i == len(secretInfo.Path)-1 {
-							switch path.Type().Embed().FullyQualifiedName() {
-							case ".google.protobuf.StringValue":
-								cg.Return(jen.Id(cur))
-							default:
-								m.Failf("unsupported message type for port")
+						for i, path := range secretInfo.Path {
+							if i == 0 {
+								continue
 							}
-						} else {
+							cur := fmt.Sprintf("v%d", i)
+							prev := fmt.Sprintf("v%d", i-1)
+
 							// Example:
-							// if v1 == nil {
-							//   return nil
-							// }
-							cg.If(jen.Id(cur).Op("==").Nil()).Block(
-								jen.Return(jen.Nil()),
-							)
+							// v1 := v0.Sys
+							cg.Id(cur).Op(":=").Id(prev).Dot(m.ctx.Name(path).String())
+
+							if i == len(secretInfo.Path)-1 {
+								switch path.Type().Embed().FullyQualifiedName() {
+								case ".google.protobuf.StringValue":
+									cg.Return(jen.Id(cur))
+								default:
+									m.Failf("unsupported message type for port")
+								}
+							} else {
+								// Example:
+								// if v1 == nil {
+								//   return nil
+								// }
+								cg.If(jen.Id(cur).Op("==").Nil()).Block(
+									jen.Return(jen.Nil()),
+								)
+							}
 						}
-					}
-				})
-			}
-			sg.Default().Block(
-				jen.Return(jen.Nil()),
-			)
-		})
+					})
+				}
+				sg.Default().Block(
+					jen.Return(jen.Nil()),
+				)
+			})
+		}
 	})
 
 	return f
