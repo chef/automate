@@ -15,19 +15,20 @@ draft = false
 
 This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Infra Client runs and Compliance scans.
 
-### Chef Automate - ServiceNow Integration
+## Chef Automate ServiceNow Integration
 
 The integration between a Chef Automate server and a ServiceNow instance requires the following:
 
 * Chef Automate
 * Chef Automate Incident Creation Application in ServiceNow
 
-The Chef Automate Incident Creation application is a ServiceNow certified scoped application available from the ServiceNow store. [Chef Automate](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance.
-Once configured, the Chef Automate server sends HTTPS JSON notifications to the Chef Automate Incident Creation Application in a ServiceNow instance to create or update incidents.
+[Chef Automate](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance.
+The Chef Automate Incident Creation Application is a ServiceNow certified scoped application available from the ServiceNow store.
+The ServiceNow Chef Automate Incident Creation Application creates or updates incidents based on HTTPS JSON notifications sent from your Chef Automate installation.
 
 ![ServiceNow and Chef Automate Flow](/images/automate/SNOW_Automate_diagram.png)
 
-#### Prerequisites
+### Prerequisites
 
 * The ServiceNow instance must be publicly reachable on https port 443
 * [Chef Automate server installation](/automate/install/)
