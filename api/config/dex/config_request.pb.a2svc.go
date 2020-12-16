@@ -116,6 +116,9 @@ func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
 
 // GetSecret gets a secret by name. Returns nil if it is not set
 func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
+	if m == nil {
+		return nil
+	}
 	switch name {
 	case "ldap_password":
 		v0 := m.V1

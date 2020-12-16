@@ -449,6 +449,9 @@ func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc
 		if len(acc.secretInfo) == 0 {
 			g.Return(jen.Nil())
 		} else {
+			g.If(jen.Id("m").Op("==").Nil()).Block(
+				jen.Return(jen.Nil()),
+			)
 			// switch name {
 			g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
 				for _, secretInfo := range acc.secretInfo {
