@@ -20,10 +20,10 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Mlsa:     &ac.Mlsa{},
-				Service:  &ConfigRequest_V1_System_Service{},
-				Log:      &ac.Log{},
-				Timeouts: &ConfigRequest_V1_System_Timeouts{},
+				Mlsa:      &ac.Mlsa{},
+				Service:   &ConfigRequest_V1_System_Service{},
+				Log:       &ac.Log{},
+				Timeouts:  &ConfigRequest_V1_System_Timeouts{},
 				Resolvers: &ConfigRequest_V1_System_Resolvers{},
 			},
 		},
@@ -40,7 +40,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Timeouts.Connect = w.Int32(5)
 	c.V1.Sys.Timeouts.Idle = w.Int32(43200)
 	c.V1.Sys.Resolvers.EnableSystemNameservers = w.Bool(false)
-	c.V1.Sys.Resolvers.NameServers = nil
 
 	if externalPG := c.GetV1().GetSys().Service.GetExternalPostgresql(); externalPG.GetEnable().GetValue() {
 
@@ -86,9 +85,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.PreparedSystemConfig, error) {
 	c.V1.Sys.Tls = creds
 
-	enableSystemNameServer := c.V1.Sys.Resolvers.EnableSystemNameservers.GetValue()
+	enableSystemNameServer := c.GetV1().GetSys().GetResolvers().GetEnableSystemNameservers().GetValue()
+	nameServers := c.GetV1().GetSys().GetResolvers().GetNameServers()
 
-	if ((c.V1.Sys.Resolvers.NameServers == nil) || (len(c.V1.Sys.Resolvers.NameServers) == 0)) && enableSystemNameServer {
+	if ((nameServers == nil) || (len(nameServers) == 0)) && enableSystemNameServer {
 		c.V1.Sys.Resolvers.NameServers = getSystemResolvers()
 	}
 
