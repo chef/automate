@@ -76,7 +76,7 @@
     "ajv": "^6.12.6",
     "angular2-template-loader": "^0.6.2",
     "axe-webdriverjs": "^2.3.0",
-    "codelyzer": "^5.2.2",
+    "codelyzer": "^6.0.1",
     "faker": "^4.1.0",
     "hock": "^1.4.1",
     "htmlhint": "^0.11.0",
