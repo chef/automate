@@ -180,12 +180,6 @@ func (d *diskStore) Exists(secret SecretName) (bool, error) {
 	return fileutils.PathExists(path)
 }
 
-// checks if encryption key exists or not
-func keyExists(basePath string) (bool, error) {
-	path := filepath.Join(basePath, "key")
-	return fileutils.PathExists(path)
-}
-
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 	var ret []byte
 
