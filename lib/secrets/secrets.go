@@ -180,6 +180,12 @@ func (d *diskStore) Exists(secret SecretName) (bool, error) {
 	return fileutils.PathExists(path)
 }
 
+// checks if encryption key exists or not
+func keyExists(basePath string) (bool, error) {
+	path := filepath.Join(basePath, "key")
+	return fileutils.PathExists(path)
+}
+
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 	var ret []byte
 
@@ -192,7 +198,6 @@ func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
 		}
-
 		// decrypts and returns the secret value
 		retE, err := getDecryptedData(d.basePath, ret)
 		if err != nil {
@@ -350,34 +355,6 @@ func writeToml(algorithm string, iv string, ciphertext string, path string) erro
 		return err
 	}
 	return nil
-
-	// secretData := SecretKeyToml{
-	// 	Algorithm:  algorithm,
-	// 	IV:         iv,
-	// 	Ciphertext: ciphertext,
-	// }
-	// tomlData, err := tomlEnc.Marshal(secretData)
-	// if err != nil {
-	// 	return errors.Wrap(err, "Error Marshaling SecretKeyToml struct")
-	// }
-	// err = fileutils.AtomicWrite(path, bytes.NewReader(tomlData), fileutils.WithAtomicWriteFileMode(0700))
-	// if err != nil {
-	// 	return err
-	// }
-	// return nil
-
-	// 	str := fmt.Sprintf(
-	// 		`algorithm = "%s"
-	// iv = "%s"
-	// ciphertext = "%s"`, algorithm, iv, ciphertext)
-
-	// 	s := bytes.NewReader([]byte(str))
-	// 	// writing the key to a file
-	// 	err := fileutils.AtomicWrite(path, s, fileutils.WithAtomicWriteFileMode(0700))
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return nil
 }
 
 // takes in the secret value and encrypts it
@@ -417,7 +394,6 @@ func getDecryptedData(basePath string, ret []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var secretData SecretKeyToml
 	_, err = toml.Decode(string(ret), &secretData)
 	if err != nil {
