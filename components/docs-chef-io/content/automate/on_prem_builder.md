@@ -82,13 +82,13 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 
 Deploying Chef Habitat Builder with Chef Automate requires a Chef Automate license.
 If you already have a Chef Automate license, you may use it for the deployment.
-Otherwise, you can accept the 30-day trial license when you first sign in to Chef Automate.s
+Otherwise, you can accept the 30-day trial license when you first sign in to Chef Automate.
 
 If you are deploying Chef Habitat Builder with Chef Automate in an airgapped environment, follow [the documentation on building an airgap bundle]({{< relref "airgapped_installation.md" >}}).
 
 You can deploy Chef Habitat Builder either with a full Chef Automate installation or with the Chef Automate auth stack only.
 
-When deploying Chef Habitat Builder on the same host as Chef Automate authentication to Chef Automate will be configured as part of the deployment.
+When deploying Chef Habitat Builder on the same host as Chef Automate, authentication to Chef Automate will be configured as part of the deployment.
 
 #### Deploy Chef Automate and Chef Habitat Builder
 
