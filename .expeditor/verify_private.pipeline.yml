@@ -119,6 +119,7 @@ steps:
     - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
     - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
     - export SEMGREP_REPO_NAME=chef/automate
+    - export SEMGREP_REPO_URL=https://github.com/chef/automate
     - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
     - \[ -z "$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \] && echo "manual build; using 'master' as base branch"
     - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}
