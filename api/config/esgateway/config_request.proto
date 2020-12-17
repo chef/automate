@@ -43,7 +43,13 @@ message ConfigRequest {
 				message Main {
 					google.protobuf.Int32Value worker_processes = 1;
 					google.protobuf.Int32Value max_fails = 2;
-					google.protobuf.StringValue resolvers = 3;
+					Resolvers resolvers = 3;
+
+					message Resolvers {
+						google.protobuf.BoolValue enable_system_nameservers = 1;
+						repeated google.protobuf.StringValue nameservers = 2;
+						google.protobuf.StringValue nameservers_string = 3;
+					}
 				}
 
 				message Events {

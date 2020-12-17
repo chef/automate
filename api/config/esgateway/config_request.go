@@ -48,8 +48,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	// resolvers once we are a bit more confident in the nginx
 	// module we are using to do dynamic resolution.
 	//
-	// c.V1.Sys.Ngx.Main.Resolvers = getSystemResolvers()
 
+	c.V1.Sys.Ngx.Main.Resolvers.EnableSystemNameservers = w.Bool(false)
+	c.V1.Sys.Ngx.Main.Resolvers.Nameservers = nil
 	c.V1.Sys.Ngx.Events.WorkerConnections = w.Int32(1024)
 
 	c.V1.Sys.Ngx.Http.ServerNamesHashBucketSize = w.Int32(128)
@@ -89,6 +90,20 @@ func (c *ConfigRequest) Validate() error {
 // to start the service.
 func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.PreparedSystemConfig, error) {
 	c.V1.Sys.Tls = creds
+
+	enableSystemNameServer := c.V1.Sys.Ngx.Main.Resolvers.EnableSystemNameservers.GetValue()
+
+	if ((c.V1.Sys.Ngx.Main.Resolvers.Nameservers == nil) || (len(c.V1.Sys.Ngx.Main.Resolvers.Nameservers) == 0)) && enableSystemNameServer {
+		c.V1.Sys.Ngx.Main.Resolvers.NameserversString = getSystemResolvers()
+	} else {
+		if (c.V1.Sys.Ngx.Main.Resolvers.Nameservers != nil) && (len(c.V1.Sys.Ngx.Main.Resolvers.Nameservers) > 0) {
+			ns := make([]string, 0, len(c.V1.Sys.Ngx.Main.Resolvers.Nameservers))
+			for _, n := range c.V1.Sys.Ngx.Main.Resolvers.Nameservers {
+				ns = append(ns, n.GetValue())
+			}
+			c.V1.Sys.Ngx.Main.Resolvers.NameserversString = w.String(strings.Join(ns, " "))
+		}
+	}
 	return c.V1.Sys, nil
 }
 
