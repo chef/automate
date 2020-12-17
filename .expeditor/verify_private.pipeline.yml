@@ -138,7 +138,6 @@ steps:
           environment:
             - SEMGREP_TOKEN
             - SEMGREP_ID
-    soft_fail: true
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
