@@ -10,9 +10,10 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -40,6 +41,8 @@ type SecretName struct {
 	Name  string
 }
 
+// SecretKeyToml secret toml structure thats required to write and read
+// to the encrypted secret file
 type SecretKeyToml struct {
 	Algorithm  string `toml:"algorithm"`
 	IV         string `toml:"iv"`
@@ -177,22 +180,19 @@ func (d *diskStore) Exists(secret SecretName) (bool, error) {
 	return fileutils.PathExists(path)
 }
 
-// checks if encryption key exists or not
-func keyExists(basePath string) (bool, error) {
-	path := filepath.Join(basePath, "key")
-	return fileutils.PathExists(path)
-}
-
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 	var ret []byte
+
 	// checks if the encrypted secret exists
-	pathToEncryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name+".enc")
+	pathToEncryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name+".enc.toml")
 	encryptedSecretExists, err := fileutils.PathExists(pathToEncryptedSecret)
+
 	if encryptedSecretExists {
 		ret, err = ioutil.ReadFile(pathToEncryptedSecret)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
 		}
+
 		// decrypts and returns the secret value
 		retE, err := getDecryptedData(d.basePath, ret)
 		if err != nil {
@@ -200,7 +200,8 @@ func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 		}
 		return retE, err
 	}
-	// else return normal secret
+
+	// else return unencrypted secret
 	pathToUnencryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name)
 	ret, err = ioutil.ReadFile(pathToUnencryptedSecret)
 	if err != nil {
@@ -211,7 +212,7 @@ func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
 
 func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 	parentDir := filepath.Join(d.basePath, secret.Group)
-	secretPath := filepath.Join(parentDir, secret.Name+".enc")
+	secretPath := filepath.Join(parentDir, secret.Name+".enc.toml")
 	err := os.MkdirAll(parentDir, 0700)
 	if err != nil {
 		return errors.Wrap(err, "could not create directory for secrets data")
@@ -228,7 +229,7 @@ func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 	}
 
 	// writes as toml file
-	err = writeToml("AES256 CTR mode", string(iv), string(encryptedData), secretPath)
+	err = writeToml("AES256 CTR mode", encodeBase64(iv), encodeBase64(encryptedData), secretPath)
 	if err != nil {
 		return errors.Wrap(err, "could not write secrets data to disk")
 	}
@@ -280,38 +281,109 @@ func PrepareSSHPrivateKey(keyContent string) (string, error) {
 	return keyPath.Name(), nil
 }
 
-func encrypt(block cipher.Block, value []byte, iv []byte) []byte {
-	stream := cipher.NewCTR(block, iv)
-	ciphertext := make([]byte, len(value))
-	stream.XORKeyStream(ciphertext, value)
-	return ciphertext
+// checks if encryption key exists or not
+func keyExists(basePath string) (bool, error) {
+	path := filepath.Join(basePath, "key")
+	return fileutils.PathExists(path)
 }
 
-func decrypt(block cipher.Block, ciphertext []byte, iv []byte) []byte {
+func encodeBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func decodeBase64(s string) ([]byte, error) {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to decode base64 string")
+	}
+	return data, nil
+}
+
+// Takes in key and the data, then encrypts the base64 encoded data
+// Uses AES256 CTR mode for encryption
+// returns the ciphertext, iv and error
+func encrypt(key []byte, value []byte) ([]byte, []byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error creating cipher block during encryption")
+	}
+	iv, err := GenerateRandomBytes(block.BlockSize())
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate random iv for encryption")
+	}
+	b := encodeBase64(value)
+	stream := cipher.NewCTR(block, iv)
+	ciphertext := make([]byte, len(b))
+	stream.XORKeyStream(ciphertext, []byte(b))
+	return ciphertext, iv, nil
+}
+
+// decrpting the cipher for ctr mode
+// returns the decoded data ( originally encoded with base64 ) and error
+func decrypt(block cipher.Block, ciphertext []byte, iv []byte) ([]byte, error) {
 	stream := cipher.NewCTR(block, iv)
 	plain := make([]byte, len(ciphertext))
-	// XORKeyStream is used to decrypt too!
 	stream.XORKeyStream(plain, ciphertext)
-	return plain
+	d, err := decodeBase64(string(plain))
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
 }
 
+// function used to write the secret values to given file in toml format
+// stores the name of the algorithm , iv and the ciphertext
 func writeToml(algorithm string, iv string, ciphertext string, path string) error {
-	str := fmt.Sprintf(
-		`algorithm = "%s"
-iv = "%s"
-ciphertext = "%s"`, algorithm, iv, ciphertext)
+	secretData := SecretKeyToml{
+		Algorithm:  algorithm,
+		IV:         iv,
+		Ciphertext: ciphertext,
+	}
 
-	s := bytes.NewReader([]byte(str))
-	// writing the key to a file
-	err := fileutils.AtomicWrite(path, s, fileutils.WithAtomicWriteFileMode(0700))
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(secretData); err != nil {
+		log.Fatal(err)
+	}
+
+	err := fileutils.AtomicWrite(path, bytes.NewReader(buf.Bytes()), fileutils.WithAtomicWriteFileMode(0700))
 	if err != nil {
 		return err
 	}
 	return nil
+
+	// secretData := SecretKeyToml{
+	// 	Algorithm:  algorithm,
+	// 	IV:         iv,
+	// 	Ciphertext: ciphertext,
+	// }
+	// tomlData, err := tomlEnc.Marshal(secretData)
+	// if err != nil {
+	// 	return errors.Wrap(err, "Error Marshaling SecretKeyToml struct")
+	// }
+	// err = fileutils.AtomicWrite(path, bytes.NewReader(tomlData), fileutils.WithAtomicWriteFileMode(0700))
+	// if err != nil {
+	// 	return err
+	// }
+	// return nil
+
+	// 	str := fmt.Sprintf(
+	// 		`algorithm = "%s"
+	// iv = "%s"
+	// ciphertext = "%s"`, algorithm, iv, ciphertext)
+
+	// 	s := bytes.NewReader([]byte(str))
+	// 	// writing the key to a file
+	// 	err := fileutils.AtomicWrite(path, s, fileutils.WithAtomicWriteFileMode(0700))
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return nil
 }
 
+// takes in the secret value and encrypts it
+// return encrypted cipher, iv and error
 func getEncryptedData(data []byte, basePath string) ([]byte, []byte, error) {
-	// generating the secret
+	// we create the encryption key if it doesnot exist
 	var secretKey []byte
 	keyExists, err := keyExists(basePath)
 	if err != nil {
@@ -329,17 +401,15 @@ func getEncryptedData(data []byte, basePath string) ([]byte, []byte, error) {
 			return nil, nil, errors.Wrap(err, "could not read secrets key (unexpected error)")
 		}
 	}
-
-	block, err := aes.NewCipher(secretKey)
+	encryptedData, iv, err := encrypt(secretKey, data)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error creating secret key for encryption")
+		return nil, nil, err
 	}
-
-	iv, _ := GenerateRandomBytes(block.BlockSize())
-
-	return encrypt(block, data, iv), iv, nil
+	return encryptedData, iv, nil
 }
 
+// gets the secret from the toml file and decrypts it
+// returns the decrypted data or error
 func getDecryptedData(basePath string, ret []byte) ([]byte, error) {
 	keyPath := filepath.Join(basePath, "key")
 	key, err := ioutil.ReadFile(keyPath)
@@ -347,14 +417,34 @@ func getDecryptedData(basePath string, ret []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var secretData SecretKeyToml
 	_, err = toml.Decode(string(ret), &secretData)
 	if err != nil {
 		return nil, err
 	}
-	return decrypt(block, []byte(secretData.Ciphertext), []byte(secretData.IV)), nil
+
+	// coverts ciphertext to byte from base64
+	dcdCipher, err := decodeBase64(secretData.Ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	// coverts iv to byte from base64
+	dcdIv, err := decodeBase64(secretData.IV)
+	if err != nil {
+		return nil, err
+	}
+
+	decrypted, err := decrypt(block, dcdCipher, dcdIv)
+	if err != nil {
+		return nil, err
+	}
+	return decrypted, nil
 }
 
+// Creates the Key used for the secret values' encryption
+// we generate a random byte array of 32 bytes required for the AES256 encryption
+// returns the key
 func createEncryptionKey(basePath string) ([]byte, error) {
 	secretKey, err := GenerateRandomBytes(32)
 	if err != nil {
