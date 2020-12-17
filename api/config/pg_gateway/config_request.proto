@@ -27,6 +27,7 @@ message ConfigRequest {
 			message Endpoint {
 				google.protobuf.BoolValue is_domain = 1;
 				google.protobuf.StringValue address = 2;
+				google.protobuf.StringValue port = 3;
 			}
 
 			message Service {

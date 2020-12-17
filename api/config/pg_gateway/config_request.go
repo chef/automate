@@ -1,12 +1,18 @@
 package pg_gateway
 
 import (
+	"fmt"
 	"net"
 
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/lib/config"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+)
+
+const (
+	defaultResolverPort = 52
+	defaultServerPort   = "5432"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -36,14 +42,19 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Resolvers = getSystemResolvers()
 
 	if externalPG := c.GetV1().GetSys().Service.GetExternalPostgresql(); externalPG.GetEnable().GetValue() {
+
 		nodes := externalPG.GetNodes()
 
 		if len(nodes) > 0 {
 			endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
 
 			for _, node := range nodes {
-				host, _, _ := net.SplitHostPort(node.GetValue())
-				n := &ConfigRequest_V1_System_Endpoint{Address: node}
+				host, port, err := net.SplitHostPort(node.GetValue())
+				if err != nil {
+					port = defaultServerPort
+				}
+
+				n := &ConfigRequest_V1_System_Endpoint{Address: w.String(host), Port: w.String(port)}
 				n.IsDomain = w.Bool(!isIPAddress(host))
 				endpoints = append(endpoints, n)
 			}
@@ -81,7 +92,12 @@ func getSystemResolvers() []*wrappers.StringValue {
 	resolvers := make([]*wrappers.StringValue, 0, len(ns))
 
 	for _, n := range ns {
-		resolvers = append(resolvers, w.String(n))
+		_, _, err := net.SplitHostPort(n)
+		if err == nil {
+			resolvers = append(resolvers, w.String(n))
+		} else {
+			resolvers = append(resolvers, w.String(fmt.Sprintf("%s:%s", n, defaultServerPort)))
+		}
 	}
 	return resolvers
 }
