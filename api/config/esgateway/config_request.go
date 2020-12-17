@@ -94,7 +94,7 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 
 	enableSystemNameServer := c.GetV1().GetSys().GetNgx().GetMain().GetResolvers().GetEnableSystemNameservers().GetValue()
 	nameServers := c.GetV1().GetSys().GetNgx().GetMain().GetResolvers().GetNameservers()
-	if ((nameServers == nil) || (len(nameServers) == 0)) && enableSystemNameServer {
+	if len(nameServers) == 0 && enableSystemNameServer {
 		c.V1.Sys.Ngx.Main.Resolvers.NameserversString = getSystemResolvers()
 	} else {
 		if (nameServers != nil) && (len(nameServers) > 0) {
