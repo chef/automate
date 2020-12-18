@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
@@ -40,7 +40,7 @@ describe('NodeDetailsComponent', () => {
     describe('on initialization', () => {
       it('subscribes to the node-details event service', () => {
         spyOn(eventService.showModal$, 'subscribe')
-          .and.returnValue(new BehaviorSubject<boolean>(false));
+          .and.returnValue(new Subscription);
         component.ngOnInit();
         // Next line complains "subscribe is deprecated" -- but this usage is OK!
         // tslint:disable-next-line
