@@ -52,7 +52,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   }
 
   private get trendData(): TrendData[] {
-    if(this.trendDataCache === undefined || this.trendDataCache.length == 0) {
+    if (this.trendDataCache === undefined || this.trendDataCache.length == 0) {
       this.trendDataCache = this.data.map(d => {
         return { ...d, report_time: this.createUtcDate(d.report_time) };
       });
