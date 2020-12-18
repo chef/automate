@@ -33,7 +33,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     private el: ElementRef,
     @Inject(DOCUMENT) private document: Document
   ) {}
-  treandDataCache = [];
+  trendDataCache = [];
 
   @Input() data = [];
 
@@ -51,35 +51,35 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     return `0 0 ${this.vbWidth} ${this.vbHeight}`;
   }
 
-  get trendData(): TrendData[] {
-    if(this.treandDataCache === undefined || this.treandDataCache.length == 0) {
+  private get trendData(): TrendData[] {
+    if(this.trendDataCache === undefined || this.trendDataCache.length == 0) {
       console.log("trendDataCache..!")
-      this.treandDataCache = this.data.map(d => {
+      this.trendDataCache = this.data.map(d => {
         return { ...d, report_time: this.createUtcDate(d.report_time) };
       });
     }
-    return this.treandDataCache
+    return this.trendDataCache
   }
 
-  get domainX() {
+  private get domainX() {
     const min = d3.min(this.trendData, (d: TrendData) => d.report_time);
     const max = d3.max(this.trendData, (d: TrendData) => d.report_time);
     return [min, max];
   }
 
-  get rangeX() {
+  private get rangeX() {
     const min = 50;
     const max = this.vbWidth - 50;
     return [min, max];
   }
 
-  get scaleX() {
+  private get scaleX() {
     return d3.scaleTime()
       .domain(this.domainX)
       .range(this.rangeX);
   }
 
-  get domainY() {
+  private get domainY() {
     const min = 0;
     const max = d3.max(this.trendData, (d: TrendData) => d3.max([
       d.failed,
@@ -90,41 +90,41 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     return [min, max];
   }
 
-  get rangeY() {
+  private get rangeY() {
     const min = 10;
     const max = this.vbHeight - 30;
     return [max, min];
   }
 
-  get scaleY() {
+  private get scaleY() {
     return d3.scaleLinear()
       .domain(this.domainY)
       .range(this.rangeY);
   }
 
-  get svgSelection() {
+  private get svgSelection() {
     return d3.select(this.svg.nativeElement);
   }
 
-  get axisXSelection() {
+  private get axisXSelection() {
     return this.svgSelection.select('.x-axis');
   }
 
-  get axisYSelection() {
+  private get axisYSelection() {
     return this.svgSelection.select('.y-axis');
   }
 
-  get dotsSelection() {
+  private get dotsSelection() {
     return this.svgSelection.selectAll('.dot-group')
       .data(this.trendData, (d: TrendData) => d.report_time.getTime());
   }
 
-  get tipsSelection() {
+  private get tipsSelection() {
     return d3.select(this.document.body).selectAll('.dot-group-tip')
       .data(this.trendData, (d: TrendData) => d.report_time.getTime());
   }
 
-  get linesSelection() {
+  private get linesSelection() {
     return this.svgSelection.selectAll('.status-line')
       .data([
         'skipped',
@@ -134,7 +134,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       ].map(status => ({ status, values: this.trendData })));
   }
   ngOnChanges() {
-    this.treandDataCache = [];
+    this.trendDataCache = [];
     this.resize();
     this.draw();
   }
@@ -322,7 +322,11 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   }
 
   createUtcDate(time: string): Date {
-    const utcDate = moment(time);
-    return new Date(utcDate.year(), utcDate.month(), utcDate.date());
-  }
+    const utcDate = moment.utc(time);
+    if (utcDate.isValid) {	    
+      return new Date(utcDate.year(), utcDate.month(), utcDate.date());	
+    } else {	
+      console.error('Not a valid date ' + time);	
+      return new Date();	
+    }  }
 }
