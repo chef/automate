@@ -15,26 +15,26 @@ func TestPgGateway(t *testing.T) {
 		c.V1.Sys.Resolvers.EnableSystemNameservers = w.Bool(true)
 		c.PrepareSystemConfig(&ac.TLSCredentials{})
 
-		require.True(t, len(c.V1.Sys.Resolvers.NameServers) > 0)
+		require.True(t, len(c.V1.Sys.Resolvers.Nameservers) > 0)
 	})
 
 	t.Run("check nameserver by setting the nameservers", func(t *testing.T) {
 		c := DefaultConfigRequest()
-		c.V1.Sys.Resolvers.NameServers = []*wrappers.StringValue{w.String("111.11.111.0")}
+		c.V1.Sys.Resolvers.Nameservers = []*wrappers.StringValue{w.String("111.11.111.0")}
 		c.PrepareSystemConfig(&ac.TLSCredentials{})
 
-		require.True(t, len(c.V1.Sys.Resolvers.NameServers) > 0)
+		require.True(t, len(c.V1.Sys.Resolvers.Nameservers) > 0)
 		require.False(t, c.V1.Sys.Resolvers.EnableSystemNameservers.GetValue())
 	})
 
 	t.Run("check nameserver by setting both the enable nameserver flag and the nameservers", func(t *testing.T) {
 		c := DefaultConfigRequest()
-		c.V1.Sys.Resolvers.NameServers = []*wrappers.StringValue{w.String("111.11.111.0")}
+		c.V1.Sys.Resolvers.Nameservers = []*wrappers.StringValue{w.String("111.11.111.0")}
 		c.V1.Sys.Resolvers.EnableSystemNameservers = w.Bool(true)
 		c.PrepareSystemConfig(&ac.TLSCredentials{})
 
-		require.Equal(t, len(c.V1.Sys.Resolvers.NameServers), 1)
-		require.Equal(t, c.V1.Sys.Resolvers.NameServers[0].GetValue(), "111.11.111.0")
+		require.Equal(t, len(c.V1.Sys.Resolvers.Nameservers), 1)
+		require.Equal(t, c.V1.Sys.Resolvers.Nameservers[0].GetValue(), "111.11.111.0")
 		require.True(t, c.V1.Sys.Resolvers.EnableSystemNameservers.GetValue())
 	})
 

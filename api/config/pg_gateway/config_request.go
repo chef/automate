@@ -87,10 +87,10 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 	c.V1.Sys.Tls = creds
 
 	enableSystemNameServer := c.GetV1().GetSys().GetResolvers().GetEnableSystemNameservers().GetValue()
-	nameServers := c.GetV1().GetSys().GetResolvers().GetNameServers()
+	nameServers := c.GetV1().GetSys().GetResolvers().GetNameservers()
 
-	if ((nameServers == nil) || (len(nameServers) == 0)) && enableSystemNameServer {
-		c.V1.Sys.Resolvers.NameServers = getSystemResolvers()
+	if (len(nameServers) == 0) && enableSystemNameServer {
+		c.V1.Sys.Resolvers.Nameservers = getSystemResolvers()
 	}
 
 	return c.V1.Sys, nil

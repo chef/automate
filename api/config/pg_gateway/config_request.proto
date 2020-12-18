@@ -25,7 +25,7 @@ message ConfigRequest {
 			Resolvers resolvers = 6;
 
 			message Resolvers {
-				repeated google.protobuf.StringValue name_servers = 1;
+				repeated google.protobuf.StringValue nameservers = 1;
 				google.protobuf.BoolValue enable_system_nameservers = 2;
 			}
 
