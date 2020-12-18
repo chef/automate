@@ -32,7 +32,7 @@ defmodule Slack.Message.Attachment do
   field :fallback, 2, type: :string
   field :pretext, 3, type: :string
   field :text, 4, type: :string
-  field :mrkdwn_in, 5, type: :string
+  field :mrkdwn_in, 5, type: :string, json_name: "mrkdwnIn"
   field :fields, 6, repeated: true, type: Slack.Message.Attachment.Field
 end
 
@@ -48,7 +48,7 @@ defmodule Slack.Message do
         }
   defstruct [:icon_url, :text, :username, :attachments]
 
-  field :icon_url, 1, type: :string
+  field :icon_url, 1, type: :string, json_name: "iconUrl"
   field :text, 2, type: :string
   field :username, 3, type: :string
   field :attachments, 4, repeated: true, type: Slack.Message.Attachment

@@ -18,11 +18,11 @@ deps:
 	mix deps.get
 .PHONY: deps
 
-ELIXIR_PROTOC=PATH=$(PATH):~/.mix/escripts protoc --elixir_out=plugins=grpc:./lib/pb -I ../../../ -I priv -I ../../../api/external/secrets -I ../../../protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/
-BASE_PROTO_FILES=notifications.proto rules.proto server.proto health.proto slack_post.proto secrets.proto google/protobuf/struct.proto
+ELIXIR_PROTOC=PATH=$(PATH):~/.mix/escripts protoc --elixir_out=plugins=grpc:./lib/pb -I ../../../ -I priv -I ../../../api/external/secrets -I ../../../api/  -I ../../../protovendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/
+BASE_PROTO_FILES=notifications.proto rules.proto server.proto health.proto slack_post.proto secrets.proto external/common/query/parameters.proto
 
 elixir_client:
-	$(ELIXIR_PROTOC) $(BASE_PROTO_FILES) priv/google/protobuf/struct.proto
+	$(ELIXIR_PROTOC) $(BASE_PROTO_FILES)
 
 gen-proto: deps elixir_client
 
