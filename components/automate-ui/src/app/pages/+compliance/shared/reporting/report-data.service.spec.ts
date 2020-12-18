@@ -137,7 +137,7 @@ describe('ReportDataService', () => {
         filters: [ ],
         last24h: false
       };
-      const data = [];
+      const data = {total: '', items: ''};
       spyOn(statsService, 'getControls').and.returnValue(observableOf(data));
 
       service.getReportingControlsList(reportQuery);
