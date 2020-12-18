@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,7 +24,7 @@ describe('CreateNotificationModalComponent', () => {
   let component: CreateNotificationModalComponent;
   let fixture: ComponentFixture<CreateNotificationModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),

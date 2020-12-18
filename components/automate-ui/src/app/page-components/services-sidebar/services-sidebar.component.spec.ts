@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixture, async } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { ServicesSidebarComponent } from './services-sidebar.component';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
@@ -191,7 +191,7 @@ describe('ServicesSidebarComponent', () => {
 
     describe('clicking delete services button', () => {
 
-      it('delete modal should be visible upon clicking delete', async(() => {
+      it('delete modal should be visible upon clicking delete', waitForAsync(() => {
         expect(component.checkedServices.length).toEqual(0);
         component.handleToggleCheckbox(300, true);
         expect(component.checkedServices.length).toEqual(1);

@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { using } from 'app/testing/spec-helpers';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal.component';
 import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
@@ -8,7 +8,7 @@ describe('ConfirmApplyStopModalComponent', () => {
   let component: ConfirmApplyStopModalComponent;
   let fixture: ComponentFixture<ConfirmApplyStopModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [
@@ -137,14 +137,14 @@ describe('ConfirmApplyStopModalComponent', () => {
   });
 
   describe('when confirm-button is clicked', () => {
-    it('emits a confirm event', async () => {
+    it('emits a confirm event', waitForAsync(() => {
       spyOn(component.confirm, 'emit');
 
       const button = fixture.nativeElement.querySelector('#confirm-button');
-      await button.click();
+      button.click();
 
       expect(component.confirm.emit).toHaveBeenCalled();
-    });
+    }));
   });
 
   it('displays a cancel-button', () => {
@@ -154,13 +154,13 @@ describe('ConfirmApplyStopModalComponent', () => {
   });
 
   describe('when cancel-button is clicked', () => {
-    it('emits a cancel event', async () => {
+    it('emits a cancel event', waitForAsync(() => {
       spyOn(component.cancel, 'emit');
 
       const button = fixture.nativeElement.querySelector('#cancel-button');
-      await button.click();
+      button.click();
 
       expect(component.cancel.emit).toHaveBeenCalled();
-    });
+    }));
   });
 });

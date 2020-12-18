@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CreateOrgModalComponent } from './create-org-modal.component';
 import { MockComponent } from 'ng2-mock-component';
@@ -11,7 +11,7 @@ describe('CreateOrgModalComponent', () => {
   let component: CreateOrgModalComponent;
   let fixture: ComponentFixture<CreateOrgModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         CreateOrgModalComponent,

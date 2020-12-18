@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ClApiComponent } from './cl-api.component';
 
@@ -6,7 +6,7 @@ describe('ClApiComponent', () => {
   let component: ClApiComponent;
   let fixture: ComponentFixture<ClApiComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ClApiComponent ]
     })

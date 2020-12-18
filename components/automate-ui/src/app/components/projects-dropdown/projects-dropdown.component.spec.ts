@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, SimpleChange } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
@@ -13,7 +13,7 @@ describe('ProjectsDropdownComponent', () => {
   let fixture: ComponentFixture<ProjectsDropdownComponent>;
   let store: Store<NgrxStateAtom>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ProjectsDropdownComponent ],
       imports: [

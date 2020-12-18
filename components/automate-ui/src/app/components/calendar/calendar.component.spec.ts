@@ -1,5 +1,5 @@
 import { Component, DebugElement, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { CalendarComponent } from './calendar.component';
@@ -30,7 +30,7 @@ describe('CalendarComponent', () => {
   let calendarEl: DebugElement;     // Calendar configured with separate attributes
   let calendarDateEl: DebugElement; // Calendar configured with date attribute
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TestHostComponent, CalendarComponent ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

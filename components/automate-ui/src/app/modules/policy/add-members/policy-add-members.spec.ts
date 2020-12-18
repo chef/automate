@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
@@ -13,7 +13,7 @@ describe('PolicyAddMembersComponent', () => {
     let component: PolicyAddMembersComponent;
     let fixture: ComponentFixture<PolicyAddMembersComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
                 MockComponent({ selector: 'chef-page' }),

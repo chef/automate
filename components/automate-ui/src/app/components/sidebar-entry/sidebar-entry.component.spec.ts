@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
 import { SidebarEntryComponent } from './sidebar-entry.component';
@@ -7,7 +7,7 @@ describe('SidebarEntryComponent', () => {
   let component: SidebarEntryComponent;
   let fixture: ComponentFixture<SidebarEntryComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         SidebarEntryComponent,

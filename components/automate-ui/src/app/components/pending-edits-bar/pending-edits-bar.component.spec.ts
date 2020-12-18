@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -30,7 +30,7 @@ describe('PendingEditsBarComponent', () => {
   let projectService: ProjectService;
   let store: Store<NgrxStateAtom>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
       configureWith({
         '/apis/iam/v2/projects': genPerm('/apis/iam/v2/projects', true)
       });
@@ -176,7 +176,7 @@ describe('PendingEditsBarComponent--unauthorized', () => {
   let fixture: ComponentFixture<PendingEditsBarComponent>;
   let store: Store<NgrxStateAtom>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     configureWith({
       '/apis/iam/v2/projects': genPerm('/apis/iam/v2/projects', false)
     });

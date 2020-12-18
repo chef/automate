@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { MiniTableComponent } from './mini-table.component';
@@ -8,7 +8,7 @@ describe('MiniTableComponent', () => {
   let component: MiniTableComponent;
   let fixture: ComponentFixture<MiniTableComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         DefinedOrDefaultPipe,

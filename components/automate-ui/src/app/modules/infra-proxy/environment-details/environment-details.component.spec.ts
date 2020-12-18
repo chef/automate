@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -53,7 +53,7 @@ describe('EnvironmentDetailsComponent', () => {
     }
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
@@ -127,7 +127,7 @@ describe('EnvironmentDetailsComponent', () => {
       expect(element.query(By.css('.jsontree_value_object'))).toBeNull();
     });
 
-    it('fetches attributes and returns an EnvironmentAttributes object', async(() => {
+    it('fetches attributes and returns an EnvironmentAttributes object', waitForAsync(() => {
       fixture.whenStable().then(() => {
         expect(component.retrieve('default_attributes')).toEqual(retrieve_default);
       });

@@ -1,4 +1,4 @@
-import { async, TestBed } from '@angular/core/testing';
+import { waitForAsync, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -91,7 +91,7 @@ describe('AttributesComponent', () => {
     expect(element.query(By.css('.attributes-rollup'))).not.toBeNull();
   });
 
-  it('fetches attributes and returns a NodeAttributes object', async(() => {
+  it('fetches attributes and returns a NodeAttributes object', waitForAsync(() => {
     fixture.whenStable().then(() => {
       expect(component.retrieve('default')).toEqual(retrieve_default);
       expect(component.retrieve('all')).toEqual(retrieve_all);
@@ -100,7 +100,7 @@ describe('AttributesComponent', () => {
 
   describe('#filter', () => {
 
-    it('applies the selected precedence level', async(() => {
+    it('applies the selected precedence level', waitForAsync(() => {
       fixture.whenStable().then(() => {
         expect(component.selected_level).toBe('all');
 
@@ -109,7 +109,7 @@ describe('AttributesComponent', () => {
       });
     }));
 
-    it('applies the selected attributes collection', async(() => {
+    it('applies the selected attributes collection', waitForAsync(() => {
       fixture.whenStable().then(() => {
         expect(component.selectedAttrs).toEqual(retrieve_all);
 

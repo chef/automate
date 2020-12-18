@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 
 import { runtimeChecks } from 'app/ngrx.reducers';
@@ -32,7 +32,7 @@ describe('LandingComponent', () => {
 
     router.navigate.calls.reset();
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureWith({
         '/apis/iam/v2/users': genPerm('/apis/iam/v2/users', false),
         '/apis/iam/v2/teams': genPerm('/apis/iam/v2/teams', true),
@@ -67,7 +67,7 @@ describe('LandingComponent', () => {
     const targetIndex = 0;
     router.navigate.calls.reset();
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureWith({
         '/apis/iam/v2/users': genPerm('/apis/iam/v2/users', true),
         '/apis/iam/v2/teams': genPerm('/apis/iam/v2/teams', true),
@@ -108,7 +108,7 @@ describe('LandingComponent', () => {
       { allOfCheck: [['/apis/iam/v2/users', 'get']], route: '/settings/users' }
     ];
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureWith({
         '/apis/iam/v2/users': genPerm('/apis/iam/v2/users', true),
         '/apis/iam/v2/teams': genPerm('/apis/iam/v2/teams', false),

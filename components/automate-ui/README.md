@@ -74,6 +74,12 @@ error TS6200: Definitions of the following identifiers conflict with those in an
 There are very few reports of others experiencing this problem and no resolution presents itself.
 Reference: https://stackoverflow.com/a/57592510
 
+### Package tslint: ^5.0.0
+restricted to 5.0.0 because errors thrown from dependent packages.  
+
+npm ERR! peer dep missing: tslint@^5.0.0, required by rxjs-tslint@0.1.8
+npm ERR! peer dep missing: tslint@^5.x, required by tslint-defocus@2.0.6
+
 ### Package immutable: ^3.8.2
 
 Reason: Later releases are release candidates; should only be using production-releases.
@@ -82,39 +88,6 @@ Reason: Later releases are release candidates; should only be using production-r
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
-### Package tslint: ^5.20.1
-
-Reason: Trying to install the latest version `npm install tslint@6` reports these warnings
-so maintaining at highest version of 5.x.x:
-
-```text
-npm WARN deprecated tslint@6.0.0: TSLint has been deprecated in favor of ESLint. Please see https://github.com/palantir/tslint/issues/4534 for more information.
-npm WARN codelyzer@5.2.1 requires a peer of tslint@^5.0.0 but none is installed. You must install peer dependencies yourself.
-npm WARN rxjs-tslint@0.1.7 requires a peer of tslint@^5.0.0 but none is installed. You must install peer dependencies yourself.
-npm WARN tslint-defocus@2.0.6 requires a peer of tslint@^5.x but none is installed. You must install peer dependencies yourself.
-```
-
-### Package typescript: ~3.5.3
-
-Reason: Trying to install the latest version `npm install typescript@3.7.4` reports these warnings
-so maintaining at highest version of 3.5.x:
-
-```text
-@angular-devkit/build-angular@0.803.21 requires a peer of typescript@>=3.1 < 3.6 but none is installed.
-@angular/compiler-cli@8.2.14 requires a peer of typescript@>=3.4 <3.6 but none is installed.
-@ngtools/webpack@8.3.21 requires a peer of typescript@>=3.4 < 3.6 but none is installed.
-```
-
-### Package @nguniversal/express-engine: 9.0.0-rc.2
-
-Reason: `ng build` reported this error:
-
-```text
-ERROR in The target entry-point "ngx-cookie" has missing dependencies:
- - express-serve-static-core
-```
-
-Reference: https://github.com/salemdar/ngx-cookie/issues/106
 
 ## Angular Module Architecture
 
