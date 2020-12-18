@@ -41,6 +41,23 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Timeouts.Idle = w.Int32(43200)
 	c.V1.Sys.Resolvers.EnableSystemNameservers = w.Bool(false)
 
+	return c
+}
+
+// Validate validates that the config is sufficient to start the Service. If
+// validation succeeds it will return nil, if it fails it will return a new
+// instance of config.InvalidConfigError that has the missing keys and invalid
+// fields populated.
+func (c *ConfigRequest) Validate() error {
+	return nil
+}
+
+// SetGlobalConfig is a callback that allows us to populate the
+// configuration of an individual service with global automate config.
+func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
+	c.V1.Sys.Mlsa = g.V1.Mlsa
+	c.V1.Sys.Service.ExternalPostgresql = g.GetV1().GetExternal().GetPostgresql()
+
 	if externalPG := c.GetV1().GetSys().Service.GetExternalPostgresql(); externalPG.GetEnable().GetValue() {
 
 		nodes := externalPG.GetNodes()
@@ -62,22 +79,6 @@ func DefaultConfigRequest() *ConfigRequest {
 			c.V1.Sys.Service.ParsedNodes = endpoints
 		}
 	}
-	return c
-}
-
-// Validate validates that the config is sufficient to start the Service. If
-// validation succeeds it will return nil, if it fails it will return a new
-// instance of config.InvalidConfigError that has the missing keys and invalid
-// fields populated.
-func (c *ConfigRequest) Validate() error {
-	return nil
-}
-
-// SetGlobalConfig is a callback that allows us to populate the
-// configuration of an individual service with global automate config.
-func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
-	c.V1.Sys.Mlsa = g.V1.Mlsa
-	c.V1.Sys.Service.ExternalPostgresql = g.GetV1().GetExternal().GetPostgresql()
 }
 
 // PrepareSystemConfig returns a system configuration that can be used

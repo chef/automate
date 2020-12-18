@@ -37,4 +37,29 @@ func TestPgGateway(t *testing.T) {
 		require.Equal(t, c.V1.Sys.Resolvers.NameServers[0].GetValue(), "111.11.111.0")
 		require.True(t, c.V1.Sys.Resolvers.EnableSystemNameservers.GetValue())
 	})
+
+	t.Run("check node parsing from the config", func(t *testing.T) {
+		c := DefaultConfigRequest()
+		c.SetGlobalConfig((&ac.GlobalConfig{
+			V1: &ac.V1{
+				External: &ac.External{
+					Postgresql: &ac.External_Postgresql{
+						Enable: w.Bool(true),
+						Nodes: []*wrappers.StringValue{
+							w.String("172.17.0.2:7432"),
+							w.String("172.17.0.3:7432"),
+						},
+					},
+				},
+			},
+		}))
+
+		require.Equal(t, c.V1.Sys.Service.ParsedNodes[0].Address.GetValue(), "172.17.0.2")
+		require.Equal(t, c.V1.Sys.Service.ParsedNodes[0].Port.GetValue(), "7432")
+		require.False(t, c.V1.Sys.Service.ParsedNodes[0].IsDomain.GetValue())
+		require.Equal(t, c.V1.Sys.Service.ParsedNodes[1].Address.GetValue(), "172.17.0.3")
+		require.Equal(t, c.V1.Sys.Service.ParsedNodes[1].Port.GetValue(), "7432")
+		require.False(t, c.V1.Sys.Service.ParsedNodes[1].IsDomain.GetValue())
+
+	})
 }
