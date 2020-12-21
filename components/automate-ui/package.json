@@ -70,7 +70,7 @@
     "@angular/cli": "^11.0.5",
     "@angular/compiler-cli": "^11.0.5",
     "@angular/language-service": "^11.0.5",
-    "@types/faker": "^4.1.12",
+    "@types/faker": "^5.1.5",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "^2.0.8",
     "@types/lodash": "^4.14.165",
