@@ -327,5 +327,6 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     } else {
       console.error('Not a valid date ' + time);
       return new Date();
-    }  }
+    }
+  }
 }
