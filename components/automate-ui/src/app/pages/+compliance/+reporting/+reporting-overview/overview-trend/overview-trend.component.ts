@@ -52,12 +52,12 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   }
 
   private get trendData(): TrendData[] {
-    if (this.trendDataCache === undefined || this.trendDataCache.length == 0) {
+    if (this.trendDataCache === undefined || this.trendDataCache.length === 0) {
       this.trendDataCache = this.data.map(d => {
         return { ...d, report_time: this.createUtcDate(d.report_time) };
       });
     }
-    return this.trendDataCache
+    return this.trendDataCache;
   }
 
   private get domainX() {
@@ -322,10 +322,10 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   createUtcDate(time: string): Date {
     const utcDate = moment.utc(time);
-    if (utcDate.isValid) {	    
-      return new Date(utcDate.year(), utcDate.month(), utcDate.date());	
-    } else {	
-      console.error('Not a valid date ' + time);	
-      return new Date();	
+    if (utcDate.isValid) {
+      return new Date(utcDate.year(), utcDate.month(), utcDate.date());
+    } else {
+      console.error('Not a valid date ' + time);
+      return new Date();
     }  }
 }
