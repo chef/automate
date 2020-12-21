@@ -17,7 +17,7 @@ type xmlFields struct {
 	Environment      string    `xml:"Environment,omitempty"`
 	IPAddress        string    `xml:"IPAddress,omitempty"`
 	FQDN             string    `xml:"FQDN,omitempty"`
-	Profiles         []Profile `xml:"Profiles,omitempty"`
+	Profiles         []Profile `xml:"Profiles>Profile,omitempty"`
 	Version          string    `xml:"Version,omitempty"`
 	ChefServer       string    `xml:"ChefServer,omitempty"`
 	ChefOrganization string    `xml:"ChefOrganization,omitempty"`
@@ -32,31 +32,31 @@ type Platform struct {
 
 // Profile detail
 type Profile struct {
-	Name      string    `xml:"Profile>Name,omitempty"`
-	Title     string    `xml:"Profile>Title,omitempty"`
-	Version   string    `xml:"Profile>Version,omitempty"`
-	Summary   string    `xml:"Profile>Summary,omitempty"`
-	Controles []Control `xml:"Profile>Controles,omitempty"`
+	Name      string    `xml:"Name,omitempty"`
+	Title     string    `xml:"Title,omitempty"`
+	Version   string    `xml:"Version,omitempty"`
+	Summary   string    `xml:"Summary,omitempty"`
+	Controles []Control `xml:"Controles>Control,omitempty"`
 }
 
 // Control detail
 type Control struct {
-	ID                  string   `xml:"Control>ID,omitempty"`
-	Title               string   `xml:"Control>Title,omitempty"`
-	Impact              float32  `xml:"Control>Impact,omitempty"`
+	ID                  string   `xml:"ID,omitempty"`
+	Title               string   `xml:"Title,omitempty"`
+	Impact              float32  `xml:"Impact,omitempty"`
 	Waived              string   `xml:"Waived,omitempty"`
 	WaiverJustification string   `xml:"Waiver>Justification,omitempty"`
 	WaiverExpiration    string   `xml:"Waiver>Expiration,omitempty"`
-	Results             []Result `xml:"Results,omitempty"`
+	Results             []Result `xml:"Results>Result,omitempty"`
 }
 
 // Result detail
 type Result struct {
-	Status          string  `xml:"Result>Status,omitempty"`
-	RunTime         float32 `xml:"Result>RunTime,omitempty"`
-	CodeDescription string  `xml:"Result>CodeDescription,omitempty"`
-	Message         string  `xml:"Result>Message,omitempty"`
-	SkipMessage     string  `xml:"Result>SkipMessage,omitempty"`
+	Status          string  `xml:"Status,omitempty"`
+	RunTime         float32 `xml:"RunTime,omitempty"`
+	CodeDescription string  `xml:"CodeDescription,omitempty"`
+	Message         string  `xml:"Message,omitempty"`
+	SkipMessage     string  `xml:"SkipMessage,omitempty"`
 }
 
 // ReportToXML converts a report to its XML representation as a string
