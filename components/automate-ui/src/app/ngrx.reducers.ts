@@ -1,6 +1,8 @@
 import { Params, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import * as router from '@ngrx/router-store';
+import { Action } from '@ngrx/store';
 import { set, get, pipe, map } from 'lodash/fp';
+
 import * as destinationEntity from './entities/destinations/destination.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
@@ -53,6 +55,8 @@ import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
+
+import { LayoutActionTypes, UpdateSidebars } from './entities/layout/layout.actions';
 
 // AOT likely won't allow dynamic object property names here even when the underlying
 // typescript bug preventing it is fixed
@@ -304,3 +308,22 @@ export const ngrxReducers = {
   users: userEntity.userEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
+
+// Add other actions as needed if Redux Dev Tools starts crashing in the browser
+export const actionSanitizer = (action: Action): Action =>
+  action.type === LayoutActionTypes.UPDATE_SIDEBARS && (action as UpdateSidebars).payload
+    ? { ...action, payload: '<<LONG_BLOB>>' } as UpdateSidebars
+    : action;
+
+// The UPDATE_SIDEBARS action above creates a large chunk of state in the sidebars property.
+// Blank it out for Redux Dev Tools to reduce its memory footprint.
+export const stateSanitizer = (state: NgrxStateAtom): NgrxStateAtom =>
+  state?.layout?.sidebars
+    ? {
+      ...state,
+      layout: {
+        ...state.layout,
+        sidebars: {}
+      }
+    }
+    : state;
