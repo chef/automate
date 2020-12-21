@@ -69,7 +69,7 @@ func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
 				v = (reflectVal.Interface()).(a2conf.A2ServiceConfig)
 				isNew = true
 			} else {
-				v = (f.Elem().Interface()).(a2conf.A2ServiceConfig)
+				v = (f.Interface()).(a2conf.A2ServiceConfig)
 			}
 			for _, secret := range v.ListSecrets() {
 				if v.GetSecret(secret.Name) == nil {
