@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package chef.automate.domain.keyval;
+option go_package = "github.com/chef/automate/api/interservice/keyval";
+
+message PutKeyRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message PutKeyResponse {
+}
+
+service KeyvalService {
+    rpc PutKey (PutKeyRequest) returns (PutKeyResponse);
+}

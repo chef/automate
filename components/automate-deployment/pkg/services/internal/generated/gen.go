@@ -435,6 +435,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/keyval-service",
+      "metadata": {
+        "name": "chef/keyval-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -568,7 +578,8 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-cds"
+        "chef/automate-cds",
+        "chef/keyval-service"
       ],
       "packages": null,
       "dependencies": [
