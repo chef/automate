@@ -93,14 +93,14 @@ export class JobAddComponent implements OnDestroy {
     const nodesGroup = this.fb.group({
       managers: this.fb.array([])
     }, {
-      validator: nodeSelectionRequiredValidator
+      validators: nodeSelectionRequiredValidator
     });
     const profilesGroup = this.fb.group({
       allSelected: false,
       someSelected: false,
       profiles: this.fb.array([])
     }, {
-      validator: profileSelectionRequiredValidator
+      validators: profileSelectionRequiredValidator
     });
     const defaultStart = moment.utc();
     const defaultEnd = moment.utc(defaultStart).add(1, 'days');
