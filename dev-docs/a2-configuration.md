@@ -11,7 +11,7 @@ This process, pictured below, involves the automate-cli,
 deployment-service, and Habitat supervisor and is centered around
 protocol buffer (protobuf) descriptions of the configuration.
 
-```
+```text
 +---------------+
 | User-written  |
 | config.toml   |
@@ -147,17 +147,16 @@ regenerate the Go code generated from the protobufs using the
 following command from the development studio:
 
 ```shell
-ompile_go_protobuf_component config
+compile_go_protobuf_component config
 ```
 
 ## User-provided configuration and CLI interface
-
 
 Users configure the system by providing a TOML representation of some
 or all of the `AutomateConfig` protobuf message which is eventually
 passed to the deployment-service via gRPC.
 
-```
+```text
 +---------------+
 | User-written  |
 | config.toml   |
@@ -243,11 +242,11 @@ level = "debug"
 
 ## Deployment Service
 
-The deployment-service takes the configuration from the user, perists
+The deployment-service takes the configuration from the user, persists
 it to long-term storage, transforms it according to code provided by
 the service, and passes it to Habitat for further processing.
 
-```
+```text
  +-------------+     +--------------+
  |  deployment |     |  Habitat     |
  |   service   +---->+  "user" toml |
@@ -272,7 +271,6 @@ following functions for each service-level configuration object:
   here rather than in Habitat's default.toml because it allows us to
   dynamically calculate defaults and works around historical bugs in
   Habitat's configuration processing.
-
 
 - `func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig)`:
   Takes the GlobalConfig and can set any of the ConfigRequest fields
@@ -302,7 +300,7 @@ the process happens at the point that the user sets the configuration
 via an RPC call. The process is then finished during the "periodic
 converge loop" in the deployment service:
 
-```
+```text
 +----------------------------------------------------------------+
 |                                                                |
 |      +----------------------+     +------------------------+   |
@@ -358,7 +356,7 @@ Habitat reads this file and uses it to configure the service.
 
 ## Habitat Configuration
 
-```
+```text
  +--------------+     +--------------+
  |  Habitat     |     |              |
  |  "user" toml |<----|    hab-sup   |
@@ -393,7 +391,7 @@ A2 services use a combination of command line arguments passed via
 the Handlebars templating engine. For example, the `teams-service`
 config.yml template includes:
 
-```
+```text
 grpc: 127.0.0.1:{{ cfg.service.port }}
 log-level: {{ cfg.log.level }}
 log-format: {{ cfg.log.format }}
@@ -405,7 +403,7 @@ only the `System` portion of the service's configuration protobuf is
 passed to Habitat, the configuration keys available are those from the
 System structure. Thus
 
-```
+```text
 cfg.log.level
 ```
 
