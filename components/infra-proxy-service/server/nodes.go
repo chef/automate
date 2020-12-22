@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
-	"strconv"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -107,7 +105,7 @@ func (s *Server) GetNode(ctx context.Context, req *request.Node) (*response.Node
 		PolicyName:          res.PolicyName,
 		PolicyGroup:         res.PolicyGroup,
 		RunList:             res.RunList,
-		Tags:                safeSliceFromMap(res.NormalAttributes, "tags"),
+		Tags:                SafeSliceFromMap(res.NormalAttributes, "tags"),
 		DefaultAttributes:   string(defaultAttributes),
 		AutomaticAttributes: string(automaticAttributes),
 		NormalAttributes:    string(normalAttributes),
@@ -230,52 +228,18 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 	for _, element := range sr.Rows {
 		m := element.(map[string]interface{})["data"].(map[string]interface{})
 		results[index] = &response.NodeAttribute{
-			Id:          safeStringFromMap(m, "chef_guid"),
-			Name:        safeStringFromMap(m, "name"),
-			Fqdn:        safeStringFromMap(m, "fqdn"),
-			IpAddress:   safeStringFromMap(m, "ipaddress"),
-			CheckIn:     safeStringFromMapFloat(m, "ohai_time"),
-			Environment: safeStringFromMap(m, "chef_environment"),
-			Platform:    safeStringFromMap(m, "platform"),
-			PolicyGroup: safeStringFromMap(m, "policy_group"),
-			Uptime:      safeStringFromMap(m, "uptime"),
+			Id:          SafeStringFromMap(m, "chef_guid"),
+			Name:        SafeStringFromMap(m, "name"),
+			Fqdn:        SafeStringFromMap(m, "fqdn"),
+			IpAddress:   SafeStringFromMap(m, "ipaddress"),
+			CheckIn:     SafeStringFromMapFloat(m, "ohai_time"),
+			Environment: SafeStringFromMap(m, "chef_environment"),
+			Platform:    SafeStringFromMap(m, "platform"),
+			PolicyGroup: SafeStringFromMap(m, "policy_group"),
+			Uptime:      SafeStringFromMap(m, "uptime"),
 		}
 		index++
 	}
 
 	return results
-}
-
-// This returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the original string.
-func safeStringFromMap(values map[string]interface{}, key string) string {
-	if values[key] == nil {
-		return ""
-	}
-	return values[key].(string)
-}
-
-// This returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the base 64 float string.
-func safeStringFromMapFloat(values map[string]interface{}, key string) string {
-	if values[key] == nil {
-		return ""
-	}
-	return strconv.FormatFloat(values[key].(float64), 'E', -1, 64)
-}
-
-// This returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty slice string; otherwise it returns the original slice string.
-func safeSliceFromMap(values map[string]interface{}, key string) []string {
-	value := reflect.ValueOf(values[key])
-	switch value.Kind() {
-	case reflect.Slice:
-		t := make([]string, value.Len())
-		for i := 0; i < value.Len(); i++ {
-			t[i] = fmt.Sprint(value.Index(i))
-		}
-		return t
-	}
-
-	return []string{}
 }

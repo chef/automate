@@ -63,7 +63,7 @@ func (a *InfraProxyServer) DeleteNode(ctx context.Context, r *gwreq.DeleteNode) 
 	}, nil
 }
 
-// GetNode get the node
+// GetNode gets the node
 func (a *InfraProxyServer) GetNode(ctx context.Context, r *gwreq.Node) (*gwres.Node, error) {
 	req := &infra_req.Node{
 		OrgId:    r.OrgId,
