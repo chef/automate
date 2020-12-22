@@ -179,12 +179,12 @@ Name Servers can be added in two ways:
   1. **Adding the nameserver IPs:** If you are awae of the nameservers which shoud resolve the Elastic search nodes, the nameservers can be added to the `config.toml` file.
   ```toml
   [esgateway.v1.sys.ngx.main.resolvers]
-    nameservers = ["127.0.0.53:52"]
+    nameservers = ["127.0.0.53:53"]
   ```
   2. **Using system DNS entries:** If you want to use the system nameserver entries in `/etc/resolv.conf` file, that can be done by adding the following entries in `config.toml` file 
   ```toml
   [esgateway.v1.sys.ngx.main.resolvers]
-    enable_system_resolvers = true
+    enable_system_nameservers = true
   ```
 
 In case both the options are set, the preference will be given to the nameserver IPs over the system nameserver entries 
@@ -347,7 +347,7 @@ Name Servers can be added in two ways:
   [pg_gateway.v1.sys.resolvers]
     # Multiple resolvers can be specified by
     # adding the resolvers in the list.
-    nameservers = ["127.0.0.53:52"]
+    nameservers = ["127.0.0.53:53"]
   ```
   2. **Using system DNS entries:** If you want to use the system nameserver entries in `/etc/resolv.conf` file, that can be done by adding the following entries in `config.toml` file
   ```toml
