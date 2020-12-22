@@ -173,25 +173,26 @@ Because externally-deployed Elasticsearch nodes will not have access to Chef Aut
 
 ##### Adding Resolvers for Elasticsearch
 
-In case you want to resolve the elastic search node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+In case you want to resolve the Elasticsearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
 Name Servers can be added in two ways:
 
-1. **Add nameserver IPs:** Add the nameservers to the `config.toml` file to resolve the Elasticsearch nodes.
+1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the Elasticsearch nodes.
 
-    ```toml
-    [esgateway.v1.sys.ngx.main.resolvers]
-      nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
-    ```
+  ```toml
+  [esgateway.v1.sys.ngx.main.resolvers]
+    # Multiple resolvers can be specified by adding the resolvers in the list.
+    nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
+  ```
 
-1. **Set system DNS entries:** To use existing system nameserver entries from the `/etc/resolv.conf` file, add the following setting to the `config.toml`.
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
 
-    ```toml
-    [esgateway.v1.sys.ngx.main.resolvers]
-      enable_system_nameservers = true
-    ```
+  ```toml
+  [esgateway.v1.sys.ngx.main.resolvers]
+    enable_system_nameservers = true
+  ```
 
-`nameserver` IP takes precedence over the `system_nameserver` if both configurations are set.
+If both options are set, nameserver IPs takes precedence over the system nameserver entries.
 
 Apply the changes:
 
@@ -199,11 +200,11 @@ Apply the changes:
 sudo chef-automate config patch config.toml
 ````
 
-Restore the default configuration or modify the configuration:
+If you wish to reset to the default configuration or to modify the configuration:
 
 1. Run `chef-automate config show config.toml`.
-1. Open the `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
-1. Run `chef-automate config set config.toml` to apply your updated configuration.
+1. Open `config.toml` and remove the `esgateway.v1.sys.ngx.main.resolvers` configuration or change the values.
+1. Run `chef-automate config set config.toml` to apply your changes.
 
 ##### Backup Externally-Deployed Elasticsearch to Local Filesystem
 
@@ -346,28 +347,35 @@ enable = true
 
 ##### Adding Resolvers for PostgreSQL Database
 
-In case you want to resolve the postgresql cluster node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
+In case you want to resolve the PostgreSQL cluster node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
 
 Name Servers can be added in two ways:
-  1. **Adding the nameserver IPs:** If you are awae of the nameservers which shoud resolve the PostgreSQL nodes, the nameservers can be added to the `config.toml` file.
+
+1. **Add nameserver IPs:** If you are aware of the nameservers which should resolve the PostgreSQL nodes, the nameservers can be added to your `config.toml` file.
+
   ```toml
   [pg_gateway.v1.sys.resolvers]
-    # Multiple resolvers can be specified by
-    # adding the resolvers in the list.
+    # Multiple resolvers can be specified by adding the resolvers in the list.
     nameservers = ["127.0.0.53:53"]
   ```
-  2. **Using system DNS entries:** If you want to use the system nameserver entries in `/etc/resolv.conf` file, that can be done by adding the following entries in `config.toml` file
+
+1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
+
   ```toml
   [pg_gateway.v1.sys.resolvers]
     enable_system_nameservers = false
   ```
-In case both the options are set, the preference will be given to the nameserver IPs over the system nameserver entries.
 
-The changes will be reflected after you run:
-```shell
+If both options are set, nameserver IPs takes precedence over the system nameserver entries.
+
+Apply the changes:
+
+```bash
 sudo chef-automate config patch config.toml
 ````
-In order to reset back to the default configuration or modify the configuration, follow these steps:
+
+If you wish to reset to the default configuration or to modify the configuration:
+
 1. Run `chef-automate config show config.toml`.
-2. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
-3. Run `chef-automate config set config.toml` to set your updated configuration.
+1. Edit `config.toml` to replace/edit the `pg_gateway.v1.sys.resolvers` section with the configuration values.
+1. Run `chef-automate config set config.toml` to apply your changes.
