@@ -5,6 +5,7 @@ import (
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
@@ -266,5 +267,13 @@ func TestExternalElasticsearch(t *testing.T) {
 		assert.Equal(t, "10.0.0.1", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetAddress().GetValue())
 		assert.Equal(t, "443", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetPort().GetValue())
 		assert.Equal(t, false, c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetIsDomain().GetValue())
+	})
+
+	t.Run("setting platformconfig for nameservers", func(t *testing.T) {
+		c := DefaultConfigRequest()
+		c.V1.Sys.Ngx.Main.Resolvers.Nameservers = []*wrappers.StringValue{w.String("111.11.11.11:50")}
+		c.PrepareSystemConfig(&ac.TLSCredentials{})
+
+		require.Equal(t, c.V1.Sys.Ngx.Main.Resolvers.NameserversString.GetValue(), "111.11.11.11:50", "does not match with the nameserver passed")
 	})
 }
