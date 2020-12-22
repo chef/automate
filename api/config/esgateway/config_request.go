@@ -100,7 +100,9 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 		if len(nameServers) > 0 {
 			ns := make([]string, 0, len(nameServers))
 			for _, n := range nameServers {
-				ns = append(ns, n.GetValue())
+				if n != nil {
+					ns = append(ns, n.GetValue())
+				}
 			}
 			c.V1.Sys.Ngx.Main.Resolvers.NameserversString = w.String(strings.Join(ns, " "))
 		}

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultResolverPort = 52
+	defaultResolverPort = 53
 	defaultServerPort   = "5432"
 )
 
@@ -105,7 +105,7 @@ func getSystemResolvers() []*wrappers.StringValue {
 		if err == nil {
 			resolvers = append(resolvers, w.String(n))
 		} else {
-			resolvers = append(resolvers, w.String(fmt.Sprintf("%s:%s", n, defaultServerPort)))
+			resolvers = append(resolvers, w.String(fmt.Sprintf("%s:%d", n, defaultResolverPort)))
 		}
 	}
 	return resolvers
