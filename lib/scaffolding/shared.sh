@@ -85,10 +85,10 @@ EOF
 {{~#if postgresql.cfg }}
 "cfg": {{ toJson postgresql.cfg }},
 {{~/if}}
-"__placeholder": {}
-},
   {{~/if}}
+"__placeholder": {}
 {{~/eachAlive}}
+},
 "pg_sidecar": {
 {{~#eachAlive bind.pg-sidecar-service.members as |pgs|}}
   {{~#if @last}}
