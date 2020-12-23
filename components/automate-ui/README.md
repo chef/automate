@@ -55,24 +55,17 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
-### Package @types/jasmine: =3.3.10
+### Package karma: ^5.1.1
 
-Reason: `make serve` and `make unit` report this error:
+"@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
 
-```text
-error TS6200: Definitions of the following identifiers conflict with those in another file: ImplementationCallback, Expected, SpyObjMethodNames, CustomEqualityTester, CustomMatcherFactory, ExpectationFailed, SpecFunction, SpyObj, jasmine
+### Package typescript: ^4.0.5
 
-25 type ImplementationCallback = jasmine.ImplementationCallback;
-   ~~~~
+"@angular-devkit/build-angular" has an incompatible peer dependency to typescript which requires ~4.0.0
 
-  ../node_modules/@types/jasmine/ts3.1/index.d.ts:22:1
-    22 type ImplementationCallback = jasmine.ImplementationCallback;
-       ~~~~
-    Conflicts are in this file.
-```
+### Package jwt-decode: ^2.2.0
 
-There are very few reports of others experiencing this problem and no resolution presents itself.
-Reference: https://stackoverflow.com/a/57592510
+Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
 
 ### Package tslint: ^5.0.0
 restricted to 5.0.0 because errors thrown from dependent packages.  
