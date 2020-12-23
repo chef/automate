@@ -4695,6 +4695,44 @@
         }
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetNodes",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Nodes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "put": {
         "tags": [
@@ -5090,28 +5128,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/infra/version": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetVersion",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           },
           "default": {
@@ -16344,8 +16360,16 @@
           "description": "Node environment name.",
           "type": "string"
         },
+        "fqdn": {
+          "description": "Node FQDN.",
+          "type": "string"
+        },
         "id": {
           "description": "Node ID.",
+          "type": "string"
+        },
+        "ip_address": {
+          "description": "Node IP address.",
           "type": "string"
         },
         "name": {
@@ -16363,6 +16387,18 @@
         "uptime": {
           "description": "Node uptime.",
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Nodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "description": "Node list.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
+          }
         }
       }
     },
