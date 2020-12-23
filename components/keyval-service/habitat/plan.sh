@@ -16,8 +16,6 @@ pkg_exports=(
   [port]=service.port # default service is grpc
 )
 pkg_binds=(
-  [automate-pg-gateway]="port"
-  [pg-sidecar-service]="port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
