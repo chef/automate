@@ -88,6 +88,9 @@ Reason: Later releases are release candidates; should only be using production-r
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
+### Package zone.js: ^0.10.3
+
+Per: https://www.npmjs.com/package/zone.js?activeTab=readme, Starting with v0.11.1, A breaking change is introduced for legacy browsers such as IE11.  If we are no longer supporting IE 11, we are safe to upgrade, otherwise we can instead `import 'zone.js/dist/zone';`
 
 ## Angular Module Architecture
 
