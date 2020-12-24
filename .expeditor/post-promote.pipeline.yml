@@ -1,6 +1,9 @@
 steps:
   - command:
       - .expeditor/upload-files.sh
+    # ruby dependencies themselves are > 7 minutes
+    # so increasing from default of 10 minutes here
+    timeout_in_minutes: 15
     label: "Manifest and CLI Upload"
     concurrency: 1
     concurrency_group: chef-automate-master/deploy/$CHANNEL
