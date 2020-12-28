@@ -71,12 +71,6 @@ awaiting the release of ngrx 11.  Until then, we will get incompatible peer depe
 
 Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
 
-### Package tslint: ^5.0.0
-restricted to 5.0.0 because errors thrown from dependent packages.  
-
-npm ERR! peer dep missing: tslint@^5.0.0, required by rxjs-tslint@0.1.8
-npm ERR! peer dep missing: tslint@^5.x, required by tslint-defocus@2.0.6
-
 ### Package immutable: ^3.8.2
 
 Reason: Later releases are release candidates; should only be using production-releases.
