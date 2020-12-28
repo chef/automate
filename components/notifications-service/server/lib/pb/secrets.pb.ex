@@ -53,7 +53,7 @@ defmodule Chef.Automate.Api.Secrets.Query do
   field :order, 21, type: Chef.Automate.Api.Secrets.Query.OrderType, enum: true
   field :sort, 22, type: :string
   field :page, 23, type: :int32
-  field :per_page, 24, type: :int32
+  field :per_page, 24, type: :int32, json_name: "perPage"
 end
 
 defmodule Chef.Automate.Api.Secrets.Secret do
@@ -73,7 +73,7 @@ defmodule Chef.Automate.Api.Secrets.Secret do
   field :id, 1, type: :string
   field :name, 2, type: :string
   field :type, 3, type: :string
-  field :last_modified, 20, type: Google.Protobuf.Timestamp
+  field :last_modified, 20, type: Google.Protobuf.Timestamp, json_name: "lastModified"
   field :tags, 21, repeated: true, type: Chef.Automate.Api.Common.Query.Kv
   field :data, 22, repeated: true, type: Chef.Automate.Api.Common.Query.Kv
 end

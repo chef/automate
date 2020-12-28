@@ -133,8 +133,8 @@ defmodule Notifications.ServiceNowAlert do
   defstruct [:url, :secret_id, :critical_controls_only]
 
   field :url, 1, type: :string
-  field :secret_id, 2, type: :string
-  field :critical_controls_only, 3, type: :bool
+  field :secret_id, 2, type: :string, json_name: "secretId"
+  field :critical_controls_only, 3, type: :bool, json_name: "criticalControlsOnly"
 end
 
 defmodule Notifications.Rule do
@@ -150,6 +150,7 @@ defmodule Notifications.Rule do
   defstruct [:action, :id, :name, :event]
 
   oneof :action, 0
+
   field :id, 1, type: :string
   field :name, 2, type: :string
   field :event, 3, type: Notifications.Rule.Event, enum: true
@@ -195,9 +196,15 @@ defmodule Notifications.URLValidationRequest do
   defstruct [:credentials, :url]
 
   oneof :credentials, 0
+
   field :url, 1, type: :string
-  field :username_password, 2, type: Notifications.UsernamePassword, oneof: 0
-  field :secret_id, 3, type: Notifications.SecretId, oneof: 0
+
+  field :username_password, 2,
+    type: Notifications.UsernamePassword,
+    json_name: "usernamePassword",
+    oneof: 0
+
+  field :secret_id, 3, type: Notifications.SecretId, json_name: "secretId", oneof: 0
   field :none, 4, type: Notifications.Empty, oneof: 0
 end
 

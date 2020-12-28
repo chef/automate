@@ -26,8 +26,8 @@ defmodule Notifications.TimeInfo do
         }
   defstruct [:start_time, :end_time]
 
-  field :start_time, 1, type: :string
-  field :end_time, 2, type: :string
+  field :start_time, 1, type: :string, json_name: "startTime"
+  field :end_time, 2, type: :string, json_name: "endTime"
 end
 
 defmodule Notifications.Profile.Control.Result do
@@ -45,11 +45,11 @@ defmodule Notifications.Profile.Control.Result do
   defstruct [:status, :code_desc, :run_time, :start_time, :message, :skip_message]
 
   field :status, 1, type: :string
-  field :code_desc, 2, type: :string
-  field :run_time, 3, type: :float
-  field :start_time, 4, type: :string
+  field :code_desc, 2, type: :string, json_name: "codeDesc"
+  field :run_time, 3, type: :float, json_name: "runTime"
+  field :start_time, 4, type: :string, json_name: "startTime"
   field :message, 5, type: :string
-  field :skip_message, 6, type: :string
+  field :skip_message, 6, type: :string, json_name: "skipMessage"
 end
 
 defmodule Notifications.Profile.Control.ResultTotals do
@@ -64,10 +64,10 @@ defmodule Notifications.Profile.Control.ResultTotals do
         }
   defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
 
-  field :num_tests, 1, type: :int32
-  field :num_failed_tests, 2, type: :int32
-  field :num_skipped_tests, 3, type: :int32
-  field :num_passed_tests, 4, type: :int32
+  field :num_tests, 1, type: :int32, json_name: "numTests"
+  field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
+  field :num_skipped_tests, 3, type: :int32, json_name: "numSkippedTests"
+  field :num_passed_tests, 4, type: :int32, json_name: "numPassedTests"
 end
 
 defmodule Notifications.Profile.Control do
@@ -92,9 +92,14 @@ defmodule Notifications.Profile.Control do
   field :title, 3, type: :string
   field :code, 4, type: :string
   field :desc, 5, type: :string
-  field :source_location, 6, type: Notifications.SourceLocation
+  field :source_location, 6, type: Notifications.SourceLocation, json_name: "sourceLocation"
   field :refs, 7, repeated: true, type: Notifications.Refs
-  field :failed_results, 9, repeated: true, type: Notifications.Profile.Control.Result
+
+  field :failed_results, 9,
+    repeated: true,
+    type: Notifications.Profile.Control.Result,
+    json_name: "failedResults"
+
   field :stats, 10, type: Notifications.Profile.Control.ResultTotals
 end
 
@@ -136,10 +141,10 @@ defmodule Notifications.Profile.ControlTotals do
         }
   defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
 
-  field :num_tests, 1, type: :int32
-  field :num_failed_tests, 2, type: :int32
-  field :num_skipped_tests, 3, type: :int32
-  field :num_passed_tests, 4, type: :int32
+  field :num_tests, 1, type: :int32, json_name: "numTests"
+  field :num_failed_tests, 2, type: :int32, json_name: "numFailedTests"
+  field :num_skipped_tests, 3, type: :int32, json_name: "numSkippedTests"
+  field :num_passed_tests, 4, type: :int32, json_name: "numPassedTests"
 end
 
 defmodule Notifications.Profile do
@@ -184,11 +189,16 @@ defmodule Notifications.Profile do
   field :maintainer, 5, type: :string
   field :license, 6, type: :string
   field :copyright, 7, type: :string
-  field :copyright_email, 8, type: :string
+  field :copyright_email, 8, type: :string, json_name: "copyrightEmail"
   field :sha256, 9, type: :string
   field :supports, 10, repeated: true, type: Notifications.PlatformSupport
   field :attributes, 11, repeated: true, type: Notifications.Profile.Attribute
-  field :failed_controls, 12, repeated: true, type: Notifications.Profile.Control
+
+  field :failed_controls, 12,
+    repeated: true,
+    type: Notifications.Profile.Control,
+    json_name: "failedControls"
+
   field :stats, 13, type: Notifications.Profile.ControlTotals
 end
 
@@ -233,8 +243,8 @@ defmodule Notifications.PlatformSupport do
   defstruct [:inspec, :os_name, :os_family, :release]
 
   field :inspec, 1, type: :string
-  field :os_name, 2, type: :string
-  field :os_family, 3, type: :string
+  field :os_name, 2, type: :string, json_name: "osName"
+  field :os_family, 3, type: :string, json_name: "osFamily"
   field :release, 4, type: :string
 end
 
@@ -253,10 +263,10 @@ defmodule Notifications.ComplianceSuccess do
   defstruct [:id, :compliance_url, :node_name, :node_id, :end_time, :timestamp]
 
   field :id, 1, type: :string
-  field :compliance_url, 2, type: :string
-  field :node_name, 3, type: :string
-  field :node_id, 4, type: :string
-  field :end_time, 5, type: :string
+  field :compliance_url, 2, type: :string, json_name: "complianceUrl"
+  field :node_name, 3, type: :string, json_name: "nodeName"
+  field :node_id, 4, type: :string, json_name: "nodeId"
+  field :end_time, 5, type: :string, json_name: "endTime"
   field :timestamp, 6, type: :string
 end
 
@@ -277,7 +287,7 @@ defmodule Notifications.ComplianceFailure.ControlTotals do
   field :passed, 2, type: :int32
   field :failed, 3, type: :int32
   field :critical, 4, type: :int32
-  field :critical_failed, 5, type: :int32
+  field :critical_failed, 5, type: :int32, json_name: "criticalFailed"
 end
 
 defmodule Notifications.ComplianceFailure do
@@ -308,13 +318,21 @@ defmodule Notifications.ComplianceFailure do
   ]
 
   field :id, 1, type: :string
-  field :compliance_url, 2, type: :string
-  field :node_name, 3, type: :string
-  field :node_id, 4, type: :string
-  field :inspec_version, 5, type: :string
-  field :test_totals, 6, type: Notifications.ComplianceFailure.ControlTotals
-  field :failed_profiles, 7, repeated: true, type: Notifications.Profile
-  field :end_time, 8, type: :string
+  field :compliance_url, 2, type: :string, json_name: "complianceUrl"
+  field :node_name, 3, type: :string, json_name: "nodeName"
+  field :node_id, 4, type: :string, json_name: "nodeId"
+  field :inspec_version, 5, type: :string, json_name: "inspecVersion"
+
+  field :test_totals, 6,
+    type: Notifications.ComplianceFailure.ControlTotals,
+    json_name: "testTotals"
+
+  field :failed_profiles, 7,
+    repeated: true,
+    type: Notifications.Profile,
+    json_name: "failedProfiles"
+
+  field :end_time, 8, type: :string, json_name: "endTime"
   field :timestamp, 9, type: :string
 end
 
@@ -345,10 +363,10 @@ defmodule Notifications.CCRFailure do
     :timestamp
   ]
 
-  field :run_id, 1, type: :string
-  field :node_name, 2, type: :string
-  field :node_url, 3, type: :string
-  field :run_url, 4, type: :string
+  field :run_id, 1, type: :string, json_name: "runId"
+  field :node_name, 2, type: :string, json_name: "nodeName"
+  field :node_url, 3, type: :string, json_name: "nodeUrl"
+  field :run_url, 4, type: :string, json_name: "runUrl"
   field :cookbook, 5, type: :string
   field :recipe, 6, type: :string
   field :time, 7, type: Notifications.TimeInfo
@@ -370,11 +388,11 @@ defmodule Notifications.CCRSuccess do
         }
   defstruct [:run_id, :node_name, :run_url, :time, :updated_resource_count, :timestamp]
 
-  field :run_id, 1, type: :string
-  field :node_name, 2, type: :string
-  field :run_url, 3, type: :string
+  field :run_id, 1, type: :string, json_name: "runId"
+  field :node_name, 2, type: :string, json_name: "nodeName"
+  field :run_url, 3, type: :string, json_name: "runUrl"
   field :time, 4, type: Notifications.TimeInfo
-  field :updated_resource_count, 5, type: :int32
+  field :updated_resource_count, 5, type: :int32, json_name: "updatedResourceCount"
   field :timestamp, 6, type: :string
 end
 
@@ -397,6 +415,7 @@ defmodule Notifications.Event do
   defstruct [:event, :id]
 
   oneof :event, 0
+
   field :id, 1, type: :string
   field :CCRSuccess, 2, type: Notifications.CCRSuccess, oneof: 0
   field :CCRFailure, 3, type: Notifications.CCRFailure, oneof: 0
