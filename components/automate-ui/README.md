@@ -85,6 +85,8 @@ Per https://github.com/chef/automate/pull/1867, future versions have made a brea
 
 Per: https://www.npmjs.com/package/zone.js?activeTab=readme, Starting with v0.11.1, A breaking change is introduced for legacy browsers such as IE11.  If we are no longer supporting IE 11, we are safe to upgrade, otherwise we can instead `import 'zone.js/dist/zone';`
 
+There is a also an incompatible peer dependency with angular/core that will be cleared up in Angular 11.1.0 re: https://github.com/angular/angular/issues/39094#issuecomment-742227156
+
 ## Angular Module Architecture
 
 As a very brief introduction to the Angular architecture, it all starts with app.module.ts,
