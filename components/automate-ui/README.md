@@ -55,6 +55,10 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
+### Packages @ngrx/* =10.1.0
+
+awaiting the release of ngrx 11.  Until then, we will get incompatible peer dependencies if we try to update to latest.
+
 ### Package karma: ^5.1.1
 
 "@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
