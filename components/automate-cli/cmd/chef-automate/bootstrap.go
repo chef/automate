@@ -177,6 +177,10 @@ func runBootstrapBundleUnpack(cmd *cobra.Command, args []string) error {
 	secretStore := secrets.NewDiskStore(
 		secretStorePath, uid, gid)
 
+	if err := secretStore.Initialize(); err != nil {
+		return errors.Wrap(err, "could not initialize secret store")
+	}
+
 	b := bootstrapbundle.NewCreator(
 		secretStore,
 		bootstrapbundle.WithRootDir(bootstrapBundleCmdFlags.rootDir))
