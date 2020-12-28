@@ -7,6 +7,8 @@ package secrets
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
 	"io/ioutil"
@@ -19,6 +21,7 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/user"
+	"github.com/chef/toml"
 )
 
 // Commonly used secrets names. When accessing this library from
@@ -34,6 +37,14 @@ var BifrostSuperuserIDName = SecretName{
 type SecretName struct {
 	Group string
 	Name  string
+}
+
+// SecretKeyToml secret toml structure thats required to write and read
+// to the encrypted secret file
+type SecretKeyToml struct {
+	Algorithm  string `toml:"algorithm"`
+	IV         string `toml:"iv"`
+	Ciphertext string `toml:"ciphertext"`
 }
 
 // SecretNameFromString returns parses the string according to the
@@ -97,6 +108,9 @@ const (
 	// secrets store, read the secrets as root, and then drop privs when
 	// we exec the command.
 	DefaultDiskStoreDataOwner = "hab"
+
+	// SecretFileExtension is the extension name for the encrypted secrets file
+	SecretFileExtension = ".enc.toml"
 )
 
 func NewDiskStoreReader(basePath string) SecretsReader {
@@ -147,27 +161,68 @@ func (d *diskStore) Initialize() error {
 		return errors.Wrap(err, "could now chown shared data directory for secrets store")
 	}
 
+	// creates encryption key if it does not exist
+	keyExists, err := keyExists(d.basePath)
+	if err != nil {
+		return err
+	}
+	if !keyExists {
+		_, err := d.createEncryptionKey()
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 func (d *diskStore) Exists(secret SecretName) (bool, error) {
+	// added logic to check if secret is encrypted or not
+	encryptedPath := filepath.Join(d.basePath, secret.Group, addSecretFileExtension(secret.Name))
+	encryptedExists, err := fileutils.PathExists(encryptedPath)
+	if err != nil {
+		return false, err
+	}
+	if encryptedExists {
+		return encryptedExists, nil
+	}
 	path := filepath.Join(d.basePath, secret.Group, secret.Name)
 	return fileutils.PathExists(path)
 }
 
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
-	path := filepath.Join(d.basePath, secret.Group, secret.Name)
-	ret, err := ioutil.ReadFile(path)
+
+	// checks if the encrypted secret exists
+	pathToEncryptedSecret := filepath.Join(d.basePath, secret.Group, addSecretFileExtension(secret.Name))
+	encryptedSecretExists, err := fileutils.PathExists(pathToEncryptedSecret)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
+		return nil, errors.Wrap(err, "unexpected error while checking if encrypted file exists (secret may not have been generated yet)")
+	}
+	if encryptedSecretExists {
+		value, err := ioutil.ReadFile(pathToEncryptedSecret)
+		if err != nil {
+			return nil, errors.Wrap(err, "unexpected error while reading encrypted secret data")
+		}
+		// decrypts and returns the secret value
+		ret, err := getDecryptedData(d.basePath, value)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not decrypt secret with existing key")
+		}
+		return ret, err
 	}
 
+	// else return unencrypted secret
+	pathToUnencryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name)
+	ret, err := ioutil.ReadFile(pathToUnencryptedSecret)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not read unencrypted secrets data (secret may not have been generated yet)")
+	}
 	return ret, err
 }
 
 func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 	parentDir := filepath.Join(d.basePath, secret.Group)
-	secretPath := filepath.Join(parentDir, secret.Name)
+	secretPath := filepath.Join(parentDir, addSecretFileExtension(secret.Name))
 	err := os.MkdirAll(parentDir, 0700)
 	if err != nil {
 		return errors.Wrap(err, "could not create directory for secrets data")
@@ -177,19 +232,47 @@ func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 		return errors.Wrap(err, "could not chown directory for secrets data")
 	}
 
-	r := bytes.NewReader(data)
-	err = fileutils.AtomicWrite(secretPath, r, fileutils.WithAtomicWriteFileMode(0700))
+	// creates encrypted data from input data
+	encryptedData, iv, err := getEncryptedData(data, d.basePath)
+	if err != nil {
+		return err
+	}
+
+	// writes as toml file
+	err = writeToml("AES256 CTR mode", hex.EncodeToString(iv), hex.EncodeToString(encryptedData), secretPath, d.ownerUid, d.ownerGid)
 	if err != nil {
 		return errors.Wrap(err, "could not write secrets data to disk")
 	}
 
-	// TODO(ssd) 2018-08-20: Should this be an option we can pass to AtomicWrite?
-	err = os.Chown(secretPath, d.ownerUid, d.ownerGid)
+	return nil
+}
+
+// Creates the Key used for the secret values' encryption
+// we generate a random byte array of 32 bytes required for the AES256 encryption
+// save the key to a file named key in base path and sets owner
+// returns the key
+func (d *diskStore) createEncryptionKey() ([]byte, error) {
+	secretKey, err := GenerateRandomBytes(32)
 	if err != nil {
-		return errors.Wrap(err, "could not chown secrets data")
+		return nil, errors.Wrap(err, "could not generate random secret for encryption")
 	}
 
-	return nil
+	// creating path to store the secret key
+	secretKeyPath := filepath.Join(d.basePath, "key")
+	s := bytes.NewReader(secretKey)
+
+	// writing the key to a file
+	err = fileutils.AtomicWrite(secretKeyPath, s, fileutils.WithAtomicWriteFileMode(0700))
+	if err != nil {
+		return nil, errors.Wrap(err, "could not write secret to disk")
+	}
+
+	// TODO(ssd) 2018-08-20: Should this be an option we can pass to AtomicWrite?
+	err = os.Chown(secretKeyPath, d.ownerUid, d.ownerGid)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not chown secrets data")
+	}
+	return secretKey, nil
 }
 
 // GenerateRandomBytes generates the requested number of ASCII bytes
@@ -228,4 +311,124 @@ func PrepareSSHPrivateKey(keyContent string) (string, error) {
 		return "", errors.New("Failed to write inspec private key " + keyPath.Name() + ": " + err.Error())
 	}
 	return keyPath.Name(), nil
+}
+
+// checks if encryption key exists or not
+func keyExists(basePath string) (bool, error) {
+	path := filepath.Join(basePath, "key")
+	return fileutils.PathExists(path)
+}
+
+// Takes in key and the data
+// Uses AES256 CTR mode for encryption
+// returns the ciphertext, iv and error
+func encrypt(key []byte, value []byte) ([]byte, []byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error creating cipher block during encryption")
+	}
+	iv, err := GenerateRandomBytes(block.BlockSize())
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate random iv for encryption")
+	}
+	stream := cipher.NewCTR(block, iv)
+	ciphertext := make([]byte, len(value))
+	stream.XORKeyStream(ciphertext, value)
+	return ciphertext, iv, nil
+}
+
+// decrpting the cipher for ctr mode
+// returns the data and error
+func decrypt(block cipher.Block, ciphertext []byte, iv []byte) []byte {
+	stream := cipher.NewCTR(block, iv)
+	plain := make([]byte, len(ciphertext))
+	stream.XORKeyStream(plain, ciphertext)
+	return plain
+}
+
+// function used to write the secret values to given file in toml format
+// also sets the owner for that file
+// stores the name of the algorithm , iv and the ciphertext
+func writeToml(algorithm string, iv string, ciphertext string, path string, ownerUID int, ownerGID int) error {
+	secretData := SecretKeyToml{
+		Algorithm:  algorithm,
+		IV:         iv,
+		Ciphertext: ciphertext,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(secretData); err != nil {
+		return errors.Wrap(err, "failed to encode struct SecretKeyToml data to toml")
+	}
+
+	err := fileutils.AtomicWrite(path, bytes.NewReader(buf.Bytes()), fileutils.WithAtomicWriteFileMode(0700))
+	if err != nil {
+		return errors.Wrap(err, "error writing the secret file")
+	}
+
+	// TODO(ssd) 2018-08-20: Should this be an option we can pass to AtomicWrite?
+	err = os.Chown(path, ownerUID, ownerGID)
+	if err != nil {
+		return errors.Wrap(err, "could not chown secrets data")
+	}
+	return nil
+}
+
+// takes in the secret value and encrypts it
+// return encrypted cipher, iv and error
+func getEncryptedData(data []byte, basePath string) ([]byte, []byte, error) {
+	// we create the encryption key if it doesnot exist
+	var secretKey []byte
+	keyExists, err := keyExists(basePath)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !keyExists {
+		return nil, nil, errors.New("Could not find the encryption key")
+	}
+	path := filepath.Join(basePath, "key")
+	secretKey, err = ioutil.ReadFile(path)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not read secrets key (unexpected error)")
+	}
+	encryptedData, iv, err := encrypt(secretKey, data)
+	if err != nil {
+		return nil, nil, err
+	}
+	return encryptedData, iv, nil
+}
+
+// gets the secret from the toml file and decrypts the file contents
+// returns the decrypted data or error
+func getDecryptedData(basePath string, data []byte) ([]byte, error) {
+	keyPath := filepath.Join(basePath, "key")
+	key, err := ioutil.ReadFile(keyPath)
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to covert secret key to block")
+	}
+	var secretData SecretKeyToml
+	_, err = toml.Decode(string(data), &secretData)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to unmarshal data from secret toml file")
+	}
+
+	// coverts ciphertext to byte from hex
+	dcdCipher, err := hex.DecodeString(secretData.Ciphertext)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to decode secret ciphertext value while reading from file")
+	}
+
+	// coverts iv to byte from hex
+	dcdIv, err := hex.DecodeString(secretData.IV)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to decode iv value while reading from file")
+	}
+
+	decrypted := decrypt(block, dcdCipher, dcdIv)
+	return decrypted, nil
+}
+
+func addSecretFileExtension(name string) string {
+	return name + SecretFileExtension
 }
