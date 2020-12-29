@@ -161,7 +161,7 @@ export class StatsService {
         ({ total, failed, passed, skipped, waived, items: profiles })));
   }
 
-  getControls(reportQuery: ReportQuery) {
+  getControls(reportQuery: ReportQuery): Observable<{total: any, items: any}> {
     const url = `${CC_API_URL}/reporting/controls`;
     const filters = this.formatFilters(reportQuery);
     const body = { filters };

@@ -55,30 +55,21 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
-### Package @types/jasmine: =3.3.10
+### Packages @ngrx/* =10.1.0
 
-Reason: `make serve` and `make unit` report this error:
+awaiting the release of ngrx 11.  Until then, we will get incompatible peer dependencies if we try to update to latest.
 
-```text
-error TS6200: Definitions of the following identifiers conflict with those in another file: ImplementationCallback, Expected, SpyObjMethodNames, CustomEqualityTester, CustomMatcherFactory, ExpectationFailed, SpecFunction, SpyObj, jasmine
+### Package karma: ^5.1.1
 
-25 type ImplementationCallback = jasmine.ImplementationCallback;
-   ~~~~
+"@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
 
-  ../node_modules/@types/jasmine/ts3.1/index.d.ts:22:1
-    22 type ImplementationCallback = jasmine.ImplementationCallback;
-       ~~~~
-    Conflicts are in this file.
-```
+### Package typescript: ^4.0.5
 
-There are very few reports of others experiencing this problem and no resolution presents itself.
-Reference: https://stackoverflow.com/a/57592510
+"@angular-devkit/build-angular" has an incompatible peer dependency to typescript which requires ~4.0.0
 
-### Package tslint: ^5.0.0
-restricted to 5.0.0 because errors thrown from dependent packages.  
+### Package jwt-decode: ^2.2.0
 
-npm ERR! peer dep missing: tslint@^5.0.0, required by rxjs-tslint@0.1.8
-npm ERR! peer dep missing: tslint@^5.x, required by tslint-defocus@2.0.6
+Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
 
 ### Package immutable: ^3.8.2
 
@@ -88,6 +79,11 @@ Reason: Later releases are release candidates; should only be using production-r
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
+### Package zone.js: ^0.10.3
+
+Per: https://www.npmjs.com/package/zone.js?activeTab=readme, Starting with v0.11.1, A breaking change is introduced for legacy browsers such as IE11.  If we are no longer supporting IE 11, we are safe to upgrade, otherwise we can instead `import 'zone.js/dist/zone';`
+
+There is a also an incompatible peer dependency with angular/core that will be cleared up in Angular 11.1.0 re: https://github.com/angular/angular/issues/39094#issuecomment-742227156
 
 ## Angular Module Architecture
 
