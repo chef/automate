@@ -229,21 +229,21 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       // add class to rotate labels when more than comfortable to fit in space
       .classed('turnt', () => this.xData.length > 7)
 
-      .on('mouseenter', () => {
-        this.handleHover(d3.event);
+      .on('mouseenter', (e) => {
+        this.handleHover(e);
       })
       .on('mouseout', () => {
         this.AllDeactivate();
       })
       // focus styles
-      .on('focus', () => {
-        this.handleHover(d3.event);
+      .on('focus', (e) => {
+        this.handleHover(e);
       })
       .on('focusout', () => {
         this.AllDeactivate();
       })
-      .on('click', () => {
-        this.handleClick(d3.event);
+      .on('click', (e) => {
+        this.handleClick(e);
       });
   }
 
