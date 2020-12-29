@@ -112,8 +112,6 @@ Historical information such as Chef Infra Client run data and compliance scan da
 By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured.
 Invoke the migration using the `--skip-backup-check` flag to avoid this check.
 
-To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](https://docs.chef.io/delivery_server_backup/).
-
 ### Unsupported Features and Topologies
 
 Chef Automate 2 includes significant architectural and technical improvements to the core product platform.
@@ -147,14 +145,6 @@ Chef Automate 2 stores its data in directories named `/hab/svc/$service-name/dat
 * PostgreSQL data is stored in `/hab/svc/automate-postgresql/data/`
 
 If you use dedicated disks or partitions for either of these applications in Chef Automate 1, you must modify your disk mount configuration to make these disks/partitions available to Chef Automate 2.
-
-### Workflow
-
-Follow the instructions in [Upgrade Workflow]({{< relref "workflow_install.md" >}}).
-The migration process will stop if it detects that you used the Workflow component of Chef Automate 1.
-To use Workflow with Chef Automate 2, specify the `--enable-workflow` option to enable the Workflow component.
-You can enable the Workflow component after upgrading with `chef-automate deploy --enable-workflow`.
-
 ### Chef Automate 2 License
 
 Login to Chef Automate to start a trial.
