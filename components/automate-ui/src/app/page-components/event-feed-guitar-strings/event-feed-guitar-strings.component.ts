@@ -389,21 +389,23 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
 
     svg.select('.zoom-slider-button.start')
       .call(d3.drag()
-        .on('start', () => { this.dragStarted(); })
-        .on('drag', (e) => { this.dragStartSlider(e); })
-        .on('end', () => { this.dragEnded('start'); }));
+        .on('start', () => this.dragStarted())
+        .on('drag', (e) => this.dragStartSlider(e))
+        .on('end', () => this.dragEnded('start'))
+        );
     svg.select('.zoom-slider-button.end')
       .call(d3.drag()
-        .on('start', () => { this.dragStarted(); })
-        .on('drag', (e) => { this.dragEndSlider(e); })
-        .on('end', () => { this.dragEnded('end'); }));
+        .on('start', () => this.dragStarted())
+        .on('drag', (e) => this.dragEndSlider(e))
+        .on('end', () => this.dragEnded('end'))
+        );
   }
 
   dragStarted() {
     this.sliderWidth = this.getComponentWidth();
   }
 
-  dragStartSlider(e) {
+  dragStartSlider(e: DragEvent) {
     const positionPercentage = e.x / this.sliderWidth * 100;
 
     // Checks to see if the start slider is about to bump into the end slider
@@ -417,7 +419,7 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
     }
   }
 
-  dragEndSlider(e) {
+  dragEndSlider(e: DragEvent) {
     const positionPercentage = e.x / this.sliderWidth * 100;
 
     // Checks to see if the end slider is about to bump into the start slider

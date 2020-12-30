@@ -229,22 +229,12 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       // add class to rotate labels when more than comfortable to fit in space
       .classed('turnt', () => this.xData.length > 7)
 
-      .on('mouseenter', (e) => {
-        this.handleHover(e);
-      })
-      .on('mouseout', () => {
-        this.AllDeactivate();
-      })
+      .on('mouseenter', e => this.handleHover(e))
+      .on('mouseout', () => this.AllDeactivate())
       // focus styles
-      .on('focus', (e) => {
-        this.handleHover(e);
-      })
-      .on('focusout', () => {
-        this.AllDeactivate();
-      })
-      .on('click', (e) => {
-        this.handleClick(e);
-      });
+      .on('focus', e => this.handleHover(e))
+      .on('focusout', () => this.AllDeactivate())
+      .on('click', e => this.handleClick(e));
   }
 
   private formatLabels(daysAgo: number): string {
@@ -301,13 +291,13 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
       .remove();
   }
 
-  private handleHover(d3Event: d3.Event): void {
-    const num = this.getHoveredElement(d3Event);
+  private handleHover(e: MouseEvent): void {
+    const num = this.getHoveredElement(e);
     d3.selectAll(`.elem-${num}`).classed('active', true);
   }
 
-  private handleClick(d3Event: d3.Event): void {
-    const num = this.getHoveredElement(d3Event);
+  private handleClick(e: MouseEvent): void {
+    const num = this.getHoveredElement(e);
     const isAlreadyLocked = d3.selectAll(`.elem-${num}`).classed('lock');
     if (isAlreadyLocked) {
       d3.selectAll(`.elem-${num}`).classed('lock', false);
@@ -319,8 +309,8 @@ export class SimpleLineGraphComponent implements OnChanges, OnInit {
     }
   }
 
-  private getHoveredElement(d3Event: d3.Event): string {
-    const classes = d3.select(d3Event.target).attr('class');
+  private getHoveredElement(e: MouseEvent): string {
+    const classes = d3.select(e.target).attr('class');
     const match = classes.match(/elem-([0-9]{1,2})/g)[0];
     const num = match.split('-')[1];
     return num;
