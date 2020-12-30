@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-// SafeStringFromMap returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the original string.
+// SafeStringFromMap returns the value referenced by `key` in `values`. as a string.
+// If not found, it returns an empty string.
 func SafeStringFromMap(values map[string]interface{}, key string) string {
 	if values[key] == nil {
 		return ""
@@ -15,8 +15,8 @@ func SafeStringFromMap(values map[string]interface{}, key string) string {
 	return values[key].(string)
 }
 
-// SafeStringFromMapFloat returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the base 64 float string.
+// SafeStringFromMapFloat returns the value referenced by `key` in `values`. as a string (after first formatting as a base 64 float).
+// If not found, it returns an empty string.
 func SafeStringFromMapFloat(values map[string]interface{}, key string) string {
 	if values[key] == nil {
 		return ""
@@ -24,8 +24,8 @@ func SafeStringFromMapFloat(values map[string]interface{}, key string) string {
 	return strconv.FormatFloat(values[key].(float64), 'E', -1, 64)
 }
 
-// SafeSliceFromMap returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty slice string; otherwise it returns the original slice string.
+// SafeSliceFromMap returns the value referenced by `key` in `values`. as a slice.
+// If not found, it returns an empty slice.
 func SafeSliceFromMap(values map[string]interface{}, key string) []string {
 	value := reflect.ValueOf(values[key])
 	switch value.Kind() {
