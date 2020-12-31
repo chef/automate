@@ -55,29 +55,34 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
-### Packages @ngrx/* =10.1.0
+### Package ajv: ^6.9.1
 
-awaiting the release of ngrx 11.  Until then, we will get incompatible peer dependencies if we try to update to latest.
-
-### Package karma: ^5.1.1
-
-"@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
-
-### Package typescript: ^4.0.5
-
-"@angular-devkit/build-angular" has an incompatible peer dependency to typescript which requires ~4.0.0
-
-### Package jwt-decode: ^2.2.0
-
-Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
+Updating to ajv 7 requires ajv-keywords 4, they are similar but actually have
+different docs, which should be thoroughly checked before updating.
 
 ### Package immutable: ^3.8.2
 
 Reason: Later releases are release candidates; should only be using production-releases.
 
+### Package jwt-decode: ^2.2.0
+
+Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
+
+### Package karma: ^5.1.1
+
+"@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
+
+### Packages @ngrx/*: =10.1.0
+
+awaiting the release of ngrx 11.  Until then, we will get incompatible peer dependencies if we try to update to latest.
+
 ### Package rrule: =2.4.1
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
+
+### Package typescript: ^4.0.5
+
+"@angular-devkit/build-angular" has an incompatible peer dependency to typescript which requires ~4.0.0
 
 ### Package zone.js: ^0.10.3
 
