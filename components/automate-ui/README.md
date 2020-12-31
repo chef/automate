@@ -57,8 +57,7 @@ While it is problematic to document this information due to the maintenance burd
 
 ### Package ajv: ^6.9.1
 
-Updating to ajv 7 requires ajv-keywords 4, they are similar but actually have
-different docs, which should be thoroughly checked before updating.
+Updating to from ajv version 6 to 7 requires ajv-keywords 4.  Ajv versions 6 and 7 are similar, however they contain different docs, which should be thoroughly checked before updating.
 
 ### Package immutable: ^3.8.2
 
