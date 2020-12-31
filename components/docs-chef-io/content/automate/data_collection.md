@@ -188,48 +188,6 @@ via the Chef Infra Server. Please see the audit cookbook for an
 |`data_collector['http_cull_interval']`|How often Chef Infra Server should cull aged-out Chef Automate HTTP workers that have exceeded their `http_max_age`, specified as an Erlang tuple.|Default: `{1, min}`|
 |`data_collector['http_max_connection_duration']`|Maximum duration an HTTP connection is allowed to exist before it is terminated, specified as an Erlang tuple.|Default: `{70, sec}`|
 
-<!-- Hiding external Elasticsearch: Consult Irving's team for solution  -->
-<!-- ## Use an external Elasticsearch cluster (optional)
-
-Chef Automate uses Elasticsearch to store its data, and the default Chef Automate install includes a single Elasticsearch service.
-This is sufficient to run production workloads; however, for greater data retention, we recommend using a multi-node Elasticsearch cluster with replication and sharding to store and protect your data.
-
-As of Chef Automate 1.7.114, the compliance service uses a ``compliance-latest`` Elasticsearch index to improves the performance of the reporting APIs at scale. Chef Automate creates this index automatically as part of the upgrade to Chef Automate 1.7.114. The index is updated with each new compliance report. If the ``compliance-latest`` Elasticsearch index becomes out of sync with the time-series data, it can be regenerated using the ``workflow-ctl migrate-compliance`` subcommand. For more information, see [migrate-compliance ](https://docs.chef.io/ctl_automate_server/#migrate-compliance).
-
-### Prerequisites
-
-* Chef Automate server
-* Elasticsearch (version 2.4.1 or greater; version 5.x is required for Chef Automate 1.6 and above)
-
-### Elasticsearch configuration
-
-To utilize an external Elasticsearch installation, set the following configuration option in your
-``/etc/delivery/delivery.rb``:
-
-```ruby
-elasticsearch['urls'] = ['https://my-elasticsearch-cluster.mycompany.com']
-```
-
-Or for a three node on premise install
-
-```ruby
-elasticsearch['urls'] = ['http://172.16.0.100:9200','http://172.16.0.101:9200','http://172.16.0.100:9202']
-```
-
-The ``elasticsearch['urls']`` attribute should be an array of Elasticsearch nodes over
-which Chef Automate will round-robin requests. You can also supply a single entry which corresponds to
-a load-balancer or a third-party Elasticsearch-as-a-service offering.
-
-After saving the file, run ``sudo workflow-ctl reconfigure``.
-
-An additional Elasticsearch option is ``elasticsearch['host_header']``. This is the HTTP ``Host`` header to send with the request.
-When this attribute is unspecified, the default behavior is as follows:
-
- * If the ``urls`` parameter contains a single entry, the host of the supplied URI will be sent as the Host header.
- * If the ``urls`` parameter contains more than one entry, no Host header will be  sent.
-
-When this attribute is specified, the supplied string will be sent as the ``Host`` header on all requests. This may be required for some third-party Elasticsearch offerings. -->
-
 ## Configure your Chef Infra Client to Send Data to Chef Automate without Chef Infra Server
 
 If you do not use a Chef Infra Server in your environment (if you only use `chef-solo`, for example), you

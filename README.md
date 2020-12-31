@@ -73,10 +73,6 @@ Automate
   * [Chef Server Gateway](components/automate-cs-nginx)
   * [Erchef](components/automate-cs-oc-erchef)
 
-* Chef Workflow (in-development)
-  * [Chef Workflow Gateway](components/automate-workflow-nginx)
-  * [Workflow](components/automate-workflow-server)
-
 ## Getting Started
 
 Please see Quickstart and Development Basics in the [development
