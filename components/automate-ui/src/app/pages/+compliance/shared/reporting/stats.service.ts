@@ -226,6 +226,17 @@ export class StatsService {
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 
+  downloaNodeReport(format: string, reportQuery: ReportQuery): Observable<string> {
+    const url = `${CC_API_URL}/reporting/node/export`;
+
+        // for export, we want to send the start_time as the beg of day of end time
+    // so we find the endtime in the filters, and then set start time to beg of that day
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
+
+    const body = { type: format, filters: this.formatFilters(reportQuery) };
+    return this.httpClient.post(url, body, { responseType: 'text' });
+  }
+
   getSingleReport(reportID: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);

@@ -6,7 +6,8 @@ import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/repo
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { takeUntil, first } from 'rxjs/operators';
+import { takeUntil, first, finalize } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-reporting-node',
@@ -29,7 +30,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   pageSize = 10;
   totalReports = 0;
   firstReportIsLoaded = false;
-
+  downloadList: Array<string> = [];
+  downloadOptsVisible: boolean = false;
+  downloadStatusVisible: boolean;
+  downloadInProgress: boolean;
+  downloadFailed: boolean;
   openControls = {};
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -204,5 +209,45 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.layoutFacade.ShowPageLoading(false);
         this.activeReport = Object.assign(report, data);
       });
+  }
+  
+  toggleDownloadDropdown() {
+    this.downloadOptsVisible = !this.downloadOptsVisible;
+  }
+  hideDownloadStatus() {
+    this.downloadStatusVisible = false;
+    this.downloadInProgress = false;
+    this.downloadFailed = false;
+  }
+
+  showDownloadStatus() {
+    this.downloadStatusVisible = true;
+    this.downloadInProgress = true;
+    this.downloadFailed = false;
+  }
+
+  onDownloadNodeReport(format) {
+    this.downloadOptsVisible = false;
+    const id: string = this.route.snapshot.params['id'];
+    const reportQuery = this.reportQueryService.getReportQuery();
+    reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
+    const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${format}`;
+
+    const onComplete = () => this.downloadInProgress = false;
+    const onError = _e => this.downloadFailed = true;
+    const types = { 'json': 'application/json', 'csv': 'text/csv' };
+    const onNext = data => {
+      const type = types[format];
+      const blob = new Blob([data], { type });
+      saveAs(blob, filename);
+      this.hideDownloadStatus();
+    };
+
+    this.downloadList = [filename];
+    this.showDownloadStatus();
+    this.statsService.downloaNodeReport(format, reportQuery).pipe(
+      finalize(onComplete))
+      .subscribe(onNext, onError);
+
   }
 }
