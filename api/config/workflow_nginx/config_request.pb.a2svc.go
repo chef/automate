@@ -3,7 +3,10 @@
 
 package workflow_nginx
 
-import a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
+import (
+	a2conf "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+)
 
 // ServiceName returns the name of the service this config belongs to
 func (m *ConfigRequest) ServiceName() string {
@@ -30,4 +33,19 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 	default:
 		return 0, a2conf.ErrPortNotFound
 	}
+}
+
+// ListSecrets lists all the secrets exposed by the config
+func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
+	return []a2conf.SecretInfo{}
+}
+
+// GetSecret gets a secret by name. Returns nil if it is not set
+func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
+	return nil
+}
+
+// SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
+func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) error {
+	return a2conf.ErrSecretNotFound
 }

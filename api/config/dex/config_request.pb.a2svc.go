@@ -102,3 +102,116 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 		return 0, a2conf.ErrPortNotFound
 	}
 }
+
+// ListSecrets lists all the secrets exposed by the config
+func (m *ConfigRequest) ListSecrets() []a2conf.SecretInfo {
+	return []a2conf.SecretInfo{a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_LDAP_PASSWORD",
+		Name:                "ldap_password",
+	}, a2conf.SecretInfo{
+		EnvironmentVariable: "AUTOMATE_SECRET_MSAD_PASSWORD",
+		Name:                "msad_password",
+	}}
+}
+
+// GetSecret gets a secret by name. Returns nil if it is not set
+func (m *ConfigRequest) GetSecret(name string) *wrappers.StringValue {
+	if m == nil {
+		return nil
+	}
+	switch name {
+	case "ldap_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Connectors
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.Ldap
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.BindPassword
+		return v4
+	case "msad_password":
+		v0 := m.V1
+		if v0 == nil {
+			return nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return nil
+		}
+		v2 := v1.Connectors
+		if v2 == nil {
+			return nil
+		}
+		v3 := v2.MsadLdap
+		if v3 == nil {
+			return nil
+		}
+		v4 := v3.BindPassword
+		return v4
+	default:
+		return nil
+	}
+}
+
+// SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist
+func (m *ConfigRequest) SetSecret(name string, value *wrappers.StringValue) error {
+	switch name {
+	case "ldap_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Connectors
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_Connectors{}
+		}
+		v3 := &(*v2).Ldap
+		if *v3 == nil {
+			*v3 = &ConfigRequest_V1_Ldap{}
+		}
+		v4 := &(*v3).BindPassword
+		if *v4 == nil {
+			*v4 = &wrappers.StringValue{}
+		}
+		*v4 = value
+	case "msad_password":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Connectors
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_Connectors{}
+		}
+		v3 := &(*v2).MsadLdap
+		if *v3 == nil {
+			*v3 = &ConfigRequest_V1_Msad_Ldap{}
+		}
+		v4 := &(*v3).BindPassword
+		if *v4 == nil {
+			*v4 = &wrappers.StringValue{}
+		}
+		*v4 = value
+	default:
+		return a2conf.ErrSecretNotFound
+	}
+	return nil
+}

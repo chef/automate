@@ -3,6 +3,8 @@ package gen
 import (
 	"bytes"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/dave/jennifer/jen"
 	"github.com/golang/protobuf/proto"
@@ -37,7 +39,7 @@ func (m *A2ServiceConfigModule) Execute(targets map[string]pgs.File, pkgs map[st
 OUTER:
 	for _, f := range targets {
 		messages := f.AllMessages()
-		acc := &PortAcc{}
+		acc := &Acc{}
 
 		for _, msg := range messages {
 			if !proto.HasExtension(msg.Descriptor().GetOptions(), a2conf.E_ServiceConfig) {
@@ -64,32 +66,41 @@ OUTER:
 	return m.Artifacts()
 }
 
-type PortAcc struct {
+type Acc struct {
 	portInfo   []PortInfo
+	secretInfo []SecretInfo
 	fieldStack []pgs.Field
 }
 
-func (acc *PortAcc) PushField(f pgs.Field) {
+func (acc *Acc) PushField(f pgs.Field) {
 	acc.fieldStack = append(acc.fieldStack, f)
 }
 
-func (acc *PortAcc) PopField() {
+func (acc *Acc) PopField() {
 	acc.fieldStack = acc.fieldStack[:len(acc.fieldStack)-1]
 }
 
-func (acc *PortAcc) SnapshotFields() []pgs.Field {
+func (acc *Acc) SnapshotFields() []pgs.Field {
 	fields := make([]pgs.Field, len(acc.fieldStack))
 	copy(fields, acc.fieldStack)
 	return fields
 }
 
 type PortInfo struct {
-	Port      a2conf.Port
+	Port      *a2conf.Port
 	SourceLoc string
 	Path      []pgs.Field
 }
 
-func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
+type SecretInfo struct {
+	Secret    *a2conf.Secret
+	SourceLoc string
+	Path      []pgs.Field
+}
+
+var secretNameValid = regexp.MustCompile(`^[a-z][a-z0-9_]+$`).MatchString
+
+func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *Acc) {
 	if msg == nil {
 		return
 	}
@@ -103,6 +114,7 @@ func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
 		sourceLoc := fmt.Sprintf("%s:%d", file, line)
 		fieldType := field.Type()
 		descriptor := field.Descriptor()
+		consumed := false
 
 		if proto.HasExtension(descriptor.GetOptions(), a2conf.E_Port) {
 			iext, err := proto.GetExtension(descriptor.GetOptions(), a2conf.E_Port)
@@ -134,11 +146,45 @@ func (m *A2ServiceConfigModule) visit(msg pgs.Message, acc *PortAcc) {
 				}
 			}
 			acc.portInfo = append(acc.portInfo, PortInfo{
-				Port:      *ext,
+				Port:      ext,
 				SourceLoc: sourceLoc,
 				Path:      acc.SnapshotFields(),
 			})
-		} else {
+			consumed = true
+		}
+
+		if proto.HasExtension(descriptor.GetOptions(), a2conf.E_Secret) {
+			iext, err := proto.GetExtension(descriptor.GetOptions(), a2conf.E_Secret)
+			m.CheckErr(err)
+			ext := iext.(*a2conf.Secret)
+			if !secretNameValid(ext.Name) {
+				m.Failf("Secret name %q is invalid. Must be alphanumeric", ext.Name)
+			}
+
+			fieldMsg := fieldType.Embed()
+
+			m.Debugf("Field %s is a port", fieldMsg.FullyQualifiedName())
+			switch fieldMsg.FullyQualifiedName() {
+			case ".google.protobuf.Int32Value", ".google.protobuf.StringValue":
+			default:
+				m.Failf("%s is not a supported Message type for Port", fieldMsg.FullyQualifiedName())
+			}
+
+			for _, secretInfo := range acc.secretInfo {
+				if secretInfo.Secret.Name == ext.Name {
+					m.Failf("%s secret name %q already in use by previous annotation at %s",
+						sourceLoc, secretInfo.Secret.Name, secretInfo.SourceLoc)
+				}
+			}
+			acc.secretInfo = append(acc.secretInfo, SecretInfo{
+				Secret:    ext,
+				SourceLoc: sourceLoc,
+				Path:      acc.SnapshotFields(),
+			})
+			consumed = true
+		}
+
+		if !consumed {
 			next := fieldType.Embed()
 			m.visit(next, acc)
 		}
@@ -156,7 +202,7 @@ func (m *A2ServiceConfigModule) applyTemplate(
 	protoFileName string,
 	message pgs.Message,
 	serviceConfigInfo *a2conf.ServiceConfig,
-	acc *PortAcc) {
+	acc *Acc) {
 
 	importPath := m.ctx.ImportPath(message).String()
 	pkgName := m.ctx.PackageName(message).String()
@@ -172,6 +218,13 @@ func (m *A2ServiceConfigModule) applyTemplate(
 	f.Add(m.generateListPorts(message, acc))
 	f.Comment("GetPort gets the port tagged with the given name. If the value is not set, it returns 0.")
 	f.Add(m.generateGetPortMethod(message, acc))
+
+	f.Comment("ListSecrets lists all the secrets exposed by the config")
+	f.Add(m.generateListSecrets(message, acc))
+	f.Comment("GetSecret gets a secret by name. Returns nil if it is not set")
+	f.Add(m.generateGetSecretMethod(message, acc))
+	f.Comment("SetSecret sets a secret by name. Returns ErrSecretNotFound if the secret does not exist")
+	f.Add(m.generateSetSecrets(message, acc))
 	m.CheckErr(f.Render(buf))
 }
 
@@ -185,7 +238,7 @@ func (m *A2ServiceConfigModule) generateServiceNameFunc(message pgs.Message, nam
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) ListPorts() []api.PortInfo
 	f := jen.Func().Params(
 		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
@@ -212,7 +265,7 @@ func (m *A2ServiceConfigModule) generateListPorts(message pgs.Message, acc *Port
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) BindPort(name string, value uint16) error
 	f := jen.Func().Params(
 		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
@@ -307,7 +360,7 @@ func (m *A2ServiceConfigModule) generateBindPortMethod(message pgs.Message, acc 
 	return f
 }
 
-func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *PortAcc) *jen.Statement {
+func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *Acc) *jen.Statement {
 	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
 	f := jen.Func().Params(
 		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
@@ -384,4 +437,175 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 	})
 
 	return f
+}
+
+func (m *A2ServiceConfigModule) generateGetSecretMethod(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) GetSecret(name string) (uint16, error)
+	f := jen.Func().Params(
+		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
+	).Id("GetSecret").Params(
+		jen.Id("name").String(),
+	).Params(jen.Op("*").Qual("github.com/golang/protobuf/ptypes/wrappers", "StringValue")).BlockFunc(func(g *jen.Group) {
+		if len(acc.secretInfo) == 0 {
+			g.Return(jen.Nil())
+		} else {
+			g.If(jen.Id("m").Op("==").Nil()).Block(
+				jen.Return(jen.Nil()),
+			)
+			// switch name {
+			g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
+				for _, secretInfo := range acc.secretInfo {
+					// Example:
+					// case "ldap_password":
+					sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
+						// Example:
+						// v0 := m.V1
+						// if v0 == nil {
+						//   return nil
+						// }
+						cg.Id("v0").Op(":=").Id("m").Dot(m.ctx.Name(secretInfo.Path[0]).String())
+						cg.If(jen.Id("v0").Op("==").Nil()).Block(
+							jen.Return(jen.Nil()),
+						)
+
+						for i, path := range secretInfo.Path {
+							if i == 0 {
+								continue
+							}
+							cur := fmt.Sprintf("v%d", i)
+							prev := fmt.Sprintf("v%d", i-1)
+
+							// Example:
+							// v1 := v0.Sys
+							cg.Id(cur).Op(":=").Id(prev).Dot(m.ctx.Name(path).String())
+
+							if i == len(secretInfo.Path)-1 {
+								switch path.Type().Embed().FullyQualifiedName() {
+								case ".google.protobuf.StringValue":
+									cg.Return(jen.Id(cur))
+								default:
+									m.Failf("unsupported message type for secret")
+								}
+							} else {
+								// Example:
+								// if v1 == nil {
+								//   return nil
+								// }
+								cg.If(jen.Id(cur).Op("==").Nil()).Block(
+									jen.Return(jen.Nil()),
+								)
+							}
+						}
+					})
+				}
+				sg.Default().Block(
+					jen.Return(jen.Nil()),
+				)
+			})
+		}
+	})
+
+	return f
+}
+
+func (m *A2ServiceConfigModule) generateListSecrets(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) ListSecrets() []api.SecretInfo
+	f := jen.Func().Params(
+		jen.Id("m").Id("*" + m.ctx.Name(message).String()),
+	).Id("ListSecrets").Params().Params(jen.Index().Qual(a2ConfPkg, "SecretInfo")).BlockFunc(func(g *jen.Group) {
+		// Example:
+		// return []api.SecretInfo {
+		//   api.SecretInfo{
+		//	   Name: "ldap_password",
+		//     EnvironmentVariable: "AUTOMATE_SECRET_LDAP_PASSWORD"
+		//   },
+		// }
+		ret := jen.Index().Qual(a2ConfPkg, "SecretInfo").ValuesFunc(func(vg *jen.Group) {
+			for _, s := range acc.secretInfo {
+				vg.Add(jen.Qual(a2ConfPkg, "SecretInfo").Values(jen.Dict{
+					jen.Id("Name"):                jen.Lit(s.Secret.Name),
+					jen.Id("EnvironmentVariable"): jen.Lit(fmt.Sprintf("AUTOMATE_SECRET_%s", strings.ToUpper(s.Secret.Name))),
+				}))
+			}
+		})
+		g.Return(ret)
+	})
+	return f
+}
+
+func (m *A2ServiceConfigModule) generateSetSecrets(message pgs.Message, acc *Acc) *jen.Statement {
+	// func (m *ConfigRequest) GetPort(name string) (uint16, error)
+	f := jen.Func().Params(
+		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
+	).Id("SetSecret").Params(
+		jen.Id("name").String(),
+		jen.Id("value").Op("*").Qual("github.com/golang/protobuf/ptypes/wrappers", "StringValue"),
+	).Params(jen.Error()).BlockFunc(func(g *jen.Group) {
+		if len(acc.secretInfo) == 0 {
+			g.Return(jen.Qual(a2ConfPkg, "ErrSecretNotFound"))
+		} else {
+			// switch name {
+			g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
+				for _, secretInfo := range acc.secretInfo {
+					// Example:
+					// case "ldap_password":
+					sg.Case(jen.Lit(secretInfo.Secret.Name)).BlockFunc(func(cg *jen.Group) {
+						m.generatePathForSetting(cg, secretInfo.Path, func(cg *jen.Group, cur string, field pgs.Field) {
+							switch field.Type().Embed().FullyQualifiedName() {
+							case ".google.protobuf.StringValue":
+								cg.Op("*").Id(cur).Op("=").Id("value")
+							default:
+								m.Failf("unsupported message type for secret")
+							}
+						})
+					})
+				}
+				sg.Default().Block(
+					jen.Return(jen.Qual(a2ConfPkg, "ErrSecretNotFound")),
+				)
+			})
+			g.Return(jen.Nil())
+		}
+	})
+	return f
+}
+
+func (m *A2ServiceConfigModule) generatePathForSetting(cg *jen.Group, fieldPath []pgs.Field, cb func(cg *jen.Group, cur string, field pgs.Field)) {
+	// Create first struct on the ConfigRequest object
+	// Example:
+	// v0 := &m.V1
+	// if *v0 == nil {
+	//   *v0 = &ConfigRequest_V1{}
+	// }
+	cg.Id("v0").Op(":=").Op("&").Id("m").Dot(m.ctx.Name(fieldPath[0]).String())
+	cg.If(jen.Op("*").Id("v0").Op("==").Nil()).Block(
+		jen.Op("*").Id("v0").Op("=").Op("&").Qual(
+			m.ctx.ImportPath(fieldPath[0].Type().Embed()).String(),
+			m.ctx.Name(fieldPath[0].Type().Embed()).String()).Values(),
+	)
+
+	// Continue creating structs where nil is found
+	cur := ""
+	for i, p := range fieldPath {
+		if i == 0 {
+			continue
+		}
+		cur = fmt.Sprintf("v%d", i)
+		prev := fmt.Sprintf("v%d", i-1)
+
+		// Example:
+		// v1 := &(*v0).Sys
+		cg.Id(cur).Op(":=").Op("&").Parens(jen.Op("*").Id(prev)).Dot(m.ctx.Name(p).String())
+		// Example:
+		// if *v1 == nil {
+		//   *v1 = &ConfigRequest_V1_System{}
+		// }
+		cg.If(jen.Op("*").Id(cur).Op("==").Nil()).Block(
+			jen.Op("*").Id(cur).Op("=").Op("&").Qual(
+				m.ctx.ImportPath(p.Type().Embed()).String(),
+				m.ctx.Name(p.Type().Embed()).String()).Values(),
+		)
+	}
+
+	cb(cg, cur, fieldPath[len(fieldPath)-1])
 }
