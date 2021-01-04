@@ -84,10 +84,6 @@ func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) error
 		}
 		return nil
 	})
-
-	if err != nil {
-		return err
-	}
 	return err
 }
 
@@ -109,9 +105,6 @@ func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) 
 		}
 		return nil
 	})
-	if err != nil {
-		return err
-	}
 	return err
 }
 

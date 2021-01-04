@@ -217,7 +217,7 @@ func csvReportExport(stream service.CfgMgmtService_ReportExportServer) exportRep
 			return fmt.Errorf("Failed to export CSV: %+v", err)
 		}
 
-		return err
+		return nil
 	}
 }
 

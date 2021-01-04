@@ -241,7 +241,7 @@ func csvExport(stream service.CfgMgmtService_NodeExportServer) exportHandler {
 			return fmt.Errorf("Failed to export CSV: %+v", err)
 		}
 
-		return err
+		return nil
 	}
 }
 

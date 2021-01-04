@@ -79,7 +79,7 @@ func StreamBackupStatus(conTimeout, reqTimeout time.Duration, taskID string, wri
 			// the stream has completed or we've hit an error and should exit.
 			if completed {
 				if err == nil {
-					return event, err
+					return event, nil
 				}
 
 				return nil, status.Wrap(

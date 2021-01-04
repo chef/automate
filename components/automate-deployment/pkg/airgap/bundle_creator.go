@@ -620,7 +620,7 @@ func (creator *InstallBundleCreator) createTar(InstallBundleCreatorProgress) err
 		return errors.Wrap(err, "Could not write archive")
 	}
 
-	return err
+	return nil
 }
 
 func uniq(xs []habpkg.VersionedPackage) []habpkg.VersionedPackage {
