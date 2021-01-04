@@ -226,7 +226,7 @@ export class StatsService {
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 
-  downloaNodeReport(format: string, reportQuery: ReportQuery): Observable<string> {
+  downloadNodeReport(format: string, reportQuery: ReportQuery): Observable<string> {
     const url = `${CC_API_URL}/reporting/node/export`;
 
         // for export, we want to send the start_time as the beg of day of end time

@@ -245,7 +245,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
     this.downloadList = [filename];
     this.showDownloadStatus();
-    this.statsService.downloaNodeReport(format, reportQuery).pipe(
+    this.statsService.downloadNodeReport(format, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
 
