@@ -391,7 +391,7 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal
 		}
 		schedules = append(schedules, &scheduledWorkflow)
 	}
-	if rows.Err() != nil {
+	if rows.Err() != nil { // nosemgrep: dgryski.semgrep-go.wrongerrcall.maybe-wrong-err
 		return nil, errors.Wrap(err, "could not read workflow schedules")
 	}
 
