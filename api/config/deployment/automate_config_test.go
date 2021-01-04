@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/chef/automate/api/config/compliance"
+	dex "github.com/chef/automate/api/config/dex"
 	es "github.com/chef/automate/api/config/elasticsearch"
 	config "github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
@@ -362,4 +364,109 @@ func validTLSCredentialForTest() *shared.FrontendTLSCredential {
 
 func validTLSCredentialSliceForTest() []*shared.FrontendTLSCredential {
 	return []*shared.FrontendTLSCredential{validTLSCredentialForTest()}
+}
+
+func TestPopulateSecretsFromEnvironment(t *testing.T) {
+	t.Run("if missing from config and environment, it does nothing", func(t *testing.T) {
+		expected := &AutomateConfig{
+			Deployment: &ConfigRequest{
+				V1: &ConfigRequest_V1{
+					Svc: &ConfigRequest_V1_Service{
+						Channel: w.String("foo"),
+					},
+				},
+			},
+		}
+		conf, err := expected.NewDeepCopy()
+		require.NoError(t, err)
+		conf.PopulateSecretsFromEnvironment()
+		require.Equal(t, expected, conf)
+	})
+
+	t.Run("if missing from config and is in the environment, config is populated from environment",
+		func(t *testing.T) {
+			conf := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+			}
+			expected := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+				Dex: &dex.ConfigRequest{
+					V1: &dex.ConfigRequest_V1{
+						Sys: &dex.ConfigRequest_V1_System{
+							Connectors: &dex.ConfigRequest_V1_Connectors{
+								Ldap: &dex.ConfigRequest_V1_Ldap{
+									BindPassword: w.String("imapassword"),
+								},
+							},
+						},
+					},
+				},
+			}
+			os.Setenv("AUTOMATE_SECRET_LDAP_PASSWORD", "imapassword") // nolint: errcheck
+			defer os.Unsetenv("AUTOMATE_SECRET_LDAP_PASSWORD")        // nolint: errcheck
+			conf.PopulateSecretsFromEnvironment()
+			require.Equal(t, expected, conf)
+		},
+	)
+
+	t.Run("if its in the config and the environment, nothing changes",
+		func(t *testing.T) {
+			conf := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+				Dex: &dex.ConfigRequest{
+					V1: &dex.ConfigRequest_V1{
+						Sys: &dex.ConfigRequest_V1_System{
+							Connectors: &dex.ConfigRequest_V1_Connectors{
+								Ldap: &dex.ConfigRequest_V1_Ldap{
+									BindPassword: w.String("imapassword"),
+								},
+							},
+						},
+					},
+				},
+			}
+			expected := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+				Dex: &dex.ConfigRequest{
+					V1: &dex.ConfigRequest_V1{
+						Sys: &dex.ConfigRequest_V1_System{
+							Connectors: &dex.ConfigRequest_V1_Connectors{
+								Ldap: &dex.ConfigRequest_V1_Ldap{
+									BindPassword: w.String("imapassword"),
+								},
+							},
+						},
+					},
+				},
+			}
+			os.Setenv("AUTOMATE_SECRET_LDAP_PASSWORD", "thewrongpassword") // nolint: errcheck
+			defer os.Unsetenv("AUTOMATE_SECRET_LDAP_PASSWORD")             // nolint: errcheck
+			conf.PopulateSecretsFromEnvironment()
+			require.Equal(t, expected, conf)
+		},
+	)
 }
