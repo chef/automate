@@ -109,7 +109,7 @@ func TestDiskSecretStore(t *testing.T) {
 
 	// checks if GetSecret method is able to read old unencrypted secrets
 	t.Run("Able to read preexisting unencrypted secrets", func(t *testing.T) {
-		testSecretName := secrets.SecretName{"test", "test-secret-2"}
+		testSecretName := secrets.SecretName{"test", "test-secret-3"}
 		testSecretContent := []byte("this-is-a-secret")
 
 		// creates group directory with owner permissions
