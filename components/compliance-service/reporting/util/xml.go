@@ -32,11 +32,11 @@ type Platform struct {
 
 // Profile detail
 type Profile struct {
-	Name      string    `xml:"Name,omitempty"`
-	Title     string    `xml:"Title,omitempty"`
-	Version   string    `xml:"Version,omitempty"`
-	Summary   string    `xml:"Summary,omitempty"`
-	Controles []Control `xml:"Controles>Control,omitempty"`
+	Name     string    `xml:"Name,omitempty"`
+	Title    string    `xml:"Title,omitempty"`
+	Version  string    `xml:"Version,omitempty"`
+	Summary  string    `xml:"Summary,omitempty"`
+	Controls []Control `xml:"Controls>Control,omitempty"`
 }
 
 // Control detail
@@ -99,7 +99,7 @@ func ReportToXML(report *reportingapi.Report) ([]byte, error) {
 			Title:     profile.Title,
 			Version:   profile.Version,
 			Summary:   profile.Summary,
-			Controles: exportControls,
+			Controls: exportControls,
 		}
 	} // End of profiles loop
 
