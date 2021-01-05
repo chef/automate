@@ -23,4 +23,10 @@ export class InfraRoleRequests {
     return this.http.get<InfraRole>(
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`, {headers});
   }
+
+  public createRole(server_id: string, org_id: string, role: InfraRole): Observable<InfraRole> {
+
+    return this.http.post<InfraRole>(
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles`, role);
+  }
 }

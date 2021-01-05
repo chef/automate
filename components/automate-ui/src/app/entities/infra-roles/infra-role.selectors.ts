@@ -24,3 +24,13 @@ export const infraRoleFromRoute = createSelector(
   routeParams,
   (state, { name }) => find({ name }, state)
 );
+
+export const saveStatus = createSelector(
+  infraRoleState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  infraRoleState,
+  (state) => state.saveError
+);

@@ -1,7 +1,12 @@
 <section class="infra-roles">
   <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <app-create-infra-role-modal [openEvent]="openRoleModal"
+  [rolesList]="roles" [serverId]="serverId" [orgId]="orgId"></app-create-infra-role-modal>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
+    <chef-toolbar>
+      <chef-button primary (click)="openCreateModal()">Create Role</chef-button>
+    </chef-toolbar>
     <chef-table>
       <chef-thead>
         <chef-tr>

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { InfraRole } from './infra-role.model';
+import { InfraRole, ExpandedList } from './infra-role.model';
 
 export enum RoleActionTypes {
   GET_ALL = 'ROLES::GET_ALL',
@@ -8,7 +8,10 @@ export enum RoleActionTypes {
   GET_ALL_FAILURE = 'ROLES::GET_ALL::FAILURE',
   GET = 'ROLES::GET',
   GET_SUCCESS = 'ROLES::GET::SUCCESS',
-  GET_FAILURE = 'ROLES::GET::FAILURE'
+  GET_FAILURE = 'ROLES::GET::FAILURE',
+  CREATE            = 'ROLES::CREATE',
+  CREATE_SUCCESS    = 'ROLES::CREATE::SUCCESS',
+  CREATE_FAILURE    = 'ROLES::CREATE::FAILURE',
 }
 
 export interface RolesSuccessPayload {
@@ -45,10 +48,41 @@ export class GetRoleFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface CreateRolePayload {
+  id: string;
+  name: string;
+  environments: string[];
+  chef_type: string;
+  description: string;
+  json_class: string;
+  default_attributes: string;
+  override_attributes: string;
+  run_list: string[];
+  expanded_run_list: ExpandedList[];
+}
+
+export class CreateRole implements Action {
+  readonly type = RoleActionTypes.CREATE;
+  constructor(public payload: { server_id: string, org_id: string, role: CreateRolePayload } ) { }
+}
+
+export class CreateRoleSuccess implements Action {
+  readonly type = RoleActionTypes.CREATE_SUCCESS;
+  constructor(public payload) { }
+}
+
+export class CreateRoleFailure implements Action {
+  readonly type = RoleActionTypes.CREATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type RoleActions =
   | GetRoles
   | GetRolesSuccess
   | GetRolesFailure
   | GetRole
   | GetRoleSuccess
-  | GetRoleFailure;
+  | GetRoleFailure
+  | CreateRole
+  | CreateRoleSuccess
+  | CreateRoleFailure;

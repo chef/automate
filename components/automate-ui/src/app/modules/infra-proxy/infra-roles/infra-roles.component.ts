@@ -30,7 +30,8 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roles: InfraRole[] = [];
   public rolesListLoading = true;
   public authFailure = false;
-
+  public openRoleModal = new EventEmitter<boolean>();
+  public recipes: any;
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -56,10 +57,15 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.authFailure = true;
       }
     });
+
   }
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  public openCreateModal(): void {
+    this.openRoleModal.emit();
   }
 
   ngOnDestroy(): void {

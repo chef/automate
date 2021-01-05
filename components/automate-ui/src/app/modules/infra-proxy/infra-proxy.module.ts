@@ -13,6 +13,7 @@ import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
+import { CreateInfraRoleModalComponent } from './create-infra-role-modal/create-infra-role-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
 import { EnvironmentsComponent } from './environments/environments.component';
@@ -27,6 +28,11 @@ import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.compon
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatStepperModule } from '@angular/material/stepper'
+
+
 @NgModule({
   declarations: [
     ChefServersListComponent,
@@ -37,6 +43,7 @@ import { EmptyStateComponent } from './empty-state/empty-state.component';
     CookbookDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent,
+    CreateInfraRoleModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
     EmptyStateComponent,
@@ -57,7 +64,10 @@ import { EmptyStateComponent } from './empty-state/empty-state.component';
     ChefPipesModule,
     TreeTableModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatStepperModule
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
