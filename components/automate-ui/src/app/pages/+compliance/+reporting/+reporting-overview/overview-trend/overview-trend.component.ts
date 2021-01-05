@@ -45,7 +45,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   @Input() vbHeight = 300;
 
   @ViewChild('svg', { static: true }) svg;
-  
+
   trendDataCache = [];
 
   get viewBox() {
