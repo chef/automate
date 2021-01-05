@@ -248,6 +248,5 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.downloadNodeReport(fileFormat, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
-
   }
 }
