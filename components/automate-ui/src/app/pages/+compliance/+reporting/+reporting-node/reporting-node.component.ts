@@ -31,10 +31,10 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   totalReports = 0;
   firstReportIsLoaded = false;
   downloadList: Array<string> = [];
-  downloadOptsVisible: boolean = false;
-  downloadStatusVisible: boolean;
-  downloadInProgress: boolean;
-  downloadFailed: boolean;
+  downloadOptsVisible = false;
+  downloadStatusVisible = false;
+  downloadInProgress = false;
+  downloadFailed = false;
   openControls = {};
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -210,7 +210,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.activeReport = Object.assign(report, data);
       });
   }
-  
+
   toggleDownloadDropdown() {
     this.downloadOptsVisible = !this.downloadOptsVisible;
   }
