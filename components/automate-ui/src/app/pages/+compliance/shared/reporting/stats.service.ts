@@ -17,7 +17,7 @@ export interface DateRange {
 }
 
 export type ControlStatus = 'passed' | 'failed' | 'waived' | 'skipped';
-
+export type reportFormat = 'json' | 'csv';
 export class ReportCollection {
   reports: any[];
   totalReports: number;
@@ -226,14 +226,12 @@ export class StatsService {
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 
-  downloadNodeReport(format: string, reportQuery: ReportQuery): Observable<string> {
+  downloadNodeReport(fileFormat: reportFormat, reportQuery: ReportQuery): Observable<string> {
     const url = `${CC_API_URL}/reporting/node/export`;
 
-        // for export, we want to send the start_time as the beg of day of end time
-    // so we find the endtime in the filters, and then set start time to beg of that day
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
 
-    const body = { type: format, filters: this.formatFilters(reportQuery) };
+    const body = { type: fileFormat, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 

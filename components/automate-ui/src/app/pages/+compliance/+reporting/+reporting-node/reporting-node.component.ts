@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { StatsService, ReportCollection } from '../../shared/reporting/stats.service';
+import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
 import { Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
@@ -220,24 +220,24 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.downloadFailed = false;
   }
 
-  showDownloadStatus() {
+  private showDownloadStatus() {
     this.downloadStatusVisible = true;
     this.downloadInProgress = true;
     this.downloadFailed = false;
   }
 
-  onDownloadNodeReport(format) {
+  onDownloadNodeReport(fileFormat: reportFormat) {
     this.downloadOptsVisible = false;
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQueryService.getReportQuery();
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
-    const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${format}`;
+    const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${fileFormat}`;
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
     const types = { 'json': 'application/json', 'csv': 'text/csv' };
     const onNext = data => {
-      const type = types[format];
+      const type = types[fileFormat];
       const blob = new Blob([data], { type });
       saveAs(blob, filename);
       this.hideDownloadStatus();
@@ -245,7 +245,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
     this.downloadList = [filename];
     this.showDownloadStatus();
-    this.statsService.downloadNodeReport(format, reportQuery).pipe(
+    this.statsService.downloadNodeReport(fileFormat, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
 
