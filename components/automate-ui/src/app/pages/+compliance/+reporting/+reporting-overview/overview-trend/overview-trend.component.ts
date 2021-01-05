@@ -33,7 +33,6 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     private el: ElementRef,
     @Inject(DOCUMENT) private document: Document
   ) {}
-  trendDataCache = [];
 
   @Input() data = [];
 
@@ -46,6 +45,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   @Input() vbHeight = 300;
 
   @ViewChild('svg', { static: true }) svg;
+  
+  trendDataCache = [];
 
   get viewBox() {
     return `0 0 ${this.vbWidth} ${this.vbHeight}`;
