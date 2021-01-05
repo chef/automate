@@ -139,15 +139,15 @@ func TestDiskSecretStore(t *testing.T) {
 	t.Run("get and set can roundtrip a secret with random string combinations", func(t *testing.T) {
 		parameters := gopter.DefaultTestParameters()
 		parameters.MinSuccessfulTests = 500
+		parameters.MaxSize = 5 * 1024
 		properties := gopter.NewProperties(parameters)
 		properties.Property("generate multiple random test cases to check if get and set can roundtrip a secret", prop.ForAll(
-			func(group string, name string, maxContentLength int) bool {
+			func(group string, name string, plaintext []byte) bool {
 				testSecretName := secrets.SecretName{group, name}
-				testSecretContent, err := secrets.GenerateRandomBytes(maxContentLength)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
-				err = dataStore.SetSecret(testSecretName, testSecretContent)
+				err = dataStore.SetSecret(testSecretName, plaintext)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -155,12 +155,11 @@ func TestDiskSecretStore(t *testing.T) {
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
-				return bytes.Compare(testSecretContent, secretContent) == 0
+				return bytes.Compare(plaintext, secretContent) == 0
 			},
 			stringGen(10).WithLabel("group"),
 			stringGen(10).WithLabel("name"),
-			// required to generate content from 1 byte to 5 kb
-			gen.IntRange(1, 5120).WithLabel("maxContentLength"),
+			gen.SliceOf(gen.UInt8Range(0, 255)).WithLabel("plaintext"),
 		))
 		properties.TestingRun(t)
 	})
