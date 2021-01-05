@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -97,6 +98,9 @@ const (
 	// secrets store, read the secrets as root, and then drop privs when
 	// we exec the command.
 	DefaultDiskStoreDataOwner = "hab"
+
+	// SecretFileExtension is the extension name for the encrypted secrets file
+	SecretFileExtension = ".enc"
 )
 
 func NewDiskStoreReader(basePath string) SecretsReader {
@@ -147,46 +151,99 @@ func (d *diskStore) Initialize() error {
 		return errors.Wrap(err, "could now chown shared data directory for secrets store")
 	}
 
+	// creates encryption key if it does not exist
+	if _, err := d.ensureKey(); err != nil {
+		return errors.Wrap(err, "could not create encryption key")
+	}
+
 	return nil
 }
 
 func (d *diskStore) Exists(secret SecretName) (bool, error) {
+	// added logic to check if secret is encrypted or not
+	encryptedPath := filepath.Join(d.basePath, secret.Group, addSecretFileExtension(secret.Name))
+	encryptedExists, err := fileutils.PathExists(encryptedPath)
+	if err != nil {
+		return false, err
+	}
+	if encryptedExists {
+		return true, nil
+	}
 	path := filepath.Join(d.basePath, secret.Group, secret.Name)
 	return fileutils.PathExists(path)
 }
 
 func (d *diskStore) GetSecret(secret SecretName) ([]byte, error) {
-	path := filepath.Join(d.basePath, secret.Group, secret.Name)
-	ret, err := ioutil.ReadFile(path)
+	// checks if the encrypted secret exists
+	pathToEncryptedSecret := filepath.Join(d.basePath, secret.Group, addSecretFileExtension(secret.Name))
+	encryptedSecretExists, err := fileutils.PathExists(pathToEncryptedSecret)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not read secrets data (secret may not have been generated yet)")
+		return nil, errors.Wrap(err, "unexpected error while checking if encrypted file exists (secret may not have been generated yet)")
+	}
+	if encryptedSecretExists {
+		sktJSON := SecretKeyJSON{}
+		data, err := ioutil.ReadFile(pathToEncryptedSecret)
+		if err != nil {
+			return nil, errors.Wrap(err, "unexpected error while reading encrypted secret data")
+		}
+
+		if err := json.Unmarshal(data, &sktJSON); err != nil {
+			return nil, errors.Wrap(err, "unexpected error while reading encrypted secret data")
+		}
+
+		secretKey, err := d.loadKey()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to load secret key")
+		}
+		return secretKey.decrypt(sktJSON.IV, sktJSON.Ciphertext)
 	}
 
+	// else return unencrypted secret
+	pathToUnencryptedSecret := filepath.Join(d.basePath, secret.Group, secret.Name)
+	ret, err := ioutil.ReadFile(pathToUnencryptedSecret)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not read unencrypted secrets data (secret may not have been generated yet)")
+	}
 	return ret, err
 }
 
 func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
-	parentDir := filepath.Join(d.basePath, secret.Group)
-	secretPath := filepath.Join(parentDir, secret.Name)
-	err := os.MkdirAll(parentDir, 0700)
+	secretKey, err := d.loadKey()
 	if err != nil {
+		return errors.Wrap(err, "failed to load secret key")
+	}
+
+	parentDir := filepath.Join(d.basePath, secret.Group)
+	secretPath := filepath.Join(parentDir, addSecretFileExtension(secret.Name))
+
+	if err := os.MkdirAll(parentDir, 0700); err != nil {
 		return errors.Wrap(err, "could not create directory for secrets data")
 	}
-	err = os.Chown(parentDir, d.ownerUid, d.ownerGid)
-	if err != nil {
+
+	if err := os.Chown(parentDir, d.ownerUid, d.ownerGid); err != nil {
 		return errors.Wrap(err, "could not chown directory for secrets data")
 	}
 
-	r := bytes.NewReader(data)
-	err = fileutils.AtomicWrite(secretPath, r, fileutils.WithAtomicWriteFileMode(0700))
+	iv, ct, err := secretKey.encrypt(data)
 	if err != nil {
-		return errors.Wrap(err, "could not write secrets data to disk")
+		return err
 	}
 
-	// TODO(ssd) 2018-08-20: Should this be an option we can pass to AtomicWrite?
-	err = os.Chown(secretPath, d.ownerUid, d.ownerGid)
-	if err != nil {
-		return errors.Wrap(err, "could not chown secrets data")
+	buf := new(bytes.Buffer)
+
+	if err := json.NewEncoder(buf).Encode(SecretKeyJSON{
+		Algorithm:  "AES256 CTR mode",
+		IV:         iv,
+		Ciphertext: ct,
+	}); err != nil {
+		return errors.Wrap(err, "failed to encode struct SecretKeyJSON data to json")
+	}
+
+	if err := fileutils.AtomicWrite(secretPath, bytes.NewReader(buf.Bytes()),
+		fileutils.WithAtomicWriteFileMode(0700),
+		fileutils.WithAtomicWriteChown(d.ownerUid, d.ownerGid),
+	); err != nil {
+		return errors.Wrap(err, "error writing the secret file")
 	}
 
 	return nil
@@ -228,4 +285,8 @@ func PrepareSSHPrivateKey(keyContent string) (string, error) {
 		return "", errors.New("Failed to write inspec private key " + keyPath.Name() + ": " + err.Error())
 	}
 	return keyPath.Name(), nil
+}
+
+func addSecretFileExtension(name string) string {
+	return name + SecretFileExtension
 }

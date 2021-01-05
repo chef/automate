@@ -19,7 +19,7 @@ pkg_deps=(
   core/net-tools
   core/procps-ng
   core/util-linux
-  chef/automate-platform-tools
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   core/bash
   core/cacerts # fetching manifest over HTTPS
   core/certstrap
