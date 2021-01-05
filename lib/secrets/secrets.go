@@ -241,7 +241,7 @@ func (d *diskStore) SetSecret(secret SecretName, data []byte) error {
 
 	if err := fileutils.AtomicWrite(secretPath, bytes.NewReader(buf.Bytes()),
 		fileutils.WithAtomicWriteFileMode(0700),
-		fileutils.WithAtomicWriteChown(d.ownerGid, d.ownerGid),
+		fileutils.WithAtomicWriteChown(d.ownerUid, d.ownerGid),
 	); err != nil {
 		return errors.Wrap(err, "error writing the secret file")
 	}
