@@ -350,7 +350,7 @@ func xmlExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		if initialRun {
 			initialRun = false
 		} else {
-			raw = append([]byte(","), raw...)
+			raw = append([]byte("\n"), raw...)
 		}
 		reader := bytes.NewReader(raw)
 		buf := make([]byte, streamBufferSize)
