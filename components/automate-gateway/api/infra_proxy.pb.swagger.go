@@ -2670,7 +2670,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "Recipes list."
+          "description": "Environment recipes list."
         }
       }
     },

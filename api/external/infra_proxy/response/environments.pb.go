@@ -228,7 +228,7 @@ type EnvironmentRecipesList struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Recipes list.
+	// Environment recipes list.
 	Recipes []string `protobuf:"bytes,1,rep,name=recipes,proto3" json:"recipes,omitempty"`
 }
 

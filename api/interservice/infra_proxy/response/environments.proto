@@ -31,6 +31,6 @@ message Environment {
 }
 
 message EnvironmentRecipesList {
-    // Recipes list.
+    // Environment recipes list.
     repeated string recipes = 1;
 }
