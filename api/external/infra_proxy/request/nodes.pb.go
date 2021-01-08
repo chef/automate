@@ -83,6 +83,72 @@ func (x *Nodes) GetServerId() string {
 	return ""
 }
 
+type Node struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Chef organization ID.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// Chef Infra Server ID.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Node name.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (x *Node) Reset() {
+	*x = Node{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Node) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Node) ProtoMessage() {}
+
+func (x *Node) ProtoReflect() protoreflect.Message {
+	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Node.ProtoReflect.Descriptor instead.
+func (*Node) Descriptor() ([]byte, []int) {
+	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Node) GetOrgId() string {
+	if x != nil {
+		return x.OrgId
+	}
+	return ""
+}
+
+func (x *Node) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *Node) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 type AffectedNodes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -103,7 +169,7 @@ type AffectedNodes struct {
 func (x *AffectedNodes) Reset() {
 	*x = AffectedNodes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[1]
+		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -116,7 +182,7 @@ func (x *AffectedNodes) String() string {
 func (*AffectedNodes) ProtoMessage() {}
 
 func (x *AffectedNodes) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[1]
+	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -129,7 +195,7 @@ func (x *AffectedNodes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AffectedNodes.ProtoReflect.Descriptor instead.
 func (*AffectedNodes) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{1}
+	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AffectedNodes) GetOrgId() string {
@@ -183,7 +249,7 @@ type DeleteNode struct {
 func (x *DeleteNode) Reset() {
 	*x = DeleteNode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[2]
+		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -196,7 +262,7 @@ func (x *DeleteNode) String() string {
 func (*DeleteNode) ProtoMessage() {}
 
 func (x *DeleteNode) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[2]
+	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -209,7 +275,7 @@ func (x *DeleteNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteNode.ProtoReflect.Descriptor instead.
 func (*DeleteNode) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{2}
+	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteNode) GetOrgId() string {
@@ -265,7 +331,7 @@ type UpdateNode struct {
 func (x *UpdateNode) Reset() {
 	*x = UpdateNode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[3]
+		mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -278,7 +344,7 @@ func (x *UpdateNode) String() string {
 func (*UpdateNode) ProtoMessage() {}
 
 func (x *UpdateNode) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[3]
+	mi := &file_external_infra_proxy_request_nodes_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -291,7 +357,7 @@ func (x *UpdateNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateNode.ProtoReflect.Descriptor instead.
 func (*UpdateNode) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{3}
+	return file_external_infra_proxy_request_nodes_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateNode) GetOrgId() string {
@@ -384,7 +450,12 @@ var file_external_infra_proxy_request_nodes_proto_rawDesc = []byte{
 	0x3b, 0x0a, 0x05, 0x4e, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x15, 0x0a, 0x06, 0x6f, 0x72, 0x67, 0x5f,
 	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x12,
 	0x1b, 0x0a, 0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x8e, 0x01, 0x0a,
+	0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x22, 0x4e, 0x0a, 0x04,
+	0x4e, 0x6f, 0x64, 0x65, 0x12, 0x15, 0x0a, 0x06, 0x6f, 0x72, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x73,
+	0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x8e, 0x01, 0x0a,
 	0x0d, 0x41, 0x66, 0x66, 0x65, 0x63, 0x74, 0x65, 0x64, 0x4e, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x15,
 	0x0a, 0x06, 0x6f, 0x72, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
 	0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f,
@@ -450,19 +521,20 @@ func file_external_infra_proxy_request_nodes_proto_rawDescGZIP() []byte {
 	return file_external_infra_proxy_request_nodes_proto_rawDescData
 }
 
-var file_external_infra_proxy_request_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_external_infra_proxy_request_nodes_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_external_infra_proxy_request_nodes_proto_goTypes = []interface{}{
 	(*Nodes)(nil),          // 0: chef.automate.api.infra_proxy.request.Nodes
-	(*AffectedNodes)(nil),  // 1: chef.automate.api.infra_proxy.request.AffectedNodes
-	(*DeleteNode)(nil),     // 2: chef.automate.api.infra_proxy.request.DeleteNode
-	(*UpdateNode)(nil),     // 3: chef.automate.api.infra_proxy.request.UpdateNode
-	(*_struct.Struct)(nil), // 4: google.protobuf.Struct
+	(*Node)(nil),           // 1: chef.automate.api.infra_proxy.request.Node
+	(*AffectedNodes)(nil),  // 2: chef.automate.api.infra_proxy.request.AffectedNodes
+	(*DeleteNode)(nil),     // 3: chef.automate.api.infra_proxy.request.DeleteNode
+	(*UpdateNode)(nil),     // 4: chef.automate.api.infra_proxy.request.UpdateNode
+	(*_struct.Struct)(nil), // 5: google.protobuf.Struct
 }
 var file_external_infra_proxy_request_nodes_proto_depIdxs = []int32{
-	4, // 0: chef.automate.api.infra_proxy.request.UpdateNode.automatic_attributes:type_name -> google.protobuf.Struct
-	4, // 1: chef.automate.api.infra_proxy.request.UpdateNode.default_attributes:type_name -> google.protobuf.Struct
-	4, // 2: chef.automate.api.infra_proxy.request.UpdateNode.normal_attributes:type_name -> google.protobuf.Struct
-	4, // 3: chef.automate.api.infra_proxy.request.UpdateNode.override_attributes:type_name -> google.protobuf.Struct
+	5, // 0: chef.automate.api.infra_proxy.request.UpdateNode.automatic_attributes:type_name -> google.protobuf.Struct
+	5, // 1: chef.automate.api.infra_proxy.request.UpdateNode.default_attributes:type_name -> google.protobuf.Struct
+	5, // 2: chef.automate.api.infra_proxy.request.UpdateNode.normal_attributes:type_name -> google.protobuf.Struct
+	5, // 3: chef.automate.api.infra_proxy.request.UpdateNode.override_attributes:type_name -> google.protobuf.Struct
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -489,7 +561,7 @@ func file_external_infra_proxy_request_nodes_proto_init() {
 			}
 		}
 		file_external_infra_proxy_request_nodes_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AffectedNodes); i {
+			switch v := v.(*Node); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -501,7 +573,7 @@ func file_external_infra_proxy_request_nodes_proto_init() {
 			}
 		}
 		file_external_infra_proxy_request_nodes_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteNode); i {
+			switch v := v.(*AffectedNodes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -513,6 +585,18 @@ func file_external_infra_proxy_request_nodes_proto_init() {
 			}
 		}
 		file_external_infra_proxy_request_nodes_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteNode); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_infra_proxy_request_nodes_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateNode); i {
 			case 0:
 				return &v.state
@@ -531,7 +615,7 @@ func file_external_infra_proxy_request_nodes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_infra_proxy_request_nodes_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

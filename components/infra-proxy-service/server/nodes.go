@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"strconv"
 
 	chef "github.com/go-chef/chef"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
@@ -50,6 +52,64 @@ func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNode
 
 	return &response.AffectedNodes{
 		Nodes: fromSearchAPIToAffectedNodes(*res),
+	}, nil
+}
+
+// GetNode fetches the node from chef infra server
+func (s *Server) GetNode(ctx context.Context, req *request.Node) (*response.Node, error) {
+	err := validation.New(validation.Options{
+		Target:          "node",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	defaultAttributes, err := json.Marshal(res.DefaultAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	automaticAttributes, err := json.Marshal(res.AutomaticAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	normalAttributes, err := json.Marshal(res.NormalAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	overrideAttributes, err := json.Marshal(res.OverrideAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	// TODO: Chef Infra Server node detail API is not returning the node ID https://docs.chef.io/api_chef_server/#get-38
+	return &response.Node{
+		NodeId:              res.Name,
+		Name:                res.Name,
+		Environment:         res.Environment,
+		PolicyName:          res.PolicyName,
+		PolicyGroup:         res.PolicyGroup,
+		RunList:             res.RunList,
+		Tags:                SafeSliceFromMap(res.NormalAttributes, "tags"),
+		DefaultAttributes:   string(defaultAttributes),
+		AutomaticAttributes: string(automaticAttributes),
+		NormalAttributes:    string(normalAttributes),
+		OverrideAttributes:  string(overrideAttributes),
 	}, nil
 }
 
@@ -168,36 +228,18 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 	for _, element := range sr.Rows {
 		m := element.(map[string]interface{})["data"].(map[string]interface{})
 		results[index] = &response.NodeAttribute{
-			Id:          safeStringFromMap(m, "chef_guid"),
-			Name:        safeStringFromMap(m, "name"),
-			Fqdn:        safeStringFromMap(m, "fqdn"),
-			IpAddress:   safeStringFromMap(m, "ipaddress"),
-			CheckIn:     safeStringFromMapFloat(m, "ohai_time"),
-			Environment: safeStringFromMap(m, "chef_environment"),
-			Platform:    safeStringFromMap(m, "platform"),
-			PolicyGroup: safeStringFromMap(m, "policy_group"),
-			Uptime:      safeStringFromMap(m, "uptime"),
+			Id:          SafeStringFromMap(m, "chef_guid"),
+			Name:        SafeStringFromMap(m, "name"),
+			Fqdn:        SafeStringFromMap(m, "fqdn"),
+			IpAddress:   SafeStringFromMap(m, "ipaddress"),
+			CheckIn:     SafeStringFromMapFloat(m, "ohai_time"),
+			Environment: SafeStringFromMap(m, "chef_environment"),
+			Platform:    SafeStringFromMap(m, "platform"),
+			PolicyGroup: SafeStringFromMap(m, "policy_group"),
+			Uptime:      SafeStringFromMap(m, "uptime"),
 		}
 		index++
 	}
 
 	return results
-}
-
-// This returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the original string.
-func safeStringFromMap(values map[string]interface{}, key string) string {
-	if values[key] == nil {
-		return ""
-	}
-	return values[key].(string)
-}
-
-// This returns the value referenced by `key` in `values`. If value is nil,
-// it returns an empty string; otherwise it returns the base 64 float string.
-func safeStringFromMapFloat(values map[string]interface{}, key string) string {
-	if values[key] == nil {
-		return ""
-	}
-	return strconv.FormatFloat(values[key].(float64), 'E', -1, 64)
 }
