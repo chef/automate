@@ -1,97 +1,5 @@
 @import "~styles/variables";
 
-chef-modal {
-
-  [slot=title] {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 1em;
-    padding-bottom: 12px;
-  }
-
-  .flex-container {
-    display: flex;
-    justify-content: center;
-
-    .margin {
-      margin-bottom: 30px;
-    }
-
-    form {
-      flex-basis: 61%;
-
-      input {
-        font-size: 1em;
-      }
-
-      label {
-        padding-bottom: 0;
-      }
-    }
-
-    #button-bar {
-      text-align: center;
-
-      chef-loading-spinner {
-        position: relative;
-        top: 2px;
-        margin-right: 5px;
-      }
-    }
-  }
-
-  .url-failed {
-    font-size: 13px;
-    text-align: center;
-    background-color: #DC267F;
-    color: #FFF;
-    border-radius: 4px;
-    padding: 2px;
-  }
-
-  .url-success {
-    font-size: 13px;
-    text-align: center;
-    background-color: #1074C4;
-    color: #FFF;
-    border-radius: 4px;
-    padding: 2px;
-  }
-
-  .url-success-icon {
-    margin: 2px;
-    background-color: #FFF;
-    color: rgb(56, 100, 242);
-    border-radius: 50px;
-  }
-}
-
-.input-desc {
-  font-size: 10px;
-  font-weight: 100;
-}
-
-.i-desc {
-  font-size: 12px;
-  font-weight: 300;
-}
-
-chef-select {
-  width: 100%;
-  font-weight: 100;
-}
-
-img {
-  width: 15px;
-  margin-right: 5px;
-  margin-bottom: -3px;
-}
-
-chef-modal ::ng-deep .modal {
-  height: 82%;
-  overflow-x: hidden;
-}
-
 chef-modal ::ng-deep .modal::-webkit-scrollbar {
   width: 12px;
   background-color: #F5F5F5;
@@ -100,11 +8,6 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar {
 chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: #CCC;
-}
-
-chef-checkbox ::ng-deep .check-wrap {
-  color: $chef-dark-grey;
-  border: 1px solid;
 }
 
 .small:first-of-type {
@@ -121,35 +24,51 @@ chef-checkbox ::ng-deep .check-wrap {
   font-weight: 100;
 }
 
-.example-container {
+.run-list-container {
   width: 200px;
   max-width: 100%;
   margin: 0 25px 0px 50;
   display: inline-block;
   vertical-align: top;
 }
-.examples-container {
-  width: 200px;
-  max-width: 100%;
-  margin: 0px 25px 0px 50px;
-  display: inline-block;
-  vertical-align: top;
-}
 
-.example-list {
+.role-list {
   border: solid 1px #ccc;
   width: 250px;
   max-height: 400px;
   min-height: 400px;
   background: white;
   border-radius: 4px;
-  //overflow: hidden;
   display: block;
   height: 100%;
   overflow-y: scroll;
 }
 
-.example-box {
+.recipes-list {
+  border: solid 1px #ccc;
+  width: 250px;
+  max-height: 400px;
+  min-height: 400px;
+  background: white;
+  border-radius: 4px;
+  display: block;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.edit-list {
+  border: solid 1px #ccc;
+  width: 250px;
+  max-height: 400px;
+  min-height: 400px;
+  background: white;
+  border-radius: 4px;
+  display: block;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.run-list-box {
   padding: 20px 10px;
   border-bottom: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
@@ -179,10 +98,10 @@ chef-checkbox ::ng-deep .check-wrap {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.example-box:last-child {
+.run-list-box:last-child {
   border: none;
 }
 
-.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+.run-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

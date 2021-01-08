@@ -13,19 +13,19 @@
     <tbody>
       <tr class="detail-row">
         <td class="id-column">
-          <div class="example-container">
+          <div class="run-list-container">
 
-            <div cdkDropList [cdkDropListData]="roles" class="example-list" cdkDropListSortingDisabled
+            <div cdkDropList [cdkDropListData]="roles" class="role-list" cdkDropListSortingDisabled
               (cdkDropListDropped)="drop($event)">
-              <div class="example-box" *ngFor="let item of roles" cdkDrag>{{item.name}}</div>
+              <div class="run-list-box" *ngFor="let item of roles" cdkDrag>{{item.name}}</div>
             </div>
           </div>
         </td>
         <td class="id-column">
-          <div class="examples-container">
+          <div class="run-list-container">
 
-            <div cdkDropList [cdkDropListData]="drops" class="example-list" (cdkDropListDropped)="drop($event)">
-              <div class="example-box" *ngFor="let item of drops" cdkDrag>{{item.name}}</div>
+            <div cdkDropList [cdkDropListData]="drops" class="edit-list" (cdkDropListDropped)="drop($event)">
+              <div class="run-list-box" *ngFor="let item of drops" cdkDrag>{{item.name}}</div>
             </div>
 
           </div>
@@ -34,12 +34,10 @@
       <tr class="detail-row">
         <td class="id-column">
           <h2>Available recipes</h2>
-
-          <div class="example-container">
-
-            <div cdkDropList [cdkDropListData]="recipes" class="example-list" cdkDropListSortingDisabled
+          <div class="run-list-container">
+            <div cdkDropList [cdkDropListData]="recipes" class="recipes-list" cdkDropListSortingDisabled
               (cdkDropListDropped)="drop($event)">
-              <div class="example-box" *ngFor="let item of recipes" cdkDrag>{{item}}</div>
+              <div class="run-list-box" *ngFor="let item of recipes" cdkDrag>{{item}}</div>
             </div>
           </div>
         </td>
