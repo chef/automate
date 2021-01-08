@@ -75,6 +75,7 @@ allowed_licenses:
   - CC-BY-4.0
   - curl
   - gnuplot
+  - Gocov-Authors
   - ICU
   - ISC
   - MIT
@@ -86,6 +87,7 @@ allowed_licenses:
   - Python-2.0
   - SAX-PD
   - Unlicense
+  - w32-Authors
   - WTFPL
   - Zlib
 
@@ -259,6 +261,18 @@ fallbacks:
     - name: honnef.co/go/tools
       license_id: MIT
       license_content: https://raw.githubusercontent.com/dominikh/go-tools/master/LICENSE
+    - name: github.com/axw/gocov
+      license_id: Gocov-Authors
+      license_content: https://raw.githubusercontent.com/axw/gocov/master/LICENSE
+    - name: github.com/keybase/go-ps
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/keybase/go-ps/master/LICENSE.md
+    - name: github.com/shirou/gopsutil
+      license_id: BSD-Source-Code
+      license_content: https://raw.githubusercontent.com/shirou/gopsutil/master/LICENSE
+    - name: github.com/shirou/w32
+      license_id: w32-Authors
+      license_content: https://raw.githubusercontent.com/shirou/w32/master/LICENSE
 
   habitat:
     - name: chef/mlsa
