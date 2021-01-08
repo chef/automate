@@ -234,8 +234,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     enter.append('rect')
       .attr('class', 'dot-group-bg');
 
-    enter.on('click', (line) => {
-      this.dateSelected.next(moment(line.report_time).format('YYYY-MM-DD'));
+    enter.on('click', (_d, i) => {
+      this.dateSelected.next(moment(i.report_time).format('YYYY-MM-DD'));
     });
 
     update.select('.dot-group-tick')

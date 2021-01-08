@@ -80,16 +80,19 @@ export class OverviewFailuresComponent implements OnChanges, OnDestroy {
     const update = this.bubbleSelection.merge(enter);
     const exit = this.bubbleSelection.exit();
 
-    const mouseover = (_d, i, ns) => {
+    const mouseover = (event) => {
+      const ns = d3.select(event.currentTarget).nodes();
+      const i = ns.indexOf(event.currentTarget);
       d3.selectAll(ns.filter(n => n !== ns[i])).transition()
         .style('opacity', 0.5);
     };
-    const mouseout = (_d, _i, ns) => {
+    const mouseout = (event) => {
+      const ns = d3.select(event.currentTarget).nodes();
       d3.selectAll(ns).transition()
         .style('opacity', 1);
     };
 
-    enter.on('click', (node) => {
+    enter.on('click', (_d, node) => {
       this.itemSelected.next(node.data);
     });
 
