@@ -93,7 +93,6 @@ export class OverviewFailuresComponent implements OnChanges, OnDestroy {
     };
 
     enter.on('click', (_d, node) => {
-      console.log(node.data)
       this.itemSelected.next(node.data);
     });
 
