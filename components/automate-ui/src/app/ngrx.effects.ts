@@ -33,6 +33,7 @@ import { PolicyFileEffects } from './entities/policy-files/policy-file.effects';
 import { ProfileEffects } from './entities/profiles/profile.effects';
 import { ProjectEffects } from './entities/projects/project.effects';
 import { ProjectsFilterEffects } from './services/projects-filter/projects-filter.effects';
+import { RecipeEffects } from './entities/recipes/recipe.effects';
 import { RoleEffects } from './entities/roles/role.effects';
 import { RuleEffects } from './entities/rules/rule.effects';
 import { ServerEffects } from './entities/servers/server.effects';
@@ -76,6 +77,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ProfileEffects,
       ProjectEffects,
       ProjectsFilterEffects,
+      RecipeEffects,
       RoleEffects,
       RuleEffects,
       ServerEffects,

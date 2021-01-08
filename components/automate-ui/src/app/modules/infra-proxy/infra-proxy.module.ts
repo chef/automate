@@ -16,6 +16,7 @@ import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.com
 import { CreateInfraRoleModalComponent } from './create-infra-role-modal/create-infra-role-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
+import { DragDropComponent } from './drag-drop/drag-drop.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
@@ -28,10 +29,10 @@ import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.compon
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper'
-
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { MatStepperModule } from '@angular/material/stepper'
     CreateInfraRoleModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
+    DragDropComponent,
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
@@ -62,6 +64,7 @@ import { MatStepperModule } from '@angular/material/stepper'
     AppRoutingModule,
     ChefComponentsModule,
     ChefPipesModule,
+    DragDropModule,
     TreeTableModule,
     FormsModule,
     ReactiveFormsModule,
