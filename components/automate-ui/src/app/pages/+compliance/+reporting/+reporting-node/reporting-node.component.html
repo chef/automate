@@ -270,6 +270,17 @@
             <h2 class="display4"><strong>Scan history for node:</strong></h2>
             <p>{{ activeReport?.node_name }}</p>
           </div>
+          <div class="download-report">
+            <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()" >
+              <chef-icon>cloud_download</chef-icon>
+            </chef-button>
+            <chef-dropdown class="dropdown" [visible]="downloadOptsVisible">
+              <chef-click-outside omit="dropdown-toggle">
+                <chef-button tertiary (click)="onDownloadNodeReport('json')">JSON</chef-button>
+                <chef-button tertiary (click)="onDownloadNodeReport('csv')">CSV</chef-button>
+              </chef-click-outside>
+            </chef-dropdown>
+          </div>
           <chef-button secondary (click)="onHistoryCloseClick($event)">
             <chef-icon>close</chef-icon>
           </chef-button>
@@ -307,7 +318,19 @@
           </div>
         </div>
       </chef-side-panel>
-
+      <chef-modal
+      id="download-modal"
+      title="download-title"
+      [visible]="downloadStatusVisible"
+      (closeModal)="hideDownloadStatus()">
+        <ng-container *ngIf="downloadInProgress">
+          <h2 id="download-report" class="display4" slot="title">Downloading report...</h2>
+        </ng-container>
+        <ng-container *ngIf="downloadFailed">
+          <h2 id="download-failed" class="display4" slot="title">Download failed.</h2>
+        </ng-container>
+      <chef-loading-spinner *ngIf="downloadInProgress" size="50"></chef-loading-spinner>
+    </chef-modal>
       <chef-loading-spinner *ngIf="reportLoading" size="100"></chef-loading-spinner>
     </main>
   </div>

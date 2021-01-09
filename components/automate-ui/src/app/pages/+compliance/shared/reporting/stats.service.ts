@@ -17,7 +17,7 @@ export interface DateRange {
 }
 
 export type ControlStatus = 'passed' | 'failed' | 'waived' | 'skipped';
-
+export type reportFormat = 'json' | 'csv';
 export class ReportCollection {
   reports: any[];
   totalReports: number;
@@ -223,6 +223,15 @@ export class StatsService {
     reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
 
     const body = { type: format, filters: this.formatFilters(reportQuery) };
+    return this.httpClient.post(url, body, { responseType: 'text' });
+  }
+
+  downloadNodeReport(fileFormat: reportFormat, reportQuery: ReportQuery): Observable<string> {
+    const url = `${CC_API_URL}/reporting/node/export`;
+
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
+
+    const body = { type: fileFormat, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 

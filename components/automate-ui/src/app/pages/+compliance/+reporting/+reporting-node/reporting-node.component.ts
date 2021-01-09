@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { StatsService, ReportCollection } from '../../shared/reporting/stats.service';
+import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
 import { Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { takeUntil, first } from 'rxjs/operators';
+import { takeUntil, first, finalize } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-reporting-node',
@@ -29,7 +30,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   pageSize = 10;
   totalReports = 0;
   firstReportIsLoaded = false;
-
+  downloadList: Array<string> = [];
+  downloadOptsVisible = false;
+  downloadStatusVisible = false;
+  downloadInProgress = false;
+  downloadFailed = false;
   openControls = {};
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -204,5 +209,44 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.layoutFacade.ShowPageLoading(false);
         this.activeReport = Object.assign(report, data);
       });
+  }
+
+  toggleDownloadDropdown() {
+    this.downloadOptsVisible = !this.downloadOptsVisible;
+  }
+  hideDownloadStatus() {
+    this.downloadStatusVisible = false;
+    this.downloadInProgress = false;
+    this.downloadFailed = false;
+  }
+
+  private showDownloadStatus() {
+    this.downloadStatusVisible = true;
+    this.downloadInProgress = true;
+    this.downloadFailed = false;
+  }
+
+  onDownloadNodeReport(fileFormat: reportFormat) {
+    this.downloadOptsVisible = false;
+    const id: string = this.route.snapshot.params['id'];
+    const reportQuery = this.reportQueryService.getReportQuery();
+    reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
+    const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${fileFormat}`;
+
+    const onComplete = () => this.downloadInProgress = false;
+    const onError = _e => this.downloadFailed = true;
+    const types = { 'json': 'application/json', 'csv': 'text/csv' };
+    const onNext = data => {
+      const type = types[fileFormat];
+      const blob = new Blob([data], { type });
+      saveAs(blob, filename);
+      this.hideDownloadStatus();
+    };
+
+    this.downloadList = [filename];
+    this.showDownloadStatus();
+    this.statsService.downloadNodeReport(fileFormat, reportQuery).pipe(
+      finalize(onComplete))
+      .subscribe(onNext, onError);
   }
 }

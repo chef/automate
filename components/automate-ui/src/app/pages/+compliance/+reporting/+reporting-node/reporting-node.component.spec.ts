@@ -7,7 +7,7 @@ import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { CookieModule } from 'ngx-cookie';
 import { ReportingNodeComponent } from './reporting-node.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { of as observableOf } from 'rxjs';
+import { Observable, of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
@@ -145,6 +145,13 @@ describe('ReportingNodeComponent', () => {
         {id: 2, status: 'skipped'},
         {id: 5, status: 'skipped'}
       ]);
+    });
+  });
+  describe('onDownloadNodeReport', () => {
+    it('calls downloadReport with correct format type', () => {
+      spyOn(statsService, 'downloadNodeReport').and.returnValue(new Observable(() => {}));
+      component.onDownloadNodeReport('json');
+      expect(statsService.downloadNodeReport).toHaveBeenCalledWith('json', jasmine.any(Object));
     });
   });
 });
