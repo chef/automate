@@ -82,6 +82,7 @@ func TestNodemanagers(t *testing.T) {
 	assert.Equal(t, "automate", mgrsSortedType.GetManagers()[0].GetType())
 	assert.Equal(t, "aws-api", mgrsSortedType.GetManagers()[1].GetType())
 	assert.Equal(t, "aws-ec2", mgrsSortedType.GetManagers()[2].GetType())
+	//the following assertion should no longer be failing
 	assert.Equal(t, "azure-api", mgrsSortedType.GetManagers()[3].GetType())
 
 	t.Log("list nodemanagers, sorted by status")
