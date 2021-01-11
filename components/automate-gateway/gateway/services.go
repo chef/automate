@@ -672,14 +672,21 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	writeContent(w, stream, query.Type)
+	writeContent(w, stream, query.Type, "ids")
 }
 
-func writeContent(w http.ResponseWriter, stream reporting.ReportingService_ExportClient, queryType string) {
-	//when the type is json, we will be retrieving a json array of objects and since we will be getting them one at a
-	// time, we need to provide the '[' to open and the ']' to close (the close will happen on EOF, below)
+func writeContent(w http.ResponseWriter, stream reporting.ReportingService_ExportClient, queryType string, wrapper string) {
+	//we will be retrieving an array of objects and since we will be getting them one at a time, we need to provide the
+	//opening and closing elements to close for when we are dealing with json or xml (the close will happen on EOF, below)
+	//csv has no wrapping element so there is no element to prepend or append for csv type
 	if queryType == "json" {
 		_, err := w.Write([]byte("["))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if queryType == "xml" {
+		_, err := w.Write([]byte(fmt.Sprintf("<%s>", wrapper)))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -690,6 +697,12 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 		if err == io.EOF {
 			if queryType == "json" {
 				_, err = w.Write([]byte("]"))
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			} else if queryType == "xml" {
+				_, err := w.Write([]byte(fmt.Sprintf("</%s>", wrapper)))
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
@@ -736,7 +749,7 @@ func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeContent(w, stream, query.Type)
+	writeContent(w, stream, query.Type, "nodes")
 }
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {
