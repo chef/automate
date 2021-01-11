@@ -363,7 +363,7 @@ Name Servers can be added in two ways:
 
     ```toml
     [pg_gateway.v1.sys.resolvers]
-      enable_system_nameservers = false
+      enable_system_nameservers = true
     ```
 
 If both options are set, nameserver IPs takes precedence over the system nameserver entries.
