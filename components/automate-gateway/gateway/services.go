@@ -686,7 +686,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 			return
 		}
 	} else if queryType == "xml" {
-		_, err := w.Write([]byte(fmt.Sprintf("<%s>", wrapper)))
+		_, err := w.Write([]byte(fmt.Sprintf("<%s>\n", wrapper)))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -702,7 +702,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 					return
 				}
 			} else if queryType == "xml" {
-				_, err := w.Write([]byte(fmt.Sprintf("</%s>", wrapper)))
+				_, err := w.Write([]byte(fmt.Sprintf("\n</%s>", wrapper)))
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
