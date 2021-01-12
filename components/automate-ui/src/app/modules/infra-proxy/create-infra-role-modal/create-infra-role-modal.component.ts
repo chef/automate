@@ -48,11 +48,9 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
 
   items = [];
 
-  basket = [
-  ];
+  basket = [];
 
-  baskets = [
-  ];
+  baskets = [];
   private isDestroyed = new Subject<boolean>();
 
   constructor(

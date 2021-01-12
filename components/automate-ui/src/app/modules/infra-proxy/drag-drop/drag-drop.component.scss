@@ -10,20 +10,6 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
   background-color: #CCC;
 }
 
-.small:first-of-type {
-  margin-top: 10px;
-}
-
-::ng-deep .cdk-overlay-container {
-  position: fixed;
-  z-index: 999999999;
-}
-
-::ng-deep [panelClass="chef-dropdown"] {
-  font-size: inherit;
-  font-weight: 100;
-}
-
 .run-list-container {
   width: 200px;
   max-width: 100%;
@@ -104,4 +90,38 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
 
 .run-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.data-box {
+  border-radius: 10px;
+  background-color: #CCC;
+  float: left;
+  height: 400px;
+  width: 41.5%;
+  margin-right: 10px;
+}
+
+.empty-box {
+  border-radius: 10px;
+  background-color: #CCC;
+  float: left;
+  height: 400px;
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 41.5%;
+}
+
+.left-right-arrow-box {
+  float: left;
+  height: 400px;
+  padding-top: 200px;
+  text-align: center;
+  width: 7%;
+}
+
+.up-down-arrow-box {
+  float: left;
+  height: 400px;
+  padding-top: 200px;
+  width: 5%;
 }

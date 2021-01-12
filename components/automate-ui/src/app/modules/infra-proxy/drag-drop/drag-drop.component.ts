@@ -30,9 +30,10 @@ export class DragDropComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
 
   private isDestroyed = new Subject<boolean>();
-
-  drops = [
-  ];
+  public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes']
+  public defaultType = 'available roles and recipes'
+  
+  drops = [];
   recipes: string[] = [];
 
   constructor(
@@ -42,22 +43,19 @@ export class DragDropComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.store.dispatch(new GetRecipes({
+      server_id: this.serverId, org_id: this.orgId, name: '_default'
+    }));
 
-    
-        this.store.dispatch(new GetRecipes({
-          server_id: this.serverId, org_id: this.orgId, name: '_default'
-        }));
-    
-        combineLatest([
-          this.store.select(getAllRecipesForOrgStatus),
-          this.store.select(allRecipes)
-        ]).pipe(takeUntil(this.isDestroyed))
-        .subscribe(([ getRecipesSt, allRecipesState]) => {
-          if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
-            this.recipes = allRecipesState;
-          }
-        });
-
+    combineLatest([
+      this.store.select(getAllRecipesForOrgStatus),
+      this.store.select(allRecipes)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([ getRecipesSt, allRecipesState]) => {
+      if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
+        this.recipes = allRecipesState;
+      }
+    });
   }
 
 

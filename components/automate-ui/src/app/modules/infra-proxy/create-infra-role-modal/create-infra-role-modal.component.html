@@ -58,7 +58,7 @@
           </form>
         </mat-step>
         <!-- Third step -->
-        <mat-step [stepControl]="thirdFormGroup" label="Default attributes">
+        <mat-step [stepControl]="thirdFormGroup" label="Default Attributes">
           <form [formGroup]="thirdFormGroup">
             
             <div class="button-bar-box">
@@ -74,7 +74,7 @@
           </form>
         </mat-step>
         <mat-step>
-          <ng-template matStepLabel>Done</ng-template>
+          <ng-template matStepLabel>Override Attributes</ng-template>
           <div class="button-bar-box">
             <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
             <button chef-button mat-button matStepperPrevious primary class="primary">Privious</button>

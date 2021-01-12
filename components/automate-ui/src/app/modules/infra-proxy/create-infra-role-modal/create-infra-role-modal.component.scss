@@ -42,31 +42,6 @@ chef-modal {
       }
     }
   }
-
-  .url-failed {
-    font-size: 13px;
-    text-align: center;
-    background-color: #DC267F;
-    color: #FFF;
-    border-radius: 4px;
-    padding: 2px;
-  }
-
-  .url-success {
-    font-size: 13px;
-    text-align: center;
-    background-color: #1074C4;
-    color: #FFF;
-    border-radius: 4px;
-    padding: 2px;
-  }
-
-  .url-success-icon {
-    margin: 2px;
-    background-color: #FFF;
-    color: rgb(56, 100, 242);
-    border-radius: 50px;
-  }
 }
 
 .input-desc {
@@ -93,6 +68,8 @@ img {
 chef-modal ::ng-deep .modal {
   height: 82%;
   overflow-x: hidden;
+  padding: 5px;
+  --default-modal-width: 800px;
 }
 
 chef-modal ::ng-deep .modal::-webkit-scrollbar {
