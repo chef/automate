@@ -672,7 +672,7 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	writeContent(w, stream, query.Type, "ids")
+	writeContent(w, stream, query.Type, "NodeScans")
 }
 
 func writeContent(w http.ResponseWriter, stream reporting.ReportingService_ExportClient, queryType string, wrapper string) {
