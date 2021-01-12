@@ -749,7 +749,7 @@ func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeContent(w, stream, query.Type, "nodes")
+	writeContent(w, stream, query.Type, "NodeRuns")
 }
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {

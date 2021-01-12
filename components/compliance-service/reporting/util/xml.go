@@ -8,7 +8,7 @@ import (
 )
 
 type xmlFields struct {
-	XMLName          xml.Name  `xml:"Node"`
+	XMLName          xml.Name  `xml:"NodeRun"`
 	ID               string    `xml:"ID,omitempty"`
 	NodeID           string    `xml:"NodeID,omitempty"`
 	NodeName         string    `xml:"NodeName,omitempty"`
@@ -95,10 +95,10 @@ func ReportToXML(report *reportingapi.Report) ([]byte, error) {
 		} // End of controls loop
 
 		exportProfiles[i] = Profile{
-			Name:      profile.Name,
-			Title:     profile.Title,
-			Version:   profile.Version,
-			Summary:   profile.Summary,
+			Name:     profile.Name,
+			Title:    profile.Title,
+			Version:  profile.Version,
+			Summary:  profile.Summary,
 			Controls: exportControls,
 		}
 	} // End of profiles loop
