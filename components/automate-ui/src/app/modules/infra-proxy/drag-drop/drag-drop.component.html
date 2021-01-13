@@ -11,6 +11,12 @@
 
 
     <!-- combined data -->
+     <div class="multi-list-container"> 
+      <div cdkDropList [cdkDropListData]="merge" class="role-list" cdkDropListSortingDisabled
+        (cdkDropListDropped)="drop($event)">
+        <div class="run-list-box" *ngFor="let item of merge" cdkDrag>{{item.name}}</div>
+      </div>
+    </div> 
 
   </div>
   <div class="left-right-arrow-box">

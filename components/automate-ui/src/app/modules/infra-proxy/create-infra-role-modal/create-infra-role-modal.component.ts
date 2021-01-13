@@ -46,11 +46,13 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public secondFormGroup: FormGroup;
   public thirdFormGroup: FormGroup;
 
-  items = [];
-
   basket = [];
 
   baskets = [];
+  public server: string;
+  public org: string;
+  public showdrag = false;
+  items: InfraRole[] = [];
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -76,6 +78,11 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
         this.conflictError = false;
         this.visible = true;
         this.items = this.rolesList;
+
+      this.showdrag = true;
+      this.server = this.serverId;
+      this.org = this.orgId;
+
       });
 
   }

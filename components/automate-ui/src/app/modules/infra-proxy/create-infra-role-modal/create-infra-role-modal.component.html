@@ -44,8 +44,11 @@
         <!-- Second step -->
         <mat-step [stepControl]="secondFormGroup" label="RunList">
           <form [formGroup]="secondFormGroup">
-            <app-drag-drop [roles]="items" [serverId]="serverId" [orgId]="orgId"></app-drag-drop>
-            <div class="button-bar-box">
+            <div *ngIf="showdrag">
+              <app-drag-drop [roles]="rolesList" [serverId]="server" [orgId]="org"></app-drag-drop>
+              </div>
+  
+              <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <button chef-button mat-button matStepperPrevious primary class="primary">Privious</button>
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!secondFormGroup?.valid">Next</button>

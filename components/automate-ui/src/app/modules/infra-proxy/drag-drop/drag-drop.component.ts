@@ -19,6 +19,11 @@ import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 
+export interface Merge {
+  name: string;
+  type: 'role' | 'recipe';
+}
+
 @Component({
   selector: 'app-drag-drop',
   templateUrl: './drag-drop.component.html',
@@ -32,10 +37,10 @@ export class DragDropComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes']
   public defaultType = 'available roles and recipes'
-  
+  merge: Merge[] = [];
   drops = [];
   recipes: string[] = [];
-
+  
   constructor(
     private store: Store<NgrxStateAtom>,
   ) {
@@ -54,10 +59,32 @@ export class DragDropComponent implements OnInit, OnDestroy {
     .subscribe(([ getRecipesSt, allRecipesState]) => {
       if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
         this.recipes = allRecipesState;
+        this.mergeArray(this.recipes);
       }
     });
   }
 
+  mergeArray(reci) {
+    if(this.recipes.length > 0) {
+    this.roles.forEach((role) => { 
+    console.log(role.name);
+    this.merge.push({
+      name: role.name,
+      type: "role"
+    });
+  });
+  console.log(this.recipes);
+  reci.forEach((recipe) =>{
+      this.merge.push({
+    name: recipe,
+    type: "recipe"
+  });
+});
+    }
+    console.log(this.merge);
+
+
+  }
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
