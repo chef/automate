@@ -21,4 +21,8 @@ pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 # cleanup static path
 rm -rf "{{pkg.svc_static_path}}/web"
 
-exec dex serve {{pkg.svc_var_path}}/etc/config.yml
+exec secrets-helper exec \
+  --watch \
+  --optional-secret userconfig.ldap_password \
+  --optional-secret userconfig.msad_password \
+  -- dex serve {{pkg.svc_var_path}}/etc/config.yml
