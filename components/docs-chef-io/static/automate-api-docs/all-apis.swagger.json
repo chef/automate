@@ -4695,6 +4695,51 @@
         }
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetEnvironmentRecipes",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Environment name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentRecipesList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
         "tags": [
@@ -4734,6 +4779,49 @@
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetNode",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Node name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Node"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "InfraProxy"
@@ -16246,6 +16334,18 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.EnvironmentRecipesList": {
+      "type": "object",
+      "properties": {
+        "recipes": {
+          "description": "Environment recipes list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Environments": {
       "type": "object",
       "properties": {
@@ -16342,6 +16442,61 @@
         },
         "run_list": {
           "description": "Run list associated with the policy.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Node": {
+      "type": "object",
+      "properties": {
+        "automatic_attributes": {
+          "description": "Node automatic attributes JSON.",
+          "type": "string"
+        },
+        "default_attributes": {
+          "description": "Node default attributes JSON.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "Node environment.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Node name.",
+          "type": "string"
+        },
+        "node_id": {
+          "description": "Node ID.",
+          "type": "string"
+        },
+        "normal_attributes": {
+          "description": "Node normal attributes JSON.",
+          "type": "string"
+        },
+        "override_attributes": {
+          "description": "Node override attributes JSON.",
+          "type": "string"
+        },
+        "policy_group": {
+          "description": "Node policy group.",
+          "type": "string"
+        },
+        "policy_name": {
+          "description": "Node policy name.",
+          "type": "string"
+        },
+        "run_list": {
+          "description": "Node run-list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "description": "Node tags.",
           "type": "array",
           "items": {
             "type": "string"
