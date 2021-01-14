@@ -55,7 +55,7 @@ func testServer(t target.Target) server {
 	c.Deployment.V1.Svc.AdminUser.Password = w.String("ponies")
 
 	d, _ := deployment.CreateDeployment()
-	d.UpdateWithUserOverrideConfig(c)
+	d.UpdateWithUserOverrideConfig(c, nil)
 	d.SetTarget(t)
 
 	return server{deployment: d, ensureStatusInterval: time.Nanosecond}
