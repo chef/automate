@@ -1,0 +1,127 @@
+.select-box-list-container{
+    display:flex; 
+    flex-direction:row;
+}
+
+.vertical{
+    display:flex; 
+    flex-direction:column;
+}
+
+.role-list {
+     border: solid 1px #ccc; 
+     width: 300px; 
+    max-height: 350px;
+    min-height: 300px;
+    background: white;
+    /* border-radius: 4px; */
+    display: block;
+    height: 100%;
+    overflow-y: scroll;
+  }
+
+  .run-list-box {
+    padding: 10px 10px;
+    /* //border-bottom: solid 1px #ccc; */
+    color: rgba(0, 0, 0, 0.87);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+    background: white;
+    font-size: 14px;
+  }
+  
+
+.select-box-list{
+    border: 1px solid gray; 
+    width:250px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.select-box-list::-webkit-scrollbar {
+    width: 12px;
+}
+
+.select-box-list::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+
+.select-box-list::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.select-box-list-item{
+    padding: 10px;
+    /* border: 1px solid gray; */
+    border-radius: 25px;
+}
+
+.run-list-box.selected{
+    background-color: BLUE;
+}
+
+.select-box-list-item.selected{
+    background-color: BLUE;
+}
+
+.select-box-buttons{
+    vertical-align: center;
+    padding: 20px;
+    display:flex; 
+    flex-direction:column;
+    width:50px;
+    height: 250px;
+}
+
+.select-box-preview span{
+    background-color: BLUE;
+    /* border: 0.25px solid gray; */
+    border-radius: 25px;
+    padding:10px;
+}
+
+.select-box-placeholder span{
+    background-color: BLUE;
+    // border: 0.25px solid gray;
+    border-radius: 25px;
+    padding:10px;
+}
+
+.selectbox-search{
+    height:25px;
+}
+
+.left-right-arrow-box {
+    float: left;
+    height: 400px;
+    padding: 150px 100px 0px 30px;
+    flex-direction:column;
+    //height: 250px;
+    //padding-top: 200px;
+    text-align: center;
+    width: 7%;
+  }
+
+  .dropdown-toggle{
+      color: white;
+      width: 40px;
+  }
+
+  .margin{
+      margin-top: 30px;
+      width: 40px;
+
+  }
+
+  .up-down-arrow-box {
+    float: left;
+    height: 400px;
+    padding-top: 200px;
+    width: 5%;
+  }

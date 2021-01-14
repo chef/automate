@@ -11,44 +11,32 @@
 
 
     <!-- combined data -->
-     <div class="multi-list-container"> 
-      <div cdkDropList [cdkDropListData]="merge" class="role-list" cdkDropListSortingDisabled
-        (cdkDropListDropped)="drop($event)">
-        <div class="run-list-box" *ngFor="let item of merge" cdkDrag>{{item.name}}</div>
-      </div>
-    </div> 
+    <div *ngIf="showbutton" class="margin">
+      <form [formGroup]="userForm">
+        <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
+        </select-box>
+
+        <br />
+
+        <button type="submit" (click)="submit()">Submit1</button>
+      </form>
+
+
+      <br />
+    </div>
+
 
   </div>
-  <div class="left-right-arrow-box">
-    <div>
-      <chef-button class="dropdown-toggle" primary>
-        <chef-icon>arrow_forward</chef-icon>
-      </chef-button>
-      <chef-button class="dropdown-toggle" primary>
-        <chef-icon>arrow_back</chef-icon>
-      </chef-button>
-    </div>
-  </div>
-  <div class="empty-box">
-  </div>
-  <div class="up-down-arrow-box">
-    <div>
-      <chef-button class="dropdown-toggle" primary>
-        <chef-icon>arrow_upward</chef-icon>
-      </chef-button>
-      <chef-button class="dropdown-toggle" primary>
-        <chef-icon>arrow_downward</chef-icon>
-      </chef-button>
-    </div>
-  </div>
-  
+
   <table>
     <thead>
       <tr class="detail-row">
         <th class="id-column">
           <h2>Available Roles</h2>
         </th>
-        <th class="id-column"><h2>Currents Run List</h2></th>
+        <th class="id-column">
+          <h2>Currents Run List</h2>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -82,5 +70,5 @@
       </tr>
     </tbody>
   </table>
- 
+
 </div>

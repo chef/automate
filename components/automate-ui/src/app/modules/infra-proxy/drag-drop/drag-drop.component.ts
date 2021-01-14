@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import { GetRecipes } from 'app/entities/recipes/recipe.action';
 import {
@@ -17,6 +17,7 @@ import {
 } from 'app/entities/recipes/recipe.selectors';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { FormGroup, FormControl } from '@angular/forms';
 
 
 export interface Merge {
@@ -40,7 +41,11 @@ export class DragDropComponent implements OnInit, OnDestroy {
   merge: Merge[] = [];
   drops = [];
   recipes: string[] = [];
-  
+  userForm: FormGroup;
+  public showbutton = false;
+
+  list: string[] = [];
+
   constructor(
     private store: Store<NgrxStateAtom>,
   ) {
@@ -56,44 +61,60 @@ export class DragDropComponent implements OnInit, OnDestroy {
       this.store.select(getAllRecipesForOrgStatus),
       this.store.select(allRecipes)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getRecipesSt, allRecipesState]) => {
-      if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
-        this.recipes = allRecipesState;
-        this.mergeArray(this.recipes);
-      }
+      .subscribe(([getRecipesSt, allRecipesState]) => {
+        if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
+          this.recipes = allRecipesState;
+          this.mergeArray(this.recipes);
+        }
+      });
+
+    this.userForm = new FormGroup({
+      'firstNameControl': new FormControl(null),
+      'selected': new FormControl({ value: [] }),
+      'test': new FormControl(null)
     });
+
   }
 
   mergeArray(reci) {
-    if(this.recipes.length > 0) {
-    this.roles.forEach((role) => { 
-    console.log(role.name);
-    this.merge.push({
-      name: role.name,
-      type: "role"
-    });
-  });
-  console.log(this.recipes);
-  reci.forEach((recipe) =>{
-      this.merge.push({
-    name: recipe,
-    type: "recipe"
-  });
-});
-    }
-    console.log(this.merge);
+    if (this.recipes.length > 0) {
+      this.roles.forEach((role) => {
+        this.merge.push({
+          name: role.name,
+          type: "role"
+        });
+      });
+      reci.forEach((recipe) => {
+        this.merge.push({
+          name: recipe,
+          type: "recipe"
+        });
+      });
+      this.showbutton = true;
 
+    }
 
   }
+
+
+  submit() {
+    console.log(this.userForm.value);
+  }
+
+  submit2(value) {
+    console.log(value);
+  }
+
+
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex);
     }
   }
 
