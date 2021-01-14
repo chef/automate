@@ -27,3 +27,30 @@ message Client {
 	// Chef object type.
 	string chef_type = 6;
 }
+
+message CreateClient {
+	// Client name.
+	string name = 1;
+	// Client key detail.
+	ClientKey client_key = 2;
+}
+
+message ClientKey {
+    // Client key name.
+	string name = 1;
+	// Client public key.
+	string public_key = 2;
+	// Client key expiration date.
+	string expiration_date = 3;
+	// Client private key.
+	string private_key = 4;
+}
+
+message ClientAccessKey {
+    // Client key name.
+	string name = 1;
+	// Client public key.
+	string public_key = 2;
+	// Client key expiration date.
+	string expiration_date = 3;
+}

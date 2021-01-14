@@ -490,6 +490,50 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
+      },
+      "post": {
+        "operationId": "InfraProxy_CreateClient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CreateClient"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateClient"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
@@ -530,6 +574,100 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "delete": {
+        "operationId": "InfraProxy_DeleteClient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Client"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Client name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "put": {
+        "operationId": "InfraProxy_ResetClientKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Client name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ClientKey"
+            }
           }
         ],
         "tags": [
@@ -1791,6 +1929,58 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.infra_proxy.request.ClientKey": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Client name."
+        },
+        "key_name": {
+          "type": "string",
+          "description": "Client key name."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.CreateClient": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Client name."
+        },
+        "client_name": {
+          "type": "string",
+          "description": "Client client name."
+        },
+        "validator": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean indicates client type is validator or not."
+        },
+        "create_key": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean indicates wheather it required to create key or not."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.CreateDataBag": {
       "type": "object",
       "properties": {
@@ -2249,6 +2439,27 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ClientKey": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Client key name."
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Client public key."
+        },
+        "expiration_date": {
+          "type": "string",
+          "description": "Client key expiration date."
+        },
+        "private_key": {
+          "type": "string",
+          "description": "Client private key."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.ClientListItem": {
       "type": "object",
       "properties": {
@@ -2509,6 +2720,19 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookVersion"
           },
           "description": "List of cookbooks with name and version."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CreateClient": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Client name."
+        },
+        "client_key": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey",
+          "description": "Client key detail."
         }
       }
     },

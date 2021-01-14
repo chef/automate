@@ -214,6 +214,204 @@ func (x *Client) GetChefType() string {
 	return ""
 }
 
+type CreateClient struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Client name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Client key detail.
+	ClientKey *ClientKey `protobuf:"bytes,2,opt,name=client_key,json=clientKey,proto3" json:"client_key,omitempty" toml:"client_key,omitempty" mapstructure:"client_key,omitempty"`
+}
+
+func (x *CreateClient) Reset() {
+	*x = CreateClient{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateClient) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateClient) ProtoMessage() {}
+
+func (x *CreateClient) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateClient.ProtoReflect.Descriptor instead.
+func (*CreateClient) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_clients_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateClient) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateClient) GetClientKey() *ClientKey {
+	if x != nil {
+		return x.ClientKey
+	}
+	return nil
+}
+
+type ClientKey struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Client key name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Client public key.
+	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" toml:"public_key,omitempty" mapstructure:"public_key,omitempty"`
+	// Client key expiration date.
+	ExpirationDate string `protobuf:"bytes,3,opt,name=expiration_date,json=expirationDate,proto3" json:"expiration_date,omitempty" toml:"expiration_date,omitempty" mapstructure:"expiration_date,omitempty"`
+	// Client private key.
+	PrivateKey string `protobuf:"bytes,4,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty" toml:"private_key,omitempty" mapstructure:"private_key,omitempty"`
+}
+
+func (x *ClientKey) Reset() {
+	*x = ClientKey{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientKey) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientKey) ProtoMessage() {}
+
+func (x *ClientKey) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientKey.ProtoReflect.Descriptor instead.
+func (*ClientKey) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_clients_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ClientKey) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ClientKey) GetPublicKey() string {
+	if x != nil {
+		return x.PublicKey
+	}
+	return ""
+}
+
+func (x *ClientKey) GetExpirationDate() string {
+	if x != nil {
+		return x.ExpirationDate
+	}
+	return ""
+}
+
+func (x *ClientKey) GetPrivateKey() string {
+	if x != nil {
+		return x.PrivateKey
+	}
+	return ""
+}
+
+type ClientAccessKey struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Client key name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Client public key.
+	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" toml:"public_key,omitempty" mapstructure:"public_key,omitempty"`
+	// Client key expiration date.
+	ExpirationDate string `protobuf:"bytes,3,opt,name=expiration_date,json=expirationDate,proto3" json:"expiration_date,omitempty" toml:"expiration_date,omitempty" mapstructure:"expiration_date,omitempty"`
+}
+
+func (x *ClientAccessKey) Reset() {
+	*x = ClientAccessKey{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientAccessKey) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientAccessKey) ProtoMessage() {}
+
+func (x *ClientAccessKey) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_clients_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientAccessKey.ProtoReflect.Descriptor instead.
+func (*ClientAccessKey) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_clients_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ClientAccessKey) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ClientAccessKey) GetPublicKey() string {
+	if x != nil {
+		return x.PublicKey
+	}
+	return ""
+}
+
+func (x *ClientAccessKey) GetExpirationDate() string {
+	if x != nil {
+		return x.ExpirationDate
+	}
+	return ""
+}
+
 var File_interservice_infra_proxy_response_clients_proto protoreflect.FileDescriptor
 
 var file_interservice_infra_proxy_response_clients_proto_rawDesc = []byte{
@@ -242,12 +440,35 @@ var file_interservice_infra_proxy_response_clients_proto_rawDesc = []byte{
 	0x73, 0x6f, 0x6e, 0x5f, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x09, 0x6a, 0x73, 0x6f, 0x6e, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x68,
 	0x65, 0x66, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63,
-	0x68, 0x65, 0x66, 0x54, 0x79, 0x70, 0x65, 0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d,
-	0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79,
-	0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x68, 0x65, 0x66, 0x54, 0x79, 0x70, 0x65, 0x22, 0x77, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x53, 0x0a, 0x0a, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x34, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e,
+	0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f,
+	0x78, 0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x43, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79,
+	0x22, 0x88, 0x01, 0x0a, 0x09, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x12,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x6b, 0x65, 0x79,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x4b, 0x65,
+	0x79, 0x12, 0x27, 0x0a, 0x0f, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x64, 0x61, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x65, 0x78, 0x70, 0x69,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x72,
+	0x69, 0x76, 0x61, 0x74, 0x65, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x4b, 0x65, 0x79, 0x22, 0x6d, 0x0a, 0x0f, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x12,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x6b, 0x65, 0x79,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x4b, 0x65,
+	0x79, 0x12, 0x27, 0x0a, 0x0f, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x64, 0x61, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x65, 0x78, 0x70, 0x69,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x65, 0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -262,19 +483,23 @@ func file_interservice_infra_proxy_response_clients_proto_rawDescGZIP() []byte {
 	return file_interservice_infra_proxy_response_clients_proto_rawDescData
 }
 
-var file_interservice_infra_proxy_response_clients_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_interservice_infra_proxy_response_clients_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_interservice_infra_proxy_response_clients_proto_goTypes = []interface{}{
-	(*Clients)(nil),        // 0: chef.automate.domain.infra_proxy.response.Clients
-	(*ClientListItem)(nil), // 1: chef.automate.domain.infra_proxy.response.ClientListItem
-	(*Client)(nil),         // 2: chef.automate.domain.infra_proxy.response.Client
+	(*Clients)(nil),         // 0: chef.automate.domain.infra_proxy.response.Clients
+	(*ClientListItem)(nil),  // 1: chef.automate.domain.infra_proxy.response.ClientListItem
+	(*Client)(nil),          // 2: chef.automate.domain.infra_proxy.response.Client
+	(*CreateClient)(nil),    // 3: chef.automate.domain.infra_proxy.response.CreateClient
+	(*ClientKey)(nil),       // 4: chef.automate.domain.infra_proxy.response.ClientKey
+	(*ClientAccessKey)(nil), // 5: chef.automate.domain.infra_proxy.response.ClientAccessKey
 }
 var file_interservice_infra_proxy_response_clients_proto_depIdxs = []int32{
 	1, // 0: chef.automate.domain.infra_proxy.response.Clients.clients:type_name -> chef.automate.domain.infra_proxy.response.ClientListItem
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 1: chef.automate.domain.infra_proxy.response.CreateClient.client_key:type_name -> chef.automate.domain.infra_proxy.response.ClientKey
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_interservice_infra_proxy_response_clients_proto_init() }
@@ -319,6 +544,42 @@ func file_interservice_infra_proxy_response_clients_proto_init() {
 				return nil
 			}
 		}
+		file_interservice_infra_proxy_response_clients_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateClient); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_infra_proxy_response_clients_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientKey); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_infra_proxy_response_clients_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientAccessKey); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -326,7 +587,7 @@ func file_interservice_infra_proxy_response_clients_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_infra_proxy_response_clients_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

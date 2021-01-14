@@ -47,6 +47,68 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 	}, nil
 }
 
+// CreateClient creates an infra client
+func (a *InfraProxyServer) CreateClient(ctx context.Context, r *gwreq.CreateClient) (*gwres.CreateClient, error) {
+	req := &infra_req.CreateClient{
+		OrgId:      r.OrgId,
+		ServerId:   r.ServerId,
+		Name:       r.Name,
+		ClientName: r.ClientName,
+		Validator:  r.Validator,
+		CreateKey:  r.CreateKey,
+	}
+	res, err := a.client.CreateClient(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CreateClient{
+		Name: res.GetName(),
+		ClientKey: &gwres.ClientKey{
+			Name:           res.GetClientKey().GetName(),
+			PublicKey:      res.GetClientKey().GetPublicKey(),
+			ExpirationDate: res.GetClientKey().GetExpirationDate(),
+			PrivateKey:     res.GetClientKey().GetPrivateKey(),
+		},
+	}, nil
+}
+
+// DeleteClient deletes an infra client
+func (a *InfraProxyServer) DeleteClient(ctx context.Context, r *gwreq.Client) (*gwres.Client, error) {
+	req := &infra_req.Client{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteClient(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Client{
+		Name: res.GetName(),
+	}, nil
+}
+
+// ResetClientKey resets an infra client
+func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKey) (*gwres.ClientKey, error) {
+	req := &infra_req.ClientKey{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		KeyName:  r.KeyName,
+	}
+	res, err := a.client.ResetClientKey(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ClientKey{
+		Name:       res.GetName(),
+		PrivateKey: res.GetPrivateKey(),
+	}, nil
+}
+
 func fromUpstreamClients(clients []*infra_res.ClientListItem) []*gwres.ClientListItem {
 	ts := make([]*gwres.ClientListItem, len(clients))
 
