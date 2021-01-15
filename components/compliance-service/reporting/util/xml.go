@@ -8,55 +8,55 @@ import (
 )
 
 type xmlFields struct {
-	XMLName          xml.Name  `xml:"Scan"`
-	ID               string    `xml:"ID,omitempty"`
-	NodeID           string    `xml:"NodeID,omitempty"`
-	NodeName         string    `xml:"NodeName,omitempty"`
-	EndTime          int64     `xml:"EndTime>Seconds,omitempty"`
-	Platform         Platform  `xml:"Platform,omitempty"`
-	Environment      string    `xml:"Environment,omitempty"`
-	IPAddress        string    `xml:"IPAddress,omitempty"`
-	FQDN             string    `xml:"FQDN,omitempty"`
-	Profiles         []Profile `xml:"Profiles>Profile,omitempty"`
-	Version          string    `xml:"Version,omitempty"`
-	ChefServer       string    `xml:"ChefServer,omitempty"`
-	ChefOrganization string    `xml:"ChefOrganization,omitempty"`
+	XMLName          xml.Name  `xml:"xcan"`
+	ID               string    `xml:"id,omitempty"`
+	NodeID           string    `xml:"node_id,omitempty"`
+	NodeName         string    `xml:"node_name,omitempty"`
+	EndTime          int64     `xml:"end_time>seconds,omitempty"`
+	Platform         Platform  `xml:"platform,omitempty"`
+	Environment      string    `xml:"environment,omitempty"`
+	IPAddress        string    `xml:"ipaddress,omitempty"`
+	FQDN             string    `xml:"fqdn,omitempty"`
+	Profiles         []Profile `xml:"profiles>profile,omitempty"`
+	Version          string    `xml:"version,omitempty"`
+	ChefServer       string    `xml:"chef_server,omitempty"`
+	ChefOrganization string    `xml:"chef_organization,omitempty"`
 }
 
 // Platform detail
 type Platform struct {
-	Name    string `xml:"Platform>Name,omitempty"`
-	Release string `xml:"Platform>Release,omitempty"`
-	Full    string `xml:"Platform>Full,omitempty"`
+	Name    string `xml:"platform>name,omitempty"`
+	Release string `xml:"platform>release,omitempty"`
+	Full    string `xml:"platform>full,omitempty"`
 }
 
 // Profile detail
 type Profile struct {
-	Name     string    `xml:"Name,omitempty"`
-	Title    string    `xml:"Title,omitempty"`
-	Version  string    `xml:"Version,omitempty"`
-	Summary  string    `xml:"Summary,omitempty"`
-	Controls []Control `xml:"Controls>Control,omitempty"`
+	Name     string    `xml:"name,omitempty"`
+	Title    string    `xml:"title,omitempty"`
+	Version  string    `xml:"version,omitempty"`
+	Summary  string    `xml:"summary,omitempty"`
+	Controls []Control `xml:"controls>control,omitempty"`
 }
 
 // Control detail
 type Control struct {
-	ID                  string   `xml:"ID,omitempty"`
-	Title               string   `xml:"Title,omitempty"`
-	Impact              float32  `xml:"Impact,omitempty"`
-	Waived              string   `xml:"Waived,omitempty"`
-	WaiverJustification string   `xml:"Waiver>Justification,omitempty"`
-	WaiverExpiration    string   `xml:"Waiver>Expiration,omitempty"`
-	Results             []Result `xml:"Results>Result,omitempty"`
+	ID                  string   `xml:"id,omitempty"`
+	Title               string   `xml:"title,omitempty"`
+	Impact              float32  `xml:"impact,omitempty"`
+	Waived              string   `xml:"waived,omitempty"`
+	WaiverJustification string   `xml:"waiver>justification,omitempty"`
+	WaiverExpiration    string   `xml:"waiver>expiration,omitempty"`
+	Results             []Result `xml:"results>result,omitempty"`
 }
 
 // Result detail
 type Result struct {
-	Status          string  `xml:"Status,omitempty"`
-	RunTime         float32 `xml:"RunTime,omitempty"`
-	CodeDescription string  `xml:"CodeDescription,omitempty"`
-	Message         string  `xml:"Message,omitempty"`
-	SkipMessage     string  `xml:"SkipMessage,omitempty"`
+	Status          string  `xml:"status,omitempty"`
+	RunTime         float32 `xml:"run_time,omitempty"`
+	CodeDescription string  `xml:"code_desc,omitempty"`
+	Message         string  `xml:"message,omitempty"`
+	SkipMessage     string  `xml:"skip_message,omitempty"`
 }
 
 // ReportToXML converts a report to its XML representation as a string
