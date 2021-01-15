@@ -8,7 +8,7 @@ import (
 )
 
 type xmlFields struct {
-	XMLName          xml.Name  `xml:"xcan"`
+	XMLName          xml.Name  `xml:"scan"`
 	ID               string    `xml:"id,omitempty"`
 	NodeID           string    `xml:"node_id,omitempty"`
 	NodeName         string    `xml:"node_name,omitempty"`
