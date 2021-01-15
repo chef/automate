@@ -99,6 +99,20 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
     this.onChange(this.value);
   }
 
+  ascItems(){
+    console.log(this.selectedItems);
+
+    this.selectedItems.sort((a, b) => (a.value > b.value) ? 1 : -1);
+    console.log(this.selectedItems);
+  }
+
+  descItems(){
+    console.log(this.selectedItems);
+
+    this.selectedItems.sort((a, b) => (a.value < b.value) ? 1 : -1);
+    console.log(this.selectedItems);
+  }
+
   /*This method handles the drag event onto selected list on the right */
   dragOntoRightItems(event) {
     if (event.previousContainer === event.container) {
