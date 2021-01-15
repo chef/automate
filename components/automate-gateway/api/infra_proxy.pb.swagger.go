@@ -1975,7 +1975,7 @@ func init() {
         "create_key": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean indicates wheather it required to create key or not."
+          "description": "Boolean indicates whether it's required to create a key or not."
         }
       }
     },
@@ -2450,7 +2450,7 @@ func init() {
         },
         "expiration_date": {
           "type": "string",
-          "description": "Client key expiration date."
+          "description": "Client key expiration date string."
         },
         "private_key": {
           "type": "string",

@@ -161,7 +161,7 @@ type CreateClient struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Boolean indicates client type is validator or not.
 	Validator bool `protobuf:"varint,4,opt,name=validator,proto3" json:"validator,omitempty"`
-	// Boolean indicates wheather it required to create key or not.
+	// Boolean indicates whether it's required to create a key or not.
 	CreateKey bool `protobuf:"varint,5,opt,name=create_key,json=createKey,proto3" json:"create_key,omitempty"`
 }
 

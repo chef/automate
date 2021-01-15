@@ -83,10 +83,9 @@ func (s *Server) CreateClient(ctx context.Context, req *request.CreateClient) (*
 	}
 
 	res, err := c.client.Clients.Create(chef.ApiNewClient{
-		Name:       req.Name,
-		ClientName: req.Name,
-		Validator:  req.Validator,
-		CreateKey:  req.CreateKey,
+		Name:      req.Name,
+		Validator: req.Validator,
+		CreateKey: req.CreateKey,
 	})
 	if err != nil {
 		return nil, ParseAPIError(err)

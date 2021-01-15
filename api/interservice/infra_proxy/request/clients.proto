@@ -28,7 +28,7 @@ message CreateClient {
 	string name = 3;
 	// Boolean indicates client type is validator or not.
 	bool validator = 4;
-	// Boolean indicates wheather it required to create key or not.
+	// Boolean indicates whether it's required to create a key or not.
     bool create_key = 5;
 }
 
