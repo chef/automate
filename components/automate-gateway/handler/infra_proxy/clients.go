@@ -50,12 +50,11 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 // CreateClient creates an infra client
 func (a *InfraProxyServer) CreateClient(ctx context.Context, r *gwreq.CreateClient) (*gwres.CreateClient, error) {
 	req := &infra_req.CreateClient{
-		OrgId:      r.OrgId,
-		ServerId:   r.ServerId,
-		Name:       r.Name,
-		ClientName: r.ClientName,
-		Validator:  r.Validator,
-		CreateKey:  r.CreateKey,
+		OrgId:     r.OrgId,
+		ServerId:  r.ServerId,
+		Name:      r.Name,
+		Validator: r.Validator,
+		CreateKey: r.CreateKey,
 	}
 	res, err := a.client.CreateClient(ctx, req)
 	if err != nil {

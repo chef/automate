@@ -622,7 +622,9 @@ func init() {
         "tags": [
           "InfraProxy"
         ]
-      },
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset": {
       "put": {
         "operationId": "InfraProxy_ResetClientKey",
         "responses": {
@@ -1964,10 +1966,6 @@ func init() {
         "name": {
           "type": "string",
           "description": "Client name."
-        },
-        "client_name": {
-          "type": "string",
-          "description": "Client client name."
         },
         "validator": {
           "type": "boolean",

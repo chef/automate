@@ -377,8 +377,6 @@ func init() {
 					return m.ServerId
 				case "name":
 					return m.Name
-				case "client_name":
-					return m.ClientName
 				default:
 					return ""
 				}
@@ -403,7 +401,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ResetClientKey", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ResetClientKey", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.ClientKey); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

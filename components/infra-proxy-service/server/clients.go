@@ -67,10 +67,9 @@ func (s *Server) CreateClient(ctx context.Context, req *request.CreateClient) (*
 		Target:  "client",
 		Request: *req,
 		Rules: validation.Rules{
-			"OrgId":      []string{"required"},
-			"ServerId":   []string{"required"},
-			"Name":       []string{"required"},
-			"ClientName": []string{"required"},
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
 		},
 	}).Validate()
 
@@ -85,7 +84,7 @@ func (s *Server) CreateClient(ctx context.Context, req *request.CreateClient) (*
 
 	res, err := c.client.Clients.Create(chef.ApiNewClient{
 		Name:       req.Name,
-		ClientName: req.ClientName,
+		ClientName: req.Name,
 		Validator:  req.Validator,
 		CreateKey:  req.CreateKey,
 	})
@@ -161,15 +160,15 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 	}
 
 	// Deletes the existing key
-	acceessKey, err := c.client.Clients.DeleteKey(req.Name, req.KeyName)
-	if err != nil {
+	_, err = c.client.Clients.DeleteKey(req.Name, key)
+	chefError, _ := chef.ChefError(err)
+	if err != nil && chefError.StatusCode() != 404 {
 		return nil, ParseAPIError(err)
 	}
 
 	// Add new key to existing client
 	body, err := chef.JSONReader(AccessKeyReq{
 		Name:           key,
-		PublicKey:      acceessKey.PublicKey,
 		ExpirationDate: "infinity",
 		CreateKey:      true,
 	})

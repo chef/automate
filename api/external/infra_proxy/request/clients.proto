@@ -26,12 +26,10 @@ message CreateClient {
     string server_id = 2;
 	// Client name.
 	string name = 3;
-	// Client client name.
-	string client_name = 4;
 	// Boolean indicates client type is validator or not.
-	bool validator = 5;
+	bool validator = 4;
     // Boolean indicates wheather it required to create key or not.
-    bool create_key = 6;
+    bool create_key = 5;
 }
 
 message ClientKey {
