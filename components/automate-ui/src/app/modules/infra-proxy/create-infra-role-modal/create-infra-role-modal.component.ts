@@ -45,6 +45,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public firstFormGroup: FormGroup;
   public secondFormGroup: FormGroup;
   public thirdFormGroup: FormGroup;
+  public fourthFormGroup: FormGroup;
 
   basket = [];
 
@@ -54,6 +55,11 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public showdrag = false;
   items: InfraRole[] = [];
   private isDestroyed = new Subject<boolean>();
+  public jsonString: string;
+  public dattrParseError: boolean;
+  public oattrParseError: boolean;
+  public data: any;
+  public textareaID: string;
 
   constructor(
     private fb: FormBuilder
@@ -68,7 +74,9 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     });
     this.thirdFormGroup = this.fb.group({
       dattr: [''],
-      oattr: ['']
+    });
+    this.fourthFormGroup = this.fb.group({
+      oattr: ['',[Validators.required]]
     });
   }
 
@@ -140,4 +148,43 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';
   }
+
+  // this is the initial value set to the component
+  public writeValue(obj: any) {
+    if (obj) {
+        this.data = obj;
+        // this will format it with 4 character spacing
+        this.jsonString = JSON.stringify(this.data, undefined, 4); 
+    }
+  }
+
+  // registers 'fn' that will be fired wheb changes are made
+  // this is how we emit the changes back to the form
+  public registerOnChange(fn: any) {
+      this.propagateChange = fn;
+  }
+
+  private onChangeJSON(event) {
+    this.dattrParseError = false;
+    this.oattrParseError = false;
+    // get value from text area
+    let newValue = event.target.value;
+    this.textareaID = event.target.id;
+    try {
+        // parse it to json
+        this.data = JSON.parse(newValue);
+        this.textareaID == 'dattr' ? this.dattrParseError = false : '';
+        this.textareaID == 'oattr' ? this.oattrParseError = false : '';
+    } catch (ex) {
+        // set parse error if it fails
+        this.textareaID == 'dattr' ? this.dattrParseError = true : '';
+        this.textareaID == 'oattr' ? this.oattrParseError = true : '';
+    }
+    // update the form
+    this.propagateChange(this.data);
+  }
+
+  // the method set in registerOnChange to emit changes back to the form
+  private propagateChange = (_: any) => { };
+
 }

@@ -63,11 +63,15 @@
         <!-- Third step -->
         <mat-step [stepControl]="thirdFormGroup" label="Default Attributes">
           <form [formGroup]="thirdFormGroup">
-            
+            <textarea chefInput name="dattr" id="dattr" formControlName="dattr" (change)="onChangeJSON($event)"
+              (keyup)="onChangeJSON($event)">{}</textarea>
+            <chef-error *ngIf="dattrParseError">
+              Must be a valid JSON object
+            </chef-error>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <button chef-button mat-button matStepperPrevious primary class="primary">Privious</button>
-              <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!thirdFormGroup?.valid">Next</button>
+              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="dattrParseError">Privious</button>
+              <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!thirdFormGroup?.valid || dattrParseError">Next</button>
               <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal">
                 <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
                 <span>Create Role</span>
@@ -76,18 +80,25 @@
             </div>
           </form>
         </mat-step>
-        <mat-step>
-          <ng-template matStepLabel>Override Attributes</ng-template>
-          <div class="button-bar-box">
-            <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-            <button chef-button mat-button matStepperPrevious primary class="primary">Privious</button>
-            <button chef-button mat-button matStepperNext primary class="primary" disabled>Next</button>
-            <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal">
-              <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
-              <span>Create Role</span>
-              <!-- <span *ngIf="creating">Creating Notification...</span> -->
-            </chef-button>
-          </div>
+        <mat-step [stepControl]="fourthFormGroup">
+          <form [formGroup]="fourthFormGroup">
+            <ng-template matStepLabel>Override Attributes</ng-template>
+            <textarea chefInput name="oattr" id="oattr" formControlName="oattr" autofocus (change)="onChangeJSON($event)"
+                  (keyup)="onChangeJSON($event)">{}</textarea>
+                <chef-error *ngIf="oattrParseError">
+                  Must be a valid JSON object
+                </chef-error>
+            <div class="button-bar-box">
+              <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="oattrParseError">Privious</button>
+              <button chef-button mat-button matStepperNext primary class="primary" disabled>Next</button>
+              <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal">
+                <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
+                <span>Create Role</span>
+                <!-- <span *ngIf="creating">Creating Notification...</span> -->
+              </chef-button>
+            </div>
+          </form>
         </mat-step>
       </mat-horizontal-stepper>
       
