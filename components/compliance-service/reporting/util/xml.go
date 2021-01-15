@@ -13,6 +13,7 @@ type xmlFields struct {
 	NodeID           string    `xml:"node_id,omitempty"`
 	NodeName         string    `xml:"node_name,omitempty"`
 	EndTime          int64     `xml:"end_time>seconds,omitempty"`
+	Status           string    `xml:"status,omitempty"`
 	Platform         Platform  `xml:"platform,omitempty"`
 	Environment      string    `xml:"environment,omitempty"`
 	IPAddress        string    `xml:"ipaddress,omitempty"`
@@ -21,6 +22,7 @@ type xmlFields struct {
 	Version          string    `xml:"version,omitempty"`
 	ChefServer       string    `xml:"chef_server,omitempty"`
 	ChefOrganization string    `xml:"chef_organization,omitempty"`
+	Statistics       float32   `xml:"statistics>duration,omitempty"`
 }
 
 // Platform detail
@@ -122,6 +124,7 @@ func ReportToXML(report *reportingapi.Report) ([]byte, error) {
 		Version:          report.Version,
 		ChefServer:       report.ChefServer,
 		ChefOrganization: report.ChefOrganization,
+		Statistics:       report.Statistics.Duration,
 	}
 
 	content, err := xml.MarshalIndent(xF, "  ", "    ")
