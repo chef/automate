@@ -179,18 +179,18 @@ Name Servers can be added in two ways:
 
 1. **Add nameserver IPs:** Add the nameservers to your `config.toml` file to resolve the Elasticsearch nodes.
 
-  ```toml
-  [esgateway.v1.sys.ngx.main.resolvers]
-    # Multiple resolvers can be specified by adding the resolvers in the list.
-    nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
-  ```
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers in the list.
+      nameservers = ["192.0.2.0:24", "198.51.100.0:24"]
+    ```
 
 1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
 
-  ```toml
-  [esgateway.v1.sys.ngx.main.resolvers]
-    enable_system_nameservers = true
-  ```
+    ```toml
+    [esgateway.v1.sys.ngx.main.resolvers]
+      enable_system_nameservers = true
+    ```
 
 If both options are set, nameserver IPs takes precedence over the system nameserver entries.
 
@@ -353,18 +353,18 @@ Name Servers can be added in two ways:
 
 1. **Add nameserver IPs:** If you are aware of the nameservers which should resolve the PostgreSQL nodes, the nameservers can be added to your `config.toml` file.
 
-  ```toml
-  [pg_gateway.v1.sys.resolvers]
-    # Multiple resolvers can be specified by adding the resolvers in the list.
-    nameservers = ["127.0.0.53:53"]
-  ```
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      # Multiple resolvers can be specified by adding the resolvers in the list.
+      nameservers = ["127.0.0.53:53"]
+    ```
 
 1. **Set system DNS entries:** To use existing system nameserver entries from `/etc/resolv.conf`, add the following setting to `config.toml`:
 
-  ```toml
-  [pg_gateway.v1.sys.resolvers]
-    enable_system_nameservers = false
-  ```
+    ```toml
+    [pg_gateway.v1.sys.resolvers]
+      enable_system_nameservers = true
+    ```
 
 If both options are set, nameserver IPs takes precedence over the system nameserver entries.
 
