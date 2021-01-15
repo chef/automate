@@ -1,14 +1,5 @@
 @import "~styles/variables";
 
-chef-modal ::ng-deep .modal::-webkit-scrollbar {
-  width: 12px;
-  background-color: #F5F5F5;
-}
-
-chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #CCC;
-}
 
 .multi-list-container {
   border: solid 1px #ccc;
@@ -99,7 +90,6 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
 
 .data-box {
   border-radius: 10px;
-  background-color: #CCC;
   float: left;
   height: 400px;
   width: 41.5%;
@@ -108,7 +98,6 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
 
 .empty-box {
   border-radius: 10px;
-  background-color: #CCC;
   float: left;
   height: 400px;
   margin-right: 10px;
@@ -134,4 +123,13 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
 .margin {
   margin-top: 25px;
 
+}
+::ng-deep .role-list::-webkit-scrollbar {
+  width: 10px;
+  background-color: #F5F5F5;
+}
+
+::ng-deep .role-list::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: #CCC;
 }

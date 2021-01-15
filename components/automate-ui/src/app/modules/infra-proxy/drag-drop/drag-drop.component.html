@@ -6,7 +6,6 @@
         {{ key }}
       </mat-option>
     </mat-select>
-
     <!-- search box -->
 
 
@@ -15,17 +14,11 @@
       <form [formGroup]="userForm">
         <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
         </select-box>
-
         <br />
-
         <button type="submit" (click)="submit()">Submit1</button>
       </form>
-
-
       <br />
     </div>
-
-
   </div>
 
   <table>

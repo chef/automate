@@ -47,12 +47,14 @@
 }
 
 .select-box-list::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
     border-radius: 10px;
+    box-shadow: inherit;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
 }
 
 .select-box-list::-webkit-scrollbar-thumb {
     border-radius: 10px;
+    box-shadow: inherit;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 }
 
@@ -94,7 +96,9 @@
 }
 
 .selectbox-search{
-    height:25px;
+    margin-bottom: 21px;
+    margin-top: -8px;
+    width: 101%;
 }
 
 .left-right-arrow-box {
