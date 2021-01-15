@@ -105,7 +105,7 @@ export class NodesEditComponent implements OnInit {
       .subscribe(() => this.router.navigate(['/compliance', 'scan-jobs', 'nodes']));
   }
 
-  createForm(node): FormGroup {
+  private createForm(node): FormGroup {
     const target_config = this.fb.group({
       host: [node.target_config.host, Validators.required],
       backend: [node.target_config.backend, Validators.required],

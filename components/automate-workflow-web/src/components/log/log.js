@@ -49,7 +49,6 @@ function logComponent($document, $window, $http, $httpParamSerializer, Session, 
 
           if (logObjects.length > 0) {
             scope.viewPlugin = 'compliance';
-            scope.viewPlugin = 'compliance';
             scope.viewCompliance = true;
             scope.changeView = 'Log';
 

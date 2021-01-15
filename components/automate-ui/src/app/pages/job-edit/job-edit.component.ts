@@ -97,7 +97,7 @@ export class JobEditComponent implements OnDestroy {
     this.store.dispatch(new ProfilesSearch({ owner: this.chefSession.username }));
   }
 
-  public ngOnDestroy() {
+  ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }

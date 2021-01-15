@@ -45,7 +45,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService
   ) { }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
 
     this.store.select(routeParams).pipe(
