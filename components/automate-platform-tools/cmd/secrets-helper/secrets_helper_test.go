@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -198,4 +200,54 @@ func TestEndToEndSecretsHelper(t *testing.T) {
 		assert.Equal(t, []byte(fmt.Sprintf(`{"test":{"%s":"%s"}}`, secretName, "some-specific-secret")), output)
 	})
 
+	t.Run("exec with watch exits if an optional secret appears", func(t *testing.T) {
+		secretName := fmt.Sprintf("test-secret-%d", helper.UniqueInt())
+		fullName := fmt.Sprintf("test.%s", secretName)
+		go func() {
+			time.Sleep(1 * time.Second)
+			_, err := helper.RunSecretsHelperWithInput("some-specific-secret", "insert", fullName)
+			require.NoError(t, err)
+		}()
+
+		_, err := helper.RunSecretsHelper("exec", "--watch", "--interval", "20ms",
+			"--optional-secret", fullName, "--", "bash", "-c", "sleep 120")
+		exitErr := &exec.ExitError{}
+		require.True(t, errors.As(err, &exitErr))
+	})
+
+	t.Run("exec with watch exits if an optional secret changes", func(t *testing.T) {
+		secretName := fmt.Sprintf("test-secret-%d", helper.UniqueInt())
+		fullName := fmt.Sprintf("test.%s", secretName)
+		_, err := helper.RunSecretsHelperWithInput("some-specific-secret", "insert", fullName)
+		require.NoError(t, err)
+
+		go func() {
+			time.Sleep(1 * time.Second)
+			_, err := helper.RunSecretsHelperWithInput("some-changed-secret", "insert", fullName)
+			require.NoError(t, err)
+		}()
+
+		_, err = helper.RunSecretsHelper("exec", "--watch", "--interval", "20ms",
+			"--optional-secret", fullName, "--", "bash", "-c", "sleep 120")
+		exitErr := &exec.ExitError{}
+		require.True(t, errors.As(err, &exitErr))
+	})
+
+	t.Run("exec with watch exits if a required secret changes", func(t *testing.T) {
+		secretName := fmt.Sprintf("test-secret-%d", helper.UniqueInt())
+		fullName := fmt.Sprintf("test.%s", secretName)
+		_, err := helper.RunSecretsHelperWithInput("some-specific-secret", "insert", fullName)
+		require.NoError(t, err)
+
+		go func() {
+			time.Sleep(1 * time.Second)
+			_, err := helper.RunSecretsHelperWithInput("some-changed-secret", "insert", fullName)
+			require.NoError(t, err)
+		}()
+
+		_, err = helper.RunSecretsHelper("exec", "--watch", "--interval", "20ms",
+			"--secret", fullName, "--", "bash", "-c", "sleep 120")
+		exitErr := &exec.ExitError{}
+		require.True(t, errors.As(err, &exitErr))
+	})
 }

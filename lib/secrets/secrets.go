@@ -10,6 +10,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -35,6 +36,10 @@ var BifrostSuperuserIDName = SecretName{
 type SecretName struct {
 	Group string
 	Name  string
+}
+
+func (s SecretName) String() string {
+	return fmt.Sprintf("%s.%s", s.Group, s.Name)
 }
 
 // SecretNameFromString returns parses the string according to the

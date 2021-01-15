@@ -85,7 +85,7 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 
-		if err = s.deployment.ReplaceUserOverrideConfig(existingCopy); err != nil {
+		if err = s.deployment.ReplaceUserOverrideConfig(existingCopy, s.secretStore); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
@@ -129,7 +129,7 @@ func (s *server) SetAutomateConfig(ctx context.Context,
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 
-		if err = s.deployment.ReplaceUserOverrideConfig(req.Config); err != nil {
+		if err = s.deployment.ReplaceUserOverrideConfig(req.Config, s.secretStore); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
@@ -221,7 +221,7 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 		return status.Error(codes.InvalidArgument, errors.Wrap(err, "updating config").Error())
 	}
 
-	if err = s.deployment.ReplaceUserOverrideConfig(cfg); err != nil {
+	if err = s.deployment.ReplaceUserOverrideConfig(cfg, s.secretStore); err != nil {
 		return status.Error(codes.Internal, errors.Wrap(err, "replacing config").Error())
 	}
 

@@ -86,6 +86,31 @@ func (c *AutomateConfig) PopulateSecretsFromEnvironment() {
 	}
 }
 
+func (c *AutomateConfig) PullSecretsFromConfig() map[string]string {
+	a2ServiceConfigType := reflect.TypeOf((*a2conf.A2ServiceConfig)(nil)).Elem()
+	a := reflect.ValueOf(c).Elem()
+	secrets := make(map[string]string)
+	for i := 0; i < a.NumField(); i++ {
+		f := a.Field(i)
+
+		if f.Type().Implements(a2ServiceConfigType) {
+			var v a2conf.A2ServiceConfig
+			if f.IsNil() {
+				continue
+			} else {
+				v = (f.Interface()).(a2conf.A2ServiceConfig)
+			}
+			for _, secret := range v.ListSecrets() {
+				if sec := v.GetSecret(secret.Name); sec != nil && sec.GetValue() != "" {
+					secrets[secret.Name] = sec.GetValue()
+					v.SetSecret(secret.Name, nil) // nolint: errcheck
+				}
+			}
+		}
+	}
+	return secrets
+}
+
 // WithConfigOptions applies the given AutomateConfigOpts to an AutomateConfig
 func WithConfigOptions(cfg *AutomateConfig, options ...AutomateConfigOpt) error {
 	for _, option := range options {

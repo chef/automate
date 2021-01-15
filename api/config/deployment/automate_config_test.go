@@ -470,3 +470,70 @@ func TestPopulateSecretsFromEnvironment(t *testing.T) {
 		},
 	)
 }
+
+func TestPullSecretsFromConfig(t *testing.T) {
+	t.Run("if missing from config, secret not returned", func(t *testing.T) {
+		expected := &AutomateConfig{
+			Deployment: &ConfigRequest{
+				V1: &ConfigRequest_V1{
+					Svc: &ConfigRequest_V1_Service{
+						Channel: w.String("foo"),
+					},
+				},
+			},
+		}
+		conf, err := expected.NewDeepCopy()
+		require.NoError(t, err)
+		secrets := conf.PullSecretsFromConfig()
+		require.Equal(t, map[string]string{}, secrets)
+		require.Equal(t, expected, conf)
+	})
+
+	t.Run("if secret is in the config, it is removed and returned",
+		func(t *testing.T) {
+			conf := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+				Dex: &dex.ConfigRequest{
+					V1: &dex.ConfigRequest_V1{
+						Sys: &dex.ConfigRequest_V1_System{
+							Connectors: &dex.ConfigRequest_V1_Connectors{
+								Ldap: &dex.ConfigRequest_V1_Ldap{
+									BindPassword: w.String("imapassword"),
+								},
+							},
+						},
+					},
+				},
+			}
+			expected := &AutomateConfig{
+				Deployment: &ConfigRequest{
+					V1: &ConfigRequest_V1{
+						Svc: &ConfigRequest_V1_Service{
+							Channel: w.String("foo"),
+						},
+					},
+				},
+				Dex: &dex.ConfigRequest{
+					V1: &dex.ConfigRequest_V1{
+						Sys: &dex.ConfigRequest_V1_System{
+							Connectors: &dex.ConfigRequest_V1_Connectors{
+								Ldap: &dex.ConfigRequest_V1_Ldap{
+									BindPassword: nil,
+								},
+							},
+						},
+					},
+				},
+			}
+			secrets := conf.PullSecretsFromConfig()
+			require.Equal(t, map[string]string{"ldap_password": "imapassword"}, secrets)
+			require.Equal(t, expected, conf)
+		},
+	)
+}

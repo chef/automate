@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
+	"github.com/chef/automate/lib/secrets"
 )
 
 // Deployment represents a given deployment of Chef Automate.
@@ -60,7 +61,7 @@ func CreateDeploymentWithUserOverrideConfig(config *dc.AutomateConfig) (*Deploym
 	if err != nil {
 		return nil, err
 	}
-	err = d.UpdateWithUserOverrideConfig(config)
+	err = d.UpdateWithUserOverrideConfig(config, nil)
 	return d, err
 }
 
@@ -86,6 +87,25 @@ func newDeploymentFromUserOverrideConfig(config *dc.AutomateConfig) (*Deployment
 	}, nil
 }
 
+func (d *Deployment) MoveSecretsToSecretStore(secretStore secrets.SecretStore) error {
+	if d.userOverrideConfig != nil {
+		d.userOverrideConfig.PullSecretsFromConfig()
+	}
+	if d.Config != nil {
+		secretsFromConfig := d.Config.PullSecretsFromConfig()
+		for secret, val := range secretsFromConfig {
+			err := secretStore.SetSecret(secrets.SecretName{
+				Group: "userconfig",
+				Name:  secret,
+			}, []byte(val))
+			if err != nil {
+				return errors.Wrapf(err, "failed to set userconfig secret %q in the secret store", secret)
+			}
+		}
+	}
+	return nil
+}
+
 // UpdateWithUserOverrideConfig creates a new Deployment struct with a
 // user-provided configuration as input. This input is stored
 // internally and is what is persisted when we persist the Deployment
@@ -93,7 +113,7 @@ func newDeploymentFromUserOverrideConfig(config *dc.AutomateConfig) (*Deployment
 // configuration with the default configuration values is available to
 // use via the Config field. We also initialize the set of expected
 // services
-func (d *Deployment) UpdateWithUserOverrideConfig(config *dc.AutomateConfig) error {
+func (d *Deployment) UpdateWithUserOverrideConfig(config *dc.AutomateConfig, secretStore secrets.SecretStore) error {
 	mergedConfig, err := dc.MergeWithDefaults(config)
 	if err != nil {
 		return errors.Wrap(err, "error merging configuration with defaults")
@@ -109,7 +129,7 @@ func (d *Deployment) UpdateWithUserOverrideConfig(config *dc.AutomateConfig) err
 	}
 
 	d.ExpectedServices = expectedServices
-	return nil
+	return d.MoveSecretsToSecretStore(secretStore)
 }
 
 // GetUserOverrideConfigForPersistence returns the user-provided
@@ -121,7 +141,7 @@ func (d *Deployment) GetUserOverrideConfigForPersistence() *dc.AutomateConfig {
 
 // MergeIntoUserOverrideConfig merges the provided config into the user override
 // config. The input should be a sparse override config.
-func (d *Deployment) MergeIntoUserOverrideConfig(config *dc.AutomateConfig) error {
+func (d *Deployment) MergeIntoUserOverrideConfig(config *dc.AutomateConfig, secretStore secrets.SecretStore) error {
 	err := d.userOverrideConfig.OverrideConfigValues(config)
 	if err != nil {
 		return err
@@ -134,12 +154,12 @@ func (d *Deployment) MergeIntoUserOverrideConfig(config *dc.AutomateConfig) erro
 	mergedConfig.SetGlobalConfig()
 	d.Config = mergedConfig
 
-	return nil
+	return d.MoveSecretsToSecretStore(secretStore)
 }
 
 // ReplaceUserOverrideConfig replaces the deployments override config with the
 // given config. The input should be a sparse override config.
-func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error {
+func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig, secretStore secrets.SecretStore) error {
 	d.userOverrideConfig = config
 
 	mergedConfig, err := dc.MergeWithDefaults(d.userOverrideConfig)
@@ -149,7 +169,7 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 	mergedConfig.SetGlobalConfig()
 	d.Config = mergedConfig
 
-	return nil
+	return d.MoveSecretsToSecretStore(secretStore)
 }
 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {

@@ -21,6 +21,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -31,6 +33,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -39,6 +42,8 @@ import (
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/user"
 )
+
+var defaultWatchInterval = 15 * time.Second
 
 //
 // Option structs
@@ -55,6 +60,8 @@ type globalOptions struct {
 type execOptions struct {
 	requiredSecrets []string
 	optionalSecrets []string
+	watch           bool
+	watchInterval   time.Duration
 }
 
 type insertOptions struct {
@@ -76,6 +83,7 @@ var generateOpts = generateOptions{}
 // build up an array value.
 type requiredSecret struct{}
 type optionalSecret struct{}
+type watchSecrets struct{}
 
 // TODO(ssd) 2018-08-20: Should String() return something sensible?
 func (i requiredSecret) String() string { return "" }
@@ -87,6 +95,13 @@ func (i requiredSecret) Set(value string) error { // nolint: unparam
 func (i optionalSecret) String() string { return "" }
 func (i optionalSecret) Set(value string) error { // nolint: unparam
 	execOpts.optionalSecrets = append(execOpts.optionalSecrets, value)
+	return nil
+}
+
+func (i watchSecrets) String() string   { return "" }
+func (i watchSecrets) IsBoolFlag() bool { return true }
+func (i watchSecrets) Set(value string) error { // nolint: unparam
+	execOpts.watch = value == "true"
 	return nil
 }
 
@@ -172,6 +187,9 @@ func newCmd() *cobra.Command {
 		Usage: "Optional secret to pass to service",
 		Value: optionalSecret{},
 	})
+
+	execCmd.PersistentFlags().BoolVar(&execOpts.watch, "watch", false, "Runs process as a child, kills it if secrets change")
+	execCmd.PersistentFlags().DurationVar(&execOpts.watchInterval, "interval", defaultWatchInterval, "How often to check for changes")
 
 	insertCmd.PersistentFlags().BoolVar(
 		&insertOpts.ifNotExists, "if-not-exists", false, "Exit without an error if value exists")
@@ -332,6 +350,10 @@ func execCommand(_ *cobra.Command, args []string) {
 	}
 
 	secretData := make(map[string]map[string]string, 8)
+	var changeDetectData map[secrets.SecretName][]byte
+	if execOpts.watch {
+		changeDetectData = make(map[secrets.SecretName][]byte)
+	}
 	for _, secretSpec := range execOpts.requiredSecrets {
 		secretName, err := secrets.SecretNameFromString(secretSpec)
 		if err != nil {
@@ -349,6 +371,10 @@ func execCommand(_ *cobra.Command, args []string) {
 		}
 
 		secretData[secretName.Group][secretName.Name] = string(content)
+
+		if changeDetectData != nil {
+			changeDetectData[secretName] = content
+		}
 	}
 
 	for _, secretSpec := range execOpts.optionalSecrets {
@@ -359,6 +385,9 @@ func execCommand(_ *cobra.Command, args []string) {
 
 		content, err := secretsStore.GetSecret(secretName)
 		if err != nil {
+			if changeDetectData != nil {
+				changeDetectData[secretName] = []byte{}
+			}
 			logrus.Warn(err)
 			continue
 		}
@@ -369,6 +398,9 @@ func execCommand(_ *cobra.Command, args []string) {
 		}
 
 		secretData[secretName.Group][secretName.Name] = string(content)
+		if changeDetectData != nil {
+			changeDetectData[secretName] = content
+		}
 	}
 
 	secretJson, err := json.Marshal(secretData)
@@ -396,22 +428,73 @@ func execCommand(_ *cobra.Command, args []string) {
 		logrus.Fatal(errors.Wrap(err, "could not close write-end of secrets pipe"))
 	}
 
-	// Clear FD_CLOEXEC flag on the read pipe so that the process
-	// we exec below can still open it.
-	_, _, errno := syscall.Syscall(syscall.SYS_FCNTL, readPipe.Fd(), syscall.F_SETFD, 0)
-	if errno != 0 {
-		logrus.Fatal(errors.Wrap(err, "failed to clear CLOEXEC flag on secrets pipe"))
-	}
+	// WARNING: If you care about your process exiting cleanly, do not use watch (or fix it)
+	// It will sigkill your process whenever the secrets change
+	if execOpts.watch {
+		// If watch is specified, we cannot exec because we want to continue to run our code
+		// to check for changes
+		cmdCtx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 
-	logrus.WithFields(logrus.Fields{
-		"secrets_fd": readPipe.Fd(),
-		"full_exe":   fullExe,
-		"args":       args,
-	}).Debug("Executing command")
-	env := append(os.Environ(), fmt.Sprintf("CHEF_SECRETS_FD=%d", readPipe.Fd()))
-	err = syscall.Exec(fullExe, args, env)
-	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "failed to exec command"))
+		cmd := exec.CommandContext(cmdCtx, fullExe, args[1:]...)
+		cmd.ExtraFiles = []*os.File{readPipe}
+		cmd.Env = append(os.Environ(), fmt.Sprintf("CHEF_SECRETS_FD=%d", 3)) // 3 + i from ExtraFiles
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Pdeathsig: syscall.SIGTERM,
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"secrets_fd": readPipe.Fd(),
+			"full_exe":   fullExe,
+			"args":       args[1:],
+		}).Debug("Running command")
+
+		go func() {
+			// Detect changes
+			c := time.Tick(execOpts.watchInterval)
+			for range c {
+				for secretName, oldContent := range changeDetectData {
+					content, err := secretsStore.GetSecret(secretName)
+					if err != nil {
+						continue
+					}
+					if bytes.Compare(content, oldContent) != 0 {
+						logrus.Debugf("Secret %s changed... restarting", secretName.String())
+						cancel()
+						return
+					}
+				}
+			}
+		}()
+
+		if err := cmd.Run(); err != nil {
+			exitErr := &exec.ExitError{}
+			if errors.As(err, &exitErr) {
+				os.Exit(exitErr.ExitCode())
+			}
+			logrus.Fatal(err)
+		}
+	} else {
+		// Clear FD_CLOEXEC flag on the read pipe so that the process
+		// we exec below can still open it.
+		_, _, errno := syscall.Syscall(syscall.SYS_FCNTL, readPipe.Fd(), syscall.F_SETFD, 0)
+		if errno != 0 {
+			logrus.Fatal(errors.Wrap(err, "failed to clear CLOEXEC flag on secrets pipe"))
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"secrets_fd": readPipe.Fd(),
+			"full_exe":   fullExe,
+			"args":       args,
+		}).Debug("Executing command")
+		env := append(os.Environ(), fmt.Sprintf("CHEF_SECRETS_FD=%d", readPipe.Fd()))
+		err = syscall.Exec(fullExe, args, env)
+		if err != nil {
+			logrus.Fatal(errors.Wrap(err, "failed to exec command"))
+		}
 	}
 }
 
