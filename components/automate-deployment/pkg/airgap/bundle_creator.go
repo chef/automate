@@ -101,13 +101,13 @@ func (dl *netHabDownloader) DownloadHabBinary(version string, release string, w 
 	}
 
 	// NOTE: We're downloading this via HTTPS from a location that's trusted.
-	gzipReader, err := gzip.NewReader(resp.Body) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
+	gzipReader, err := gzip.NewReader(resp.Body) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	if err != nil {
 		return errors.Wrap(err, "Failed to download hab binary. Could not open gzip")
 	}
 
 	// NOTE: See above.
-	tarReader := tar.NewReader(gzipReader) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
+	tarReader := tar.NewReader(gzipReader) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	for {
 		hdr, err := tarReader.Next()
 		if err == io.EOF {
@@ -620,7 +620,7 @@ func (creator *InstallBundleCreator) createTar(InstallBundleCreatorProgress) err
 		return errors.Wrap(err, "Could not write archive")
 	}
 
-	return err
+	return nil
 }
 
 func uniq(xs []habpkg.VersionedPackage) []habpkg.VersionedPackage {

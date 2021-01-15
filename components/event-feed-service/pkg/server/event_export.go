@@ -198,7 +198,7 @@ func csvExport(stream event_feed.EventFeedService_EventExportServer) exportHandl
 			return fmt.Errorf("Failed to export CSV: %+v", err)
 		}
 
-		return err
+		return nil
 	}
 }
 

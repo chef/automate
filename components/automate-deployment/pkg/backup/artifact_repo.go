@@ -630,7 +630,7 @@ func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (*os.Fi
 	}
 
 	// NOTE: This reads a backup archive, provided by an admin. It's trusted input.
-	g, err := gzip.NewReader(reader) // nosem: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
+	g, err := gzip.NewReader(reader) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 	if err != nil {
 		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
