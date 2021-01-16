@@ -637,7 +637,7 @@ func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (*os.Fi
 	}
 	defer logClose(g, "failed to close gzip reader")
 
-	if _, err := io.Copy(tmpFile, g); err != nil {
+	if _, err := io.Copy(tmpFile, g); err != nil { // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
 	}

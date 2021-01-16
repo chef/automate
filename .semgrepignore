@@ -26,7 +26,9 @@ tests/
 
 # Chef customizations
 third_party/
+coverage/
 *_test.go
 *.pb.go
+*.pb.*.go
 *.bindata.go
 *.spec.ts

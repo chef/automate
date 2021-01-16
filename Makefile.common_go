@@ -21,7 +21,7 @@ GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
 LINTERARGS?=./...
 
 # Semgrep by default respects .gitignore; these are additive:
-SEMGREP_IGNORE := --exclude third_party --exclude *_test.go --exclude *.pb.go --exclude *.bindata.go
+SEMGREP_IGNORE := --exclude third_party --exclude *_test.go --exclude *.pb.go --exclude *.pb.*.go --exclude *.bindata.go
 SEMGREP_CONFIG := https://semgrep.dev/p/r2c-ci
 
 $(REPOROOT)/cache/$(GOLANGCILINTTARBALL):

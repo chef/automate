@@ -12,8 +12,9 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/compliance-service/inspec"
 )
 
 // Zip2Path extracts a zip file on disk to a destination folder on disk.
@@ -47,7 +48,7 @@ func Zip2Path(zipPath string, extractPath string) error {
 			if err != nil {
 				return err
 			}
-			_, err = io.Copy(f, rc)
+			_, err = io.Copy(f, rc) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 			cerr := rc.Close()
 			ferr := f.Close()
 			if err != nil {

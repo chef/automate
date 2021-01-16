@@ -120,7 +120,7 @@ func (dl *netHabDownloader) DownloadHabBinary(version string, release string, w 
 
 		if hdr.Typeflag == tar.TypeReg {
 			if hdr.FileInfo().Name() == "hab" {
-				_, err := io.Copy(w, tarReader)
+				_, err := io.Copy(w, tarReader) // nosemgrep: go.lang.security.decompression_bomb.potential-dos-via-decompression-bomb
 				if err != nil {
 					return errors.Wrap(err, "Could not untar hab binary tarball")
 				}
