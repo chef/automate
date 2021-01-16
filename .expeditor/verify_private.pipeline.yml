@@ -113,34 +113,33 @@ steps:
             "/go/src/github.com/chef/automate"
           ]
 
-  # 2021.01.09 (ms) suddenly this times out on every run so disabling it until we resolve issue
-  # - label: ":semgrep: Security"
-  #   command:
-  #   - echo "running in $(pwd)"
-  #   - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
-  #   - export SEMGREP_REPO_NAME=chef/automate
-  #   # Activates links to buildkite builds in slack notification
-  #   - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
-  #   # Activates links to git commits in slack notification
-  #   - export SEMGREP_REPO_URL=https://github.com/chef/automate
-  #   - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
-  #   - \[ -z "$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \] && echo "manual build; using 'master' as base branch"
-  #   - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}
-  #   timeout_in_minutes: 20
-  #   expeditor:
-  #     secrets: true
-  #   plugins:
-  #     # Temporary workaround per @tduffield; do not propagate this solution too much!
-  #     - chef/step-hook#v0.1.1:
-  #         pre-command:
-  #           - .expeditor/export_semgrep_token.sh
-  #     - docker#v3.7.0:
-  #         image: returntocorp/semgrep-agent:v1
-  #         propogate-environment: true
-  #         workdir: /go/src/github.com/chef/automate
-  #         environment:
-  #           - SEMGREP_TOKEN
-  #           - SEMGREP_ID
+  - label: ":semgrep: Security"
+    command:
+    - echo "running in $(pwd)"
+    - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
+    - export SEMGREP_REPO_NAME=chef/automate
+    # Activates links to buildkite builds in slack notification
+    - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
+    # Activates links to git commits in slack notification
+    - export SEMGREP_REPO_URL=https://github.com/chef/automate
+    - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
+    - \[ -z "$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \] && echo "manual build; using 'master' as base branch"
+    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}
+    timeout_in_minutes: 20
+    expeditor:
+      secrets: true
+    plugins:
+      # Temporary workaround per @tduffield; do not propagate this solution too much!
+      - chef/step-hook#v0.1.1:
+          pre-command:
+            - .expeditor/export_semgrep_token.sh
+      - docker#v3.7.0:
+          image: returntocorp/semgrep-agent:v1
+          propogate-environment: true
+          workdir: /go/src/github.com/chef/automate
+          environment:
+            - SEMGREP_TOKEN
+            - SEMGREP_ID
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets
