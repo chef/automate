@@ -122,12 +122,12 @@ steps:
       - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
       # Activates links to git commits in slack notification
       - export SEMGREP_REPO_URL=https://github.com/chef/automate
-      - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
       - export BASELINE=$BUILDKITE_PULL_REQUEST_BASE_BRANCH
-      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -z "$BASELINE" \] && echo "manual build; using 'master' as base branch" && BASELINE=master
+      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -n "\$BASELINE" \] && echo "PR build on '$BUILDKITE_BRANCH' branch; base is '\$BASELINE'"
+      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -z "\$BASELINE" \] && echo "manual build on '$BUILDKITE_BRANCH' branch; using master as base" && BASELINE=master
       - \[ "$BUILDKITE_BRANCH" == "master" \] && echo "build on master; using 'master~1' as base branch" && BASELINE=master~1
       - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \$BASELINE
-    timeout_in_minutes: 10
+    timeout_in_minutes: 15
     # TODO: soft_fail until confirming this works when run on master (after being merged)
     soft_fail: true
     expeditor:
