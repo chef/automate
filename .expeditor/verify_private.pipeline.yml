@@ -115,17 +115,21 @@ steps:
 
   - label: ":semgrep: Security"
     command:
-    - echo "running in $(pwd)"
-    - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
-    - export SEMGREP_REPO_NAME=chef/automate
-    # Activates links to buildkite builds in slack notification
-    - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
-    # Activates links to git commits in slack notification
-    - export SEMGREP_REPO_URL=https://github.com/chef/automate
-    - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
-    - \[ -z "$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \] && echo "manual build; using 'master' as base branch"
-    - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}
-    timeout_in_minutes: 20
+      - echo "running in $(pwd)"
+      - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
+      - export SEMGREP_REPO_NAME=chef/automate
+      # Activates links to buildkite builds in slack notification
+      - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
+      # Activates links to git commits in slack notification
+      - export SEMGREP_REPO_URL=https://github.com/chef/automate
+      - echo "branch=[$BUILDKITE_BRANCH], PR base branch=[$BUILDKITE_PULL_REQUEST_BASE_BRANCH]"
+      - export BASELINE=$BUILDKITE_PULL_REQUEST_BASE_BRANCH
+      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -z "$BASELINE" \] && echo "manual build; using 'master' as base branch" && BASELINE=master
+      - \[ "$BUILDKITE_BRANCH" == "master" \] && echo "build on master; using 'master~1' as base branch" && BASELINE=master~1
+      - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \$BASELINE
+    timeout_in_minutes: 10
+    # TODO: soft_fail until confirming this works when run on master (after being merged)
+    soft_fail: true
     expeditor:
       secrets: true
     plugins:
