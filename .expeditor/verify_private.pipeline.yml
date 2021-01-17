@@ -128,8 +128,6 @@ steps:
       - \[ "$BUILDKITE_BRANCH" == "master" \] && echo "build on master; using 'master~1' as base branch" && BASELINE=master~1
       - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \$BASELINE
     timeout_in_minutes: 15
-    # TODO: soft_fail until confirming this works when run on master (after being merged)
-    soft_fail: true
     expeditor:
       secrets: true
     plugins:
