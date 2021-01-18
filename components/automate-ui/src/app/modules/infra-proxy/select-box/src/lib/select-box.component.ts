@@ -205,17 +205,22 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
 
   /* Methods to implement ControlValueAccessor */
   onChange = (val: string[]) => { console.log(val)};
+
   onTouched = () => { };
+
   writeValue(value: string[]): void {
     this.setSelectedValues(value);
     this.onChange(this.value);
   }
+  
   registerOnChange(fn: (val: string[]) => void): void {
     this.onChange = fn;
   }
+
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
+
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }

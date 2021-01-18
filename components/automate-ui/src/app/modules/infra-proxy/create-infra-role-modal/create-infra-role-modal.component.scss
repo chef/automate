@@ -191,6 +191,10 @@ chef-checkbox ::ng-deep .check-wrap {
     font-weight: bolder !important;
   }
 
+  .mat-step-header .mat-step-icon-selected {
+    background-color: rgba(220, 38, 127, 0.9) !important;
+  }
+
   .mat-stepper-label-position-bottom .mat-horizontal-stepper-header .mat-step-label {
     padding: 3px 0 0 0;
     text-align: center;

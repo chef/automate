@@ -60,7 +60,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public oattrParseError: boolean;
   public data: any;
   public textareaID: string;
-
+  public default_attr_value = '{}'
   constructor(
     private fb: FormBuilder
   ) {

@@ -76,12 +76,12 @@ export class DragDropComponent implements OnInit, OnDestroy {
 
   }
 
+  selectChangeHandler(id: string): void {
+    this.defaultType = id;
+    console.log(this.defaultType);
 
-selectChangeHandler(id: string): void {
-  this.defaultType = id;
-  console.log(this.defaultType);
+  }
 
-}
   mergeArray(reci) {
     if (this.recipes.length > 0) {
       this.roles.forEach((role) => {
@@ -97,21 +97,8 @@ selectChangeHandler(id: string): void {
         });
       });
       this.showbutton = true;
-
     }
-
   }
-
-
-  submit() {
-    console.log(this.userForm.value);
-  }
-
-  submit2(value) {
-    console.log(value);
-  }
-
-
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
@@ -129,4 +116,3 @@ selectChangeHandler(id: string): void {
     this.isDestroyed.complete();
   }
 }
-

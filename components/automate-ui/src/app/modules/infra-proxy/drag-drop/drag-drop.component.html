@@ -1,33 +1,30 @@
 <div cdkDropListGroup>
-  <div class="data-box">
+  <div class="select-box">
     <!-- drop down for available types -->
     <mat-select #li panelClass="chef-dropdown" [value]="defaultType" (selectionChange)="selectChangeHandler(li.value)">
       <mat-option *ngFor="let key of typeAvailable" [value]="key">
         {{ key }}
       </mat-option>
     </mat-select>
-    <!-- search box -->
+  </div>
 
-
-    <!-- combined data -->
-    <div *ngIf="showbutton" class="margin">
-      <form [formGroup]="userForm">
-        <div *ngIf="defaultType=== 'available roles and recipes'">
-          <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
-          </select-box>
-        </div>
-        <div *ngIf="defaultType=== 'available roles'">      
-          <select-box id="myListBox" [list]="roles" search="true" sort="true" selectAll="true" formControlName="selected">
-          </select-box>
-        </div>
-        <div *ngIf="defaultType=== 'available recipes'">      
-          <select-box id="myListBox" [list]="recipes" search="true" sort="true" selectAll="true" formControlName="selected">
-          </select-box>
-        </div>
-        <br />
-        <button type="submit" (click)="submit()">Submit1</button>
-      </form>
+  <!-- combined data -->
+  <div *ngIf="showbutton" class="margin">
+    <form [formGroup]="userForm">
+      <div *ngIf="defaultType === 'available roles and recipes'">
+        <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
+        </select-box>
+      </div>
+      <div *ngIf="defaultType === 'available roles'">      
+        <select-box id="myListBox" [list]="roles" search="true" sort="true" selectAll="true" formControlName="selected">
+        </select-box>
+      </div>
+      <div *ngIf="defaultType === 'available recipes'">      
+        <select-box id="myListBox" [list]="recipes" search="true" sort="true" selectAll="true" formControlName="selected">
+        </select-box>
+      </div>
       <br />
-    </div>
+    </form>
+    <br />
   </div>
 </div>
