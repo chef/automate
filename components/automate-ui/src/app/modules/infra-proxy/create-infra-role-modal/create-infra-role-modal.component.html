@@ -63,11 +63,13 @@
         <!-- Third step -->
         <mat-step [stepControl]="thirdFormGroup" label="Default Attributes">
           <form [formGroup]="thirdFormGroup">
-            <textarea chefInput name="dattr" id="dattr" formControlName="dattr" (change)="onChangeJSON($event)"
-              (keyup)="onChangeJSON($event)">{}</textarea>
-            <chef-error *ngIf="dattrParseError">
+            <chef-form-field>
+              <textarea chefInput name="dattr" id="dattr" formControlName="dattr" (change)="onChangeJSON($event)"
+                (keyup)="onChangeJSON($event)">{}</textarea>
+              <chef-error *ngIf="dattrParseError">
               Must be a valid JSON object
-            </chef-error>
+              </chef-error>
+          </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="dattrParseError">Privious</button>
@@ -83,11 +85,13 @@
         <mat-step [stepControl]="fourthFormGroup">
           <form [formGroup]="fourthFormGroup">
             <ng-template matStepLabel>Override Attributes</ng-template>
-            <textarea chefInput name="oattr" id="oattr" formControlName="oattr" autofocus (change)="onChangeJSON($event)"
-                  (keyup)="onChangeJSON($event)">{}</textarea>
-                <chef-error *ngIf="oattrParseError">
-                  Must be a valid JSON object
-                </chef-error>
+            <chef-form-field>
+              <textarea chefInput name="oattr" id="oattr" formControlName="oattr" autofocus (change)="onChangeJSON($event)"
+                    (keyup)="onChangeJSON($event)">{}</textarea>
+              <chef-error *ngIf="oattrParseError">
+              Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="oattrParseError">Privious</button>
