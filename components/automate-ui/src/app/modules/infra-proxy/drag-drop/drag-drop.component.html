@@ -1,7 +1,7 @@
 <div cdkDropListGroup>
   <div class="data-box">
     <!-- drop down for available types -->
-    <mat-select panelClass="chef-dropdown" [value]="defaultType">
+    <mat-select #li panelClass="chef-dropdown" [value]="defaultType" (selectionChange)="selectChangeHandler(li.value)">
       <mat-option *ngFor="let key of typeAvailable" [value]="key">
         {{ key }}
       </mat-option>
@@ -12,56 +12,22 @@
     <!-- combined data -->
     <div *ngIf="showbutton" class="margin">
       <form [formGroup]="userForm">
-        <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
-        </select-box>
+        <div *ngIf="defaultType=== 'available roles and recipes'">
+          <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
+          </select-box>
+        </div>
+        <div *ngIf="defaultType=== 'available roles'">      
+          <select-box id="myListBox" [list]="roles" search="true" sort="true" selectAll="true" formControlName="selected">
+          </select-box>
+        </div>
+        <div *ngIf="defaultType=== 'available recipes'">      
+          <select-box id="myListBox" [list]="recipes" search="true" sort="true" selectAll="true" formControlName="selected">
+          </select-box>
+        </div>
         <br />
         <button type="submit" (click)="submit()">Submit1</button>
       </form>
       <br />
     </div>
   </div>
-
-  <table>
-    <thead>
-      <tr class="detail-row">
-        <th class="id-column">
-          <h2>Available Roles</h2>
-        </th>
-        <th class="id-column">
-          <h2>Currents Run List</h2>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="detail-row">
-        <td class="id-column">
-          <div class="run-list-container">
-            <div cdkDropList [cdkDropListData]="roles" class="role-list" cdkDropListSortingDisabled
-              (cdkDropListDropped)="drop($event)">
-              <div class="run-list-box" *ngFor="let item of roles" cdkDrag>{{item.name}}</div>
-            </div>
-          </div>
-        </td>
-        <td class="id-column">
-          <div class="run-list-container">
-            <div cdkDropList [cdkDropListData]="drops" class="edit-list" (cdkDropListDropped)="drop($event)">
-              <div class="run-list-box" *ngFor="let item of drops" cdkDrag>{{item.name}}</div>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr class="detail-row">
-        <td class="id-column">
-          <h2>Available recipes</h2>
-          <div class="run-list-container">
-            <div cdkDropList [cdkDropListData]="recipes" class="recipes-list" cdkDropListSortingDisabled
-              (cdkDropListDropped)="drop($event)">
-              <div class="run-list-box" *ngFor="let item of recipes" cdkDrag>{{item}}</div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
 </div>

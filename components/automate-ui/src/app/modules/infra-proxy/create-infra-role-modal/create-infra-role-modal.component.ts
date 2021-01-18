@@ -164,7 +164,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       this.propagateChange = fn;
   }
 
-  private onChangeJSON(event) {
+  onChangeJSON(event) {
     this.dattrParseError = false;
     this.oattrParseError = false;
     // get value from text area
