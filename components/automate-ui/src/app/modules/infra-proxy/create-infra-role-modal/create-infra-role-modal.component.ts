@@ -32,7 +32,7 @@ import { MatStepper } from '@angular/material/stepper';
   templateUrl: './create-infra-role-modal.component.html',
   styleUrls: ['./create-infra-role-modal.component.scss']
 })
-export class CreateInfraRoleModalComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<void>;
   @Input() rolesList: InfraRole[] = [];
   @Input() serverId: string;
@@ -131,6 +131,7 @@ export class CreateInfraRoleModalComponent implements OnInit, AfterViewInit, OnD
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
           this.conflictError = true;
+          this.stepper.selectedIndex = 0;
         } else {
           this.creating = false;
           this.store.dispatch(new GetRoles({
@@ -182,10 +183,6 @@ export class CreateInfraRoleModalComponent implements OnInit, AfterViewInit, OnD
       ]
     };
     this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
-    
-    if (this.conflictError) {
-      this.stepper.selectedIndex = 0;
-    }
   }
 
   private resetCreateModal(): void {
