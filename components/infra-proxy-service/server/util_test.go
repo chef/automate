@@ -44,3 +44,28 @@ func TestSafeSliceFromMap(t *testing.T) {
 	assert.Equal(t, []string{}, SafeSliceFromMap(testData, "test3"))
 	assert.Equal(t, []string{}, SafeSliceFromMap(testData, "no-key"))
 }
+
+func TestSubstractSlice(t *testing.T) {
+	assert.Equal(t, []string{"tag2", "tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1"}))
+	assert.Equal(t, []string{"tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1", "tag2"}))
+	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"unknown"}))
+}
+
+func TestRemoveElement(t *testing.T) {
+	testData1 := []string{"tag1", "tag2", "tag3"}
+	assert.Equal(t, []string{"tag1", "tag2"}, RemoveElement(testData1, "tag3"))
+
+	testData2 := []string{"tag1", "tag2", "tag3"}
+	assert.Equal(t, testData2, RemoveElement(testData2, "unknown"))
+
+	testData3 := []string{"tag1", "tag2", "tag3"}
+	assert.Equal(t, testData3, RemoveElement(testData3, ""))
+}
+
+func TestUnique(t *testing.T) {
+	testData1 := []string{"tag1", "tag2", "tag3"}
+	assert.Equal(t, testData1, Unique(testData1))
+
+	testData2 := []string{"tag1", "tag1", "tag2", "tag3"}
+	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, Unique(testData2))
+}
