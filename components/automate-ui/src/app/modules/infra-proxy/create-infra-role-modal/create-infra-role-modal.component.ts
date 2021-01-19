@@ -7,7 +7,7 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -22,7 +22,6 @@ import {
 import { isNil } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
-import { combineLatest } from 'rxjs';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { MatStepper } from '@angular/material/stepper';
 
@@ -38,9 +37,10 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
   @Input() serverId: string;
   @Input() orgId: string;
 
+  @ViewChild('stepper') stepper: MatStepper;
+
   public visible = false;
   public creating = false;
-  
   public conflictErrorEvent = new EventEmitter<boolean>();
   public close = new EventEmitter();
   public conflictError = false;
@@ -53,8 +53,6 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
   public server: string;
   public org: string;
   public showdrag = false;
-  
-  private isDestroyed = new Subject<boolean>();
   public jsonString: string;
   public dattrParseError: boolean;
   public oattrParseError: boolean;
@@ -63,13 +61,15 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
   public default_attr_value = '{}';
   public override_attr_value = '{}';
 
+  private isDestroyed = new Subject<boolean>();
+
   basket = [];
   baskets = [];
   items: InfraRole[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>,
+    private store: Store<NgrxStateAtom>
   ) {
 
     this.firstFormGroup = this.fb.group({
@@ -81,15 +81,13 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
     });
 
     this.thirdFormGroup = this.fb.group({
-      dattr: [''],
+      dattr: ['']
     });
 
     this.fourthFormGroup = this.fb.group({
-      oattr: ['',[Validators.required]]
+      oattr: ['', [Validators.required]]
     });
   }
-
-  @ViewChild('stepper') stepper: MatStepper;
 
   ngAfterViewInit() {
     this.stepper.selectedIndex = 0;
@@ -120,7 +118,7 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
           this.closeCreateModal();
         }
       });
-  
+
     combineLatest([
       this.store.select(saveStatus),
       this.store.select(saveError)
@@ -162,9 +160,9 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
 
   dragDropHandler(count: ListItem[]) {
     this.selectedItems = [];
-    count.forEach(c =>{
+    count.forEach(c => {
       this.selectedItems.push(`${c.type}[${c.value}]`);
-    })
+    });
 
   }
 
@@ -179,7 +177,7 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
       override_attributes: JSON.parse(this.fourthFormGroup.controls['oattr'].value),
       run_list: this.selectedItems,
       env_run_lists: [
-    
+
       ]
     };
     this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
@@ -204,7 +202,7 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
     if (obj) {
       this.data = obj;
       // this will format it with 4 character spacing
-      this.jsonString = JSON.stringify(this.data, undefined, 4); 
+      this.jsonString = JSON.stringify(this.data, undefined, 4);
     }
   }
 
@@ -218,17 +216,17 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
     this.dattrParseError = false;
     this.oattrParseError = false;
     // get value from text area
-    let newValue = event.target.value;
+    const newValue = event.target.value;
     this.textareaID = event.target.id;
     try {
         // parse it to json
         this.data = JSON.parse(newValue);
-        this.textareaID == 'dattr' ? this.dattrParseError = false : '';
-        this.textareaID == 'oattr' ? this.oattrParseError = false : '';
+        this.textareaID === 'dattr' ? (this.dattrParseError = false) : '';
+        this.textareaID === 'oattr' ? (this.oattrParseError = false) : '';
     } catch (ex) {
         // set parse error if it fails
-        this.textareaID == 'dattr' ? this.dattrParseError = true : '';
-        this.textareaID == 'oattr' ? this.oattrParseError = true : '';
+        this.textareaID === 'dattr' ? (this.dattrParseError = true) : '';
+        this.textareaID === 'oattr' ? (this.oattrParseError = true) : '';
     }
     // update the form
     this.propagateChange(this.data);

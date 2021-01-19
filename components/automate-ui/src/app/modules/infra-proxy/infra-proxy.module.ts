@@ -33,7 +33,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SelectBoxModule } from './select-box/src/public_api';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatStepperModule } from '@angular/material/stepper'
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   declarations: [

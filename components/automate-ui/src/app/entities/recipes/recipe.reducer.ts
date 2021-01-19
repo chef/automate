@@ -27,16 +27,16 @@ export function recipeEntityReducer(
   switch (action.type) {
     case RecipeActionTypes.GET_ALL:
       return set(GET_ALL_STATUS, EntityStatus.loading, recipeEntityAdapter.removeAll(state));
-  
+
     case RecipeActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
         (recipeEntityAdapter.setAll(action.payload.recipes, state)) as
         RecipeEntityState;
-  
+
     case RecipeActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
-  
+
 
     default:
       return state;

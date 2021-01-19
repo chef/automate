@@ -82,7 +82,7 @@ export class InfraRoleEffects {
     ofType(RoleActionTypes.CREATE_SUCCESS),
     map(({ payload: { } }: CreateRoleSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created role.`
+      message: 'Created role.'
     })));
 
   @Effect()

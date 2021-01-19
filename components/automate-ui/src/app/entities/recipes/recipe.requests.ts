@@ -12,8 +12,10 @@ export class RecipeRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getRecipes(server_id: string, org_id: string, name: string): Observable<RecipesSuccessPayload> {
-    return this.http.get<RecipesSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}/recipes`, {headers});
+  public getRecipes(server_id: string, org_id: string, name: string): 
+    Observable<RecipesSuccessPayload> {
+      return this.http.get<RecipesSuccessPayload>(
+        `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}/recipes`,
+        {headers});
   }
 }

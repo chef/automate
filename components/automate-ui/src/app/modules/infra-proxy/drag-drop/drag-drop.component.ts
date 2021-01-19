@@ -23,7 +23,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 
 
-export interface available_Type {
+export interface AvailableType {
   name: string;
   type: 'role' | 'recipe';
 }
@@ -40,19 +40,19 @@ export class DragDropComponent implements OnInit, OnDestroy {
 
   @Output()  valueChanged: EventEmitter<ListItem[]> =   new EventEmitter();
   private isDestroyed = new Subject<boolean>();
-  public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes']
-  public defaultType = 'available roles and recipes'
-  availableType: available_Type[] = [];
+  public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes'];
+  public defaultType = 'available roles and recipes';
+  availableType: AvailableType[] = [];
   drops = [];
   recipes: string[] = [];
   userForm: FormGroup;
   public showbutton = false;
-  
+
   public selected: ListItem[] = [];
   list: string[] = [];
 
   constructor(
-    private store: Store<NgrxStateAtom>,
+    private store: Store<NgrxStateAtom>
   ) {
 
   }
@@ -90,33 +90,33 @@ export class DragDropComponent implements OnInit, OnDestroy {
   mergeArray(recipeList: string[], id: string) {
     this.showbutton = true;
     this.availableType = [];
-    if(id === 'available roles and recipes') {
+    if (id === 'available roles and recipes') {
       if (this.recipes.length > 0) {
         this.roles.forEach((role) => {
           this.availableType.push({
             name: role.name,
-            type: "role"
+            type: 'role'
           });
         });
         recipeList.forEach((recipe) => {
           this.availableType.push({
             name: recipe,
-            type: "recipe"
+            type: 'recipe'
           });
         });
       }
-    } else if(id === 'available roles') {
+    } else if (id === 'available roles') {
       this.roles.forEach((role) => {
         this.availableType.push({
           name: role.name,
-          type: "role"
+          type: 'role'
         });
       });
     } else {
       recipeList.forEach((recipe) => {
         this.availableType.push({
           name: recipe,
-          type: "recipe"
+          type: 'recipe'
         });
       });
     }

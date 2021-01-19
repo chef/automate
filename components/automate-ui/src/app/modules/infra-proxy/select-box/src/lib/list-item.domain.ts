@@ -7,5 +7,4 @@ export class ListItem {
     public value: string;
     public selected: boolean = false;
     public type: string;
-
 }

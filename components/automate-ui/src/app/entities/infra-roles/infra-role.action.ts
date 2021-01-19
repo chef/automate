@@ -11,7 +11,7 @@ export enum RoleActionTypes {
   GET_FAILURE = 'ROLES::GET::FAILURE',
   CREATE            = 'ROLES::CREATE',
   CREATE_SUCCESS    = 'ROLES::CREATE::SUCCESS',
-  CREATE_FAILURE    = 'ROLES::CREATE::FAILURE',
+  CREATE_FAILURE    = 'ROLES::CREATE::FAILURE'
 }
 
 export interface RolesSuccessPayload {
