@@ -131,13 +131,13 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
           this.conflictError = true;
           this.stepper.selectedIndex = 0;
         } else {
-          this.creating = false;
           this.store.dispatch(new GetRoles({
             server_id: this.serverId, org_id: this.orgId
           }));
           // Close the modal on any error other than conflict and display in banner.
           this.closeCreateModal();
         }
+        this.creating = false;
       });
   }
 

@@ -38,7 +38,7 @@
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!firstFormGroup?.valid">Next</button>
               <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span>Create Role</span>
+                <span *ngIf="!creating">Create Role</span>
                 <span *ngIf="creating">Creating Role...</span>
               </chef-button>
             </div>
@@ -57,7 +57,7 @@
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!secondFormGroup?.valid">Next</button>
               <chef-button [disabled]="!secondFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span>Create Role</span>
+                <span *ngIf="!creating">Create Role</span>
                 <span *ngIf="creating">Creating Role...</span>
               </chef-button>
             </div>
@@ -79,7 +79,7 @@
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!thirdFormGroup?.valid || dattrParseError">Next</button>
               <chef-button [disabled]="!thirdFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span>Create Role</span>
+                <span *ngIf="!creating">Create Role</span>
                 <span *ngIf="creating">Creating Role...</span>
               </chef-button>
             </div>
@@ -101,7 +101,7 @@
               <button chef-button mat-button matStepperNext primary class="primary" disabled>Next</button>
               <chef-button [disabled]="!fourthFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span>Create Role</span>
+                <span *ngIf="!creating">Create Role</span>
                 <span *ngIf="creating">Creating role...</span>
               </chef-button>
             </div>
