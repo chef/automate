@@ -191,6 +191,56 @@ func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*resp
 	}, nil
 }
 
+// UpdateNodeTags updates the tags
+func (s *Server) UpdateNodeTags(ctx context.Context, req *request.UpdateNodeTags) (*response.UpdateNodeTags, error) {
+	err := validation.New(validation.Options{
+		Target:  "node",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+			"Action":   []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	chefNode, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	tags := SafeSliceFromMap(chefNode.NormalAttributes, "tags")
+	switch req.Action {
+	case "add":
+		tags = Unique(append(tags, req.Tags...))
+	case "delete":
+		tags = SubstractSlice(tags, req.Tags)
+	case "set":
+		tags = req.Tags
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid node action: %s", req.Action)
+	}
+
+	chefNode.NormalAttributes["tags"] = tags
+	res, err := c.client.Nodes.Put(chefNode)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.UpdateNodeTags{
+		Tags: SafeSliceFromMap(res.NormalAttributes, "tags"),
+	}, nil
+}
+
 // fetchAffectedNodes get the nodes used by chef object
 // URL is being constructed based on the chefType, name, and version
 // chefType: should be one of the cookbooks, roles and chef_environment value

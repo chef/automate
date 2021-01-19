@@ -115,6 +115,25 @@ func (a *InfraProxyServer) UpdateNode(ctx context.Context, r *gwreq.UpdateNode) 
 	}, nil
 }
 
+// UpdateNodeTags updates the node tags
+func (a *InfraProxyServer) UpdateNodeTags(ctx context.Context, r *gwreq.UpdateNodeTags) (*gwres.UpdateNodeTags, error) {
+	req := &infra_req.UpdateNodeTags{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Action:   r.Action,
+		Tags:     r.Tags,
+	}
+	res, err := a.client.UpdateNodeTags(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.UpdateNodeTags{
+		Tags: res.GetTags(),
+	}, nil
+}
+
 func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAttribute {
 	nl := make([]*gwres.NodeAttribute, len(nodes))
 

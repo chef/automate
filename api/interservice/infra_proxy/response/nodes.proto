@@ -68,3 +68,8 @@ message Node {
     // Node override attributes JSON.
     string override_attributes = 11;
 }
+
+message UpdateNodeTags {
+    // Node tags.
+    repeated string tags = 5;
+}
