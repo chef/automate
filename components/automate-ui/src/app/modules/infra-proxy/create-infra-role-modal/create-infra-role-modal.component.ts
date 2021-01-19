@@ -2,8 +2,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  AfterViewInit,
   OnDestroy,
-  OnInit
+  OnInit,
+  ViewChild
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -11,7 +13,7 @@ import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
 import { filter, takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
-import { InfraRole, RoleAttributes } from 'app/entities/infra-roles/infra-role.model';
+import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import { CreateRole, GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import {
     saveStatus,
@@ -22,6 +24,7 @@ import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
 import { combineLatest } from 'rxjs';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
+import { MatStepper } from '@angular/material/stepper';
 
 
 @Component({
@@ -29,7 +32,7 @@ import { ListItem } from '../select-box/src/lib/list-item.domain';
   templateUrl: './create-infra-role-modal.component.html',
   styleUrls: ['./create-infra-role-modal.component.scss']
 })
-export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
+export class CreateInfraRoleModalComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() openEvent: EventEmitter<void>;
   @Input() rolesList: InfraRole[] = [];
   @Input() serverId: string;
@@ -60,7 +63,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public default_attr_value = '{}';
   public override_attr_value = '{}';
 
-
   basket = [];
   baskets = [];
   items: InfraRole[] = [];
@@ -85,6 +87,12 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.fourthFormGroup = this.fb.group({
       oattr: ['',[Validators.required]]
     });
+  }
+
+  @ViewChild('stepper') stepper: MatStepper;
+
+  ngAfterViewInit() {
+    this.stepper.selectedIndex = 0;
   }
 
   ngOnInit() {
@@ -122,6 +130,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
+          this.conflictError = true;
         } else {
           this.creating = false;
           this.store.dispatch(new GetRoles({
@@ -199,7 +208,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       name: this.firstFormGroup.controls['name'].value,
       description: this.firstFormGroup.controls['description'].value,
-      default_attributes: new RoleAttributes(this.thirdFormGroup.controls['dattr'].value),
+      default_attributes: JSON.parse(this.thirdFormGroup.controls['dattr'].value),
       override_attributes: {},
       run_list: this.selectedItems,
       env_run_lists: [
@@ -216,23 +225,27 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       name: this.firstFormGroup.controls['name'].value,
       description: this.firstFormGroup.controls['description'].value,
-      default_attributes: new RoleAttributes(this.thirdFormGroup.controls['dattr'].value),
-      override_attributes: new RoleAttributes(this.fourthFormGroup.controls['oattr'].value),
+      default_attributes: JSON.parse(this.thirdFormGroup.controls['dattr'].value),
+      override_attributes: JSON.parse(this.fourthFormGroup.controls['oattr'].value),
       run_list: this.selectedItems,
       env_run_lists: [
     
       ]
     };
     this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
+    
+    if (this.conflictError) {
+      this.stepper.selectedIndex = 0;
+    }
   }
 
   private resetCreateModal(): void {
     this.creating = false;
     this.firstFormGroup.reset();
     this.secondFormGroup.reset();
-    this.thirdFormGroup.reset();
-    this.fourthFormGroup.reset();
-
+    this.default_attr_value = '{}';
+    this.override_attr_value = '{}';
+    this.stepper.selectedIndex = 0;
     this.conflictErrorEvent.emit(false);
   }
 

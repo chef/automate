@@ -4,7 +4,7 @@ export interface InfraRole {
   chef_type?: string;
   description: string;
   json_class?: string;
-  default_attributes: Object ;
+  default_attributes: Object;
   override_attributes: Object;
   run_list?: string[];
   expanded_run_list?: ExpandedList[];
