@@ -81,11 +81,9 @@ export class DragDropComponent implements OnInit, OnDestroy {
 
   }
 
-selectChangeHandler(id: string): void {
-  this.defaultType = id;
-  console.log(this.defaultType);
-
-}
+  selectChangeHandler(id: string): void {
+    this.defaultType = id;
+  }
 
 mergeArray(reci) {
     if (this.recipes.length > 0) {

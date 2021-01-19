@@ -7,61 +7,33 @@
 }
 
 .run-list-container {
-  width: 200px;
+  display: inline-block;
   max-width: 100%;
   margin: 0 25px 0px 50;
-  display: inline-block;
   vertical-align: top;
+  width: 200px;
 }
 
 .role-list {
-  //border: solid 1px #ccc;
-  //width: 250px;
   max-height: 400px;
   min-height: 300px;
   background: white;
-  //border-radius: 4px;
-  display: block;
-  height: 100%;
-  overflow-y: scroll;
-}
-
-.recipes-list {
-  border: solid 1px #ccc;
-  width: 250px;
-  max-height: 400px;
-  min-height: 400px;
-  background: white;
-  border-radius: 4px;
-  display: block;
-  height: 100%;
-  overflow-y: scroll;
-}
-
-.edit-list {
-  border: solid 1px #ccc;
-  width: 250px;
-  max-height: 400px;
-  min-height: 400px;
-  background: white;
-  border-radius: 4px;
   display: block;
   height: 100%;
   overflow-y: scroll;
 }
 
 .run-list-box {
-  padding: 10px 10px;
-  //border-bottom: solid 1px #ccc;
+  align-items: center;
+  background: white;
+  box-sizing: border-box;
   color: rgba(0, 0, 0, 0.87);
+  cursor: move;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  background: white;
   font-size: 14px;
+  justify-content: space-between;
+  padding: 10px 10px;
 }
 
 .cdk-drag-preview {
@@ -84,10 +56,6 @@
   border: none;
 }
 
-.run-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
 .select-box {
   width: 41.5%;
 }
@@ -97,8 +65,8 @@
 }
 
 ::ng-deep .role-list::-webkit-scrollbar {
-  width: 10px;
   background-color: #F5F5F5;
+  width: 10px;
 }
 
 ::ng-deep .role-list::-webkit-scrollbar-thumb {
