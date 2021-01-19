@@ -1,13 +1,13 @@
 export interface InfraRole {
   name: string;
-  environments: string[];
-  chef_type: string;
+  environments?: string[];
+  chef_type?: string;
   description: string;
-  json_class: string;
-  default_attributes: string;
-  override_attributes: string;
-  run_list: string[];
-  expanded_run_list: ExpandedList[];
+  json_class?: string;
+  default_attributes: Object ;
+  override_attributes: Object;
+  run_list?: string[];
+  expanded_run_list?: ExpandedList[];
 }
 
 export interface ExpandedList {
@@ -45,8 +45,8 @@ export class RoleAttributes {
 }
 
 export interface RespAttributes {
-  default_attributes: string;
-  override_attributes: string;
+  default_attributes?: string;
+  override_attributes?: string;
 }
 
 export interface AllAttributes {

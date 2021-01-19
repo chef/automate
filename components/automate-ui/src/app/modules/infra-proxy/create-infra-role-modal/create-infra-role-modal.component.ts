@@ -6,11 +6,23 @@ import {
   OnInit
 } from '@angular/core';
 import { Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
-import {  takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+import { InfraRole, RoleAttributes } from 'app/entities/infra-roles/infra-role.model';
+import { CreateRole, GetRoles } from 'app/entities/infra-roles/infra-role.action';
+import {
+    saveStatus,
+    saveError
+  } from 'app/entities/infra-roles/infra-role.selectors';
+  import { isNil } from 'lodash/fp';
+  import {  EntityStatus } from 'app/entities/entities';
+  import { HttpStatus } from 'app/types/types';
+
+import { combineLatest } from 'rxjs';
+import { ListItem } from '../select-box/src/lib/list-item.domain';
 
 enum UrlTestState {
   Inactive,
@@ -40,6 +52,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public urlState = UrlTestState;
   public targetKeys: string[];
   public alertTypeKeys: string[];
+  public selectedItems: string[] = [];
 
   public isLinear = true;
   public firstFormGroup: FormGroup;
@@ -60,9 +73,11 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public oattrParseError: boolean;
   public data: any;
   public textareaID: string;
-  public default_attr_value = '{}'
+  public default_attr_value = '{}';
+  public override_attr_value = '{}';
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private store: Store<NgrxStateAtom>,
   ) {
 
     this.firstFormGroup = this.fb.group({
@@ -70,7 +85,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.secondFormGroup = this.fb.group({
-      
+
     });
     this.thirdFormGroup = this.fb.group({
       dattr: [''],
@@ -93,23 +108,45 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
 
       });
 
+
+      this.store.select(saveStatus)
+      .pipe(
+        takeUntil(this.isDestroyed),
+        filter(state => state === EntityStatus.loadingSuccess))
+        .subscribe(state => {
+          this.creating = false;
+          if (state === EntityStatus.loadingSuccess) {
+            this.store.dispatch(new GetRoles({
+              server_id: this.serverId, org_id: this.orgId
+            }));
+            this.closeCreateModal();
+          }
+        });
+  
+      combineLatest([
+        this.store.select(saveStatus),
+        this.store.select(saveError)
+      ]).pipe(
+        takeUntil(this.isDestroyed),
+        filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+        .subscribe(([_, error]) => {
+          if (error.status === HttpStatus.CONFLICT) {
+            this.conflictErrorEvent.emit(true);
+          } else {
+            this.creating = false;
+            this.store.dispatch(new GetRoles({
+              server_id: this.serverId, org_id: this.orgId
+            }));
+            // Close the modal on any error other than conflict and display in banner.
+            this.closeCreateModal();
+          }
+        });
+
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-
-  drop(event: CdkDragDrop<string[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
-    }
   }
 
   public handleInput(event: KeyboardEvent): void {
@@ -124,17 +161,82 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.visible = false;
   }
 
-  createNotification(): void {
-    this.creating = true;
-    
-    const role = {
-      id: this.createForm.controls['id'].value,
-      name: this.createForm.controls['name'].value.trim(),
-      description: this.createForm.controls['description'].value.trim(),
-      dattr: this.createForm.controls['dattr'].value.trim()
-    };
-    console.log(role);
+  dragDropHandler(count: ListItem[]) {
+    this.selectedItems = [];
+    count.forEach(c =>{
+      this.selectedItems.push(`${c.type}[${c.value}]`);
+    })
 
+  }
+
+  createRole() {
+    this.creating = true;
+    const role = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.firstFormGroup.controls['name'].value,
+      description: this.firstFormGroup.controls['description'].value,
+      default_attributes: {},
+      override_attributes: {},
+      run_list: [],
+      env_run_lists: [
+    
+      ]
+    };
+    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
+  }
+
+  createRoleSecond() {
+    this.creating = true;
+    const role = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.firstFormGroup.controls['name'].value,
+      description: this.firstFormGroup.controls['description'].value,
+      default_attributes: {},
+      override_attributes: {},
+      run_list: this.selectedItems,
+      env_run_lists: [
+    
+      ]
+    };
+    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
+  }
+
+  createRoleThird() {
+    
+
+    this.creating = true;
+    const role = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.firstFormGroup.controls['name'].value,
+      description: this.firstFormGroup.controls['description'].value,
+      default_attributes: new RoleAttributes(this.thirdFormGroup.controls['dattr'].value),
+      override_attributes: {},
+      run_list: this.selectedItems,
+      env_run_lists: [
+    
+      ]
+    };
+    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
+  }
+
+  createRoleFourth() {
+    this.creating = true;
+    const role = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.firstFormGroup.controls['name'].value,
+      description: this.firstFormGroup.controls['description'].value,
+      default_attributes: new RoleAttributes(this.thirdFormGroup.controls['dattr'].value),
+      override_attributes: new RoleAttributes(this.fourthFormGroup.controls['oattr'].value),
+      run_list: this.selectedItems,
+      env_run_lists: [
+    
+      ]
+    };
+    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
   }
 
   private resetCreateModal(): void {
@@ -142,6 +244,9 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.creating = false;
     this.firstFormGroup.reset();
     this.secondFormGroup.reset();
+    this.thirdFormGroup.reset();
+    this.fourthFormGroup.reset();
+
     this.conflictErrorEvent.emit(false);
   }
 

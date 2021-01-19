@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, forwardRef } from '@angular/core';
+import { Component, OnInit, Input, forwardRef, EventEmitter, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListFilterPipe } from './list-filter.pipe';
 import { ListItem } from './list-item.domain';
@@ -42,10 +42,11 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
 
   /* selected items that will be passed back to form control */
   @Input('value') selectedList: string[] = [];
+  @Output() selectedValues: EventEmitter<ListItem[]> =   new EventEmitter();
 
   ngOnInit() {
     this.list.forEach(element => {
-      this.originalItems.push(new ListItem(element.name));
+      this.originalItems.push(new ListItem(element.name, 'role'));
     });
 
     if (this.selectedList != null && this.selectedList != []) {
@@ -97,20 +98,17 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
       }
     }
     this.onChange(this.value);
+    this.selectedValues.emit(this.selectedItems);
   }
 
   ascItems(){
-    console.log(this.selectedItems);
-
     this.selectedItems.sort((a, b) => (a.value > b.value) ? 1 : -1);
-    console.log(this.selectedItems);
+    this.selectedValues.emit(this.selectedItems);
   }
 
   descItems(){
-    console.log(this.selectedItems);
-
     this.selectedItems.sort((a, b) => (a.value < b.value) ? 1 : -1);
-    console.log(this.selectedItems);
+    this.selectedValues.emit(this.selectedItems);
   }
 
   /*This method handles the drag event onto selected list on the right */
@@ -185,7 +183,7 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
         //Add to items selected items working list
         this.selectedList.forEach(
           element => {
-            const item: ListItem = new ListItem(element);
+            const item: ListItem = new ListItem(element, 'role');
             this.selectedItems.push(item);
           }
         );
@@ -212,7 +210,7 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
     this.setSelectedValues(value);
     this.onChange(this.value);
   }
-  
+
   registerOnChange(fn: (val: string[]) => void): void {
     this.onChange = fn;
   }

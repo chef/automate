@@ -8,23 +8,23 @@
     </mat-select>
   </div>
 
-  <!-- combined data -->
-  <div *ngIf="showbutton" class="margin">
-    <form [formGroup]="userForm">
-      <div *ngIf="defaultType === 'available roles and recipes'">
-        <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected">
-        </select-box>
-      </div>
-      <div *ngIf="defaultType === 'available roles'">      
-        <select-box id="myListBox" [list]="roles" search="true" sort="true" selectAll="true" formControlName="selected">
-        </select-box>
-      </div>
-      <div *ngIf="defaultType === 'available recipes'">      
-        <select-box id="myListBox" [list]="recipes" search="true" sort="true" selectAll="true" formControlName="selected">
-        </select-box>
-      </div>
+    <!-- combined data -->
+    <div *ngIf="showbutton" class="margin">
+      <form [formGroup]="userForm">
+        <div *ngIf="defaultType === 'available roles and recipes'">
+          <select-box id="myListBox" [list]="merge" search="true" sort="true" selectAll="true" formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+          </select-box>
+        </div>
+        <div *ngIf="defaultType === 'available roles'">      
+          <select-box id="myListBox" [list]="roles" search="true" sort="true" selectAll="true" formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+          </select-box>
+        </div>
+        <div *ngIf="defaultType === 'available recipes'">      
+          <select-box id="myListBox" [list]="recipes" search="true" sort="true" selectAll="true" formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+          </select-box>
+        </div>
+        <br />
+      </form>
       <br />
-    </form>
-    <br />
+    </div>
   </div>
-</div>

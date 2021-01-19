@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { InfraRole, ExpandedList } from './infra-role.model';
+import { InfraRole } from './infra-role.model';
 
 export enum RoleActionTypes {
   GET_ALL = 'ROLES::GET_ALL',
@@ -16,6 +16,10 @@ export enum RoleActionTypes {
 
 export interface RolesSuccessPayload {
   roles: InfraRole[];
+}
+
+export interface RoleSuccessPayload {
+  role: InfraRole;
 }
 
 export class GetRoles implements Action {
@@ -49,16 +53,14 @@ export class GetRoleFailure implements Action {
 }
 
 export interface CreateRolePayload {
-  id: string;
+  org_id: string;
+  server_id: string;
   name: string;
-  environments: string[];
-  chef_type: string;
   description: string;
-  json_class: string;
-  default_attributes: string;
-  override_attributes: string;
+  default_attributes: Object ;
+  override_attributes: Object ;
   run_list: string[];
-  expanded_run_list: ExpandedList[];
+  env_run_lists: Object;
 }
 
 export class CreateRole implements Action {

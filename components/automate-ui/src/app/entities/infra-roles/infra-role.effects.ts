@@ -21,7 +21,7 @@ import {
   GetRoleFailure
 } from './infra-role.action';
 
-import { InfraRoleRequests } from './infra-role.requests';
+import { InfraRoleRequests, RoleResponse } from './infra-role.requests';
 
 @Injectable()
 export class InfraRoleEffects {
@@ -73,16 +73,16 @@ export class InfraRoleEffects {
     ofType(RoleActionTypes.CREATE),
     mergeMap(({ payload: { server_id, org_id, role } }: CreateRole) =>
       this.requests.createRole(server_id, org_id, role).pipe(
-        map((resp) => new CreateRoleSuccess(resp)),
+        map((resp: RoleResponse) => new CreateRoleSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateRoleFailure(error))))));
 
   @Effect()
   createRoleSuccess$ = this.actions$.pipe(
     ofType(RoleActionTypes.CREATE_SUCCESS),
-    map(({ payload }: CreateRoleSuccess) => new CreateNotification({
+    map(({ payload: { } }: CreateRoleSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created notification ${payload.name}.`
+      message: `Created role.`
     })));
 
   @Effect()

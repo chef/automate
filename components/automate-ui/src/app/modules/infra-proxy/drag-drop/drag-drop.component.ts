@@ -2,7 +2,9 @@ import {
   Component,
   Input,
   OnDestroy,
-  OnInit
+  OnInit,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { isNil } from 'lodash/fp';
@@ -18,6 +20,7 @@ import {
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FormGroup, FormControl } from '@angular/forms';
+import { ListItem } from '../select-box/src/lib/list-item.domain';
 
 
 export interface Merge {
@@ -35,6 +38,7 @@ export class DragDropComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
 
+  @Output()  valueChanged: EventEmitter<ListItem[]> =   new EventEmitter();
   private isDestroyed = new Subject<boolean>();
   public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes']
   public defaultType = 'available roles and recipes'
@@ -43,7 +47,8 @@ export class DragDropComponent implements OnInit, OnDestroy {
   recipes: string[] = [];
   userForm: FormGroup;
   public showbutton = false;
-
+  
+  public selected: ListItem[] = [];
   list: string[] = [];
 
   constructor(
@@ -76,13 +81,13 @@ export class DragDropComponent implements OnInit, OnDestroy {
 
   }
 
-  selectChangeHandler(id: string): void {
-    this.defaultType = id;
-    console.log(this.defaultType);
+selectChangeHandler(id: string): void {
+  this.defaultType = id;
+  console.log(this.defaultType);
 
-  }
+}
 
-  mergeArray(reci) {
+mergeArray(reci) {
     if (this.recipes.length > 0) {
       this.roles.forEach((role) => {
         this.merge.push({
@@ -98,6 +103,11 @@ export class DragDropComponent implements OnInit, OnDestroy {
       });
       this.showbutton = true;
     }
+  }
+
+  selectedItemsHandler(value: ListItem[]) {
+    this.selected = value;
+    this.valueChanged.emit(this.selected);
   }
 
   drop(event: CdkDragDrop<string[]>) {

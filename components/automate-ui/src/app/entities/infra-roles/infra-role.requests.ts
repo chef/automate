@@ -6,6 +6,10 @@ import { RolesSuccessPayload } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
+export interface RoleResponse {
+  role: InfraRole;
+}
+
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
 @Injectable()
@@ -24,9 +28,9 @@ export class InfraRoleRequests {
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`, {headers});
   }
 
-  public createRole(server_id: string, org_id: string, role: InfraRole): Observable<InfraRole> {
+  public createRole(server_id: string, org_id: string, role: InfraRole): Observable<RoleResponse> {
 
-    return this.http.post<InfraRole>(
+    return this.http.post<RoleResponse>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles`, role);
   }
 }
