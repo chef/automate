@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, forwardRef, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, forwardRef, EventEmitter, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListFilterPipe } from './list-filter.pipe';
 import { ListItem } from './list-item.domain';
@@ -15,7 +15,7 @@ export const SELECT_BOX_ACCESSOR: any = {
   styleUrls: ['./select-box.component.scss'],
   providers: [SELECT_BOX_ACCESSOR, ListFilterPipe]
 })
-export class SelectBoxComponent implements OnInit, ControlValueAccessor {
+export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChanges {
   constructor() { }
 
   /* paramter used to pass in the list items*/
@@ -53,6 +53,17 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor {
       this.setSelectedValues(this.selectedList);
       this.onChange(this.value);
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.originalItems = [];
+    if(changes.list.currentValue) {
+      this.list?.forEach(element => {
+          this.originalItems.push(new ListItem(element.name, element.type));
+        });    
+      } else if (changes.list.currentValue.length >0 ) {
+        this.originalItems = changes.list.currentValue;
+      }
   }
 
   /* This method returns the selected items on the original list on left side*/

@@ -23,7 +23,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 
 
-export interface Merge {
+export interface available_Type {
   name: string;
   type: 'role' | 'recipe';
 }
@@ -42,7 +42,7 @@ export class DragDropComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes']
   public defaultType = 'available roles and recipes'
-  merge: Merge[] = [];
+  availableType: available_Type[] = [];
   drops = [];
   recipes: string[] = [];
   userForm: FormGroup;
@@ -69,7 +69,7 @@ export class DragDropComponent implements OnInit, OnDestroy {
       .subscribe(([getRecipesSt, allRecipesState]) => {
         if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
           this.recipes = allRecipesState;
-          this.mergeArray(this.recipes);
+          this.mergeArray(this.recipes, this.defaultType);
         }
       });
 
@@ -83,26 +83,44 @@ export class DragDropComponent implements OnInit, OnDestroy {
 
   selectChangeHandler(id: string): void {
     this.defaultType = id;
+    this.mergeArray(this.recipes, this.defaultType);
+
   }
 
-mergeArray(reci) {
-    if (this.recipes.length > 0) {
+  mergeArray(recipeList: string[], id: string) {
+    this.showbutton = true;
+    this.availableType = [];
+    if(id === 'available roles and recipes') {
+      if (this.recipes.length > 0) {
+        this.roles.forEach((role) => {
+          this.availableType.push({
+            name: role.name,
+            type: "role"
+          });
+        });
+        recipeList.forEach((recipe) => {
+          this.availableType.push({
+            name: recipe,
+            type: "recipe"
+          });
+        });
+      }
+    } else if(id === 'available roles') {
       this.roles.forEach((role) => {
-        this.merge.push({
+        this.availableType.push({
           name: role.name,
           type: "role"
         });
       });
-      reci.forEach((recipe) => {
-        this.merge.push({
+    } else {
+      recipeList.forEach((recipe) => {
+        this.availableType.push({
           name: recipe,
           type: "recipe"
         });
       });
-      this.showbutton = true;
     }
-  }
-
+    }
   selectedItemsHandler(value: ListItem[]) {
     this.selected = value;
     this.valueChanged.emit(this.selected);
