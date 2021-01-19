@@ -34,7 +34,7 @@
             </div>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <button chef-button mat-button matStepperPrevious primary class="primary" disabled>Privious</button>
+              <button chef-button mat-button matStepperPrevious primary class="primary" disabled>Previous</button>
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!firstFormGroup?.valid">Next</button>
               <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
@@ -53,9 +53,9 @@
   
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <button chef-button mat-button matStepperPrevious primary class="primary">Privious</button>
+              <button chef-button mat-button matStepperPrevious primary class="primary">Previous</button>
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!secondFormGroup?.valid">Next</button>
-              <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRoleSecond()">
+              <chef-button [disabled]="!secondFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span>Create Role</span>
                 <span *ngIf="creating">Creating Role...</span>
@@ -75,9 +75,9 @@
           </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="dattrParseError">Privious</button>
+              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="dattrParseError">Previous</button>
               <button chef-button mat-button matStepperNext primary class="primary" [disabled]="!thirdFormGroup?.valid || dattrParseError">Next</button>
-              <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRoleThird()">
+              <chef-button [disabled]="!thirdFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span>Create Role</span>
                 <span *ngIf="creating">Creating Role...</span>
@@ -97,9 +97,9 @@
               </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="oattrParseError">Privious</button>
+              <button chef-button mat-button matStepperPrevious primary class="primary" [disabled]="oattrParseError">Previous</button>
               <button chef-button mat-button matStepperNext primary class="primary" disabled>Next</button>
-              <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRoleFourth()">
+              <chef-button [disabled]="!fourthFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span>Create Role</span>
                 <span *ngIf="creating">Creating role...</span>

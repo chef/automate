@@ -174,57 +174,6 @@ export class CreateInfraRoleModalComponent implements OnInit, AfterViewInit, OnD
       server_id: this.serverId,
       name: this.firstFormGroup.controls['name'].value,
       description: this.firstFormGroup.controls['description'].value,
-      default_attributes: {},
-      override_attributes: {},
-      run_list: [],
-      env_run_lists: [
-    
-      ]
-    };
-    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
-  }
-
-  createRoleSecond() {
-    this.creating = true;
-    const role = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.firstFormGroup.controls['name'].value,
-      description: this.firstFormGroup.controls['description'].value,
-      default_attributes: {},
-      override_attributes: {},
-      run_list: this.selectedItems,
-      env_run_lists: [
-    
-      ]
-    };
-    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
-  }
-
-  createRoleThird() {
-    this.creating = true;
-    const role = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.firstFormGroup.controls['name'].value,
-      description: this.firstFormGroup.controls['description'].value,
-      default_attributes: JSON.parse(this.thirdFormGroup.controls['dattr'].value),
-      override_attributes: {},
-      run_list: this.selectedItems,
-      env_run_lists: [
-    
-      ]
-    };
-    this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
-  }
-
-  createRoleFourth() {
-    this.creating = true;
-    const role = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.firstFormGroup.controls['name'].value,
-      description: this.firstFormGroup.controls['description'].value,
       default_attributes: JSON.parse(this.thirdFormGroup.controls['dattr'].value),
       override_attributes: JSON.parse(this.fourthFormGroup.controls['oattr'].value),
       run_list: this.selectedItems,
