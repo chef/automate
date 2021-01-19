@@ -16,20 +16,13 @@ import { CreateRole, GetRoles } from 'app/entities/infra-roles/infra-role.action
 import {
     saveStatus,
     saveError
-  } from 'app/entities/infra-roles/infra-role.selectors';
-  import { isNil } from 'lodash/fp';
-  import {  EntityStatus } from 'app/entities/entities';
-  import { HttpStatus } from 'app/types/types';
-
+} from 'app/entities/infra-roles/infra-role.selectors';
+import { isNil } from 'lodash/fp';
+import { EntityStatus } from 'app/entities/entities';
+import { HttpStatus } from 'app/types/types';
 import { combineLatest } from 'rxjs';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 
-enum UrlTestState {
-  Inactive,
-  Loading,
-  Success,
-  Failure
-}
 
 @Component({
   selector: 'app-create-infra-role-modal',
@@ -41,32 +34,23 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   @Input() rolesList: InfraRole[] = [];
   @Input() serverId: string;
   @Input() orgId: string;
+
   public visible = false;
   public creating = false;
-  public sending = false;
+  
   public conflictErrorEvent = new EventEmitter<boolean>();
   public close = new EventEmitter();
-  public createForm: FormGroup;
-  public hookStatus = UrlTestState.Inactive;
   public conflictError = false;
-  public urlState = UrlTestState;
-  public targetKeys: string[];
-  public alertTypeKeys: string[];
   public selectedItems: string[] = [];
-
   public isLinear = true;
   public firstFormGroup: FormGroup;
   public secondFormGroup: FormGroup;
   public thirdFormGroup: FormGroup;
   public fourthFormGroup: FormGroup;
-
-  basket = [];
-
-  baskets = [];
   public server: string;
   public org: string;
   public showdrag = false;
-  items: InfraRole[] = [];
+  
   private isDestroyed = new Subject<boolean>();
   public jsonString: string;
   public dattrParseError: boolean;
@@ -75,6 +59,12 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public textareaID: string;
   public default_attr_value = '{}';
   public override_attr_value = '{}';
+
+
+  basket = [];
+  baskets = [];
+  items: InfraRole[] = [];
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -87,9 +77,11 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.secondFormGroup = this.fb.group({
 
     });
+
     this.thirdFormGroup = this.fb.group({
       dattr: [''],
     });
+
     this.fourthFormGroup = this.fb.group({
       oattr: ['',[Validators.required]]
     });
@@ -98,50 +90,47 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.conflictError = false;
-        this.visible = true;
-        this.items = this.rolesList;
-
+      this.conflictError = false;
+      this.visible = true;
+      this.items = this.rolesList;
       this.showdrag = true;
       this.server = this.serverId;
       this.org = this.orgId;
+    });
 
+
+    this.store.select(saveStatus)
+    .pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => state === EntityStatus.loadingSuccess))
+      .subscribe(state => {
+        this.creating = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.store.dispatch(new GetRoles({
+            server_id: this.serverId, org_id: this.orgId
+          }));
+          this.closeCreateModal();
+        }
       });
-
-
-      this.store.select(saveStatus)
-      .pipe(
-        takeUntil(this.isDestroyed),
-        filter(state => state === EntityStatus.loadingSuccess))
-        .subscribe(state => {
-          this.creating = false;
-          if (state === EntityStatus.loadingSuccess) {
-            this.store.dispatch(new GetRoles({
-              server_id: this.serverId, org_id: this.orgId
-            }));
-            this.closeCreateModal();
-          }
-        });
   
-      combineLatest([
-        this.store.select(saveStatus),
-        this.store.select(saveError)
-      ]).pipe(
-        takeUntil(this.isDestroyed),
-        filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-        .subscribe(([_, error]) => {
-          if (error.status === HttpStatus.CONFLICT) {
-            this.conflictErrorEvent.emit(true);
-          } else {
-            this.creating = false;
-            this.store.dispatch(new GetRoles({
-              server_id: this.serverId, org_id: this.orgId
-            }));
-            // Close the modal on any error other than conflict and display in banner.
-            this.closeCreateModal();
-          }
-        });
-
+    combineLatest([
+      this.store.select(saveStatus),
+      this.store.select(saveError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          this.creating = false;
+          this.store.dispatch(new GetRoles({
+            server_id: this.serverId, org_id: this.orgId
+          }));
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -204,8 +193,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   }
 
   createRoleThird() {
-    
-
     this.creating = true;
     const role = {
       org_id: this.orgId,
@@ -240,7 +227,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   }
 
   private resetCreateModal(): void {
-    this.hookStatus = UrlTestState.Inactive;
     this.creating = false;
     this.firstFormGroup.reset();
     this.secondFormGroup.reset();
@@ -257,16 +243,16 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   // this is the initial value set to the component
   public writeValue(obj: any) {
     if (obj) {
-        this.data = obj;
-        // this will format it with 4 character spacing
-        this.jsonString = JSON.stringify(this.data, undefined, 4); 
+      this.data = obj;
+      // this will format it with 4 character spacing
+      this.jsonString = JSON.stringify(this.data, undefined, 4); 
     }
   }
 
   // registers 'fn' that will be fired wheb changes are made
   // this is how we emit the changes back to the form
   public registerOnChange(fn: any) {
-      this.propagateChange = fn;
+    this.propagateChange = fn;
   }
 
   public onChangeJSON(event) {
