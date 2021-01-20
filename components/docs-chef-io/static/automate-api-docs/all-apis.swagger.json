@@ -4695,51 +4695,6 @@
         }
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes": {
-      "get": {
-        "tags": [
-          "InfraProxy"
-        ],
-        "operationId": "InfraProxy_GetEnvironmentRecipes",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Chef Infra Server ID.",
-            "name": "server_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Chef organization ID.",
-            "name": "org_id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "Environment name.",
-            "name": "name",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentRecipesList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
         "tags": [
