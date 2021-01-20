@@ -3,10 +3,11 @@
 chef-modal {
 
   [slot=title] {
-    text-align: center;
+    text-align: left;
     font-weight: bold;
-    margin-top: 1em;
+    margin-top: 2em;
     padding-bottom: 12px;
+    margin-left: 1em;
   }
 
   .flex-container {
@@ -38,7 +39,7 @@ chef-modal {
     }
 
     .button-bar-box {
-      text-align: center;
+      text-align: right;
 
       chef-loading-spinner {
         position: relative;
