@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
 import { SelectBoxComponent } from './select-box.component';
@@ -7,7 +7,7 @@ describe('SelectBoxComponent', () => {
   let component: SelectBoxComponent;
   let fixture: ComponentFixture<SelectBoxComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),

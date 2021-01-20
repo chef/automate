@@ -5,6 +5,6 @@ export class ListItem {
         this.type = type;
     }
     public value: string;
-    public selected: boolean = false;
+    public selected: boolean;
     public type: string;
 }

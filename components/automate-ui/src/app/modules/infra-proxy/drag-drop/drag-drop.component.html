@@ -11,8 +11,8 @@
     <!-- combined data -->
     <div *ngIf="showbutton" class="margin">
       <form [formGroup]="userForm">
-        <select-box id="myListBox" [list]="availableType" search="true" sort="true" selectAll="true" formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
-        </select-box>
+        <app-select-box id="myListBox" [list]="availableType" search="true" sort="true" selectAll="true" formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+        </app-select-box>
         <br />
       </form>
       <br />

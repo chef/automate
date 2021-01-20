@@ -221,12 +221,12 @@ export class CreateInfraRoleModalComponent implements AfterViewInit, OnInit, OnD
     try {
         // parse it to json
         this.data = JSON.parse(newValue);
-        this.textareaID === 'dattr' ? (this.dattrParseError = false) : '';
-        this.textareaID === 'oattr' ? (this.oattrParseError = false) : '';
+      this.textareaID === 'dattr' ? (this.dattrParseError = false) : '';
+      this.textareaID === 'oattr' ? (this.oattrParseError = false) : '';
     } catch (ex) {
         // set parse error if it fails
-        this.textareaID === 'dattr' ? (this.dattrParseError = true) : '';
-        this.textareaID === 'oattr' ? (this.oattrParseError = true) : '';
+      this.textareaID === 'dattr' ? (this.dattrParseError = true) : '';
+      this.textareaID === 'oattr' ? (this.oattrParseError = true) : '';
     }
     // update the form
     this.propagateChange(this.data);
