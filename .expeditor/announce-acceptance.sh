@@ -21,5 +21,4 @@ Next steps:
 (3) Perform general acceptance testing: https://a2-acceptance.cd.chef.co/.
 EOF
 
-echo $message
-# post_slack_message "a2-release-coordinate" "$message"
+post_slack_message "a2-release-coordinate" "$message"
