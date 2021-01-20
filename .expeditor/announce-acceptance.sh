@@ -6,9 +6,8 @@ current_date=$(git log -1 --pretty=%cI "$(git rev-list --ancestry-path "$current
 
 # Get the date of the latest acceptance sha and add one second to it, otherwise it does not appear in the list!
 acceptance_sha=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha');
-# TODO: need recipe to add one second to acceptance_date for linux. This works on macOS:
-acceptance_date_tmp=$(git log -1 --pretty=%cI $acceptance_sha | sed -e 's/T/ /' -e 's/-..:..//')
-acceptance_date=$(date -j -v '+1S'  -f '%Y-%m-%d %H:%M:%S' "$acceptance_date_tmp"  '+%Y-%m-%dT%H:%M:%S%z')
+acceptance_date_tmp=$(git log -1 --pretty=%cI "$acceptance_sha")
+acceptance_date=$(date -d "$acceptance_date_tmp + 1 second" '+%Y-%m-%dT%H:%M:%S%z')
 
 read -r -d '' message <<EOF
 <!here> Automate has been promoted from \`dev\` to \`acceptance\` :successful:
