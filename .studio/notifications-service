@@ -105,10 +105,8 @@ document "notifications_update_component" <<DOC
   Warning: this does not work for new files. If you create a new file run rebuild components/notifications-service
 DOC
 function notifications_update_component() {
-  component_path=$(hab pkg path "$HAB_ORIGIN"/notifications-service 2> /dev/null)
-  if [[ $? -ne 0 ]]; then
-    component_path=$(hab pkg path chef/notifications-service 2> /dev/null)
-    if [[ $? -ne 0 ]]; then
+  if ! component_path=$(hab pkg path "$HAB_ORIGIN"/notifications-service 2> /dev/null); then 
+    if ! component_path=$(hab pkg path chef/notifications-service 2> /dev/null); then
       error "Could not find notifications-service deployed under either your origin ($HAB_ORIGIN) or chef origin."
       error "Deploy A2 and try again."
       return 1
@@ -117,12 +115,12 @@ function notifications_update_component() {
 
   elixir_install
 
-  pushd /src/components/notifications-service/server >/dev/null
+  pushd /src/components/notifications-service/server >/dev/null || return 1
     mix local.hex --force
     mix local.rebar --force
     MIX_ENV=habitat mix "do" deps.get, compile
     returnStatus=$?
-  popd >/dev/null
+  popd >/dev/null || return 1
 
   if [[ $returnStatus == 0 ]]; then
     log_line "reload the notifications-service binary."
