@@ -411,8 +411,8 @@ func init() {
 					return m.ServerId
 				case "name":
 					return m.Name
-				case "key_name":
-					return m.KeyName
+				case "key":
+					return m.Key
 				default:
 					return ""
 				}

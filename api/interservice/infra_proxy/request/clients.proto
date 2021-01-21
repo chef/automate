@@ -40,5 +40,5 @@ message ClientKey {
     // Client name.
     string name = 3;
     // Client key name.
-    string key_name = 4;
+    string key = 4;
 }

@@ -1946,7 +1946,7 @@ func init() {
           "type": "string",
           "description": "Client name."
         },
-        "key_name": {
+        "key": {
           "type": "string",
           "description": "Client key name."
         }
@@ -2434,6 +2434,27 @@ func init() {
         "chef_type": {
           "type": "string",
           "description": "Chef object type."
+        },
+        "client_key": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientAccessKey",
+          "description": "Client key detail."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ClientAccessKey": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Client key name."
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Client public key."
+        },
+        "expiration_date": {
+          "type": "string",
+          "description": "Client key expiration date string."
         }
       }
     },

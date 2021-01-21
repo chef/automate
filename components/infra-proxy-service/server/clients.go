@@ -50,6 +50,18 @@ func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.
 		return nil, ParseAPIError(err)
 	}
 
+	// Fetch associated default client key detail
+	// Ignore if any error while fetching this.
+	var clientKey response.ClientAccessKey
+	chefKey, err := c.client.Clients.GetKey(req.Name, "default")
+	if err == nil {
+		clientKey = response.ClientAccessKey{
+			Name:           chefKey.Name,
+			ExpirationDate: chefKey.ExpirationDate,
+			PublicKey:      chefKey.PublicKey,
+		}
+	}
+
 	return &response.Client{
 		Name:       ic.Name,
 		ClientName: ic.ClientName,
@@ -57,6 +69,7 @@ func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.
 		Validator:  ic.Validator,
 		JsonClass:  ic.JsonClass,
 		ChefType:   ic.ChefType,
+		ClientKey:  &clientKey,
 	}, nil
 
 }
@@ -152,7 +165,7 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 		return nil, err
 	}
 
-	key := req.KeyName
+	key := req.Key
 
 	if key == "" {
 		key = "default"

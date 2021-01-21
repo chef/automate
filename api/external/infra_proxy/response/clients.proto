@@ -26,6 +26,8 @@ message Client {
 	string json_class = 5;
 	// Chef object type.
 	string chef_type = 6;
+	// Client key detail.
+	ClientAccessKey client_key = 7;
 }
 
 message CreateClient {

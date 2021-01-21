@@ -44,6 +44,11 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 		Validator:  res.GetValidator(),
 		JsonClass:  res.GetJsonClass(),
 		ChefType:   res.GetChefType(),
+		ClientKey: &gwres.ClientAccessKey{
+			Name:           res.GetClientKey().GetName(),
+			ExpirationDate: res.GetClientKey().GetExpirationDate(),
+			PublicKey:      res.GetClientKey().GetPublicKey(),
+		},
 	}, nil
 }
 
@@ -95,7 +100,7 @@ func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKe
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
 		Name:     r.Name,
-		KeyName:  r.KeyName,
+		Key:      r.Key,
 	}
 	res, err := a.client.ResetClientKey(ctx, req)
 	if err != nil {
