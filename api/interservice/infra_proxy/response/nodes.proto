@@ -75,3 +75,10 @@ message UpdateNodeEnvironment {
     // Node environment name.
     string environment = 2;
 }
+
+message UpdateNodeAttributes {
+    // Node name.
+    string name = 1;
+    // Node attributes JSON.
+    string attributes = 2;
+}

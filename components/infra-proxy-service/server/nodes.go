@@ -229,7 +229,6 @@ func (s *Server) UpdateNodeEnvironment(ctx context.Context, req *request.UpdateN
 		Request:         *req,
 		RequiredDefault: true,
 	}).Validate()
-
 	if err != nil {
 		return nil, err
 	}
@@ -253,6 +252,54 @@ func (s *Server) UpdateNodeEnvironment(ctx context.Context, req *request.UpdateN
 	return &response.UpdateNodeEnvironment{
 		Name:        res.Name,
 		Environment: res.Environment,
+	}, nil
+
+}
+
+// UpdateNodeAttributes update the node attributes
+func (s *Server) UpdateNodeAttributes(ctx context.Context, req *request.UpdateNodeAttributes) (*response.UpdateNodeAttributes, error) {
+	err := validation.New(validation.Options{
+		Target:  "node",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	attributes, err := StructToJSON(req.Attributes)
+	if err != nil {
+		return nil, err
+	}
+
+	chefNode, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	chefNode.NormalAttributes = attributes.(map[string]interface{})
+	res, err := c.client.Nodes.Put(chefNode)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	resAttributes, err := json.Marshal(res.NormalAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.UpdateNodeAttributes{
+		Name:       req.Name,
+		Attributes: string(resAttributes),
 	}, nil
 }
 

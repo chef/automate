@@ -266,6 +266,12 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
+  rpc UpdateNodeAttributes (infra_proxy.request.UpdateNodeAttributes) returns (infra_proxy.response.UpdateNodeAttributes) {
+    option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+  };
   rpc GetNode (infra_proxy.request.Node) returns (infra_proxy.response.Node) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";

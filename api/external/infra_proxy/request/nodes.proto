@@ -82,3 +82,14 @@ message UpdateNodeEnvironment {
     // Node environment name.
     string environment = 4;
 }
+
+message UpdateNodeAttributes {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Node name.
+    string name = 3;
+    // Node attributes JSON.
+    google.protobuf.Struct attributes = 4;
+}
