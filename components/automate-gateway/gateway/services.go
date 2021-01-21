@@ -679,14 +679,18 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 	//we will be retrieving an array of objects and since we will be getting them one at a time, we need to provide the
 	//opening and closing elements to close for when we are dealing with json or xml (the close will happen on EOF, below)
 	//csv has no wrapping element so there is no element to prepend or append for csv type
-	if queryType == "json" {
-		_, err := w.Write([]byte("["))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else if queryType == "xml" {
-		_, err := w.Write([]byte(fmt.Sprintf("<%s>\n", wrapper)))
+	var openBracket string
+	var closeBracket string
+	switch queryType {
+	case "json":
+		openBracket = "["
+		closeBracket = "]"
+	case "xml":
+		openBracket = fmt.Sprintf("<%s>\n", wrapper)
+		closeBracket = fmt.Sprintf("\n</%s>", wrapper)
+	}
+	if len(openBracket) == 0 {
+		_, err := w.Write([]byte(openBracket))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -695,14 +699,8 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 	for {
 		data, err := stream.Recv()
 		if err == io.EOF {
-			if queryType == "json" {
-				_, err = w.Write([]byte("]"))
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-			} else if queryType == "xml" {
-				_, err := w.Write([]byte(fmt.Sprintf("\n</%s>", wrapper)))
+			if len(closeBracket) == 0 {
+				_, err = w.Write([]byte(closeBracket))
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
