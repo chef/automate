@@ -7,7 +7,7 @@ import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import {  GetRoles } from 'app/entities/infra-roles/infra-role.action';
+import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
@@ -25,7 +25,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed = new Subject<boolean>();
+
   public roles: InfraRole[] = [];
   public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
@@ -35,6 +35,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public page = 1;
   public per_page = 9;
   public total: number;
+
+  public roleToDelete: InfraRole;
+  public deleteModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -69,9 +73,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.rolesListLoading = false;
         this.searching = false;
       }
-
     });
-
   }
 
   searchRoles(currentText: string) {
@@ -107,5 +109,19 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public startRoleDelete(role: InfraRole): void {
+    this.roleToDelete = role;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteRole(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteRole(this.roleToDelete));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 }

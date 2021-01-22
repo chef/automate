@@ -3,6 +3,9 @@ import { Action } from '@ngrx/store';
 import { InfraRole } from './infra-role.model';
 
 export enum RoleActionTypes {
+  DELETE          = 'ROLES::DELETE',
+  DELETE_SUCCESS  = 'ROLES::DELETE::SUCCESS',
+  DELETE_FAILURE  = 'ROLES::DELETE::FAILURE',
   GET_ALL = 'ROLES::GET_ALL',
   GET_ALL_SUCCESS = 'ROLES::GET_ALL::SUCCESS',
   GET_ALL_FAILURE = 'ROLES::GET_ALL::FAILURE',
@@ -24,6 +27,20 @@ export interface RolesPayload {
   per_page: number;
 }
 
+export class DeleteRole implements Action {
+  readonly type = RoleActionTypes.DELETE;
+  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
+}
+
+export class DeleteRoleSuccess implements Action {
+  readonly type = RoleActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { name: string }) { }
+}
+
+export class DeleteRoleFailure implements Action {
+  readonly type = RoleActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
 
 export class GetRoles implements Action {
   readonly type = RoleActionTypes.GET_ALL;
@@ -56,6 +73,9 @@ export class GetRoleFailure implements Action {
 }
 
 export type RoleActions =
+  | DeleteRole
+  | DeleteRoleSuccess
+  | DeleteRoleFailure
   | GetRoles
   | GetRolesSuccess
   | GetRolesFailure

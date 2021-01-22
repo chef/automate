@@ -14,7 +14,10 @@ import {
   RoleActionTypes,
   GetRole,
   GetRoleSuccess,
-  GetRoleFailure
+  GetRoleFailure,
+  DeleteRole,
+  DeleteRoleSuccess,
+  DeleteRoleFailure
 } from './infra-role.action';
 
 import { InfraRoleRequests } from './infra-role.requests';
@@ -64,5 +67,34 @@ export class InfraRoleEffects {
       });
     }));
 
+  @Effect()
+  deleteRole$ = this.actions$.pipe(
+    ofType(RoleActionTypes.DELETE),
+    mergeMap(({ payload: { server_id, org_id, name } }: DeleteRole) =>
+      this.requests.deleteRole(server_id, org_id, name).pipe(
+        map(() => new DeleteRoleSuccess({ name })),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteRoleFailure(error))))));
+
+  @Effect()
+  deleteRoleSuccess$ = this.actions$.pipe(
+      ofType(RoleActionTypes.DELETE_SUCCESS),
+      map(({ payload: { name } }: DeleteRoleSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Deleted role ${name}.`
+        });
+      }));
+
+  @Effect()
+  deleteRoleFailure$ = this.actions$.pipe(
+    ofType(RoleActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteRoleFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete role: ${msg || error}`
+      });
+    }));
 
 }

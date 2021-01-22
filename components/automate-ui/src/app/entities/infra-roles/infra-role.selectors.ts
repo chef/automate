@@ -29,3 +29,8 @@ export const infraRoleFromRoute = createSelector(
   routeParams,
   (state, { name }) => find({ name }, state)
 );
+
+export const deleteStatus = createSelector(
+  infraRoleState,
+  (state) => state.deleteStatus
+);
