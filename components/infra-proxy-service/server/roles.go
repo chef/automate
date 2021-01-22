@@ -20,23 +20,11 @@ type RunList []string
 // EnvRunList represents the recipes and roles with environment specified for a node or as part of a role.
 type EnvRunList map[string]RunList
 
-// Role represents the native Go version of the deserialized Role type
-type Role struct {
-	Name               string      `json:"name"`
-	ChefType           string      `json:"chef_type"`
-	Description        string      `json:"description"`
-	RunList            RunList     `json:"run_list"`
-	EnvRunList         EnvRunList  `json:"env_run_lists"`
-	DefaultAttributes  interface{} `json:"default_attributes,omitempty"`
-	OverrideAttributes interface{} `json:"override_attributes,omitempty"`
-	JSONClass          string      `json:"json_class,omitempty"`
-}
-
 // RoleListResult role list result from Search API
 type RoleListResult struct {
-	Total int     `json:"total"`
-	Start int     `json:"start"`
-	Rows  []*Role `json:"rows"`
+	Total int          `json:"total"`
+	Start int          `json:"start"`
+	Rows  []*chef.Role `json:"rows"`
 }
 
 // CreateRole creates the role
@@ -159,7 +147,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		Description:        role.Description,
 		DefaultAttributes:  string(defaultAttributes),
 		OverrideAttributes: string(overrideAttributes),
-		JsonClass:          role.JSONClass,
+		JsonClass:          role.JsonClass,
 		RunList:            role.RunList,
 		ExpandedRunList:    expandedRunList,
 	}, nil
@@ -235,7 +223,7 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 
 // fromAPIToListRoles a response.Roles from a struct of RoleList
 func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
-	cl := make([]*response.RoleListItem, result.Total)
+	cl := make([]*response.RoleListItem, len(result.Rows))
 
 	index := 0
 	for _, role := range result.Rows {
@@ -262,7 +250,7 @@ func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 	return cl
 }
 
-func findRoleFromRoleList(name string, result *RoleListResult) *Role {
+func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	for _, rItem := range result.Rows {
 		if rItem.Name == name {
 			return rItem
@@ -271,7 +259,7 @@ func findRoleFromRoleList(name string, result *RoleListResult) *Role {
 	return nil
 }
 
-func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
+func toResponseExpandedRunList(role *chef.Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
 	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
 
 	runList, err := GetExpandRunlistFromRole(role.RunList, result)
