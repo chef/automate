@@ -243,6 +243,9 @@ service InfraProxy {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
   };
 
   rpc GetNodes (infra_proxy.request.Nodes) returns (infra_proxy.response.Nodes) {

@@ -24,7 +24,13 @@ pushd ./automate.wiki
 ## Improvements
 -
 
+## Compliance Profiles
+-
+
 ## Bug Fixes
+-
+
+## Maintenance
 -
 
 ## Backward Incompatibilities
@@ -38,6 +44,7 @@ This release uses:
 - Chef Infra Server version
 - Chef InSpec version
 
+View the [package manifest](https://packages.chef.io/manifests/current/automate/latest.json) for the latest release.
 EOH
 
   # Push changes back up to GitHub
