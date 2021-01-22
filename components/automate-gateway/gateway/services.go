@@ -689,7 +689,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 		openBracket = fmt.Sprintf("<%s>\n", wrapper)
 		closeBracket = fmt.Sprintf("\n</%s>", wrapper)
 	}
-	if len(openBracket) == 0 {
+	if len(openBracket) > 0 {
 		_, err := w.Write([]byte(openBracket))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
