@@ -699,7 +699,7 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 	for {
 		data, err := stream.Recv()
 		if err == io.EOF {
-			if len(closeBracket) == 0 {
+			if len(closeBracket) > 0 {
 				_, err = w.Write([]byte(closeBracket))
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
