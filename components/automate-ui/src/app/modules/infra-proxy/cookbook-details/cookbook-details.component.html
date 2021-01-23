@@ -46,7 +46,7 @@
             <div *ngIf="!contentLoading">
               <h2 class="item-heading">{{ activeContentName }}</h2>
               <div class="item-content">
-                <chef-snippet [code]="urlContent?.content"></chef-snippet>
+                <chef-snippet [code]="contentData"></chef-snippet>
               </div>
             </div>
           </div>
