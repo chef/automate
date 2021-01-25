@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -88,9 +89,13 @@ func newDeploymentFromUserOverrideConfig(config *dc.AutomateConfig) (*Deployment
 }
 
 func (d *Deployment) MoveSecretsToSecretStore(secretStore secrets.SecretStore) error {
+	if secretStore == nil || reflect.ValueOf(secretStore).IsNil() {
+		return nil
+	}
 	if d.userOverrideConfig != nil {
 		d.userOverrideConfig.PullSecretsFromConfig()
 	}
+
 	if d.Config != nil {
 		secretsFromConfig := d.Config.PullSecretsFromConfig()
 		for secret, val := range secretsFromConfig {
