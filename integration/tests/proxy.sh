@@ -4,6 +4,9 @@
 test_name="proxy"
 test_proxy="true"
 
+source integration/services/common.sh
+_ssh_node_container_name="$(service_container_name "ssh_node")"
+
 do_setup() {
     do_setup_default
 
