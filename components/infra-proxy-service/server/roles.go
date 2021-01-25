@@ -14,12 +14,6 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// RunList represents the recipes and roles specified for a node or as part of a role.
-type RunList []string
-
-// EnvRunList represents the recipes and roles with environment specified for a node or as part of a role.
-type EnvRunList map[string]RunList
-
 // RoleListResult role list result from Search API
 type RoleListResult struct {
 	Total int          `json:"total"`
