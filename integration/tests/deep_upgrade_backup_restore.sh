@@ -52,7 +52,15 @@ do_deploy() {
 [load_balancer.v1.sys.service]
   https_port = 4443
 [compliance.v1.sys.retention]
-compliance_report_days = 50
+  compliance_report_days = 50
+[dex.v1.sys.connectors.ldap]
+  host = "ldap.localhost"
+  bind_dn = "uid=service_account,dc=example,dc=local"
+  bind_password = "testpassword3"
+  insecure_no_ssl = true
+  username_attr = "cn"
+  user_id_attr = "uid"
+  base_user_search_dn = "cn=users,dc=example,dc=local"
 EOF
 
     #shellcheck disable=SC2154
