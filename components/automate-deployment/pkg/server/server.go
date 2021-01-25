@@ -1012,17 +1012,17 @@ func StartServer(config *Config) error {
 	defer database.Close()
 	server.deploymentStore = boltdb.NewDeploymentStore(database)
 
+	err = server.initSecretStore()
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize secret store")
+	}
+
 	err = server.initDeploymentFromDB()
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize deployment")
 	}
 
 	maybeResetHabPath(server)
-
-	err = server.initSecretStore()
-	if err != nil {
-		return errors.Wrap(err, "failed to initialize secret store")
-	}
 
 	certs, _, err := server.readOrGenDeploymentServiceCerts()
 	if err != nil {
@@ -1396,6 +1396,7 @@ func (s *server) initDeploymentFromDB() error {
 // runConfigMigrations does any necessary config migrations in the current config version
 func (s *server) runConfigMigrations(d *deployment.Deployment) {
 	c := d.GetUserOverrideConfigForPersistence()
+
 	if c == nil {
 		return
 	}

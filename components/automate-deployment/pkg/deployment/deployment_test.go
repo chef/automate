@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	w "github.com/chef/automate/api/config/shared/wrappers"
@@ -100,4 +101,11 @@ func TestSetInstalledExpectations(t *testing.T) {
 	err := deployment.SetInstalledExpectations([]string{"local-user-service"})
 	assert.Nil(t, err)
 	assert.Equal(t, svc.DeploymentState, Installed)
+}
+
+func TestMoveSecretsToSecretStoreWithNilValue(t *testing.T) {
+	config := dc.NewAutomateConfig()
+	deployment, _ := CreateDeploymentWithUserOverrideConfig(config)
+	err := deployment.MoveSecretsToSecretStore(nil)
+	require.NoError(t, err)
 }
