@@ -31,6 +31,7 @@
           <div class="empty-section" *ngIf="!dataBagDetails.length">No data available</div>
           <div class="details-row" *ngIf="dataBagDetails.length">
             <div class="item-column">
+              <span class="item-heading-name">Items</span>
               <ul>
                 <li *ngFor="let item of dataBagDetails" [class.selected]="item.name === selectedItem"
                   (click)="handleItemSelected(item.name)">
@@ -42,6 +43,9 @@
             <div class="item-details-column">
               <chef-loading-spinner *ngIf="dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
               <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
+                <div class="item-details-name">
+                  <span>{{ selectedItemDetailName }}</span>
+                </div>
                 <div class="expand-collapse">
                   <span class="action" (click)="tree.expand()">
                     <chef-icon>add_circle</chef-icon>

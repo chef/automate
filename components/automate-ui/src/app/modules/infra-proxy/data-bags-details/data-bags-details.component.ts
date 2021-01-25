@@ -33,6 +33,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public selectedItem: string;
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
+  public selectedItemDetailName: object;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -87,6 +88,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         !isNil(dataBagItemDetailsState)),
       takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
+       this.selectedItemDetailName = JSON.parse(dataBagItemDetailsState.data).id;
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         this.dataBagsItemDetailsLoading = false;
       });
