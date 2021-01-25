@@ -90,7 +90,9 @@ org({:name => "pedant_testorg_#{chef_server_uid}",
 
 # You MUST specify the address of the server the API requests will be
 # sent to.  Only specify protocol, hostname, and port.
-chef_server "https://localhost"
+chef_server "https://localhost:443"
+base_resource_url "https://localhost:443"
+explicit_port_url true
 
 # SSL protocol version to use for secure communications
 # with the load balancer
