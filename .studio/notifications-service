@@ -38,6 +38,14 @@ function notifications_lint() {
   return $EXIT_CODE
 }
 
+document "notifications_integration" <<DOC
+  run the notifications service's integration tests
+DOC
+function notifications_integration() {
+  check_if_deployinate_started || return 1;
+  A2_SVC_NAME="notifications-service" A2_SVC_PATH="/hab/svc/notifications-service" go_test "github.com/chef/automate/components/notifications-service/integration_test"
+}
+
 document "notifications_compile_protobuf" <<DOC
   create the protobuf files for the notifications-service and notifications-client.
   This was copied from both of the components Make files.
