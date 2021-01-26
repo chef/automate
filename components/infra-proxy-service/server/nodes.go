@@ -298,7 +298,7 @@ func (s *Server) UpdateNodeAttributes(ctx context.Context, req *request.UpdateNo
 	}
 
 	return &response.UpdateNodeAttributes{
-		Name:       req.Name,
+		Name:       res.Name,
 		Attributes: string(resAttributes),
 	}, nil
 }
