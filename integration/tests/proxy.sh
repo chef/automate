@@ -13,6 +13,12 @@ do_setup() {
     echo "Installing docker"
     hab pkg install --binlink core/docker
     echo "Installed docker"
+
+    hab pkg install core/jq-static
+}
+
+jq() {
+    hab pkg exec core/jq-static jq "$@"
 }
 
 do_deploy() {
@@ -46,7 +52,7 @@ do_test_deploy() {
     token=$(chef-automate iam token create admin --admin)
     # TZoBEkR8RQg7r3KpFXbyINcbBo0=
     echo "${token}"
-    if [[ "$token" -ne 200 ]] ; then
+    if [[  -z "$token"]] ; then
       echo "Failed to create admin token"
       exit 1
     fi
