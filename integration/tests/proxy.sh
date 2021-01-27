@@ -52,7 +52,7 @@ do_test_deploy() {
     token=$(chef-automate iam token create admin --admin)
     # TZoBEkR8RQg7r3KpFXbyINcbBo0=
     echo "${token}"
-    if [[  -z "$token"]] ; then
+    if [[  -z "$token" ]] ; then
       echo "Failed to create admin token"
       exit 1
     fi
