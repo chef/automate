@@ -44,7 +44,9 @@
                 <span>Reset Key</span>
               </p>
             </div>
-            <div class="key-tab-body"></div>
+            <div class="key-tab-body">
+              <chef-snippet [code]="client?.client_key.public_key" lang="json"></chef-snippet>
+            </div>
           </div>
         </div>
       </section>
