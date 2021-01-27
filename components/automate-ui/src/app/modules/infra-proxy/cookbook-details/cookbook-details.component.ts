@@ -54,6 +54,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public defaultContent: SubMenu;
   public contentUrl: string;
   public urlContent;
+  public contentData: string;
   public activeContentName: string;
   public listItem = [
     'attributes',
@@ -198,6 +199,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.urlContent = fileContent;
         this.contentTabLoading = false;
         this.contentLoading = false;
+        this.contentData = this.urlContent.content.toString();
       });
   }
 
