@@ -14,6 +14,11 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 	req := &infra_req.Environments{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:     r.GetSearchQuery().GetQ(),
+			Start: r.GetSearchQuery().GetStart(),
+			Rows:  r.GetSearchQuery().GetRows(),
+		},
 	}
 	res, err := a.client.GetEnvironments(ctx, req)
 	if err != nil {
@@ -22,6 +27,8 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 
 	return &gwres.Environments{
 		Environments: fromUpstreamEnvironments(res.Environments),
+		Start:        res.GetStart(),
+		Total:        res.GetTotal(),
 	}, nil
 }
 
@@ -128,10 +135,10 @@ func (a *InfraProxyServer) GetEnvironmentRecipes(ctx context.Context, r *gwreq.E
 
 func fromUpstreamEnvironments(environments []*infra_res.EnvironmentListItem) []*gwres.EnvironmentListItem {
 	ts := make([]*gwres.EnvironmentListItem, len(environments))
-
 	for i, e := range environments {
 		ts[i] = &gwres.EnvironmentListItem{
-			Name: e.GetName(),
+			Name:        e.GetName(),
+			Description: e.GetDescription(),
 		}
 	}
 
