@@ -9,12 +9,17 @@ _ssh_node_container_name="$(service_container_name "ssh_node")"
 
 do_setup() {
     do_setup_default
+    local previous_umask
+    previous_umask=$(umask)
+    umask 022
 
     echo "Installing docker"
     hab pkg install --binlink core/docker
     echo "Installed docker"
 
     hab pkg install core/jq-static
+
+    umask "$previous_umask"
 }
 
 jq() {
