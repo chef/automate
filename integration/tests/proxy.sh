@@ -64,7 +64,7 @@ do_test_deploy() {
 
     # create credentials
     id=$(curl 'https://localhost/api/v0/secrets'   \
-    -H "api-token: ${token}"   -d '{"id":"test","name":"test","type":"ssh","data":[{"key":"username","value":"abla"},{"key":"password","value":"dable"},{"key":"key","value":null}],"tags":[]}' -k | jq -r '.id')
+    -H "api-token: ${token}" -noproxy '*' -d '{"id":"test","name":"test","type":"ssh","data":[{"key":"username","value":"abla"},{"key":"password","value":"dable"},{"key":"key","value":null}],"tags":[]}' -k | jq -r '.id')
     echo "${id}"
     if [[ "$id" -eq "null" ]] ; then
       echo "Failed to create admin token"
@@ -74,7 +74,7 @@ do_test_deploy() {
 
     # create node
     node=$(curl 'https://localhost/api/v0/nodes/bulk-create' \
-        -H "api-token: ${token}"
+        -H "api-token: ${token}"  -noproxy '*'
         -d '{"nodes":[{"name":"aws test-3.138.179.244","manager":"automate","target_config":{"backend":"ssh","secrets":["2a86f66b-11a8-4591-917e-874006420225"],"port":22,"sudo":false,"hosts":["3.138.179.244"]},"tags":[]}]}' \
         -k | jq -r '.id.[1]')
     echo "$node"
@@ -89,7 +89,7 @@ do_test_deploy() {
     #   -H "api-token: ${token}"
     #   --data-raw $'------WebKitFormBoundaryQrwmi71c5IFquAl3\r\nContent-Disposition: form-data; name="file"; filename="testproxy-0.1.0.tar.gz"\r\nContent-Type: application/x-gzip\r\n\r\n\r\n------WebKitFormBoundaryQrwmi71c5IFquAl3--\r\n' \
     #   -k
-    upload=$(curl -d "data=@testproxy-0.1.0.tar.gz" https://localhost/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin -k | jq -r '.summary.valid')
+    upload=$(curl -noproxy '*' -d "data=@testproxy-0.1.0.tar.gz" https://localhost/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin -k | jq -r '.summary.valid')
     echo "$upload"
     if [[ "$upload" -eq "null" ]] ; then
       echo "Failed to create node"
@@ -99,14 +99,14 @@ do_test_deploy() {
 
     # get automate node manager
     managerId=$(curl 'https://a2-perf-test-single-local-inplace-upgrade-acceptance.cd.chef.co/api/v0/nodemanagers/search' \
-      -H "api-token: ${token}"
+      -H "api-token: ${token}"  -noproxy '*'
       -d '{ "filter_map": [ { "key": "type", "values": [ "automate" ] } ], "sort": "date_added" }' \
       -k | jq -r '.managers.[0].id')
 
 
     # schedule scan job
     scanId=$(curl 'https://localhost/api/v0/compliance/scanner/jobs' \
-      -H "api-token: ${token}"
+      -H "api-token: ${token}"  -noproxy '*'
       -d '{"type":"exec","tags":[],"name":"test","profiles":["compliance://admin/testProxy#0.1.0"],"node_selectors":[{"manager_id":'${managerId}',"filters":[{"key":"name","values":["aws test-3.138.179.244"],"exclude":false}]}],"recurrence":""}' \
       -k | jq -r '.id')
 
@@ -137,7 +137,7 @@ do_test_deploy() {
     # check the report failed or success
     sleep 1m
     status=$(curl 'https://localhost/api/v0/compliance/reporting/stats/summary' \
-    -H "api-token: ${token}"
+    -H "api-token: ${token}" -noproxy '*'
     -d '{"filters":[{"type":"job_id","values":['${scanId}']},{"type":"start_time","values":["2021-01-12T00:00:00Z"]},{"type":"end_time","values":["2021-01-22T23:59:59Z"]}]}' \
     -k | jq -r '.report_summary.stats.status')
 
