@@ -1,5 +1,6 @@
 export interface DataBags {
   name: string;
+  active?: boolean;
 }
 
 export interface DataBagsItemDetails {

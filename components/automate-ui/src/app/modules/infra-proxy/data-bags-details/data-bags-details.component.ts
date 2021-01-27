@@ -33,10 +33,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public selectedItem: string;
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
+  public activeClassName: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
   ) { }
 
   ngOnInit() {
@@ -70,10 +71,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
         this.dataBagDetails = dataBagDetailsState;
-        // This code block is for selecting first item from the list by default.
-        if (this.dataBagDetails.length) {
-          this.handleItemSelected(this.dataBagDetails[0].name);
-        }
+        this.appendActiveToItems(this.dataBagDetails);
         this.dataBagsDetailsLoading = false;
       });
 
@@ -92,7 +90,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  public handleItemSelected(item: string): void {
+  public handleItemSelected(item: string, index: number): void {
     this.selectedItem = item;
     this.dataBagsItemDetailsLoading = true;
     this.store.dispatch(new GetDataBagItemDetails({
@@ -101,10 +99,26 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       name: this.dataBagsName,
       item_name: item
     }));
+    
+    this.dataBagDetails.filter(
+      (item, i) => i !== index && item.active
+    ).forEach(menu => menu.active = !menu.active);
+
+    this.dataBagDetails[index].active = !this.dataBagDetails[index].active;
+    this.activeClassName = 'autoHeight'
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  appendActiveToItems (items: DataBags[]) {
+    items.forEach((i, index) => {
+      const tempItem = i;
+      tempItem['active'] = false;
+      items[index] = tempItem
+    })
+    this.dataBagDetails = items;
   }
 }

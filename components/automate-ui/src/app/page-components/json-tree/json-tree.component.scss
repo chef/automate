@@ -12,7 +12,7 @@
 
   ::ng-deep .jsontree_node {
     display: list-item;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 28px;
     padding-bottom: 0;
 
@@ -51,7 +51,7 @@
 
   ::ng-deep .jsontree_label {
     color: $chef-primary-bright;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   ::ng-deep > .jsontree_tree > .jsontree_node > .jsontree_value-wrapper > .jsontree_value > b {
@@ -73,7 +73,7 @@
 ::ng-deep .jsontree_tree {
   margin-left: 30px;
   font-family: 'PT Mono', monospace;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 /* Styles for a list of child nodes */
