@@ -44,7 +44,7 @@ do_test_deploy() {
     source "${source_dir}/helpers/bldr_tests.sh"
 
     do_test_deploy_default
-    bldr_smoke_test
+    # bldr_smoke_test
 
     start_ssh_node
 
@@ -130,7 +130,7 @@ do_test_deploy() {
     # {"jobs":[{"id":"e55e6047-072d-47d5-8d98-d9adc9db2630","name":"test","type":"exec","timeout":0,"tags":[],"start_time":"2021-01-22T13:57:40Z","end_time":"2021-01-22T13:57:50Z","status":"completed","retries":0,"retries_left":0,"results":[],"nodes":[],"profiles":[],"node_count":1,"profile_count":1,"node_selectors":[],"scheduled_time":"0001-01-01T00:00:00Z","recurrence":"","parent_id":"","job_count":0,"deleted":false}],"total":1}
 
     # check the report failed or success
-    sleep 2m
+    sleep 1m
     status=$(curl 'https://a2-dev.test/api/v0/compliance/reporting/stats/summary' \
     -H "api-token: ${token}"
     --data-raw '{"filters":[{"type":"job_id","values":['${scanId}']},{"type":"start_time","values":["2021-01-12T00:00:00Z"]},{"type":"end_time","values":["2021-01-22T23:59:59Z"]}]}' \
