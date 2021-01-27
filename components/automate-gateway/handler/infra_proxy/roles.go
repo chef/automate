@@ -35,6 +35,11 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 	req := &infra_req.Roles{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:     r.GetSearchQuery().GetQ(),
+			Start: r.GetSearchQuery().GetStart(),
+			Rows:  r.GetSearchQuery().GetRows(),
+		},
 	}
 	res, err := a.client.GetRoles(ctx, req)
 	if err != nil {
@@ -43,6 +48,8 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 
 	return &gwres.Roles{
 		Roles: fromUpstreamRoles(res.Roles),
+		Start: res.GetStart(),
+		Total: res.GetTotal(),
 	}, nil
 }
 

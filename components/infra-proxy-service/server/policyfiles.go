@@ -51,7 +51,7 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	result, err := c.GetRoleList()
+	result, err := c.SearchRoles(&request.SearchQuery{})
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}

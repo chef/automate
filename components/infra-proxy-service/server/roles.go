@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
-	"sort"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -84,10 +84,32 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 	}, nil
 }
 
-// GetRoleList gets roles list from Chef Infra Server search API.
-func (c *ChefClient) GetRoleList() (RoleListResult, error) {
+// SearchRoles gets roles list from Chef Infra Server search API.
+func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResult, error) {
 	var result RoleListResult
-	newReq, err := c.client.NewRequest("GET", "search/role", nil)
+	var searchAll bool
+	inc := 1000
+	var query chef.SearchQuery
+
+	if searchQuery == nil || searchQuery.Q == "" {
+		searchAll = true
+		query = chef.SearchQuery{
+			Index: "role",
+			Query: "*:*",
+			Start: 0,
+			Rows:  inc,
+		}
+	} else {
+		query = chef.SearchQuery{
+			Index: "role",
+			Query: searchQuery.GetQ(),
+			Start: int(searchQuery.GetStart()),
+			Rows:  int(searchQuery.GetRows()),
+		}
+	}
+
+	fullURL := fmt.Sprintf("search/%s", query)
+	newReq, err := c.client.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return result, ParseAPIError(err)
 	}
@@ -99,6 +121,27 @@ func (c *ChefClient) GetRoleList() (RoleListResult, error) {
 
 	defer res.Body.Close() // nolint: errcheck
 
+	if searchAll {
+		var searchResult RoleListResult
+		start := result.Start
+		// the total rows available for this query across all pages
+		total := result.Total
+		for start+inc <= total {
+			query.Start = query.Start + inc
+			fullURL = fmt.Sprintf("search/%s", query)
+
+			res1, err := c.client.Do(newReq, &searchResult)
+			if err != nil {
+				return result, ParseAPIError(err)
+			}
+
+			defer res1.Body.Close() // nolint: errcheck
+
+			// add this page of results to the primary SearchResult instance
+			result.Rows = append(result.Rows, searchResult.Rows...)
+		}
+	}
+
 	return result, nil
 }
 
@@ -109,13 +152,15 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 		return nil, err
 	}
 
-	result, err := client.GetRoleList()
+	result, err := client.SearchRoles(req.SearchQuery)
 	if err != nil {
 		return nil, err
 	}
 
 	return &response.Roles{
 		Roles: fromAPIToListRoles(result),
+		Start: int32(result.Start),
+		Total: int32(result.Total),
 	}, nil
 }
 
@@ -128,7 +173,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, err
 	}
 
-	result, err := c.GetRoleList()
+	result, err := c.SearchRoles(&request.SearchQuery{})
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +280,7 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 
 // fromAPIToListRoles a response.Roles from a struct of RoleList
 func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
-	cl := make([]*response.RoleListItem, result.Total)
+	cl := make([]*response.RoleListItem, len(result.Rows))
 
 	index := 0
 	for _, role := range result.Rows {
@@ -254,10 +299,6 @@ func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 		}
 		index++
 	}
-
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
 
 	return cl
 }

@@ -27,6 +27,7 @@ import "external/infra_proxy/response/policyfiles.proto";
 
 import "external/annotations/iam/annotations.proto";
 
+
 service InfraProxy {
   rpc GetServers (infra_proxy.request.GetServers) returns (infra_proxy.response.GetServers) {
     option (google.api.http).get = "/api/v0/infra/servers";

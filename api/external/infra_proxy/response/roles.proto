@@ -6,6 +6,10 @@ option go_package = "github.com/chef/automate/api/external/infra_proxy/response"
 message Roles {
     // List of the roles item.
     repeated RoleListItem roles = 1;
+    // Total number of records.
+	int32 total = 2;
+	// The number of result pages to return.
+	int32 start = 3;
 }
 
 message RoleListItem {
