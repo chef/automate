@@ -68,11 +68,16 @@ func (c *ChefClient) SearchClients(searchQuery *request.SearchQuery) (ClientResu
 			Rows:  inc,
 		}
 	} else {
+		perPage := int(searchQuery.GetRows())
+		if perPage == 0 {
+			perPage = 1000
+		}
+
 		query = chef.SearchQuery{
 			Index: "client",
 			Query: searchQuery.GetQ(),
 			Start: int(searchQuery.GetStart()),
-			Rows:  int(searchQuery.GetRows()),
+			Rows:  perPage,
 		}
 	}
 
