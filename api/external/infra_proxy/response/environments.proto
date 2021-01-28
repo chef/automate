@@ -38,5 +38,5 @@ message EnvironmentRecipesList {
 message SearchListEnvironment{
     int32 total =  1;
     int32 start = 2;
-    string rows = 3;
+    repeated Environment rows = 3;
 }
