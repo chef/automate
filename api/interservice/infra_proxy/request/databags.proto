@@ -10,11 +10,27 @@ message DataBags {
     string org_id = 1;
     // Chef Infra Server ID.
     string server_id = 2;
+}
+
+message DataBag {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
     // Data bag name.
     string name = 3;
 }
 
-message DataBag {
+message DataBagItems {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Data bag name.
+    string name = 3;
+}
+
+message DataBagItem {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
