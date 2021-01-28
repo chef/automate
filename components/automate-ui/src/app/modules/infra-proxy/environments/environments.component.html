@@ -1,5 +1,13 @@
 <section class="environments">
   <chef-loading-spinner *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
+  <app-delete-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="environment"
+    [objectName]="environmentToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteEnvironment()"
+    objectAction="Delete">
+  </app-delete-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-items">
@@ -18,7 +26,7 @@
           <chef-th class="no_border_th">Description</chef-th>
           <chef-th class="no_border_th"></chef-th>
           <chef-th class="no_border_th"></chef-th>
-          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th three-dot-column"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -31,7 +39,11 @@
           </chef-td>
           <chef-td></chef-td>
           <chef-td></chef-td>
-          <chef-td></chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu" id="menu-{{environment.id}}">
+              <mat-option data-cy="delete" (onSelectionChange)="startEnvironmentDelete(environment)">Delete Environment</mat-option>
+            </mat-select>
+          </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>

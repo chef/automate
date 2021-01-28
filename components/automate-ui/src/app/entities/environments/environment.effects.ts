@@ -14,7 +14,10 @@ import {
   EnvironmentActionTypes,
   GetEnvironment,
   GetEnvironmentSuccess,
-  GetEnvironmentFailure
+  GetEnvironmentFailure,
+  DeleteEnvironment,
+  DeleteEnvironmentSuccess,
+  DeleteEnvironmentFailure
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';
@@ -65,4 +68,34 @@ export class EnvironmentEffects {
         message: `Could not get environment: ${msg || payload.error}`
       });
     }));
+
+    @Effect()
+    deleteEnvironment$ = this.actions$.pipe(
+      ofType(EnvironmentActionTypes.DELETE),
+      mergeMap(({ payload: { server_id, org_id, name } }: DeleteEnvironment) =>
+        this.requests.deleteEnvironment(server_id, org_id, name).pipe(
+          map(() => new DeleteEnvironmentSuccess({ name })),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new DeleteEnvironmentFailure(error))))));
+  
+    @Effect()
+    deleteEnvironmentSuccess$ = this.actions$.pipe(
+        ofType(EnvironmentActionTypes.DELETE_SUCCESS),
+        map(({ payload: { name } }: DeleteEnvironmentSuccess) => {
+          return new CreateNotification({
+            type: Type.info,
+            message: `Deleted environment ${name}.`
+          });
+        }));
+  
+    @Effect()
+    deleteEnvironmentFailure$ = this.actions$.pipe(
+      ofType(EnvironmentActionTypes.DELETE_FAILURE),
+      map(({ payload: { error } }: DeleteEnvironmentFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not delete environment: ${msg || error}`
+        });
+      }));
 }

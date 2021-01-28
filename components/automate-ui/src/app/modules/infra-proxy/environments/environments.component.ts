@@ -5,8 +5,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-
-import { GetEnvironments } from 'app/entities/environments/environment.action';
+import { GetEnvironments, DeleteEnvironment } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
 import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
 
@@ -21,7 +20,6 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed = new Subject<boolean>();
   public environments: Environment[] = [];
   public environmentsListLoading = true;
   public environmentListState: { items: Environment[], total: number };
@@ -31,6 +29,9 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public total: number;
+  public environmentToDelete: Environment;
+  public deleteModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -99,4 +100,21 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
+
+  public startEnvironmentDelete(environment: Environment): void {
+    this.environmentToDelete = environment;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteEnvironment(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteEnvironment({
+      server_id: this.serverId, org_id: this.orgId, name: this.environmentToDelete.name  
+    }));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
 }
+

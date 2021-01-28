@@ -8,7 +8,10 @@ export enum EnvironmentActionTypes {
   GET_ALL_FAILURE = 'ENVIRONMENTS::GET_ALL::FAILURE',
   GET = 'ENVIRONMENTS::GET',
   GET_SUCCESS = 'ENVIRONMENTS::GET::SUCCESS',
-  GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE'
+  GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE',
+  DELETE          = 'ENVIRONMENTS::DELETE',
+  DELETE_SUCCESS  = 'ENVIRONMENTS::DELETE::SUCCESS',
+  DELETE_FAILURE  = 'ENVIRONMENTS::DELETE::FAILURE',
 }
 
 export interface GetEnvironmentsPayload {
@@ -58,10 +61,28 @@ export class GetEnvironmentFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class DeleteEnvironment implements Action {
+  readonly type = EnvironmentActionTypes.DELETE;
+  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
+}
+
+export class DeleteEnvironmentSuccess implements Action {
+  readonly type = EnvironmentActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { name: string }) { }
+}
+
+export class DeleteEnvironmentFailure implements Action {
+  readonly type = EnvironmentActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type EnvironmentActions =
   | GetEnvironments
   | GetEnvironmentsSuccess
   | GetEnvironmentsFailure
   | GetEnvironment
   | GetEnvironmentSuccess
-  | GetEnvironmentFailure;
+  | GetEnvironmentFailure
+  | DeleteEnvironment
+  | DeleteEnvironmentSuccess
+  | DeleteEnvironmentFailure;
