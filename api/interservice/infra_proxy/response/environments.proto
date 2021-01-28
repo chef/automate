@@ -34,3 +34,9 @@ message EnvironmentRecipesList {
     // Environment recipes list.
     repeated string recipes = 1;
 }
+
+message SearchListEnvironment{
+    int32 total =  1;
+    int32 start = 2;
+    repeated Environment rows = 3;
+}

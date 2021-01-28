@@ -1301,6 +1301,58 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/search/{index}": {
+      "get": {
+        "operationId": "InfraProxy_SearchListEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SearchListEnvironment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Environment name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "index",
+            "description": "Environment search name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
         "operationId": "InfraProxy_GetNodes",
@@ -3150,6 +3202,22 @@ func init() {
             "type": "string"
           },
           "description": "Synchronized remote branches list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SearchListEnvironment": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rows": {
+          "type": "string"
         }
       }
     },

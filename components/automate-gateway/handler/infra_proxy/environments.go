@@ -126,6 +126,23 @@ func (a *InfraProxyServer) GetEnvironmentRecipes(ctx context.Context, r *gwreq.E
 	}, nil
 }
 
+// SearchListEnvironment fetches an array of environment based on search query
+func (a *InfraProxyServer) SearchListEnvironment(ctx context.Context, r *gwreq.SearchListEnvironment) (*gwres.SearchListEnvironment, error) {
+	return &gwres.SearchListEnvironment{
+		Total: 10,
+		Start: 1,
+		Rows: &gwres.Environment{
+			Name:                "name",
+			ChefType:           "res.GetChefType()",
+			Description:        "res.GetDescription()",
+			CookbookVersions:   "res.GetCookbookVersions()",
+			JsonClass:          "res.GetJsonClass()",
+			DefaultAttributes:  "res.GetDefaultAttributes()",
+			OverrideAttributes: "res.GetOverrideAttributes()",
+		},nil
+	}, nil
+}
+
 func fromUpstreamEnvironments(environments []*infra_res.EnvironmentListItem) []*gwres.EnvironmentListItem {
 	ts := make([]*gwres.EnvironmentListItem, len(environments))
 

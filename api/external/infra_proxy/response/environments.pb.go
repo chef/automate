@@ -271,6 +271,69 @@ func (x *EnvironmentRecipesList) GetRecipes() []string {
 	return nil
 }
 
+type SearchListEnvironment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Total int32  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	Start int32  `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	Rows  string `protobuf:"bytes,3,opt,name=rows,proto3" json:"rows,omitempty"`
+}
+
+func (x *SearchListEnvironment) Reset() {
+	*x = SearchListEnvironment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_infra_proxy_response_environments_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SearchListEnvironment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchListEnvironment) ProtoMessage() {}
+
+func (x *SearchListEnvironment) ProtoReflect() protoreflect.Message {
+	mi := &file_external_infra_proxy_response_environments_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchListEnvironment.ProtoReflect.Descriptor instead.
+func (*SearchListEnvironment) Descriptor() ([]byte, []int) {
+	return file_external_infra_proxy_response_environments_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SearchListEnvironment) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+func (x *SearchListEnvironment) GetStart() int32 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *SearchListEnvironment) GetRows() string {
+	if x != nil {
+		return x.Rows
+	}
+	return ""
+}
+
 var File_external_infra_proxy_response_environments_proto protoreflect.FileDescriptor
 
 var file_external_infra_proxy_response_environments_proto_rawDesc = []byte{
@@ -318,11 +381,17 @@ var file_external_infra_proxy_response_environments_proto_rawDesc = []byte{
 	0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x32, 0x0a, 0x16, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e,
 	0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x63, 0x69, 0x70, 0x65, 0x73, 0x4c, 0x69, 0x73, 0x74, 0x12,
 	0x18, 0x0a, 0x07, 0x72, 0x65, 0x63, 0x69, 0x70, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09,
-	0x52, 0x07, 0x72, 0x65, 0x63, 0x69, 0x70, 0x65, 0x73, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74,
-	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e,
-	0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x07, 0x72, 0x65, 0x63, 0x69, 0x70, 0x65, 0x73, 0x22, 0x57, 0x0a, 0x15, 0x53, 0x65, 0x61,
+	0x72, 0x63, 0x68, 0x4c, 0x69, 0x73, 0x74, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65,
+	0x6e, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x72,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12, 0x12,
+	0x0a, 0x04, 0x72, 0x6f, 0x77, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x72, 0x6f,
+	0x77, 0x73, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72,
+	0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -337,17 +406,18 @@ func file_external_infra_proxy_response_environments_proto_rawDescGZIP() []byte 
 	return file_external_infra_proxy_response_environments_proto_rawDescData
 }
 
-var file_external_infra_proxy_response_environments_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_external_infra_proxy_response_environments_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_external_infra_proxy_response_environments_proto_goTypes = []interface{}{
 	(*Environments)(nil),           // 0: chef.automate.api.infra_proxy.response.Environments
 	(*EnvironmentListItem)(nil),    // 1: chef.automate.api.infra_proxy.response.EnvironmentListItem
 	(*Environment)(nil),            // 2: chef.automate.api.infra_proxy.response.Environment
 	(*EnvironmentRecipesList)(nil), // 3: chef.automate.api.infra_proxy.response.EnvironmentRecipesList
-	nil,                            // 4: chef.automate.api.infra_proxy.response.Environment.CookbookVersionsEntry
+	(*SearchListEnvironment)(nil),  // 4: chef.automate.api.infra_proxy.response.SearchListEnvironment
+	nil,                            // 5: chef.automate.api.infra_proxy.response.Environment.CookbookVersionsEntry
 }
 var file_external_infra_proxy_response_environments_proto_depIdxs = []int32{
 	1, // 0: chef.automate.api.infra_proxy.response.Environments.environments:type_name -> chef.automate.api.infra_proxy.response.EnvironmentListItem
-	4, // 1: chef.automate.api.infra_proxy.response.Environment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.response.Environment.CookbookVersionsEntry
+	5, // 1: chef.automate.api.infra_proxy.response.Environment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.response.Environment.CookbookVersionsEntry
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -409,6 +479,18 @@ func file_external_infra_proxy_response_environments_proto_init() {
 				return nil
 			}
 		}
+		file_external_infra_proxy_response_environments_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchListEnvironment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -416,7 +498,7 @@ func file_external_infra_proxy_response_environments_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_infra_proxy_response_environments_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

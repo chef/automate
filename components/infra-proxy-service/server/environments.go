@@ -245,6 +245,13 @@ func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environ
 	}, nil
 }
 
+func (s *Server) SearchListEnvironment(ctx context.Context, req *request.SearchListEnvironment) (*response.SearchListEnvironment, error) {
+	s.service.Logger.Info("req", req)
+	return &response.SearchListEnvironment{
+
+	}, nil
+}
+
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
 func fromAPIToListEnvironments(al chef.EnvironmentResult) []*response.EnvironmentListItem {
 	cl := make([]*response.EnvironmentListItem, len(al))

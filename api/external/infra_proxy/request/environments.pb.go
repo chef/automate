@@ -371,6 +371,81 @@ func (x *UpdateEnvironment) GetOverrideAttributes() *_struct.Struct {
 	return nil
 }
 
+type SearchListEnvironment struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Chef organization ID.
+	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	// Chef Infra Server ID.
+	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Environment name.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Environment search name.
+	Index string `protobuf:"bytes,4,opt,name=index,proto3" json:"index,omitempty"`
+}
+
+func (x *SearchListEnvironment) Reset() {
+	*x = SearchListEnvironment{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_infra_proxy_request_environments_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SearchListEnvironment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchListEnvironment) ProtoMessage() {}
+
+func (x *SearchListEnvironment) ProtoReflect() protoreflect.Message {
+	mi := &file_external_infra_proxy_request_environments_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchListEnvironment.ProtoReflect.Descriptor instead.
+func (*SearchListEnvironment) Descriptor() ([]byte, []int) {
+	return file_external_infra_proxy_request_environments_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SearchListEnvironment) GetOrgId() string {
+	if x != nil {
+		return x.OrgId
+	}
+	return ""
+}
+
+func (x *SearchListEnvironment) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *SearchListEnvironment) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SearchListEnvironment) GetIndex() string {
+	if x != nil {
+		return x.Index
+	}
+	return ""
+}
+
 var File_external_infra_proxy_request_environments_proto protoreflect.FileDescriptor
 
 var file_external_infra_proxy_request_environments_proto_rawDesc = []byte{
@@ -453,11 +528,19 @@ var file_external_infra_proxy_request_environments_proto_rawDesc = []byte{
 	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
 	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a,
 	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61,
-	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d,
-	0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c,
-	0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x75, 0x0a, 0x15, 0x53, 0x65, 0x61, 0x72, 0x63,
+	0x68, 0x4c, 0x69, 0x73, 0x74, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74,
+	0x12, 0x15, 0x0a, 0x06, 0x6f, 0x72, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x65, 0x72, 0x76, 0x65,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x65, 0x72, 0x76,
+	0x65, 0x72, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65,
+	0x78, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x42, 0x3b,
+	0x5a, 0x39, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65,
+	0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65,
+	0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -472,23 +555,24 @@ func file_external_infra_proxy_request_environments_proto_rawDescGZIP() []byte {
 	return file_external_infra_proxy_request_environments_proto_rawDescData
 }
 
-var file_external_infra_proxy_request_environments_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_external_infra_proxy_request_environments_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_external_infra_proxy_request_environments_proto_goTypes = []interface{}{
-	(*Environments)(nil),      // 0: chef.automate.api.infra_proxy.request.Environments
-	(*Environment)(nil),       // 1: chef.automate.api.infra_proxy.request.Environment
-	(*CreateEnvironment)(nil), // 2: chef.automate.api.infra_proxy.request.CreateEnvironment
-	(*UpdateEnvironment)(nil), // 3: chef.automate.api.infra_proxy.request.UpdateEnvironment
-	nil,                       // 4: chef.automate.api.infra_proxy.request.CreateEnvironment.CookbookVersionsEntry
-	nil,                       // 5: chef.automate.api.infra_proxy.request.UpdateEnvironment.CookbookVersionsEntry
-	(*_struct.Struct)(nil),    // 6: google.protobuf.Struct
+	(*Environments)(nil),          // 0: chef.automate.api.infra_proxy.request.Environments
+	(*Environment)(nil),           // 1: chef.automate.api.infra_proxy.request.Environment
+	(*CreateEnvironment)(nil),     // 2: chef.automate.api.infra_proxy.request.CreateEnvironment
+	(*UpdateEnvironment)(nil),     // 3: chef.automate.api.infra_proxy.request.UpdateEnvironment
+	(*SearchListEnvironment)(nil), // 4: chef.automate.api.infra_proxy.request.SearchListEnvironment
+	nil,                           // 5: chef.automate.api.infra_proxy.request.CreateEnvironment.CookbookVersionsEntry
+	nil,                           // 6: chef.automate.api.infra_proxy.request.UpdateEnvironment.CookbookVersionsEntry
+	(*_struct.Struct)(nil),        // 7: google.protobuf.Struct
 }
 var file_external_infra_proxy_request_environments_proto_depIdxs = []int32{
-	4, // 0: chef.automate.api.infra_proxy.request.CreateEnvironment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.request.CreateEnvironment.CookbookVersionsEntry
-	6, // 1: chef.automate.api.infra_proxy.request.CreateEnvironment.default_attributes:type_name -> google.protobuf.Struct
-	6, // 2: chef.automate.api.infra_proxy.request.CreateEnvironment.override_attributes:type_name -> google.protobuf.Struct
-	5, // 3: chef.automate.api.infra_proxy.request.UpdateEnvironment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.request.UpdateEnvironment.CookbookVersionsEntry
-	6, // 4: chef.automate.api.infra_proxy.request.UpdateEnvironment.default_attributes:type_name -> google.protobuf.Struct
-	6, // 5: chef.automate.api.infra_proxy.request.UpdateEnvironment.override_attributes:type_name -> google.protobuf.Struct
+	5, // 0: chef.automate.api.infra_proxy.request.CreateEnvironment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.request.CreateEnvironment.CookbookVersionsEntry
+	7, // 1: chef.automate.api.infra_proxy.request.CreateEnvironment.default_attributes:type_name -> google.protobuf.Struct
+	7, // 2: chef.automate.api.infra_proxy.request.CreateEnvironment.override_attributes:type_name -> google.protobuf.Struct
+	6, // 3: chef.automate.api.infra_proxy.request.UpdateEnvironment.cookbook_versions:type_name -> chef.automate.api.infra_proxy.request.UpdateEnvironment.CookbookVersionsEntry
+	7, // 4: chef.automate.api.infra_proxy.request.UpdateEnvironment.default_attributes:type_name -> google.protobuf.Struct
+	7, // 5: chef.automate.api.infra_proxy.request.UpdateEnvironment.override_attributes:type_name -> google.protobuf.Struct
 	6, // [6:6] is the sub-list for method output_type
 	6, // [6:6] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -550,6 +634,18 @@ func file_external_infra_proxy_request_environments_proto_init() {
 				return nil
 			}
 		}
+		file_external_infra_proxy_request_environments_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchListEnvironment); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -557,7 +653,7 @@ func file_external_infra_proxy_request_environments_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_infra_proxy_request_environments_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

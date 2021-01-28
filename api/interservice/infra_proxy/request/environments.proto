@@ -58,3 +58,14 @@ message UpdateEnvironment {
     // Environment override attributes JSON.
     google.protobuf.Struct override_attributes = 8;
 }
+
+message SearchListEnvironment{
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Environment name.
+    string name = 3;
+    // Environment search name.
+    string index = 4;
+}
