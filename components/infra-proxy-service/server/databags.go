@@ -103,7 +103,7 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 	}, nil
 }
 
-// GetDataBags get data bags list
+// GetDataBags gets data bags list
 func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*response.DataBags, error) {
 	err := validation.New(validation.Options{
 		Target:          "databag",
@@ -130,7 +130,7 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 	}, nil
 }
 
-// GetDataBagItems get data bag items list
+// GetDataBagItems gets data bag items list
 func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems) (*response.DataBagItems, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
