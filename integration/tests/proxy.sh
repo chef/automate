@@ -112,7 +112,7 @@ do_test_deploy() {
       -H "api-token: ${token}" \
       -d '{"type":"exec","tags":[],"name":"test","profiles":["compliance://admin/testProxy#0.1.0"],"node_selectors":[{"manager_id":'${managerId}',"filters":[{"key":"name","values":["aws test-3.138.179.244"],"exclude":false}]}],"recurrence":""}' \
       -k | jq -r '.id')
-
+    echo "${scanId}"
     # {"id":"e55e6047-072d-47d5-8d98-d9adc9db2630","name":"test"}
 
     # # check if scan is complete
@@ -145,7 +145,7 @@ do_test_deploy() {
     -k | jq -r '.report_summary.stats.status')
 
 # {"controls_summary":null,"node_summary":null,"report_summary":{"stats":{"nodes":"1","platforms":1,"environments":1,"profiles":1,"nodes_cnt":1,"controls":3},"status":"failed","duration":0,"start_date":""}}
-
+    echo "${status}"
     if [[ "$status" -eq "failed" ]] ; then
       echo "OMG SCANNED===================::::::::::::::::::::---------"
       exit 1
