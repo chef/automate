@@ -90,7 +90,7 @@ do_test_deploy() {
     #   --data-raw $'------WebKitFormBoundaryQrwmi71c5IFquAl3\r\nContent-Disposition: form-data; name="file"; filename="testproxy-0.1.0.tar.gz"\r\nContent-Type: application/x-gzip\r\n\r\n\r\n------WebKitFormBoundaryQrwmi71c5IFquAl3--\r\n' \
     #   -k
 
-    upload=$(curl  -v -F file=@testproxy-0.1.0.tar.gz 'https://a2-dev.test/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin' -H "api-token: ${token}" -k | jq -r '.summary.valid')
+    upload=$(curl  -v -F file=@testproxy-0.1.0.tar.gz 'https://localhost/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin' -H "api-token: ${token}" -k | jq -r '.summary.valid')
     echo "$upload"
     if [[ -z "$upload" ]] ; then
       echo "Failed to upload"
@@ -101,7 +101,7 @@ do_test_deploy() {
     # {"summary":{"valid":true,"timestamp":"2021-01-22T13:54:36+00:00","location":"/hab/svc/compliance-service/var/tmp/inspec-upload528214652.tar.gz","controls":3}}
 
     # get automate node manager
-    managerId=$(curl 'https://a2-perf-test-single-local-inplace-upgrade-acceptance.cd.chef.co/api/v0/nodemanagers/search' \
+    managerId=$(curl 'https://localhost/api/v0/nodemanagers/search' \
       -H "api-token: ${token}" \
       -d '{ "filter_map": [ { "key": "type", "values": [ "automate" ] } ], "sort": "date_added" }' \
       -k | jq -r '.managers[0].id')
