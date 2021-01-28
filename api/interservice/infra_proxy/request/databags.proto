@@ -5,6 +5,15 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/reque
 
 import "google/protobuf/struct.proto";
 
+message SearchQuery {
+	// The search query used to identify a list of items.
+	string q = 1;
+	// The number of result pages to return.
+	int32 start = 2;
+	// The number of results on each page.
+	int32 rows = 3;
+}
+
 message DataBags {
     // Chef organization ID.
     string org_id = 1;
@@ -28,6 +37,8 @@ message DataBagItems {
     string server_id = 2;
     // Data bag name.
     string name = 3;
+    // Items search query.
+    SearchQuery search_query = 4;
 }
 
 message DataBagItem {
