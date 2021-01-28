@@ -62,11 +62,16 @@ func (c *ChefClient) SearchEnvironments(searchQuery *request.SearchQuery) (Envir
 			Rows:  inc,
 		}
 	} else {
+		perPage := int(searchQuery.GetRows())
+		if perPage == 0 {
+			perPage = 1000
+		}
+
 		query = chef.SearchQuery{
 			Index: "environment",
 			Query: searchQuery.GetQ(),
 			Start: int(searchQuery.GetStart()),
-			Rows:  int(searchQuery.GetRows()),
+			Rows:  perPage,
 		}
 	}
 
