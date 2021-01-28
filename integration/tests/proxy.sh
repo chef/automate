@@ -75,10 +75,10 @@ do_test_deploy() {
     # create node
     node=$(curl 'https://localhost/api/v0/nodes/bulk-create' \
         -H "api-token: ${token}" \
-        -d '{"nodes":[{"name":"aws test-3.138.179.244","manager":"automate","target_config":{"backend":"ssh","secrets":["2a86f66b-11a8-4591-917e-874006420225"],"port":22,"sudo":false,"hosts":["3.138.179.244"]},"tags":[]}]}' \
-        -k | jq -r '.id.[1]')
+        -d '{"nodes":[{"name":"aws test-3.138.179.244","manager":"automate","target_config":{"backend":"ssh","secrets":['${id}'],"port":22,"sudo":false,"hosts":["3.138.179.244"]},"tags":[]}]}' \
+        -k | jq -r '.ids[0]')
     echo "$node"
-    if [[ "$node" -eq "null" ]] ; then
+    if [[ -z "$node" ]] ; then
       echo "Failed to create node"
       exit 1
     fi
@@ -89,19 +89,22 @@ do_test_deploy() {
     #   -H "api-token: ${token}"
     #   --data-raw $'------WebKitFormBoundaryQrwmi71c5IFquAl3\r\nContent-Disposition: form-data; name="file"; filename="testproxy-0.1.0.tar.gz"\r\nContent-Type: application/x-gzip\r\n\r\n\r\n------WebKitFormBoundaryQrwmi71c5IFquAl3--\r\n' \
     #   -k
-    upload=$(curl -d "data=@testproxy-0.1.0.tar.gz" https://localhost/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin -k | jq -r '.summary.valid')
+
+    upload=$(curl  -v -F file=@testproxy-0.1.0.tar.gz 'https://a2-dev.test/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin' -H "api-token: ${token}" -k | jq -r '.summary.valid')
     echo "$upload"
-    if [[ "$upload" -eq "null" ]] ; then
-      echo "Failed to create node"
+    if [[ -z "$upload" ]] ; then
+      echo "Failed to upload"
       exit 1
     fi
+
+    echo "valid ${upload}"
     # {"summary":{"valid":true,"timestamp":"2021-01-22T13:54:36+00:00","location":"/hab/svc/compliance-service/var/tmp/inspec-upload528214652.tar.gz","controls":3}}
 
     # get automate node manager
     managerId=$(curl 'https://a2-perf-test-single-local-inplace-upgrade-acceptance.cd.chef.co/api/v0/nodemanagers/search' \
       -H "api-token: ${token}" \
       -d '{ "filter_map": [ { "key": "type", "values": [ "automate" ] } ], "sort": "date_added" }' \
-      -k | jq -r '.managers.[0].id')
+      -k | jq -r '.managers[0].id')
 
 
     # schedule scan job
