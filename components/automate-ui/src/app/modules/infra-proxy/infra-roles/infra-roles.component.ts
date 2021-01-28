@@ -118,7 +118,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   public deleteRole(): void {
     this.closeDeleteModal();
-    debugger
     this.store.dispatch(new DeleteRole({
       server_id: this.serverId, org_id: this.orgId, name: this.roleToDelete.name
     }));
