@@ -18,7 +18,7 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !roles.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue === ''">No roles available</p>
+      <p *ngIf="searchValue === ''">No roles available.</p>
       <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
     </div>
     <chef-table *ngIf="roles.length">

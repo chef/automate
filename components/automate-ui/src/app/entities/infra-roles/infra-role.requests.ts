@@ -39,6 +39,7 @@ export class InfraRoleRequests {
   }
 
   public deleteRole(server_id: string, org_id: string, name: string): Observable<{}> {
+    debugger
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`,
     {headers});
   }
