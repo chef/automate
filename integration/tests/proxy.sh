@@ -103,7 +103,7 @@ do_test_deploy() {
     # get automate node manager
     managerId=$(curl 'https://localhost/api/v0/nodemanagers/search' \
       -H "api-token: ${token}" \
-      -d '{ "filter_map": [ { "key": "type", "values": [ "automate" ] } ], "sort": "date_added" }' \
+      -d '{ "filter_map": [ { "key": "manager_type", "values": [ "automate" ] } ], "sort": "date_added" }' \
       -k | jq -r '.managers[0].id')
 
 
