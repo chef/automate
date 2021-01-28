@@ -30,6 +30,12 @@
         <div class="section-container" *ngIf="dataBagDetails">
           <div class="empty-section" *ngIf="!dataBagDetails.length">No data available</div>
           <div>
+            <div class="search-items">
+              <input chefInput type="text" placeholder="Search data bag items" name="search">
+              <button chef-button class="search-button primary" primary>
+                <chef-icon>search</chef-icon>
+              </button>
+            </div>
             <ul id="accordion" class="accordion" >
               <li *ngFor="let item of dataBagDetails; let i = index" [class.active]="item.active" class="items">
                 <div class="menu" (click)="handleItemSelected(item.name, i)">

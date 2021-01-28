@@ -128,6 +128,32 @@ tbody > .detail-row {
   color: $royal-blue;
 }
 
+.search-button {
+  box-shadow: 0 1px 14px #E6EBEE;
+  border: 1px solid #E5E5E5;
+  border-left: none;
+  border-radius: 0px 4px 4px 0px;
+  background: #E6EBEE;
+  width: 2.6%;
+  height: 45px;
+  float: right;
+}
+
+.chef-input {
+  border-radius: 4px 0px 0px 4px;
+  // border-right: none;
+  width: 97.4%;
+}
+
+.search-items {
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+chef-tab-selector chef-option:before {
+  height: 3px;
+}
+
 // CSS for accordion
 
 .accordion {
