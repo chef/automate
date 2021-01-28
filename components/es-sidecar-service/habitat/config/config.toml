@@ -78,6 +78,9 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~#if cfg.backups.s3.es.chunk_size}}
   chunk_size = "{{cfg.backups.s3.es.chunk_size}}"
   {{~/if}}
+  {{~#if cfg.backups.s3.role_arn}}
+  role_arn = "{{cfg.backups.s3.role_arn}}"
+  {{~/if}}
 {{~/if}}
 
 {{~#if cfg.backups.gcs.bucket}}

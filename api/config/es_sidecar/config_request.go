@@ -145,6 +145,10 @@ func (c *ConfigRequest) applyExternalConfig(
 			cfg.S3.Client = c
 		}
 
+		if a := extS3cfg.GetRoleArn(); a != nil {
+			cfg.S3.RoleArn = a
+		}
+
 		if s := extS3cfg.GetSettings(); s != nil {
 			cfg.S3.Es = s
 		}

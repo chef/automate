@@ -16,6 +16,7 @@ type S3BackupsConfig struct {
 	MaxSnapshotBytesPerSec string `mapstructure:"max_snapshot_bytes_per_sec"`
 	MaxRestoreBytesPerSec  string `mapstructure:"max_restore_bytes_per_sec"`
 	ChunkSize              string `mapstructure:"chunk_size"`
+	RoleARN                string `mapstructure:"role_arn"`
 }
 
 // ConfigureSnapshotCreateRepositoryService takes a pointer to an existing snapshot
@@ -53,6 +54,9 @@ func (s3 *S3BackupsConfig) createRepoReq(repoName string) createRepoReq {
 	}
 	if s3.MaxSnapshotBytesPerSec != "" {
 		req.Settings["max_snapshot_bytes_per_sec"] = s3.MaxSnapshotBytesPerSec
+	}
+	if s3.RoleARN != "" {
+		req.Settings["role_arn"] = s3.RoleARN
 	}
 
 	return req

@@ -37,6 +37,7 @@ message External {
         google.protobuf.StringValue client = 2;
         google.protobuf.StringValue base_path = 3;
         chef.automate.infra.config.Backups.S3.Elasticsearch settings = 4; // optional settings
+        google.protobuf.StringValue role_arn = 5;
       }
 
       message GCSSettings {
