@@ -14,9 +14,15 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
-// DataBagItem represents the search based deserialized data bag item type
+// DataBagItem represents the search based deserialized data bag item
 type DataBagItem struct {
-	Name string `json:"name"`
+	Name        string      `json:"name"`
+	RawItemData RawItemData `json:"raw_data"`
+}
+
+// RawItemData represents the search based deserialized raw data
+type RawItemData struct {
+	ID string `json:"id"`
 }
 
 // DataBagItemsResult list result from Search API
@@ -340,7 +346,7 @@ func fromAPIToListDatabagItems(al []*DataBagItem) []*response.DataBagListItem {
 	cl := make([]*response.DataBagListItem, len(al))
 	for index, c := range al {
 		cl[index] = &response.DataBagListItem{
-			Name: c.Name,
+			Name: c.RawItemData.ID,
 		}
 	}
 
