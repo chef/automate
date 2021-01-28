@@ -246,9 +246,19 @@ func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environ
 }
 
 func (s *Server) SearchListEnvironment(ctx context.Context, req *request.SearchListEnvironment) (*response.SearchListEnvironment, error) {
-	s.service.Logger.Info("req", req)
-	return &response.SearchListEnvironment{
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 
+	if err != nil {
+		return nil, err
+	}
+
+	environments, err := c.client.Environments.List()
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.SearchListEnvironment{
+		Environments: environments,
 	}, nil
 }
 

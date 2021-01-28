@@ -3217,7 +3217,10 @@ func init() {
           "format": "int32"
         },
         "rows": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+          }
         }
       }
     },

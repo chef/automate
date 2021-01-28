@@ -128,18 +128,20 @@ func (a *InfraProxyServer) GetEnvironmentRecipes(ctx context.Context, r *gwreq.E
 
 // SearchListEnvironment fetches an array of environment based on search query
 func (a *InfraProxyServer) SearchListEnvironment(ctx context.Context, r *gwreq.SearchListEnvironment) (*gwres.SearchListEnvironment, error) {
+	req := &infra_req.SearchListEnvironment{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Index:    r.Index,
+	}
+	res, err := a.client.SearchListEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 	return &gwres.SearchListEnvironment{
-		Total: 10,
-		Start: 1,
-		Rows: &gwres.Environment{
-			Name:                "name",
-			ChefType:           "res.GetChefType()",
-			Description:        "res.GetDescription()",
-			CookbookVersions:   "res.GetCookbookVersions()",
-			JsonClass:          "res.GetJsonClass()",
-			DefaultAttributes:  "res.GetDefaultAttributes()",
-			OverrideAttributes: "res.GetOverrideAttributes()",
-		},nil
+		Total: res.GetTotal(),
+		Start: res.GetStart(),
+		Rows: fromUpstreamEnvironments(res.),
 	}, nil
 }
 
