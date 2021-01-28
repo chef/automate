@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	chef "github.com/go-chef/chef"
 
@@ -20,6 +19,20 @@ type AccessKeyReq struct {
 	CreateKey      bool   `json:"create_key,omitempty"`
 }
 
+// Client represents api client struct.
+type Client struct {
+	Name       string `json:"name"`
+	ClientName string `json:"clientname"`
+	OrgName    string `json:"orgname"`
+}
+
+// ClientResult list result from Search API
+type ClientResult struct {
+	Total int       `json:"total"`
+	Start int       `json:"start"`
+	Rows  []*Client `json:"rows"`
+}
+
 // GetClients get clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
@@ -27,17 +40,80 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		return nil, err
 	}
 
-	clients, err := c.client.Clients.List()
+	res, err := c.SearchClients(req.SearchQuery)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
 	return &response.Clients{
-		Clients: fromAPIToListClients(clients),
+		Clients: fromAPIToListClients(res.Rows),
+		Start:   int32(res.Start),
+		Total:   int32(res.Total),
 	}, nil
 }
 
-// GetClient gets the client
+// SearchClients gets client list from Chef Infra Server search API.
+func (c *ChefClient) SearchClients(searchQuery *request.SearchQuery) (ClientResult, error) {
+	var result ClientResult
+	var searchAll bool
+	inc := 1000
+	var query chef.SearchQuery
+
+	if searchQuery == nil || searchQuery.Q == "" {
+		searchAll = true
+		query = chef.SearchQuery{
+			Index: "client",
+			Query: "*:*",
+			Start: 0,
+			Rows:  inc,
+		}
+	} else {
+		query = chef.SearchQuery{
+			Index: "client",
+			Query: searchQuery.GetQ(),
+			Start: int(searchQuery.GetStart()),
+			Rows:  int(searchQuery.GetRows()),
+		}
+	}
+
+	fullURL := fmt.Sprintf("search/%s", query)
+	newReq, err := c.client.NewRequest("GET", fullURL, nil)
+
+	if err != nil {
+		return result, ParseAPIError(err)
+	}
+
+	res, err := c.client.Do(newReq, &result)
+	if err != nil {
+		return result, ParseAPIError(err)
+	}
+
+	defer res.Body.Close() // nolint: errcheck
+
+	if searchAll {
+		var searchResult ClientResult
+		start := result.Start
+		// the total rows available for this query across all pages
+		total := result.Total
+		for start+inc <= total {
+			query.Start = query.Start + inc
+			fullURL = fmt.Sprintf("search/%s", query)
+
+			res1, err := c.client.Do(newReq, &searchResult)
+			if err != nil {
+				return result, ParseAPIError(err)
+			}
+
+			defer res1.Body.Close() // nolint: errcheck
+
+			// add this page of results to the primary SearchResult instance
+			result.Rows = append(result.Rows, searchResult.Rows...)
+		}
+	}
+	return result, nil
+}
+
+// GetClient get client
 func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.Client, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -204,20 +280,13 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 }
 
 // fromAPIToListClients a response.Clients from a struct of ClientList
-func fromAPIToListClients(al chef.ApiClientListResult) []*response.ClientListItem {
+func fromAPIToListClients(al []*Client) []*response.ClientListItem {
 	cl := make([]*response.ClientListItem, len(al))
-
-	index := 0
-	for c := range al {
+	for index, c := range al {
 		cl[index] = &response.ClientListItem{
-			Name: c,
+			Name: c.Name,
 		}
 		index++
 	}
-
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
-
 	return cl
 }

@@ -14,6 +14,11 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 	req := &infra_req.Clients{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:     r.GetSearchQuery().GetQ(),
+			Start: r.GetSearchQuery().GetStart(),
+			Rows:  r.GetSearchQuery().GetRows(),
+		},
 	}
 	res, err := a.client.GetClients(ctx, req)
 	if err != nil {
@@ -22,6 +27,8 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 
 	return &gwres.Clients{
 		Clients: fromUpstreamClients(res.Clients),
+		Start:   res.GetStart(),
+		Total:   res.GetTotal(),
 	}, nil
 }
 

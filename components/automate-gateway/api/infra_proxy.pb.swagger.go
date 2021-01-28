@@ -485,6 +485,29 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "search_query.q",
+            "description": "The search query used to identify a list of items.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "search_query.start",
+            "description": "The number of result pages to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "search_query.rows",
+            "description": "The number of results on each page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -2186,6 +2209,25 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.SearchQuery": {
+      "type": "object",
+      "properties": {
+        "q": {
+          "type": "string",
+          "description": "The search query used to identify a list of items."
+        },
+        "start": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of result pages to return."
+        },
+        "rows": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of results on each page."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateDataBagItem": {
       "type": "object",
       "properties": {
@@ -2497,6 +2539,16 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientListItem"
           },
           "description": "Client list."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of records."
+        },
+        "start": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of result pages to return."
         }
       }
     },
