@@ -39,13 +39,6 @@ chef-modal {
           font-weight: bold;
         }
       }
-
-      .scrollable-form-div {
-        height: calc(100vh - 220px);
-        overflow-y: scroll;
-        padding-right: 90px;
-        margin-left: 100px;
-      }
     }
 
     #button-org {
@@ -63,4 +56,19 @@ chef-modal {
       height: 45px;
     }
   }
+}
+
+chef-modal ::ng-deep .modal {
+  height: 90%;
+  overflow-x: hidden;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar {
+  width: 12px;
+  background-color: #F5F5F5;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #CCC;
 }
