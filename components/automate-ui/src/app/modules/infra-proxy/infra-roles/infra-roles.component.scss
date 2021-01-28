@@ -60,3 +60,22 @@ img {
 .three-dot-column {
   text-align: right;
 }
+
+::ng-deep {
+  chef-modal .modal {
+    width: 462px;
+    height: 329px;
+  }
+  
+  chef-modal .modal .close {
+    border: none;
+    color: black;
+  }
+
+  chef-modal {
+    [slot=title] {
+      font-size: 12px !important;
+      font-weight: 400 !important;
+    }
+  }
+}
