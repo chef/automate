@@ -10,7 +10,7 @@ import { routeParams } from 'app/route.selectors';
 
 import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { allDataBagDetails, getAllStatus, getSearchStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
@@ -24,6 +24,7 @@ export type DataBagsDetailsTab = 'details';
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public dataBagDetails: DataBags[];
+  public dataBagSearch: DataBags[];
   public dataBagItemDetails: DataBagsItemDetails;
   public serverId: string;
   public orgId: string;
@@ -78,6 +79,25 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       });
 
     combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allDataBagDetails)
+    ]).pipe(
+      filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
+        getDataBagDetailsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
+        !isNil(dataBagDetailsState)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
+        this.dataBagSearch = dataBagDetailsState;
+        console.log(this.dataBagSearch);
+        // // This code block is for selecting first item from the list by default.
+        // if (this.dataBagDetails.length) {
+        //   this.handleItemSelected(this.dataBagDetails[0].name);
+        // }
+        this.dataBagsDetailsLoading = false;
+      });
+
+    combineLatest([
       this.store.select(getStatus),
       this.store.select(dataBagItemDetailsFromRoute)
     ]).pipe(
@@ -101,6 +121,25 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       name: this.dataBagsName,
       item_name: item
     }));
+  }
+
+  toggleFilters(currentText: string) {
+    console.log(currentText);
+    if(currentText) {
+      const payload = {
+        databagId: currentText,
+        page: 0,
+        per_page: 20,
+        server_id: this.serverId,
+        org_id: this.orgId,
+         name: this.dataBagsName,
+         query: 'q'
+      };
+      console.log(payload);
+
+       //this.store.dispatch(new GetDataBagSearchDetails(payload));
+    }
+
   }
 
   ngOnDestroy(): void {

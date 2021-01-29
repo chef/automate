@@ -11,7 +11,11 @@ import {
   GetDataBagDetailsSuccess,
   GetDataBagDetailsFailure,
   DataBagDetailsSuccessPayload,
-  DataBagDetailsActionTypes
+  DataBagDetailsActionTypes,
+  DataBagSearchDetails,
+  DataBagSearchSuccessPayload,
+  DataBagSearchDetailsSuccess,
+  DataBagSearchdDetailsFailure
 } from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
@@ -25,22 +29,44 @@ export class DataBagDetailsEffects {
 
   @Effect()
   getDataBagDetails$ = this.actions$.pipe(
-      ofType(DataBagDetailsActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id, name } }: GetDataBagDetails) =>
-        this.requests.getDataBagDetails(server_id, org_id, name).pipe(
-          map((resp: DataBagDetailsSuccessPayload) => new GetDataBagDetailsSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
+    ofType(DataBagDetailsActionTypes.GET_ALL),
+    mergeMap(({ payload: { server_id, org_id, name } }: GetDataBagDetails) =>
+      this.requests.getDataBagDetails(server_id, org_id, name).pipe(
+        map((resp: DataBagDetailsSuccessPayload) => new GetDataBagDetailsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
           observableOf(new GetDataBagDetailsFailure(error))))));
 
   @Effect()
   getDataBagDetailsFailure$ = this.actions$.pipe(
-      ofType(DataBagDetailsActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetDataBagDetailsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra data bag details: ${msg || payload.error}`
-        });
-      }));
+    ofType(DataBagDetailsActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetDataBagDetailsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra data bag details: ${msg || payload.error}`
+      });
+    }));
+
+
+  @Effect()
+  getDataBagSearchDetails$ = this.actions$.pipe(
+    ofType(DataBagDetailsActionTypes.SEARCH),
+    mergeMap((action: DataBagSearchDetails) =>
+      this.requests.getDataBagSearchDetails(action.payload).pipe(
+        map((resp: DataBagSearchSuccessPayload) => new DataBagSearchDetailsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DataBagSearchdDetailsFailure(error))))));
+
+  @Effect()
+  getDataBagSearchDetailsFailure$ = this.actions$.pipe(
+    ofType(DataBagDetailsActionTypes.SEARCH_FAILURE),
+    map(({ payload }: DataBagSearchdDetailsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra data bag details: ${msg || payload.error}`
+      });
+    }));
+
 
 }

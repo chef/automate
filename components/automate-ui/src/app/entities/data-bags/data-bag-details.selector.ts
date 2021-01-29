@@ -20,6 +20,11 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
+export const getSearchStatus = createSelector(
+  dataBagDetailsState,
+  (state) => state.getSearchStatus
+);
+
 export const dataBagDetailsFromRoute = createSelector(
   dataBagDetailsEntities,
   routeParams,
