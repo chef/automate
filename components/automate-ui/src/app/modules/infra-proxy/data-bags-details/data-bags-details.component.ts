@@ -8,9 +8,9 @@ import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
 
-import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
+import { GetDataBagDetails, DataBagSearchDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import { allDataBagDetails, getAllStatus, getSearchStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
@@ -76,25 +76,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
           this.handleItemSelected(this.dataBagDetails[0].name);
         }
         this.dataBagsDetailsLoading = false;
-      });
 
-    combineLatest([
-      this.store.select(getSearchStatus),
-      this.store.select(allDataBagDetails)
-    ]).pipe(
-      filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
-        getDataBagDetailsSt === EntityStatus.loadingSuccess),
-      filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
-        !isNil(dataBagDetailsState)),
-      takeUntil(this.isDestroyed))
-      .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
-        this.dataBagSearch = dataBagDetailsState;
-        console.log(this.dataBagSearch);
-        // // This code block is for selecting first item from the list by default.
-        // if (this.dataBagDetails.length) {
-        //   this.handleItemSelected(this.dataBagDetails[0].name);
-        // }
-        this.dataBagsDetailsLoading = false;
       });
 
     combineLatest([
@@ -108,6 +90,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
+
         this.dataBagsItemDetailsLoading = false;
       });
   }
@@ -123,21 +106,18 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  toggleFilters(currentText: string) {
-    console.log(currentText);
+  searchDataBagItems(currentText: string) {
     if(currentText) {
+
       const payload = {
         databagId: currentText,
-        page: 0,
-        per_page: 20,
         server_id: this.serverId,
         org_id: this.orgId,
-         name: this.dataBagsName,
-         query: 'q'
+        name: this.dataBagsName,
+        query: 'q'
       };
-      console.log(payload);
 
-       //this.store.dispatch(new GetDataBagSearchDetails(payload));
+       this.store.dispatch(new DataBagSearchDetails(payload));
     }
 
   }

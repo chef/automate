@@ -15,6 +15,10 @@ export interface DataBagDetailsSuccessPayload {
   data_bags: DataBags[];
 }
 
+export interface DataBagItemListsSuccessPayload {
+  items: DataBags[];
+}
+
 export class GetDataBagDetails implements Action {
   readonly type = DataBagDetailsActionTypes.GET_ALL;
   constructor(public payload: { server_id: string, org_id: string, name: string }) { }
@@ -22,7 +26,7 @@ export class GetDataBagDetails implements Action {
 
 export class GetDataBagDetailsSuccess implements Action {
   readonly type = DataBagDetailsActionTypes.GET_ALL_SUCCESS;
-  constructor(public payload: DataBagDetailsSuccessPayload) { }
+  constructor(public payload: DataBagItemListsSuccessPayload) { }
 }
 
 export class GetDataBagDetailsFailure implements Action {
@@ -32,12 +36,10 @@ export class GetDataBagDetailsFailure implements Action {
 
 export interface DataBagSearchPayload {
   databagId: string;
-  page: number;
-  per_page: number;
   server_id: string;
   org_id: string;
-   name: string;
-   query: string;
+  name: string;
+  query: string;
 }
 
 export class DataBagSearchDetails implements Action {
@@ -46,9 +48,7 @@ export class DataBagSearchDetails implements Action {
 }
 
 export interface DataBagSearchSuccessPayload {
-  databagId: string;
-  nodes: any[];
-  total: number;
+  items: DataBags[];
 }
 
 export class DataBagSearchDetailsSuccess implements Action {

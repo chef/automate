@@ -35,7 +35,7 @@ export function dataBagDetailsEntityReducer(
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
         (dataBagDetailsEntityAdapter
-          .setAll(action.payload.data_bags, state)) as DataBagDetailsEntityState;
+          .setAll(action.payload.items, state)) as DataBagDetailsEntityState;
 
     case DataBagDetailsActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
@@ -48,7 +48,7 @@ export function dataBagDetailsEntityReducer(
       return pipe(
         set(GET_SEARCH_STATUS, EntityStatus.loadingSuccess))
         (dataBagDetailsEntityAdapter
-          .setAll(action.payload.nodes, state)) as DataBagDetailsEntityState;
+          .setAll(action.payload.items, state)) as DataBagDetailsEntityState;
 
     case DataBagDetailsActionTypes.SEARCH_FAILURE:
       return set(GET_SEARCH_STATUS, EntityStatus.loadingFailure, state);

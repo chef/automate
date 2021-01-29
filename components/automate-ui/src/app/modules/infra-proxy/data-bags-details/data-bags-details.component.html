@@ -33,7 +33,7 @@
  
             <div class="item-column">
               <app-search-bar-data-bages
-              (searchButtonClick)="toggleFilters($event)"
+              (searchButtonClick)="searchDataBagItems($event)"
               ></app-search-bar-data-bages>
               <ul>
                 <li *ngFor="let item of dataBagDetails" [class.selected]="item.name === selectedItem"
