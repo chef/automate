@@ -1,17 +1,18 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
-import { GetClients } from 'app/entities/clients/client.action';
-import { Client } from 'app/entities/clients/client.model';
+import { GetClients, ClientSearch } from 'app/entities/clients/client.action';
+import { Client, ClientName } from 'app/entities/clients/client.model';
 import {
   allClients,
-  getAllStatus as getAllClientsForOrgStatus
+  getAllStatus as getAllClientsForOrgStatus,
+  getSearchStatus
 } from 'app/entities/clients/client.selectors';
 
 
@@ -30,6 +31,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clients: Client[] = [];
   public clientsListLoading = true;
   public authFailure = false;
+  public clientSearch: ClientName[];
+  public clientName: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -56,10 +59,41 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.authFailure = true;
       }
     });
+
+    combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allClients),
+    ]).pipe(
+      filter(([getClientsSt, _ClientsState]) =>
+      getClientsSt === EntityStatus.loadingSuccess),
+      filter(([_getClientsSt, clientsState]) =>
+        !isNil(clientsState)),
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getClientsSt, clientsState]) => {
+      this.clientSearch = clientsState;
+      console.log("this.clientSearch", this.clientSearch);
+    });
   }
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  toggleFilters(currentText: string) {
+    console.log("currentText", currentText);
+    if(currentText) {
+      const payload = {
+        clientId: currentText,
+        page: 0,
+        per_page: 20,
+        server_id: this.serverId,
+        org_id: this.orgId,
+         name: this.clientName,
+         query: 'q'
+      };
+      console.log("payload",payload);
+       this.store.dispatch(new ClientSearch(payload));
+    }
   }
 
   ngOnDestroy(): void {

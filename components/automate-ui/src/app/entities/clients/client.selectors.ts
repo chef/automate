@@ -16,3 +16,8 @@ export const getAllStatus = createSelector(
   clientState,
   (state) => state.getAllStatus
 );
+
+export const getSearchStatus = createSelector(
+  clientState,
+  (state) => state.getSearchStatus
+);

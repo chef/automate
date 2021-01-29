@@ -2,6 +2,8 @@
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
+    <app-search-bar-clients (searchButtonClick)="toggleFilters($event)">
+    </app-search-bar-clients>
     <chef-table>
       <chef-thead>
         <chef-tr>

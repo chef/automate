@@ -14,7 +14,11 @@ import {
   ClientActionTypes,
   GetClient,
   GetClientSuccess,
-  GetClientFailure
+  GetClientFailure,
+  ClientSearch,
+  ClientSearchSuccessPayload,
+  ClientSearchSuccess,
+  ClientSearchFailure
 } from './client.action';
 
 import { ClientRequests } from './client.requests';
@@ -65,4 +69,24 @@ export class ClientEffects {
         message: `Could not get client: ${msg || payload.error}`
       });
     }));
+
+    @Effect()
+    getDataBagSearchDetails$ = this.actions$.pipe(
+      ofType(ClientActionTypes.SEARCH),
+      mergeMap((action: ClientSearch) =>
+        this.requests.getClientSearch(action.payload).pipe(
+          map((resp: ClientSearchSuccessPayload) => new ClientSearchSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new ClientSearchFailure(error))))));
+  
+    @Effect()
+    getDataBagSearchDetailsFailure$ = this.actions$.pipe(
+      ofType(ClientActionTypes.SEARCH_FAILURE),
+      map(({ payload }: ClientSearchFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get infra data bag details: ${msg || payload.error}`
+        });
+      }));
 }

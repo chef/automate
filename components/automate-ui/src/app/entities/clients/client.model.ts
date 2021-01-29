@@ -11,3 +11,15 @@ export interface Client {
   json_class: string;
   chef_type: string;
 }
+
+export interface ClientSearch {
+  name: string;
+  page: number;
+  count: number;
+  filter: string;
+  sort: string;
+}
+
+export interface ClientName {
+  name: string;
+}
