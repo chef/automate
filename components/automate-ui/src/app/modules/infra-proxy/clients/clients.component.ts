@@ -71,7 +71,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
         !isNil(clientsState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getClientsSt, clientsState]) => {
-      this.clients = clientsState;
+      this.clientSearch = clientsState;
+      console.log("this.clientSearch", this.clientSearch);
     });
   }
 
@@ -88,30 +89,11 @@ export class ClientsComponent implements OnInit, OnDestroy {
         per_page: 20,
         server_id: this.serverId,
         org_id: this.orgId,
-         name: this.clientName,
-         query: 'q'
+        name: this.clientName,
+        query: 'q'
       };
-      combineLatest([
-        this.store.select(getSearchStatus),
-        this.store.select(allClients)
-      ]).pipe(
-        filter(([getClientsSt, _ClientsState]) =>
-        getClientsSt === EntityStatus.loadingSuccess),
-        filter(([_getClientsSt, clientsState]) =>
-          !isNil(clientsState)),
-        takeUntil(this.isDestroyed))
-      .subscribe(([_getClientsSt, clientsState]) => {
-        this.clients = clientsState;
-      });
+      
        this.store.dispatch(new ClientSearch(payload));
-
-       setTimeout(() => {
-        this.searchItems = false;
-      }, 2000);
-    } else {
-      this.store.dispatch(new GetClients({
-        server_id: this.serverId, org_id: this.orgId
-      }));
     }
   }
 
