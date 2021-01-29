@@ -70,8 +70,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         !isNil(clientsState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getClientsSt, clientsState]) => {
-      this.clientSearch = clientsState;
-      console.log("this.clientSearch", this.clientSearch);
+      this.clients = clientsState;
     });
   }
 
@@ -80,7 +79,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
-    console.log("currentText", currentText);
     if(currentText) {
       const payload = {
         clientId: currentText,
@@ -91,7 +89,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
          name: this.clientName,
          query: 'q'
       };
-      console.log("payload",payload);
        this.store.dispatch(new ClientSearch(payload));
     }
   }

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { Client, ClientName } from './client.model';
+import { Client,ClientName } from './client.model';
 
 export enum ClientActionTypes {
   GET_ALL = 'CLIENTS::GET_ALL',
@@ -51,12 +51,10 @@ export class GetClientFailure implements Action {
 
 export interface ClientSearchPayload {
   clientId: string;
-  page: number;
-  per_page: number;
   server_id: string;
   org_id: string;
-   name: string;
-   query: string;
+  name: string;
+  query: string;
 }
 
 export class ClientSearch implements Action {
@@ -65,7 +63,9 @@ export class ClientSearch implements Action {
 }
 
 export interface ClientSearchSuccessPayload {
-  clients: Client[];
+  clients: ClientName[];
+  start: number;
+  total: number;
 }
 
 export class ClientSearchSuccess implements Action {

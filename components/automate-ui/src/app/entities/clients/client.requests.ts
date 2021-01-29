@@ -29,19 +29,13 @@ export class ClientRequests {
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`, {headers});
   }
 
+  // ?search_query.q=name:node-*
   public getClientSearch(payload: ClientSearchPayload)
   : Observable<ClientSearchResponse> {
     return this.http.get<ClientSearchResponse>(
-      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients?search_query.${payload.query}=name:${payload.clientId}`,
+      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients?search_query.${payload.query}=name:${payload.clientId}-*`,
       {headers}
     );
   }
-  // ?search_query.q=id:root
-  public getClientDetails(server_id: string, org_id: string, name: string, item_name: string)
-  : Observable<Client> {
-    return this.http.get<Client>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}/${item_name}`,
-      {headers}
-    );
-  }
+  
 }
