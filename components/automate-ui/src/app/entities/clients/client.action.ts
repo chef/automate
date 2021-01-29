@@ -51,8 +51,6 @@ export class GetClientFailure implements Action {
 
 export interface ClientSearchPayload {
   clientId: string;
-  page: number;
-  per_page: number;
   server_id: string;
   org_id: string;
   query: string;
@@ -65,6 +63,8 @@ export class ClientSearch implements Action {
 
 export interface ClientSearchSuccessPayload {
   clients: Client[];
+  start: number;
+  total: number;
 }
 
 export class ClientSearchSuccess implements Action {

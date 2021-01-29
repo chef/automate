@@ -71,8 +71,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         !isNil(clientsState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getClientsSt, clientsState]) => {
-      this.clientSearch = clientsState;
-      console.log("this.clientSearch", this.clientSearch);
+      this.clients = clientsState;
     });
   }
 
