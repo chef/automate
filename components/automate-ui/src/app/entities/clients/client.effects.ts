@@ -71,22 +71,22 @@ export class ClientEffects {
     }));
 
     @Effect()
-    getDataBagSearchDetails$ = this.actions$.pipe(
+    getClientSearch$ = this.actions$.pipe(
       ofType(ClientActionTypes.SEARCH),
       mergeMap((action: ClientSearch) =>
         this.requests.getClientSearch(action.payload).pipe(
-          map((resp: ClientSearchSuccessPayload) => new ClientSearchSuccess(resp)),
+          map((resp) => new ClientSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new ClientSearchFailure(error))))));
   
     @Effect()
-    getDataBagSearchDetailsFailure$ = this.actions$.pipe(
+    getClientSearchFailure$ = this.actions$.pipe(
       ofType(ClientActionTypes.SEARCH_FAILURE),
       map(({ payload }: ClientSearchFailure) => {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get infra data bag details: ${msg || payload.error}`
+          message: `Could not get infra clients details: ${msg || payload.error}`
         });
       }));
 }
