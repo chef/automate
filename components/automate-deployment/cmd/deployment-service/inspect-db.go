@@ -152,10 +152,16 @@ func pretty(buf io.Writer, v reflect.Value, depth int) {
 
 		fmt.Fprint(buf, "{\n")
 		for i := 0; i < v.NumField(); i++ {
+			field := v.Field(i)
+			fieldName := v.Type().Field(i).Name
+			if skipPBInternal(fieldName, field) {
+				continue
+			}
+
 			fmt.Fprint(buf, nextIndent)
-			fmt.Fprint(buf, v.Type().Field(i).Name)
+			fmt.Fprint(buf, fieldName)
 			fmt.Fprint(buf, ": ")
-			pretty(buf, v.Field(i), depth+1)
+			pretty(buf, field, depth+1)
 			fmt.Fprint(buf, ",\n")
 		}
 		fmt.Fprint(buf, indent)
@@ -179,6 +185,25 @@ func pretty(buf io.Writer, v reflect.Value, depth int) {
 	default: // Chan, Func, UnsafePointer, and anything new, just print. String() is special and always returns us /something/
 		fmt.Fprint(buf, v.String())
 	}
+}
+
+// skipPBInternal returns true if the field looks like protobuf
+// internal state that isn't useful to print.
+func skipPBInternal(fieldName string, field reflect.Value) bool {
+	switch fieldName {
+	case "state":
+		typeName := field.Type().Name()
+		if typeName == "MessageState" {
+			return true
+		}
+	case "sizeCache":
+		return true
+	case "unknownFields":
+		if field.Kind() == reflect.Slice && field.Len() == 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func fallbackDump(db *bolt.DB, err error) {
