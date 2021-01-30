@@ -4,6 +4,8 @@ title = "System Requirements"
 weight = 20
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "System Requirements"
@@ -11,8 +13,6 @@ draft = false
     identifier = "automate/getting_started/system_requirements.md System Requirements"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/system_requirements.md)
 
 ## Hardware
 

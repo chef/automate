@@ -2,6 +2,8 @@
 title = "Data Collection"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Data Collection"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/configuring_automate/data_collection.md Data Collection"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/data_collection.md)
 
 # Audit Cookbook + Inspec + Automate 2 Versions Support Matrix
 

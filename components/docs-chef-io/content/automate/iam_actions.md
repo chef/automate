@@ -2,6 +2,8 @@
 title = "IAM Actions"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "IAM Actions"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/authorization/iam_actions.md IAM Actions"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/iam_actions.md)
 
 Reference the chart on this page when creating a *Role* to know which action grants access to what page in the browser.
 

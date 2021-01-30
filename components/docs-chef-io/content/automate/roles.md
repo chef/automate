@@ -2,6 +2,8 @@
 title = "Roles"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Roles"
@@ -9,8 +11,6 @@ draft = false
     parent = "automate/settings"
     weight = 100
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/roles.md)
 
 ## Overview
 

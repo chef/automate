@@ -3,6 +3,8 @@ title = "IAM Users Guide"
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "IAM Users Guide"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/authorization/iam_v2_guide.md IAM Users Guide"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/iam_v2_guide.md)
 
 {{< note >}}
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.

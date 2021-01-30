@@ -3,6 +3,8 @@ title = "ServiceNow Integration"
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "ServiceNow Integration"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/reference/servicenow_integration_install.md ServiceNow Integration"
     weight = 40
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/servicenow_integration_install.md)
 
 This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Infra Client runs and Compliance scans.
 

@@ -3,6 +3,8 @@ title = "chef-automate CLI"
 
 date = 2018-03-26T15:29:24-07:00
 draft = false
+
+gh_repo = "automate"
 toc_layout = "cli_chef_automate_toc"
 
 [menu]
@@ -12,8 +14,6 @@ toc_layout = "cli_chef_automate_toc"
     identifier = "automate/reference/cli_chef_automate.md chef-automate CLI"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/cli_chef_automate.md)
 
 ## Automate CLI Commands
 

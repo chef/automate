@@ -2,6 +2,8 @@
 title = "Elasticsearch"
 
 draft = true
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Elasticsearch"
@@ -10,4 +12,3 @@ draft = true
     weight = 30
 +++
 
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/elasticsearch.md)

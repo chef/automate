@@ -5,6 +5,8 @@ date = 2019-11-19T14:10:15-08:00
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Install Chef Habitat Builder On-prem"
@@ -12,8 +14,6 @@ draft = false
     identifier = "automate/getting_started/on_prem_builder.md Install Chef Habitat Builder On-prem"
     weight = 50
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/on_prem_builder.md)
 
 This guide details how to install Chef Automate and deploy Chef Habitat Builder on-prem together. Enterprise customers may wish to set up an on-premises Chef Habitat Builder depot to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.
 

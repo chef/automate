@@ -2,6 +2,8 @@
 title = "Projects"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Projects"
@@ -9,8 +11,6 @@ draft = false
     parent = "automate/settings"
     weight = 110
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/projects.md)
 
 ## Overview
 

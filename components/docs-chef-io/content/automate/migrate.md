@@ -2,6 +2,8 @@
 title = "Migrate from Chef Automate 1"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Migrate from Chef Automate 1"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/getting_started/migrate.md Migrate from Chef Automate 1"
     weight = 60
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/migrate.md)
 
 Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported.
 For more information and for help upgrading your system, please contact your Chef account representative.

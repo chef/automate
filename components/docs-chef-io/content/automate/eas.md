@@ -3,6 +3,8 @@ title = "Chef EAS"
 
 date = 2019-10-18T18:54:09+00:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef EAS"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/applications/eas.md Chef EAS"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/eas.md)
 
 The Chef Enterprise Application Stack (EAS) allows organizations to automate infrastructure, security, and application delivery together, helping them deploy software quickly while maintaining compliance with industry regulations. Chef EAS helps teams drive efficiency and consistency for any application across multi-cloud and heterogeneous infrastructure.
 

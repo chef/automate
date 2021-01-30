@@ -3,6 +3,8 @@ title = "Installation Guide"
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Install Guide"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/getting_started/install.md Install Guide"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/install.md)
 
 Before beginning your installation, check the [System Requirements]({{< relref "system_requirements.md" >}}) for Chef Automate.
 

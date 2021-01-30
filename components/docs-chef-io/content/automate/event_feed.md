@@ -3,6 +3,8 @@ title = "Event Feed"
 
 date = 2018-03-26T16:01:47-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Event Feed"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/event_feed.md Event Feed"
     weight = 40
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/event_feed.md)
 
 Use the _Event Feed_ for actionable insights and operational visibility.
 The _Event Feed_ shows the time of the event, its type, the object acted upon, the action, and the initiating action.

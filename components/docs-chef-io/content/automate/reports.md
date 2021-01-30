@@ -3,6 +3,8 @@ title = "Reports"
 
 date = 2018-03-26T16:02:09-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Reports"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/compliance/reports.md Reports"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/reports.md)
 
 The _Reports_ page (Compliance > Reports) provides comprehensive insight into the compliance status of all scanned infrastructure.
 Scan results for audit cookbook configurations also appear in this view.

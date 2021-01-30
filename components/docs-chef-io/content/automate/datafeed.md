@@ -3,6 +3,8 @@ title = "Data Feeds"
 date = 2020-05-05T13:19:02-07:00
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Data Feeds"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/settings/datafeed.md Data Feeds"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/datafeed.md)
 
 {{< note >}}
 Data Feed is a beta feature in active development. To enable Data Feed, first select anywhere on the Chef Automate interface and enter 'feat' to open the feature flags window and then toggle "Chef Automate Data Feed" to the "ON" position.

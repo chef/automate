@@ -3,6 +3,8 @@ title = "Notifications"
 
 date = 2018-05-18T13:19:02-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Notifications"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/settings/notifications.md Notifications"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/notifications.md)
 
 ## About Notifications
 

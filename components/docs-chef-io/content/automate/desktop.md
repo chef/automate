@@ -3,6 +3,8 @@ title = "Desktop Dashboard"
 
 date = 2018-03-26T16:01:47-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Desktop Dashboard"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/desktop.md Desktop Dashboard"
     weight = 50
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/desktop.md)
 
 The Chef Automate _Desktop_ dashboard displays status information about all desktops connected to Chef Automate.
 Desktop information populates this dashboard after a Chef Infra Client run has executed.

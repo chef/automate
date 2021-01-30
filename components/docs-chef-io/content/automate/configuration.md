@@ -3,6 +3,8 @@ title = "Configuration"
 
 date = 2018-05-08T18:54:09+00:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Configuration"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/configuring_automate/configuration.md Configuration"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/configuration.md)
 
 The `chef-automate` CLI provides commands to help you work with your existing Chef Automate configuration:
 

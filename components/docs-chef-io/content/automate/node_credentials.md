@@ -4,6 +4,8 @@ title = "Node Credentials"
 date = 2018-05-22T17:23:24-07:00
 weight = 20
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Node Credentials"
@@ -11,8 +13,6 @@ draft = false
     parent = "automate/settings"
     weight = 50
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/node_credentials.md)
 
 The Chef Automate Credentials page allows you to add, edit, and delete ``SSH``, ``WinRm``, and ``Sudo`` credentials for remotely access to your nodes.
 

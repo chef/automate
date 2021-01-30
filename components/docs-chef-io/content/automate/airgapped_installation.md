@@ -3,6 +3,8 @@ title = "Airgapped Installation"
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Airgapped Installation"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/getting_started/airgapped_installation.md Airgapped Installation"
     weight = 40
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/airgapped_installation.md)
 
 ## Overview
 

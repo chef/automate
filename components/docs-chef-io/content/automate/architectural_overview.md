@@ -2,6 +2,8 @@
 title = "Architecture"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Architecture"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/reference/architecture.md Architecture"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/architectural_overview.md)
 
 ## Automate 2 Architecture
 
