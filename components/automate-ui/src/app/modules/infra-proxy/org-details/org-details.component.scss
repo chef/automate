@@ -93,6 +93,15 @@ chef-table {
     margin-right: 4px;
     outline: none;
   }
+
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+  }
+
 }
 
 chef-loading-spinner {
