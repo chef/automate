@@ -109,4 +109,4 @@ The default time for a node to report to Chef Automate is 5 minutes.
 
 Chef Habitat sends the health check messages every 30 seconds by default.
 Configure this setting using the `--health-check-interval` option with the `hab sup run` command.
-See the [Habitat CLI documentation](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) for more information.
+See the [Habitat CLI documentation]({{< relref "/habitat/habitat_cli#hab-sup-run" >}}) for more information.

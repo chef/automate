@@ -42,7 +42,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Install Channel
 
-Chef Automate consists of [Habitat](https://www.habitat.sh/) packages installed from a release channel.
+Chef Automate consists of [Habitat]({{< relref "habitat">}}) packages installed from a release channel.
 The default channel is `current`.
 
 #### Upgrade Strategy

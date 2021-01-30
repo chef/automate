@@ -25,7 +25,7 @@ The Chef Automate migration process performs the following steps, in order:
 
 1. Runs preflight checks to ensure the system is suitable for Chef Automate 2, your Chef Automate 1 installation can be migrated safely, and that the upgrade process will be able to migrate your data.
 1. Analyzes your Chef Automate 1 configuration files and migrates the relevant settings to a configuration file for Chef Automate 2. If incompatibilities are detected, the migration process fails and emits a description of the problem. You will have an opportunity to make any necessary changes to the generated Chef Automate 2 configuration.
-1. Downloads Chef Automate 2. Chef Automate 2 is distributed via [Habitat](https://www.habitat.sh/) packages that are installed early in the process to minimize the downtime required for the migration.
+1. Downloads Chef Automate 2. Chef Automate 2 is distributed via [Habitat]({{< relref "/habitat/">}}) packages that are installed early in the process to minimize the downtime required for the migration.
 1. Puts your Chef Automate 1 installation into maintenance mode, waits for queued data to be processed, and then backs up all Chef Automate 1 data. This ensures that data will not be lost in the migration process and that you will be able to recover to a working state should an unforeseen error occur.
 1. Creates a local snapshot of Chef Automate 1 data for import into Chef Automate 2.
 1. Shuts down Chef Automate 1.
