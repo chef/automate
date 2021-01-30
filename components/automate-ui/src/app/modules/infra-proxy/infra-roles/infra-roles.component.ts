@@ -7,7 +7,7 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
-import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
+import { GetRoles, RoleSearch } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   allInfraRoles,
@@ -47,15 +47,28 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       this.store.select(getAllRolesForOrgStatus),
       this.store.select(allInfraRoles)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getRolesSt, allInfraRolesState]) => {
-      if (getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState)) {
-        this.roles = allInfraRolesState;
-        this.rolesListLoading = false;
-      } else if (getRolesSt === EntityStatus.loadingFailure) {
-        this.rolesListLoading = false;
-        this.authFailure = true;
-      }
-    });
+      .subscribe(([getRolesSt, allInfraRolesState]) => {
+        if (getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState)) {
+          this.roles = allInfraRolesState;
+          this.rolesListLoading = false;
+        } else if (getRolesSt === EntityStatus.loadingFailure) {
+          this.rolesListLoading = false;
+          this.authFailure = true;
+        }
+      });
+  }
+
+  searchRoles(currentText: string) {
+    const payload = {
+      roleId: currentText,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: 0,
+      per_page: this.roles.length
+    };
+
+    this.store.dispatch(new RoleSearch(payload));
+
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

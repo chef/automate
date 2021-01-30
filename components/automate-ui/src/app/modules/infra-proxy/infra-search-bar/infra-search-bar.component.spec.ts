@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InfraSearchBarComponent } from './infra-search-bar.component';
 
-describe('SearchBarDataBagesComponent', () => {
+describe('InfraSearchBarComponent', () => {
   let component: InfraSearchBarComponent;
   let fixture: ComponentFixture<InfraSearchBarComponent>;
 

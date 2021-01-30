@@ -35,8 +35,4 @@ export class InfraSearchBarComponent {
         break;
     }
   }
-
-  getFilterText(): string {
-    return 'Search ' + this.placeHolder;
-  }
 }

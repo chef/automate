@@ -8,7 +8,10 @@ export enum RoleActionTypes {
   GET_ALL_FAILURE = 'ROLES::GET_ALL::FAILURE',
   GET = 'ROLES::GET',
   GET_SUCCESS = 'ROLES::GET::SUCCESS',
-  GET_FAILURE = 'ROLES::GET::FAILURE'
+  GET_FAILURE = 'ROLES::GET::FAILURE',
+  SEARCH = 'ROLES::SEARCH',
+  SEARCH_SUCCESS = 'ROLES::SEARCH::SUCCESS',
+  SEARCH_FAILURE = 'ROLES::SEARCH::FAILURE'
 }
 
 export interface RolesSuccessPayload {
@@ -45,10 +48,40 @@ export class GetRoleFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface RoleSearchPayload {
+  roleId: string;
+  server_id: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+}
+
+export class RoleSearch implements Action {
+  readonly type = RoleActionTypes.SEARCH;
+  constructor(public payload: RoleSearchPayload) { }
+}
+
+export interface RoleSearchSuccessPayload {
+  roles: InfraRole[];
+}
+
+export class RoleSearchSuccess implements Action {
+  readonly type = RoleActionTypes.SEARCH_SUCCESS;
+  constructor(public payload: RoleSearchSuccessPayload) { }
+}
+
+export class RoleSearchFailure implements Action {
+  readonly type = RoleActionTypes.SEARCH_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type RoleActions =
   | GetRoles
   | GetRolesSuccess
   | GetRolesFailure
   | GetRole
   | GetRoleSuccess
-  | GetRoleFailure;
+  | GetRoleFailure
+  | RoleSearch
+  | RoleSearchSuccess
+  | RoleSearchFailure;
