@@ -19,7 +19,3 @@ export interface ClientSearch {
   filter: string;
   sort: string;
 }
-
-export interface ClientName {
-  name: string;
-}

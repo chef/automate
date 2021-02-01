@@ -9,7 +9,7 @@ import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interc
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
 export interface ClientSearchResponse {
-  nodes: any[];
+  clients: any[];
   total: number;
 }
 

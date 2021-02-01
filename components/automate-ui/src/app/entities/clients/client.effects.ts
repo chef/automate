@@ -16,7 +16,6 @@ import {
   GetClientSuccess,
   GetClientFailure,
   ClientSearch,
-  ClientSearchSuccessPayload,
   ClientSearchSuccess,
   ClientSearchFailure
 } from './client.action';
