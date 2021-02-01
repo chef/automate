@@ -1,6 +1,9 @@
 package migrations
 
-import "context"
+import (
+	"context"
+	"net/http"
+)
 
 // CheckName is the name of the check. The name should be lowercase,
 // and not contain spaces, undersores, or any characters that would
@@ -23,6 +26,7 @@ type CheckStatus struct {
 type TestProbe interface {
 	Ctx() context.Context
 	DeployedProducts() []string
+	HTTPClient(serviceName string, ssl bool) (*http.Client, error)
 }
 
 // Check represents a test we can run against the system
