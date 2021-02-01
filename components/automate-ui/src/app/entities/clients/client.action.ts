@@ -63,8 +63,6 @@ export class ClientSearch implements Action {
 
 export interface ClientSearchSuccessPayload {
   clients: Client[];
-  start: number;
-  total: number;
 }
 
 export class ClientSearchSuccess implements Action {
