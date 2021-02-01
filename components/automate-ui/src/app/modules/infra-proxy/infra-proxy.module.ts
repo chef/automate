@@ -26,6 +26,7 @@ import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
+import { SearchBarEnvironmentsComponent } from './search-bar-environments/search-bar-environments.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { EmptyStateComponent } from './empty-state/empty-state.component';
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent
+    ResetAdminKeyComponent,
+    SearchBarEnvironmentsComponent
   ],
   imports: [
     CommonModule,
