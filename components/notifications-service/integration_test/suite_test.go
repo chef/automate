@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/chef/automate/api/external/secrets"
 	deploymentConst "github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -20,7 +21,8 @@ var (
 // Suite holds any global state needed for the test run and implements
 // GlobalSetup and GlobalTeardown methods.
 type Suite struct {
-	Client api.NotificationsClient
+	Client        api.NotificationsClient
+	SecretsClient secrets.SecretsServiceClient
 }
 
 func (s *Suite) GlobalSetup() error {
@@ -38,12 +40,18 @@ func (s *Suite) GlobalSetup() error {
 	}
 
 	mutTLSFactory := secureconn.NewFactory(*certData)
-	grpcEndpoint, err := mutTLSFactory.Dial("notifications-service", "localhost:10125")
+	notificationsEndpoint, err := mutTLSFactory.Dial("notifications-service", "localhost:10125")
 	if err != nil {
 		return err
 	}
 
-	s.Client = api.NewNotificationsClient(grpcEndpoint)
+	s.Client = api.NewNotificationsClient(notificationsEndpoint)
+
+	secretsEndpoint, err := mutTLSFactory.Dial("secrets-service", "localhost:10131")
+	if err != nil {
+		return err
+	}
+	s.SecretsClient = secrets.NewSecretsServiceClient(secretsEndpoint)
 
 	return s.DeleteEverything()
 }

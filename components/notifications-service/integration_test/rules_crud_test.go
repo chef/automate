@@ -10,14 +10,6 @@ import (
 	"github.com/chef/automate/lib/pcmp/passert"
 )
 
-/*
-	API Endpoints to Test:
-
-	* rpc Notify(Event) returns (Response);
-	* rpc ValidateWebhook(URLValidationRequest) returns (URLValidationResponse);
-		}
-*/
-
 func TestGetVersion(t *testing.T) {
 	res, err := suite.Client.Version(ctx, &api.VersionRequest{})
 	require.NoError(t, err)
@@ -337,9 +329,11 @@ func TestUpdateRuleValidation(t *testing.T) {
 		updatedRule.Name = "TestAddRule_validations_unique"
 		response, err := suite.Client.UpdateRule(ctx, updatedRule)
 		require.NoError(t, err)
-		// TODO: the elixir implementation does not check for this case so it
-		// returns an internal error when the db request fails on the key constraint.
-		// This should be changed so the server detects the duplicate
+		// NOTE: the elixir implementation does not check for the case that an
+		// update would violate the uniqueness constraint on the name column, so it
+		// returns an internal error when the db request fails on the contstraint
+		// violation. This is a bug, but we don't plan to change the behavior until
+		// after the elixir implementation is replaced.
 		assert.NotEqual(t, api.RuleUpdateResponse_OK, response.Code)
 		//assert.Equal(t, api.RuleUpdateResponse_DUPLICATE_NAME, response.Code)
 		//assert.Contains(t, response.Messages, "A rule with this name already exists")
