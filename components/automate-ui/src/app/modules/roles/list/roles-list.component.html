@@ -22,7 +22,7 @@
             <chef-thead>
               <chef-tr>
                 <chef-th>Name</chef-th>
-                <chef-th></chef-th>
+                <chef-th>ID</chef-th>
                 <chef-th>Type</chef-th>
                 <chef-th class="three-dot-column"></chef-th>
               </chef-tr>
@@ -32,7 +32,7 @@
                   <chef-td>
                     <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
                   </chef-td>
-                  <chef-td></chef-td>
+                  <chef-td>{{ role.id }}</chef-td>
                   <chef-td>{{ role.type | iamType }}</chef-td>
                   <chef-td class="three-dot-column">
                     <!-- <app-authorized [allOf]="[`/apis/iam/v2/roles/{id}`, 'delete', role.id]"> -->
