@@ -8,7 +8,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
 import { GetClients, ClientSearch } from 'app/entities/clients/client.action';
-import { Client, ClientName } from 'app/entities/clients/client.model';
+import { Client } from 'app/entities/clients/client.model';
 import {
   allClients,
   getAllStatus as getAllClientsForOrgStatus,
@@ -31,7 +31,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clients: Client[] = [];
   public clientsListLoading = true;
   public authFailure = false;
-  public clientSearch: ClientName[];
+  public clientSearch: Client[];
   public clientName: string;
 
   constructor(
