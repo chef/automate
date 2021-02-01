@@ -17,6 +17,7 @@ import {
   GetEnvironmentFailure,
   EnvironmentSearch,
   EnvironmentSearchSuccess,
+  EnvironmentSearchSuccessPayload,
   EnvironmentSearchFailure
 } from './environment.action';
 
@@ -74,12 +75,12 @@ export class EnvironmentEffects {
       ofType(EnvironmentActionTypes.SEARCH),
       mergeMap((action: EnvironmentSearch) =>
         this.requests.getEnvironmentSearch(action.payload).pipe(
-          map((resp) => new EnvironmentSearchSuccess(resp)),
+          map((resp: EnvironmentSearchSuccessPayload) => new EnvironmentSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new EnvironmentSearchFailure(error))))));
   
     @Effect()
-    getClientSearchFailure$ = this.actions$.pipe(
+    getEnvironmentSearchFailure$ = this.actions$.pipe(
       ofType(EnvironmentActionTypes.SEARCH_FAILURE),
       map(({ payload }: EnvironmentSearchFailure) => {
         const msg = payload.error.error;
