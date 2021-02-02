@@ -30,7 +30,7 @@ export class InfraSearchBarComponent implements OnInit {
     this.searchButtonClick.emit(currentText);
   }
 
-  handleInput(key, currentText): void {
+  handleInput(key: string, currentText: string): void {
     switch (key.toLowerCase()) {
       case 'enter':
         this.pressEnter(currentText);

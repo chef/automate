@@ -33,6 +33,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public environmentsSearch: Environment[];
   public environmentsName: string;
+  public searchItems = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -79,17 +80,38 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
+    this.searchItems = true;
     if (currentText) {
       const payload = {
         environmentId: currentText,
         page: 0,
-        per_page: 20,
+        per_page: this.environments.length,
         server_id: this.serverId,
         org_id: this.orgId,
         name: this.environmentsName,
         query: 'q'
       };
-       this.store.dispatch(new EnvironmentSearch(payload));
+      combineLatest([
+        this.store.select(getSearchStatus),
+        this.store.select(allEnvironments)
+      ]).pipe(
+        filter(([getEnvironmentsSt, _EnvironmentsState]) =>
+        getEnvironmentsSt === EntityStatus.loadingSuccess),
+        filter(([_getEnvironmentsSt, EnvironmentsState]) =>
+          !isNil(EnvironmentsState)),
+        takeUntil(this.isDestroyed))
+      .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
+        this.environmentsSearch = EnvironmentsState;
+      });
+      this.store.dispatch(new EnvironmentSearch(payload));
+
+      setTimeout(() => {
+        this.searchItems = false;
+      }, 2000);
+    } else {
+      this.store.dispatch(new GetEnvironments({
+        server_id: this.serverId, org_id: this.orgId
+      }));
     }
   }
 
