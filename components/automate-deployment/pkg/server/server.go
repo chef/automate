@@ -990,7 +990,7 @@ func (s *server) SystemLogs(_ *api.SystemLogsRequest,
 }
 
 func (s *server) SetLogLevel(_ context.Context, _ *api.SetLogLevelRequest) (*api.SetLogLevelResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "The SetLogLevel method has been replaced by the configuration patch command.")
+	return nil, status.Error(codes.Unimplemented, "the SetLogLevel method has been replaced by the debug set-log-level command")
 }
 
 // StartServer starts the automate deployment gRPC server
@@ -1075,7 +1075,7 @@ func StartServer(config *Config) error {
 	server.convergeLoop = NewLooper(convergeIntervalDuration, periodicConverger(server, grpcServer))
 
 	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
 	go func() {
 		sig := <-ch
 		grpcServer.GracefulStop()
@@ -1095,10 +1095,6 @@ func StartServer(config *Config) error {
 			}
 		}()
 	}()
-
-	hupChan := make(chan os.Signal, 1)
-	signal.Notify(hupChan, syscall.SIGHUP)
-	go server.ReconfigureHandler(hupChan, grpcServer)
 
 	server.convergeLoop.Start()
 	return grpcServer.Serve(listener)

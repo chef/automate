@@ -83,3 +83,15 @@ func setAndLogProcessState() {
 	logrus.Infof("Effective UID: %d", euid)
 	logrus.Infof("PATH: %s", os.Getenv("PATH"))
 }
+
+func setLogrusLevel(newLogLevel string) {
+	var err error
+	level := logrus.InfoLevel
+	if newLogLevel != "" {
+		level, err = logrus.ParseLevel(newLogLevel)
+		if err != nil {
+			logrus.WithField("level", newLogLevel).WithError(err).Error("could not parse log level using default level of 'info'")
+		}
+	}
+	logrus.SetLevel(level)
+}
