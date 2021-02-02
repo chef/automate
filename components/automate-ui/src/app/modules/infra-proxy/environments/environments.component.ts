@@ -62,7 +62,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getSearchStatus),
-      this.store.select(allEnvironments),
+      this.store.select(allEnvironments)
     ]).pipe(
       filter(([getEnvironmentsSt, _EnvironmentsState]) =>
       getEnvironmentsSt === EntityStatus.loadingSuccess),
@@ -79,15 +79,15 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
-    if(currentText) {
+    if (currentText) {
       const payload = {
         environmentId: currentText,
         page: 0,
         per_page: 20,
         server_id: this.serverId,
         org_id: this.orgId,
-         name: this.environmentsName,
-         query: 'q'
+        name: this.environmentsName,
+        query: 'q'
       };
        this.store.dispatch(new EnvironmentSearch(payload));
     }
