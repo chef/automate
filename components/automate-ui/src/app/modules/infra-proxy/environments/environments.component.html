@@ -5,7 +5,7 @@
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="environments"></app-infra-search-bar>
     </div> 
-    <chef-loading-spinner *ngIf="searchItems && !environments.length" size="50" fixed></chef-loading-spinner>   
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searchItems && !environments.length" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searchItems && !environments.length">No Environments available</div>
     <chef-table *ngIf="environments.length">
       <chef-thead>
