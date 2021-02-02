@@ -94,7 +94,7 @@ func (a *InfraProxyServer) DeleteClient(ctx context.Context, r *gwreq.Client) (*
 	}, nil
 }
 
-// ResetClientKey resets an infra client
+// ResetClientKey resets an infra client key
 func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKey) (*gwres.ClientKey, error) {
 	req := &infra_req.ClientKey{
 		OrgId:    r.OrgId,
