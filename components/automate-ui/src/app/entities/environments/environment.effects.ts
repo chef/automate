@@ -78,7 +78,7 @@ export class EnvironmentEffects {
           map((resp: EnvironmentSearchSuccessPayload) => new EnvironmentSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new EnvironmentSearchFailure(error))))));
-  
+
     @Effect()
     getEnvironmentSearchFailure$ = this.actions$.pipe(
       ofType(EnvironmentActionTypes.SEARCH_FAILURE),

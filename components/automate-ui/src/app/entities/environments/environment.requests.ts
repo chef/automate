@@ -30,7 +30,6 @@ export class EnvironmentRequests {
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}`, {headers});
   }
 
-  // ?search_query.q=name:node-*
   public getEnvironmentSearch(payload: EnvironmentSearchPayload)
   : Observable<EnvironmentSearchResponse> {
     return this.http.get<EnvironmentSearchResponse>(
