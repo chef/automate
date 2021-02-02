@@ -2,8 +2,12 @@
   <chef-loading-spinner *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
-    <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="environments..."></app-infra-search-bar>
-    <chef-table>
+    <div class="search-items">
+      <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="environments"></app-infra-search-bar>
+    </div> 
+    <chef-loading-spinner *ngIf="searchItems && !environments.length" size="50" fixed></chef-loading-spinner>   
+    <div class="empty-section" *ngIf="!searchItems && !environments.length">No Environments available</div>
+    <chef-table *ngIf="environments.length">
       <chef-thead>
         <chef-tr>
           <chef-th>Environments Name</chef-th>
