@@ -62,7 +62,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getSearchStatus),
-      this.store.select(allClients),
+      this.store.select(allClients)
     ]).pipe(
       filter(([getClientsSt, _ClientsState]) =>
       getClientsSt === EntityStatus.loadingSuccess),
@@ -79,7 +79,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
-    if(currentText) {
+    if (currentText) {
       const payload = {
         clientId: currentText,
         page: 0,
