@@ -2,9 +2,13 @@
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
-    <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="Clients...">
-    </app-infra-search-bar>
-    <chef-table>
+    <div class="search-items">
+      <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="Clients">
+      </app-infra-search-bar>
+    </div>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searchItems && !clients.length" size="50" fixed></chef-loading-spinner>
+    <div class="empty-section" *ngIf="!searchItems && !clients.length">No data bag items available</div>
+    <chef-table *ngIf="clients.length">
       <chef-thead>
         <chef-tr>
           <chef-th>Clients Name</chef-th>
