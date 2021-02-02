@@ -19,6 +19,7 @@ import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
+import { InfraSearchBarComponent } from './infra-search-bar/infra-search-bar.component';
 import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.component';
 import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
@@ -26,7 +27,6 @@ import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
-import { SearchBarClientsComponent } from './search-bar-clients/search-bar-clients.component';
 
 @NgModule({
   declarations: [
@@ -43,14 +43,14 @@ import { SearchBarClientsComponent } from './search-bar-clients/search-bar-clien
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
+    InfraSearchBarComponent,
     JsonTreeTableComponent,
     InfraRolesComponent,
     InfraRoleDetailsComponent,
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent,
-    SearchBarClientsComponent
+    ResetAdminKeyComponent
   ],
   imports: [
     CommonModule,

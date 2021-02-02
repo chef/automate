@@ -5,28 +5,29 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
+  Input
 } from '@angular/core';
 
 @Component({
-  selector: 'app-search-bar-clients',
-  templateUrl: './search-bar-clients.component.html',
-  styleUrls: ['./search-bar-clients.component.scss']
+  selector: 'app-infra-search-bar',
+  templateUrl: './infra-search-bar.component.html',
+  styleUrls: ['./infra-search-bar.component.scss']
 })
-export class SearchBarClientsComponent implements OnInit {
-  inputText= '';
 
+export class InfraSearchBarComponent implements OnInit {
+  inputText = '';
+
+  @Input() placeHolder: string;
   @Output() searchButtonClick: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('search_box', { static: true }) inputField: ElementRef;
 
   ngOnInit() {}
 
   handleFiltersClick(currentText: string): void {
-    console.log(currentText);
-    this.searchButtonClick.emit(currentText);    
+    this.searchButtonClick.emit(currentText);
   }
 
   pressEnter(currentText: string): void {
-    console.log(currentText);
     this.searchButtonClick.emit(currentText);
   }
 
@@ -39,10 +40,6 @@ export class SearchBarClientsComponent implements OnInit {
   }
 
   getFilterText(): string {
-    return 'Search Clients';
+    return 'Search ' + this.placeHolder;
   }
-
-  // clearAll(): void {
-  //   this.inputField.nativeElement.value = '';
-  // } 
 }

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SearchBarClientsComponent } from './search-bar-clients.component';
+import { InfraSearchBarComponent } from './infra-search-bar.component';
 
 describe('SearchBarClientsComponent', () => {
-  let component: SearchBarClientsComponent;
-  let fixture: ComponentFixture<SearchBarClientsComponent>;
+  let component: InfraSearchBarComponent;
+  let fixture: ComponentFixture<InfraSearchBarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SearchBarClientsComponent ]
+      declarations: [ InfraSearchBarComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SearchBarClientsComponent);
+    fixture = TestBed.createComponent(InfraSearchBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

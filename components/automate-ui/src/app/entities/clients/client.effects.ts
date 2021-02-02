@@ -77,7 +77,7 @@ export class ClientEffects {
           map((resp) => new ClientSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new ClientSearchFailure(error))))));
-  
+
     @Effect()
     getClientSearchFailure$ = this.actions$.pipe(
       ofType(ClientActionTypes.SEARCH_FAILURE),
