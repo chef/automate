@@ -32,5 +32,10 @@ chef-loading-spinner {
   margin: 100px auto;
   width: 100px;
   z-index: 199;
-  background: transparent;
+}
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  width: initial;
 }
