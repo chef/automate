@@ -93,6 +93,14 @@ export class ClientsComponent implements OnInit, OnDestroy {
       };
       
        this.store.dispatch(new ClientSearch(payload));
+
+       setTimeout(() => {
+        this.searchItems = false;
+      }, 2000);
+    } else {
+      this.store.dispatch(new GetClients({
+        server_id: this.serverId, org_id: this.orgId
+      }));
     }
   }
 
