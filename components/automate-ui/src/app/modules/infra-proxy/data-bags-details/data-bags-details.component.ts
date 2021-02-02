@@ -35,6 +35,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
   public activeClassName: string;
+  public searchItems = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -124,6 +125,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   searchDataBagItems(currentText: string) {
+    this.searchItems = true;
     const payload = {
       databagId: currentText,
       server_id: this.serverId,
@@ -132,6 +134,21 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       page: 0,
       per_page: this.dataBagDetails.length
     };
-    this.store.dispatch(new DataBagSearchDetails(payload));
+
+    combineLatest([
+      this.store.select(getAllStatus)
+    ]).pipe(
+      filter(([getDataBagsearchItemsSt]) =>
+      getDataBagsearchItemsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagsearchItemsSt]) =>
+        !isNil(_getDataBagsearchItemsSt)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(() => {
+      this.store.dispatch(new DataBagSearchDetails(payload));
+    });
+
+    setTimeout(() => {
+      this.searchItems = false;
+    }, 2000);
   }
 }

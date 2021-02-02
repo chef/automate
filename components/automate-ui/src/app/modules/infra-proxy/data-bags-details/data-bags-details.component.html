@@ -27,12 +27,13 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
+        <div class="search-items">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
+        </div>
         <div class="section-container" *ngIf="dataBagDetails">
-          <div class="empty-section" *ngIf="!dataBagDetails.length">No data available</div>
+          <chef-loading-spinner *ngIf="searchItems && !dataBagDetails.length" size="50" fixed></chef-loading-spinner>
+          <div class="empty-section" *ngIf="!searchItems && !dataBagDetails.length">No data bag items available</div>
           <div *ngIf="dataBagDetails.length">
-            <div class="search-items">
-              <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
-            </div>
             <ul id="accordion" class="accordion" >
               <li *ngFor="let item of dataBagDetails; let i = index" [class.active]="item.active" class="items">
                 <div class="menu" (click)="handleItemSelected(item.name, i)">
