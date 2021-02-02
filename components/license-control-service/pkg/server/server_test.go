@@ -56,7 +56,8 @@ func TestAppliedLicense(t *testing.T) {
 	}
 
 	srv := testLicenseControlServer(t)
-	srv.Update(context.Background(), &lc.UpdateRequest{LicenseData: string(validLicenseData)})
+	_, err := srv.Update(context.Background(), &lc.UpdateRequest{LicenseData: string(validLicenseData)})
+	require.NoError(t, err)
 
 	t.Run("License() with a valid license applied", func(t *testing.T) {
 		res, err := srv.License(
@@ -64,6 +65,7 @@ func TestAppliedLicense(t *testing.T) {
 			&lc.LicenseRequest{},
 		)
 		require.NoError(t, err)
+		require.NotNil(t, res.GetLicense())
 		assert.NotNil(t, res.License.Id, "License should include a license ID")
 		assert.Equal(t, "44c6e9d1-98f6-4b4a-857f-d15da015f05f", res.License.CustomerId, "License should be valid")
 	})
