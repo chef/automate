@@ -6,9 +6,11 @@ import { DataBags } from './data-bags.model';
 
 export interface DataBagDetailsEntityState extends EntityState<DataBags> {
   getAllStatus: EntityStatus;
+  getSearchStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const GET_SEARCH_STATUS = 'getSearchStatus';
 
 export const dataBagDetailsEntityAdapter: EntityAdapter<DataBags> = createEntityAdapter<DataBags>({
   selectId: (dataBags: DataBags) => dataBags.name
@@ -32,12 +34,25 @@ export function dataBagDetailsEntityReducer(
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
         (dataBagDetailsEntityAdapter
-          .setAll(action.payload.data_bags, state)) as DataBagDetailsEntityState;
+          .setAll(action.payload.items, state)) as DataBagDetailsEntityState;
 
     case DataBagDetailsActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
-    default:
+    case DataBagDetailsActionTypes.SEARCH:
+      return set(GET_SEARCH_STATUS, EntityStatus.loading, dataBagDetailsEntityAdapter
+        .removeAll(state));
+
+    case DataBagDetailsActionTypes.SEARCH_SUCCESS:
+      return pipe(
+        set(GET_SEARCH_STATUS, EntityStatus.loadingSuccess))
+        (dataBagDetailsEntityAdapter
+          .setAll(action.payload.items, state)) as DataBagDetailsEntityState;
+
+    case DataBagDetailsActionTypes.SEARCH_FAILURE:
+      return set(GET_SEARCH_STATUS, EntityStatus.loadingFailure, state);
+
+      default:
       return state;
   }
 }

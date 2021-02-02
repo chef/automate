@@ -25,3 +25,8 @@ export const dataBagDetailsFromRoute = createSelector(
   routeParams,
   (state, { name }) => find({ name }, state)
 );
+
+export const getSearchStatus = createSelector(
+  dataBagDetailsState,
+  (state) => state.getSearchStatus
+);

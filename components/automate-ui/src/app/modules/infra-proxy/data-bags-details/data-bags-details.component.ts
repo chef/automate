@@ -8,7 +8,7 @@ import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
 
-import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
+import { GetDataBagDetails, DataBagSearchDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
 import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
@@ -24,6 +24,7 @@ export type DataBagsDetailsTab = 'details';
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public dataBagDetails: DataBags[];
+  public dataBagSearch: DataBags[];
   public dataBagItemDetails: DataBagsItemDetails;
   public serverId: string;
   public orgId: string;
@@ -37,7 +38,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
@@ -99,13 +100,13 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       name: this.dataBagsName,
       item_name: item
     }));
-    
+
     this.dataBagDetails.filter(
-      (item, i) => i !== index && item.active
+      (d_item, i) => i !== index && d_item.active
     ).forEach(menu => menu.active = !menu.active);
 
     this.dataBagDetails[index].active = !this.dataBagDetails[index].active;
-    this.activeClassName = 'autoHeight'
+    this.activeClassName = 'autoHeight';
   }
 
   ngOnDestroy(): void {
@@ -117,8 +118,20 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     items.forEach((i, index) => {
       const tempItem = i;
       tempItem['active'] = false;
-      items[index] = tempItem
-    })
+      items[index] = tempItem;
+    });
     this.dataBagDetails = items;
+  }
+
+  searchDataBagItems(currentText: string) {
+    const payload = {
+      databagId: currentText,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.dataBagsName,
+      page: 0,
+      per_page: this.dataBagDetails.length
+    };
+    this.store.dispatch(new DataBagSearchDetails(payload));
   }
 }
