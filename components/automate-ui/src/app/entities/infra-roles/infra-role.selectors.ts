@@ -19,6 +19,11 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
+export const getSearchStatus = createSelector(
+  infraRoleState,
+  (state) => state.getSearchStatus
+);
+
 export const infraRoleFromRoute = createSelector(
   roleEntities,
   routeParams,

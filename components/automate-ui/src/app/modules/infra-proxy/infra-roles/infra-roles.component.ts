@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -11,9 +11,9 @@ import { GetRoles, RoleSearch } from 'app/entities/infra-roles/infra-role.action
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   allInfraRoles,
-  getAllStatus as getAllRolesForOrgStatus
+  getAllStatus as getAllRolesForOrgStatus,
+  getSearchStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
-
 
 @Component({
   selector: 'app-infra-roles',
@@ -30,6 +30,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roles: InfraRole[] = [];
   public rolesListLoading = true;
   public authFailure = false;
+  public searchItems = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -59,6 +60,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   }
 
   searchRoles(currentText: string) {
+    this.searchItems = true;
     const payload = {
       roleId: currentText,
       server_id: this.serverId,
@@ -66,8 +68,25 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       page: 0,
       per_page: this.roles.length
     };
+    combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allInfraRoles)
+    ]).pipe(
+      filter(([getClientsSt, _ClientsState]) =>
+      getClientsSt === EntityStatus.loadingSuccess),
+      filter(([_getClientsSt, clientsState]) =>
+        !isNil(clientsState)),
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getClientsSt, clientsState]) => {
+      this.roles = clientsState;
+    });
 
     this.store.dispatch(new RoleSearch(payload));
+
+    setTimeout(() => {
+      this.searchItems = false;
+    }, 2000);
+
 
   }
 
