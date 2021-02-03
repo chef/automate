@@ -39,15 +39,15 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 	query.Rows = perPage
 	query.Start = int(req.GetSearchQuery().GetStart())
 
-	res1, err := query.Do(c.client)
+	res, err := query.Do(c.client)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
 	return &response.Clients{
-		Clients: fromAPIToListClients(res1.Rows),
-		Start:   int32(res1.Start),
-		Total:   int32(res1.Total),
+		Clients: fromAPIToListClients(res.Rows),
+		Start:   int32(res.Start),
+		Total:   int32(res.Total),
 	}, nil
 }
 
