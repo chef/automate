@@ -2,7 +2,6 @@ import {
   Component,
   EventEmitter,
   Output,
-  OnInit,
   ViewChild,
   ElementRef,
   Input
@@ -14,13 +13,12 @@ import {
   styleUrls: ['./infra-search-bar.component.scss']
 })
 
-export class InfraSearchBarComponent implements OnInit {
+export class InfraSearchBarComponent {
   inputText = '';
+
   @Input() placeHolder: string;
   @Output() searchButtonClick: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('search_box', { static: true }) inputField: ElementRef;
-
-  ngOnInit() {}
 
   handleFiltersClick(currentText: string): void {
     this.searchButtonClick.emit(currentText);
