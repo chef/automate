@@ -19,20 +19,6 @@ type AccessKeyReq struct {
 	CreateKey      bool   `json:"create_key,omitempty"`
 }
 
-// Client represents api client struct.
-type Client struct {
-	Name       string `json:"name"`
-	ClientName string `json:"clientname"`
-	OrgName    string `json:"orgname"`
-}
-
-// ClientResult list result from Search API
-type ClientResult struct {
-	Total int       `json:"total"`
-	Start int       `json:"start"`
-	Rows  []*Client `json:"rows"`
-}
-
 // GetClients get clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
@@ -40,82 +26,29 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		return nil, err
 	}
 
-	res, err := c.SearchClients(req.SearchQuery)
+	perPage := int(req.GetSearchQuery().GetRows())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery("client", searchStr)
+	query.Rows = perPage
+	query.Start = int(req.GetSearchQuery().GetStart())
+
+	res1, err := query.Do(c.client)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
 	return &response.Clients{
-		Clients: fromAPIToListClients(res.Rows),
-		Start:   int32(res.Start),
-		Total:   int32(res.Total),
+		Clients: fromAPIToListClients(res1.Rows),
+		Start:   int32(res1.Start),
+		Total:   int32(res1.Total),
 	}, nil
-}
-
-// SearchClients gets client list from Chef Infra Server search API.
-func (c *ChefClient) SearchClients(searchQuery *request.SearchQuery) (ClientResult, error) {
-	var result ClientResult
-	var searchAll bool
-	inc := 1000
-	var query chef.SearchQuery
-
-	if searchQuery == nil || searchQuery.Q == "" {
-		searchAll = true
-		query = chef.SearchQuery{
-			Index: "client",
-			Query: "*:*",
-			Start: 0,
-			Rows:  inc,
-		}
-	} else {
-		perPage := int(searchQuery.GetRows())
-		if perPage == 0 {
-			perPage = 1000
-		}
-
-		query = chef.SearchQuery{
-			Index: "client",
-			Query: searchQuery.GetQ(),
-			Start: int(searchQuery.GetStart()),
-			Rows:  perPage,
-		}
-	}
-
-	fullURL := fmt.Sprintf("search/%s", query)
-	newReq, err := c.client.NewRequest("GET", fullURL, nil)
-
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	res, err := c.client.Do(newReq, &result)
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	defer res.Body.Close() // nolint: errcheck
-
-	if searchAll {
-		var searchResult ClientResult
-		start := result.Start
-		// the total rows available for this query across all pages
-		total := result.Total
-		for start+inc <= total {
-			query.Start = query.Start + inc
-			fullURL = fmt.Sprintf("search/%s", query)
-
-			res1, err := c.client.Do(newReq, &searchResult)
-			if err != nil {
-				return result, ParseAPIError(err)
-			}
-
-			defer res1.Body.Close() // nolint: errcheck
-
-			// add this page of results to the primary SearchResult instance
-			result.Rows = append(result.Rows, searchResult.Rows...)
-		}
-	}
-	return result, nil
 }
 
 // GetClient get client
@@ -284,14 +217,14 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 
 }
 
-// fromAPIToListClients a response.Clients from a struct of ClientList
-func fromAPIToListClients(al []*Client) []*response.ClientListItem {
+// fromAPIToListClients a response ClientListItems from a result map interface
+func fromAPIToListClients(al []interface{}) []*response.ClientListItem {
 	cl := make([]*response.ClientListItem, len(al))
 	for index, c := range al {
 		cl[index] = &response.ClientListItem{
-			Name: c.Name,
+			Name: SafeStringFromMap(c.(map[string]interface{}), "name"),
 		}
-		index++
 	}
+
 	return cl
 }
