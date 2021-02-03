@@ -78,6 +78,9 @@ bind_dn
 bind_password
 : "your bind_password"
 
+  `bind_password` may also be passed via the `AUTOMATE_SECRET_MSAD_PASSWORD` environment
+  variable when running `chef-automate` commands.
+
 ca_contents
 : Your certificate authority (CA) certificate contents. You can provide multiple PEM-encoded CA certs. Optional.
 
@@ -495,6 +498,9 @@ See below for the full configuration and additional details about all LDAP confi
    # users to authenticate for Chef Automate (and also to search for their group membership).
    # Example: "uid=seviceaccount,cn=users,dc=example,dc=com"
    bind_dn = "<your bind_dn>"
+
+   # bind_password may also be passed via the AUTOMATE_SECRET_LDAP_PASSWORD environment
+   # variable when running `chef-automate` commands.
    bind_password = "<your bind_password>"
 
    ###
