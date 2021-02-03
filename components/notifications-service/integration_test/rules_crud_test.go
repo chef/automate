@@ -31,7 +31,7 @@ func TestGetRule(t *testing.T) {
 	})
 
 	t.Run("returns the rule when the rule exists", func(t *testing.T) {
-		rule := validRule("TestGetRule_success_01")
+		rule := newValidRule("TestGetRule_success_01")
 		createResponse, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
 		require.NotEmpty(t, createResponse.Id)
@@ -58,7 +58,7 @@ func TestListRules(t *testing.T) {
 	t.Run("Returns the rules when rules exist", func(t *testing.T) {
 		expectedRuleNames := []string{"TestListRules_success_01", "TestListRules_success_02"}
 		for _, name := range expectedRuleNames {
-			_, err := suite.Client.AddRule(ctx, validRule(name))
+			_, err := suite.Client.AddRule(ctx, newValidRule(name))
 			require.NoError(t, err)
 		}
 
@@ -77,15 +77,40 @@ func TestAddRuleSuccessCase(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
-	t.Run("valid rule returns a successful response", func(t *testing.T) {
-		rule := validRule("TestAddRule_success_01")
+	t.Run("valid SlackAlert rule returns a successful response", func(t *testing.T) {
+		rule := newValidRule("TestAddRule_success_01")
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
 		assert.Equal(t, api.RuleAddResponse_ADDED, response.Code)
 		assert.NotEmpty(t, response.Id)
 		passert.Equal(t, rule, response.Rule)
 	})
-
+	t.Run("valid ServiceNowAlert rule returns a successful response", func(t *testing.T) {
+		rule := newValidRule("TestAddRule_success_02")
+		rule.Action = &api.Rule_ServiceNowAlert{
+			ServiceNowAlert: &api.ServiceNowAlert{
+				Url: "https://valid.example/",
+			},
+		}
+		response, err := suite.Client.AddRule(ctx, rule)
+		require.NoError(t, err)
+		assert.Equal(t, api.RuleAddResponse_ADDED, response.Code)
+		assert.NotEmpty(t, response.Id)
+		passert.Equal(t, rule, response.Rule)
+	})
+	t.Run("valid webhook rule returns a successful response", func(t *testing.T) {
+		rule := newValidRule("TestAddRule_success_03")
+		rule.Action = &api.Rule_WebhookAlert{
+			WebhookAlert: &api.WebhookAlert{
+				Url: "https://valid.example",
+			},
+		}
+		response, err := suite.Client.AddRule(ctx, rule)
+		require.NoError(t, err)
+		assert.Equal(t, api.RuleAddResponse_ADDED, response.Code)
+		assert.NotEmpty(t, response.Id)
+		passert.Equal(t, rule, response.Rule)
+	})
 }
 
 func TestAddRuleValidations(t *testing.T) {
@@ -93,7 +118,7 @@ func TestAddRuleValidations(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("the Id field must be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_Id")
+		rule := newValidRule("TestAddRule_validations_Id")
 		rule.Id = "43"
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -103,7 +128,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the Name field must not be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_Name")
+		rule := newValidRule("TestAddRule_validations_Name")
 		rule.Name = ""
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -113,7 +138,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the Name must be unique", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_unique")
+		rule := newValidRule("TestAddRule_validations_unique")
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
 		assert.Equal(t, api.RuleAddResponse_ADDED, response.Code)
@@ -127,7 +152,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the Action field must not be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_Action")
+		rule := newValidRule("TestAddRule_validations_Action")
 		rule.Action = nil
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -137,7 +162,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the URL in a SlackAlert action must not be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_SlackAlertURL")
+		rule := newValidRule("TestAddRule_validations_SlackAlertURL")
 		rule.GetSlackAlert().Url = ""
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -146,7 +171,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a SlackAlert action must include the protocol/scheme", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_SlackAlertURL")
+		rule := newValidRule("TestAddRule_validations_SlackAlertURL")
 		rule.GetSlackAlert().Url = "example.com"
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -155,7 +180,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a SlackAlert action must include the hostname", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_SlackAlertURL")
+		rule := newValidRule("TestAddRule_validations_SlackAlertURL")
 		rule.GetSlackAlert().Url = "https://"
 		response, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
@@ -165,7 +190,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the URL in a WebhookAlert action must not be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_WebhookAlertURL")
+		rule := newValidRule("TestAddRule_validations_WebhookAlertURL")
 		rule.Action = validWebhook()
 		rule.GetWebhookAlert().Url = ""
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -175,7 +200,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a WebhookAlert action must include the protocol/scheme", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_WebhookAlertURL")
+		rule := newValidRule("TestAddRule_validations_WebhookAlertURL")
 		rule.Action = validWebhook()
 		rule.GetWebhookAlert().Url = "example.com"
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -185,7 +210,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a WebhookAlert action must include the hostname", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_WebhookAlertURL")
+		rule := newValidRule("TestAddRule_validations_WebhookAlertURL")
 		rule.Action = validWebhook()
 		rule.GetWebhookAlert().Url = "https://"
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -196,7 +221,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("the URL in a ServiceNowAlert action must not be empty", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_ServiceNowAlertURL")
+		rule := newValidRule("TestAddRule_validations_ServiceNowAlertURL")
 		rule.Action = validServiceNowAlert()
 		rule.GetServiceNowAlert().Url = ""
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -206,7 +231,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a ServiceNowAlert action must include the protocol/scheme", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_ServiceNowAlertURL")
+		rule := newValidRule("TestAddRule_validations_ServiceNowAlertURL")
 		rule.Action = validServiceNowAlert()
 		rule.GetServiceNowAlert().Url = "example.com"
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -216,7 +241,7 @@ func TestAddRuleValidations(t *testing.T) {
 		assert.Contains(t, response.Messages, "A valid action URL must be supplied")
 	})
 	t.Run("the URL in a ServiceNowAlert action must include the hostname", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_ServiceNowAlertURL")
+		rule := newValidRule("TestAddRule_validations_ServiceNowAlertURL")
 		rule.Action = validServiceNowAlert()
 		rule.GetServiceNowAlert().Url = "https://"
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -227,7 +252,7 @@ func TestAddRuleValidations(t *testing.T) {
 	})
 
 	t.Run("Multiple error messages are returned when multiple validation rules are not satisfied", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_MuliInvalid")
+		rule := newValidRule("TestAddRule_validations_MuliInvalid")
 		rule.Action = nil
 		rule.Name = ""
 		rule.Id = "42"
@@ -244,7 +269,7 @@ func TestAddRuleValidations(t *testing.T) {
 	// NOTE: it's unclear to me if this behavior is correct. It's how the
 	// original elixir implementation behaves.
 	t.Run("the SecretId in a ServiceNowAlert action can be blank", func(t *testing.T) {
-		rule := validRule("TestAddRule_validations_ServiceNowAlert_SecretId")
+		rule := newValidRule("TestAddRule_validations_ServiceNowAlert_SecretId")
 		rule.Action = validServiceNowAlert()
 		rule.GetServiceNowAlert().SecretId = ""
 		response, err := suite.Client.AddRule(ctx, rule)
@@ -261,7 +286,7 @@ func TestUpdateRuleSuccess(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("valid rule returns a successful response", func(t *testing.T) {
-		rule := validRule("TestAddRule_success_01")
+		rule := newValidRule("TestAddRule_success_01")
 		createResponse, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
 		assert.Equal(t, api.RuleAddResponse_ADDED, createResponse.Code)
@@ -275,7 +300,7 @@ func TestUpdateRuleSuccess(t *testing.T) {
 	})
 
 	t.Run("update can modify the rule name", func(t *testing.T) {
-		rule := validRule("TestAddRule_success_02")
+		rule := newValidRule("TestAddRule_success_02")
 		createResponse, err := suite.Client.AddRule(ctx, rule)
 		require.NoError(t, err)
 		assert.Equal(t, api.RuleAddResponse_ADDED, createResponse.Code)
@@ -286,6 +311,29 @@ func TestUpdateRuleSuccess(t *testing.T) {
 		require.NoError(t, err)
 		assert.Empty(t, response.Messages)
 		assert.Equal(t, api.RuleUpdateResponse_OK, response.Code)
+
+		updated, err := suite.Client.GetRule(ctx, &api.RuleIdentifier{Id: createResponse.Id})
+		require.NoError(t, err)
+		assert.Equal(t, "TestAddRule_success_02_updated_value", updated.Rule.Name)
+	})
+
+	t.Run("update can modify the action", func(t *testing.T) {
+		rule := newValidRule("TestAddRule_success_02")
+		createResponse, err := suite.Client.AddRule(ctx, rule)
+		require.NoError(t, err)
+		assert.Equal(t, api.RuleAddResponse_ADDED, createResponse.Code)
+
+		rule.Id = createResponse.Id
+		rule.Action = validServiceNowAlert()
+
+		response, err := suite.Client.UpdateRule(ctx, rule)
+		require.NoError(t, err)
+		assert.Empty(t, response.Messages)
+		assert.Equal(t, api.RuleUpdateResponse_OK, response.Code)
+
+		updated, err := suite.Client.GetRule(ctx, &api.RuleIdentifier{Id: createResponse.Id})
+		require.NoError(t, err)
+		passert.Equal(t, validServiceNowAlert().ServiceNowAlert, updated.Rule.GetServiceNowAlert())
 	})
 
 }
@@ -294,7 +342,7 @@ func TestUpdateRuleValidation(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
-	ruleToCreate := validRule("TestUpdateRule_validations")
+	ruleToCreate := newValidRule("TestUpdateRule_validations")
 	created, err := suite.Client.AddRule(ctx, ruleToCreate)
 	require.NoError(t, err)
 	createdRule := created.Rule
@@ -309,6 +357,15 @@ func TestUpdateRuleValidation(t *testing.T) {
 		assert.Contains(t, response.Messages, "Rule ID must be included from the rule being modified")
 	})
 
+	t.Run("the Id field must refer to a rule that exists", func(t *testing.T) {
+		updatedRule := copyRule(createdRule)
+		updatedRule.Id = "42"
+		response, err := suite.Client.UpdateRule(ctx, updatedRule)
+		require.NoError(t, err)
+		assert.Equal(t, api.RuleUpdateResponse_NOT_FOUND, response.Code)
+		assert.Contains(t, response.Messages, "The requested rule could not be found")
+	})
+
 	t.Run("the Name field must not be empty", func(t *testing.T) {
 		updatedRule := copyRule(createdRule)
 		updatedRule.Name = ""
@@ -319,7 +376,7 @@ func TestUpdateRuleValidation(t *testing.T) {
 	})
 
 	t.Run("the Name must be unique", func(t *testing.T) {
-		rule2 := validRule("TestAddRule_validations_unique")
+		rule2 := newValidRule("TestAddRule_validations_unique")
 		res, err := suite.Client.AddRule(ctx, rule2)
 		require.NoError(t, err)
 		assert.Equal(t, api.RuleAddResponse_ADDED, res.Code)
@@ -356,7 +413,7 @@ func TestDeleteRule(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
-	ruleToCreate := validRule("TestUpdateRule_validations")
+	ruleToCreate := newValidRule("TestUpdateRule_validations")
 	created, err := suite.Client.AddRule(ctx, ruleToCreate)
 	require.NoError(t, err)
 
@@ -380,7 +437,7 @@ func copyRule(r *api.Rule) *api.Rule {
 	return &r2
 }
 
-func validRule(name string) *api.Rule {
+func newValidRule(name string) *api.Rule {
 	return &api.Rule{
 		Event: api.Rule_CCRFailure,
 		Name:  name,

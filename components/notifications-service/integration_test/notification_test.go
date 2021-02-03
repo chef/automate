@@ -414,24 +414,9 @@ EXAMPLE EXCEPTION MESSAGE
 		assert.Equal(t, "EXAMPLE EXCEPTION MESSAGE\n(cookbook_example::recipe_example line 13)", actual.ExceptionMessage)
 		expectedBT := []string{"/path/to/recipe_example.rb: 42", "/path/to/recipe_example.rb: 23"}
 		assert.Equal(t, expectedBT, actual.ExceptionBacktrace)
-		// NOTE: the string values of the time will be different because of how the
-		// floating point value of the fractional seconds is converted to a string
-		// in different programming languages. E.g., trying to compare the strings
-		// can result in something like this:
-		// 		expected: "2021-01-29T19:11:09Z"
-		// 		actual  : "2021-01-29T19:11:09.000000Z"
-		// We can verify the time objects are the same, though.
-		actualStartTime, err := time.Parse(time.RFC3339Nano, actual.StartTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, startTime, actualStartTime)
-
-		actualEndTime, err := time.Parse(time.RFC3339Nano, actual.EndTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, endTime, actualEndTime)
-
-		actualTimestamp, err := time.Parse(time.RFC3339Nano, actual.EndTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, endTime, actualTimestamp)
+		assertRFC3339Equal(t, actual.StartTimeUTC, startTime)
+		assertRFC3339Equal(t, actual.EndTimeUTC, endTime)
+		assertRFC3339Equal(t, actual.TimestampUTC, endTime)
 	})
 	t.Run("ComplianceFailure alerts are sent to the ServiceNow URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
@@ -462,20 +447,9 @@ EXAMPLE EXCEPTION MESSAGE
 		assert.Equal(t, "https://chefautomate.example/compliance_failure/0", actual.AutomateFailureURL)
 		expectedFailureSnippet := "InSpec found a control failure on [chefnode.example](https://chefautomate.example/compliance_failure/0)"
 		assert.Equal(t, expectedFailureSnippet, actual.FailureSnippet)
-		// NOTE: the string values of the time will be different because of how the
-		// floating point value of the fractional seconds is converted to a string
-		// in different programming languages. E.g., trying to compare the strings
-		// can result in something like this:
-		// 		expected: "2021-01-29T19:11:09Z"
-		// 		actual  : "2021-01-29T19:11:09.000000Z"
-		// We can verify the time objects are the same, though.
-		actualEndTime, err := time.Parse(time.RFC3339Nano, actual.EndTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, endTime, actualEndTime)
 
-		actualTimestamp, err := time.Parse(time.RFC3339Nano, actual.TimestampUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, startTime, actualTimestamp)
+		assertRFC3339Equal(t, actual.EndTimeUTC, endTime)
+		assertRFC3339Equal(t, actual.TimestampUTC, startTime)
 
 		assert.Equal(t, 1, actual.TotalNumberOfTests)
 		assert.Equal(t, 0, actual.TotalNumberOfSkippedTests)
@@ -540,10 +514,7 @@ EXAMPLE EXCEPTION MESSAGE
 		assert.Equal(t, "not good", resultActual.CodeDesc)
 		assert.Equal(t, 3.5, resultActual.RunTime)
 
-		resultStartTime, err := time.Parse(time.RFC3339Nano, resultActual.StartTime)
-		assert.NoError(t, err)
-		assert.Equal(t, startTime, resultStartTime)
-
+		assertRFC3339Equal(t, resultActual.StartTime, startTime)
 	})
 }
 
@@ -658,13 +629,8 @@ func TestNotificationDispatchWithOneWebhookAlertRuleForAllEvents(t *testing.T) {
 		assert.NotEmpty(t, actual.AutomateFQDN)
 		assert.Equal(t, "https://automate.example/nodes/0/runs/1", actual.AutomateFailureURL)
 
-		actualStartTime, err := time.Parse(time.RFC3339Nano, actual.StartTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, startTime, actualStartTime)
-
-		actualEndTime, err := time.Parse(time.RFC3339Nano, actual.EndTimeUTC)
-		assert.NoError(t, err)
-		assert.Equal(t, endTime, actualEndTime)
+		assertRFC3339Equal(t, actual.StartTimeUTC, startTime)
+		assertRFC3339Equal(t, actual.EndTimeUTC, endTime)
 	})
 
 	t.Run("ComplianceFailure alerts are sent to the Webhook URL", func(t *testing.T) {
@@ -760,9 +726,7 @@ func TestNotificationDispatchWithOneWebhookAlertRuleForAllEvents(t *testing.T) {
 		assert.Equal(t, "not good", resultActual.CodeDesc)
 		assert.Equal(t, 3.5, resultActual.RunTime)
 
-		resultStartTime, err := time.Parse(time.RFC3339Nano, resultActual.StartTime)
-		assert.NoError(t, err)
-		assert.Equal(t, startTime, resultStartTime)
+		assertRFC3339Equal(t, resultActual.StartTime, startTime)
 	})
 }
 
@@ -800,7 +764,38 @@ func TestNotificationDispatchWithMultipleDestinations(t *testing.T) {
 
 	})
 	t.Run("a compliance failure sends one alert to each destination", func(t *testing.T) {
+		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
+		require.NoError(t, err)
+		actualURLPaths := make(map[string]bool)
+		for i := 0; i < 3; i++ {
+			postData := ts.GetLastPost()
+			assert.NotNil(t, postData)
+			actualURLPaths[postData.URL] = true
+		}
+		expectedURLPaths := map[string]bool{
+			"/slackalert/":      true,
+			"/servicenowalert/": true,
+			"/webhookalert/":    true,
+		}
+
+		assert.Equal(t, expectedURLPaths, actualURLPaths)
 	})
+}
+
+// assertRFC3339Equal asserts that the given RFC3339 formatted time string
+// matches the expectedTime. A string comparison is likely to fail
+// inadvertently because of how the floating point value of the fractional
+// seconds is converted to a string in different programming languages. E.g.,
+// trying to compare the strings can result in something like this:
+//   expected:"2021-01-29T19:11:09Z"
+//   actual:  "2021-01-29T19:11:09.000000Z"
+// This function converts the string to a time object before comparing. It's
+// recommended to truncate your time values to the nearest second to avoid
+// floating point shenanigans.
+func assertRFC3339Equal(t *testing.T, rfc3339str string, expectedTime time.Time) {
+	parsedValue, err := time.Parse(time.RFC3339Nano, rfc3339str)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTime, parsedValue)
 }
 
 func addRules(t *testing.T, rules ...*api.Rule) {
