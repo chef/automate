@@ -15,8 +15,10 @@ document "ip_integration" <<DOC
   run the notifications service's integration tests
 DOC
 function ip_integration() {
-  check_if_deployinate_started || return 1;
-  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+  go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+
+  # check_if_deployinate_started || return 1;
+  # A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
 }
 
 document "infra_service_load_sample_data" <<DOC
