@@ -329,6 +329,22 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: "ip-service"
+    command:
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/infra-proxy-service --with-deps &&
+          ip_integration"
+    timeout_in_minutes: 10
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   - label: "es-sidecar-service"
     command:
       - . scripts/verify_setup.sh
