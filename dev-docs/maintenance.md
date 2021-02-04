@@ -7,18 +7,19 @@ Every engineer should own this; taking the initiative to either fix something or
 
 There are two main aspects to this:
 
-- Proactive: keeping up with third-party library releases
-- Reactive: addressing issues that come up due to system changes (which may include third-party libraries as well as changes in environments and so forth).
+- Proactive: keeping up with third-party library releases -- covered in this document.
+- Reactive: addressing system or pipeline issues that come up due to system changes, library changes, environment changes, etc. -- this is covered in the separate  HOW_THE_PIPELINE_WORKS.md document.
 
 ## Third-party Dependency Update Monitoring
 
 Proactively one should monitor releases of third-party libraries and re-sync our code base with them as soon as scheduling allows.
-Automate uses two main languages, Go and TypeScript, each having their own complex ecosystem.
+Automate uses two main languages, Go (back-end) and TypeScript (front-end), each having their own complex ecosystem.
 
-### Backend Updates
+### Back-end Updates
 
 There is no central place to check on all dependencies.
-The following, though, lists some of the key Golang dependencies. One can set up a "watch" on each of these repositories to be automatically notified of new releases that can then be scheduled as technical debt items to be done in a timely fashion.
+The following, though, lists some of the key Golang dependencies--this is NOT a complete list by any mean.
+One can set up a "watch" on each of these repositories to be automatically notified of new releases that can then be scheduled as technical debt items to be done in a timely fashion.
 
 - https://github.com/golang/go/releases
 - https://github.com/grpc/grpc-go/releases
@@ -28,11 +29,14 @@ The following, though, lists some of the key Golang dependencies. One can set up
 - https://github.com/golang/protobuf/protoc-gen-go/releases
 - https://github.com/stretchr/testify/releases
 - https://github.com/lib/pq/releases
-- core/dex
-- core/nginx
+- https://github.com/dexidp/dex/releases
+- https://github.com/nginx/nginx/releases
 
-### Frontend Updates
+Note that some of these may be pinned for various reasons; those reasons should be re-examined periodically to see if the issue requiring the pinning can be or has been resolved. Example: at the time of writing, `dex` is pinned at 2.19.0 as indicated here: https://github.com/chef/automate/blob/4b6d53641d3687bcf0f15303eed5b1dcd7eb251c/go.mod#L132-L133
 
+### Front-end Updates
+
+All of the following occurs in the context of components/automate-ui.
 One can quickly identify any outdated packages using `npm outdated` on the command-line (from the automate-ui directory).
 There are some packages that we deliberately pin (in automate-ui/package.json) for compatibility reasons.
 These are documented in the "Dependency Management" section of automate-ui/README.md.
@@ -71,4 +75,3 @@ make e2e:
         https://github.com/angular/webdriver-manager/issues/476
 
 ```
-
