@@ -26,7 +26,7 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		return nil, err
 	}
 
-	perPage := int(req.GetSearchQuery().GetRows())
+	perPage := int(req.GetSearchQuery().GetPerPage())
 	if perPage == 0 {
 		perPage = 1000
 	}
@@ -37,7 +37,9 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 	}
 	query, err := c.client.Search.NewQuery("client", searchStr)
 	query.Rows = perPage
-	query.Start = int(req.GetSearchQuery().GetStart())
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
 
 	res, err := query.Do(c.client)
 	if err != nil {
@@ -46,7 +48,6 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 
 	return &response.Clients{
 		Clients: fromAPIToListClients(res.Rows),
-		Start:   int32(res.Start),
 		Total:   int32(res.Total),
 	}, nil
 }
