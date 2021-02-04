@@ -51,7 +51,9 @@ message ConfigRequest {
 					google.protobuf.StringValue client = 2;
 					google.protobuf.StringValue base_path = 3;
 					chef.automate.infra.config.Backups.S3.Elasticsearch es = 4;
-					google.protobuf.StringValue role_arn = 5;
+					google.protobuf.BoolValue enable_aws_auth = 5;
+					chef.automate.infra.config.External.Elasticsearch.Authentication.AwsElasticsearchAuth aws_auth = 6;
+					google.protobuf.StringValue es_url = 7;
 				}
 				message GCSSettings {
 					google.protobuf.StringValue bucket = 1;

@@ -78,8 +78,29 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
   {{~#if cfg.backups.s3.es.chunk_size}}
   chunk_size = "{{cfg.backups.s3.es.chunk_size}}"
   {{~/if}}
-  {{~#if cfg.backups.s3.role_arn}}
-  role_arn = "{{cfg.backups.s3.role_arn}}"
+  {{~#if cfg.backups.s3.es.region}}
+  region = "{{cfg.backups.s3.es.region}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.role_arn}}
+  role_arn = "{{cfg.backups.s3.es.role_arn}}"
+  {{~/if}}
+
+  {{~#if cfg.backups.s3.enable_aws_auth}}
+[backups.s3.aws_auth]
+enable = true
+    {{~#if cfg.backups.s3.es.region}}
+region = "{{cfg.backups.s3.es.region}}"
+    {{~/if}}
+    {{~#if cfg.backups.s3.aws_auth.access_key}}
+access_key = "{{cfg.backups.s3.aws_auth.access_key}}"
+    {{~/if}}
+    {{~#if cfg.backups.s3.aws_auth.secret_key}}
+secret_key = "{{cfg.backups.s3.aws_auth.secret_key}}"
+    {{~/if}}
+    {{~#if cfg.backups.s3.es_url}}
+es_url = "{{cfg.backups.s3.es_url}}"
+    {{~/if}}
+
   {{~/if}}
 {{~/if}}
 

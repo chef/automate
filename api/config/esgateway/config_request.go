@@ -144,7 +144,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			}
 		}
 
-		if auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() == "basic_auth" {
+		switch auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() {
+		case "basic_auth":
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
@@ -152,6 +153,18 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 					auth.GetBasicAuth().GetPassword().GetValue(),
 				),
 			)))
+		case "aws_es":
+			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(nodes) > 0 {
+				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = nodes[0]
+			}
+			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
+				fmt.Sprintf(
+					"%s:%s",
+					auth.GetAwsEs().GetUsername().GetValue(),
+					auth.GetAwsEs().GetPassword().GetValue(),
+				),
+			)))
+		default:
 		}
 
 		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert()

@@ -547,7 +547,7 @@ func (es *Elastic) CreateSnapshotRepository(ctx context.Context, repoName string
 		req = bc.FsBackupsConfig.createRepoReq(repoName)
 	}
 
-	creator := es.client.SnapshotCreateRepository(repoName)
+	creator := es.createRepoClient.SnapshotCreateRepository(repoName)
 	creator.BodyJson(req)
 	creator.Verify(bc.VerifyRepo)
 	res, err := creator.Do(ctx)
