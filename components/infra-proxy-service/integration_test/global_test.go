@@ -2,63 +2,30 @@ package integration_test
 
 import (
 	"os"
-
-	"github.com/pkg/errors"
-
-	"github.com/chef/automate/components/infra-proxy-service/config"
-	"github.com/chef/automate/components/infra-proxy-service/server"
-	"github.com/chef/automate/components/infra-proxy-service/service"
-	platform_config "github.com/chef/automate/lib/platform/config"
+	"testing"
 )
 
 // Global variables
 var (
+	cFile = "/src/components/infra-proxy-service/dev/config"
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
 	suite = NewSuite()
 )
 
-// GlobalSetup makes backend connections to postgres. It also sets
-// global vars to usable values.
-func (s *Suite) GlobalSetup() error {
-	// set global infraProxy
-	var err error
-	infraProxy, err = newInfraProxyServer()
+func TestMain(m *testing.M) {
+	// Global Setup hook: Here is where you can initialize anythings you need
+	// for your tests to run, things like; Initialize ES indices, insert
+	// nodes or runs, etc.
+	suite.GlobalSetup()
 
-	if err != nil {
-		return err
-	}
+	// Execute the test suite and record the exit code
+	exitCode := m.Run()
 
-	return nil
-}
+	// Teardown hook: It says it all, this hook should clean documents
+	// from ES so that the next test can run on a clean env.
+	suite.GlobalTeardown()
 
-
-// newInfraProxyServer initializes a InfraProxyServer with the default config
-func newInfraProxyServer() (*server.Server, error) {
-	_, haveSvcName := os.LookupEnv(A2_SVC_NAME)
-	_, haveSvcPath := os.LookupEnv(A2_SVC_PATH)
-	if !(haveSvcName && haveSvcPath) {
-		_ = os.Setenv(A2_SVC_NAME, defaultA2ServiceName)
-		_ = os.Setenv(A2_SVC_PATH, defaultA2ServicePath)
-	}
-
-	uri, err := platform_config.PGURIFromEnvironment(pgDatabaseName)
-
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get pg uri from environment variables")
-	}
-
-	cfg := config.Default()
-	cfg.PGURL = uri
-	cfg.Database = pgDatabaseName
-
-	service, err := service.Start(cfg.LogLevel, migrationConfig, nil, nil, nil)
-	if err != nil {
-		fail(errors.Wrap(err, "could not initialize storage"))
-	}
-
-	fail(server.GRPC(cfg.GRPC, service))
-
-	srv := server.NewServer(cfg)
-	return srv, nil
+	// call with result of m.Run()
+	os.Exit(exitCode)
 }
