@@ -17,6 +17,7 @@ import {
   GetClientFailure,
   ClientSearch,
   ClientSearchSuccess,
+  ClientSearchSuccessPayload,
   ClientSearchFailure
 } from './client.action';
 
@@ -74,7 +75,7 @@ export class ClientEffects {
       ofType(ClientActionTypes.SEARCH),
       mergeMap((action: ClientSearch) =>
         this.requests.getClientSearch(action.payload).pipe(
-          map((resp) => new ClientSearchSuccess(resp)),
+          map((resp: ClientSearchSuccessPayload) => new ClientSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new ClientSearchFailure(error))))));
 

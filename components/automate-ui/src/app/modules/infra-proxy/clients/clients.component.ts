@@ -87,11 +87,11 @@ export class ClientsComponent implements OnInit, OnDestroy {
       const payload = {
         clientId: currentText,
         page: 0,
-        per_page: 20,
+        per_page: this.clients.length,
         server_id: this.serverId,
         org_id: this.orgId,
-         name: this.clientName,
-         query: 'q'
+        name: this.clientName,
+        query: 'q'
       };
       combineLatest([
         this.store.select(getSearchStatus),
