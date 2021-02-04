@@ -53,8 +53,8 @@ export interface ClientSearchPayload {
   clientId: string;
   server_id: string;
   org_id: string;
-  name: string;
-  query: string;
+  page: number;
+  per_page: number;
 }
 
 export class ClientSearch implements Action {
