@@ -32,7 +32,10 @@
         </div>
         <div class="section-container" *ngIf="dataBagDetails">
           <chef-loading-spinner *ngIf="searchItems && !dataBagDetails.length" size="50" fixed></chef-loading-spinner>
-          <div class="empty-section" *ngIf="!searchItems && !dataBagDetails.length">No data bag items available</div>
+          <div class="empty-section" *ngIf="!searchItems && !dataBagDetails.length">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p>No data bag items available</p>
+          </div>
           <div *ngIf="dataBagDetails.length">
             <ul id="accordion" class="accordion" >
               <li *ngFor="let item of dataBagDetails; let i = index" [class.active]="item.active" class="items">
