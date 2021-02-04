@@ -135,17 +135,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       per_page: this.dataBagDetails.length
     };
 
-    combineLatest([
-      this.store.select(getAllStatus)
-    ]).pipe(
-      filter(([getDataBagsearchItemsSt]) =>
-      getDataBagsearchItemsSt === EntityStatus.loadingSuccess),
-      filter(([_getDataBagsearchItemsSt]) =>
-        !isNil(_getDataBagsearchItemsSt)),
-      takeUntil(this.isDestroyed)
-    ).subscribe(() => {
-      this.store.dispatch(new DataBagSearchDetails(payload));
-    });
+    this.store.dispatch(new DataBagSearchDetails(payload));
 
     setTimeout(() => {
       this.searchItems = false;
