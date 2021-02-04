@@ -31,9 +31,9 @@ export class ClientRequests {
 
   public getClientSearch(payload: ClientSearchPayload)
   : Observable<ClientSearchResponse> {
-    return this.http.get<ClientSearchResponse>(
-      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients?search_query.${payload.query}=name:*${payload.clientId}*`,
-      {headers}
-    );
+    const params = `search_query.q=name:${payload.clientId}*&search_query.page=${payload.page}&search_query.per_page=${payload.per_page}`;
+    const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients?${params}`;
+            
+    return this.http.get<ClientSearchResponse>(url, {headers});
   }
 }
