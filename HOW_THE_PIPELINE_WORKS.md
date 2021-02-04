@@ -358,3 +358,70 @@ deploys; however, failures here are still taken seriously and
 investigated.
 
 Our nightly pipeline is defined in `.expeditor/nightly.pipeline.yml`
+
+## Pipeline Monitoring
+
+There are a handful of processing pipelines that work together to achieve our continuous integration environment,
+covering everything from validating a pull request to releasing code to customers.
+These pipelines need to be monitored on a DAILY basis for any anomalies.
+
+### Monitoring for FAILED Runs
+
+There are two dashboards that show these pipelines in the browser.
+The rightmost bar in each spark chart indicates the latest status.
+Any that are red indicate a failure.
+Some of these failures, though, are routine and require no action from someone monitoring them.
+For example, the verify/private pipeline (https://buildkite.com/chef/chef-automate-master-verify-private) will report failing unit tests on a branch for an individual pull request, indicating only that the author has a bit more work to finish their PR.
+But if that same pipeline fails on `master` that may indicate a problem elsewhere that needs remediation.
+At the time of writing, only one pipeline is under "chef-oss"; all the rest are under "chef":
+
+- Chef pipelines: https://buildkite.com/chef?filter=chef%2Fautomate%3A
+- Chef OSS pipelines: https://buildkite.com/chef-oss?filter=chef%2Fautomate
+
+### Monitoring for BLOCKED Runs
+
+The dashboards mentioned above indicate the success or failure of each run; they do NOT indicate any pipelines that are blocked.
+Thus, either you have to check builds one-by-one, or run the following shell function to check them all.
+Run `pipelines --blocked` after sourcing scripts/pipeline_info.sh and satisfying its prerequisites.
+
+Example output:
+
+```json
+{"branch":"Amol/project_and_roles_changes","created_at":"2021-01-28T09:38:49.345Z","state":"passed","pr":"4393","pipeline":"[chef/automate:master] verify_private","message":"Added Id testcase for policy.\n\nSigned-off-by: samshinde <ashinde@chef.io>"}
+{"branch":"Himanshi/client_UI_changes","created_at":"2021-01-28T08:42:51.369Z","state":"passed","pr":"4661","pipeline":"[chef/automate:master] verify_private","message":"Addedd CSS changes in client details.\n\nSigned-off-by: Himanshi Chhabra <himanshi.chhabra@msystechnologies.com>"}
+```
+
+Occasionally you will see a false positive if someone resolved the blockage by just starting a new build instead of unblocking the original blocked build.
+Example: https://buildkite.com/chef/chef-automate-master-verify-private/builds?branch=Himanshi/client_UI_changes
+
+### Monitoring for STALE Runs
+
+The dashboards mentioned above indicate the success or failure of each run; they do NOT indicate any pipelines that have stopped running.
+Thus, either you have to check the date on each pipeline's last build one-by-one, or run the following shell function to check them all.
+Run `pipelines --stale` after sourcing scripts/pipeline_info.sh and satisfying its prerequisites.
+The output itemizes all pipelines that have not been run in the last day.
+That does not, however, mean each has a problem; some pipelines are needed to run less frequently.
+
+Example output:
+
+```json
+{"name":"[chef/automate:master] post-promote","createdAt":"2021-02-01T09:00:52.228Z"}
+{"name":"[chef/automate:master] deploy/ui-library","createdAt":"2020-12-23T04:04:33.035Z"}
+{"name":"[chef/automate:master] habitat/build","createdAt":"2021-02-01T19:46:53.664Z"}
+{"name":"[chef/automate:master] deploy/acceptance","createdAt":"2021-01-30T16:58:23.482Z"}
+```
+
+`Post-promote` and `habitat/build`, for instance, only run after PRs that create a new deliverable.
+This therefore excludes PRs that involve files that are just touching internal docs or build files, etc.
+So if there are no PRs at all in a given day, or only PRs that update e.g. internal docs, then that pipeline will not run that day.
+Another example: `deploy/acceptance` will only run on days that we promote code to acceptance.
+
+So this list is a starting point of things you might need to check, compared to the whole list (run `pipelines` with no arguments).
+
+### Monitoring Other Pipeline Issues
+
+Some issues will show up in notifications the `#a2-notify` slack channel.
+
+- Problems reported by Buildkite itself will show a "thumbs-down" indicator if there is a problem needing attention.
+- Other problems, like those reported by Netlify, will require reading the text, e.g. "Deploy did not complete for chef-automate (deploy preview 4676)".
+- Still others, like those from Semgrep, report only problems, so each one requires attention. (Well, in the Semgrep case, it depends: Semgrep reports issues on master, yes, but it also reports issues in open PRs; the latter are up to the developer to resolve).
