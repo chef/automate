@@ -35,7 +35,7 @@ const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
 const orgId = '6e98f609-586d-4816-a6de';
 const dataBagName = 'demo_data_bag';
 
-const data_bags: DataBags[] = [{
+const items: DataBags[] = [{
   name: 'auth'
 }];
 
@@ -87,9 +87,9 @@ describe('DataBagsDetailsComponent', () => {
   });
 
   it('Check data bag items success', () => {
-    store.dispatch(new GetDataBagDetailsSuccess({ data_bags }));
+    store.dispatch(new GetDataBagDetailsSuccess({ items }));
     fixture.detectChanges();
-    expect(component.dataBagDetails).toEqual(data_bags);
+    expect(component.dataBagDetails).toEqual(items);
   });
 
 });
