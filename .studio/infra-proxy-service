@@ -11,6 +11,14 @@ function start_infra_proxy_service() {
   chef-automate dev deploy-some $HAB_ORIGIN/infra-proxy-service --with-deps
 }
 
+document "infra_service_integration" <<DOC
+  run the infra service's integration tests
+DOC
+function infra_service_integration() {
+  check_if_deployinate_started || return 1;
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+}
+
 document "infra_service_load_sample_data" <<DOC
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
   Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
