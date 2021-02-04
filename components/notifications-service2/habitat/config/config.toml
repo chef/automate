@@ -1,6 +1,8 @@
 [service]
-external_fqdn = "{{cfg.service.external_fqdn}}"
+host = "127.0.0.1"
 port = {{cfg.service.port}}
+external_fqdn = "{{cfg.service.external_fqdn}}"
+log_level = "{{cfg.log.level}}"
 
 ## TODO: is this needed?
 # export CACHE_TIMEOUT_MS_EVENT_RULE="{{cfg.cache.event_rule_timeout_ms}}"

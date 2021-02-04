@@ -11,7 +11,10 @@ port = 4001
 dedup_window_seconds = 300
 
 [storage]
-user = "notifications"
+database = "notifications_service"
+max_open_conns = 10
+max_idle_conns = 10
+
 
 [cache]
 event_rule_timeout_ms = 5000

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/components/notifications-service2/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -29,17 +31,15 @@ func newServeCommand() *cobra.Command {
 }
 
 func runServeCommand(cmd *cobra.Command, args []string) error {
+	c, err := config.FromFile(serveCmdFlags.configFile)
+	if err != nil {
+		return err
+	}
 	for {
 		fmt.Println("hello from notifications-service2")
+		s, _ := toml.Marshal(c)
+		fmt.Println(string(s))
 		time.Sleep(5 * time.Second)
 	}
-	// Tasks:
-	// - implement config. parse the toml file
-	// - load our service certs
-	// - connect to postgres
-	// - migrate database to be identical to elixir version, but use the golang migrator.
-	//   - fresh install case
-	//   - upgrade case
-	// - start the gRPC server
 	return nil
 }
