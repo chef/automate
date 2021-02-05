@@ -16,7 +16,7 @@ func TestClientsReturnsEmptyList(t *testing.T) {
 	req := request.Clients{}
 
 	expected := new(response.Clients)
-    res, err := infraProxy.GetClients(ctx, *req)
+    res, err := infraProxy.GetClients(ctx, &req)
     fmt.Print(expected)
     fmt.Print(res)
     fmt.Print(err)

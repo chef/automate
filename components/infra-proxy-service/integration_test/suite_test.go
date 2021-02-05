@@ -1,7 +1,7 @@
 package integration_test
 
 import (
-	grpc "github.com/chef/automate/components/infra-proxy-service/server"
+	"github.com/chef/automate/components/infra-proxy-service/server"
 )
 
 // Global variables
@@ -13,7 +13,7 @@ var (
 	// ```
 	// res, err := infraProxy.GetOrgs(ctx, &req)
 	// ```
-	infraProxy *grpc.Server
+	infraProxy *server.Server
 )
 
 const (

@@ -11,13 +11,13 @@ import (
 
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/components/infra-proxy-service/config"
 	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"
-	"github.com/chef/automate/lib/tls/certs"
 )
 
 var serveCmd = &cobra.Command{
@@ -25,18 +25,6 @@ var serveCmd = &cobra.Command{
 	Short: "Launches the automate infra proxy service.",
 	Run:   serve,
 	Args:  cobra.ExactArgs(1),
-}
-
-type config struct {
-	GRPC            string `mapstructure:"grpc"`
-	LogFormat       string `mapstructure:"log-format"`
-	LogLevel        string `mapstructure:"log-level"`
-	certs.TLSConfig `mapstructure:"tls"`
-	PGURL           string `mapstructure:"pg_url"`
-	Database        string `mapstructure:"database"`
-	MigrationsPath  string `mapstructure:"migrations-path"`
-	AuthzAddress    string `mapstructure:"authz-address"`
-	SecretsAddress  string `mapstructure:"secrets-address"`
 }
 
 func serve(cmd *cobra.Command, args []string) {
@@ -53,7 +41,7 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(errors.Wrap(err, `Could not read config file. Please pass a config file as the only argument to this command.`))
 	}
 
-	cfg := config{}
+	cfg := config.Service{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		fail(errors.Wrap(err, "couldn't parse configuration file"))
 	}

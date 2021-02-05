@@ -1,14 +1,14 @@
 package integration_test
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/chef/automate/components/infra-proxy-service/config"
-	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
-
 	"github.com/pkg/errors"
-	"google.golang.org/grpc"
+
+	"github.com/chef/automate/components/infra-proxy-service/config"
+	"github.com/chef/automate/components/infra-proxy-service/server"
+	"github.com/chef/automate/components/infra-proxy-service/service"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 // Global variables
@@ -34,7 +34,7 @@ func (s *Suite) GlobalSetup() error {
 
 
 // newInfraProxyServer initializes a InfraProxyServer with the default config
-func newInfraProxyServer() (*grpc.Server, error) {
+func newInfraProxyServer() (*server.Server, error) {
 	_, haveSvcName := os.LookupEnv(A2_SVC_NAME)
 	_, haveSvcPath := os.LookupEnv(A2_SVC_PATH)
 	if !(haveSvcName && haveSvcPath) {
@@ -42,7 +42,6 @@ func newInfraProxyServer() (*grpc.Server, error) {
 		_ = os.Setenv(A2_SVC_PATH, defaultA2ServicePath)
 	}
 
-	fmt.Print("=================")
 	uri, err := platform_config.PGURIFromEnvironment(pgDatabaseName)
 
 	if err != nil {
@@ -50,21 +49,16 @@ func newInfraProxyServer() (*grpc.Server, error) {
 	}
 
 	cfg := config.Default()
-	cfg.Postgres = config.Postgres{
-		URI:        uri,
-		Database:   pgDatabaseName,
-		SchemaPath: "/src/components/infra-proxy-service/storage/postgres/schema/sql/",
+	cfg.PGURL = uri
+	cfg.Database = pgDatabaseName
+
+	service, err := service.Start(cfg.LogLevel, migrationConfig, nil, nil, nil)
+	if err != nil {
+		fail(errors.Wrap(err, "could not initialize storage"))
 	}
 
-	err = postgres.DestructiveReMigrateForTest(&cfg.Postgres)
-	if err != nil {
-		return nil, err
-	}
+	fail(server.GRPC(cfg.GRPC, service))
 
-	srv := grpc.NewServer(cfg)
-	err = srv.ConnectPg()
-	if err != nil {
-		return nil, err
-	}
+	srv := server.NewServer(cfg)
 	return srv, nil
 }
