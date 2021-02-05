@@ -200,10 +200,6 @@ func CollectionsForConfig(c *dc.ConfigRequest) []string {
 			collections = append(collections, services.ChefServerCollectionName)
 		}
 
-		if c.GetV1().GetSvc().GetEnableWorkflow().GetValue() {
-			collections = append(collections, services.WorkflowCollectionName)
-		}
-
 		if c.GetV1().GetSvc().GetEnableDevMonitoring().GetValue() {
 			collections = append(collections, services.MonitoringCollectionName)
 		}

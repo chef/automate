@@ -41,18 +41,10 @@ var defaultHabBaseDir = "/hab/svc"
 
 // FileMoversForConfig returns the file migrations that should take
 // place given the passed DeliveryRunning configuration
-func FileMoversForConfig(d *DeliveryRunning, workflow bool) []*FileMover {
+func FileMoversForConfig(d *DeliveryRunning) []*FileMover {
 	fileMovers := []*FileMover{
 		NewFileMover(d.Delivery.Insights.DataDirectory, "automate-elasticsearch", "data"),
 		NewFileMover(d.Delivery.Compliance.ProfilesPath, "compliance-service", "data/profiles"),
-	}
-
-	// if workflow is enabled, we will add the file mover for the git repositories
-	if workflow {
-		fileMovers = append(
-			fileMovers,
-			NewFileMover(d.Delivery.Delivery.GitRepos, "automate-workflow-server", "data/git/repos"),
-		)
 	}
 
 	return fileMovers

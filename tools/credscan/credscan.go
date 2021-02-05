@@ -99,15 +99,6 @@ var a2Config = config{
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
 
-		// Test data from workflow
-		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
-		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},
-		{regex: `components/automate-workflow-server/apps/jobs/test/unit/data/fips-private-key`},
-		{regex: `components/automate-workflow-server/apps/jobs/test/unit/jobs_test_utils.erl`},
-		{regex: `components/automate-workflow-server/etc/builder_key`},
-		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
-		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},
-
 		// Habitat configuration templates, no acutal creds
 		{regex: `components/automate-dex/habitat/config/ldap-ca.pem`},
 		{regex: `components/automate-dex/habitat/config/saml-ca.pem`},

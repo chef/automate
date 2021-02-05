@@ -31,7 +31,6 @@ const (
 	AutomateCollectionName   = "automate"
 	BuilderCollectionName    = "builder"
 	ChefServerCollectionName = "chef-server"
-	WorkflowCollectionName   = "workflow"
 	MonitoringCollectionName = "monitoring"
 )
 

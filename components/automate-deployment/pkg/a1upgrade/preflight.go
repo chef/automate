@@ -74,7 +74,6 @@ type PreflightRunner struct {
 	reindexer       *Reindexer
 	writer          cli.FormatWriter
 	checkChefServer bool
-	checkWorkflow   bool
 	details         []string
 	err             error
 }
@@ -84,15 +83,13 @@ func NewPreflightRunner(
 	writer cli.FormatWriter,
 	deliveryRunning *DeliveryRunning,
 	deliverySecrets *DeliverySecrets,
-	checkChefServer bool,
-	checkWorkflow bool) *PreflightRunner {
+	checkChefServer bool) *PreflightRunner {
 
 	return &PreflightRunner{
 		writer:          writer,
 		deliveryRunning: deliveryRunning,
 		deliverySecrets: deliverySecrets,
 		checkChefServer: checkChefServer,
-		checkWorkflow:   checkWorkflow,
 	}
 }
 
@@ -313,7 +310,7 @@ func (p *PreflightRunner) checkExpectedDataPaths() {
 	}
 
 	checkDesc := "expected Automate 1 data paths exist"
-	moveJobs := FileMoversForConfig(p.deliveryRunning, p.checkWorkflow)
+	moveJobs := FileMoversForConfig(p.deliveryRunning)
 
 	missingPaths := make([]string, 0)
 	for _, m := range moveJobs {
@@ -467,9 +464,6 @@ func (p *PreflightRunner) pgDatabasesToCheck() []string {
 	if p.checkChefServer {
 		databases = append(databases, chefServerDatabaseNames...)
 	}
-	if p.checkWorkflow {
-		databases = append(databases, "delivery")
-	}
 	return databases
 }
 
@@ -480,7 +474,7 @@ func (p *PreflightRunner) checkFreeSpace() {
 
 	checkDesc := "sufficient disk space to move Automate 1 data"
 	moveJobsByMount := make(map[string][]moveJob)
-	moveJobs := FileMoversForConfig(p.deliveryRunning, p.checkWorkflow)
+	moveJobs := FileMoversForConfig(p.deliveryRunning)
 	for _, m := range moveJobs {
 		mountPoint, err := sys.MountFor(m.DestPath())
 		if err != nil {

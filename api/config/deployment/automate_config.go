@@ -294,24 +294,6 @@ func (c *AutomateConfig) SetChefServerEnabled(enabled bool) error {
 	})
 }
 
-func WithWorkflowEnabled(enabled bool) func(*AutomateConfig) error {
-	return func(c *AutomateConfig) error {
-		return c.SetWorkflowEnabled(enabled)
-	}
-}
-
-func (c *AutomateConfig) SetWorkflowEnabled(enabled bool) error {
-	return c.OverrideConfigValues(&AutomateConfig{
-		Deployment: &ConfigRequest{
-			V1: &ConfigRequest_V1{
-				Svc: &ConfigRequest_V1_Service{
-					EnableWorkflow: w.Bool(enabled),
-				},
-			},
-		},
-	})
-}
-
 func WithDeploymentOrderStressMode(enabled bool) func(*AutomateConfig) error {
 	return func(c *AutomateConfig) error {
 		return c.SetDeploymentOrderStressMode(enabled)
