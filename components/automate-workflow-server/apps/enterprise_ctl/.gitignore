@@ -1,8 +1,0 @@
-ebin/*
-*.beam
-deps/*
-rel/create_enterprise
-.concrete/DEV_MODE
-deps.plt
-.eunit
-/.rebar
