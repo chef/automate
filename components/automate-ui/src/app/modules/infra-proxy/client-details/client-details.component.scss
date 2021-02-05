@@ -93,34 +93,31 @@ chef-loading-spinner {
     display: flex;
     padding: 1.5em;
     background: $chef-white;
-    border-left: 1px dashed $chef-grey;
-    border-right: 1px dashed $chef-grey;
-    border-bottom: 1px dashed $chef-grey;
+    border: 0.5px solid #CFD2D2;
   }
 
   .key-tab-body-top {
     padding: 1em;
     background: $chef-white;
-    border-left: 1px dashed $chef-grey;
-    border-right: 1px dashed $chef-grey;
-    border-bottom: 1px dashed $chef-grey;
+    border-left: 0.5px solid #CFD2D2;
+    border-right: 0.5px solid #CFD2D2;
+    border-top: 0.5px solid #CFD2D2;
 
     p {
       margin: 0;
       text-align: right;
-      color: $chef-orange;
+      color: $chef-dark-blue;
     }
   }
 
   .key-tab-head {
     padding: 1em;
-    border: 1px dashed $chef-grey;
-    background: $chef-med-grey;
-    border-radius: $global-radius;
 
     p {
       margin: 0;
-      color: $chef-dark-grey;
+      font-weight: bold;
+      line-height: 20px;
+      color: $chef-black;
     }
   }
 }

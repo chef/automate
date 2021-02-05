@@ -114,6 +114,14 @@ export class ServerEffects {
           observableOf(new UpdateServerFailure(error))))));
 
   @Effect()
+  updateOrgSuccess$ = this.actions$.pipe(
+      ofType(ServerActionTypes.UPDATE_SUCCESS),
+      map(({ payload: { server } }: UpdateServerSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Updated server ${server.name}.`
+    })));
+
+  @Effect()
   updateServerFailure$ = this.actions$.pipe(
     ofType(ServerActionTypes.UPDATE_FAILURE),
     map(({ payload }: UpdateServerFailure) => {

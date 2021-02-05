@@ -5,8 +5,7 @@ export interface Client {
   admin: string;
   validator: string;
   certificate: string;
-  public_key: string;
-  private_key: string;
+  client_key: ClientKey;
   uri: string;
   json_class: string;
   chef_type: string;
@@ -18,4 +17,11 @@ export interface ClientSearch {
   count: number;
   filter: string;
   sort: string;
+}
+
+export interface ClientKey {
+  name: string;
+  public_key: string;
+  expiration_date: string;
+  private_key: string;
 }

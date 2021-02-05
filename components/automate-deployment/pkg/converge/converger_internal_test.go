@@ -1,7 +1,6 @@
 package converge
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -131,23 +130,6 @@ func TestTransition(t *testing.T) {
 			assert.True(t, ok, "is in waitingForRestart")
 			c.Stop()
 		})
-	t.Run("waitingForRestart ignores reconfigureDone",
-		func(t *testing.T) {
-			c := StartConverger(
-				testCompiler(nil),
-				WithDebugChannel(),
-			)
-			c.(*converger).debugSetState(newWaitingForRestart())
-			task, err := NewTask()
-			require.NoError(t, err)
-			c.ReconfigureDone(task)
-			<-task.C
-
-			s := c.(*converger).debugGetState()
-			_, ok := s.(*waitingForRestart)
-			assert.True(t, ok, "is in waitingForRestart")
-			c.Stop()
-		})
 	t.Run("waitingForRestart moves to idle after timeout",
 		func(t *testing.T) {
 			c := StartConverger(
@@ -166,30 +148,13 @@ func TestTransition(t *testing.T) {
 			assert.True(t, ok, "is in idle")
 			c.Stop()
 		})
-	t.Run("waitingForReconfigure moves to idle after reconfigureDone",
-		func(t *testing.T) {
-			c := StartConverger(
-				testCompiler(nil),
-				WithDebugChannel(),
-			)
-			c.(*converger).debugSetState(newWaitingForReconfigure(false))
-			task, err := NewTask()
-			require.NoError(t, err)
-			c.ReconfigureDone(task)
-			<-task.C
-
-			s := c.(*converger).debugGetState()
-			_, ok := s.(*idle)
-			assert.True(t, ok, "is in idle")
-			c.Stop()
-		})
 	t.Run("waitingForReconfigure ignores convergeRequest",
 		func(t *testing.T) {
 			c := StartConverger(
 				testCompiler(nil),
 				WithDebugChannel(),
 			)
-			c.(*converger).debugSetState(newWaitingForReconfigure(false))
+			c.(*converger).debugSetState(newWaitingForReconfigure())
 			task, err := NewTask()
 			require.NoError(t, err)
 			c.Converge(task, desiredState, nil)
@@ -207,7 +172,7 @@ func TestTransition(t *testing.T) {
 				testCompiler(nil),
 				WithDebugChannel(),
 			)
-			c.(*converger).debugSetState(newWaitingForReconfigure(false))
+			c.(*converger).debugSetState(newWaitingForReconfigure())
 			task, err := NewTask()
 			require.NoError(t, err)
 			c.StopServices(task, localhost, nil)
@@ -219,39 +184,15 @@ func TestTransition(t *testing.T) {
 			assert.True(t, ok, "is in waitingForReconfigure")
 			c.Stop()
 		})
-	t.Run("waitingForReconfig sends HUP after first timeout",
+	t.Run("waitingForReconfig returns to idle after timeout",
 		func(t *testing.T) {
 			logrus.SetLevel(logrus.DebugLevel)
-			h := &mockHuper{}
 			c := StartConverger(
 				testCompiler(nil),
-				WithSelfHuper(h),
 				WithDebugChannel(),
 			)
 
-			c.(*converger).debugSetState(newWaitingForReconfigure(false))
-			c.(*converger).inbox <- &timeout{}
-
-			// TODO(ssd) 2019-04-22: Technically this is
-			// racy because nothing ensures the timeout
-			// has been processed.
-			s := c.(*converger).debugGetState()
-			_, ok := s.(*waitingForReconfigure)
-			assert.True(t, h.wasCalled())
-			assert.True(t, ok, "is in waitingForReconfigure")
-			c.Stop()
-		})
-	t.Run("waitingForReconfig returns to idle after second timeout",
-		func(t *testing.T) {
-			logrus.SetLevel(logrus.DebugLevel)
-			h := &mockHuper{}
-			c := StartConverger(
-				testCompiler(nil),
-				WithSelfHuper(h),
-				WithDebugChannel(),
-			)
-
-			c.(*converger).debugSetState(newWaitingForReconfigure(true))
+			c.(*converger).debugSetState(newWaitingForReconfigure())
 			c.(*converger).inbox <- &timeout{}
 
 			// TODO(ssd) 2019-04-22: Technically this is
@@ -259,7 +200,6 @@ func TestTransition(t *testing.T) {
 			// has been processed.
 			s := c.(*converger).debugGetState()
 			_, ok := s.(*idle)
-			assert.False(t, h.wasCalled())
 			assert.True(t, ok, "is in idle")
 			c.Stop()
 		})
@@ -279,23 +219,4 @@ type mockPlan struct {
 
 func (m *mockPlan) Execute(eventSink EventSink) error {
 	return m.err
-}
-
-type mockHuper struct {
-	called bool
-	sync.Mutex
-}
-
-func (m *mockHuper) Hup() {
-	m.Lock()
-	defer m.Unlock()
-
-	m.called = true
-}
-
-func (m *mockHuper) wasCalled() bool {
-	m.Lock()
-	defer m.Unlock()
-
-	return m.called
 }

@@ -165,11 +165,16 @@ describe('Admin pages', () => {
           });
 
         waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)')
+          .then((id) => {
+            expect(id.getText()).toBe('chef-managed-administrator');
+          });
+
+        waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
           .then((policyType) => {
             expect(policyType.getText()).toBe('Chef-managed');
           });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:nth-child(4)')
           .then((members) => {
             expect(members.getText()).toBe('In use');
           });
@@ -182,11 +187,16 @@ describe('Admin pages', () => {
           });
 
         waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)')
+          .then((id) => {
+            expect(id.getText()).toBe('some-policy-id');
+          });
+
+        waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
         .then(policyType => {
           expect(policyType.getText()).toBe('Custom');
         });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:nth-child(4)')
           .then(members => {
             expect(members.getText()).toBe('No members');
           });
