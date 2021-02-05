@@ -1,19 +1,17 @@
 #!/bin/bash
 set -eou pipefail
 
-# usage: semgrep.sh $BUILDKITE_BRANCH $BUILDKITE_BUILD_URL $BUILDKITE_PULL_REQUEST_BASE_BRANCH
-
 echo "running in $(pwd)"
 
 # Env vars needed by semgrep-agent
-export SEMGREP_BRANCH=$1
+export SEMGREP_BRANCH=$BUILDKITE_BRANCH 
 export SEMGREP_REPO_NAME=chef/automate
 # Activates links to buildkite builds in slack notification
-export SEMGREP_JOB_URL=$2
+export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
 # Activates links to git commits in slack notification
 export SEMGREP_REPO_URL=https://github.com/chef/automate
 
-BASELINE=$3
+BASELINE=$BUILDKITE_PULL_REQUEST_BASE_BRANCH
 MERGE_BASE=$(git merge-base "${BASELINE:-master}" HEAD)
 if [ "$SEMGREP_BRANCH" == "master" ] ; then
   echo "build on master; using 'master~1' as base branch" && BASELINE=master~1
