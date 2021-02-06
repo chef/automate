@@ -449,6 +449,7 @@ This is integrated into the Chef Automate workflows and runs:
 
 Semgrep findings are detailed in the output log of those Buildkite tasks every time it runs.
 Most significantly, any new findings generate slack notifications in the `#a2-notify` channel, so the channel should be monitored closely for any such reports.
+Semgrep also provides a [dashboard](https://semgrep.dev/manage/findings?repo=chef%2Fautomate-nightly&ref_type=branch&ref=master&state_type=new&tab=findings) where you can see not only all current issues on master, but trends and past history on all branches.
 Note that, at the time of writing there are about 21 open findings; issues that need to be resolved. But it would be counter-productive to generate slack notifications for each of those every day--no one would pay any attention. That is why notifications occur only for new findings.
 
 Semgrep is available (through several make file entries) to be run locally as well, either on the whole code base or on individual components within the code base.

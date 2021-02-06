@@ -68,7 +68,7 @@ make unit:
       Please install 'karma-coverage' and update 'karma.conf.js.' For more info, see https://github.com/karma-runner/karma-coverage/blob/master/README.md
 
 make e2e:
-  - CURRENT PROBLEM--does not fail build:
+  - CURRENT PROBLEM--fails build when run locally, but not in Buildkite:
       spawn Unknown system error -86
       References:
         https://stackoverflow.com/questions/65618558/osx-fix-selenium-chromedriver-launch-error-spawn-unknown-system-error-86-bad-cp
