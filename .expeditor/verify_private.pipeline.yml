@@ -115,18 +115,7 @@ steps:
 
   - label: ":semgrep: Security"
     command:
-      - echo "running in $(pwd)"
-      - export SEMGREP_BRANCH=$BUILDKITE_BRANCH
-      - export SEMGREP_REPO_NAME=chef/automate
-      # Activates links to buildkite builds in slack notification
-      - export SEMGREP_JOB_URL=$BUILDKITE_BUILD_URL
-      # Activates links to git commits in slack notification
-      - export SEMGREP_REPO_URL=https://github.com/chef/automate
-      - export BASELINE=$BUILDKITE_PULL_REQUEST_BASE_BRANCH
-      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -n "\$BASELINE" \] && echo "PR build on '$BUILDKITE_BRANCH' branch; base is '\$BASELINE'"
-      - \[ "$BUILDKITE_BRANCH" != "master" \] && \[ -z "\$BASELINE" \] && echo "manual build on '$BUILDKITE_BRANCH' branch; using master as base" && BASELINE=master
-      - \[ "$BUILDKITE_BRANCH" == "master" \] && echo "build on master; using 'master~1' as base branch" && BASELINE=master~1
-      - python -m semgrep_agent --publish-token "\$SEMGREP_TOKEN" --publish-deployment \$SEMGREP_ID --baseline-ref \$BASELINE
+      - .expeditor/buildkite/semgrep.sh
     timeout_in_minutes: 15
     expeditor:
       secrets: true
@@ -137,7 +126,7 @@ steps:
             - .expeditor/export_semgrep_token.sh
       - docker#v3.7.0:
           image: returntocorp/semgrep-agent:v1
-          propogate-environment: true
+          propagate-environment: true
           workdir: /go/src/github.com/chef/automate
           environment:
             - SEMGREP_TOKEN
