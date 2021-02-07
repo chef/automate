@@ -20,10 +20,11 @@ const (
 )
 
 type GatewayTestSuite struct {
-	ctx     context.Context
-	target  *acceptanceTarget
-	clients gateway.ClientsFactory
-	gwConn  *grpc.ClientConn
+	ctx              context.Context
+	target           *acceptanceTarget
+	clients          gateway.ClientsFactory
+	gwConn           *grpc.ClientConn
+	automateAPIToken string
 	suite.Suite
 }
 
@@ -58,10 +59,11 @@ func NewGatewayTestSuite(ctx context.Context, t *testing.T, target *acceptanceTa
 	}
 
 	return &GatewayTestSuite{
-		ctx:     ctx,
-		target:  target,
-		clients: clients,
-		gwConn:  gwConn,
+		ctx:              ctx,
+		target:           target,
+		clients:          clients,
+		gwConn:           gwConn,
+		automateAPIToken: os.Getenv("AUTOMATE_API_TOKEN"),
 	}, nil
 }
 
