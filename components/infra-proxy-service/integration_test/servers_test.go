@@ -19,6 +19,5 @@ func TestGetServersReturnsEmptyList(t *testing.T) {
 	res, err := infraProxy.GetServers(ctx, req)
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
-
-	assert.NotNil(t, expected)
+	assert.Equal(t, expected, res)
 }

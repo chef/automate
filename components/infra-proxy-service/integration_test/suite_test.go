@@ -47,10 +47,6 @@ func newInfraProxyServer() (*server.Server, error) {
 	}
 
 	gRPC := server.NewServer(service)
-	err = server.GRPC("127.0.0.1:10153", service)
-	if err != nil {
-		return nil, err
-	}
 
 	return gRPC, nil
 }
