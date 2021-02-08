@@ -7,7 +7,10 @@
       </app-infra-search-bar>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searchItems && !clients.length" size="50" fixed></chef-loading-spinner>
-    <div class="empty-section" *ngIf="!searchItems && !clients.length">No clients available</div>
+    <div class="empty-section" *ngIf="!searchItems && !clients.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No results found for "{{searchText}}".</p>
+    </div>
     <chef-table *ngIf="clients.length">
       <chef-thead>
         <chef-tr>
