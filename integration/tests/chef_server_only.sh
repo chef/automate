@@ -16,12 +16,6 @@ source .studio/chef-server-collection
 
 do_create_config() {
     do_create_config_default
-
-    #shellcheck disable=SC2154
-    cat <<EOF >> "$test_config_path"
-[erchef.v1.sys.data_collector]
-enabled = false
-EOF
 }
 
 do_deploy() {

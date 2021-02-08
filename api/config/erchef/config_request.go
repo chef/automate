@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	ac "github.com/chef/automate/api/config/shared"
+	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -143,4 +145,12 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 	c.V1.Sys.Tls = creds
 
 	return c.V1.Sys, nil
+}
+
+func (c *ConfigRequest) ConfigureProduct(productConfig *config.ProductConfig) {
+	if len(productConfig.Products) > 0 {
+		if !c.V1.Sys.GetExternalAutomate().GetEnable().GetValue() && !stringutils.SliceContains(productConfig.Products, "automate") {
+			c.V1.Sys.DataCollector.Enabled = w.Bool(false)
+		}
+	}
 }
