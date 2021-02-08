@@ -15,9 +15,9 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
 		SearchQuery: &infra_req.SearchQuery{
-			Q:     r.GetSearchQuery().GetQ(),
-			Start: r.GetSearchQuery().GetStart(),
-			Rows:  r.GetSearchQuery().GetRows(),
+			Q:       r.GetSearchQuery().GetQ(),
+			PerPage: r.GetSearchQuery().GetPerPage(),
+			Page:    r.GetSearchQuery().GetPage(),
 		},
 	}
 	res, err := a.client.GetEnvironments(ctx, req)
@@ -27,7 +27,6 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 
 	return &gwres.Environments{
 		Environments: fromUpstreamEnvironments(res.Environments),
-		Start:        res.GetStart(),
 		Total:        res.GetTotal(),
 	}, nil
 }

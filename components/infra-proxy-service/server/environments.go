@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -14,102 +13,37 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
-// Environment represents the search based deserialized Environment type
-type Environment struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-// EnvironmentResult list result from Search API
-type EnvironmentResult struct {
-	Total int            `json:"total"`
-	Start int            `json:"start"`
-	Rows  []*Environment `json:"rows"`
-}
-
-// GetEnvironments get environments list
+// GetEnvironments gets environments list
 func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := c.SearchEnvironments(req.SearchQuery)
+	perPage := int(req.GetSearchQuery().GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery("environment", searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
+
+	res, err := query.Do(c.client)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
 	return &response.Environments{
-		Environments: fromAPIToListEnvironments(res),
-		Start:        int32(res.Start),
+		Environments: fromAPIToListEnvironments(res.Rows),
 		Total:        int32(res.Total),
 	}, nil
-}
-
-// SearchEnvironments gets environment list from Chef Infra Server search API.
-func (c *ChefClient) SearchEnvironments(searchQuery *request.SearchQuery) (EnvironmentResult, error) {
-	var result EnvironmentResult
-	var searchAll bool
-	inc := 1000
-	var query chef.SearchQuery
-
-	if searchQuery == nil || searchQuery.Q == "" {
-		searchAll = true
-		query = chef.SearchQuery{
-			Index: "environment",
-			Query: "*:*",
-			Start: 0,
-			Rows:  inc,
-		}
-	} else {
-		perPage := int(searchQuery.GetRows())
-		if perPage == 0 {
-			perPage = 1000
-		}
-
-		query = chef.SearchQuery{
-			Index: "environment",
-			Query: searchQuery.GetQ(),
-			Start: int(searchQuery.GetStart()),
-			Rows:  perPage,
-		}
-	}
-
-	fullURL := fmt.Sprintf("search/%s", query)
-	newReq, err := c.client.NewRequest("GET", fullURL, nil)
-
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	res, err := c.client.Do(newReq, &result)
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	defer res.Body.Close() // nolint: errcheck
-
-	if searchAll {
-		var searchResult EnvironmentResult
-		start := result.Start
-		// the total rows available for this query across all pages
-		total := result.Total
-		for start+inc <= total {
-			query.Start = query.Start + inc
-			fullURL = fmt.Sprintf("search/%s", query)
-
-			res1, err := c.client.Do(newReq, &searchResult)
-			if err != nil {
-				return result, ParseAPIError(err)
-			}
-
-			defer res1.Body.Close() // nolint: errcheck
-
-			// add this page of results to the primary SearchResult instance
-			result.Rows = append(result.Rows, searchResult.Rows...)
-		}
-	}
-	return result, nil
 }
 
 // GetEnvironment gets the environment details
@@ -327,12 +261,12 @@ func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environ
 }
 
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
-func fromAPIToListEnvironments(al EnvironmentResult) []*response.EnvironmentListItem {
-	cl := make([]*response.EnvironmentListItem, len(al.Rows))
-	for index, e := range al.Rows {
+func fromAPIToListEnvironments(al []interface{}) []*response.EnvironmentListItem {
+	cl := make([]*response.EnvironmentListItem, len(al))
+	for index, e := range al {
 		cl[index] = &response.EnvironmentListItem{
-			Name:        e.Name,
-			Description: e.Description,
+			Name:        SafeStringFromMap(e.(map[string]interface{}), "name"),
+			Description: SafeStringFromMap(e.(map[string]interface{}), "description"),
 		}
 	}
 

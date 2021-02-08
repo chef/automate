@@ -7,11 +7,11 @@ import "google/protobuf/struct.proto";
 
 message SearchQuery {
 	// The search query used to identify a list of items.
-	string q = 1;
-	// The number of result pages to return.
-	int32 start = 2;
+    string q = 1;
+    // The number of result pages to return.
+	int32 page = 2;
 	// The number of results on each page.
-	int32 rows = 3;
+	int32 per_page = 3;
 }
 
 message Environments {
