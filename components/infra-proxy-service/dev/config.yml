@@ -4,9 +4,9 @@ log-level: "info"
 log-format: "text"
 
 tls:
-  cert_path: ../../../dev/certs/infra-proxy-service.crt
-  key_path: ../../../dev/certs/infra-proxy-service.key
-  root_ca_path: ../../../dev/certs/Chef_Automate_FAKE_Dev.crt
+  cert_path: /hab/svc/infra-proxy-service/config/service.crt
+  key_path: /hab/svc/infra-proxy-service/config/service.key
+  root_ca_path: /hab/svc/infra-proxy-service/config/root_ca.crt
 
 pg_url: "postgresql://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable"
 database: chef_infra_proxy

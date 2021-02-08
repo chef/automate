@@ -35,10 +35,8 @@ type Service struct {
 func ConfigFromViper(configFile string) (*service.Service, error) {
 	// Set the file name of the configurations file
 	viper.SetConfigName("config")
-
 	// Set the configuration file type
 	viper.SetConfigType("yaml")
-
 	// Set the path to look for the configurations file
 	viper.AddConfigPath("../dev")
 
@@ -47,7 +45,6 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 	}
 
 	cfg := Service{}
-
 	if err := viper.Unmarshal(&cfg); err != nil {
 		fail(errors.Wrap(err, "couldn't parse configuration file"))
 	}
