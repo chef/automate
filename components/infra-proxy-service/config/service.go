@@ -52,13 +52,11 @@ func ConfigFromViper(configFile string) (*service.Service, error) {
 		fail(errors.Wrap(err, "couldn't parse configuration file"))
 	}
 
-	if cfg.PGURL == "" {
-		var err error
-		cfg.PGURL, err = platform_config.PGURIFromEnvironment(cfg.Database)
-		if err != nil {
-			fail(errors.Wrap(err, "Failed to get pg uri"))
-		}
+	pgURL, err := platform_config.PGURIFromEnvironment(cfg.Database)
+	if err != nil {
+		fail(errors.Wrap(err, "Failed to get pg uri"))
 	}
+	cfg.PGURL = pgURL
 
 	l, err := logger.NewLogger(cfg.LogFormat, cfg.LogLevel)
 	if err != nil {
