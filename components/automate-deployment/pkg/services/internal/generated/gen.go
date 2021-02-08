@@ -383,22 +383,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-workflow-server",
-      "metadata": {
-        "name": "chef/automate-workflow-server",
-        "data_service": false,
-        "binlinks": [
-          "workflow-ctl"
-        ],
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/automate-workflow-nginx",
-      "metadata": null
-    },
-    {
       "name": "chef/automate-load-balancer",
       "metadata": null
     },
@@ -594,20 +578,6 @@ var ProductMetadataJSON = `
         "core",
         "postgresql",
         "elasticsearch"
-      ],
-      "hidden": false
-    },
-    {
-      "name": "workflow",
-      "aliases": null,
-      "type": "product",
-      "services": [
-        "chef/automate-workflow-server",
-        "chef/automate-workflow-nginx"
-      ],
-      "packages": null,
-      "dependencies": [
-        "automate"
       ],
       "hidden": false
     },

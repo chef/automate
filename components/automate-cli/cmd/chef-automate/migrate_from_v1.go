@@ -51,7 +51,6 @@ type migrateCmdFlagSet struct {
 	skipExternalESCheck       bool
 	skipFIPSCheck             bool
 	skipSAMLCheck             bool
-	skipWorkflowCheck         bool
 	airgap                    string
 	// airgapPreflight only applies to the preflight-check migrate-from-v1
 	// subcommand; we want to reuse all the skip*Check options there but for
@@ -59,7 +58,6 @@ type migrateCmdFlagSet struct {
 	// migration.
 	airgapPreflight  bool
 	enableChefServer bool
-	enableWorkflow   bool
 }
 
 var migrateCmdFlags = migrateCmdFlagSet{}
@@ -185,12 +183,6 @@ func init() {
 		false,
 		"Enable integrated Chef Server migration and deployment; only valid for all-in-one topology")
 
-	migrateFrom1Cmd.PersistentFlags().BoolVar(
-		&migrateCmdFlags.enableWorkflow,
-		"enable-workflow",
-		false,
-		"Enable integrated Workflow migration and deployment; only valid for all-in-one topology")
-
 	// passwords are not validated until the end of the migration, which makes this
 	// feature dangerous. But we still want to have it in Ci, so we mark it as
 	// hidden
@@ -201,13 +193,6 @@ func init() {
 	}
 	// end users don't have any use for self-test, so don't show them
 	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("self-test")
-	if err != nil {
-		fmt.Printf("failed configuring cobra: %s\n", err.Error())
-		panic(":(")
-	}
-
-	// a1 migration with Workflow Server will be hidden until it is fully completed
-	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-workflow")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
@@ -245,12 +230,6 @@ func init() {
 		"skip-saml-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has SAML configured (default = false)")
-	migrateFrom1Cmd.PersistentFlags().BoolVar(
-		&migrateCmdFlags.skipWorkflowCheck,
-		"skip-workflow-check",
-		false,
-		"Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)")
-
 	migrateFrom1Cmd.PersistentFlags().StringVar(
 		&migrateCmdFlags.airgap,
 		"airgap-bundle",
@@ -453,11 +432,7 @@ func newLocalMigration() (*a1upgrade.A1Upgrade, error) {
 
 		a1upgrade.SkipSAMLConfiguredCheck(migrateCmdFlags.skipSAMLCheck),
 
-		a1upgrade.SkipWorkflowConfiguredCheck(migrateCmdFlags.skipWorkflowCheck),
-
 		a1upgrade.WithChefServerEnabled(migrateCmdFlags.enableChefServer),
-
-		a1upgrade.WithWorkflowEnabled(migrateCmdFlags.enableWorkflow),
 	)
 
 	if err != nil {

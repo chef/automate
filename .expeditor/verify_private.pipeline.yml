@@ -521,26 +521,6 @@ steps:
         linux:
           privileged: true
 
-  - label: "a1migration"
-    command:
-      - integration/run_test integration/tests/a1migration.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-
-  - label: "airgap a1migration"
-    command:
-      - integration/run_test integration/tests/airgap_a1migration.sh
-    timeout_in_minutes: 25
-    expeditor:
-      executor:
-        linux:
-          single-use: true
-          privileged: true
-
   - label: "product"
     command:
       - integration/run_test integration/tests/product.sh
@@ -620,15 +600,6 @@ steps:
       executor:
         linux:
           single-use: true
-          privileged: true
-
-  - label: "workflow"
-    command:
-      - integration/run_test integration/tests/workflow.sh
-    timeout_in_minutes: 30 # longer timeout for workflow
-    expeditor:
-      executor:
-        linux:
           privileged: true
 
   - label: "backup to s3"

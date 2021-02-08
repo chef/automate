@@ -459,67 +459,6 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{
 			Name: "automate-cs-nginx", WriteMetadata: false,
 		},
-
-		// Workflow stuff
-		{
-			Name:          "automate-workflow-server",
-			WriteMetadata: true,
-			SyncDbsV2: []DatabaseDumpOperationV2{
-				{
-					Name: "chef_workflow",
-					User: "workflow",
-				},
-			},
-			SyncPaths: []PathCopyOperation{
-				{
-					Name:    "git-server-ssh-keys",
-					SrcPath: "/hab/svc/automate-workflow-server/data",
-					RsyncMatchers: []RsyncMatcher{
-						Include("ssh_git_server_keys"),
-						Exclude("*"),
-					},
-				},
-				{
-					Name:    "git-repos",
-					SrcPath: "/hab/svc/automate-workflow-server/data/git/repos",
-				},
-				{
-					Name:    "git-workspace",
-					SrcPath: "/hab/svc/automate-workflow-server/data/git/workspace",
-				},
-				{
-					Name:    "git-template",
-					SrcPath: "/hab/svc/automate-workflow-server/files/git_repo_template",
-				},
-				{
-					Name:    "builder_key",
-					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-					RsyncMatchers: []RsyncMatcher{
-						Include("builder_key"),
-						Exclude("*"),
-					},
-				},
-				{
-					Name:    "builder_key.pub",
-					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-					RsyncMatchers: []RsyncMatcher{
-						Include("builder_key.pub"),
-						Exclude("*"),
-					},
-				},
-				{
-					Name:    "delivery.pem",
-					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-					RsyncMatchers: []RsyncMatcher{
-						Include("delivery.pem"),
-						Exclude("*"),
-					},
-				},
-			},
-		},
-		{
-			Name: "automate-workflow-nginx", WriteMetadata: false,
-		},
 		{
 			Name:          "automate-builder-api",
 			WriteMetadata: true,

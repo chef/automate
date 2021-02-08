@@ -43,10 +43,6 @@ automate-postgresql BINDING_MODE strict
 automate-prometheus OPTIONAL applications-service automate-gateway
 automate-prometheus BINDING_MODE relaxed
 automate-ui BINDING_MODE strict
-automate-workflow-nginx REQUIRED automate-workflow-server
-automate-workflow-nginx BINDING_MODE strict
-automate-workflow-server REQUIRED automate-pg-gateway pg-sidecar-service
-automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
 cereal-service REQUIRED automate-pg-gateway pg-sidecar-service
 cereal-service BINDING_MODE strict

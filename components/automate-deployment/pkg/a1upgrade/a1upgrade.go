@@ -57,9 +57,7 @@ type A1Upgrade struct {
 	SkipExternalESCheck       bool
 	SkipFIPSCheck             bool
 	SkipSAMLCheck             bool
-	SkipWorkflowCheck         bool
 	EnableChefServer          bool
-	EnableWorkflow            bool
 }
 
 // Option represents an option that can be applied to an
@@ -207,13 +205,6 @@ func WithA2ConfigPath(path string, options ...dc.AutomateConfigOpt) Option {
 	}
 }
 
-func WithWorkflowEnabled(enabled bool) Option {
-	return func(u *A1Upgrade) error {
-		u.EnableWorkflow = enabled
-		return nil
-	}
-}
-
 func WithChefServerEnabled(enabled bool) Option {
 	return func(u *A1Upgrade) error {
 		u.EnableChefServer = enabled
@@ -312,22 +303,11 @@ func (u *A1Upgrade) SetChefServerEnabled(enabled bool) error {
 	return u.A2Config.SetChefServerEnabled(enabled)
 }
 
-func (u *A1Upgrade) SetWorkflowEnabled(enabled bool) error {
-	return u.A2Config.SetWorkflowEnabled(enabled)
-}
-
 // Databases returns a slice of A1Databases that need to me migrated
 func (u *A1Upgrade) Databases() []A1Database {
 	// Default database that we will migrate
 	// NOTE: This only includes tables related to compliance & secrets services
 	deliveryDB := A1DeliveryDB
-
-	// If Workflow is enabled, we backup everything from the delivery database
-	// the main reason is that we need types and functions attached to it
-	if u.EnableWorkflow {
-		deliveryDB.includedTables = []string{}
-		deliveryDB.excludedTables = []string{"pg_stat_repl"}
-	}
 
 	dbs := []A1Database{deliveryDB}
 
@@ -384,15 +364,6 @@ func SkipSAMLConfiguredCheck(saml bool) Option {
 	}
 }
 
-// SkipWorkflowConfiguredCheck  returns an Option that indicates whether
-// to skip the A1 upgrade preflight check for workflow.
-func SkipWorkflowConfiguredCheck(workflow bool) Option {
-	return func(u *A1Upgrade) error {
-		u.SkipWorkflowCheck = workflow
-		return nil
-	}
-}
-
 // GenerateA2ConfigIfNoneProvided creates an Automate 2 configuration from
 // Automate 1 configuration if a2ConfigPath is the zero value for a string
 // (""). If a2ConfigPath is not the zero value, it's assumed that
@@ -437,11 +408,6 @@ func (u *A1Upgrade) GenerateA2ConfigIfNoneProvided(a2ConfigPath string) error {
 	}
 
 	err = u.SetChefServerEnabled(u.EnableChefServer)
-	if err != nil {
-		return err
-	}
-
-	err = u.SetWorkflowEnabled(u.EnableWorkflow)
 	if err != nil {
 		return err
 	}

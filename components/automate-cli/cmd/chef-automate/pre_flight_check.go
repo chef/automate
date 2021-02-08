@@ -117,12 +117,6 @@ func newMigratePreflightCmd() *cobra.Command {
 		"Optionally do not check if your Chef Automate v1 installation has SAML configured (default = false)")
 
 	cmd.PersistentFlags().BoolVar(
-		&migratePreflightCmdFlags.skipWorkflowCheck,
-		"skip-workflow-check",
-		false,
-		"Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)")
-
-	cmd.PersistentFlags().BoolVar(
 		&migratePreflightCmdFlags.airgapPreflight,
 		"airgap",
 		false,
@@ -172,11 +166,7 @@ func runMigratePreflight(cmd *cobra.Command, args []string) error {
 
 		a1upgrade.SkipSAMLConfiguredCheck(migratePreflightCmdFlags.skipSAMLCheck),
 
-		a1upgrade.SkipWorkflowConfiguredCheck(migratePreflightCmdFlags.skipWorkflowCheck),
-
 		a1upgrade.WithChefServerEnabled(migratePreflightCmdFlags.enableChefServer),
-
-		a1upgrade.WithWorkflowEnabled(migratePreflightCmdFlags.enableWorkflow),
 	)
 
 	if err != nil {
@@ -205,7 +195,6 @@ func runMigratePreflight(cmd *cobra.Command, args []string) error {
 		u.DeliveryRunning,
 		u.DeliverySecrets,
 		u.EnableChefServer,
-		u.EnableWorkflow,
 	)
 	if err := p.Run(); err != nil {
 		return status.Annotate(err, status.PreflightError)
@@ -221,12 +210,6 @@ func runMigratePreflight(cmd *cobra.Command, args []string) error {
 		ExternalESCheck:       u.SkipExternalESCheck,
 		FIPSCheck:             u.SkipFIPSCheck,
 		SAMLCheck:             u.SkipSAMLCheck,
-		WorkflowCheck:         u.SkipWorkflowCheck,
-	}
-
-	// @afiune delete me when workflow feature is completed, as well as the skip flags
-	if u.EnableWorkflow {
-		skips.SkipWorkflowCheck()
 	}
 
 	err = checker.RunAutomateChecks(u.A1Config, skips)
@@ -267,44 +250,8 @@ func runMigratePreflight(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = runWorkflowChecks(u)
-	if err != nil {
-		return err
-	}
-
 	return nil
 
-}
-
-func runWorkflowChecks(u *a1upgrade.A1Upgrade) error {
-	if !migratePreflightCmdFlags.enableWorkflow {
-		return nil
-	}
-
-	writer.Title("Checking if your Workflow Server installation uses features that are not compatible with Chef Automate v2...")
-	checker := a1upgrade.NewCompatChecker()
-	a1Config := u.A1Config
-	err := checker.RunWorkflowChecks(a1Config)
-	if err != nil {
-		return err
-	}
-
-	if checker.Failures > 0 {
-		rollupMsg := checker.Msgs.String()
-		sum := checker.Failures + checker.Warnings
-		builder := strings.Builder{}
-		fmt.Fprintf(&builder, "We found %d issue(s) with your Chef Automate Workflow configuration preventing it from being included in the Chef Automate migration:\n", sum)
-		fmt.Fprintf(&builder, "%s\n", rollupMsg)
-		builder.WriteString("Please address these issues to continue with your migration to Chef Automate v2")
-		return status.WithRecovery(
-			status.New(status.PreflightError, "Migration compatibility checks failed"),
-			builder.String(),
-		)
-	}
-
-	writer.Body("Your Chef Server config passed compatibility checks.")
-
-	return nil
 }
 
 func runChefServerChecks(u *a1upgrade.A1Upgrade) error {

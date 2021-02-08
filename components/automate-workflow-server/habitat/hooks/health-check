@@ -1,8 +1,0 @@
-#!{{pkgPathFor "core/bash"}}/bin/bash
-
-if output=$(curl --max-time 2 --fail --silent --show-error "http://{{sys.ip}}:{{cfg.api_port}}/api/_status"); then
-  exit 0
-else
-  echo "$output"
-  exit 2
-fi

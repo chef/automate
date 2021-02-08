@@ -318,8 +318,6 @@ func A1Upgrade(writer cli.FormatWriter,
 	d.moveA1ComplianceData()
 	d.writeA1ComplianceSecret()
 	d.moveA1NotificationData()
-	d.moveA1WorkflowGitRepos()
-	d.writeA1WorkflowErlCookie()
 	d.deployDataServices()
 	d.restorePostgresData()
 	d.startNonDataServices()
@@ -366,7 +364,6 @@ func (d *deployer) prepare() {
 
 	d.validateUpgradableA1Config()
 	d.validateUpgradableChefServerConfig()
-	// TODO @afiune maybe check Workflow Config here?
 	d.validateUserOverrideConfig()
 	d.genMergedConfig()
 }
@@ -573,7 +570,6 @@ func (d *deployer) upgradePreflight() {
 		d.upgrade.DeliveryRunning,
 		d.upgrade.DeliverySecrets,
 		d.upgrade.EnableChefServer,
-		d.upgrade.EnableWorkflow,
 	)
 
 	if err := p.Run(); err != nil {
@@ -1389,34 +1385,6 @@ func (d *deployer) moveA1ComplianceData() {
 	}
 }
 
-func (d *deployer) moveA1WorkflowGitRepos() {
-	if d.err != nil {
-		return
-	}
-	a1RuleStore := d.upgrade.DeliveryRunning.Delivery.Delivery.GitRepos
-	d.writer.Title("Moving Chef Automate v1 Workflow Git repositories for import to A2")
-	m := a1upgrade.NewFileMover(a1RuleStore, "automate-workflow-server", "data/git/repos")
-	if err := d.doMoveWithTimeout(m); err != nil {
-		err = status.Wrap(err, status.FileAccessError, "Failed to move Chef Automate v1 Workflow Git repositories to A2")
-		d.err = status.WithRecovery(err, d.cancelUpgradeInstructions())
-	}
-}
-
-// writeA1WorkflowErlCookie writes the erlang cookie for the automate-workflow-server
-func (d *deployer) writeA1WorkflowErlCookie() {
-	if d.err != nil {
-		return
-	}
-
-	a1ErlCookie := d.upgrade.DeliveryRunning.Delivery.Delivery.ErlCookie
-	if a1ErlCookie == "" {
-		d.writer.Title("Skipping import of Automate 1 Workflow Erlang Cookie")
-		return
-	}
-
-	d.writeServiceData("automate-workflow-server", "var/.erlang.cookie", a1ErlCookie)
-}
-
 func (d *deployer) moveA1NotificationData() {
 	if d.err != nil {
 		return
@@ -1687,12 +1655,6 @@ func (d *deployer) validateUpgradableA1Config() {
 		ExternalESCheck:       u.SkipExternalESCheck,
 		FIPSCheck:             u.SkipFIPSCheck,
 		SAMLCheck:             u.SkipSAMLCheck,
-		WorkflowCheck:         u.SkipWorkflowCheck,
-	}
-
-	// @afiune delete me when workflow feature is completed, as well as the skip flags
-	if d.upgrade.EnableWorkflow {
-		skips.SkipWorkflowCheck()
 	}
 
 	err := checker.RunAutomateChecks(u.A1Config, skips)

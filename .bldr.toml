@@ -888,18 +888,6 @@ paths = [
   "lib/user/*"
 ]
 
-[automate-workflow-nginx]
-plan_path = "components/automate-workflow-nginx"
-paths = [
-  "components/automate-workflow-nginx/*"
-]
-
-[automate-workflow-web]
-plan_path = "components/automate-workflow-web"
-paths = [
-  "components/automate-workflow-web/*"
-]
-
 [data-feed-service]
 plan_path = "components/data-feed-service"
 paths = [
@@ -1069,20 +1057,6 @@ paths = [
   "lib/version/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
-
-[automate-workflow-ctl]
-plan_path = "components/automate-workflow-ctl"
-paths = [
-  "components/automate-workflow-server/*",
-  "components/automate-workflow-ctl/*"
-]
-
-[automate-workflow-server]
-plan_path = "components/automate-workflow-server"
-paths = [
-  "components/automate-workflow-ctl/*",
-  "components/automate-workflow-server/*"
-]
 
 [automate-ui]
 plan_path = "components/automate-ui"
