@@ -29,21 +29,6 @@ pkg_binds=(
 pkg_bin_dirs=(bin)
 pkg_lib_dirs=(lib)
 
-# The service files and directories
-# NOTE: this has nothing to do with habitat. It is used for
-#       determining when a build is stale in the studiorc
-pkg_srcs=(
-  server/lib
-  server/priv
-  server/rel
-  server/config.exs
-  server/Makefile
-  server/mix.exs
-  server/mix.lock
-
-  # TODO: VERSION should be in this list
-)
-
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
@@ -55,10 +40,10 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
-## . scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
-## . scaffolding_go_binary_list=(
-## .   "${scaffolding_go_import_path}/cmd/${pkg_name}"
-## . )
+##  scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
+##  scaffolding_go_binary_list=(
+##    "${scaffolding_go_import_path}/cmd/${pkg_name}"
+##  )
 
 do_install() {
   do_default_install
@@ -71,5 +56,4 @@ do_install() {
 do_strip() {
   return 0
 }
-
 

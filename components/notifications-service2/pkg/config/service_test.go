@@ -49,7 +49,7 @@ func TestConfigMarshaling(t *testing.T) {
 	err = f.Close()
 	require.NoError(t, err)
 
-	unmarshaled, err := marshalFromFile(f.Name())
+	unmarshaled, err := MarshalFromFile(f.Name())
 	require.NoError(t, err)
 	assert.Equal(t, original, unmarshaled)
 }
@@ -96,7 +96,7 @@ func TestConfigReadCerts(t *testing.T) {
 			RootCACertPath: "/src/dev/certs/Chef_Automate_FAKE_Dev.crt",
 		},
 	}
-	err := nValid.readCerts()
+	err := nValid.ReadCerts()
 	require.NoError(t, err)
 
 }

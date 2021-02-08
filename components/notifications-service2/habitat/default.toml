@@ -4,17 +4,10 @@ accept = false
 [service]
 external_fqdn="http://localhost"
 host = "localhost"
-port = 4001
-
-# How long in seconds must pass before we consider
-# an inbound event with the same id and type as not a duplicate
-dedup_window_seconds = 300
+port = 10125
 
 [storage]
 database = "notifications_service"
 max_open_conns = 10
 max_idle_conns = 10
 
-
-[cache]
-event_rule_timeout_ms = 5000

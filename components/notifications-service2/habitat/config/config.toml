@@ -4,10 +4,6 @@ port = {{cfg.service.port}}
 external_fqdn = "{{cfg.service.external_fqdn}}"
 log_level = "{{cfg.log.level}}"
 
-## TODO: is this needed?
-# export CACHE_TIMEOUT_MS_EVENT_RULE="{{cfg.cache.event_rule_timeout_ms}}"
-# export EVENT_DEDUP_WINDOW_SECONDS="{{cfg.service.dedup_window_seconds}}"
-
 [postgres]
 database = "{{cfg.storage.database}}"
 schema_path = "{{pkg.path}}/schema"
