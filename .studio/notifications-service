@@ -38,6 +38,14 @@ function notifications_lint() {
   return $EXIT_CODE
 }
 
+document "notifications_integration" <<DOC
+  run the notifications service's integration tests
+DOC
+function notifications_integration() {
+  check_if_deployinate_started || return 1;
+  A2_SVC_NAME="notifications-service" A2_SVC_PATH="/hab/svc/notifications-service" go_test "github.com/chef/automate/components/notifications-service/integration_test"
+}
+
 document "notifications_compile_protobuf" <<DOC
   create the protobuf files for the notifications-service and notifications-client.
   This was copied from both of the components Make files.
@@ -105,10 +113,8 @@ document "notifications_update_component" <<DOC
   Warning: this does not work for new files. If you create a new file run rebuild components/notifications-service
 DOC
 function notifications_update_component() {
-  component_path=$(hab pkg path "$HAB_ORIGIN"/notifications-service 2> /dev/null)
-  if [[ $? -ne 0 ]]; then
-    component_path=$(hab pkg path chef/notifications-service 2> /dev/null)
-    if [[ $? -ne 0 ]]; then
+  if ! component_path=$(hab pkg path "$HAB_ORIGIN"/notifications-service 2> /dev/null); then 
+    if ! component_path=$(hab pkg path chef/notifications-service 2> /dev/null); then
       error "Could not find notifications-service deployed under either your origin ($HAB_ORIGIN) or chef origin."
       error "Deploy A2 and try again."
       return 1
@@ -117,12 +123,12 @@ function notifications_update_component() {
 
   elixir_install
 
-  pushd /src/components/notifications-service/server >/dev/null
+  pushd /src/components/notifications-service/server >/dev/null || return 1
     mix local.hex --force
     mix local.rebar --force
     MIX_ENV=habitat mix "do" deps.get, compile
     returnStatus=$?
-  popd >/dev/null
+  popd >/dev/null || return 1
 
   if [[ $returnStatus == 0 ]]; then
     log_line "reload the notifications-service binary."
