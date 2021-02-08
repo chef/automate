@@ -1,15 +1,15 @@
 package server
 
 import (
-    "context"
-    "fmt"
-    "sort"
+	"context"
+	"fmt"
+	"sort"
 
-    chef "github.com/go-chef/chef"
+	chef "github.com/go-chef/chef"
 
-    "github.com/chef/automate/api/interservice/infra_proxy/request"
-    "github.com/chef/automate/api/interservice/infra_proxy/response"
-    "github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
 // AccessKeyReq struct to add key.
@@ -144,6 +144,7 @@ func (s *Server) DeleteClient(ctx context.Context, req *request.Client) (*respon
 }
 
 // ResetClientKey resets the client key
+// Deletes the associated key pair and generates new key pair again, and then attached it to the client.
 func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*response.ClientKey, error) {
     err := validation.New(validation.Options{
         Target:  "client",
