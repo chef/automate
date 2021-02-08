@@ -34,6 +34,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clientSearch: Client[];
   public clientName: string;
   public searchItems = false;
+  public searchText: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -82,6 +83,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   toggleFilters(currentText: string) {
     this.searchItems = true;
     if (currentText) {
+      this.searchText = currentText;
       const payload = {
         clientId: currentText,
         page: 0,
