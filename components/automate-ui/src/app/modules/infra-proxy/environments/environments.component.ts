@@ -34,6 +34,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public environmentsSearch: Environment[];
   public environmentsName: string;
   public searchItems = false;
+  public searchText: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -82,6 +83,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   toggleFilters(currentText: string) {
     this.searchItems = true;
     if (currentText) {
+      this.searchText = currentText;
       const payload = {
         environmentId: currentText,
         page: 0,
