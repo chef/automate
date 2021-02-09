@@ -1,6 +1,6 @@
 <section class="infra-roles">
   <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
-  <app-delete-object-modal
+  <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
     objectNoun="role"
     [objectName]="roleToDelete?.name"

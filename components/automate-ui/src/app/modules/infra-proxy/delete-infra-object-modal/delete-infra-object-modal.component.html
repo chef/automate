@@ -1,0 +1,23 @@
+<chef-modal [visible]="visible" (closeModal)="closeEvent()">
+  <div class="left-box">
+    <img src="assets/img/infra-delete-icon.svg" alt="delete-icon" />
+  </div>
+
+  <div class="right-box">
+    <div class="left-align">
+      <div class="title-text">Are you sure?</div>
+      <ng-container *ngIf="custom === false">
+        <div class="action-text1"><span class="shade1">De</span>leting {{objectNoun | titlecase}} action</div>
+        <div class="action-text2"><span class="shade2">is irr</span><span>eversible.</span></div>
+        <div class="action-text3"><span class="shade3">you can't undo </span>this action</div>
+      </ng-container>
+    </div>
+
+    <div class="options">
+      <chef-button class="cancel-button" tertiary (click)="closeEvent()">Cancel</chef-button>
+      <chef-button primary caution (click)="deleteObject()">
+        {{objectAction}} {{objectNoun | titlecase}}
+      </chef-button>
+    </div>
+  </div>
+</chef-modal>
