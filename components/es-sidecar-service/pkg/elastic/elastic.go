@@ -59,9 +59,28 @@ type DiskStats struct {
 	AvailableBytes int64
 }
 
+type newElasticOpt struct {
+	awsAuth *AwsElasticsearchAuth
+}
+
+// NewElasticOpts are optional constructor parameters for New
+type NewElasticOpts func(*newElasticOpt)
+
+func WithAwsAuth(awsAuth *AwsElasticsearchAuth) NewElasticOpts {
+	return func(o *newElasticOpt) {
+		if awsAuth != nil && awsAuth.Enable {
+			o.awsAuth = awsAuth
+		}
+	}
+}
+
 // New connects to the provided ES server instance and returns an Elastic instance
 // containing a client
-func New(esURL string, awsAuth *AwsElasticsearchAuth) (*Elastic, error) {
+func New(esURL string, opts ...NewElasticOpts) (*Elastic, error) {
+	o := newElasticOpt{}
+	for _, opt := range opts {
+		opt(&o)
+	}
 	client, err := elastic.NewClient(
 		// NOTE - take a look at docs here to see what's relevant:
 		// https://github.com/olivere/elastic/wiki/Configuration
@@ -74,10 +93,10 @@ func New(esURL string, awsAuth *AwsElasticsearchAuth) (*Elastic, error) {
 	}
 
 	createRepoClient := client
-	if awsAuth != nil && awsAuth.Enable {
+	if o.awsAuth != nil && o.awsAuth.Enable {
 		var creds *credentials.Credentials
-		if awsAuth.AccessKey != "" && awsAuth.SecretKey != "" {
-			creds = credentials.NewStaticCredentials(awsAuth.AccessKey, awsAuth.SecretKey, "")
+		if o.awsAuth.AccessKey != "" && o.awsAuth.SecretKey != "" {
+			creds = credentials.NewStaticCredentials(o.awsAuth.AccessKey, o.awsAuth.SecretKey, "")
 		} else {
 			sess, err := session.NewSession(&aws.Config{})
 			if err != nil {
@@ -86,10 +105,10 @@ func New(esURL string, awsAuth *AwsElasticsearchAuth) (*Elastic, error) {
 			creds = sess.Config.Credentials
 		}
 
-		httpClient := elasticaws.NewV4SigningClient(creds, awsAuth.Region)
+		httpClient := elasticaws.NewV4SigningClient(creds, o.awsAuth.Region)
 		var err error
 		createRepoClient, err = elastic.NewClient(
-			elastic.SetURL(awsAuth.ESUrl),
+			elastic.SetURL(o.awsAuth.ESUrl),
 			elastic.SetSniff(false),
 			elastic.SetHttpClient(httpClient),
 			elastic.SetHealthcheck(false),

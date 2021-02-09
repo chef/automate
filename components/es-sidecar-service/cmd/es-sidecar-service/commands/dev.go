@@ -262,7 +262,7 @@ func grpcConnect(cfg devConfig) *grpc.ClientConn {
 }
 
 func esConnect(esURL string) (es *elastic.Elastic) {
-	es, err := elastic.New(esURL,nil)
+	es, err := elastic.New(esURL)
 	if err != nil {
 		panic(err)
 	}

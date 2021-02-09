@@ -20,7 +20,7 @@ type Watcher struct {
 
 // NewWatcher creates a new Watcher struct using the provided configuration
 func NewWatcher(checkInterval time.Duration, warning int64, critical int64, esURL string) (*Watcher, error) {
-	esClient, err := elastic.New(esURL, nil)
+	esClient, err := elastic.New(esURL)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create elasticsearch client")

@@ -26,7 +26,7 @@ func Spawn(config *config.Service) error {
 
 	awsAuth := &config.BackupsConfig.S3BackupsConfig.Auth
 
-	es, err := elastic.New(config.ElasticsearchURL, awsAuth)
+	es, err := elastic.New(config.ElasticsearchURL, elastic.WithAwsAuth(awsAuth))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"url":   config.ElasticsearchURL,
