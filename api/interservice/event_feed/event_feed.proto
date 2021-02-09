@@ -4,9 +4,6 @@ package chef.automate.domain.event_feed.api;
 option go_package = "github.com/chef/automate/api/interservice/event_feed";
 
 import "interservice/event/event.proto";
-import "external/event_feed/request/event.proto";
-import "external/event_feed/response/event.proto";
-import "external/common/response.proto";
 import "google/protobuf/timestamp.proto";
 import "external/common/query/parameters.proto";
 

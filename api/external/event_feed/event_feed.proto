@@ -7,9 +7,10 @@ import "external/event_feed/request/event.proto";
 import "external/event_feed/request/eventstrings.proto";
 import "external/event_feed/response/event.proto";
 import "external/event_feed/response/eventstrings.proto";
-import "external/common/response.proto";
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
 import "external/annotations/iam/annotations.proto";
 
 service EventFeedService {
@@ -30,14 +31,18 @@ service EventFeedService {
 	```
 	*/
   rpc GetEventFeed(event_feed.request.GetEventFeedRequest) returns (event_feed.response.GetEventFeedResponse) {
-    option (google.api.http).get =  "/api/v0/eventfeed";
+    option (google.api.http).get = "/api/v0/eventfeed";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "EventFeedService";
+    };
   };
+
   /*
-  List Count of Event Type Occurrence
-  
-  Returns totals for role, cookbook, and organization event types.
+  List Counts of Event Types
+
+  Returns totals for role, cookbook, and organization events.
 
   Example:
   ```
@@ -50,14 +55,18 @@ service EventFeedService {
 	```
 	*/
   rpc GetEventTypeCounts(request.GetEventTypeCountsRequest) returns (response.GetEventTypeCountsResponse) {
-    option (google.api.http).get =  "/api/v0/event_type_counts";
+    option (google.api.http).get = "/api/v0/event_type_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "EventFeedService";
+    };
   };
+
   /*
-  List Counts Per Event Task Occurrence 
-  
-  Returns totals for update, create, and delete event tasks, which are the actions taken on the event.
+  List Counts of Individual Event Tasks
+
+  Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.
 
   Example:
   ```
@@ -70,12 +79,16 @@ service EventFeedService {
 	```
 	*/
   rpc GetEventTaskCounts(request.GetEventTaskCountsRequest) returns (response.GetEventTaskCountsResponse) {
-    option (google.api.http).get =  "/api/v0/event_task_counts";
+    option (google.api.http).get = "/api/v0/event_task_counts";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "EventFeedService";
+    };
   };
+
   /*
-  List Summary Stats About Events
+  List Summary Data of Events
 
   Returns data that populates the guitar strings visual on the top of the event feed.
 
@@ -93,7 +106,18 @@ service EventFeedService {
     option (google.api.http).get = "/api/v0/eventstrings";
     option (chef.automate.api.iam.policy).resource = "event:events";
     option (chef.automate.api.iam.policy).action = "event:events:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "hidden";
+    };
   };
 
-  rpc EventExport(request.EventExportRequest) returns (stream response.EventExportResponse) {};
+
+  rpc EventExport(request.EventExportRequest) returns (stream response.EventExportResponse) {
+    option (google.api.http).get = "/api/v0/eventexport";
+    option (chef.automate.api.iam.policy).resource = "event:events";
+    option (chef.automate.api.iam.policy).action = "event:events:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "hidden";
+    };
+  };
 }

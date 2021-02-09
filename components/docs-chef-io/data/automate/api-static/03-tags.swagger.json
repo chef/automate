@@ -25,7 +25,7 @@
     {
       "name": "Event Feed",
       "tags": [
-        "EventFeed"
+        "EventFeedService"
       ]
     },
     {
@@ -81,7 +81,7 @@
       "x-displayName": "Managed Nodes"
     },
     {
-      "name": "EventFeed",
+      "name": "EventFeedService",
       "x-displayName": "Event Feed"
     },
     {
@@ -138,6 +138,6 @@
       "name": "teams",
       "x-displayName": "IAM Teams",
       "description": "Teams are used to group local users for policy membership."
-    } 
+    }
   ]
 }

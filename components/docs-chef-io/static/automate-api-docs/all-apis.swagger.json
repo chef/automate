@@ -3147,11 +3147,11 @@
     },
     "/api/v0/event_task_counts": {
       "get": {
-        "description": "Returns totals for update, create, and delete event tasks, which are the actions taken on the event.\n\nExample:\n```\nevent_task_counts?start=1592546400000&end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "description": "Returns the total counts of actions taken in an event. The counted actions are: update, create, and delete.\n\nExample:\n```\nevent_task_counts?start=1592546400000&end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "tags": [
           "EventFeedService"
         ],
-        "summary": "List Counts Per Event Task Occurrence",
+        "summary": "List Counts of Individual Event Tasks",
         "operationId": "EventFeedService_GetEventTaskCounts",
         "parameters": [
           {
@@ -3197,11 +3197,11 @@
     },
     "/api/v0/event_type_counts": {
       "get": {
-        "description": "Returns totals for role, cookbook, and organization event types.\n\nExample:\n```\nevent_type_counts?start=1592546400000&end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
+        "description": "Returns totals for role, cookbook, and organization events.\n\nExample:\n```\nevent_type_counts?start=1592546400000&end=1593151199999\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
         "tags": [
           "EventFeedService"
         ],
-        "summary": "List Count of Event Type Occurrence",
+        "summary": "List Counts of Event Types",
         "operationId": "EventFeedService_GetEventTypeCounts",
         "parameters": [
           {
@@ -3341,67 +3341,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.legacy.StatusResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        }
-      }
-    },
-    "/api/v0/eventstrings": {
-      "get": {
-        "description": "Returns data that populates the guitar strings visual on the top of the event feed.\n\nExample:\n```\neventstrings?timezone=America/Denver&hours_between=1&start=2020-06-19&end=2020-06-25\n```\n\nAuthorization Action:\n```\nevent:events:list\n```",
-        "tags": [
-          "EventFeedService"
-        ],
-        "summary": "List Summary Stats About Events",
-        "operationId": "EventFeedService_GetEventStringBuckets",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "Earliest events to return.",
-            "name": "start",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Latest events to return.",
-            "name": "end",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "User timezone to apply to request.",
-            "name": "timezone",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int32",
-            "description": "Interval for returned results, for example: 1 hour buckets.",
-            "name": "hours_between",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi",
-            "description": "Filters to be applied to the request.",
-            "name": "filter",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.event_feed.response.GetEventStringBucketsResponse"
             }
           },
           "default": {
@@ -18454,7 +18393,7 @@
       "x-displayName": "Managed Nodes"
     },
     {
-      "name": "EventFeed",
+      "name": "EventFeedService",
       "x-displayName": "Event Feed"
     },
     {
@@ -18539,7 +18478,7 @@
     {
       "name": "Event Feed",
       "tags": [
-        "EventFeed"
+        "EventFeedService"
       ]
     },
     {
