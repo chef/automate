@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 // CreateOrg creates a new org
@@ -41,7 +42,9 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, err
 	}
 
-	org, err := s.service.Storage.StoreOrg(ctx, req.Id, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
+	auth_cntx := auth_context.NewContext(ctx,
+		[]string{"tls:service:deployment-service:internal"}, req.Projects, "res", "act")
+	org, err := s.service.Storage.StoreOrg(auth_cntx, req.Id, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "org")
 	}

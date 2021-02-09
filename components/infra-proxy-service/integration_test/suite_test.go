@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -46,19 +47,17 @@ func (s *Suite) GlobalSetup() error {
 // GlobalTeardown is the place where you tear everything down after we have finished
 func (s *Suite) GlobalTeardown() {}
 
-func (s *Suite) SetUpAutoDeployChefServer() error {
+func (s *Suite) SetUpAutoDeployChefServer(testTimeStamp int) error {
 	ctx := context.Background()
 	var serverId string
 	server, _ := infraProxy.GetServer(ctx, &request.GetServer{
 		Id: "auto-deployed-test-server",
 	})
 
-	serverId = server.Server.Id
-
 	// Ignore insertion if already exists
 	if server == nil {
 
-		server, err := infraProxy.CreateServer(ctx, &request.CreateServer{
+		createServerResponse, err := infraProxy.CreateServer(ctx, &request.CreateServer{
 			Id:        "auto-deployed-test-server",
 			Name:      "auto-deployed-test-server",
 			IpAddress: "127.0.0.1",
@@ -69,6 +68,8 @@ func (s *Suite) SetUpAutoDeployChefServer() error {
 			return err
 		}
 
+		serverId = createServerResponse.Server.Id
+	} else {
 		serverId = server.Server.Id
 	}
 
@@ -78,9 +79,9 @@ func (s *Suite) SetUpAutoDeployChefServer() error {
 	}
 
 	_, err = infraProxy.CreateOrg(ctx, &request.CreateOrg{
-		Id:        "auto-deployed-test-org",
+		Id:        fmt.Sprintf("auto-deployed-test-org-%d", testTimeStamp),
 		ServerId:  serverId,
-		Name:      "test",
+		Name:      fmt.Sprintf("test-%d", testTimeStamp),
 		AdminUser: "pivotal",
 		AdminKey:  pemFile,
 		Projects:  []string{constants.UnassignedProjectID},
