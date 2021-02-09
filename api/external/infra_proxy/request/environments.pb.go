@@ -33,9 +33,9 @@ type SearchQuery struct {
 
 	// The search query used to identify a list of items.
 	Q string `protobuf:"bytes,1,opt,name=q,proto3" json:"q,omitempty"`
-	// The number of result pages to return.
+	// Starting page for the results.
 	Page int32 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	// The number of results on each page.
+	// Number of results on each page.
 	PerPage int32 `protobuf:"varint,3,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
 }
 

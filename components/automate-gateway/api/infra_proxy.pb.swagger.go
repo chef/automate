@@ -1201,7 +1201,7 @@ func init() {
           },
           {
             "name": "search_query.page",
-            "description": "The number of result pages to return.",
+            "description": "Starting page for the results.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1209,7 +1209,7 @@ func init() {
           },
           {
             "name": "search_query.per_page",
-            "description": "The number of results on each page.",
+            "description": "Number of results on each page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2261,12 +2261,12 @@ func init() {
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "The number of result pages to return."
+          "description": "Starting page for the results."
         },
         "per_page": {
           "type": "integer",
           "format": "int32",
-          "description": "The number of results on each page."
+          "description": "Number of results on each page."
         }
       }
     },
