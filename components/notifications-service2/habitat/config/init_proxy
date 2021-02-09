@@ -1,0 +1,9 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+{{ #if cfg.proxy.connection_string ~}}
+export https_proxy="{{cfg.proxy.connection_string}}"
+export http_proxy="{{cfg.proxy.connection_string}}"
+export no_proxy="{{cfg.proxy.no_proxy_string}}"
+{{ /if ~ }}

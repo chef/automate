@@ -1,0 +1,13 @@
+[mlsa]
+accept = false
+
+[service]
+external_fqdn="http://localhost"
+host = "localhost"
+port = 10125
+
+[storage]
+database = "notifications_service"
+max_open_conns = 10
+max_idle_conns = 10
+
