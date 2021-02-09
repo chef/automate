@@ -16,6 +16,9 @@ document "infra_service_integration" <<DOC
 DOC
 function infra_service_integration() {
   check_if_deployinate_started || return 1;
+  # Setup local chef server
+  # loads data which resides in dev-docs/adding-data/infra/chef-repo
+  infra_service_load_chef_repo
   A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
 }
 
@@ -167,6 +170,10 @@ EOH
 source "https://supermarket.chef.io"
 
 cookbook "audit"
+cookbook "chef-client"
+cookbook "iptables"
+cookbook "netdev"
+cookbook "sudo"
 EOH
 
   if ! hab pkg exec chef/chef-dk knife opc user list -c ${chef_server_pivotal_rb_path} | grep ${chef_server_test_node_name} &> /dev/null; then

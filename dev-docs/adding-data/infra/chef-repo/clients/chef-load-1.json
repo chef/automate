@@ -1,0 +1,8 @@
+{
+    "name": "chef-load-1",
+    "validator": false,
+    "admin": false,
+    "chef_type": "client",
+    "create_key": false
+  }
+  
