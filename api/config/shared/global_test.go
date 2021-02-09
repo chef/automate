@@ -359,7 +359,7 @@ format = "json"
 		cfgErr, ok := err.(Error)
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
-		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
+		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be one of 'basic_auth', 'aws_es'.")
 		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
@@ -382,8 +382,8 @@ format = "json"
 		require.Error(t, err)
 		cfgErr, ok := err.(Error)
 		require.True(t, ok)
-		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.username")
-		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.password")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.auth.basic_auth.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.auth.basic_auth.password")
 	})
 
 	t.Run("with external postgres and unsupported auth scheme", func(t *testing.T) {
