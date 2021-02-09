@@ -248,7 +248,7 @@ func TestNodeAttributeProjectFilter(t *testing.T) {
 		},
 		{
 			description:  "Node has no projects; request unassigned projects allowed",
-			ctx:          ([contextWithProjects]string{authzConstants.UnassignedProjectID}),
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID}),
 			nodeProjects: []string{},
 			expected:     expectedSuccess,
 		},
