@@ -1,6 +1,6 @@
 include ../../Makefile.common_go
 
-PACKAGE_PATH = github.com/chef/automate/components/infra-proxy-service
+PACKAGE_PATH = github.com/chef/automate/components/infra-proxy-service/server
 
 BINS = ${PACKAGE_PATH}/cmd/infra-proxy-service
 MIGRATION_READMES = storage/postgres/migration/sql/README.md
