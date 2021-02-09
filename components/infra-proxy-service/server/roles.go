@@ -14,29 +14,11 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// RunList represents the recipes and roles specified for a node or as part of a role.
-type RunList []string
-
-// EnvRunList represents the recipes and roles with environment specified for a node or as part of a role.
-type EnvRunList map[string]RunList
-
-// Role represents the native Go version of the deserialized Role type
-type Role struct {
-	Name               string      `json:"name"`
-	ChefType           string      `json:"chef_type"`
-	Description        string      `json:"description"`
-	RunList            RunList     `json:"run_list"`
-	EnvRunList         EnvRunList  `json:"env_run_lists"`
-	DefaultAttributes  interface{} `json:"default_attributes,omitempty"`
-	OverrideAttributes interface{} `json:"override_attributes,omitempty"`
-	JSONClass          string      `json:"json_class,omitempty"`
-}
-
 // RoleListResult role list result from Search API
 type RoleListResult struct {
-	Total int     `json:"total"`
-	Start int     `json:"start"`
-	Rows  []*Role `json:"rows"`
+	Total int          `json:"total"`
+	Start int          `json:"start"`
+	Rows  []*chef.Role `json:"rows"`
 }
 
 // CreateRole creates the role
@@ -87,30 +69,21 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 // SearchRoles gets roles list from Chef Infra Server search API.
 func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResult, error) {
 	var result RoleListResult
-	var searchAll bool
-	inc := 1000
-	var query chef.SearchQuery
+	perPage := int(searchQuery.GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
 
-	if searchQuery == nil || searchQuery.Q == "" {
-		searchAll = true
-		query = chef.SearchQuery{
-			Index: "role",
-			Query: "*:*",
-			Start: 0,
-			Rows:  inc,
-		}
-	} else {
-		perPage := int(searchQuery.GetRows())
-		if perPage == 0 {
-			perPage = 1000
-		}
+	searchStr := string(searchQuery.GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
 
-		query = chef.SearchQuery{
-			Index: "role",
-			Query: searchQuery.GetQ(),
-			Start: int(searchQuery.GetStart()),
-			Rows:  perPage,
-		}
+	query := chef.SearchQuery{
+		Index: "role",
+		Query: searchStr,
+		Start: int(searchQuery.GetPage()) * perPage,
+		Rows:  perPage,
 	}
 
 	fullURL := fmt.Sprintf("search/%s", query)
@@ -125,27 +98,6 @@ func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResu
 	}
 
 	defer res.Body.Close() // nolint: errcheck
-
-	if searchAll {
-		var searchResult RoleListResult
-		start := result.Start
-		// the total rows available for this query across all pages
-		total := result.Total
-		for start+inc <= total {
-			query.Start = query.Start + inc
-			fullURL = fmt.Sprintf("search/%s", query)
-
-			res1, err := c.client.Do(newReq, &searchResult)
-			if err != nil {
-				return result, ParseAPIError(err)
-			}
-
-			defer res1.Body.Close() // nolint: errcheck
-
-			// add this page of results to the primary SearchResult instance
-			result.Rows = append(result.Rows, searchResult.Rows...)
-		}
-	}
 
 	return result, nil
 }
@@ -164,7 +116,6 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 
 	return &response.Roles{
 		Roles: fromAPIToListRoles(result),
-		Start: int32(result.Start),
 		Total: int32(result.Total),
 	}, nil
 }
@@ -209,7 +160,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		Description:        role.Description,
 		DefaultAttributes:  string(defaultAttributes),
 		OverrideAttributes: string(overrideAttributes),
-		JsonClass:          role.JSONClass,
+		JsonClass:          role.JsonClass,
 		RunList:            role.RunList,
 		ExpandedRunList:    expandedRunList,
 	}, nil
@@ -308,7 +259,7 @@ func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 	return cl
 }
 
-func findRoleFromRoleList(name string, result *RoleListResult) *Role {
+func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	for _, rItem := range result.Rows {
 		if rItem.Name == name {
 			return rItem
@@ -317,7 +268,7 @@ func findRoleFromRoleList(name string, result *RoleListResult) *Role {
 	return nil
 }
 
-func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
+func toResponseExpandedRunList(role *chef.Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
 	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
 
 	runList, err := GetExpandRunlistFromRole(role.RunList, result)
