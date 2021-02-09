@@ -3,6 +3,8 @@ title = "Monitoring Chef Automate"
 
 date = 2019-10-28T14:44:28-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Monitoring Chef Automate"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/reference/monitoring.md Monitoring Chef Automate"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/monitoring.md)
 
 Use the authenticated https endpoint `/status` to monitor your Chef Automate installation.
 

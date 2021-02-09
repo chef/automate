@@ -3,6 +3,8 @@ title = "Users"
 
 date = 2018-05-16T16:03:13-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Users"
@@ -10,8 +12,6 @@ draft = false
     parent = "automate/settings"
     weight = 60
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/users.md)
 
 ## Overview
 

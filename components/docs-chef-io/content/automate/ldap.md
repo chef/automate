@@ -3,6 +3,8 @@ title = "LDAP"
 
 date = 2018-05-11T09:27:09+00:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "LDAP"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/configuring_automate/ldap.md LDAP"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/ldap.md)
 
 ## Authentication via Existing Identity Management Systems
 

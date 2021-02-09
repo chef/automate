@@ -3,6 +3,8 @@ title = "Log Management"
 
 draft = false
 
+gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "Log Management"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/configuring_automate/log_management.md Log Management"
     weight = 40
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/log_management.md)
 
 Chef Automate 2.0 uses `systemd`. Log management is performed according to the configuration defined for the system service `journald`.
 

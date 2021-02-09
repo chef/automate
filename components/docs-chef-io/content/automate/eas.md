@@ -3,6 +3,8 @@ title = "Chef EAS"
 
 date = 2019-10-18T18:54:09+00:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef EAS"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/applications/eas.md Chef EAS"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/eas.md)
 
 The Chef Enterprise Application Stack (EAS) allows organizations to automate infrastructure, security, and application delivery together, helping them deploy software quickly while maintaining compliance with industry regulations. Chef EAS helps teams drive efficiency and consistency for any application across multi-cloud and heterogeneous infrastructure.
 
@@ -64,7 +64,7 @@ In most cases, artifacts have three possible channels: "unstable", "testing", an
 When you upload your artifact to Builder, Chef Habitat labels your application artifact with the `unstable` tag, which means that it is in the "unstable" channel.
 When you promote your application artifact to another channel, such as "test" or "stable", Chef Habitat applies the new tag and makes it available to the respective channel.
 You can apply more than one tag to a single artifact, for example, artifacts are often tagged for both the "unstable" and "test" channels.
-For more information, see the Chef Habitat [Continuous Deployment Using Channels](https://www.habitat.sh/docs/using-habitat/#continuous-deployment-using-channels) documentation.
+For more information, see the Chef Habitat [Continuous Deployment Using Channels]({{< relref "/habitat/pkg_promote#continuous-deployment-using-channels" >}}) documentation.
 
 _Deployment_ -
 Each instance of an artifact downloaded from a channel into an environment is called a deployment.
@@ -78,7 +78,7 @@ _Supervisor_ -
 The Supervisor is Chef Habitat's process manager, which means it controls the processes related to a package, including starting, monitoring, and updating services. Each Supervisor runs a single instance of a service.
 Each Supervisor in an environment subscribes to a channel, which means they watch for new versions of services promoted in that channel.
 Once a supervisor detects a new artifact in a channel, it deploys the new package into its own environment and updates all of the services for that service group.
-For more information about automated deployments, see the Chef Habitat [update-strategy](https://www.habitat.sh/docs/using-habitat/#update-strategy) documentation.
+For more information about automated deployments, see the Chef Habitat [update-strategy]({{< relref "/habitat/service_group_updates#configuring-an-update-strategy" >}}) documentation.
 
 _Service_ -
 A service is any single running instance of a Chef Habitat package running in an environment and managed by a Supervisor.

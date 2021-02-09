@@ -3,6 +3,8 @@ title = "Applications Dashboard"
 
 date = 2019-10-18T18:54:09+00:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Applications Dashboard"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/applications/applications_dashboard.md Applications Dashboard"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/applications_dashboard.md)
 
 The Chef Automate *Applications* dashboard allows you to organize and display your applications data from Chef Habitat in an intuitive way.
 Chef Automate organizes data from the application and environment tags provided by the Chef Habitat supervisor.
@@ -109,4 +109,4 @@ The default time for a node to report to Chef Automate is 5 minutes.
 
 Chef Habitat sends the health check messages every 30 seconds by default.
 Configure this setting using the `--health-check-interval` option with the `hab sup run` command.
-See the [Habitat CLI documentation](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) for more information.
+See the [Habitat CLI documentation]({{< relref "/habitat/habitat_cli#hab-sup-run" >}}) for more information.

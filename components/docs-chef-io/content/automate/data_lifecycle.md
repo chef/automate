@@ -2,6 +2,8 @@
 title = "Data Lifecycle"
 description = "Chef Automate Data Lifecycle: Data Management and Data Retention"
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Data Lifecycle"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/settings/data_lifecycle.md Data Lifecycle"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/data_lifecycle.md)
 
 Data Lifecycle manages the retention of events, service groups, Chef Infra Client runs, compliance reports and scans in Chef Automate.
 Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in Elasticsearch or PostgreSQL.

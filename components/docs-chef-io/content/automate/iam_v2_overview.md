@@ -2,13 +2,13 @@
 title = "IAM Overview"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     parent = "automate/authorization"
     weight = 10
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/iam_v2_overview.md)
 
 {{< note >}}
 This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.

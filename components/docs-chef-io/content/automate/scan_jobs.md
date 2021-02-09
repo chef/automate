@@ -3,6 +3,8 @@ title = "Scan Jobs"
 
 date = 2018-03-26T16:02:35-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Scan Jobs"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/compliance/scan_jobs.md Scan Jobs"
     weight = 20
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/scan_jobs.md)
 
 ## Overview
 

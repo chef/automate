@@ -2,6 +2,8 @@
 title = "Feature Flags"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Feature Flags"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/reference/flags.md Feature Flags"
     weight = 50
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/flags.md)
 
 Use the beta, lega, or feat flags to turn on or off beta, legacy, or in-development features.
 

@@ -3,6 +3,8 @@ title = "Teams"
 
 date = 2018-05-16T16:03:13-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Teams"
@@ -10,8 +12,6 @@ draft = false
     parent = "automate/settings"
     weight = 70
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/teams.md)
 
 ## Overview
 

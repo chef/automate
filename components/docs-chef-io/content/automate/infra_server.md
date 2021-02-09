@@ -4,6 +4,8 @@ title = "Install Chef Infra Server With Automate"
 date = 2020-02-11T14:24:00-08:00
 weight = 20
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Install Chef Infra Server With Automate"
@@ -11,8 +13,6 @@ draft = false
     identifier = "automate/getting_started/infra_server.md Install Chef Infra Server With Automate"
     weight = 60
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/infra_server.md)
 
 {{% warning %}}
 

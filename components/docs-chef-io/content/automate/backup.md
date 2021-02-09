@@ -3,6 +3,8 @@ title = "Backup"
 
 date = 2018-03-26T15:27:52-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Backup"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/getting_started/backup.md Backup"
     weight = 70
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/backup.md)
 
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
 The `chef-automate backup create` command creates a single backup that contains data for all products deployed with Chef Automate, including [Chef Infra Server]({{< ref "infra_server.md" >}}) and [Chef Habitat Builder on-prem]({{< ref "on_prem_builder.md" >}}).

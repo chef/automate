@@ -2,6 +2,8 @@
 title = "Telemetry"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Telemetry"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/configuring_automate/telemetry.md Telemetry"
     weight = 50
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/telemetry.md)
 
 ### About Telemetry
 

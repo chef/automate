@@ -3,6 +3,8 @@ title = "Client Runs"
 
 date = 2018-03-26T16:01:58-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Client Runs"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/client_runs.md Client Runs"
     weight = 60
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/client_runs.md)
 
 ## Overview
 

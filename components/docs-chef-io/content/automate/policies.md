@@ -2,6 +2,8 @@
 title = "Policies"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Policies"
@@ -9,8 +11,6 @@ draft = false
     parent = "automate/settings"
     weight = 90
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/policies.md)
 
 ## Overview
 

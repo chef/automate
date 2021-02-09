@@ -3,6 +3,8 @@ title = "Profiles"
 
 date = 2018-03-26T16:02:53-07:00
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Profiles"
@@ -10,8 +12,6 @@ draft = false
     identifier = "automate/compliance/profiles.md Profiles"
     weight = 30
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/profiles.md)
 
 ## Overview
 

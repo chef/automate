@@ -2,6 +2,8 @@
 title = "Nodes API"
 
 draft = false
+
+gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Nodes"
@@ -9,8 +11,6 @@ draft = false
     identifier = "automate/compliance/nodes.md Nodes"
     weight = 40
 +++
-
-[\[edit on GitHub\]](https://github.com/chef/automate/blob/master/components/docs-chef-io/content/automate/nodes.md)
 
 ### Nodes
 
