@@ -122,10 +122,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.External = &ConfigRequest_V1_System_External{
 			Enable: w.Bool(true),
 		}
+		endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
 		if len(nodes) > 0 {
 			isSSL := false
 
-			endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
 			for _, n := range nodes {
 				endpoint, ssl := uriToEndpoint(n.GetValue())
 				endpoints = append(endpoints, endpoint)
@@ -154,8 +154,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 				),
 			)))
 		case "aws_es":
-			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(nodes) > 0 {
-				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = nodes[0]
+			// If we only have 1 AWS Elasticsearch Service endpoint specified, we can assume that
+			// the host header should be the name of that endpoint.
+			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
+				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = endpoints[0].Address
 			}
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(

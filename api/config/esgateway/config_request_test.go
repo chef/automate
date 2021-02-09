@@ -154,7 +154,6 @@ func TestExternalElasticsearch(t *testing.T) {
 
 		assert.Equal(t, "server1", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetAddress().GetValue())
 		assert.Equal(t, "443", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetPort().GetValue())
-
 	})
 
 	t.Run("single http endpoint with IP", func(t *testing.T) {
@@ -275,5 +274,37 @@ func TestExternalElasticsearch(t *testing.T) {
 		c.PrepareSystemConfig(&ac.TLSCredentials{})
 
 		require.Equal(t, c.V1.Sys.Ngx.Main.Resolvers.NameserversString.GetValue(), "111.11.11.11:50", "does not match with the nameserver passed")
+	})
+
+	t.Run("aws elasticsearch", func(t *testing.T) {
+		c := DefaultConfigRequest()
+		c.SetGlobalConfig(&ac.GlobalConfig{
+			V1: &ac.V1{
+				External: &ac.External{
+					Elasticsearch: &ac.External_Elasticsearch{
+						Enable: w.Bool(true),
+						Nodes: []*wrappers.StringValue{
+							w.String("https://server1"),
+						},
+						Auth: &ac.External_Elasticsearch_Authentication{
+							Scheme: w.String("aws_es"),
+							AwsEs: &ac.External_Elasticsearch_Authentication_AwsElasticsearchAuth{
+								Username: w.String("testuser"),
+								Password: w.String("testpassword"),
+							},
+						},
+					},
+				},
+			},
+		})
+
+		require.True(t,
+			c.GetV1().GetSys().GetExternal().GetEnable().GetValue(),
+			"expected external ES to be enabled")
+
+		require.Equal(t, "server1", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetAddress().GetValue())
+		require.Equal(t, "443", c.GetV1().GetSys().GetExternal().GetParsedEndpoints()[0].GetPort().GetValue())
+		require.Equal(t, "server1", c.GetV1().GetSys().GetNgx().GetHttp().GetProxySetHeaderHost().GetValue())
+
 	})
 }
