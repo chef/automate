@@ -16,6 +16,7 @@ document "infra_service_integration" <<DOC
 DOC
 function infra_service_integration() {
   check_if_deployinate_started || return 1;
+  export CONTAINER_HOSTNAME=localhost
   # Setup local chef server
   # loads data which resides in dev-docs/adding-data/infra/chef-repo
   infra_service_load_chef_repo
