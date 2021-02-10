@@ -432,7 +432,7 @@ steps:
   - label: "infra-proxy-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_infra_proxy_service && infra_service_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deployinate && infra_service_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
