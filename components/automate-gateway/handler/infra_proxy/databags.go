@@ -49,9 +49,9 @@ func (a *InfraProxyServer) GetDataBagItems(ctx context.Context, r *gwreq.DataBag
 		ServerId: r.ServerId,
 		Name:     r.Name,
 		SearchQuery: &infra_req.SearchQuery{
-			Q:     r.GetSearchQuery().GetQ(),
-			Start: r.GetSearchQuery().GetStart(),
-			Rows:  r.GetSearchQuery().GetRows(),
+			Q:       r.GetSearchQuery().GetQ(),
+			PerPage: r.GetSearchQuery().GetPerPage(),
+			Page:    r.GetSearchQuery().GetPage(),
 		},
 	}
 	res, err := a.client.GetDataBagItems(ctx, req)
@@ -62,7 +62,6 @@ func (a *InfraProxyServer) GetDataBagItems(ctx context.Context, r *gwreq.DataBag
 	return &gwres.DataBagItems{
 		Name:  res.GetName(),
 		Items: fromUpstreamDataBags(res.Items),
-		Start: res.GetStart(),
 		Total: res.GetTotal(),
 	}, nil
 }

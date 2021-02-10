@@ -837,16 +837,16 @@ func init() {
             "type": "string"
           },
           {
-            "name": "search_query.start",
-            "description": "The number of result pages to return.",
+            "name": "search_query.page",
+            "description": "Starting page for the results.",
             "in": "query",
             "required": false,
             "type": "integer",
             "format": "int32"
           },
           {
-            "name": "search_query.rows",
-            "description": "The number of results on each page.",
+            "name": "search_query.per_page",
+            "description": "Number of results on each page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2360,15 +2360,15 @@ func init() {
           "type": "string",
           "description": "The search query used to identify a list of items."
         },
-        "start": {
+        "page": {
           "type": "integer",
           "format": "int32",
-          "description": "The number of result pages to return."
+          "description": "Starting page for the results."
         },
-        "rows": {
+        "per_page": {
           "type": "integer",
           "format": "int32",
-          "description": "The number of results on each page."
+          "description": "Number of results on each page."
         }
       }
     },
@@ -3035,11 +3035,6 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Total number of records."
-        },
-        "start": {
-          "type": "integer",
-          "format": "int32",
-          "description": "The number of result pages to return."
         }
       }
     },

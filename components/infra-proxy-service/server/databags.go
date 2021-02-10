@@ -14,24 +14,6 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
-// DataBagItem represents the search based deserialized data bag item
-type DataBagItem struct {
-	Name        string      `json:"name"`
-	RawItemData RawItemData `json:"raw_data"`
-}
-
-// RawItemData represents the search based deserialized raw data
-type RawItemData struct {
-	ID string `json:"id"`
-}
-
-// DataBagItemsResult list result from Search API
-type DataBagItemsResult struct {
-	Total int            `json:"total"`
-	Start int            `json:"start"`
-	Rows  []*DataBagItem `json:"rows"`
-}
-
 // CreateDataBag creates a data bag
 func (s *Server) CreateDataBag(ctx context.Context, req *request.CreateDataBag) (*response.CreateDataBag, error) {
 	err := validation.New(validation.Options{
@@ -137,22 +119,24 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 		return nil, err
 	}
 
-	if req.SearchQuery == nil || req.SearchQuery.Q == "" {
-		res, err := c.client.DataBags.ListItems(req.Name)
-		if err != nil {
-			return nil, ParseAPIError(err)
-		}
-
-		items := fromAPIToListDatabags(*res)
-		return &response.DataBagItems{
-			Name:  req.Name,
-			Items: items,
-			Start: 0,
-			Total: int32(len(items)),
-		}, nil
+	perPage := int(req.GetSearchQuery().GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
 	}
 
-	res, err := c.SearchDataBagItems(req.Name, req.SearchQuery)
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery(req.Name, searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
+
+	res, err := query.Do(c.client)
+
+	s.service.Logger.Info(res)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -160,41 +144,8 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 	return &response.DataBagItems{
 		Name:  req.Name,
 		Items: fromAPIToListDatabagItems(res.Rows),
-		Start: int32(res.Start),
 		Total: int32(res.Total),
 	}, nil
-}
-
-// SearchDataBagItems gets data bag items list from Chef Infra Server search API.
-func (c *ChefClient) SearchDataBagItems(dataBag string, searchQuery *request.SearchQuery) (DataBagItemsResult, error) {
-	var result DataBagItemsResult
-	perPage := int(searchQuery.GetRows())
-	if perPage == 0 {
-		perPage = 1000
-	}
-
-	query := chef.SearchQuery{
-		Index: dataBag,
-		Query: searchQuery.GetQ(),
-		Start: int(searchQuery.GetStart()),
-		Rows:  perPage,
-	}
-
-	fullURL := fmt.Sprintf("search/%s", query)
-	newReq, err := c.client.NewRequest("GET", fullURL, nil)
-
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	res, err := c.client.Do(newReq, &result)
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	defer res.Body.Close() // nolint: errcheck
-
-	return result, nil
 }
 
 // GetDataBagItem gets data bag item
@@ -342,11 +293,12 @@ func fromAPIToListDatabags(al chef.DataBagListResult) []*response.DataBagListIte
 }
 
 // fromAPIToListDatabagItems a response data bag items from a struct
-func fromAPIToListDatabagItems(al []*DataBagItem) []*response.DataBagListItem {
+func fromAPIToListDatabagItems(al []interface{}) []*response.DataBagListItem {
 	cl := make([]*response.DataBagListItem, len(al))
 	for index, c := range al {
+		rawData := c.(map[string]interface{})["raw_data"]
 		cl[index] = &response.DataBagListItem{
-			Name: c.RawItemData.ID,
+			Name: rawData.(map[string]interface{})["id"].(string),
 		}
 	}
 
