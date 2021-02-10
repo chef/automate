@@ -13,6 +13,7 @@ import (
 // GetClients get clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+
 	if err != nil {
 		return nil, err
 	}

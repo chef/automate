@@ -1,4 +1,4 @@
-package commands
+package config
 
 import (
 	"fmt"
@@ -6,60 +6,61 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/components/infra-proxy-service/config"
-	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/tls/certs"
 )
 
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Launches the automate infra proxy service.",
-	Run:   serve,
-	Args:  cobra.ExactArgs(1),
+// Service config options
+type Service struct {
+	GRPC            string `mapstructure:"grpc"`
+	LogFormat       string `mapstructure:"log-format"`
+	LogLevel        string `mapstructure:"log-level"`
+	certs.TLSConfig `mapstructure:"tls"`
+	PGURL           string `mapstructure:"pg_url"`
+	Database        string `mapstructure:"database"`
+	MigrationsPath  string `mapstructure:"migrations-path"`
+	AuthzAddress    string `mapstructure:"authz-address"`
+	SecretsAddress  string `mapstructure:"secrets-address"`
 }
 
-func serve(cmd *cobra.Command, args []string) {
-	cmd.PersistentFlags().StringP("log-level", "l", "info", "log level")
-	cmd.PersistentFlags().StringP("log-format", "f", "text", "log format")
-	cmd.PersistentFlags().String("grpc", "127.0.0.1:10153", "grpc host and port")
-	cmd.PersistentFlags().StringP("pg_url", "p", "", "postgres uri")
-	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
-	cmd.PersistentFlags().StringP("authz-address", "a", "", "authz-service GRPC address")
-	cmd.PersistentFlags().StringP("secrets-address", "s", "", "secrets-service GRPC address")
+// ConfigFromViper returns a Service instance from the current viper config
+func ConfigFromViper(configFile string) (*service.Service, error) {
+	// Set the file name of the configurations file
+	viper.SetConfigName("config")
+	// Set the configuration file type
+	viper.SetConfigType("yaml")
+	// Set the path to look for the configurations file
+	viper.AddConfigPath("../dev")
 
-	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
 		fail(errors.Wrap(err, `Could not read config file. Please pass a config file as the only argument to this command.`))
 	}
 
-	cfg := config.Service{}
+	cfg := Service{}
 	if err := viper.Unmarshal(&cfg); err != nil {
 		fail(errors.Wrap(err, "couldn't parse configuration file"))
 	}
 
-	if cfg.PGURL == "" {
-		var err error
-		cfg.PGURL, err = platform_config.PGURIFromEnvironment(cfg.Database)
-		if err != nil {
-			fail(errors.Wrap(err, "Failed to get pg uri"))
-		}
+	pgURL, err := platform_config.PGURIFromEnvironment(cfg.Database)
+	if err != nil {
+		fail(errors.Wrap(err, "Failed to get pg uri"))
 	}
+	cfg.PGURL = pgURL
 
 	l, err := logger.NewLogger(cfg.LogFormat, cfg.LogLevel)
 	if err != nil {
 		fail(errors.Wrap(err, "couldn't initialize logger"))
 	}
 
-	cfg.FixupRelativeTLSPaths(args[0])
+	cfg.FixupRelativeTLSPaths(configFile)
 	serviceCerts, err := cfg.ReadCerts()
 	if err != nil {
 		fail(errors.Wrap(err, "Could not read certs"))
@@ -94,7 +95,7 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(errors.Wrapf(err, "failed to dial secrets-service at (%s)", cfg.SecretsAddress))
 	}
 
-	// get secrets client
+	// gets secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
 	service, err := service.Start(l, migrationConfig, connFactory, secretsClient, authzClient)
@@ -102,7 +103,7 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
 
-	fail(server.GRPC(cfg.GRPC, service))
+	return service, nil
 }
 
 // fail outputs the error and exits with a non-zero code

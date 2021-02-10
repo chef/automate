@@ -11,6 +11,18 @@ function start_infra_proxy_service() {
   chef-automate dev deploy-some $HAB_ORIGIN/infra-proxy-service --with-deps
 }
 
+document "infra_service_integration" <<DOC
+  run the infra service's integration tests
+DOC
+function infra_service_integration() {
+  check_if_deployinate_started || return 1;
+  export CONTAINER_HOSTNAME=localhost
+  # Setup local chef server
+  # loads data which resides in dev-docs/adding-data/infra/chef-repo
+  infra_service_load_chef_repo
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+}
+
 document "infra_service_load_sample_data" <<DOC
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
   Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
@@ -73,17 +85,17 @@ function infra_service_load_sample_data() {
 }
 
 function infra_service_create_servers_orgs() {
-  chef-automate dev grpcurl automate-gateway -- -d \
+  chef-automate dev grpcurl infra-proxy-service -- -d \
   "$(cat << EOF
     {"id": "$1", "name": "$2", "ip_address": "$3", "fqdn": "$4"}
 EOF
-  )" chef.automate.api.infra_proxy.InfraProxy.CreateServer >/dev/null
+  )" chef.automate.domain.infra_proxy.service.InfraProxyService.CreateServer >/dev/null
 
-  chef-automate dev grpcurl automate-gateway -- -d \
+  chef-automate dev grpcurl infra-proxy-service -- -d \
   "$(cat << EOF
     {"id": "$5", "name": "$6", "admin_user": "$7", "admin_key": "$8", "server_id": "$1", "projects": []}
 EOF
-  )" chef.automate.api.infra_proxy.InfraProxy.CreateOrg >/dev/null
+  )" chef.automate.domain.infra_proxy.service.InfraProxyService.CreateOrg >/dev/null
 }
 
 function infra_service_load_chef_repo() {
@@ -159,6 +171,10 @@ EOH
 source "https://supermarket.chef.io"
 
 cookbook "audit"
+cookbook "chef-client"
+cookbook "iptables"
+cookbook "netdev"
+cookbook "sudo"
 EOH
 
   if ! hab pkg exec chef/chef-dk knife opc user list -c ${chef_server_pivotal_rb_path} | grep ${chef_server_test_node_name} &> /dev/null; then
