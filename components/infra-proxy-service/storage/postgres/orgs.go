@@ -25,8 +25,13 @@ func (p *postgres) insertOrg(ctx context.Context,
 		projects = []string{}
 	}
 
+	// Adding the subjects if missing if gRPC calls from internal service level
+	subjects := auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects
+	if len(subjects) == 0 {
+		subjects = []string{"tls:service:compliance-service:internal"}
+	}
 	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz.ValidateProjectAssignmentReq{
-		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		Subjects:    subjects,
 		OldProjects: []string{},
 		NewProjects: projects,
 	})

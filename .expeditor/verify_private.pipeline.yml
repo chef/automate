@@ -429,6 +429,22 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: "infra-proxy-service"
+    command:
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_infra_proxy_service && infra_service_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   #
   # The following tests all use the integration test framework for
   # end-to-end testing. These tests all test full deployments of
