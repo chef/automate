@@ -444,6 +444,7 @@ steps:
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+            - CONTAINER_HOSTNAME=localhost
 
   #
   # The following tests all use the integration test framework for
