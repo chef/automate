@@ -30,7 +30,6 @@ export class FeatureFlagsComponent implements OnInit {
   features: Array<Feature> = [];
   // Note: all codes must be codeLength characters long (see above) and UPPERCASE
   @Input() experimentalCode = 'FEAT';
-  @Input() experimentalFeatures: Array<Feature> = [];
   @Input() betaCode = 'BETA';
   @Input() betaFeatures: Array<Feature> = [];
   @Input() legacyCode = 'LEGA';
@@ -61,7 +60,6 @@ export class FeatureFlagsComponent implements OnInit {
 
   ngOnInit() {
     this.betaFeatures
-      .concat(this.experimentalFeatures)
       .concat(this.legacyFeatures)
       .forEach(feature =>
         this.featureFlagsService.setFeature(feature.key,
@@ -96,7 +94,7 @@ export class FeatureFlagsComponent implements OnInit {
         this.flagType = FlagTypes.beta;
         break;
       case this.experimentalCode:
-        this.features = sortBy('name', this.betaFeatures.concat(this.experimentalFeatures));
+        this.features = sortBy('name', this.betaFeatures);
         this.warning = this.betaWarning;
         this.isVisible = !this.isVisible || this.flagType !== FlagTypes.beta_or_experimental;
         this.flagType = FlagTypes.beta_or_experimental;

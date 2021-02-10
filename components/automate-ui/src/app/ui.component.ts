@@ -17,12 +17,7 @@ import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 export class UIComponent implements OnInit, AfterViewChecked {
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
-  experimentalFeatures: Array<Feature> = [
-    {
-      key: 'chefInfraServerViews',
-      name: 'Chef Infra Server Views'
-    }
-  ];
+
   betaFeatures: Array<Feature> = [
     {
       key: 'servicenow_cmdb',
