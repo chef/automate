@@ -11,7 +11,7 @@ NG_CMD := npm run ng --
 REPOROOT=../..
 
 # Semgrep by default respects .gitignore; these are additive:
-SEMGREP_IGNORE := --exclude *.spec.ts --exclude coverage
+SEMGREP_IGNORE := --exclude *.spec.ts --exclude coverage --exclude modernizr-custom.js
 SEMGREP_CONFIG := https://semgrep.dev/p/r2c-ci
 
 
