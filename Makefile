@@ -23,3 +23,12 @@ semgrep-all: ## runs full semgrep but filters out the insignificant issues repor
 
 semgrep-legacy: ## runs full semgrep including findings for existing issues that are not significant
 	@if [[ -z "${SEMGREP_TOKEN}" || -z "${SEMGREP_ID}" ]]; then echo $(SEMGREP_MSG); else docker run -it --rm --init $(DOCKER_PARAMS) $(SEMGREP_REPO) $(SEMGREP_CONTAINER) python $(SEMGREP_COMMON_PARAMS); fi
+
+
+# For exploring new rulesets before integrating with CI.
+# For convenience, this uses all the ignores from Makefile.common_go and automate-ui/Makefile.
+# Ruleset choices come from https://semgrep.dev/explore.
+# Example: `make semgrep-test/rc2-bug-scan`
+SEMGREP_IGNORE := --exclude third_party --exclude *_test.go --exclude *.pb.go --exclude *.pb.*.go --exclude *.bindata.go --exclude *.spec.ts --exclude coverage --exclude modernizr-custom.js
+semgrep-test/%:
+	semgrep --config "p/$(@F)" $(SEMGREP_IGNORE)
