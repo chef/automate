@@ -50,6 +50,9 @@ service InfraProxyService {
 
     rpc GetClients (chef.automate.domain.infra_proxy.request.Clients) returns (chef.automate.domain.infra_proxy.response.Clients) {};
     rpc GetClient (chef.automate.domain.infra_proxy.request.Client) returns (chef.automate.domain.infra_proxy.response.Client) {};
+    rpc CreateClient (chef.automate.domain.infra_proxy.request.CreateClient) returns (chef.automate.domain.infra_proxy.response.CreateClient) {};
+    rpc DeleteClient (chef.automate.domain.infra_proxy.request.Client) returns (chef.automate.domain.infra_proxy.response.Client) {};
+    rpc ResetClientKey (chef.automate.domain.infra_proxy.request.ClientKey) returns (chef.automate.domain.infra_proxy.response.ClientKey) {};
 
     rpc GetDataBags (chef.automate.domain.infra_proxy.request.DataBags) returns (chef.automate.domain.infra_proxy.response.DataBags) {};
     rpc GetDataBagItem (chef.automate.domain.infra_proxy.request.DataBag) returns (chef.automate.domain.infra_proxy.response.DataBag) {};

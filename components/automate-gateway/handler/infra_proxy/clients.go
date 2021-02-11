@@ -44,6 +44,73 @@ func (a *InfraProxyServer) GetClient(ctx context.Context, r *gwreq.Client) (*gwr
 		Validator:  res.GetValidator(),
 		JsonClass:  res.GetJsonClass(),
 		ChefType:   res.GetChefType(),
+		ClientKey: &gwres.ClientAccessKey{
+			Name:           res.GetClientKey().GetName(),
+			ExpirationDate: res.GetClientKey().GetExpirationDate(),
+			PublicKey:      res.GetClientKey().GetPublicKey(),
+		},
+	}, nil
+}
+
+// CreateClient creates an infra client
+func (a *InfraProxyServer) CreateClient(ctx context.Context, r *gwreq.CreateClient) (*gwres.CreateClient, error) {
+	req := &infra_req.CreateClient{
+		OrgId:     r.OrgId,
+		ServerId:  r.ServerId,
+		Name:      r.Name,
+		Validator: r.Validator,
+		CreateKey: r.CreateKey,
+	}
+	res, err := a.client.CreateClient(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.CreateClient{
+		Name: res.GetName(),
+		ClientKey: &gwres.ClientKey{
+			Name:           res.GetClientKey().GetName(),
+			PublicKey:      res.GetClientKey().GetPublicKey(),
+			ExpirationDate: res.GetClientKey().GetExpirationDate(),
+			PrivateKey:     res.GetClientKey().GetPrivateKey(),
+		},
+	}, nil
+}
+
+// DeleteClient deletes an infra client
+func (a *InfraProxyServer) DeleteClient(ctx context.Context, r *gwreq.Client) (*gwres.Client, error) {
+	req := &infra_req.Client{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeleteClient(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Client{
+		Name: res.GetName(),
+	}, nil
+}
+
+// ResetClientKey resets an infra client key
+// Deletes the associated key pair and generates new key pair again, and then attaches it to the client.
+func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKey) (*gwres.ClientKey, error) {
+	req := &infra_req.ClientKey{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Key:      r.Key,
+	}
+	res, err := a.client.ResetClientKey(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ClientKey{
+		Name:       res.GetName(),
+		PrivateKey: res.GetPrivateKey(),
 	}, nil
 }
 

@@ -18,3 +18,27 @@ message Client {
     // Client name.
     string name = 3;
 }
+
+message CreateClient {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Client name.
+    string name = 3;
+    // Boolean indicates client type is validator or not.
+    bool validator = 4;
+    // Boolean indicates whether it's required to create a key or not.
+    bool create_key = 5;
+}
+
+message ClientKey {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Client name.
+    string name = 3;
+    // Client key name.
+    string key = 4;
+}
