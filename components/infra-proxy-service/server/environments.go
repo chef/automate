@@ -40,8 +40,14 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 		return nil, ParseAPIError(err)
 	}
 
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
+	}
+
 	return &response.Environments{
 		Environments: fromAPIToListEnvironments(res.Rows),
+		Page:         int32(page),
 		Total:        int32(res.Total),
 	}, nil
 }

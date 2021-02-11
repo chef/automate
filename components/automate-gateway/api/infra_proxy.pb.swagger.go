@@ -3025,6 +3025,11 @@ func init() {
           },
           "description": "Environments list."
         },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Starting page for the results."
+        },
         "total": {
           "type": "integer",
           "format": "int32",

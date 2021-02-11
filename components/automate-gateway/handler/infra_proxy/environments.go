@@ -27,6 +27,7 @@ func (a *InfraProxyServer) GetEnvironments(ctx context.Context, r *gwreq.Environ
 
 	return &gwres.Environments{
 		Environments: fromUpstreamEnvironments(res.Environments),
+		Page:         res.GetPage(),
 		Total:        res.GetTotal(),
 	}, nil
 }
