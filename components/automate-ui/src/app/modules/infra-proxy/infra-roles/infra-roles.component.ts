@@ -30,7 +30,8 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roles: InfraRole[] = [];
   public rolesListLoading = true;
   public authFailure = false;
-  public searchItems = false;
+  public searching = false;
+  public searchValue: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -57,10 +58,25 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
           this.authFailure = true;
         }
       });
+
+    combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allInfraRoles)
+    ]).pipe(
+      filter(([getRolesSt, _RolesState]) =>
+      getRolesSt === EntityStatus.loadingSuccess),
+      filter(([_getRolesSt, rolesState]) =>
+        !isNil(rolesState)),
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getRolesSt, rolesState]) => {
+        this.roles = rolesState;
+    });
+
   }
 
   searchRoles(currentText: string) {
-    this.searchItems = true;
+    this.searching = true;
+    this.searchValue = currentText;
     const payload = {
       roleId: currentText,
       server_id: this.serverId,
@@ -68,23 +84,11 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       page: 0,
       per_page: this.roles.length
     };
-    combineLatest([
-      this.store.select(getSearchStatus),
-      this.store.select(allInfraRoles)
-    ]).pipe(
-      filter(([getClientsSt, _ClientsState]) =>
-      getClientsSt === EntityStatus.loadingSuccess),
-      filter(([_getClientsSt, clientsState]) =>
-        !isNil(clientsState)),
-      takeUntil(this.isDestroyed))
-    .subscribe(([_getClientsSt, clientsState]) => {
-      this.roles = clientsState;
-    });
 
     this.store.dispatch(new RoleSearch(payload));
 
     setTimeout(() => {
-      this.searchItems = false;
+      this.searching = false;
     }, 2000);
 
 

@@ -17,7 +17,7 @@ export class InfraSearchBarComponent {
   inputText = '';
 
   @Input() placeHolder: string;
-  @Output() searchButtonClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() searchButtonClick = new EventEmitter<string>();
   @ViewChild('search_box', { static: true }) inputField: ElementRef;
 
   handleFiltersClick(currentText: string): void {

@@ -70,7 +70,7 @@ export class InfraRoleEffects {
 
 
   @Effect()
-  getRoleSearchDetails$ = this.actions$.pipe(
+  roleSearch$ = this.actions$.pipe(
     ofType(RoleActionTypes.SEARCH),
     mergeMap((action: RoleSearch) =>
       this.requests.getRoleSearch(action.payload).pipe(
@@ -79,13 +79,13 @@ export class InfraRoleEffects {
           observableOf(new RoleSearchFailure(error))))));
 
   @Effect()
-  getRoleSearchDetailsFailure$ = this.actions$.pipe(
+  roleSearchFailure$ = this.actions$.pipe(
     ofType(RoleActionTypes.SEARCH_FAILURE),
     map(({ payload }: RoleSearchFailure) => {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra role: ${msg || payload.error}`
+        message: `Could not search roles: ${msg || payload.error}`
       });
     }));
 
