@@ -2540,6 +2540,11 @@ func init() {
           },
           "description": "Client list."
         },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Records page number"
+        },
         "total": {
           "type": "integer",
           "format": "int32",

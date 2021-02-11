@@ -19,7 +19,7 @@ type AccessKeyReq struct {
 	CreateKey      bool   `json:"create_key,omitempty"`
 }
 
-// GetClients get clients list
+// GetClients gets clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -46,13 +46,19 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		return nil, ParseAPIError(err)
 	}
 
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
+	}
+
 	return &response.Clients{
 		Clients: fromAPIToListClients(res.Rows),
+		Page:    int32(page),
 		Total:   int32(res.Total),
 	}, nil
 }
 
-// GetClient get client
+// GetClient gets client
 func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.Client, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {

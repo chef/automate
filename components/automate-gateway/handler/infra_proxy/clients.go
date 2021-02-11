@@ -27,6 +27,7 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 
 	return &gwres.Clients{
 		Clients: fromUpstreamClients(res.Clients),
+		Page:    res.GetPage(),
 		Total:   res.GetTotal(),
 	}, nil
 }
