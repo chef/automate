@@ -6,7 +6,6 @@ import (
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 
-	// TODO: move code that needs this into lib/db/migrator
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
 	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
