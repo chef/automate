@@ -197,3 +197,14 @@ func TestSchemaWhenInstallingFresh(t *testing.T) {
 	}
 	assert.Equal(t, expectedColumnsAfterUpgrade, actualColumnsAfterUpgrade)
 }
+
+func TestSchemaIdempotence(t *testing.T) {
+	p := postgres.Postgres{
+		URI:        "postgresql://notifications@127.0.0.1:10145/notifications_service?sslmode=verify-ca&sslcert=/hab/svc/notifications-service/config/service.crt&sslkey=/hab/svc/notifications-service/config/service.key&sslrootcert=/hab/svc/notifications-service/config/root_ca.crt",
+		SchemaPath: "/src/components/notifications-service2/pkg/storage/postgres/schema/sql/",
+	}
+	err := p.Connect()
+	require.NoError(t, err)
+	err = p.DestructiveMigrateForTests()
+	require.NoError(t, err)
+}

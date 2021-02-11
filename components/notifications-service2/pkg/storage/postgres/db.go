@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 
 	// TODO: move code that needs this into lib/db/migrator
+	"github.com/chef/automate/components/notifications-service2/pkg/config"
 	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
@@ -20,6 +21,22 @@ type Postgres struct {
 	SchemaPath   string
 	MaxIdleConns int
 	MaxOpenConns int
+}
+
+func Start(c *config.Notifications) (*Postgres, error) {
+	p := &Postgres{
+		URI:          c.Postgres.URI,
+		MaxIdleConns: c.Postgres.MaxIdleConns,
+		MaxOpenConns: c.Postgres.MaxOpenConns,
+		SchemaPath:   c.Postgres.SchemaPath,
+	}
+	if err := p.Connect(); err != nil {
+		return nil, err
+	}
+	if err := p.Migrate(); err != nil {
+		return nil, err
+	}
+	return p, nil
 }
 
 func (db *Postgres) Connect() error {
@@ -55,7 +72,17 @@ func (db *Postgres) Migrate() error {
 	if err := migrator.Migrate(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
 	}
+	return nil
+}
 
+// DestructiveMigrateForTests clears the database then forcibly runs the
+// migrations twice. This is important to test because our db tooling will
+// retry schema migrations in face of connection errors, etc.; the retry can
+// only succeed if the schem migrations are written in idempotent style.
+func (db *Postgres) DestructiveMigrateForTests() error {
+	if err := migrator.DestructiveMigrateForTests(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
+		return errors.Wrapf(err, "Unable to re-run migrations on existing db. [path:%s]", db.SchemaPath)
+	}
 	return nil
 }
 
