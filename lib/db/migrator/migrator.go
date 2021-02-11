@@ -32,16 +32,10 @@ func Migrate(pgURL, migrationsPath string, l logger.Logger, verbose bool) error 
 // specified migrations table.
 func MigrateWithMigrationsTable(pgURL, migrationsPath, migrationsTable string, l logger.Logger, verbose bool) error {
 	l.Infof("running db migrations from %q", migrationsPath)
-	purl, err := addMigrationsTable(pgURL, migrationsTable)
+	m, err := newMigratorBackend(pgURL, migrationsPath, l, verbose)
 	if err != nil {
-		return errors.Wrap(err, "parse PG URL")
+		return err
 	}
-
-	m, err := migrate.New(addScheme(migrationsPath), purl)
-	if err != nil {
-		return errors.Wrap(err, "init migrator")
-	}
-	m.Log = migrationLog{Logger: l, verbose: verbose}
 
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
@@ -98,13 +92,10 @@ func MigrateWithMigrationsTable(pgURL, migrationsPath, migrationsTable string, l
 // of the plain Migrate function in your tests if you can.
 func DestructiveMigrateForTests(pgURL, migrationsPath string, l logger.Logger, verbose bool) error {
 	l.Infof("running db migrations in destructo test mode for DB %q from %q", pgURL, migrationsPath)
-	purl, err := addMigrationsTable(pgURL, "")
-
-	m, err := migrate.New(addScheme(migrationsPath), purl)
+	m, err := newMigratorBackend(pgURL, migrationsPath, l, verbose)
 	if err != nil {
-		return errors.Wrapf(err, "migrator setup failed for %q", pgURL)
+		return err
 	}
-	m.Log = migrationLog{Logger: l, verbose: verbose}
 	if err := m.Drop(); err != nil {
 		return errors.Wrapf(err, "drop database failed for %q", pgURL)
 	}
@@ -122,6 +113,29 @@ func DestructiveMigrateForTests(pgURL, migrationsPath string, l logger.Logger, v
 	}
 
 	return nil
+}
+
+func Drop(pgURL, migrationsPath string, l logger.Logger, verbose bool) error {
+	l.Infof("dropping all tables in DB %q", pgURL)
+	m, err := newMigratorBackend(pgURL, migrationsPath, l, verbose)
+	if err != nil {
+		return err
+	}
+	if err := m.Drop(); err != nil {
+		return errors.Wrapf(err, "drop database failed for %q", pgURL)
+	}
+	return nil
+}
+
+func newMigratorBackend(pgURL, migrationsPath string, l logger.Logger, verbose bool) (*migrate.Migrate, error) {
+	purl, err := addMigrationsTable(pgURL, "")
+
+	m, err := migrate.New(addScheme(migrationsPath), purl)
+	if err != nil {
+		return nil, errors.Wrapf(err, "migrator setup failed for %q", pgURL)
+	}
+	m.Log = migrationLog{Logger: l, verbose: verbose}
+	return m, nil
 }
 
 func addScheme(p string) string {

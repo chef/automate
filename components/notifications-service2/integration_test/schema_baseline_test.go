@@ -1,24 +1,12 @@
 package schema
 
 import (
-	"database/sql"
-	"net/url"
 	"testing"
 
-	"github.com/go-gorp/gorp"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	// TODO: move code that needs this into lib/db/migrator
-	"github.com/golang-migrate/migrate"
-	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
-	_ "github.com/golang-migrate/migrate/source/file"       // make source available
-
-	libdb "github.com/chef/automate/lib/db"
-	"github.com/chef/automate/lib/db/migrator"
-	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/components/notifications-service2/pkg/storage/postgres"
 )
 
 const schemaDisplaySQL = `
@@ -36,131 +24,6 @@ const enumDisplaySQL = `
 ORDER BY typname ASC, enumsortorder ASC;
 `
 
-type Postgres struct {
-	DbMap        *gorp.DbMap
-	dbConn       *sql.DB
-	URI          string
-	SchemaPath   string
-	MaxIdleConns int
-	MaxOpenConns int
-}
-
-func (db *Postgres) connect() error {
-	dbConn, err := libdb.PGOpen(db.URI)
-	if err != nil {
-		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
-	}
-	db.dbConn = dbConn
-
-	if db.MaxIdleConns > 0 {
-		dbConn.SetMaxIdleConns(db.MaxIdleConns)
-	}
-	if db.MaxOpenConns > 0 {
-		dbConn.SetMaxOpenConns(db.MaxOpenConns)
-	}
-	// Configure the database mapping object
-	db.DbMap = &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}}
-
-	// Verify database
-	err = db.ping()
-	if err != nil {
-		return errors.Wrapf(err, "Failed to ping database with uri: %s", db.URI)
-	}
-	return nil
-}
-
-// ping will verify if the database mapped with gorp is available
-func (db *Postgres) ping() error {
-	return db.dbConn.Ping()
-}
-
-func (db *Postgres) migrate() error {
-	if err := migrator.Migrate(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
-		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
-	}
-
-	return nil
-}
-
-func (db *Postgres) clear() error {
-	purl, err := addMigrationsTable(db.URI, "")
-
-	m, err := migrate.New(addScheme(db.SchemaPath), purl)
-	if err != nil {
-		return errors.Wrapf(err, "migrator setup failed for %q", db.URI)
-	}
-	l := logger.NewLogrusStandardLogger()
-	m.Log = migrationLog{Logger: l, verbose: true}
-	if err := m.Drop(); err != nil {
-		return errors.Wrapf(err, "drop database failed for %q", db.URI)
-	}
-
-	c := db.dbConn
-
-	// The implementation of `Drop()` in the migrator only deletes tables and it
-	// also ignores the schema_migrations table. We do additional cleanup
-	// manually here.
-	if _, err := c.Exec("DROP TYPE IF EXISTS rule_event CASCADE;"); err != nil {
-		return errors.Wrapf(err, "enum cleanup failed on %q", db.URI)
-	}
-
-	if _, err := c.Exec("DROP TYPE IF EXISTS rule_action CASCADE;"); err != nil {
-		return errors.Wrapf(err, "enum cleanup failed on %q", db.URI)
-	}
-
-	if _, err := c.Exec("DROP TABLE IF EXISTS schema_migrations CASCADE;"); err != nil {
-		return errors.Wrapf(err, "schema_migrations cleanup failed on %q", db.URI)
-	}
-
-	return nil
-
-}
-
-func (db *Postgres) resetToBaseline() error {
-	if err := db.clear(); err != nil {
-		return err
-	}
-
-	if _, err := db.dbConn.Exec(PgDump1dot0Schema); err != nil {
-		return errors.Wrapf(err, "loading pgdump failed for %q", db.URI)
-	}
-
-	return nil
-}
-
-// TODO: copied from lib/db/migrator. remove!
-type migrationLog struct {
-	logger.Logger
-	verbose bool
-}
-
-// TODO: copied from lib/db/migrator. remove!
-func (l migrationLog) Verbose() bool {
-	return l.verbose
-}
-
-// TODO: copied from lib/db/migrator. remove!
-func addScheme(p string) string {
-	u := url.URL{}
-	u.Scheme = "file"
-	u.Path = p
-	return u.String()
-}
-
-// TODO: copied from lib/db/migrator. remove!
-func addMigrationsTable(u, table string) (string, error) {
-	pgURL, err := url.Parse(u)
-	if err != nil {
-		return "", err
-	}
-	if table != "" {
-		q := pgURL.Query()
-		q.Set("x-migrations-table", table)
-		pgURL.RawQuery = q.Encode()
-	}
-	return pgURL.String(), nil
-}
-
 type PgColumnInfo struct {
 	TableName     string  `db:"table_name"`
 	ColumnName    string  `db:"column_name"`
@@ -176,14 +39,16 @@ type PgEnumInfo struct {
 }
 
 func TestSchemaWhenUpgradingFromVersion1(t *testing.T) {
-	p := Postgres{
+	p := postgres.Postgres{
 		URI:        "postgresql://notifications@127.0.0.1:10145/notifications_service?sslmode=verify-ca&sslcert=/hab/svc/notifications-service/config/service.crt&sslkey=/hab/svc/notifications-service/config/service.key&sslrootcert=/hab/svc/notifications-service/config/root_ca.crt",
 		SchemaPath: "/src/components/notifications-service2/pkg/storage/postgres/schema/sql/",
 	}
-	err := p.connect()
+	err := p.Connect()
 	require.NoError(t, err)
 
-	err = p.resetToBaseline()
+	err = p.Clear()
+	require.NoError(t, err)
+	_, err = p.Exec(PgDump1dot0Schema)
 	require.NoError(t, err)
 
 	sqlFnNow := "now()"
@@ -243,7 +108,7 @@ func TestSchemaWhenUpgradingFromVersion1(t *testing.T) {
 	assert.Equal(t, expectedEnums, actualEnums)
 
 	// Migrate the database from the 1.0 version to the 2.0 version
-	err = p.migrate()
+	err = p.Migrate()
 	require.NoError(t, err)
 
 	// the migrator itself creates the schema_migrations table and our migration
@@ -288,18 +153,18 @@ func TestSchemaWhenUpgradingFromVersion1(t *testing.T) {
 }
 
 func TestSchemaWhenInstallingFresh(t *testing.T) {
-	p := Postgres{
+	p := postgres.Postgres{
 		URI:        "postgresql://notifications@127.0.0.1:10145/notifications_service?sslmode=verify-ca&sslcert=/hab/svc/notifications-service/config/service.crt&sslkey=/hab/svc/notifications-service/config/service.key&sslrootcert=/hab/svc/notifications-service/config/root_ca.crt",
 		SchemaPath: "/src/components/notifications-service2/pkg/storage/postgres/schema/sql/",
 	}
-	err := p.connect()
+	err := p.Connect()
 	require.NoError(t, err)
 
-	err = p.clear()
+	err = p.Clear()
 	require.NoError(t, err)
 
 	// migrate from empty db to 2.0 version directly
-	err = p.migrate()
+	err = p.Migrate()
 	require.NoError(t, err)
 
 	sqlFnNow := "now()"
