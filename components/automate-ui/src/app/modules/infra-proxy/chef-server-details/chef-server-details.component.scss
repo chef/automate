@@ -24,7 +24,7 @@ chef-toolbar {
     float: right;
     width: 150px;
     height: 36px;
-    top: 268px; 
+    top: 268px;
     background: #3864F2;
     border-radius: 4px;
   }
@@ -142,12 +142,10 @@ chef-table {
     text-decoration: underline;
   }
 
-  .no_border_th
- {
-  border: none;
-  font-size: 12px;
-  //border-left: none;
-}
+  .no_border_th {
+    border: none;
+    font-size: 12px;
+  }
 }
 
 chef-loading-spinner {
