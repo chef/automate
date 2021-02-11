@@ -1247,7 +1247,7 @@ func init() {
           },
           {
             "name": "search_query.per_page",
-            "description": "Number of results on each page.",
+            "description": "The number of results on each page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2248,25 +2248,6 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each page."
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.request.SearchQuery": {
-      "type": "object",
-      "properties": {
-        "q": {
-          "type": "string",
-          "description": "The search query used to identify a list of items."
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Starting page for the results."
-        },
-        "per_page": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Number of results on each page."
         }
       }
     },
