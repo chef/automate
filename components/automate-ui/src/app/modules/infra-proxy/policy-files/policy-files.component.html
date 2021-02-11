@@ -5,14 +5,20 @@
     <chef-table>
       <chef-thead>
         <chef-tr class="no_border_tr">
-          <chef-th class="no_border_th">Name of Policies</chef-th>
+          <chef-th class="no_border_th">Name</chef-th>
           <chef-th class="no_border_th">Group of Policies </chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
         <chef-tr *ngFor="let policyFile of policyFiles">
           <chef-td>{{ policyFile.name }}</chef-td>
           <chef-td>{{ policyFile.policy_group }}</chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
