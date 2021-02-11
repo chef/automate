@@ -15,13 +15,45 @@ chef-toolbar {
     position: absolute;
     right: 0;
   }
+
+  chef-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 16px;
+    float: right;
+    width: 150px;
+    height: 36px;
+    top: 268px; 
+    background: #3864F2;
+    border-radius: 4px;
+  }
 }
 
 chef-tab-selector {
   chef-option {
-    margin-right: 16px;
+    margin-right: 4px;
     color: $chef-primary-dark;
   }
+
+  ::ng-deep .selected {
+    background-color: #F3F6F8;
+  }
+
+  ::ng-deep .selected::before {
+    height: 4px;
+    background-color: #3864F2;
+  }
+
+  chef-option:focus {
+    outline: none;
+  }
+
+  ::ng-deep chef-option::before {
+    height: 4px;
+    background-color: #E7E9E9;
+  }
+
 }
 
 form {
@@ -109,6 +141,13 @@ chef-table {
     cursor: pointer;
     text-decoration: underline;
   }
+
+  .no_border_th
+ {
+  border: none;
+  font-size: 12px;
+  //border-left: none;
+}
 }
 
 chef-loading-spinner {
