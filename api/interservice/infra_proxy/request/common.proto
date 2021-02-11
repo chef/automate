@@ -8,7 +8,7 @@ message SearchQuery {
     // The search query used to identify a list of items.
     string q = 1;
     // Starting page for the results.
-	int32 page = 2;
-	// The number of results on each page.
-	int32 per_page = 3;
+    int32 page = 2;
+    // The number of results on each page.
+    int32 per_page = 3;
 }

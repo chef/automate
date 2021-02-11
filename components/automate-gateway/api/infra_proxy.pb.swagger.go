@@ -2543,7 +2543,7 @@ func init() {
         "page": {
           "type": "integer",
           "format": "int32",
-          "title": "Records page number"
+          "description": "Starting page for the results."
         },
         "total": {
           "type": "integer",

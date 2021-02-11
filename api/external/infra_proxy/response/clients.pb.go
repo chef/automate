@@ -32,7 +32,7 @@ type Clients struct {
 
 	// Client list.
 	Clients []*ClientListItem `protobuf:"bytes,1,rep,name=clients,proto3" json:"clients,omitempty"`
-	// Records page number
+	// Starting page for the results.
 	Page int32 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	// Total number of records.
 	Total int32 `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`

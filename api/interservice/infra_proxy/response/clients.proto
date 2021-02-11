@@ -6,8 +6,8 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/respo
 message Clients {
     // Client list.
     repeated ClientListItem clients = 1;
-     // Records page number
-     int32 page = 2;
+    // Starting page for the results.
+    int32 page = 2;
     // Total number of records.
     int32 total = 3;
 }
