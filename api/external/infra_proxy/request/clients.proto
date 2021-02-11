@@ -3,11 +3,15 @@ syntax = "proto3";
 package chef.automate.api.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
 
+import "external/infra_proxy/request/common.proto";
+
 message Clients {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
     string server_id = 2;
+    // Clients search query.
+    SearchQuery search_query = 3;
 }
 
 message Client {

@@ -14,6 +14,11 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 	req := &infra_req.Clients{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:       r.GetSearchQuery().GetQ(),
+			Page:    r.GetSearchQuery().GetPage(),
+			PerPage: r.GetSearchQuery().GetPerPage(),
+		},
 	}
 	res, err := a.client.GetClients(ctx, req)
 	if err != nil {
@@ -22,6 +27,8 @@ func (a *InfraProxyServer) GetClients(ctx context.Context, r *gwreq.Clients) (*g
 
 	return &gwres.Clients{
 		Clients: fromUpstreamClients(res.Clients),
+		Page:    res.GetPage(),
+		Total:   res.GetTotal(),
 	}, nil
 }
 
@@ -116,7 +123,6 @@ func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKe
 
 func fromUpstreamClients(clients []*infra_res.ClientListItem) []*gwres.ClientListItem {
 	ts := make([]*gwres.ClientListItem, len(clients))
-
 	for i, c := range clients {
 		ts[i] = &gwres.ClientListItem{
 			Name: c.GetName(),

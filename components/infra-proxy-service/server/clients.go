@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	chef "github.com/go-chef/chef"
 
@@ -20,24 +19,46 @@ type AccessKeyReq struct {
 	CreateKey      bool   `json:"create_key,omitempty"`
 }
 
-// GetClients get clients list
+// GetClients gets clients list
 func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*response.Clients, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	clients, err := c.client.Clients.List()
+	perPage := int(req.GetSearchQuery().GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery("client", searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
+
+	res, err := query.Do(c.client)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
+	}
+
 	return &response.Clients{
-		Clients: fromAPIToListClients(clients),
+		Clients: fromAPIToListClients(res.Rows),
+		Page:    int32(page),
+		Total:   int32(res.Total),
 	}, nil
 }
 
-// GetClient gets the client
+// GetClient gets client
 func (s *Server) GetClient(ctx context.Context, req *request.Client) (*response.Client, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -203,21 +224,14 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 
 }
 
-// fromAPIToListClients a response.Clients from a struct of ClientList
-func fromAPIToListClients(al chef.ApiClientListResult) []*response.ClientListItem {
+// fromAPIToListClients a response ClientListItems from a result map interface
+func fromAPIToListClients(al []interface{}) []*response.ClientListItem {
 	cl := make([]*response.ClientListItem, len(al))
-
-	index := 0
-	for c := range al {
+	for index, c := range al {
 		cl[index] = &response.ClientListItem{
-			Name: c,
+			Name: SafeStringFromMap(c.(map[string]interface{}), "name"),
 		}
-		index++
 	}
-
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
 
 	return cl
 }
