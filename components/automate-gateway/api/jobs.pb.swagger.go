@@ -455,7 +455,7 @@ func init() {
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "The number of result pages to return."
+          "description": "Starting page for the results."
         },
         "per_page": {
           "type": "integer",

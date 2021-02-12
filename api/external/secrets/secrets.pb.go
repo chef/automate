@@ -214,7 +214,7 @@ type Query struct {
 	Order   Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.secrets.Query_OrderType" json:"order,omitempty"`
 	// Sort the results on a specific field.
 	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	// The number of result pages to return.
+	// Starting page for the results.
 	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
 	// The number of results on each page.
 	PerPage int32 `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
