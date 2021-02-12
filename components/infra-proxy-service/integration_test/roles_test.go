@@ -40,26 +40,25 @@ func TestGetRoles(t *testing.T) {
 
 	t.Run("Roles list with a per_page search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
-			PerPage: 5,
+			PerPage: 1,
 		}
 		res, err := infraProxy.GetRoles(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
-		assert.Equal(t, 5, len(res.Roles))
+		assert.Equal(t, 1, len(res.Roles))
 	})
 
 	t.Run("Roles list with a page search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
 			Q:       "*:*",
 			Page:    1,
-			PerPage: 5,
+			PerPage: 1,
 		}
 		res, err := infraProxy.GetRoles(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 1, int(res.Page))
-		assert.Equal(t, 5, len(res.Roles))
 	})
 
 	t.Run("Roles list with an invalid query search param", func(t *testing.T) {
