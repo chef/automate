@@ -135,15 +135,19 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
 
 	res, err := query.Do(c.client)
-
-	s.service.Logger.Info(res)
 	if err != nil {
 		return nil, ParseAPIError(err)
+	}
+
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
 	}
 
 	return &response.DataBagItems{
 		Name:  req.Name,
 		Items: fromAPIToListDatabagItems(res.Rows),
+		Page:  int32(page),
 		Total: int32(res.Total),
 	}, nil
 }

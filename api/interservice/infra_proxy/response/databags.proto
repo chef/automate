@@ -13,8 +13,10 @@ message DataBagItems {
     string name = 1;
     // Data bags item list.
     repeated DataBagListItem items = 2;
+    // Starting page for the results.
+    int32 page = 3;
     // Total number of records.
-	int32 total = 3;
+	int32 total = 4;
 }
 
 message DataBagListItem {

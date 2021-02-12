@@ -62,6 +62,7 @@ func (a *InfraProxyServer) GetDataBagItems(ctx context.Context, r *gwreq.DataBag
 	return &gwres.DataBagItems{
 		Name:  res.GetName(),
 		Items: fromUpstreamDataBags(res.Items),
+		Page:  res.GetPage(),
 		Total: res.GetTotal(),
 	}, nil
 }
