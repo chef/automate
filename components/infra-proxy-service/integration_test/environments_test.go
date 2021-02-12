@@ -13,6 +13,10 @@ import (
 func TestGetEnvironments(t *testing.T) {
 	// rpc GetEnvironments (request.Environments) returns (response.Environments)
 	ctx := context.Background()
+
+	// Adds environments
+	addEnvironments(ctx, 10)
+
 	req := &request.Environments{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -21,7 +25,6 @@ func TestGetEnvironments(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	total := int(res.Total)
-	total = int(res.Total) + addEnvironments(ctx, 10)
 
 	t.Run("Environments list without a search params", func(t *testing.T) {
 		res, err := infraProxy.GetEnvironments(ctx, req)
@@ -86,7 +89,7 @@ func TestGetEnvironments(t *testing.T) {
 		assert.Equal(t, 0, len(res.Environments))
 	})
 
-	t.Run("Clients list with an invalid query search param", func(t *testing.T) {
+	t.Run("Environments list with an invalid query search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
 			Q:       "INVALID_QUERY",
 			Page:    0,
