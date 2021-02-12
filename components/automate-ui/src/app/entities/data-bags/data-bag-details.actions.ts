@@ -35,7 +35,7 @@ export class GetDataBagDetailsFailure implements Action {
 }
 
 export interface DataBagSearchPayload {
-  databagId: string;
+  databagName: string;
   server_id: string;
   org_id: string;
   name: string;

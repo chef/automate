@@ -10,7 +10,7 @@ import { routeParams } from 'app/route.selectors';
 
 import { GetDataBagDetails, DataBagSearchDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { allDataBagDetails, getAllStatus, getSearchStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
@@ -35,7 +35,8 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
   public activeClassName: string;
-  public searchItems = false;
+  public searching = false;
+  public searchValue: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -90,6 +91,20 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         this.dataBagsItemDetailsLoading = false;
       });
+
+    combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allDataBagDetails)
+    ]).pipe(
+      filter(([getDataBagsSt, _DataBagsState]) =>
+      getDataBagsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagsSt, DataBagsState]) =>
+        !isNil(DataBagsState)),
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getDataBagsSt, DataBagsState]) => {
+        this.dataBagDetails = DataBagsState;
+        this.searching = false;
+    });
   }
 
   public handleItemSelected(item: string, index: number): void {
@@ -125,9 +140,10 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   searchDataBagItems(currentText: string) {
-    this.searchItems = true;
+    this.searchValue = currentText;
+    this.searching = true;
     const payload = {
-      databagId: currentText,
+      databagName: currentText,
       server_id: this.serverId,
       org_id: this.orgId,
       name: this.dataBagsName,
@@ -136,9 +152,5 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new DataBagSearchDetails(payload));
-
-    setTimeout(() => {
-      this.searchItems = false;
-    }, 2000);
   }
 }

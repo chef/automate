@@ -34,7 +34,8 @@ export class DataBagsRequests {
 
   public getDataBagSearchDetails(payload: DataBagSearchPayload)
   : Observable<DataBagSearchResponse> {
-    const params = `search_query.q=id:${payload.databagId}*&search_query.page=${payload.page}&search_query.per_page=${payload.per_page}`;
+    const nameTarget = payload.databagName + '*';
+    const params = `search_query.q=id:${nameTarget}*&search_query.page=${payload.page}&search_query.per_page=${payload.per_page}`;
     const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/data_bags/${payload.name}?${params}`;
 
     return this.http.get<DataBagSearchResponse>(url, {headers});
