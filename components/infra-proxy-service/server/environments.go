@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"sort"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -14,20 +13,42 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
-// GetEnvironments get environments list
+// GetEnvironments gets environments list
 func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments) (*response.Environments, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	environments, err := c.client.Environments.List()
+	perPage := int(req.GetSearchQuery().GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery("environment", searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
+
+	res, err := query.Do(c.client)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
+	}
+
 	return &response.Environments{
-		Environments: fromAPIToListEnvironments(*environments),
+		Environments: fromAPIToListEnvironments(res.Rows),
+		Page:         int32(page),
+		Total:        int32(res.Total),
 	}, nil
 }
 
@@ -246,20 +267,14 @@ func (s *Server) GetEnvironmentRecipes(ctx context.Context, req *request.Environ
 }
 
 // fromAPIToListEnvironments a response.Environments from a struct of Environments
-func fromAPIToListEnvironments(al chef.EnvironmentResult) []*response.EnvironmentListItem {
+func fromAPIToListEnvironments(al []interface{}) []*response.EnvironmentListItem {
 	cl := make([]*response.EnvironmentListItem, len(al))
-
-	index := 0
-	for c := range al {
+	for index, e := range al {
 		cl[index] = &response.EnvironmentListItem{
-			Name: c,
+			Name:        SafeStringFromMap(e.(map[string]interface{}), "name"),
+			Description: SafeStringFromMap(e.(map[string]interface{}), "description"),
 		}
-		index++
 	}
-
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
 
 	return cl
 }

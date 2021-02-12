@@ -6,11 +6,17 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/respo
 message Environments {
     // Environments list.
     repeated EnvironmentListItem environments = 1;
+    // Starting page for the results.
+	int32 page = 2;
+    // Total number of records.
+	int32 total = 3;
 }
 
 message EnvironmentListItem {
     // Environment name.
     string name = 1;
+    // Environment description.
+    string description = 2;
 }
 
 message Environment {
