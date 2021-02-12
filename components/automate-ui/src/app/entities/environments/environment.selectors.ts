@@ -16,3 +16,8 @@ export const getAllStatus = createSelector(
   environmentState,
   (state) => state.getAllStatus
 );
+
+export const getSearchStatus = createSelector(
+  environmentState,
+  (state) => state.getSearchStatus
+);

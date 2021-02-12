@@ -14,7 +14,11 @@ import {
   EnvironmentActionTypes,
   GetEnvironment,
   GetEnvironmentSuccess,
-  GetEnvironmentFailure
+  GetEnvironmentFailure,
+  EnvironmentSearch,
+  EnvironmentSearchSuccess,
+  EnvironmentSearchSuccessPayload,
+  EnvironmentSearchFailure
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';
@@ -65,4 +69,24 @@ export class EnvironmentEffects {
         message: `Could not get environment: ${msg || payload.error}`
       });
     }));
+
+    @Effect()
+    getEnvironmentSearch$ = this.actions$.pipe(
+      ofType(EnvironmentActionTypes.SEARCH),
+      mergeMap((action: EnvironmentSearch) =>
+        this.requests.getEnvironmentSearch(action.payload).pipe(
+          map((resp: EnvironmentSearchSuccessPayload) => new EnvironmentSearchSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new EnvironmentSearchFailure(error))))));
+
+    @Effect()
+    getEnvironmentSearchFailure$ = this.actions$.pipe(
+      ofType(EnvironmentActionTypes.SEARCH_FAILURE),
+      map(({ payload }: EnvironmentSearchFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get infra Environment details: ${msg || payload.error}`
+        });
+      }));
 }

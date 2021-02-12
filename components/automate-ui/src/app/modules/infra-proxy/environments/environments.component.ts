@@ -3,15 +3,16 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { GetEnvironments } from 'app/entities/environments/environment.action';
+import { GetEnvironments, EnvironmentSearch } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
 import {
   allEnvironments,
-  getAllStatus as getAllEnvironmentsForOrgStatus
+  getAllStatus as getAllEnvironmentsForOrgStatus,
+  getSearchStatus
 } from 'app/entities/environments/environment.selectors';
 
 
@@ -30,6 +31,10 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public environments: Environment[] = [];
   public environmentsListLoading = true;
   public authFailure = false;
+  public environmentsSearch: Environment[];
+  public environmentsName: string;
+  public searching = false;
+  public searchText = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -56,10 +61,38 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
         this.authFailure = true;
       }
     });
+
+    combineLatest([
+      this.store.select(getSearchStatus),
+      this.store.select(allEnvironments)
+    ]).pipe(
+      filter(([getEnvironmentsSt, _EnvironmentsState]) =>
+      getEnvironmentsSt === EntityStatus.loadingSuccess),
+      filter(([_getEnvironmentsSt, EnvironmentsState]) =>
+        !isNil(EnvironmentsState)),
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
+      this.environmentsSearch = EnvironmentsState;
+      this.searching = false;
+    });
   }
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  toggleFilters(currentText: string) {
+    this.searching = true;
+    this.searchText = currentText;
+    const payload = {
+      environmentName: currentText,
+      page: 0,
+      per_page: this.environments.length,
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+
+    this.store.dispatch(new EnvironmentSearch(payload));
   }
 
   ngOnDestroy(): void {

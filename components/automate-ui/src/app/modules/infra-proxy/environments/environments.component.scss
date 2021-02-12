@@ -33,3 +33,18 @@ chef-loading-spinner {
   width: 100px;
   z-index: 199;
 }
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  width: initial;
+}
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
