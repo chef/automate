@@ -4,8 +4,12 @@
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <chef-table>
       <chef-thead>
-        <chef-tr>
-          <chef-th>Environments Name</chef-th>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th">Description</chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -13,6 +17,12 @@
           <chef-td>
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'environments', environment.name]">{{ environment.name }}</a>
           </chef-td>
+          <chef-td>
+            {{ environment.description }}
+          </chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
