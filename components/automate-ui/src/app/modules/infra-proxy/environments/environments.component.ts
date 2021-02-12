@@ -91,7 +91,8 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       org_id: this.orgId
     };
-    this.store.dispatch(new EnvironmentSearch(payload));    
+
+    this.store.dispatch(new EnvironmentSearch(payload));
   }
 
   ngOnDestroy(): void {
