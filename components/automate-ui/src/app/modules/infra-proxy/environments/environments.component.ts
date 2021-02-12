@@ -10,7 +10,6 @@ import { GetEnvironments } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
 import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
 
-
 @Component({
   selector: 'app-environments',
   templateUrl: './environments.component.html',
