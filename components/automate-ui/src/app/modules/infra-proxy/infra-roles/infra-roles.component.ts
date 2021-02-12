@@ -70,6 +70,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, rolesState]) => {
         this.roles = rolesState;
+        this.searching = false;
     });
 
   }
@@ -78,7 +79,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     this.searching = true;
     this.searchValue = currentText;
     const payload = {
-      roleId: currentText,
+      roleName: currentText,
       server_id: this.serverId,
       org_id: this.orgId,
       page: 0,
@@ -86,11 +87,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new RoleSearch(payload));
-
-    setTimeout(() => {
-      this.searching = false;
-    }, 2000);
-
 
   }
 

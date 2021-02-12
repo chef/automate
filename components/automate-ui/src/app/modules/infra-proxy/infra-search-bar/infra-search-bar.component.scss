@@ -30,6 +30,10 @@
     width: 100%;
   }
 
+  ::ng-deep .chef-input:active {
+    border-width: 0.5px;
+  }
+
   .search-items {
     margin-bottom: 25px;
     width: 100%;

@@ -49,7 +49,7 @@ export class GetRoleFailure implements Action {
 }
 
 export interface RoleSearchPayload {
-  roleId: string;
+  roleName: string;
   server_id: string;
   org_id: string;
   page: number;
