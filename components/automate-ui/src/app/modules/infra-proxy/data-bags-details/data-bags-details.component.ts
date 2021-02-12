@@ -36,7 +36,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public selectedItemDetails: object;
   public activeClassName: string;
   public searching = false;
-  public searchValue: string;
+  public searchValue: string = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,

@@ -34,7 +34,8 @@
           <chef-loading-spinner *ngIf="searching && !dataBagDetails.length" size="50" fixed></chef-loading-spinner>
           <div class="empty-section" *ngIf="!searching && !dataBagDetails.length">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
-            <p>No results found for "{{searchValue}}".</p>
+            <p *ngIf="searchValue === ''">No data bag items available</p>
+            <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
           </div>
           <div *ngIf="dataBagDetails.length">
             <ul id="accordion" class="accordion" >
