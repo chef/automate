@@ -31,7 +31,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public rolesListLoading = true;
   public authFailure = false;
   public searching = false;
-  public searchValue: string;
+  public searchValue = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
