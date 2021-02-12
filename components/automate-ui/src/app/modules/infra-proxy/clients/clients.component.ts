@@ -34,7 +34,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clientSearch: Client[];
   public clientName: string;
   public searching = false;
-  public searchText: string;
+  public searchText = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,

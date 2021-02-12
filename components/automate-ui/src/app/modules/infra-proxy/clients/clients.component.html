@@ -9,7 +9,8 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching && !clients.length" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !clients.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p>No results found for "{{searchText}}".</p>
+      <p *ngIf="searchText === ''">No results found for "{{searchText}}".</p>
+      <p *ngIf="searchText != ''">No client available.</p>
     </div>
     <chef-table *ngIf="clients.length">
       <chef-thead>
