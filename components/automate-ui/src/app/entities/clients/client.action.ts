@@ -50,7 +50,7 @@ export class GetClientFailure implements Action {
 }
 
 export interface ClientSearchPayload {
-  clientId: string;
+  clientName: string;
   server_id: string;
   org_id: string;
   page: number;

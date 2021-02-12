@@ -33,7 +33,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public clientSearch: Client[];
   public clientName: string;
-  public searchItems = false;
+  public searching = false;
   public searchText: string;
 
   constructor(
@@ -73,6 +73,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
     .subscribe(([_getClientsSt, clientsState]) => {
       this.clients = clientsState;
+      this.searching = false;
     });
   }
 
@@ -81,29 +82,16 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
-    this.searchItems = true;
-    if (currentText) {
-      this.searchText = currentText;
-      const payload = {
-        clientId: currentText,
-        page: 0,
-        per_page: this.clients.length,
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.clientName,
-        query: 'q'
-      };
-      
-       this.store.dispatch(new ClientSearch(payload));
-
-       setTimeout(() => {
-        this.searchItems = false;
-      }, 2000);
-    } else {
-      this.store.dispatch(new GetClients({
-        server_id: this.serverId, org_id: this.orgId
-      }));
-    }
+    this.searching = true;
+    this.searchText = currentText;
+    const payload = {
+      clientName: currentText,
+      page: 0,
+      per_page: this.clients.length,
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+    this.store.dispatch(new ClientSearch(payload));
   }
 
   ngOnDestroy(): void {

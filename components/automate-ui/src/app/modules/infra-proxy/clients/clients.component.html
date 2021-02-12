@@ -6,8 +6,8 @@
       <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="Clients">
       </app-infra-search-bar>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searchItems && !clients.length" size="50" fixed></chef-loading-spinner>
-    <div class="empty-section" *ngIf="!searchItems && !clients.length">
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching && !clients.length" size="50" fixed></chef-loading-spinner>
+    <div class="empty-section" *ngIf="!searching && !clients.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p>No results found for "{{searchText}}".</p>
     </div>
