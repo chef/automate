@@ -48,6 +48,7 @@ func (a *InfraProxyServer) GetRoles(ctx context.Context, r *gwreq.Roles) (*gwres
 
 	return &gwres.Roles{
 		Roles: fromUpstreamRoles(res.Roles),
+		Page:  res.GetPage(),
 		Total: res.GetTotal(),
 	}, nil
 }

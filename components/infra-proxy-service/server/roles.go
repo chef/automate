@@ -99,10 +99,14 @@ func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResu
 
 	defer res.Body.Close() // nolint: errcheck
 
+	if result.Start != 0 {
+		result.Start = result.Start / perPage
+	}
+
 	return result, nil
 }
 
-// GetRoles get roles list
+// GetRoles gets roles list
 func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Roles, error) {
 	client, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -116,6 +120,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 
 	return &response.Roles{
 		Roles: fromAPIToListRoles(result),
+		Page:  int32(result.Start),
 		Total: int32(result.Total),
 	}, nil
 }
