@@ -17,11 +17,3 @@ export interface ClientKey {
   expiration_date: string;
   private_key: string;
 }
-
-export interface ClientSearch {
-  name: string;
-  page: number;
-  count: number;
-  filter: string;
-  sort: string;
-}
