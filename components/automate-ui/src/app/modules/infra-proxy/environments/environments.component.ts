@@ -33,7 +33,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public environmentsSearch: Environment[];
   public environmentsName: string;
-  public searchItems = false;
+  public searching = false;
   public searchText: string;
 
   constructor(
@@ -73,6 +73,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
     .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
       this.environmentsSearch = EnvironmentsState;
+      this.searching = false;
     });
   }
 
@@ -81,42 +82,17 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   }
 
   toggleFilters(currentText: string) {
-    this.searchItems = true;
-    if (currentText) {
-      this.searchText = currentText;
-      const payload = {
-        environmentId: currentText,
-        page: 0,
-        per_page: this.environments.length,
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environmentsName,
-        query: 'q'
-      };
-      combineLatest([
-        this.store.select(getSearchStatus),
-        this.store.select(allEnvironments)
-      ]).pipe(
-        filter(([getEnvironmentsSt, _EnvironmentsState]) =>
-        getEnvironmentsSt === EntityStatus.loadingSuccess),
-        filter(([_getEnvironmentsSt, EnvironmentsState]) =>
-          !isNil(EnvironmentsState)),
-        takeUntil(this.isDestroyed))
-      .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
-        this.environmentsSearch = EnvironmentsState;
-      });
-      this.store.dispatch(new EnvironmentSearch(payload));
-
-      setTimeout(() => {
-        this.searchItems = false;
-      }, 2000);
-    } else {
-      this.store.dispatch(new GetEnvironments({
-        server_id: this.serverId, org_id: this.orgId
-      }));
-    }
+    this.searching = true;
+    this.searchText = currentText;
+    const payload = {
+      environmentName: currentText,
+      page: 0,
+      per_page: this.environments.length,
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+    this.store.dispatch(new EnvironmentSearch(payload));    
   }
-
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
