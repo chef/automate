@@ -33,7 +33,7 @@ export class EnvironmentRequests {
   public getEnvironmentSearch(payload: EnvironmentSearchPayload)
   : Observable<EnvironmentSearchResponse> {
     return this.http.get<EnvironmentSearchResponse>(
-      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/environments?search_query.${payload.query}=name:*${payload.environmentId}*`,
+      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/environments?search_query.q=name:*${payload.environmentName}*`,
       {headers}
     );
   }

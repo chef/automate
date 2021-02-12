@@ -49,11 +49,11 @@ export class GetEnvironmentFailure implements Action {
 }
 
 export interface EnvironmentSearchPayload {
-  environmentId: string;
-  server_id: string;
+  environmentName: string;
   org_id: string;
-  name: string;
-  query: string;
+  page: number;
+  per_page: number;
+  server_id: string;
 }
 
 export class EnvironmentSearch implements Action {
