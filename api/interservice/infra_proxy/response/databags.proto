@@ -4,22 +4,38 @@ package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
 message DataBags {
-    // List of data bags item.
-    repeated DataBagListItem data_bags = 2;
+    // Data bags list.
+    repeated DataBagListItem data_bags = 1;
+}
+
+message DataBagItems {
+    // Data bag name
+    string name = 1;
+    // Data bags item list.
+    repeated DataBagListItem items = 2;
+    // Starting page for the results.
+    int32 page = 3;
+    // Total number of records.
+    int32 total = 4;
 }
 
 message DataBagListItem {
-    // Name of the data bag item.
+    // Data bag item name.
     string name = 1;
 }
 
-message DataBag {
+message DataBagItem {
     // Data bag name.
     string name = 1;
     // Data bag item ID.
     string id = 2;
     // Stringified json of data bag item.
     string data = 3;
+}
+
+message DataBag {
+    // Data bag name.
+    string name = 1;
 }
 
 message CreateDataBag {

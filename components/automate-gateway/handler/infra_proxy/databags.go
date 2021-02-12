@@ -31,7 +31,6 @@ func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (
 	req := &infra_req.DataBags{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
-		Name:     r.Name,
 	}
 	res, err := a.client.GetDataBags(ctx, req)
 	if err != nil {
@@ -43,9 +42,34 @@ func (a *InfraProxyServer) GetDataBags(ctx context.Context, r *gwreq.DataBags) (
 	}, nil
 }
 
+// GetDataBagItems fetches an array of existing data bag items
+func (a *InfraProxyServer) GetDataBagItems(ctx context.Context, r *gwreq.DataBagItems) (*gwres.DataBagItems, error) {
+	req := &infra_req.DataBagItems{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:       r.GetSearchQuery().GetQ(),
+			PerPage: r.GetSearchQuery().GetPerPage(),
+			Page:    r.GetSearchQuery().GetPage(),
+		},
+	}
+	res, err := a.client.GetDataBagItems(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.DataBagItems{
+		Name:  res.GetName(),
+		Items: fromUpstreamDataBags(res.Items),
+		Page:  res.GetPage(),
+		Total: res.GetTotal(),
+	}, nil
+}
+
 // GetDataBagItem fetches an infra data bag item details
-func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBag) (*gwres.DataBag, error) {
-	req := &infra_req.DataBag{
+func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBagItem) (*gwres.DataBagItem, error) {
+	req := &infra_req.DataBagItem{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
 		Name:     r.Name,
@@ -56,20 +80,19 @@ func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBag)
 		return nil, err
 	}
 
-	return &gwres.DataBag{
+	return &gwres.DataBagItem{
 		Id:   res.GetId(),
 		Name: res.GetName(),
 		Data: res.GetData(),
 	}, nil
 }
 
-// DeleteDataBag deletes the data bag and data bag item
+// DeleteDataBag deletes the data bag
 func (a *InfraProxyServer) DeleteDataBag(ctx context.Context, r *gwreq.DataBag) (*gwres.DataBag, error) {
 	req := &infra_req.DataBag{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
 		Name:     r.Name,
-		Item:     r.Item,
 	}
 	res, err := a.client.DeleteDataBag(ctx, req)
 	if err != nil {
@@ -77,6 +100,24 @@ func (a *InfraProxyServer) DeleteDataBag(ctx context.Context, r *gwreq.DataBag) 
 	}
 
 	return &gwres.DataBag{
+		Name: res.GetName(),
+	}, nil
+}
+
+// DeleteDataBagItem deletes the data bag item
+func (a *InfraProxyServer) DeleteDataBagItem(ctx context.Context, r *gwreq.DataBagItem) (*gwres.DataBagItem, error) {
+	req := &infra_req.DataBagItem{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+		Item:     r.Item,
+	}
+	res, err := a.client.DeleteDataBagItem(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.DataBagItem{
 		Id:   res.GetId(),
 		Name: res.GetName(),
 		Data: res.GetData(),
@@ -123,7 +164,6 @@ func (a *InfraProxyServer) UpdateDataBagItem(ctx context.Context, r *gwreq.Updat
 
 func fromUpstreamDataBags(dbags []*infra_res.DataBagListItem) []*gwres.DataBagListItem {
 	ts := make([]*gwres.DataBagListItem, len(dbags))
-
 	for i, c := range dbags {
 		ts[i] = &gwres.DataBagListItem{
 			Name: c.GetName(),

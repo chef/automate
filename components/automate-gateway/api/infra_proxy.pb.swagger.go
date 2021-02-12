@@ -925,13 +925,6 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "name",
-            "description": "Data bag name.",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
@@ -984,6 +977,72 @@ func init() {
       }
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+      "get": {
+        "operationId": "InfraProxy_GetDataBagItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagItems"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "search_query.q",
+            "description": "The search query used to identify a list of items.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "search_query.page",
+            "description": "Starting page for the results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "search_query.per_page",
+            "description": "The number of results on each page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
       "delete": {
         "operationId": "InfraProxy_DeleteDataBag",
         "responses": {
@@ -1020,13 +1079,6 @@ func init() {
             "description": "Data bag name.",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "item",
-            "description": "Data bag item name.",
-            "in": "query",
-            "required": false,
             "type": "string"
           }
         ],
@@ -1153,7 +1205,57 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagItem"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Data bag name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item",
+            "description": "Data bag item name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "delete": {
+        "operationId": "InfraProxy_DeleteDataBagItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagItem"
             }
           },
           "default": {
@@ -2876,6 +2978,15 @@ func init() {
         "name": {
           "type": "string",
           "description": "Data bag name."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBagItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Data bag name."
         },
         "id": {
           "type": "string",
@@ -2884,6 +2995,32 @@ func init() {
         "data": {
           "type": "string",
           "description": "Stringified json of data bag item."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBagItems": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Data bag name"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
+          },
+          "description": "Data bags item list."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Starting page for the results."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of records."
         }
       }
     },

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sort"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -86,23 +85,21 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 	}, nil
 }
 
-// GetDataBags get data bags list
+// GetDataBags gets data bags list
 func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*response.DataBags, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:          "databag",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name != "" {
-		dataBags, err := c.client.DataBags.ListItems(req.Name)
-		if err != nil {
-			return nil, ParseAPIError(err)
-		}
-
-		return &response.DataBags{
-			DataBags: fromAPIToListDatabags(*dataBags),
-		}, nil
-
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	dataBags, err := c.client.DataBags.List()
@@ -115,17 +112,52 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 	}, nil
 }
 
-// GetDataBagItem get data bag
-func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
+// GetDataBagItems gets data bag items list
+func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems) (*response.DataBagItems, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	perPage := int(req.GetSearchQuery().GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(req.GetSearchQuery().GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery(req.Name, searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
+
+	res, err := query.Do(c.client)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	page := res.Start
+	if page != 0 {
+		page = page / perPage
+	}
+
+	return &response.DataBagItems{
+		Name:  req.Name,
+		Items: fromAPIToListDatabagItems(res.Rows),
+		Page:  int32(page),
+		Total: int32(res.Total),
+	}, nil
+}
+
+// GetDataBagItem gets data bag item
+func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBagItem) (*response.DataBagItem, error) {
 	err := validation.New(validation.Options{
-		Target:  "databag",
-		Request: *req,
-		Rules: validation.Rules{
-			"OrgId":    []string{"required"},
-			"ServerId": []string{"required"},
-			"Name":     []string{"required"},
-			"Item":     []string{"required"},
-		},
+		Target:          "databag",
+		Request:         *req,
+		RequiredDefault: true,
 	}).Validate()
 
 	if err != nil {
@@ -147,7 +179,7 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &response.DataBag{
+	return &response.DataBagItem{
 		Id:   fmt.Sprint(ic.(map[string]interface{})["id"]),
 		Name: req.Name,
 		Data: string(data),
@@ -155,16 +187,12 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 
 }
 
-// DeleteDataBag delete the data bag and data bag item
+// DeleteDataBag deletes the data bag
 func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*response.DataBag, error) {
 	err := validation.New(validation.Options{
-		Target:  "databag",
-		Request: *req,
-		Rules: validation.Rules{
-			"OrgId":    []string{"required"},
-			"ServerId": []string{"required"},
-			"Name":     []string{"required"},
-		},
+		Target:          "databag",
+		Request:         *req,
+		RequiredDefault: true,
 	}).Validate()
 
 	if err != nil {
@@ -176,18 +204,6 @@ func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*resp
 		return nil, err
 	}
 
-	if req.Item != "" {
-		err = c.client.DataBags.DeleteItem(req.Name, req.Item)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		return &response.DataBag{
-			Id:   req.Item,
-			Name: req.Name,
-		}, nil
-	}
-
 	data, err := c.client.DataBags.Delete(req.Name)
 	if err != nil {
 		return nil, ParseAPIError(err)
@@ -195,6 +211,35 @@ func (s *Server) DeleteDataBag(ctx context.Context, req *request.DataBag) (*resp
 
 	return &response.DataBag{
 		Name: data.Name,
+	}, nil
+
+}
+
+// DeleteDataBagItem deletes the data bag item
+func (s *Server) DeleteDataBagItem(ctx context.Context, req *request.DataBagItem) (*response.DataBagItem, error) {
+	err := validation.New(validation.Options{
+		Target:          "databag",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.client.DataBags.DeleteItem(req.Name, req.Item)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.DataBagItem{
+		Name: req.Name,
+		Id:   req.Item,
 	}, nil
 
 }
@@ -240,7 +285,6 @@ func (s *Server) UpdateDataBagItem(ctx context.Context, req *request.UpdateDataB
 // fromAPIToListDatabags a response.DataBags from a struct of DataBags
 func fromAPIToListDatabags(al chef.DataBagListResult) []*response.DataBagListItem {
 	cl := make([]*response.DataBagListItem, len(al))
-
 	index := 0
 	for c := range al {
 		cl[index] = &response.DataBagListItem{
@@ -249,9 +293,18 @@ func fromAPIToListDatabags(al chef.DataBagListResult) []*response.DataBagListIte
 		index++
 	}
 
-	sort.Slice(cl, func(i, j int) bool {
-		return cl[i].Name < cl[j].Name
-	})
+	return cl
+}
+
+// fromAPIToListDatabagItems a response data bag items from a struct
+func fromAPIToListDatabagItems(al []interface{}) []*response.DataBagListItem {
+	cl := make([]*response.DataBagListItem, len(al))
+	for index, c := range al {
+		rawData := c.(map[string]interface{})["raw_data"]
+		cl[index] = &response.DataBagListItem{
+			Name: rawData.(map[string]interface{})["id"].(string),
+		}
+	}
 
 	return cl
 }

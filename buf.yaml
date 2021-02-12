@@ -399,3 +399,6 @@ breaking:
     # later PR:
     # - external/oops/oops.proto
     - config/esgateway/config_request.proto
+    - external/infra_proxy/infra_proxy.proto
+    - external/infra_proxy/request/databags.proto
+    - external/infra_proxy/response/databags.proto

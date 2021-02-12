@@ -30,8 +30,8 @@ type DataBags struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// List of data bags item.
-	DataBags []*DataBagListItem `protobuf:"bytes,2,rep,name=data_bags,json=dataBags,proto3" json:"data_bags,omitempty" toml:"data_bags,omitempty" mapstructure:"data_bags,omitempty"`
+	// Data bags list.
+	DataBags []*DataBagListItem `protobuf:"bytes,1,rep,name=data_bags,json=dataBags,proto3" json:"data_bags,omitempty" toml:"data_bags,omitempty" mapstructure:"data_bags,omitempty"`
 }
 
 func (x *DataBags) Reset() {
@@ -73,19 +73,94 @@ func (x *DataBags) GetDataBags() []*DataBagListItem {
 	return nil
 }
 
+type DataBagItems struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Data bag name
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	// Data bags item list.
+	Items []*DataBagListItem `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty" toml:"items,omitempty" mapstructure:"items,omitempty"`
+	// Starting page for the results.
+	Page int32 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty" toml:"page,omitempty" mapstructure:"page,omitempty"`
+	// Total number of records.
+	Total int32 `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty" toml:"total,omitempty" mapstructure:"total,omitempty"`
+}
+
+func (x *DataBagItems) Reset() {
+	*x = DataBagItems{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DataBagItems) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataBagItems) ProtoMessage() {}
+
+func (x *DataBagItems) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataBagItems.ProtoReflect.Descriptor instead.
+func (*DataBagItems) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *DataBagItems) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DataBagItems) GetItems() []*DataBagListItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *DataBagItems) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *DataBagItems) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
 type DataBagListItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Name of the data bag item.
+	// Data bag item name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
 }
 
 func (x *DataBagListItem) Reset() {
 	*x = DataBagListItem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[1]
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -98,7 +173,7 @@ func (x *DataBagListItem) String() string {
 func (*DataBagListItem) ProtoMessage() {}
 
 func (x *DataBagListItem) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[1]
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -111,7 +186,7 @@ func (x *DataBagListItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataBagListItem.ProtoReflect.Descriptor instead.
 func (*DataBagListItem) Descriptor() ([]byte, []int) {
-	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{1}
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DataBagListItem) GetName() string {
@@ -121,7 +196,7 @@ func (x *DataBagListItem) GetName() string {
 	return ""
 }
 
-type DataBag struct {
+type DataBagItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -134,10 +209,72 @@ type DataBag struct {
 	Data string `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty" toml:"data,omitempty" mapstructure:"data,omitempty"`
 }
 
+func (x *DataBagItem) Reset() {
+	*x = DataBagItem{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DataBagItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataBagItem) ProtoMessage() {}
+
+func (x *DataBagItem) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataBagItem.ProtoReflect.Descriptor instead.
+func (*DataBagItem) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *DataBagItem) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DataBagItem) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DataBagItem) GetData() string {
+	if x != nil {
+		return x.Data
+	}
+	return ""
+}
+
+type DataBag struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Data bag name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+}
+
 func (x *DataBag) Reset() {
 	*x = DataBag{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[2]
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -150,7 +287,7 @@ func (x *DataBag) String() string {
 func (*DataBag) ProtoMessage() {}
 
 func (x *DataBag) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[2]
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -163,26 +300,12 @@ func (x *DataBag) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataBag.ProtoReflect.Descriptor instead.
 func (*DataBag) Descriptor() ([]byte, []int) {
-	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{2}
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DataBag) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *DataBag) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *DataBag) GetData() string {
-	if x != nil {
-		return x.Data
 	}
 	return ""
 }
@@ -199,7 +322,7 @@ type CreateDataBag struct {
 func (x *CreateDataBag) Reset() {
 	*x = CreateDataBag{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[3]
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -212,7 +335,7 @@ func (x *CreateDataBag) String() string {
 func (*CreateDataBag) ProtoMessage() {}
 
 func (x *CreateDataBag) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[3]
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,7 +348,7 @@ func (x *CreateDataBag) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDataBag.ProtoReflect.Descriptor instead.
 func (*CreateDataBag) Descriptor() ([]byte, []int) {
-	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{3}
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateDataBag) GetName() string {
@@ -249,7 +372,7 @@ type CreateDataBagItem struct {
 func (x *CreateDataBagItem) Reset() {
 	*x = CreateDataBagItem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[4]
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -262,7 +385,7 @@ func (x *CreateDataBagItem) String() string {
 func (*CreateDataBagItem) ProtoMessage() {}
 
 func (x *CreateDataBagItem) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[4]
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -275,7 +398,7 @@ func (x *CreateDataBagItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDataBagItem.ProtoReflect.Descriptor instead.
 func (*CreateDataBagItem) Descriptor() ([]byte, []int) {
-	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{4}
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateDataBagItem) GetName() string {
@@ -306,7 +429,7 @@ type UpdateDataBagItem struct {
 func (x *UpdateDataBagItem) Reset() {
 	*x = UpdateDataBagItem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[5]
+		mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -319,7 +442,7 @@ func (x *UpdateDataBagItem) String() string {
 func (*UpdateDataBagItem) ProtoMessage() {}
 
 func (x *UpdateDataBagItem) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[5]
+	mi := &file_interservice_infra_proxy_response_databags_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +455,7 @@ func (x *UpdateDataBagItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateDataBagItem.ProtoReflect.Descriptor instead.
 func (*UpdateDataBagItem) Descriptor() ([]byte, []int) {
-	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{5}
+	return file_interservice_infra_proxy_response_databags_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateDataBagItem) GetName() string {
@@ -359,33 +482,45 @@ var file_interservice_infra_proxy_response_databags_proto_rawDesc = []byte{
 	0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70,
 	0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x63, 0x0a,
 	0x08, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x73, 0x12, 0x57, 0x0a, 0x09, 0x64, 0x61, 0x74,
-	0x61, 0x5f, 0x62, 0x61, 0x67, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3a, 0x2e, 0x63,
+	0x61, 0x5f, 0x62, 0x61, 0x67, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3a, 0x2e, 0x63,
 	0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d,
 	0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e,
 	0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67,
 	0x4c, 0x69, 0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x08, 0x64, 0x61, 0x74, 0x61, 0x42, 0x61,
-	0x67, 0x73, 0x22, 0x25, 0x0a, 0x0f, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x4c, 0x69, 0x73,
-	0x74, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x41, 0x0a, 0x07, 0x44, 0x61, 0x74,
-	0x61, 0x42, 0x61, 0x67, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x23, 0x0a, 0x0d,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x12, 0x12, 0x0a,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
-	0x65, 0x22, 0x37, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x42,
-	0x61, 0x67, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x40, 0x0a, 0x11, 0x55, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x49, 0x74, 0x65, 0x6d, 0x12,
-	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x74, 0x65, 0x6d, 0x5f, 0x69, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x74, 0x65, 0x6d, 0x49, 0x64, 0x42, 0x40, 0x5a, 0x3e,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f,
-	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74,
-	0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f,
-	0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x67, 0x73, 0x22, 0x9e, 0x01, 0x0a, 0x0c, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x49, 0x74,
+	0x65, 0x6d, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x50, 0x0a, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73,
+	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3a, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x6e,
+	0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x74,
+	0x65, 0x6d, 0x52, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x14, 0x0a,
+	0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x74, 0x6f,
+	0x74, 0x61, 0x6c, 0x22, 0x25, 0x0a, 0x0f, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x4c, 0x69,
+	0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x45, 0x0a, 0x0b, 0x44, 0x61,
+	0x74, 0x61, 0x42, 0x61, 0x67, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a,
+	0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74,
+	0x61, 0x22, 0x1d, 0x0a, 0x07, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x12, 0x12, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x22, 0x23, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61,
+	0x67, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x37, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44,
+	0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x40,
+	0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x61, 0x74, 0x61, 0x42, 0x61, 0x67, 0x49,
+	0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x74, 0x65, 0x6d, 0x5f,
+	0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x74, 0x65, 0x6d, 0x49, 0x64,
+	0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63,
+	0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e,
+	0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -400,22 +535,25 @@ func file_interservice_infra_proxy_response_databags_proto_rawDescGZIP() []byte 
 	return file_interservice_infra_proxy_response_databags_proto_rawDescData
 }
 
-var file_interservice_infra_proxy_response_databags_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_interservice_infra_proxy_response_databags_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_interservice_infra_proxy_response_databags_proto_goTypes = []interface{}{
 	(*DataBags)(nil),          // 0: chef.automate.domain.infra_proxy.response.DataBags
-	(*DataBagListItem)(nil),   // 1: chef.automate.domain.infra_proxy.response.DataBagListItem
-	(*DataBag)(nil),           // 2: chef.automate.domain.infra_proxy.response.DataBag
-	(*CreateDataBag)(nil),     // 3: chef.automate.domain.infra_proxy.response.CreateDataBag
-	(*CreateDataBagItem)(nil), // 4: chef.automate.domain.infra_proxy.response.CreateDataBagItem
-	(*UpdateDataBagItem)(nil), // 5: chef.automate.domain.infra_proxy.response.UpdateDataBagItem
+	(*DataBagItems)(nil),      // 1: chef.automate.domain.infra_proxy.response.DataBagItems
+	(*DataBagListItem)(nil),   // 2: chef.automate.domain.infra_proxy.response.DataBagListItem
+	(*DataBagItem)(nil),       // 3: chef.automate.domain.infra_proxy.response.DataBagItem
+	(*DataBag)(nil),           // 4: chef.automate.domain.infra_proxy.response.DataBag
+	(*CreateDataBag)(nil),     // 5: chef.automate.domain.infra_proxy.response.CreateDataBag
+	(*CreateDataBagItem)(nil), // 6: chef.automate.domain.infra_proxy.response.CreateDataBagItem
+	(*UpdateDataBagItem)(nil), // 7: chef.automate.domain.infra_proxy.response.UpdateDataBagItem
 }
 var file_interservice_infra_proxy_response_databags_proto_depIdxs = []int32{
-	1, // 0: chef.automate.domain.infra_proxy.response.DataBags.data_bags:type_name -> chef.automate.domain.infra_proxy.response.DataBagListItem
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: chef.automate.domain.infra_proxy.response.DataBags.data_bags:type_name -> chef.automate.domain.infra_proxy.response.DataBagListItem
+	2, // 1: chef.automate.domain.infra_proxy.response.DataBagItems.items:type_name -> chef.automate.domain.infra_proxy.response.DataBagListItem
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_interservice_infra_proxy_response_databags_proto_init() }
@@ -437,7 +575,7 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			}
 		}
 		file_interservice_infra_proxy_response_databags_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DataBagListItem); i {
+			switch v := v.(*DataBagItems); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -449,7 +587,7 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			}
 		}
 		file_interservice_infra_proxy_response_databags_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DataBag); i {
+			switch v := v.(*DataBagListItem); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -461,7 +599,7 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			}
 		}
 		file_interservice_infra_proxy_response_databags_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateDataBag); i {
+			switch v := v.(*DataBagItem); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -473,7 +611,7 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			}
 		}
 		file_interservice_infra_proxy_response_databags_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateDataBagItem); i {
+			switch v := v.(*DataBag); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -485,6 +623,30 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			}
 		}
 		file_interservice_infra_proxy_response_databags_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDataBag); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_infra_proxy_response_databags_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDataBagItem); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_infra_proxy_response_databags_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateDataBagItem); i {
 			case 0:
 				return &v.state
@@ -503,7 +665,7 @@ func file_interservice_infra_proxy_response_databags_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_infra_proxy_response_databags_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
