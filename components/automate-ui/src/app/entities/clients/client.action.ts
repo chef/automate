@@ -8,7 +8,10 @@ export enum ClientActionTypes {
   GET_ALL_FAILURE = 'CLIENTS::GET_ALL::FAILURE',
   GET = 'CLIENTS::GET',
   GET_SUCCESS = 'CLIENTS::GET::SUCCESS',
-  GET_FAILURE = 'CLIENTS::GET::FAILURE'
+  GET_FAILURE = 'CLIENTS::GET::FAILURE',
+  SEARCH = 'CLIENTS::SEARCH',
+  SEARCH_SUCCESS = 'CLIENTS::SEARCH::SUCCESS',
+  SEARCH_FAILURE = 'CLIENTS::SEARCH::FAILURE'
 }
 
 export interface ClientsSuccessPayload {
@@ -46,10 +49,40 @@ export class GetClientFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface ClientSearchPayload {
+  clientName: string;
+  server_id: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+}
+
+export class ClientSearch implements Action {
+  readonly type = ClientActionTypes.SEARCH;
+  constructor(public payload: ClientSearchPayload) { }
+}
+
+export interface ClientSearchSuccessPayload {
+  clients: Client[];
+}
+
+export class ClientSearchSuccess implements Action {
+  readonly type = ClientActionTypes.SEARCH_SUCCESS;
+  constructor(public payload: ClientSearchSuccessPayload) { }
+}
+
+export class ClientSearchFailure implements Action {
+  readonly type = ClientActionTypes.SEARCH_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ClientActions =
   | GetClients
   | GetClientsSuccess
   | GetClientsFailure
   | GetClient
   | GetClientSuccess
-  | GetClientFailure;
+  | GetClientFailure
+  | ClientSearch
+  | ClientSearchSuccess
+  | ClientSearchFailure;
