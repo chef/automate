@@ -27,7 +27,7 @@ func TestGetEnvironments(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
-		assert.GreaterOrEqual(t, 0, int(res.Total))
+		assert.GreaterOrEqual(t, int(res.Total), 0)
 
 	})
 
@@ -41,7 +41,7 @@ func TestGetEnvironments(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 1, len(res.Environments))
-		assert.GreaterOrEqual(t, 0, int(res.Total))
+		assert.GreaterOrEqual(t, int(res.Total), 0)
 	})
 
 	t.Run("Environments list with a page search param", func(t *testing.T) {
@@ -55,21 +55,7 @@ func TestGetEnvironments(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, 1, int(res.Page))
 		assert.Equal(t, 1, len(res.Environments))
-		assert.GreaterOrEqual(t, 0, int(res.Total))
-	})
-
-	t.Run("Environments list with a page search param", func(t *testing.T) {
-		req.SearchQuery = &request.SearchQuery{
-			PerPage: 1,
-			Page:    1,
-		}
-
-		res, err := infraProxy.GetEnvironments(ctx, req)
-		assert.NoError(t, err)
-		assert.NotNil(t, res)
-		assert.Equal(t, 1, int(res.Page))
-		assert.Equal(t, 1, len(res.Environments))
-		assert.GreaterOrEqual(t, 0, int(res.Total))
+		assert.GreaterOrEqual(t, int(res.Total), 0)
 	})
 
 	t.Run("Environments list with an invalid query search param", func(t *testing.T) {

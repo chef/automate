@@ -72,19 +72,20 @@ func TestGetDatabagItems(t *testing.T) {
 
 	t.Run("items list with a per_page search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
-			PerPage: 5,
+			PerPage: 1,
 		}
 
 		res, err := infraProxy.GetDataBagItems(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.GetPage()))
-		assert.Equal(t, 5, len(res.GetItems()))
+		assert.Equal(t, 1, len(res.GetItems()))
+		assert.GreaterOrEqual(t, int(res.Total), 0)
 	})
 
 	t.Run("items list with a page search param", func(t *testing.T) {
 		req.SearchQuery = &request.SearchQuery{
-			PerPage: 5,
+			PerPage: 1,
 			Page:    1,
 		}
 
@@ -92,20 +93,8 @@ func TestGetDatabagItems(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 1, int(res.GetPage()))
-		assert.Equal(t, 5, len(res.GetItems()))
-	})
-
-	t.Run("items list with a page search param", func(t *testing.T) {
-		req.SearchQuery = &request.SearchQuery{
-			PerPage: 5,
-			Page:    1,
-		}
-
-		res, err := infraProxy.GetDataBagItems(ctx, req)
-		assert.NoError(t, err)
-		assert.NotNil(t, res)
-		assert.Equal(t, 1, int(res.GetPage()))
-		assert.Equal(t, 5, len(res.GetItems()))
+		assert.Equal(t, 1, len(res.GetItems()))
+		assert.GreaterOrEqual(t, int(res.Total), 0)
 	})
 
 	t.Run("items list with an invalid query search param", func(t *testing.T) {
