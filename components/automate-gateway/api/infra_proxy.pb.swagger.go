@@ -1887,6 +1887,29 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "search_query.q",
+            "description": "The search query used to identify a list of items.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "search_query.page",
+            "description": "Starting page for the results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "search_query.per_page",
+            "description": "The number of results on each page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -3556,6 +3579,16 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RoleListItem"
           },
           "description": "List of the roles item."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Starting page for the results."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of records."
         }
       }
     },
