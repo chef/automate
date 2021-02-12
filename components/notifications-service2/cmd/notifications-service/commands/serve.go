@@ -1,11 +1,8 @@
 package commands
 
 import (
-	"fmt"
-	"time"
-
-	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
+	"github.com/chef/automate/components/notifications-service2/pkg/server"
 	"github.com/chef/automate/components/notifications-service2/pkg/storage/postgres"
 	"github.com/spf13/cobra"
 )
@@ -40,11 +37,6 @@ func runServeCommand(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	for {
-		fmt.Println("hello from notifications-service2")
-		s, _ := toml.Marshal(c)
-		fmt.Println(string(s))
-		time.Sleep(5 * time.Second)
-	}
-	return nil
+
+	return server.RunGRPCServer(c)
 }
