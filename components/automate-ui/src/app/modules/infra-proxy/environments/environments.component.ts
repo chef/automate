@@ -34,7 +34,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public environmentsSearch: Environment[];
   public environmentsName: string;
   public searching = false;
-  public searchText: '';
+  public searchText = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
