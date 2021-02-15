@@ -18,7 +18,7 @@
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'environments', environment.name]">{{ environment.name }}</a>
           </chef-td>
           <chef-td>
-            {{ environment.description }}
+            {{ (environment.description.length &gt; 30)? (environment.description | slice:0:30)+'...' : environment.description }}
           </chef-td>
           <chef-td></chef-td>
           <chef-td></chef-td>
