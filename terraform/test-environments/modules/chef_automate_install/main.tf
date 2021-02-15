@@ -194,8 +194,8 @@ EOF
 -A OUTPUT -p udp -m udp --dport 123 -j ACCEPT
 
 # allow outbound traffic to Active Directory servers for SSH auth
--A OUTPUT -d 172.21.8.10/32 -p tcp -m tcp --dport 636 -j ACCEPT
--A OUTPUT -d 172.21.8.74/32 -p tcp -m tcp --dport 636 -j ACCEPT
+-A OUTPUT -d 172.21.8.50/32 -p tcp -m tcp --dport 636 -j ACCEPT
+-A OUTPUT -d 172.21.8.105/32 -p tcp -m tcp --dport 636 -j ACCEPT
 
 # allow outbound traffic to redis servers for sensu monitoring
 -A OUTPUT -d 172.21.240.208/32 -p tcp -m tcp --dport 6379 -j ACCEPT
