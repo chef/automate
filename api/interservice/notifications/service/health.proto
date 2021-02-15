@@ -1,0 +1,15 @@
+syntax = "proto3";
+package chef.automate.domain.notifications.service;
+
+option go_package = "github.com/chef/automate/api/interservice/notifications/service";
+
+///
+// Health check and server metadata messages and responses
+///
+
+message VersionRequest {
+}
+
+message VersionResponse {
+  string version  = 1;
+}
