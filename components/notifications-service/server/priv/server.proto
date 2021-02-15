@@ -2,8 +2,16 @@ syntax = "proto3";
 package notifications;
 
 option go_package = ".;api";
-// Core RPC definitions for the notifications service, which includes
-// posting notifications and managing rules.
+
+///
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// NOTICE!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// These proto files are moving to api/interservice as part of a project to
+// rewrite this service. Changes to this file must be accompanied by
+// corresponding changes to the copy of this file in
+// api/interservice/notifications/service.
+///
 
 import "notifications.proto";
 import "rules.proto";

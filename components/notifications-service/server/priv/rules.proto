@@ -2,9 +2,17 @@ syntax = "proto3";
 package notifications;
 
 option go_package = ".;api";
-////
-// Rules management messages and responses
-////
+
+///
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// NOTICE!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// These proto files are moving to api/interservice as part of a project to
+// rewrite this service. Changes to this file must be accompanied by
+// corresponding changes to the copy of this file in
+// api/interservice/notifications/service.
+///
+
 message Empty { }
 message SlackAlert {
   string url = 1;
