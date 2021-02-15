@@ -40,9 +40,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
-  public OrgDetailsViewFlagOn: boolean;
-  public PolicyFilesViewFlagOn: boolean;
-  public ResetAdminKeyViewFlagOn: boolean;
+  public chefInfraViewsFeatureFlagOn: boolean;
 
   previousRoute$: Observable<RouterState>;
 
@@ -53,12 +51,8 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     private featureFlagsService: FeatureFlagsService
   ) {
       // feature flag enable and disable the details tab
-      this.OrgDetailsViewFlagOn =
-        this.featureFlagsService.getFeatureStatus('chefInfraOrgDetailsView');
-      this.PolicyFilesViewFlagOn =
-        this.featureFlagsService.getFeatureStatus('chefInfraPolicyFilesView');
-      this.ResetAdminKeyViewFlagOn =
-        this.featureFlagsService.getFeatureStatus('chefInfraResetAdminKeyView');
+      this.chefInfraViewsFeatureFlagOn =
+        this.featureFlagsService.getFeatureStatus('chefInfraViewsFeatureFlagOn');
 
       this.previousRoute$ = this.store.select(previousRoute);
       // condition for breadcrumb to select specific tab
