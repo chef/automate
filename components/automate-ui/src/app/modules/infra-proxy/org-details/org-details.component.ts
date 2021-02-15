@@ -52,7 +52,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   ) {
       // feature flag enable and disable the details tab
       this.chefInfraViewsFeatureFlagOn =
-        this.featureFlagsService.getFeatureStatus('chefInfraViewsFeatureFlagOn');
+        this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
 
       this.previousRoute$ = this.store.select(previousRoute);
       // condition for breadcrumb to select specific tab
