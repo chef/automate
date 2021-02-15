@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/reflection"
 
-	notifications "github.com/chef/automate/components/notifications-client/api"
+	notifications "github.com/chef/automate/api/interservice/notifications/service"
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
