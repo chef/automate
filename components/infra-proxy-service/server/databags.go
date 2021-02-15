@@ -119,35 +119,15 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 		return nil, err
 	}
 
-	perPage := int(req.GetSearchQuery().GetPerPage())
-	if perPage == 0 {
-		perPage = 1000
-	}
-
-	searchStr := string(req.GetSearchQuery().GetQ())
-	if searchStr == "" {
-		searchStr = "*:*"
-	}
-	query, err := c.client.Search.NewQuery(req.Name, searchStr)
-	query.Rows = perPage
-
-	// Query accepts start param, The row at which return results begin.
-	query.Start = int(req.GetSearchQuery().GetPage()) * perPage
-
-	res, err := query.Do(c.client)
+	res, err := c.SearchObjectsWithDefaults(req.Name, req.SearchQuery)
 	if err != nil {
 		return nil, ParseAPIError(err)
-	}
-
-	page := res.Start
-	if page != 0 {
-		page = page / perPage
 	}
 
 	return &response.DataBagItems{
 		Name:  req.Name,
 		Items: fromAPIToListDatabagItems(res.Rows),
-		Page:  int32(page),
+		Page:  int32(res.Start),
 		Total: int32(res.Total),
 	}, nil
 }

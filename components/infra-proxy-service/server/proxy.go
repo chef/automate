@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	secrets "github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 )
 
@@ -28,6 +29,41 @@ type ChefConfig struct {
 // ChefClient type definition for the chef client
 type ChefClient struct {
 	client *chef.Client
+}
+
+// SearchObjectsWithDefaults constructs the search query with defaults params values
+// Default per_page is set 1000
+// Default search term q is "*:*"
+// Default page is set to 0
+func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *request.SearchQuery) (chef.SearchResult, error) {
+	var result chef.SearchResult
+	perPage := int(searchQuery.GetPerPage())
+	if perPage == 0 {
+		perPage = 1000
+	}
+
+	searchStr := string(searchQuery.GetQ())
+	if searchStr == "" {
+		searchStr = "*:*"
+	}
+	query, err := c.client.Search.NewQuery(searchIndex, searchStr)
+	query.Rows = perPage
+
+	// Query accepts start param, The row at which return results begin.
+	query.Start = int(searchQuery.GetPage()) * perPage
+
+	res, err := query.Do(c.client)
+	if err != nil {
+		return result, ParseAPIError(err)
+	}
+
+	// Chef infra Server search API returning starting page like, starting of records offset value
+	// converting it to page value with respect to per page.
+	if res.Start != 0 {
+		res.Start = res.Start / perPage
+	}
+
+	return result, nil
 }
 
 // NewChefClient is an infra-proxy server

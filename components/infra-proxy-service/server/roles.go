@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	chef "github.com/go-chef/chef"
@@ -12,24 +11,27 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
-
-// RoleListResult role list result from Search API
-type RoleListResult struct {
-	Total int          `json:"total"`
-	Start int          `json:"start"`
-	Rows  []*chef.Role `json:"rows"`
-}
 
 // CreateRole creates the role
 func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "role",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	runList := req.RunList
@@ -66,54 +68,26 @@ func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*resp
 	}, nil
 }
 
-// SearchRoles gets roles list from Chef Infra Server search API.
-func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResult, error) {
-	var result RoleListResult
-	perPage := int(searchQuery.GetPerPage())
-	if perPage == 0 {
-		perPage = 1000
-	}
-
-	searchStr := string(searchQuery.GetQ())
-	if searchStr == "" {
-		searchStr = "*:*"
-	}
-
-	query := chef.SearchQuery{
-		Index: "role",
-		Query: searchStr,
-		Start: int(searchQuery.GetPage()) * perPage,
-		Rows:  perPage,
-	}
-
-	fullURL := fmt.Sprintf("search/%s", query)
-	newReq, err := c.client.NewRequest("GET", fullURL, nil)
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	res, err := c.client.Do(newReq, &result)
-	if err != nil {
-		return result, ParseAPIError(err)
-	}
-
-	defer res.Body.Close() // nolint: errcheck
-
-	if result.Start != 0 {
-		result.Start = result.Start / perPage
-	}
-
-	return result, nil
-}
-
 // GetRoles gets roles list
 func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Roles, error) {
+	err := validation.New(validation.Options{
+		Target:  "role",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+		},
+	}).Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	client, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := client.SearchRoles(req.SearchQuery)
+	result, err := client.SearchObjectsWithDefaults("role", req.SearchQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -129,19 +103,29 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 // In order to get expanded runlist it required to have all roles if any
 // RunList contains the another Role's RunList.
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
+	err := validation.New(validation.Options{
+		Target:          "role",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := c.SearchRoles(&request.SearchQuery{})
+	result, err := c.SearchObjectsWithDefaults("role", &request.SearchQuery{})
 	if err != nil {
-		return nil, err
+		return nil, ParseAPIError(err)
 	}
 
-	role := findRoleFromRoleList(req.Name, &result)
-	if role == nil {
-		return nil, status.Errorf(codes.NotFound, "no %s found with name %q", "role", req.Name)
+	role, err := c.client.Roles.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
 	}
 
 	defaultAttributes, err := json.Marshal(role.DefaultAttributes)
@@ -154,7 +138,7 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	expandedRunList, err := toResponseExpandedRunList(role, &result)
+	expandedRunList, err := toResponseExpandedRunList(role)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -174,13 +158,18 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 
 // DeleteRole deletes the role
 func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.Role, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:          "role",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	err = c.client.Roles.Delete(req.Name)
@@ -196,13 +185,22 @@ func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.R
 
 // UpdateRole updates the role
 func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*response.Role, error) {
-	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	err := validation.New(validation.Options{
+		Target:  "role",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "must supply role name")
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
 	}
 
 	runList := req.RunList
@@ -273,10 +271,9 @@ func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	return nil
 }
 
-func toResponseExpandedRunList(role *chef.Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
+func toResponseExpandedRunList(role *chef.Role) ([]*response.ExpandedRunList, error) {
 	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
-
-	runList, err := GetExpandRunlistFromRole(role.RunList, result)
+	runList, err := getExpandRunlistFromRole(role.RunList)
 	if err != nil {
 		return nil, err
 	}
@@ -303,10 +300,9 @@ func toResponseExpandedRunList(role *chef.Role, result *RoleListResult) ([]*resp
 }
 
 // GetExpandRunlistFromRole expands the run-list based on role's run-list
-func GetExpandRunlistFromRole(runlist []string, result *RoleListResult) ([]*response.RunList, error) {
+func GetExpandRunlistFromRole(runlist []string) ([]*response.RunList, error) {
 	runList := make([]*response.RunList, len(runlist))
 	for i, item := range runlist {
-
 		newItem, err := chef.NewRunListItem(item)
 		if err != nil {
 			return nil, err
@@ -318,7 +314,7 @@ func GetExpandRunlistFromRole(runlist []string, result *RoleListResult) ([]*resp
 		}
 
 		if newItem.IsRole() {
-			currentRole := findRoleFromRoleList(newItem.Name, result)
+			currentRole := 
 			if currentRole != nil {
 				newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
 			}
