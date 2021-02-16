@@ -5,7 +5,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/components/notifications-client/api"
+	api "github.com/chef/automate/api/interservice/notifications/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +44,8 @@ func TestWebhookValidator(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, api.URLValidationResponse_OK, res.Code)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 
@@ -64,7 +65,8 @@ func TestWebhookValidator(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, api.URLValidationResponse_OK, res.Code)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		assert.True(t, postData.BasicAuthUsed)
@@ -87,7 +89,8 @@ func TestWebhookValidator(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, api.URLValidationResponse_OK, res.Code)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 		assert.False(t, postData.BasicAuthUsed)
 	})
@@ -124,7 +127,8 @@ func TestWebhookValidator(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, api.URLValidationResponse_OK, res.Code)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 		assert.True(t, postData.BasicAuthUsed)
 		assert.Equal(t, "integration_test_username_secretstore", postData.BasicAuthUsername)

@@ -56,8 +56,20 @@ func (n *notificationReceiver) WebhookURL() string {
 	return fmt.Sprintf("%s/webhookalert/", n.server.URL)
 }
 
-func (n *notificationReceiver) GetLastPost() *notificationPost {
-	return <-n.posts
+func (n *notificationReceiver) GetLastPost() (*notificationPost, error) {
+	timeoutSig := make(chan (int))
+	timeoutLimit := 5 * time.Second
+	canceler := time.AfterFunc(timeoutLimit, func() {
+		timeoutSig <- 1
+	})
+
+	select {
+	case p := <-n.posts:
+		canceler.Stop()
+		return p, nil
+	case <-timeoutSig:
+		return nil, fmt.Errorf("no post received by the test server before timeout of %s", timeoutLimit)
+	}
 }
 
 // CheckForPost: Check if there is a post in the posts channel, and return it

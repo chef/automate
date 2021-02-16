@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/components/notifications-client/api"
+	api "github.com/chef/automate/api/interservice/notifications/service"
 	"github.com/chef/automate/lib/pcmp/passert"
 )
 
