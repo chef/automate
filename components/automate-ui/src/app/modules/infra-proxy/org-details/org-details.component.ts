@@ -8,6 +8,7 @@ import { NgrxStateAtom, RouterState } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, previousRoute } from 'app/route.selectors';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { EntityStatus } from 'app/entities/entities';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -39,13 +40,20 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
+  public chefInfraViewsFeatureFlagOn: boolean;
+
   previousRoute$: Observable<RouterState>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    private featureFlagsService: FeatureFlagsService
   ) {
+      // feature flag enable and disable the details tab
+      this.chefInfraViewsFeatureFlagOn =
+        this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
+
       this.previousRoute$ = this.store.select(previousRoute);
       // condition for breadcrumb to select specific tab
       this.previousRoute$.subscribe((params: Params) => {

@@ -19,10 +19,11 @@ export class UIComponent implements OnInit, AfterViewChecked {
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
   experimentalFeatures: Array<Feature> = [
     {
-      key: 'chefInfraServerViews',
-      name: 'Chef Infra Server Views'
+      key: 'chefInfraTabsViews',
+      name: 'Chef Infra Server Views (remaining)'
     }
   ];
+
   betaFeatures: Array<Feature> = [
     {
       key: 'servicenow_cmdb',
