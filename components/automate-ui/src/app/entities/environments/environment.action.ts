@@ -6,9 +6,9 @@ export enum EnvironmentActionTypes {
   GET = 'ENVIRONMENTS::GET',
   GET_SUCCESS = 'ENVIRONMENTS::GET::SUCCESS',
   GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE',
-  SEARCH = 'ENVIRONMENTS::SEARCH',
-  SEARCH_SUCCESS = 'ENVIRONMENTS::SEARCH::SUCCESS',
-  SEARCH_FAILURE = 'ENVIRONMENTS::SEARCH::FAILURE'
+  GETALL = 'ENVIRONMENTS::GETALL',
+  GETALL_SUCCESS = 'ENVIRONMENTS::GETALL::SUCCESS',
+  GETALL_FAILURE = 'ENVIRONMENTS::GETALL::FAILURE'
 }
 
 export interface EnvironmentsSuccessPayload {
@@ -30,7 +30,7 @@ export class GetEnvironmentFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export interface EnvironmentSearchPayload {
+export interface EnvironmentGetAllPayload {
   environmentName: string;
   org_id: string;
   page: number;
@@ -38,23 +38,23 @@ export interface EnvironmentSearchPayload {
   server_id: string;
 }
 
-export class EnvironmentSearch implements Action {
-  readonly type = EnvironmentActionTypes.SEARCH;
-  constructor(public payload: EnvironmentSearchPayload) { }
+export class EnvironmentGetAll implements Action {
+  readonly type = EnvironmentActionTypes.GETALL;
+  constructor(public payload: EnvironmentGetAllPayload) { }
 }
 
-export interface EnvironmentSearchSuccessPayload {
+export interface EnvironmentGetAllSuccessPayload {
   environments: Environment[];
   total: number;
 }
 
-export class EnvironmentSearchSuccess implements Action {
-  readonly type = EnvironmentActionTypes.SEARCH_SUCCESS;
-  constructor(public payload: EnvironmentSearchSuccessPayload) { }
+export class EnvironmentGetAllSuccess implements Action {
+  readonly type = EnvironmentActionTypes.GETALL_SUCCESS;
+  constructor(public payload: EnvironmentGetAllSuccessPayload) { }
 }
 
-export class EnvironmentSearchFailure implements Action {
-  readonly type = EnvironmentActionTypes.SEARCH_FAILURE;
+export class EnvironmentGetAllFailure implements Action {
+  readonly type = EnvironmentActionTypes.GETALL_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -62,7 +62,7 @@ export type EnvironmentActions =
   | GetEnvironment
   | GetEnvironmentSuccess
   | GetEnvironmentFailure
-  | EnvironmentSearch
-  | EnvironmentSearchSuccess
-  | EnvironmentSearchFailure;
-  
+  | EnvironmentGetAll
+  | EnvironmentGetAllSuccess
+  | EnvironmentGetAllFailure;
+

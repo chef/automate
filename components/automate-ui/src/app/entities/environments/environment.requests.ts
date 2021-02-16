@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { EnvironmentSearchPayload } from './environment.action';
+import { EnvironmentGetAllPayload } from './environment.action';
 import { Environment } from './environment.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
-export interface EnvironmentSearchResponse {
+export interface EnvironmentGetAllResponse {
   environments: any[];
   total: number;
 }
@@ -24,8 +24,8 @@ export class EnvironmentRequests {
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}`, {headers});
   }
 
-  public getEnvironments(payload: EnvironmentSearchPayload)
-  : Observable<EnvironmentSearchResponse> {
+  public getEnvironments(payload: EnvironmentGetAllPayload)
+  : Observable<EnvironmentGetAllResponse> {
     const wildCardSearch = '*';
     const target = payload.environmentName !== '' ?
      'name:' + wildCardSearch + payload.environmentName : wildCardSearch + ':';
@@ -34,6 +34,6 @@ export class EnvironmentRequests {
 
      const params = `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`;
     const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/environments?${params}`;
-    return this.http.get<EnvironmentSearchResponse>(url, {headers});    
+    return this.http.get<EnvironmentGetAllResponse>(url, {headers});    
   }
 }

@@ -6,7 +6,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { EnvironmentSearch } from 'app/entities/environments/environment.action';
+import { EnvironmentGetAll } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
 import { getSearchStatus, environmentList } from 'app/entities/environments/environment.selectors';
 
@@ -31,7 +31,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchText = '';
   public total: number;
-  public per_page = 1;
+  public per_page = 20;
   public page = 1;
   public environmentListState;
   
@@ -46,12 +46,12 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     const payload = {
         environmentName: '',
         page: 1,
-        per_page: 1,
+        per_page: this.per_page,
         server_id: this.serverId,
         org_id: this.orgId
       };
   
-      this.store.dispatch(new EnvironmentSearch(payload));
+      this.store.dispatch(new EnvironmentGetAll(payload));
 
     combineLatest([
         this.store.select(getSearchStatus),
@@ -78,28 +78,25 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     this.searching = true;
     this.environmentsListLoading = true;
     this.searchText = currentText;
-    const payload = {
-      environmentName: currentText,
-      page: this.page,
-      per_page: 1,
-      server_id: this.serverId,
-      org_id: this.orgId
-    };
-
-    this.store.dispatch(new EnvironmentSearch(payload));
+    this.getData()
   }
 
   onPageChange(event: number): void {
     this.page = event;
     this.environmentsListLoading = true;
-    const params = {
+    this.getData()
+  }
+
+  getData() {
+    const payload = {
       environmentName: this.searchText,
       page: this.page,
-      per_page: 1,
+      per_page: this.per_page,
       server_id: this.serverId,
       org_id: this.orgId
     };
-    this.store.dispatch(new EnvironmentSearch(params));
+
+    this.store.dispatch(new EnvironmentGetAll(payload));
   }
 
   ngOnDestroy(): void {

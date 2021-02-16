@@ -11,10 +11,10 @@ import {
   GetEnvironment,
   GetEnvironmentSuccess,
   GetEnvironmentFailure,
-  EnvironmentSearch,
-  EnvironmentSearchSuccess,
-  EnvironmentSearchSuccessPayload,
-  EnvironmentSearchFailure
+  EnvironmentGetAll,
+  EnvironmentGetAllSuccess,
+  EnvironmentGetAllSuccessPayload,
+  EnvironmentGetAllFailure
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';
@@ -48,17 +48,17 @@ export class EnvironmentEffects {
 
     @Effect()
     getEnvironmentSearch$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.SEARCH),
-      mergeMap((action: EnvironmentSearch) =>
+      ofType(EnvironmentActionTypes.GETALL),
+      mergeMap((action: EnvironmentGetAll) =>
         this.requests.getEnvironments(action.payload).pipe(
-          map((resp: EnvironmentSearchSuccessPayload) => new EnvironmentSearchSuccess(resp)),
+          map((resp: EnvironmentGetAllSuccessPayload) => new EnvironmentGetAllSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new EnvironmentSearchFailure(error))))));
+            observableOf(new EnvironmentGetAllFailure(error))))));
 
     @Effect()
     getEnvironmentSearchFailure$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.SEARCH_FAILURE),
-      map(({ payload }: EnvironmentSearchFailure) => {
+      ofType(EnvironmentActionTypes.GETALL_FAILURE),
+      map(({ payload }: EnvironmentGetAllFailure) => {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,

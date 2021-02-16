@@ -14,7 +14,7 @@ export interface EnvironmentEntityState extends EntityState<Environment> {
   };
 }
 
-const GET_SEARCH_STATUS = 'getSearchStatus';
+const GET_GETALL_STATUS = 'getSearchStatus';
 
 export const environmentEntityAdapter: EntityAdapter<Environment> =
   createEntityAdapter<Environment>({
@@ -31,18 +31,18 @@ export function environmentEntityReducer(
   action: EnvironmentActions): EnvironmentEntityState {
 
   switch (action.type) {
-    case EnvironmentActionTypes.SEARCH:
-      return set(GET_SEARCH_STATUS, EntityStatus.loading, environmentEntityAdapter
+    case EnvironmentActionTypes.GETALL:
+      return set(GET_GETALL_STATUS, EntityStatus.loading, environmentEntityAdapter
         .removeAll(state));
 
-    case EnvironmentActionTypes.SEARCH_SUCCESS:
+    case EnvironmentActionTypes.GETALL_SUCCESS:
       return pipe(
         set('environmentList.items', action.payload.environments || []),
         set('environmentList.total', action.payload.total || 0)
         )(state) as EnvironmentEntityState;
 
-    case EnvironmentActionTypes.SEARCH_FAILURE:
-      return set(GET_SEARCH_STATUS, EntityStatus.loadingFailure, state);
+    case EnvironmentActionTypes.GETALL_FAILURE:
+      return set(GET_GETALL_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;
