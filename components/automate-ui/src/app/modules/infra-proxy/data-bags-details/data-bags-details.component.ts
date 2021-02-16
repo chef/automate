@@ -38,7 +38,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public page = 1;
-  public per_page = 10;
+  public per_page = 9;
   public total: number;
 
   constructor(
