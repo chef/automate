@@ -9,8 +9,7 @@ export enum DataBagsActionTypes {
 }
 
 export interface DataBagsSuccessPayload {
-  dataBags: DataBags[];
-  total: number;
+  data_bags: DataBags[];
 }
 
 export class GetDataBags implements Action {

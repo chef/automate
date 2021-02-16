@@ -14,7 +14,7 @@ import { ClientEffects } from './entities/clients/client.effects';
 // CredentialsEffects will be removed when the credentials page is refactored.
 import { CredentialEffects } from './entities/credentials/credential.effects';
 import { DataBagsEffects } from './entities/data-bags/data-bags.effects';
-import { DataBagDetailsEffects } from './entities/data-bags/data-bag-details.effects';
+import { DataBagItemsEffects } from './entities/data-bags/data-bag-details.effects';
 import { DataBagItemDetailsEffects } from './entities/data-bags/data-bag-item-details.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
@@ -57,7 +57,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ClientEffects,
       CredentialEffects,
       DataBagsEffects,
-      DataBagDetailsEffects,
+      DataBagItemsEffects,
       DataBagItemDetailsEffects,
       DesktopEffects,
       DestinationEffects,

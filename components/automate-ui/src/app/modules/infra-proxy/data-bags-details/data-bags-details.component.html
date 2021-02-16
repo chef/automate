@@ -30,16 +30,16 @@
         <div class="search-items">
           <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
         </div>
-        <div class="section-container" *ngIf="dataBagDetails">
-          <chef-loading-spinner *ngIf="searching && !dataBagDetails.length" size="50" fixed></chef-loading-spinner>
-          <div class="empty-section" *ngIf="!searching && !dataBagDetails.length">
+        <div class="section-container" *ngIf="dataBagItems">
+          <chef-loading-spinner *ngIf="true" size="50" fixed></chef-loading-spinner>
+          <div class="empty-section" *ngIf="!searching && !dataBagItems.length">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p *ngIf="searchValue === ''">No data bag items available</p>
             <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
           </div>
-          <div *ngIf="dataBagDetails.length">
+          <div *ngIf="dataBagItems.length">
             <ul id="accordion" class="accordion" >
-              <li *ngFor="let item of dataBagDetails; let i = index" [class.active]="item.active" class="items">
+              <li *ngFor="let item of dataBagItems; let i = index" [class.active]="item.active" class="items">
                 <div class="menu" (click)="handleItemSelected(item.name, i)">
                   <div class="data-bag-name">
                     {{ item.name }}

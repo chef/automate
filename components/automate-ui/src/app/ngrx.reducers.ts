@@ -19,7 +19,7 @@ import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.re
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
 import * as credential from './entities/credentials/credential.reducer';
 import * as dataBagsEntity from './entities/data-bags/data-bags.reducer';
-import * as dataBagDetailsEntity from './entities/data-bags/data-bag-details.reducer';
+import * as dataBagItemsEntity from './entities/data-bags/data-bag-details.reducer';
 import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
@@ -90,7 +90,7 @@ export interface NgrxStateAtom {
   // Named credentialEntity until we refactor the credentials page
   credentialEntity: credential.CredentialState;
   dataBags: dataBagsEntity.DataBagsEntityState;
-  dataBagDetails: dataBagDetailsEntity.DataBagDetailsEntityState;
+  dataBagItems: dataBagItemsEntity.DataBagItemsEntityState;
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
@@ -216,7 +216,7 @@ export const defaultInitialState = {
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
   dataBags: dataBagsEntity.DataBagsEntityInitialState,
-  dataBagDetails: dataBagDetailsEntity.DataBagDetailsEntityInitialState,
+  dataBagItems: dataBagItemsEntity.DataBagItemsEntityInitialState,
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
@@ -278,7 +278,7 @@ export const ngrxReducers = {
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
   credentialEntity: credential.credentialReducer,
   dataBags: dataBagsEntity.dataBagsEntityReducer,
-  dataBagDetails: dataBagDetailsEntity.dataBagDetailsEntityReducer,
+  dataBagItems: dataBagItemsEntity.dataBagItemsEntityReducer,
   dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
