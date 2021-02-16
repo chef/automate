@@ -17,7 +17,7 @@ import (
 
 func RunGRPCServer(c *config.Notifications) error {
 	uri := fmt.Sprintf("%s:%d", c.Service.Host, c.Service.Port)
-	log.WithFields(log.Fields{"uri": uri}).Info("Starting applications-service gRPC Server")
+	log.WithFields(log.Fields{"uri": uri}).Info("Starting notifications-service gRPC Server")
 	conn, err := net.Listen("tcp", uri)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Fatal("TCP listen failed")
