@@ -16,7 +16,7 @@ revendor: ## revendor dependencies in protovendor/ and update .bldr.toml with de
 	@scripts/revendor.sh
 
 semgrep: ## runs differential semgrep, checking only changes in the current PR, just as is done in Buildkite
-	@if [[ -z "${SEMGREP_TOKEN}" || -z "${SEMGREP_ID}" ]]; then echo $(SEMGREP_MSG); else docker run -it --rm --init $(DOCKER_PARAMS) $(SEMGREP_REPO) $(SEMGREP_CONTAINER) python $(SEMGREP_COMMON_PARAMS) --baseline-ref  $(shell git merge-base master head); fi
+	@if [[ -z "${SEMGREP_TOKEN}" || -z "${SEMGREP_ID}" ]]; then echo $(SEMGREP_MSG); else docker run -it --rm --init $(DOCKER_PARAMS) $(SEMGREP_REPO) $(SEMGREP_CONTAINER) python $(SEMGREP_COMMON_PARAMS) --baseline-ref  $(shell git merge-base master HEAD); fi
 
 semgrep-all: ## runs full semgrep but filters out the insignificant issues reported by semgrep-legacy; this is what runs nightly in Buildkite
 	@if [[ -z "${SEMGREP_TOKEN}" || -z "${SEMGREP_ID}" ]]; then echo $(SEMGREP_MSG); else docker run -it --rm --init $(DOCKER_PARAMS) $(SEMGREP_NIGHTLY_REPO) $(SEMGREP_CONTAINER) python $(SEMGREP_COMMON_PARAMS); fi
