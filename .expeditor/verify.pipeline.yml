@@ -1,3 +1,6 @@
+env:
+  DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+
 expeditor:
   defaults:
     executor:
