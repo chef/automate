@@ -1,3 +1,6 @@
+env:
+  DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+
 expeditor:
   defaults:
     executor:
@@ -616,7 +619,6 @@ steps:
   - label: "compliance-service db-migrations"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -644,7 +646,6 @@ steps:
   - label: "compliance-service scanner"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -673,7 +674,6 @@ steps:
   - label: "compliance-service scanner with inspec master"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec_master.sh
       - sudo scripts/install_golang.sh
@@ -703,7 +703,6 @@ steps:
   - label: "compliance-service reporting"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -730,7 +729,6 @@ steps:
 
   - label: "nodemanager-service run-db-tests"
     command:
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -759,7 +757,6 @@ steps:
   - label: "compliance-service upgrade from Automate v1"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -787,7 +784,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v1"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -815,7 +811,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v2"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -843,7 +838,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v3"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -871,7 +865,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v4"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -899,7 +892,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v5"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
@@ -927,7 +919,6 @@ steps:
   - label: "compliance-service upgrade from Automate v2v6"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
-      - sudo /usr/local/buildkite-aws-stack/plugins/docker-login/hooks/pre-command # Log in to Docker Hub
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
