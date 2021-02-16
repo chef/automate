@@ -10,7 +10,7 @@ import (
 	"github.com/chef/automate/lib/pcmp/passert"
 )
 
-func TestGetVersion(t *testing.T) {
+func TestRulesCRUDGetVersion(t *testing.T) {
 	res, err := suite.Client.Version(ctx, &api.VersionRequest{})
 	require.NoError(t, err)
 	// In local dev the version string changes to include extra information (in
@@ -19,7 +19,7 @@ func TestGetVersion(t *testing.T) {
 	assert.NotEmpty(t, res.Version)
 }
 
-func TestGetRule(t *testing.T) {
+func TestRulesCRUDGetRule(t *testing.T) {
 	err := suite.DeleteEverything()
 	assert.NoError(t, err)
 
@@ -45,7 +45,7 @@ func TestGetRule(t *testing.T) {
 	})
 }
 
-func TestListRules(t *testing.T) {
+func TestRulesCRUDListRules(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
@@ -73,7 +73,7 @@ func TestListRules(t *testing.T) {
 	})
 }
 
-func TestAddRuleSuccessCase(t *testing.T) {
+func TestRulesCRUDAddRuleSuccessCase(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
@@ -113,7 +113,7 @@ func TestAddRuleSuccessCase(t *testing.T) {
 	})
 }
 
-func TestAddRuleValidations(t *testing.T) {
+func TestRulesCRUDAddRuleValidations(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
@@ -281,7 +281,7 @@ func TestAddRuleValidations(t *testing.T) {
 
 }
 
-func TestUpdateRuleSuccess(t *testing.T) {
+func TestRulesCRUDUpdateRuleSuccess(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
@@ -314,6 +314,7 @@ func TestUpdateRuleSuccess(t *testing.T) {
 
 		updated, err := suite.Client.GetRule(ctx, &api.RuleIdentifier{Id: createResponse.Id})
 		require.NoError(t, err)
+		require.NotNil(t, updated.Rule)
 		assert.Equal(t, "TestAddRule_success_02_updated_value", updated.Rule.Name)
 	})
 
@@ -333,18 +334,20 @@ func TestUpdateRuleSuccess(t *testing.T) {
 
 		updated, err := suite.Client.GetRule(ctx, &api.RuleIdentifier{Id: createResponse.Id})
 		require.NoError(t, err)
+		require.NotNil(t, updated.Rule)
 		passert.Equal(t, validServiceNowAlert().ServiceNowAlert, updated.Rule.GetServiceNowAlert())
 	})
 
 }
 
-func TestUpdateRuleValidation(t *testing.T) {
+func TestRulesCRUDUpdateRuleValidation(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
 	ruleToCreate := newValidRule("TestUpdateRule_validations")
 	created, err := suite.Client.AddRule(ctx, ruleToCreate)
 	require.NoError(t, err)
+	require.NotNil(t, created.Rule)
 	createdRule := created.Rule
 	createdRule.Id = created.Id
 
@@ -409,7 +412,7 @@ func TestUpdateRuleValidation(t *testing.T) {
 	// as AddRule does. We don't explicitly test those because it's repetitive
 }
 
-func TestDeleteRule(t *testing.T) {
+func TestRulesCRUDDeleteRule(t *testing.T) {
 	err := suite.DeleteEverything()
 	require.NoError(t, err)
 
