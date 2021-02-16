@@ -42,7 +42,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
     const payload = {
         environmentName: '',
-        page: 1,
+        page: this.page,
         per_page: this.per_page,
         server_id: this.serverId,
         org_id: this.orgId
@@ -95,7 +95,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new GetEnvironments(payload));
   }
-
+  
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
