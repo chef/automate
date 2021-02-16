@@ -3,7 +3,7 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-items">
-      <app-infra-search-bar (searchButtonClick)="toggleFilters($event)" placeHolder="environments"></app-infra-search-bar>
+      <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
     </div> 
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching && !environments.length" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searching && !environments.length">
@@ -35,5 +35,12 @@
         </chef-tr>
       </chef-tbody>
     </chef-table>
+     <app-page-picker
+        class="nodes-list-paging"
+        [total]="total"
+        [perPage]="per_page"
+        [page]="page"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
   </ng-container>
 </section>

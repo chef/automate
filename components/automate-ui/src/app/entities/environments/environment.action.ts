@@ -3,9 +3,6 @@ import { Action } from '@ngrx/store';
 import { Environment } from './environment.model';
 
 export enum EnvironmentActionTypes {
-  GET_ALL = 'ENVIRONMENTS::GET_ALL',
-  GET_ALL_SUCCESS = 'ENVIRONMENTS::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'ENVIRONMENTS::GET_ALL::FAILURE',
   GET = 'ENVIRONMENTS::GET',
   GET_SUCCESS = 'ENVIRONMENTS::GET::SUCCESS',
   GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE',
@@ -16,21 +13,6 @@ export enum EnvironmentActionTypes {
 
 export interface EnvironmentsSuccessPayload {
   environments: Environment[];
-}
-
-export class GetEnvironments implements Action {
-  readonly type = EnvironmentActionTypes.GET_ALL;
-  constructor(public payload: { server_id: string, org_id: string }) { }
-}
-
-export class GetEnvironmentsSuccess implements Action {
-  readonly type = EnvironmentActionTypes.GET_ALL_SUCCESS;
-  constructor(public payload: EnvironmentsSuccessPayload) { }
-}
-
-export class GetEnvironmentsFailure implements Action {
-  readonly type = EnvironmentActionTypes.GET_ALL_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class GetEnvironment implements Action {
@@ -63,6 +45,7 @@ export class EnvironmentSearch implements Action {
 
 export interface EnvironmentSearchSuccessPayload {
   environments: Environment[];
+  total: number;
 }
 
 export class EnvironmentSearchSuccess implements Action {
@@ -76,12 +59,10 @@ export class EnvironmentSearchFailure implements Action {
 }
 
 export type EnvironmentActions =
-  | GetEnvironments
-  | GetEnvironmentsSuccess
-  | GetEnvironmentsFailure
   | GetEnvironment
   | GetEnvironmentSuccess
   | GetEnvironmentFailure
   | EnvironmentSearch
   | EnvironmentSearchSuccess
   | EnvironmentSearchFailure;
+  

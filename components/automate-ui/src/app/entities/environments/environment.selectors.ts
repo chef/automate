@@ -21,3 +21,8 @@ export const getSearchStatus = createSelector(
   environmentState,
   (state) => state.getSearchStatus
 );
+
+export const environmentList = createSelector(
+  environmentState,
+  (state) => state.environmentList
+);

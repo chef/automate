@@ -7,10 +7,6 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetEnvironments,
-  GetEnvironmentsSuccess,
-  EnvironmentsSuccessPayload,
-  GetEnvironmentsFailure,
   EnvironmentActionTypes,
   GetEnvironment,
   GetEnvironmentSuccess,
@@ -29,26 +25,6 @@ export class EnvironmentEffects {
     private actions$: Actions,
     private requests: EnvironmentRequests
   ) { }
-
-  @Effect()
-  getEnvironments$ = this.actions$.pipe(
-    ofType(EnvironmentActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetEnvironments) =>
-      this.requests.getEnvironments(server_id, org_id).pipe(
-        map((resp: EnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
-        catchError((error: HttpErrorResponse) =>
-        observableOf(new GetEnvironmentsFailure(error))))));
-
-  @Effect()
-  getEnvironmentsFailure$ = this.actions$.pipe(
-    ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
-    map(({ payload }: GetEnvironmentsFailure) => {
-      const msg = payload.error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not get environments: ${msg || payload.error}`
-      });
-    }));
 
   @Effect()
   getEnvironment$ = this.actions$.pipe(
@@ -74,7 +50,7 @@ export class EnvironmentEffects {
     getEnvironmentSearch$ = this.actions$.pipe(
       ofType(EnvironmentActionTypes.SEARCH),
       mergeMap((action: EnvironmentSearch) =>
-        this.requests.getEnvironmentSearch(action.payload).pipe(
+        this.requests.getEnvironments(action.payload).pipe(
           map((resp: EnvironmentSearchSuccessPayload) => new EnvironmentSearchSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new EnvironmentSearchFailure(error))))));
