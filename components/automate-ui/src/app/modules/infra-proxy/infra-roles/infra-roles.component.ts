@@ -1,19 +1,19 @@
-import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit,
+  OnDestroy, EventEmitter, Output, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus } from 'app/entities/entities';
-import { GetRoles, RoleSearch } from 'app/entities/infra-roles/infra-role.action';
+import {  GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
-  allInfraRoles,
-  getAllStatus as getAllRolesForOrgStatus,
-  getSearchStatus
+  getAllStatus,
+  roleList
 } from 'app/entities/infra-roles/infra-role.selectors';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-infra-roles',
@@ -25,13 +25,18 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   private isDestroyed = new Subject<boolean>();
   public roles: InfraRole[] = [];
+  public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
   public authFailure = false;
   public searching = false;
   public searchValue = '';
+  public page = 1;
+  public per_page = 10;
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -41,53 +46,61 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetRoles({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    const payload = {
+      roleName: '',
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new GetRoles(payload));
+
 
     combineLatest([
-      this.store.select(getAllRolesForOrgStatus),
-      this.store.select(allInfraRoles)
-    ]).pipe(takeUntil(this.isDestroyed))
-      .subscribe(([getRolesSt, allInfraRolesState]) => {
-        if (getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState)) {
-          this.roles = allInfraRolesState;
-          this.rolesListLoading = false;
-        } else if (getRolesSt === EntityStatus.loadingFailure) {
-          this.rolesListLoading = false;
-          this.authFailure = true;
-        }
-      });
-
-    combineLatest([
-      this.store.select(getSearchStatus),
-      this.store.select(allInfraRoles)
+      this.store.select(getAllStatus),
+      this.store.select(roleList)
     ]).pipe(
-      filter(([getRolesSt, _RolesState]) =>
-      getRolesSt === EntityStatus.loadingSuccess),
-      filter(([_getRolesSt, rolesState]) =>
-        !isNil(rolesState)),
       takeUntil(this.isDestroyed))
-    .subscribe(([_getRolesSt, rolesState]) => {
-        this.roles = rolesState;
+    .subscribe(([_getRolesSt, RolesState]) => {
+
+      if (!isNil(RolesState)) {
+        this.roleListState = RolesState;
+        this.roles = RolesState?.items;
+        this.total = RolesState?.total;
+        this.rolesListLoading = false;
         this.searching = false;
+      }
+
     });
 
   }
 
   searchRoles(currentText: string) {
+    this.page = 1;
     this.searching = true;
+    this.rolesListLoading = true;
     this.searchValue = currentText;
+
+    this.getRolesData();
+  }
+
+  onPageChange(event): void {
+    this.page = event;
+    this.rolesListLoading = true;
+    this.getRolesData();
+  }
+
+  getRolesData() {
     const payload = {
-      roleName: currentText,
+      roleName: this.searchValue,
       server_id: this.serverId,
       org_id: this.orgId,
-      page: 0,
-      per_page: this.roles.length
+      page: this.page,
+      per_page: this.per_page
     };
 
-    this.store.dispatch(new RoleSearch(payload));
-
+    this.store.dispatch(new GetRoles(payload));
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

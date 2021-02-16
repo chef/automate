@@ -14,11 +14,7 @@ import {
   RoleActionTypes,
   GetRole,
   GetRoleSuccess,
-  GetRoleFailure,
-  RoleSearch,
-  RoleSearchSuccess,
-  RoleSearchFailure,
-  RoleSearchSuccessPayload
+  GetRoleFailure
 } from './infra-role.action';
 
 import { InfraRoleRequests } from './infra-role.requests';
@@ -33,8 +29,8 @@ export class InfraRoleEffects {
   @Effect()
   getRoles$ = this.actions$.pipe(
     ofType(RoleActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetRoles) =>
-      this.requests.getRoles(server_id, org_id).pipe(
+    mergeMap((action: GetRoles) =>
+      this.requests.getRoles(action.payload).pipe(
         map((resp: RolesSuccessPayload) => new GetRolesSuccess(resp)),
         catchError((error: HttpErrorResponse) => observableOf(new GetRolesFailure(error))))));
 
@@ -65,27 +61,6 @@ export class InfraRoleEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get infra role: ${msg || payload.error}`
-      });
-    }));
-
-
-  @Effect()
-  roleSearch$ = this.actions$.pipe(
-    ofType(RoleActionTypes.SEARCH),
-    mergeMap((action: RoleSearch) =>
-      this.requests.getRoleSearch(action.payload).pipe(
-        map((resp: RoleSearchSuccessPayload) => new RoleSearchSuccess(resp)),
-        catchError((error: HttpErrorResponse) =>
-          observableOf(new RoleSearchFailure(error))))));
-
-  @Effect()
-  roleSearchFailure$ = this.actions$.pipe(
-    ofType(RoleActionTypes.SEARCH_FAILURE),
-    map(({ payload }: RoleSearchFailure) => {
-      const msg = payload.error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not search roles: ${msg || payload.error}`
       });
     }));
 

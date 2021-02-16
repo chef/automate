@@ -36,5 +36,13 @@
           </chef-tr>
         </chef-tbody>
       </chef-table>
+
+      <app-page-picker
+      class="roles-list-paging"
+      [total]="total"
+      [perPage]="per_page"
+      [page]="page"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
   </ng-container>
 </section>
