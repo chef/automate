@@ -11,27 +11,9 @@ export enum DataBagDetailsActionTypes {
   SEARCH_FAILURE = 'DATA_BAG_DETAILS::SEARCH::FAILURE'
 }
 
-export interface DataBagDetailsSuccessPayload {
-  data_bags: DataBags[];
-}
-
-export interface DataBagItemListsSuccessPayload {
+export interface DataBagSearchSuccessPayload {
   items: DataBags[];
-}
-
-export class GetDataBagDetails implements Action {
-  readonly type = DataBagDetailsActionTypes.GET_ALL;
-  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
-}
-
-export class GetDataBagDetailsSuccess implements Action {
-  readonly type = DataBagDetailsActionTypes.GET_ALL_SUCCESS;
-  constructor(public payload: DataBagItemListsSuccessPayload) { }
-}
-
-export class GetDataBagDetailsFailure implements Action {
-  readonly type = DataBagDetailsActionTypes.GET_ALL_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
+  total: number;
 }
 
 export interface DataBagSearchPayload {
@@ -43,14 +25,27 @@ export interface DataBagSearchPayload {
   per_page: number;
 }
 
+export class GetDataBagDetails implements Action {
+  readonly type = DataBagDetailsActionTypes.GET_ALL;
+  constructor(public payload: DataBagSearchPayload) { }
+}
+
+export class GetDataBagDetailsSuccess implements Action {
+  readonly type = DataBagDetailsActionTypes.GET_ALL_SUCCESS;
+  constructor(public payload: DataBagSearchSuccessPayload) { }
+}
+
+export class GetDataBagDetailsFailure implements Action {
+  readonly type = DataBagDetailsActionTypes.GET_ALL_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+
 export class DataBagSearchDetails implements Action {
   readonly type = DataBagDetailsActionTypes.SEARCH;
   constructor(public payload: DataBagSearchPayload) { }
 }
 
-export interface DataBagSearchSuccessPayload {
-  items: DataBags[];
-}
 
 export class DataBagSearchDetailsSuccess implements Action {
   readonly type = DataBagDetailsActionTypes.SEARCH_SUCCESS;

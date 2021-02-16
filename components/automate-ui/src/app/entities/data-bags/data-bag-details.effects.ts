@@ -15,7 +15,6 @@ import {
   DataBagSearchSuccessPayload,
   DataBagSearchDetailsSuccess,
   DataBagSearchdDetailsFailure,
-  DataBagItemListsSuccessPayload
 } from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
@@ -30,9 +29,9 @@ export class DataBagDetailsEffects {
   @Effect()
   getDataBagDetails$ = this.actions$.pipe(
     ofType(DataBagDetailsActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id, name } }: GetDataBagDetails) =>
-      this.requests.getDataBagItemList(server_id, org_id, name).pipe(
-        map((resp: DataBagItemListsSuccessPayload) => new GetDataBagDetailsSuccess(resp)),
+    mergeMap(( action: GetDataBagDetails) =>
+      this.requests.getDataBagItemList(action.payload).pipe(
+        map((resp: DataBagSearchSuccessPayload) => new GetDataBagDetailsSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new GetDataBagDetailsFailure(error))))));
 

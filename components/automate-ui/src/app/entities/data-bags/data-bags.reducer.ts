@@ -6,6 +6,10 @@ import { DataBags } from './data-bags.model';
 
 export interface DataBagsEntityState extends EntityState<DataBags> {
   getAllStatus: EntityStatus;
+  dataBagList: {
+    dataBags: DataBags[],
+    total: number;
+  }
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -29,9 +33,10 @@ export function dataBagsEntityReducer(
 
     case DataBagsActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (dataBagsEntityAdapter.setAll(action.payload.data_bags, state)) as DataBagsEntityState;
-
+        set('dataBagList.dataBags', action.payload.dataBags || []),
+        set('dataBagList.total', action.payload.total || 0)
+        )(state) as DataBagsEntityState;
+  
     case DataBagsActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 

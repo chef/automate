@@ -3,14 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { DataBagsSuccessPayload } from './data-bags.actions';
-import { DataBagSearchPayload, DataBagItemListsSuccessPayload } from './data-bag-details.actions';
-import { DataBagsItemDetails } from './data-bags.model';
+import { DataBagSearchPayload, DataBagSearchSuccessPayload } from './data-bag-details.actions';
+import { DataBags, DataBagsItemDetails } from './data-bags.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
 export interface DataBagSearchResponse {
-  items: any[];
+  items: DataBags[];
   total: number;
 }
 
@@ -24,10 +24,11 @@ export class DataBagsRequests {
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags`, {headers});
   }
 
-  public getDataBagItemList(server_id: string, org_id: string, name: string)
-  : Observable<DataBagItemListsSuccessPayload> {
-    return this.http.get<DataBagItemListsSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags/${name}`,
+  public getDataBagItemList(payload: DataBagSearchPayload)
+  : Observable<DataBagSearchSuccessPayload> {
+    const currentPage = payload.page -1
+    return this.http.get<DataBagSearchSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/data_bags/${payload.databagName}?search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`,
       {headers}
     );
   }
@@ -35,7 +36,8 @@ export class DataBagsRequests {
   public getDataBagSearchDetails(payload: DataBagSearchPayload)
   : Observable<DataBagSearchResponse> {
     const nameTarget = payload.databagName + '*';
-    const params = `search_query.q=id:${nameTarget}*&search_query.page=${payload.page}&search_query.per_page=${payload.per_page}`;
+    const currentPage = payload.page -1
+    const params = `search_query.q=id:${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`;
     const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/data_bags/${payload.name}?${params}`;
 
     return this.http.get<DataBagSearchResponse>(url, {headers});

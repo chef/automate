@@ -7,6 +7,10 @@ import { DataBags } from './data-bags.model';
 export interface DataBagDetailsEntityState extends EntityState<DataBags> {
   getAllStatus: EntityStatus;
   getSearchStatus: EntityStatus;
+  dataBagList: {
+    items: DataBags[],
+    total: number;
+  }
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -15,6 +19,8 @@ const GET_SEARCH_STATUS = 'getSearchStatus';
 export const dataBagDetailsEntityAdapter: EntityAdapter<DataBags> = createEntityAdapter<DataBags>({
   selectId: (dataBags: DataBags) => dataBags.name
 });
+
+
 
 export const DataBagDetailsEntityInitialState: DataBagDetailsEntityState =
   dataBagDetailsEntityAdapter.getInitialState(<DataBagDetailsEntityState>{
@@ -45,9 +51,9 @@ export function dataBagDetailsEntityReducer(
 
     case DataBagDetailsActionTypes.SEARCH_SUCCESS:
       return pipe(
-        set(GET_SEARCH_STATUS, EntityStatus.loadingSuccess))
-        (dataBagDetailsEntityAdapter
-          .setAll(action.payload.items, state)) as DataBagDetailsEntityState;
+        set('dataBagList.items', action.payload.items || []),
+        set('dataBagList.total', action.payload.total || 0)
+        )(state) as DataBagDetailsEntityState;
 
     case DataBagDetailsActionTypes.SEARCH_FAILURE:
       return set(GET_SEARCH_STATUS, EntityStatus.loadingFailure, state);

@@ -10,7 +10,7 @@ import { routeParams } from 'app/route.selectors';
 
 import { GetDataBagDetails, DataBagSearchDetails } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import { allDataBagDetails, getAllStatus, getSearchStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import {  getAllStatus, getSearchStatus, dataBagList } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
@@ -38,6 +38,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
 
+  public page = 1;
+  public per_page = 1;
+  public total: number;
+  public dataBagListState;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -56,16 +61,20 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.orgId = org_id;
       this.dataBagsName = dataBags_name;
-      this.store.dispatch(new GetDataBagDetails({
-        server_id: server_id,
-        org_id: org_id,
-        name: dataBags_name
-      }));
+      const payload = {
+        databagName: this.dataBagsName,
+        server_id: this.serverId,
+        org_id: this.orgId,
+        name: this.dataBagsName,
+        page: this.page,
+        per_page: this.per_page
+      };
+      this.store.dispatch(new GetDataBagDetails(payload));
     });
 
     combineLatest([
       this.store.select(getAllStatus),
-      this.store.select(allDataBagDetails)
+      this.store.select(dataBagList)
     ]).pipe(
       filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
         getDataBagDetailsSt === EntityStatus.loadingSuccess),
@@ -73,9 +82,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         !isNil(dataBagDetailsState)),
       takeUntil(this.isDestroyed))
       .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
-        this.dataBagDetails = dataBagDetailsState;
+        this.dataBagDetails = dataBagDetailsState.items;
+        this.total = dataBagDetailsState.total;
         this.appendActiveToItems(this.dataBagDetails);
         this.dataBagsDetailsLoading = false;
+        
       });
 
     combineLatest([
@@ -91,10 +102,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         this.dataBagsItemDetailsLoading = false;
       });
+    
+    // this.searchDataBagItems('')
 
     combineLatest([
       this.store.select(getSearchStatus),
-      this.store.select(allDataBagDetails)
+      this.store.select(dataBagList)
     ]).pipe(
       filter(([getDataBagsSt, _DataBagsState]) =>
       getDataBagsSt === EntityStatus.loadingSuccess),
@@ -102,7 +115,10 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         !isNil(DataBagsState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getDataBagsSt, DataBagsState]) => {
-        this.dataBagDetails = DataBagsState;
+        debugger
+        this.dataBagListState = DataBagsState;
+        this.dataBagDetails = DataBagsState.items;
+        this.total = DataBagsState.total;
         this.searching = false;
     });
   }
@@ -140,6 +156,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   searchDataBagItems(currentText: string) {
+    this.page = 1;
     this.searchValue = currentText;
     this.searching = true;
     const payload = {
@@ -147,8 +164,22 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       org_id: this.orgId,
       name: this.dataBagsName,
-      page: 0,
-      per_page: this.dataBagDetails.length
+      page: this.page,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new DataBagSearchDetails(payload));
+  }
+
+  onPageChange(event): void {
+    this.page = event;
+    const payload = {
+      databagName: this.searchValue,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.dataBagsName,
+      page: this.page,
+      per_page: this.per_page
     };
 
     this.store.dispatch(new DataBagSearchDetails(payload));

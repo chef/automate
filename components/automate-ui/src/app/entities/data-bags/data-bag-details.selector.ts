@@ -30,3 +30,8 @@ export const getSearchStatus = createSelector(
   dataBagDetailsState,
   (state) => state.getSearchStatus
 );
+
+export const dataBagList = createSelector(
+  dataBagDetailsState,
+  (state) => state.dataBagList
+);

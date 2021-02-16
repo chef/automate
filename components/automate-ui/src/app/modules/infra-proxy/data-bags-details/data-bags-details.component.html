@@ -69,6 +69,13 @@
               </li>
             </ul>
           </div>
+          <app-page-picker
+            class="data-bag-items-list-paging"
+            [total]="total"
+            [perPage]="per_page"
+            [page]="page"
+            (pageChanged)="onPageChange($event)">
+          </app-page-picker>
         </div>
       </section>
     </main>
