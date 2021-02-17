@@ -1,4 +1,4 @@
-package schema
+package integration
 
 // PgDump1dot0Schema is the schema created by the 1.0 (elixir) version of the
 // notifications service.
