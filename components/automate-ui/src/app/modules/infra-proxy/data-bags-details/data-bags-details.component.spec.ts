@@ -14,8 +14,8 @@ import {
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { GetDataBagDetailsSuccess } from 'app/entities/data-bags/data-bag-details.actions';
-import { DataBags } from 'app/entities/data-bags/data-bags.model';
+import { GetDataBagItemsSuccess } from 'app/entities/data-bags/data-bag-details.actions';
+import { DataBagItems } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsDetailsComponent } from './data-bags-details.component';
 
 
@@ -33,11 +33,13 @@ const declarations: any[] = [
 ];
 const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
 const orgId = '6e98f609-586d-4816-a6de';
-const dataBagName = 'demo_data_bag';
+const dataBagName = 'auth';
 
-const items: DataBags[] = [{
+const items: DataBagItems[] = [{
   name: 'auth'
 }];
+
+const total: number = 10;
 
 describe('DataBagsDetailsComponent', () => {
   let component: DataBagsDetailsComponent;
@@ -87,10 +89,8 @@ describe('DataBagsDetailsComponent', () => {
   });
 
   it('Check data bag items success', () => {
-    store.dispatch(new GetDataBagDetailsSuccess({ items }));
+    store.dispatch(new GetDataBagItemsSuccess({ items, total }));
     fixture.detectChanges();
-    expect(component.dataBagDetails).toEqual(items);
+    expect(component.dataBagItems).toEqual(items);
   });
-
 });
-
