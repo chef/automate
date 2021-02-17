@@ -41,7 +41,7 @@ export function environmentEntityReducer(
         )(state) as EnvironmentEntityState;
 
     case EnvironmentActionTypes.GET_ALL_FAILURE:
-      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);    
+      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

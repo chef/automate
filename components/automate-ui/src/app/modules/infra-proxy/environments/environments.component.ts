@@ -94,7 +94,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new GetEnvironments(payload));
   }
-  
+
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();

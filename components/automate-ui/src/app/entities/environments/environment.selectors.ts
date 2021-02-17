@@ -21,8 +21,3 @@ export const environmentList = createSelector(
   environmentState,
   (state) => state.environmentList
 );
-
-export const environmentList = createSelector(
-  environmentState,
-  (state) => state.environmentList
-);
