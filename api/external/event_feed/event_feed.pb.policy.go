@@ -45,4 +45,17 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.event_feed.EventFeedService/EventExport", "event:events", "event:events:list", "GET", "/api/v0/eventexport", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.EventExportRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "output_type":
+					return m.OutputType
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }
