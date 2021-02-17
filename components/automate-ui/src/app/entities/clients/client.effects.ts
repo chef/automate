@@ -14,11 +14,7 @@ import {
   ClientActionTypes,
   GetClient,
   GetClientSuccess,
-  GetClientFailure,
-  ClientSearch,
-  ClientSearchSuccess,
-  ClientSearchSuccessPayload,
-  ClientSearchFailure
+  GetClientFailure
 } from './client.action';
 
 import { ClientRequests } from './client.requests';
@@ -33,8 +29,8 @@ export class ClientEffects {
   @Effect()
   getClients$ = this.actions$.pipe(
     ofType(ClientActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetClients) =>
-      this.requests.getClients(server_id, org_id).pipe(
+    mergeMap((action: GetClients) =>
+    this.requests.getClients(action.payload).pipe(
         map((resp: ClientsSuccessPayload) => new GetClientsSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
         observableOf(new GetClientsFailure(error))))));
@@ -69,24 +65,4 @@ export class ClientEffects {
         message: `Could not get client: ${msg || payload.error}`
       });
     }));
-
-    @Effect()
-    getClientSearch$ = this.actions$.pipe(
-      ofType(ClientActionTypes.SEARCH),
-      mergeMap((action: ClientSearch) =>
-        this.requests.getClientSearch(action.payload).pipe(
-          map((resp: ClientSearchSuccessPayload) => new ClientSearchSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-            observableOf(new ClientSearchFailure(error))))));
-
-    @Effect()
-    getClientSearchFailure$ = this.actions$.pipe(
-      ofType(ClientActionTypes.SEARCH_FAILURE),
-      map(({ payload }: ClientSearchFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra clients details: ${msg || payload.error}`
-        });
-      }));
 }

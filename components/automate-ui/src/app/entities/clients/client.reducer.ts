@@ -7,11 +7,13 @@ import { Client } from './client.model';
 export interface ClientEntityState extends EntityState<Client> {
   clientsStatus: EntityStatus;
   getAllStatus: EntityStatus;
-  getSearchStatus: EntityStatus;
+  clientList: {
+    items: Client[],
+    total: number
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
-const GET_SEARCH_STATUS = 'getSearchStatus';
 
 export const clientEntityAdapter: EntityAdapter<Client> =
   createEntityAdapter<Client>({
@@ -33,25 +35,12 @@ export function clientEntityReducer(
 
     case ClientActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (clientEntityAdapter.setAll(action.payload.clients, state)) as
-        ClientEntityState;
+        set('clientList.items', action.payload.clients || []),
+        set('clientList.total', action.payload.total || 0)
+        )(state) as ClientEntityState;
 
     case ClientActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
-
-    case ClientActionTypes.SEARCH:
-      return set(GET_SEARCH_STATUS, EntityStatus.loading, clientEntityAdapter
-        .removeAll(state));
-
-    case ClientActionTypes.SEARCH_SUCCESS:
-      return pipe(
-        set(GET_SEARCH_STATUS, EntityStatus.loadingSuccess))
-        (clientEntityAdapter
-          .setAll(action.payload.clients, state)) as ClientEntityState;
-
-    case ClientActionTypes.SEARCH_FAILURE:
-      return set(GET_SEARCH_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;
