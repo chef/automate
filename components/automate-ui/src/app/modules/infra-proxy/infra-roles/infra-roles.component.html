@@ -4,10 +4,12 @@
   <ng-container *ngIf="!rolesListLoading && !authFailure">
     <chef-table>
       <chef-thead>
-        <chef-tr>
-          <chef-th>Role Name</chef-th>
-          <chef-th>Description</chef-th>
-          <chef-th>Environments</chef-th>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th">Description</chef-th>
+          <chef-th class="no_border_th">Environments</chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -17,6 +19,8 @@
           </chef-td>
           <chef-td>{{ role.description === '' ?  '...' : role.description }}</chef-td>
           <chef-td>{{ role.environments.join(", ") }}</chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
