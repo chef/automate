@@ -24,7 +24,13 @@ pushd ./automate.wiki
 ## Improvements
 -
 
+## Compliance Profile Updates
+-
+
 ## Bug Fixes
+-
+
+## Maintenance
 -
 
 ## Backward Incompatibilities
@@ -33,10 +39,20 @@ pushd ./automate.wiki
 ## Chef Product Versions
 
 This release uses:
-- Chef Habitat version
-- Chef Habitat Builder version
-- Chef Infra Server version
-- Chef InSpec version
+- Chef Habitat version:
+- Chef Habitat Builder version:
+- Chef Infra Server version:
+- Chef InSpec version:
+
+## Service Versions
+
+This release uses:
+- Postgres:
+- ElasticSearch:
+- Nginx:
+- Haproxy:
+
+View the [package manifest](https://packages.chef.io/manifests/current/automate/latest.json) for the latest release.
 
 EOH
 
