@@ -75,6 +75,32 @@ chef-table {
     margin: 100px auto;
     width: 100px;
   }
+
+  ::ng-deep button.nav-tab.active {
+    background: #F4F6F8;
+  }
+
+  ::ng-deep button.nav-tab:focus {
+    outline: none;
+  }
+
+  ::ng-deep .nav-tab:before {
+    height: 4px;
+    background: #E7E9E9;
+  }
+
+  ::ng-deep .nav-tabs-item {
+    margin-right: 4px;
+    outline: none;
+  }
+
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+  }
 }
 
 chef-loading-spinner {

@@ -1,3 +1,6 @@
+env:
+  DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+
 expeditor:
   defaults:
     executor:
@@ -60,6 +63,37 @@ steps:
           environment:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
+
+  # - label: ":semgrep: Custom"
+  #   expeditor:
+  #     executor:
+  #       docker:
+  #         image: returntocorp/semgrep:latest
+  #         entrypoint: semgrep
+  #         command: [
+  #           "--error",
+  #           "--exclude", "*.spec.ts",
+  #           "--config", "/go/src/github.com/chef/automate/semgrep",
+  #           "/go/src/github.com/chef/automate"
+  #         ]
+
+  - label: ":semgrep: Published"
+    expeditor:
+      executor:
+        docker:
+          image: returntocorp/semgrep:latest
+          entrypoint: semgrep
+          command: [
+            "--error",
+            "--exclude", "third_party",
+            "--exclude", "*_test.go",
+            "--exclude", "*.pb.go",
+            "--exclude", "*.bindata.go",
+            "--exclude", "*.spec.ts",
+            "--timeout", "120",
+            "--config", "https://semgrep.dev/p/r2c-ci",
+            "/go/src/github.com/chef/automate"
+          ]
 
   #
   # Static & Unit tests
@@ -590,7 +624,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-db
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-db
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -617,7 +651,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -645,7 +679,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -674,7 +708,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-reporting
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-reporting
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log
@@ -700,7 +734,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/nodemanager-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-db
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-db
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -728,7 +762,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -755,7 +789,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -782,7 +816,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -809,7 +843,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -836,7 +870,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -863,7 +897,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log
@@ -890,7 +924,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+      - sudo -E PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-automate-upgrade
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/compliance.log

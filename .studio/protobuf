@@ -137,7 +137,7 @@ function compile_go_protobuf_component() {
 # Adding auto tab complete
 complete -F _component_auto_complete compile_go_protobuf_component
 
-describe "check_breaking_for_all_proto_components" <<DOC
+document "check_breaking_for_all_proto_components" <<DOC
   Run the \`buf\` breaking change detector against the automate protos
 DOC
 function check_breaking_for_all_proto_components() {

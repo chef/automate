@@ -15,7 +15,6 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
     providedIn: 'root'
 })
 export class LayoutSidebarService {
-    public chefInfraServerViewsFeatureFlagOn: boolean;
     public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
     private workflowEnabled$: Observable<boolean>;
@@ -27,7 +26,6 @@ export class LayoutSidebarService {
         private featureFlagsService: FeatureFlagsService
     ) {
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
-        this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
         this.updateSidebars();
     }
@@ -75,8 +73,7 @@ export class LayoutSidebarService {
               route: '/infrastructure/chef-servers',
               authorized: {
                 anyOf: [['/api/v0/infra/servers', 'get']]
-              },
-              visible$: new BehaviorSubject(this.chefInfraServerViewsFeatureFlagOn)
+              }
             },
             {
               name: 'Workflow',

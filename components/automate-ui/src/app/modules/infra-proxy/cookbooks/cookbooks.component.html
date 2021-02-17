@@ -4,9 +4,12 @@
   <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
     <chef-table>
       <chef-thead>
-        <chef-tr>
-          <chef-th>Cookbook Name</chef-th>
-          <chef-th>Cookbook Version</chef-th>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th">Cookbook Version</chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -15,6 +18,9 @@
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
           </chef-td>
           <chef-td>{{ cookbook.version }}</chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
+          <chef-td></chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
