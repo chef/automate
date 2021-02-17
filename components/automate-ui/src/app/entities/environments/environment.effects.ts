@@ -14,7 +14,7 @@ import {
   EnvironmentActionTypes,
   GetEnvironment,
   GetEnvironmentSuccess,
-  GetEnvironmentFailure  
+  GetEnvironmentFailure
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';

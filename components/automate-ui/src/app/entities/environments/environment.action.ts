@@ -65,4 +65,3 @@ export type EnvironmentActions =
   | GetEnvironment
   | GetEnvironmentSuccess
   | GetEnvironmentFailure;
-  

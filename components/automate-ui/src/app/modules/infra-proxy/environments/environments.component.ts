@@ -72,7 +72,6 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   searchEnvironment(currentText: string) {
     this.page = 1;
-    this.environmentsListLoading = true;
     this.searching = true;
     this.searchValue = currentText;
     this.getEnvironmentData();
@@ -80,7 +79,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   onPageChange(event: number): void {
     this.page = event;
-    this.environmentsListLoading = true;
+    this.searching = true;
     this.getEnvironmentData();
   }
 

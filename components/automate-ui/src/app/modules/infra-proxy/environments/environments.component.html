@@ -5,7 +5,7 @@
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
     </div> 
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching && !environments.length" size="50" fixed></chef-loading-spinner>   
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searching && !environments.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
