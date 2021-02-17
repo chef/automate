@@ -7,6 +7,10 @@ import { InfraRole } from './infra-role.model';
 export interface InfraRoleEntityState extends EntityState<InfraRole> {
   rolesStatus: EntityStatus;
   getAllStatus: EntityStatus;
+  roleList: {
+    items: InfraRole[],
+    total: number
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -17,8 +21,8 @@ export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdap
 
 export const InfraRoleEntityInitialState: InfraRoleEntityState =
   infraRoleEntityAdapter.getInitialState(<InfraRoleEntityState>{
-  getAllStatus: EntityStatus.notLoaded
-});
+    getAllStatus: EntityStatus.notLoaded
+  });
 
 export function infraRoleEntityReducer(
   state: InfraRoleEntityState = InfraRoleEntityInitialState,
@@ -30,11 +34,13 @@ export function infraRoleEntityReducer(
 
     case RoleActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (infraRoleEntityAdapter.setAll(action.payload.roles, state)) as InfraRoleEntityState;
+        set('roleList.items', action.payload.roles || []),
+        set('roleList.total', action.payload.total || 0)
+        )(state) as InfraRoleEntityState;
 
     case RoleActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
 
     default:
       return state;

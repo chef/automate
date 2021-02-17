@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit,
+  OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -6,14 +7,12 @@ import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus } from 'app/entities/entities';
-import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
+import {  GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
-  allInfraRoles,
-  getAllStatus as getAllRolesForOrgStatus
+  getAllStatus,
+  roleList
 } from 'app/entities/infra-roles/infra-role.selectors';
-
 
 @Component({
   selector: 'app-infra-roles',
@@ -28,8 +27,14 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   private isDestroyed = new Subject<boolean>();
   public roles: InfraRole[] = [];
+  public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public page = 1;
+  public per_page = 9;
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -39,23 +44,60 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetRoles({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    const payload = {
+      roleName: '',
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new GetRoles(payload));
+
 
     combineLatest([
-      this.store.select(getAllRolesForOrgStatus),
-      this.store.select(allInfraRoles)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getRolesSt, allInfraRolesState]) => {
-      if (getRolesSt === EntityStatus.loadingSuccess && !isNil(allInfraRolesState)) {
-        this.roles = allInfraRolesState;
+      this.store.select(getAllStatus),
+      this.store.select(roleList)
+    ]).pipe(
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getRolesSt, RolesState]) => {
+
+      if (!isNil(RolesState)) {
+        this.roleListState = RolesState;
+        this.roles = RolesState?.items;
+        this.total = RolesState?.total;
         this.rolesListLoading = false;
-      } else if (getRolesSt === EntityStatus.loadingFailure) {
-        this.rolesListLoading = false;
-        this.authFailure = true;
+        this.searching = false;
       }
+
     });
+
+  }
+
+  searchRoles(currentText: string) {
+    this.page = 1;
+    this.searching = true;
+    this.searchValue = currentText;
+
+    this.getRolesData();
+  }
+
+  onPageChange(event: number): void {
+    this.page = event;
+    this.searching = true;
+    this.getRolesData();
+  }
+
+  getRolesData() {
+    const payload = {
+      roleName: this.searchValue,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new GetRoles(payload));
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

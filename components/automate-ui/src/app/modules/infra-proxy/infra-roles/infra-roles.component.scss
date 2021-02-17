@@ -33,3 +33,25 @@ chef-loading-spinner {
   width: 100px;
   z-index: 199;
 }
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  margin-top: 239px;
+  background-color: #FFFFFF;
+  opacity: 0.7;
+  width: initial;
+}
+
+.roles-list-paging {
+  margin: 0 0 35px;
+}

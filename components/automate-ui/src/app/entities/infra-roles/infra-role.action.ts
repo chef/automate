@@ -13,11 +13,21 @@ export enum RoleActionTypes {
 
 export interface RolesSuccessPayload {
   roles: InfraRole[];
+  total: number;
 }
+
+export interface RolesPayload {
+  roleName: string;
+  server_id: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+}
+
 
 export class GetRoles implements Action {
   readonly type = RoleActionTypes.GET_ALL;
-  constructor(public payload: { server_id: string, org_id: string }) { }
+  constructor(public payload: RolesPayload) { }
 }
 
 export class GetRolesSuccess implements Action {
