@@ -13,11 +13,20 @@ export enum ClientActionTypes {
 
 export interface ClientsSuccessPayload {
   clients: Client[];
+  total: number;
+}
+
+export interface ClientsPayload {
+  clientName: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+  server_id: string;
 }
 
 export class GetClients implements Action {
   readonly type = ClientActionTypes.GET_ALL;
-  constructor(public payload: { server_id: string, org_id: string }) { }
+  constructor(public payload: ClientsPayload) { }
 }
 
 export class GetClientsSuccess implements Action {

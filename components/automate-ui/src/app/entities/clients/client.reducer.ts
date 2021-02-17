@@ -7,6 +7,10 @@ import { Client } from './client.model';
 export interface ClientEntityState extends EntityState<Client> {
   clientsStatus: EntityStatus;
   getAllStatus: EntityStatus;
+  clientList: {
+    items: Client[],
+    total: number
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -31,9 +35,9 @@ export function clientEntityReducer(
 
     case ClientActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (clientEntityAdapter.setAll(action.payload.clients, state)) as
-        ClientEntityState;
+        set('clientList.items', action.payload.clients || []),
+        set('clientList.total', action.payload.total || 0)
+        )(state) as ClientEntityState;
 
     case ClientActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

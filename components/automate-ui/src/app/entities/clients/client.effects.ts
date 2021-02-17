@@ -29,8 +29,8 @@ export class ClientEffects {
   @Effect()
   getClients$ = this.actions$.pipe(
     ofType(ClientActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetClients) =>
-      this.requests.getClients(server_id, org_id).pipe(
+    mergeMap((action: GetClients) =>
+    this.requests.getClients(action.payload).pipe(
         map((resp: ClientsSuccessPayload) => new GetClientsSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
         observableOf(new GetClientsFailure(error))))));

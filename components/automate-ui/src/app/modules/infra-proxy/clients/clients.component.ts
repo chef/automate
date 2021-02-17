@@ -6,12 +6,11 @@ import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { EntityStatus } from 'app/entities/entities';
 import { GetClients } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import {
-  allClients,
-  getAllStatus as getAllClientsForOrgStatus
+  getAllStatus,
+  clientList
 } from 'app/entities/clients/client.selectors';
 
 
@@ -28,8 +27,15 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   private isDestroyed = new Subject<boolean>();
   public clients: Client[] = [];
+  public clientListState: { items: Client[], total: number };
   public clientsListLoading = true;
   public authFailure = false;
+  public clientName: string;
+  public searching = false;
+  public searchValue = '';
+  public page = 1;
+  public per_page = 9;
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -39,23 +45,54 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetClients({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    const payload = {
+      clientName: '',
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+    this.store.dispatch(new GetClients(payload));
 
     combineLatest([
-      this.store.select(getAllClientsForOrgStatus),
-      this.store.select(allClients)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([getClientsSt, allClientsState]) => {
-      if (getClientsSt === EntityStatus.loadingSuccess && !isNil(allClientsState)) {
-        this.clients = allClientsState;
+      this.store.select(getAllStatus),
+      this.store.select(clientList)
+    ]).pipe(
+      takeUntil(this.isDestroyed))
+    .subscribe(([_getClientsSt, ClientsState]) => {
+      if (!isNil(ClientsState)) {
+        this.clientListState = ClientsState;
+        this.clients = ClientsState?.items;
+        this.total = ClientsState?.total;
         this.clientsListLoading = false;
-      } else if (getClientsSt === EntityStatus.loadingFailure) {
-        this.clientsListLoading = false;
-        this.authFailure = true;
+        this.searching = false;
       }
     });
+  }
+
+  searchClients(currentText: string) {
+    this.page = 1;
+    this.searching = true;
+    this.searchValue = currentText;
+    this.getClientsData();
+  }
+
+  onPageChange(event: number): void {
+    this.page = event;
+    this.searching = true;
+    this.getClientsData();
+  }
+
+  getClientsData() {
+    const payload = {
+      clientName: this.searchValue,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new GetClients(payload));
   }
 
   resetKeyTabRedirection(resetLink: boolean) {
