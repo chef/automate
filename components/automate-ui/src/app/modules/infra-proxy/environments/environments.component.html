@@ -8,8 +8,8 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching && !environments.length" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searching && !environments.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchText != ''">No results found for "{{searchText}}".</p>
-      <p *ngIf="searchText === ''">No environment available.</p>
+      <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue === ''">No environment available.</p>
     </div>
     <chef-table *ngIf="environments.length">
       <chef-thead>

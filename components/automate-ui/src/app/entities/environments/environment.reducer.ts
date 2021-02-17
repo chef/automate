@@ -7,14 +7,13 @@ import { Environment } from './environment.model';
 export interface EnvironmentEntityState extends EntityState<Environment> {
   environmentsStatus: EntityStatus;
   getAllStatus: EntityStatus;
-  getSearchStatus: EntityStatus;
   environmentList: {
     items: Environment[],
     total: number
   };
 }
 
-const GET_GETALL_STATUS = 'getSearchStatus';
+const GET_ALL_STATUS = 'getAllStatus';
 
 export const environmentEntityAdapter: EntityAdapter<Environment> =
   createEntityAdapter<Environment>({
@@ -31,18 +30,18 @@ export function environmentEntityReducer(
   action: EnvironmentActions): EnvironmentEntityState {
 
   switch (action.type) {
-    case EnvironmentActionTypes.GETALL:
-      return set(GET_GETALL_STATUS, EntityStatus.loading, environmentEntityAdapter
+    case EnvironmentActionTypes.GET_ALL:
+      return set(GET_ALL_STATUS, EntityStatus.loading, environmentEntityAdapter
         .removeAll(state));
 
-    case EnvironmentActionTypes.GETALL_SUCCESS:
+    case EnvironmentActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set('environmentList.items', action.payload.environments || []),
         set('environmentList.total', action.payload.total || 0)
         )(state) as EnvironmentEntityState;
 
-    case EnvironmentActionTypes.GETALL_FAILURE:
-      return set(GET_GETALL_STATUS, EntityStatus.loadingFailure, state);
+    case EnvironmentActionTypes.GET_ALL_FAILURE:
+      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

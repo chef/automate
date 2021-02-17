@@ -3,12 +3,40 @@ import { Action } from '@ngrx/store';
 import { Environment } from './environment.model';
 
 export enum EnvironmentActionTypes {
+  GET_ALL = 'ENVIRONMENTS::GET_ALL',
+  GET_ALL_SUCCESS = 'ENVIRONMENTS::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE = 'ENVIRONMENTS::GET_ALL::FAILURE',
   GET = 'ENVIRONMENTS::GET',
   GET_SUCCESS = 'ENVIRONMENTS::GET::SUCCESS',
-  GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE',
-  GETALL = 'ENVIRONMENTS::GETALL',
-  GETALL_SUCCESS = 'ENVIRONMENTS::GETALL::SUCCESS',
-  GETALL_FAILURE = 'ENVIRONMENTS::GETALL::FAILURE'
+  GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE'
+}
+
+export interface GetEnvironmentsPayload {
+  environmentName: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+  server_id: string;
+}
+
+export class GetEnvironments implements Action {
+  readonly type = EnvironmentActionTypes.GET_ALL;
+  constructor(public payload: GetEnvironmentsPayload) { }
+}
+
+export interface GetEnvironmentsSuccessPayload {
+  environments: Environment[];
+  total: number;
+}
+
+export class GetEnvironmentsSuccess implements Action {
+  readonly type = EnvironmentActionTypes.GET_ALL_SUCCESS;
+  constructor(public payload: GetEnvironmentsSuccessPayload) { }
+}
+
+export class GetEnvironmentsFailure implements Action {
+  readonly type = EnvironmentActionTypes.GET_ALL_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export interface EnvironmentsSuccessPayload {
@@ -30,39 +58,10 @@ export class GetEnvironmentFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export interface EnvironmentGetAllPayload {
-  environmentName: string;
-  org_id: string;
-  page: number;
-  per_page: number;
-  server_id: string;
-}
-
-export class EnvironmentGetAll implements Action {
-  readonly type = EnvironmentActionTypes.GETALL;
-  constructor(public payload: EnvironmentGetAllPayload) { }
-}
-
-export interface EnvironmentGetAllSuccessPayload {
-  environments: Environment[];
-  total: number;
-}
-
-export class EnvironmentGetAllSuccess implements Action {
-  readonly type = EnvironmentActionTypes.GETALL_SUCCESS;
-  constructor(public payload: EnvironmentGetAllSuccessPayload) { }
-}
-
-export class EnvironmentGetAllFailure implements Action {
-  readonly type = EnvironmentActionTypes.GETALL_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
-}
-
 export type EnvironmentActions =
+  | GetEnvironments
+  | GetEnvironmentsSuccess
+  | GetEnvironmentsFailure
   | GetEnvironment
   | GetEnvironmentSuccess
-  | GetEnvironmentFailure
-  | EnvironmentGetAll
-  | EnvironmentGetAllSuccess
-  | EnvironmentGetAllFailure;
-
+  | GetEnvironmentFailure;

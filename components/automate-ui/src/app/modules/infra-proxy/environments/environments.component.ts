@@ -6,9 +6,9 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { EnvironmentGetAll } from 'app/entities/environments/environment.action';
+import { GetEnvironments } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
-import { getSearchStatus, environmentList } from 'app/entities/environments/environment.selectors';
+import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
 
 
 @Component({
@@ -25,16 +25,14 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public environments: Environment[] = [];
   public environmentsListLoading = true;
+  public environmentListState: { items: Environment[], total: number };
   public authFailure = false;
-  public environmentsSearch: Environment[];
-  public environmentsName: string;
-  public searching = false;
-  public searchText = '';
-  public total: number;
-  public per_page = 20;
+  public per_page = 9;
   public page = 1;
-  public environmentListState;
-  
+  public searching = false;
+  public searchValue = '';
+  public total: number;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -50,11 +48,11 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
         server_id: this.serverId,
         org_id: this.orgId
       };
-  
-      this.store.dispatch(new EnvironmentGetAll(payload));
+
+      this.store.dispatch(new GetEnvironments(payload));
 
     combineLatest([
-        this.store.select(getSearchStatus),
+        this.store.select(getAllStatus),
         this.store.select(environmentList)
       ]).pipe(
         takeUntil(this.isDestroyed))
@@ -75,28 +73,28 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   searchEnvironment(currentText: string) {
     this.page = 1;
-    this.searching = true;
     this.environmentsListLoading = true;
-    this.searchText = currentText;
-    this.getData()
+    this.searching = true;
+    this.searchValue = currentText;
+    this.getEnvironmentData();
   }
 
   onPageChange(event: number): void {
     this.page = event;
     this.environmentsListLoading = true;
-    this.getData()
+    this.getEnvironmentData();
   }
 
-  getData() {
+  getEnvironmentData() {
     const payload = {
-      environmentName: this.searchText,
+      environmentName: this.searchValue,
       page: this.page,
       per_page: this.per_page,
       server_id: this.serverId,
       org_id: this.orgId
     };
 
-    this.store.dispatch(new EnvironmentGetAll(payload));
+    this.store.dispatch(new GetEnvironments(payload));
   }
 
   ngOnDestroy(): void {

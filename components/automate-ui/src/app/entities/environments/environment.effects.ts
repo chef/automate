@@ -7,14 +7,14 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
+  GetEnvironments,
+  GetEnvironmentsSuccess,
+  GetEnvironmentsSuccessPayload,
+  GetEnvironmentsFailure,
   EnvironmentActionTypes,
   GetEnvironment,
   GetEnvironmentSuccess,
-  GetEnvironmentFailure,
-  EnvironmentGetAll,
-  EnvironmentGetAllSuccess,
-  EnvironmentGetAllSuccessPayload,
-  EnvironmentGetAllFailure
+  GetEnvironmentFailure  
 } from './environment.action';
 
 import { EnvironmentRequests } from './environment.requests';
@@ -25,6 +25,26 @@ export class EnvironmentEffects {
     private actions$: Actions,
     private requests: EnvironmentRequests
   ) { }
+
+  @Effect()
+  getEnvironments$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.GET_ALL),
+    mergeMap((action: GetEnvironments) =>
+      this.requests.getEnvironments(action.payload).pipe(
+        map((resp: GetEnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetEnvironmentsFailure(error))))));
+
+  @Effect()
+  getEnvironmentsFailure$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetEnvironmentsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra Environment details: ${msg || payload.error}`
+      });
+    }));
 
   @Effect()
   getEnvironment$ = this.actions$.pipe(
@@ -45,24 +65,4 @@ export class EnvironmentEffects {
         message: `Could not get environment: ${msg || payload.error}`
       });
     }));
-
-    @Effect()
-    getEnvironmentSearch$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GETALL),
-      mergeMap((action: EnvironmentGetAll) =>
-        this.requests.getEnvironments(action.payload).pipe(
-          map((resp: EnvironmentGetAllSuccessPayload) => new EnvironmentGetAllSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-            observableOf(new EnvironmentGetAllFailure(error))))));
-
-    @Effect()
-    getEnvironmentSearchFailure$ = this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GETALL_FAILURE),
-      map(({ payload }: EnvironmentGetAllFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra Environment details: ${msg || payload.error}`
-        });
-      }));
 }
