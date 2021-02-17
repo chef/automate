@@ -27,36 +27,55 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <div class="section-container" *ngIf="dataBagDetails">
-          <div class="empty-section" *ngIf="!dataBagDetails.length">No data available</div>
-          <div class="details-row" *ngIf="dataBagDetails.length">
-            <div class="item-column">
-              <ul>
-                <li *ngFor="let item of dataBagDetails" [class.selected]="item.name === selectedItem"
-                  (click)="handleItemSelected(item.name)">
-                  {{item.name}}
-                  <chef-icon class="arrow">play_arrow</chef-icon>
-                </li>
-              </ul>
-            </div>
-            <div class="item-details-column">
-              <chef-loading-spinner *ngIf="dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
-              <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
-                <div class="expand-collapse">
-                  <span class="action" (click)="tree.expand()">
-                    <chef-icon>add_circle</chef-icon>
-                    <span>Expand All</span>
-                  </span>
-                  <span class="separator">|</span>
-                  <span class="action" (click)="tree.collapse()">
-                    <chef-icon>remove_circle</chef-icon>
-                    <span>Collapse All</span>
-                  </span>
-                </div>
-                <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
-              </div>
-            </div>
+        <div class="search-items">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
+        </div>
+        <div class="section-container" *ngIf="dataBagItems">
+          <chef-loading-spinner *ngIf="searching" size="50" fixed></chef-loading-spinner>
+          <div class="empty-section" *ngIf="!searching && !dataBagItems.length">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p *ngIf="searchValue === ''">No data bag items available</p>
+            <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
           </div>
+          <div *ngIf="dataBagItems.length">
+            <ul id="accordion" class="accordion" >
+              <li *ngFor="let item of dataBagItems; let i = index" [class.active]="item.active" class="items">
+                <div class="menu" (click)="handleItemSelected(item.name, i)">
+                  <div class="data-bag-name">
+                    {{ item.name }}
+                  </div>
+                  <!-- <i class="fa fa-chevron-down"></i> -->
+                  <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+                </div>
+                <div class="submenu" [ngClass]="item.active ? activeClassName : ''"> 
+                  <div class="item-details">
+                    <chef-loading-spinner *ngIf="item.active && dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
+                    <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
+                      <div class="expand-collapse">
+                        <span class="action" (click)="tree.expand()">
+                          <chef-icon>add_circle</chef-icon>
+                          <span>Expand All</span>
+                        </span>
+                        <span class="separator">|</span>
+                        <span class="action" (click)="tree.collapse()">
+                          <chef-icon>remove_circle</chef-icon>
+                          <span>Collapse All</span>
+                        </span>
+                      </div>
+                      <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
+                    </div>
+                  </div>  
+                </div>
+              </li>
+            </ul>
+          </div>
+          <app-page-picker
+            class="data-bag-items-list-paging"
+            [total]="total"
+            [perPage]="per_page"
+            [page]="page"
+            (pageChanged)="onPageChange($event)">
+          </app-page-picker>
         </div>
       </section>
     </main>

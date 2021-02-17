@@ -8,9 +8,9 @@ import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
 
-import { GetDataBagDetails } from 'app/entities/data-bags/data-bag-details.actions';
-import { DataBags, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import { allDataBagDetails, getAllStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { GetDataBagItems } from 'app/entities/data-bags/data-bag-details.actions';
+import { DataBagItems, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
+import {  getAllStatus, dataBagItemList } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
 
@@ -23,7 +23,8 @@ export type DataBagsDetailsTab = 'details';
 })
 export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
-  public dataBagDetails: DataBags[];
+  public dataBagItems: DataBagItems[];
+  public dataBagSearch: DataBagItems[];
   public dataBagItemDetails: DataBagsItemDetails;
   public serverId: string;
   public orgId: string;
@@ -33,6 +34,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public selectedItem: string;
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
+  public activeClassName: string;
+  public searching = false;
+  public searchValue = '';
+  public page = 1;
+  public per_page = 9;
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -52,29 +59,32 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.orgId = org_id;
       this.dataBagsName = dataBags_name;
-      this.store.dispatch(new GetDataBagDetails({
-        server_id: server_id,
-        org_id: org_id,
-        name: dataBags_name
-      }));
+      const payload = {
+        databagName: '',
+        server_id: this.serverId,
+        org_id: this.orgId,
+        name: this.dataBagsName,
+        page: this.page,
+        per_page: this.per_page
+      };
+      this.store.dispatch(new GetDataBagItems(payload));
     });
 
     combineLatest([
       this.store.select(getAllStatus),
-      this.store.select(allDataBagDetails)
+      this.store.select(dataBagItemList)
     ]).pipe(
-      filter(([getDataBagDetailsSt, _dataBagDetailsState]) =>
-        getDataBagDetailsSt === EntityStatus.loadingSuccess),
-      filter(([_getDataBagDetailsSt, dataBagDetailsState]) =>
-        !isNil(dataBagDetailsState)),
+      filter(([getDataBagItemsSt, _dataBagItemsState]) =>
+      getDataBagItemsSt === EntityStatus.loadingSuccess),
+      filter(([_getDataBagItemsSt, dataBagItemsState]) =>
+        !isNil(dataBagItemsState)),
       takeUntil(this.isDestroyed))
-      .subscribe(([_getDataBagDetailsSt, dataBagDetailsState]) => {
-        this.dataBagDetails = dataBagDetailsState;
-        // This code block is for selecting first item from the list by default.
-        if (this.dataBagDetails.length) {
-          this.handleItemSelected(this.dataBagDetails[0].name);
-        }
+      .subscribe(([_getDataBagItemsSt, dataBagItemsState]) => {
+        this.dataBagItems = dataBagItemsState.items;
+        this.total = dataBagItemsState.total;
+        this.appendActiveToItems(this.dataBagItems);
         this.dataBagsDetailsLoading = false;
+        this.searching = false;
       });
 
     combineLatest([
@@ -92,7 +102,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  public handleItemSelected(item: string): void {
+  public handleItemSelected(item: string, index: number): void {
     this.selectedItem = item;
     this.dataBagsItemDetailsLoading = true;
     this.store.dispatch(new GetDataBagItemDetails({
@@ -101,10 +111,51 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       name: this.dataBagsName,
       item_name: item
     }));
+
+    this.dataBagItems.filter(
+      (d_item, i) => i !== index && d_item.active
+    ).forEach(menu => menu.active = !menu.active);
+
+    this.dataBagItems[index].active = !this.dataBagItems[index].active;
+    this.activeClassName = 'autoHeight';
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  appendActiveToItems (items: DataBagItems[]) {
+    items.forEach((i, index) => {
+      const tempItem = i;
+      tempItem['active'] = false;
+      items[index] = tempItem;
+    });
+    this.dataBagItems = items;
+  }
+
+  searchDataBagItems(currentText: string) {
+    this.searching = true;
+    this.page = 1;
+    this.searchValue = currentText;
+    this.getDataBagItemsData();
+  }
+
+  onPageChange(event: number): void {
+    this.searching = true;
+    this.page = event;
+    this.getDataBagItemsData();
+  }
+
+  getDataBagItemsData() {
+    const payload = {
+      databagName: this.searchValue,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.dataBagsName,
+      page: this.page,
+      per_page: this.per_page
+    };
+    this.store.dispatch(new GetDataBagItems(payload));
   }
 }

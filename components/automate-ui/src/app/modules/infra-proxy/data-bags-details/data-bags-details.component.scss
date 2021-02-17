@@ -6,6 +6,7 @@ chef-page-header {
 }
 
 chef-loading-spinner {
+  margin-top: 188px;
   z-index: 199;
 }
 
@@ -13,36 +14,33 @@ chef-loading-spinner {
 
   .details-row {
     display: flex;
+  }
 
-    .item-column {
-      flex-basis: 30%;
-      height: fit-content;
-      margin-right: 1em;
-      padding: 1em;
-      border: 1px solid $chef-light-grey;
-      background-color: $chef-white;
-      border-radius: $global-radius;
+  .item-details {
+    chef-loading-spinner {
+      display: flex;
+      margin: auto auto;
+      width: 100%;
+      position: relative;
     }
 
-    .item-details-column {
-      chef-loading-spinner {
-        display: flex;
-        margin: auto auto;
-        width: 100%;
-        position: relative;
-      }
-
-      flex-basis: 70%;
-      padding: 1em;
-      border: 1px solid $chef-light-grey;
-      background-color: $chef-white;
-      border-radius: $global-radius;
+    ::ng-deep chef-loading-spinner svg {
+      width: 25px;
     }
+
+    flex-basis: 70%;
+    padding: 1em;
+    border: 1px solid $chef-light-grey;
+    background-color: $chef-white;
   }
 
   .empty-section {
-    padding: 35px;
+    margin-top: 130px;
     text-align: center;
+  }
+
+  img {
+    width: 70px;
   }
 
   ul {
@@ -52,7 +50,6 @@ chef-loading-spinner {
   }
 
   li {
-    padding: 10px 10px;
     cursor: pointer;
 
     &:hover, &.selected {
@@ -117,9 +114,11 @@ tbody > .detail-row {
 }
 
 .expand-collapse {
-  font-size: 13px;
-  color: $link-blue;
-  margin-bottom: 16px;
+  border-bottom: 0.5px solid #CFD2D2;
+  font-size: 14px;
+  color: $royal-blue;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
 
   .action {
     cursor: pointer;
@@ -128,4 +127,118 @@ tbody > .detail-row {
   .separator {
     margin: 0 5px;
   }
+}
+
+.jsontree_tree .jsontree_label {
+  color: $royal-blue;
+}
+
+.search-button {
+  box-shadow: 0 1px 14px #E6EBEE;
+  border: 1px solid #E5E5E5;
+  border-left: none;
+  border-radius: 0px 4px 4px 0px;
+  background: #E6EBEE;
+  width: 2.6%;
+  height: 45px;
+  float: right;
+}
+
+.chef-input {
+  border-radius: 4px 0px 0px 4px;
+  // border-right: none;
+  width: 97.4%;
+}
+
+.search-items {
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+chef-tab-selector chef-option:before {
+  height: 3px;
+}
+
+// CSS for accordion
+
+.accordion {
+  margin: auto;
+  border-radius: 4px;
+  padding-inline-start: 0px;
+  width: 100%;
+}
+
+.accordion {
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    list-style-type: none;
+    margin-bottom: 10px;
+  }
+}
+
+.accordion .menu {
+  background-color: $chef-white;
+  border-radius: 4px 4px 0px 0px;
+  border: 1px solid #E5E5E5;
+  border-bottom: none;
+  cursor: pointer;
+  font-weight: bold;
+  height: 40px;
+  position: relative;
+  padding: 10px 10px 10px 15px;
+  transition: all 0.4s ease;
+}
+
+.accordion li:last-child .menu {
+  border-bottom: 0;
+}
+
+.accordion li .arrows {
+  right: 1rem;
+  left: auto;
+  float: right;
+}
+
+.accordion li .data-bag-name {
+  float: left;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.accordion li.active .arrows {
+  transform: rotate(180deg);
+}
+
+.accordion li.active .menu {
+  background: #DEE5FD;
+}
+
+.submenu {
+  background-color: #FFF;
+  border: 1px solid #E5E5E5;
+  border-top: none;
+  border-radius: 0px 0px 4px 4px;
+  font-size: 12px;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.4s ease;
+}
+
+.submenu .item-details {
+  padding: 15px;
+}
+
+.accordion .submenu {
+  border-radius: 0 0 4px 4px;
+}
+
+.accordion li:last-child .submenu li:last-child {
+  border-bottom: 0;
+}
+
+.autoHeight {
+  height: auto;
 }

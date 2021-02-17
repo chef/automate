@@ -15,17 +15,18 @@ import { CreateChefServerModalComponent } from './create-chef-server-modal/creat
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
+import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
+import { InfraSearchBarComponent } from './infra-search-bar/infra-search-bar.component';
 import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.component';
 import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
-import { EmptyStateComponent } from './empty-state/empty-state.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { EmptyStateComponent } from './empty-state/empty-state.component';
     JsonTreeTableComponent,
     InfraRolesComponent,
     InfraRoleDetailsComponent,
+    InfraSearchBarComponent,
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,

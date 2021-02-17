@@ -1,40 +1,46 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
-import { DataBagDetailsActionTypes, DataBagDetailsActions } from './data-bag-details.actions';
-import { DataBags } from './data-bags.model';
+import { DataBagItemsActionTypes, DataBagItemsActions } from './data-bag-details.actions';
+import { DataBagItems } from './data-bags.model';
 
-export interface DataBagDetailsEntityState extends EntityState<DataBags> {
+export interface DataBagItemsEntityState extends EntityState<DataBagItems> {
   getAllStatus: EntityStatus;
+  dataBagItems: {
+    items: DataBagItems[],
+    total: number;
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
 
-export const dataBagDetailsEntityAdapter: EntityAdapter<DataBags> = createEntityAdapter<DataBags>({
-  selectId: (dataBags: DataBags) => dataBags.name
+export const dataBagItemsEntityAdapter: EntityAdapter<DataBagItems> =
+  createEntityAdapter<DataBagItems>({
+    selectId: (dataBagItems: DataBagItems) => dataBagItems.name
 });
 
-export const DataBagDetailsEntityInitialState: DataBagDetailsEntityState =
-  dataBagDetailsEntityAdapter.getInitialState(<DataBagDetailsEntityState>{
+export const DataBagItemsEntityInitialState: DataBagItemsEntityState =
+  dataBagItemsEntityAdapter.getInitialState(<DataBagItemsEntityState>{
     getAllStatus: EntityStatus.notLoaded
   });
 
-export function dataBagDetailsEntityReducer(
-  state: DataBagDetailsEntityState = DataBagDetailsEntityInitialState,
-  action: DataBagDetailsActions): DataBagDetailsEntityState {
+export function dataBagItemsEntityReducer(
+  state: DataBagItemsEntityState = DataBagItemsEntityInitialState,
+  action: DataBagItemsActions): DataBagItemsEntityState {
 
   switch (action.type) {
-    case DataBagDetailsActionTypes.GET_ALL:
-      return set(GET_ALL_STATUS, EntityStatus.loading, dataBagDetailsEntityAdapter
+    case DataBagItemsActionTypes.GET_ALL:
+      return set(GET_ALL_STATUS, EntityStatus.loading, dataBagItemsEntityAdapter
         .removeAll(state));
 
-    case DataBagDetailsActionTypes.GET_ALL_SUCCESS:
+    case DataBagItemsActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (dataBagDetailsEntityAdapter
-          .setAll(action.payload.data_bags, state)) as DataBagDetailsEntityState;
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
+        set('dataBagItems.items', action.payload.items || []),
+        set('dataBagItems.total', action.payload.total || 0)
+        )(state) as DataBagItemsEntityState;
 
-    case DataBagDetailsActionTypes.GET_ALL_FAILURE:
+    case DataBagItemsActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
     default:
@@ -43,4 +49,4 @@ export function dataBagDetailsEntityReducer(
 }
 
 export const getEntityById = (id: string) =>
-  (state: DataBagDetailsEntityState) => state.entities[id];
+  (state: DataBagItemsEntityState) => state.entities[id];

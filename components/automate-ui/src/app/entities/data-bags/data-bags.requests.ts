@@ -3,11 +3,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { DataBagsSuccessPayload } from './data-bags.actions';
-import { DataBagDetailsSuccessPayload } from './data-bag-details.actions';
-import { DataBagsItemDetails } from './data-bags.model';
+import { DataBagItemPayload } from './data-bag-details.actions';
+import { DataBags, DataBagsItemDetails } from './data-bags.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
+
+export interface DataBagSearchResponse {
+  items: DataBags[];
+  total: number;
+}
 
 @Injectable()
 export class DataBagsRequests {
@@ -19,12 +24,18 @@ export class DataBagsRequests {
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags`, {headers});
   }
 
-  public getDataBagDetails(server_id: string, org_id: string, name: string)
-  : Observable<DataBagDetailsSuccessPayload> {
-    return this.http.get<DataBagDetailsSuccessPayload>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags?name=${name}`,
-      {headers}
-    );
+  public getDataBagItems(payload: DataBagItemPayload)
+  : Observable<DataBagSearchResponse> {
+
+    const wildCardSearch = '*';
+    const target = payload.databagName !== '' ?
+     'id:' + wildCardSearch + payload.databagName : wildCardSearch + ':';
+    const nameTarget = target + wildCardSearch;
+    const currentPage = payload.page - 1;
+    const params = `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`;
+    const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/data_bags/${payload.name}?${params}`;
+
+    return this.http.get<DataBagSearchResponse>(url, {headers});
   }
 
   public getDataBagItemDetails(server_id: string, org_id: string, name: string, item_name: string)

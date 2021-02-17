@@ -1,27 +1,29 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
+import { DataBagItemsEntityState, dataBagItemsEntityAdapter } from './data-bag-details.reducer';
 
-import { DataBagDetailsEntityState, dataBagDetailsEntityAdapter } from './data-bag-details.reducer';
 
-
-export const dataBagDetailsState =
-  createFeatureSelector<DataBagDetailsEntityState>
-('dataBagDetails');
+export const dataBagItemsState =
+  createFeatureSelector<DataBagItemsEntityState>('dataBagItems');
 
 export const {
-  selectAll: allDataBagDetails,
-  selectEntities: dataBagDetailsEntities
-} = dataBagDetailsEntityAdapter.getSelectors(dataBagDetailsState);
+  selectAll: allDataBagItems,
+  selectEntities: dataBagItemsEntities
+} = dataBagItemsEntityAdapter.getSelectors(dataBagItemsState);
 
 export const getAllStatus = createSelector(
-  dataBagDetailsState,
+  dataBagItemsState,
   (state) => state.getAllStatus
 );
 
-export const dataBagDetailsFromRoute = createSelector(
-  dataBagDetailsEntities,
+export const dataBagItemsFromRoute = createSelector(
+  dataBagItemsEntities,
   routeParams,
   (state, { name }) => find({ name }, state)
+);
+
+export const dataBagItemList = createSelector(
+  dataBagItemsState,
+  (state) => state.dataBagItems
 );

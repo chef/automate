@@ -7,40 +7,40 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetDataBagDetails,
-  GetDataBagDetailsSuccess,
-  GetDataBagDetailsFailure,
-  DataBagDetailsSuccessPayload,
-  DataBagDetailsActionTypes
+  GetDataBagItems,
+  GetDataBagItemsSuccess,
+  GetDataBagItemsFailure,
+  DataBagItemsActionTypes,
+  DataBagItemsSuccessPayload
 } from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
 
 @Injectable()
-export class DataBagDetailsEffects {
+export class DataBagItemsEffects {
   constructor(
     private actions$: Actions,
     private requests: DataBagsRequests
   ) { }
 
   @Effect()
-  getDataBagDetails$ = this.actions$.pipe(
-      ofType(DataBagDetailsActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id, name } }: GetDataBagDetails) =>
-        this.requests.getDataBagDetails(server_id, org_id, name).pipe(
-          map((resp: DataBagDetailsSuccessPayload) => new GetDataBagDetailsSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-          observableOf(new GetDataBagDetailsFailure(error))))));
+  getDataBagItems$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.GET_ALL),
+    mergeMap(( action: GetDataBagItems) =>
+      this.requests.getDataBagItems(action.payload).pipe(
+        map((resp: DataBagItemsSuccessPayload) => new GetDataBagItemsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetDataBagItemsFailure(error))))));
 
   @Effect()
-  getDataBagDetailsFailure$ = this.actions$.pipe(
-      ofType(DataBagDetailsActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetDataBagDetailsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra data bag details: ${msg || payload.error}`
-        });
-      }));
+  getDataBagItemsFailure$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetDataBagItemsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra data bag items: ${msg || payload.error}`
+      });
+    }));
 
 }
