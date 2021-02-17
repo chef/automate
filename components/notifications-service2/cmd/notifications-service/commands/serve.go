@@ -33,10 +33,10 @@ func runServeCommand(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	_, err = postgres.Start(c)
+	db, err := postgres.Start(c)
 	if err != nil {
 		return err
 	}
 
-	return server.RunGRPCServer(c)
+	return server.RunGRPCServer(db, c)
 }

@@ -10,12 +10,13 @@ import (
 
 	notifications "github.com/chef/automate/api/interservice/notifications/service"
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
+	"github.com/chef/automate/components/notifications-service2/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/version"
 )
 
-func RunGRPCServer(c *config.Notifications) error {
+func RunGRPCServer(db storage.Client, c *config.Notifications) error {
 	uri := fmt.Sprintf("%s:%d", c.Service.Host, c.Service.Port)
 	log.WithFields(log.Fields{"uri": uri}).Info("Starting notifications-service gRPC Server")
 	conn, err := net.Listen("tcp", uri)
@@ -28,7 +29,7 @@ func RunGRPCServer(c *config.Notifications) error {
 		secureconn.WithVersionInfo(version.Version, version.GitSHA))
 	grpcServer := connFactory.NewServer()
 
-	notificationsServer := New()
+	notificationsServer := New(db)
 	notifications.RegisterNotificationsServer(grpcServer, notificationsServer)
 
 	reflection.Register(grpcServer)
@@ -39,10 +40,12 @@ func RunGRPCServer(c *config.Notifications) error {
 
 type Server struct {
 	health *health.Service
+	db     storage.Client
 }
 
-func New() *Server {
+func New(db storage.Client) *Server {
 	return &Server{
+		db:     db,
 		health: health.NewService(),
 	}
 }
