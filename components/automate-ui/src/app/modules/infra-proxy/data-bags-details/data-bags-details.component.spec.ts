@@ -39,7 +39,7 @@ const items: DataBagItems[] = [{
   name: 'auth'
 }];
 
-const total: number = 10;
+const total = 10;
 
 describe('DataBagsDetailsComponent', () => {
   let component: DataBagsDetailsComponent;
