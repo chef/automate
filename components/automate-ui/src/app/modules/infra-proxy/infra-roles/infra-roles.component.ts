@@ -79,15 +79,14 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   searchRoles(currentText: string) {
     this.page = 1;
     this.searching = true;
-    this.rolesListLoading = true;
     this.searchValue = currentText;
 
     this.getRolesData();
   }
 
-  onPageChange(event): void {
+  onPageChange(event: number): void {
     this.page = event;
-    this.rolesListLoading = true;
+    this.searching = true;
     this.getRolesData();
   }
 
