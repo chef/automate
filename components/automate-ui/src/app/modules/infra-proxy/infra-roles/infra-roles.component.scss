@@ -44,10 +44,12 @@ img {
 }
 
 .full-screen-spinner {
+  background-color: #FFFFFF;
   display: flex;
   margin: auto;
-  width: initial;
   margin-top: 239px;
+  opacity: 0.7;
+  width: initial;
 }
 
 .roles-list-paging {
