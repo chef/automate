@@ -11,10 +11,10 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 
 
-jdomain_version="1.1.5"
-jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
-jdomain_source="https://github.com/nicholaschiasson/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
-jdomain_shasum=e7346dac41d473ea02995b7626bd0660115538c2c784dfe683e235c58dbc2c2c
+jdomain_version="master"
+jdomain_filename="ngx_upstream_jdomain-master.tar.gz"
+jdomain_source="https://github.com/wdaike/ngx_upstream_jdomain/archive/master.tar.gz"
+jdomain_shasum=3e7bedcddedf26d82da214d299e4cbee7605ac85a04ff3415c6b85de4f5a4ed5
 
 nginx_version="1.19.2"
 pkg_source="https://nginx.org/download/nginx-${nginx_version}.tar.gz"
