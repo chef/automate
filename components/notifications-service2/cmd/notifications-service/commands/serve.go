@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
+	"github.com/chef/automate/components/notifications-service2/pkg/storage/postgres"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +33,10 @@ func newServeCommand() *cobra.Command {
 
 func runServeCommand(cmd *cobra.Command, args []string) error {
 	c, err := config.FromFile(serveCmdFlags.configFile)
+	if err != nil {
+		return err
+	}
+	_, err = postgres.Start(c)
 	if err != nil {
 		return err
 	}
