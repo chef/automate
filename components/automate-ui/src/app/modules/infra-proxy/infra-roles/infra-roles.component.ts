@@ -1,5 +1,5 @@
 import { Component, Input, OnInit,
-  OnDestroy, EventEmitter, Output, ViewChild } from '@angular/core';
+  OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -13,7 +13,6 @@ import {
   getAllStatus,
   roleList
 } from 'app/entities/infra-roles/infra-role.selectors';
-import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-infra-roles',
@@ -25,7 +24,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   private isDestroyed = new Subject<boolean>();
   public roles: InfraRole[] = [];
