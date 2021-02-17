@@ -215,23 +215,29 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 
 		auth := c.GetV1().GetExternal().GetElasticsearch().GetAuth()
 		scheme := auth.GetScheme().GetValue()
-		if scheme != "" {
-			// External ES uses a supported auth scheme
-			if scheme != "basic_auth" {
-				cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
+		switch scheme {
+		case "basic_auth":
+			u := auth.GetBasicAuth().GetUsername().GetValue()
+			p := auth.GetBasicAuth().GetPassword().GetValue()
+			if u == "" {
+				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.username")
 			}
-
-			// Username and password specified in config if using basic auth
-			if scheme == "basic_auth" {
-				u := auth.GetBasicAuth().GetUsername().GetValue()
-				p := auth.GetBasicAuth().GetPassword().GetValue()
-				if u == "" {
-					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.username")
-				}
-				if p == "" {
-					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.password")
-				}
+			if p == "" {
+				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.basic_auth.password")
 			}
+		case "aws_es":
+			u := auth.GetAwsEs().GetUsername().GetValue()
+			p := auth.GetAwsEs().GetPassword().GetValue()
+			if u == "" {
+				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.username")
+			}
+			if p == "" {
+				cfgErr.AddMissingKey("global.v1.external.elasticsearch.auth.aws_es.password")
+			}
+		case "":
+		default:
+			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme",
+				"Scheme should be one of 'basic_auth', 'aws_es'.")
 		}
 	}
 

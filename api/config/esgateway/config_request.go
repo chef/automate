@@ -122,10 +122,10 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.External = &ConfigRequest_V1_System_External{
 			Enable: w.Bool(true),
 		}
+		endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
 		if len(nodes) > 0 {
 			isSSL := false
 
-			endpoints := make([]*ConfigRequest_V1_System_Endpoint, 0, len(nodes))
 			for _, n := range nodes {
 				endpoint, ssl := uriToEndpoint(n.GetValue())
 				endpoints = append(endpoints, endpoint)
@@ -144,7 +144,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			}
 		}
 
-		if auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() == "basic_auth" {
+		switch auth := g.GetV1().GetExternal().GetElasticsearch().GetAuth(); auth.GetScheme().GetValue() {
+		case "basic_auth":
 			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
 				fmt.Sprintf(
 					"%s:%s",
@@ -152,6 +153,20 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 					auth.GetBasicAuth().GetPassword().GetValue(),
 				),
 			)))
+		case "aws_es":
+			// If we only have 1 AWS Elasticsearch Service endpoint specified, we can assume that
+			// the host header should be the name of that endpoint.
+			if c.V1.Sys.Ngx.Http.ProxySetHeaderHost.Value == "$http_host" && len(endpoints) == 1 {
+				c.V1.Sys.Ngx.Http.ProxySetHeaderHost = endpoints[0].Address
+			}
+			c.V1.Sys.External.BasicAuthCredentials = w.String(base64.StdEncoding.EncodeToString([]byte(
+				fmt.Sprintf(
+					"%s:%s",
+					auth.GetAwsEs().GetUsername().GetValue(),
+					auth.GetAwsEs().GetPassword().GetValue(),
+				),
+			)))
+		default:
 		}
 
 		c.V1.Sys.External.RootCert = g.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert()

@@ -6,9 +6,7 @@ option go_package = "github.com/chef/automate/api/config/shared";
 import "google/protobuf/wrappers.proto";
 import "config/shared/tls.proto";
 
-message GlobalConfig {
-	V1 v1 = 1;
-}
+message GlobalConfig { V1 v1 = 1; }
 
 message V1 {
   google.protobuf.StringValue fqdn = 1;
@@ -58,8 +56,19 @@ message External {
         google.protobuf.StringValue username = 1;
         google.protobuf.StringValue password = 2;
       }
+      message AwsElasticsearchAuth {
+        // Authentication for Aws ES must provide a user and password for basic
+        // auth. access_key and secret_key can be optionally specified. They are
+        // needed for making snapshot repos, but if not provided, we can use the
+        // instance creds.
+        google.protobuf.StringValue username = 1;
+        google.protobuf.StringValue password = 2;
+        google.protobuf.StringValue access_key = 3;
+        google.protobuf.StringValue secret_key = 4;
+      }
       google.protobuf.StringValue scheme = 1;
       BasicAuth basic_auth = 2;
+      AwsElasticsearchAuth aws_es = 3;
     }
 
     message SSL {
@@ -76,9 +85,7 @@ message External {
   }
 
   message Postgresql {
-    message Backup {
-	  google.protobuf.BoolValue enable = 1;
-	}
+    message Backup { google.protobuf.BoolValue enable = 1; }
 
     message Authentication {
       message PasswordAuthentication {
@@ -130,9 +137,7 @@ message External {
   Automate automate = 3;
 }
 
-message Mlsa {
-  google.protobuf.BoolValue accept = 1;
-}
+message Mlsa { google.protobuf.BoolValue accept = 1; }
 
 message Proxy {
   google.protobuf.StringValue host = 1;
@@ -186,6 +191,9 @@ message Backups {
       google.protobuf.Int32Value max_retries = 11;
       google.protobuf.BoolValue use_throttle_retries = 12;
       google.protobuf.StringValue protocol = 13;
+      // Aws Elasticsearch
+      google.protobuf.StringValue region = 14;
+      google.protobuf.StringValue role_arn = 15;
     }
 
     message Bucket {
@@ -194,9 +202,7 @@ message Backups {
       google.protobuf.StringValue name = 3;
     }
 
-    message SSL {
-	  google.protobuf.StringValue root_cert = 1;
-	}
+    message SSL { google.protobuf.StringValue root_cert = 1; }
   }
 
   message GCS {
@@ -204,9 +210,7 @@ message Backups {
     Elasticsearch es = 2;
     Bucket bucket = 3;
 
-    message GCPCredentials {
-	  google.protobuf.StringValue json = 1;
-	}
+    message GCPCredentials { google.protobuf.StringValue json = 1; }
 
     message Elasticsearch {
       // Backup repo settings

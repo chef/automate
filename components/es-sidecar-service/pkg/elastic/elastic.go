@@ -6,9 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
+	elasticaws "gopkg.in/olivere/elastic.v6/aws/v4"
 )
 
 const (
@@ -36,7 +40,8 @@ const (
 
 // Elastic is the interface to this component.
 type Elastic struct {
-	client *elastic.Client
+	client           *elastic.Client
+	createRepoClient *elastic.Client
 }
 
 // HostDiskStats captures a collection of PerDiskStats
@@ -54,9 +59,28 @@ type DiskStats struct {
 	AvailableBytes int64
 }
 
+type newElasticOpt struct {
+	awsAuth *AwsElasticsearchAuth
+}
+
+// NewElasticOpts are optional constructor parameters for New
+type NewElasticOpts func(*newElasticOpt)
+
+func WithAwsAuth(awsAuth *AwsElasticsearchAuth) NewElasticOpts {
+	return func(o *newElasticOpt) {
+		if awsAuth != nil && awsAuth.Enable {
+			o.awsAuth = awsAuth
+		}
+	}
+}
+
 // New connects to the provided ES server instance and returns an Elastic instance
 // containing a client
-func New(esURL string) (*Elastic, error) {
+func New(esURL string, opts ...NewElasticOpts) (*Elastic, error) {
+	o := newElasticOpt{}
+	for _, opt := range opts {
+		opt(&o)
+	}
 	client, err := elastic.NewClient(
 		// NOTE - take a look at docs here to see what's relevant:
 		// https://github.com/olivere/elastic/wiki/Configuration
@@ -68,7 +92,33 @@ func New(esURL string) (*Elastic, error) {
 		return nil, errors.Wrap(err, "Failed to create ES client")
 	}
 
-	return &Elastic{client: client}, nil
+	createRepoClient := client
+	if o.awsAuth != nil && o.awsAuth.Enable {
+		var creds *credentials.Credentials
+		if o.awsAuth.AccessKey != "" && o.awsAuth.SecretKey != "" {
+			creds = credentials.NewStaticCredentials(o.awsAuth.AccessKey, o.awsAuth.SecretKey, "")
+		} else {
+			sess, err := session.NewSession(&aws.Config{})
+			if err != nil {
+				return nil, errors.Wrap(err, "Failed to initialize session object")
+			}
+			creds = sess.Config.Credentials
+		}
+
+		httpClient := elasticaws.NewV4SigningClient(creds, o.awsAuth.Region)
+		var err error
+		createRepoClient, err = elastic.NewClient(
+			elastic.SetURL(o.awsAuth.ESUrl),
+			elastic.SetSniff(false),
+			elastic.SetHttpClient(httpClient),
+			elastic.SetHealthcheck(false),
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to create ES client with aws signing")
+		}
+	}
+
+	return &Elastic{client: client, createRepoClient: createRepoClient}, nil
 }
 
 // DeleteTimeSeriesIndicesByAge deletes all indices names as baseName-YYYY-mm-dd that are older than

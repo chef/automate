@@ -3,6 +3,7 @@ package es_sidecar
 import (
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -91,7 +92,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
 
 	if externalCfg.GetEnable().GetValue() {
-		c.applyExternalConfig(backupsCfg, g.GetV1().GetBackups(), externalCfg.GetBackup())
+		c.applyExternalConfig(backupsCfg, g.GetV1().GetBackups(), externalCfg.GetBackup(),
+			externalCfg.GetAuth(), externalCfg.GetNodes())
 		// Early return as we don't need to migrate to the backup-gateway with
 		// external es
 		return
@@ -107,7 +109,9 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 func (c *ConfigRequest) applyExternalConfig(
 	cfg *ConfigRequest_V1_System_Backups,
 	global *ac.Backups,
-	override *ac.External_Elasticsearch_Backup) {
+	override *ac.External_Elasticsearch_Backup,
+	auth *ac.External_Elasticsearch_Authentication,
+	nodes []*wrapperspb.StringValue) {
 
 	// If backups are disabled we don't need to worry about applying any other
 	// config.
@@ -147,6 +151,14 @@ func (c *ConfigRequest) applyExternalConfig(
 
 		if s := extS3cfg.GetSettings(); s != nil {
 			cfg.S3.Es = s
+		}
+
+		if auth.GetScheme().GetValue() == "aws_es" {
+			cfg.S3.EnableAwsAuth = w.Bool(true)
+			cfg.S3.AwsAuth = auth.GetAwsEs()
+			if len(nodes) > 0 {
+				cfg.S3.EsUrl = nodes[0]
+			}
 		}
 	case "gcs":
 		cfg.Backend = w.String(backend)

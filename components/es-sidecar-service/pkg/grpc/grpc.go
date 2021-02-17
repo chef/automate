@@ -24,7 +24,9 @@ func Spawn(config *config.Service) error {
 	}
 	connFactory := secureconn.NewFactory(*tlsOpts)
 
-	es, err := elastic.New(config.ElasticsearchURL)
+	awsAuth := &config.BackupsConfig.S3BackupsConfig.Auth
+
+	es, err := elastic.New(config.ElasticsearchURL, elastic.WithAwsAuth(awsAuth))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"url":   config.ElasticsearchURL,
