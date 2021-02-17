@@ -6,14 +6,9 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { EntityStatus } from 'app/entities/entities';
 import { GetEnvironments } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
-import {
-  allEnvironments,
-  getAllStatus as getAllEnvironmentsForOrgStatus
-} from 'app/entities/environments/environment.selectors';
-
+import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
 
 @Component({
   selector: 'app-environments',
@@ -29,7 +24,13 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public environments: Environment[] = [];
   public environmentsListLoading = true;
+  public environmentListState: { items: Environment[], total: number };
   public authFailure = false;
+  public per_page = 9;
+  public page = 1;
+  public searching = false;
+  public searchValue = '';
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -39,27 +40,59 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetEnvironments({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    const payload = {
+        environmentName: '',
+        page: this.page,
+        per_page: this.per_page,
+        server_id: this.serverId,
+        org_id: this.orgId
+      };
+
+      this.store.dispatch(new GetEnvironments(payload));
 
     combineLatest([
-      this.store.select(getAllEnvironmentsForOrgStatus),
-      this.store.select(allEnvironments)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getEnvironmentsSt, allEnvironmentsState]) => {
-      if (getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(allEnvironmentsState)) {
-        this.environments = allEnvironmentsState;
-        this.environmentsListLoading = false;
-      } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
-        this.environmentsListLoading = false;
-        this.authFailure = true;
-      }
-    });
+        this.store.select(getAllStatus),
+        this.store.select(environmentList)
+      ]).pipe(
+        takeUntil(this.isDestroyed))
+      .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
+        if (!isNil(EnvironmentsState)) {
+          this.environmentListState = EnvironmentsState;
+          this.environments = EnvironmentsState?.items;
+          this.total = EnvironmentsState?.total;
+          this.environmentsListLoading = false;
+          this.searching = false;
+        }
+      });
   }
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  searchEnvironment(currentText: string) {
+    this.page = 1;
+    this.searching = true;
+    this.searchValue = currentText;
+    this.getEnvironmentData();
+  }
+
+  onPageChange(event: number): void {
+    this.page = event;
+    this.searching = true;
+    this.getEnvironmentData();
+  }
+
+  getEnvironmentData() {
+    const payload = {
+      environmentName: this.searchValue,
+      page: this.page,
+      per_page: this.per_page,
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+
+    this.store.dispatch(new GetEnvironments(payload));
   }
 
   ngOnDestroy(): void {

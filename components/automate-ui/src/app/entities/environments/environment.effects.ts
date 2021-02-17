@@ -9,7 +9,7 @@ import { Type } from 'app/entities/notifications/notification.model';
 import {
   GetEnvironments,
   GetEnvironmentsSuccess,
-  EnvironmentsSuccessPayload,
+  GetEnvironmentsSuccessPayload,
   GetEnvironmentsFailure,
   EnvironmentActionTypes,
   GetEnvironment,
@@ -29,11 +29,11 @@ export class EnvironmentEffects {
   @Effect()
   getEnvironments$ = this.actions$.pipe(
     ofType(EnvironmentActionTypes.GET_ALL),
-    mergeMap(({ payload: { server_id, org_id } }: GetEnvironments) =>
-      this.requests.getEnvironments(server_id, org_id).pipe(
-        map((resp: EnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
+    mergeMap((action: GetEnvironments) =>
+      this.requests.getEnvironments(action.payload).pipe(
+        map((resp: GetEnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-        observableOf(new GetEnvironmentsFailure(error))))));
+          observableOf(new GetEnvironmentsFailure(error))))));
 
   @Effect()
   getEnvironmentsFailure$ = this.actions$.pipe(
@@ -42,7 +42,7 @@ export class EnvironmentEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get environments: ${msg || payload.error}`
+        message: `Could not get infra Environment details: ${msg || payload.error}`
       });
     }));
 

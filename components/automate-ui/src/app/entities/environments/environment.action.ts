@@ -11,23 +11,36 @@ export enum EnvironmentActionTypes {
   GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE'
 }
 
-export interface EnvironmentsSuccessPayload {
-  environments: Environment[];
+export interface GetEnvironmentsPayload {
+  environmentName: string;
+  org_id: string;
+  page: number;
+  per_page: number;
+  server_id: string;
 }
 
 export class GetEnvironments implements Action {
   readonly type = EnvironmentActionTypes.GET_ALL;
-  constructor(public payload: { server_id: string, org_id: string }) { }
+  constructor(public payload: GetEnvironmentsPayload) { }
+}
+
+export interface GetEnvironmentsSuccessPayload {
+  environments: Environment[];
+  total: number;
 }
 
 export class GetEnvironmentsSuccess implements Action {
   readonly type = EnvironmentActionTypes.GET_ALL_SUCCESS;
-  constructor(public payload: EnvironmentsSuccessPayload) { }
+  constructor(public payload: GetEnvironmentsSuccessPayload) { }
 }
 
 export class GetEnvironmentsFailure implements Action {
   readonly type = EnvironmentActionTypes.GET_ALL_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
+}
+
+export interface EnvironmentsSuccessPayload {
+  environments: Environment[];
 }
 
 export class GetEnvironment implements Action {

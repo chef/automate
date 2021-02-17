@@ -16,3 +16,8 @@ export const getAllStatus = createSelector(
   environmentState,
   (state) => state.getAllStatus
 );
+
+export const environmentList = createSelector(
+  environmentState,
+  (state) => state.environmentList
+);
