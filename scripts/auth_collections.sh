@@ -8,7 +8,7 @@
 #    variable $TOK
 #       An admin token obtained from `get_admin_token` or `chef-automate iam token create admin-token-1 --admin`
 #    variable $TARGET_HOST
-#       A host running A2, either `https://a2-dev.test` or a remote machine.
+#       A host running Automate, either `https://a2-dev.test` or a remote machine.
 #
 # These works either inside or outside Habitat Studio.
 
@@ -17,10 +17,10 @@
 # authQuery
 #############
 # Purpose:
-#     Provide a very concise way to fetch collections of a2 auth resources at the API level.
+#     Provide a very concise way to fetch collections of Automate auth resources at the API level.
 #
 # Usage:
-#     a2 [ <options> ] <collection> [ <name> <value> ]
+#     authQuery [ <options> ] <collection> [ <name> <value> ]
 #
 #     <collection> may be "users", "teams", "policies", "tokens", "projects", or "roles".
 #     Optionally specify a property <name> and <value> if you wish to emit just a single entity.
@@ -32,14 +32,14 @@
 #    -p or --projects     project filter; a comma-separate list as a single argument
 #
 # Examples:
-#     a2 users
-#     a2 --one users
-#     a2 -s users name bob
-#     a2 -o --show users name bob
-#     a2 --v1 -o --show -p proj1,proj2 roles
+#     authQuery users
+#     authQuery --one users
+#     authQuery -s users name bob
+#     authQuery -o --show users name bob
+#     authQuery --v1 -o --show -p proj1,proj2 roles
 #
 # To run on a different environment you can adjust the env vars for a single invocation. Example:
-# TARGET_HOST=https://fresh-install-dev.cd.chef.co TOK=stVpD9I23OFn_U2OME= a2 -s policies
+# TARGET_HOST=https://fresh-install-dev.cd.chef.co TOK=stVpD9I23OFn_U2OME= authQuery -s policies
 
 authQuery () {
   # prerequisites
@@ -86,7 +86,7 @@ authQuery () {
 # authLoad
 #############
 # Purpose:
-#     Load a list of a2 auth resources.
+#     Load a list of Automate auth resources.
 #     You can copy resources from one machine to another (e.g. for debugging or backup)
 #     by storing the output of authQuery into a file and feeding that file to authLoad.
 #
@@ -147,7 +147,7 @@ authLoad() {
 # authGen
 #############
 # Purpose:
-#     Generate a list of a2 auth resources.
+#     Generate a list of Automate auth resources.
 #     This generates dummy data that is not particularly realistic
 #     but can be used to observe general performance characteristics.
 #     NB: When generating policies, it builds one policy per token,
