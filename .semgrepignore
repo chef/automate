@@ -32,3 +32,4 @@ coverage/
 *.pb.*.go
 *.bindata.go
 *.spec.ts
+modernizr-custom.js
