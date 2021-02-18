@@ -78,12 +78,12 @@
           </chef-form-field>
         </div>
         <div id="button-bar">
+          <chef-button id="cancel-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
           <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createChefServer()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Add Chef Server</span>
             <span *ngIf="creating">Adding Chef Server ...</span>
           </chef-button>
-          <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
         </div>
       </form>
     </div>

@@ -3,18 +3,21 @@
 chef-modal {
 
   [slot=title] {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 1em;
-    padding-bottom: 12px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: 700;
+    margin-left: 10px;
+    margin-top: 0px;
+    padding-bottom: 27px;
   }
 
   .flex-container {
-    display: flex;
     justify-content: center;
+    margin: 10px;
+    margin-top: 28px;
 
-    .input-margin {
-      margin-bottom: 30px;
+    .input-margin, .id-margin {
+      margin-bottom: 20px;
     }
 
     form {
@@ -43,13 +46,57 @@ chef-modal {
     }
 
     #button-bar {
-      text-align: center;
+      text-align: right;
 
       chef-loading-spinner {
         position: relative;
         top: 2px;
         margin-right: 5px;
       }
+    }
+  }
+
+  ::ng-deep {
+
+    .modal { 
+      width: 528px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px #CCC;
+    }
+
+    .chef-input {
+      height: 36px;
+    }
+
+    chef-button {
+      height: 36px;
+    }
+
+    chef-button#create-button-object-modal {
+      margin: 10px 0px 0px 0px;
+    }
+
+    chef-button#cancel-popup {
+      margin: 10px 15px 0px 0px;
+    }
+
+    .modal-overlay {
+      background-color: #FFFFFF;
+      mix-blend-mode: normal;
+      opacity: 0.7;
+    }
+
+    chef-button.close {
+      border: none;
+      color: var(--chef-primary-dark);
+      outline: none;
+      margin-top: 18px;
+      margin-right: 18px;
+    }
+
+    chef-button.close:active {
+      background: none;
+      color: var(--chef-primary-dark);
     }
   }
 }
