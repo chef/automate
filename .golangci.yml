@@ -10,6 +10,9 @@ linters-settings:
   godox:
     keywords:
       - NOCOMMIT
+  govet:
+    disable:
+      - copylocks
 
 linters:
   enable-all: true
@@ -19,8 +22,13 @@ linters:
     - funlen
     - gocognit
     - goconst
+    - godot
+    - goerr113
+    - gomnd
     - maligned
     - megacheck
+    - nestif
+    - nolintlint
     - interfacer
     - golint
     - gas
