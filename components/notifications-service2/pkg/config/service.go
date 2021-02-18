@@ -43,7 +43,7 @@ type Secrets struct {
 // certs), sets derived config and populates global state (e.g., log level,
 // etc.)
 func FromFile(path string) (*Notifications, error) {
-	n, err := MarshalFromFile(path)
+	n, err := UnmarshalFromFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func FromFile(path string) (*Notifications, error) {
 	return n, nil
 }
 
-func MarshalFromFile(path string) (*Notifications, error) {
+func UnmarshalFromFile(path string) (*Notifications, error) {
 	viper.SetConfigFile(path)
 
 	err := viper.ReadInConfig()

@@ -3,6 +3,7 @@ package config
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	log "github.com/sirupsen/logrus"
@@ -49,7 +50,7 @@ func TestConfigMarshaling(t *testing.T) {
 	err = f.Close()
 	require.NoError(t, err)
 
-	unmarshaled, err := MarshalFromFile(f.Name())
+	unmarshaled, err := UnmarshalFromFile(f.Name())
 	require.NoError(t, err)
 	assert.Equal(t, original, unmarshaled)
 }
@@ -89,14 +90,21 @@ func TestConfigLogLevel(t *testing.T) {
 }
 
 func TestConfigReadCerts(t *testing.T) {
+	cPath, err := filepath.Abs("../../../../dev/certs/notifications-service.crt")
+	require.NoError(t, err)
+	kPath, err := filepath.Abs("../../../../dev/certs/notifications-service.key")
+	require.NoError(t, err)
+	rcaPath, err := filepath.Abs("../../../../dev/certs/Chef_Automate_FAKE_Dev.crt")
+	require.NoError(t, err)
+
 	nValid := &Notifications{
 		TLSConfig: &certs.TLSConfig{
-			CertPath:       "/src/dev/certs/notifications-service.crt",
-			KeyPath:        "/src/dev/certs/notifications-service.key",
-			RootCACertPath: "/src/dev/certs/Chef_Automate_FAKE_Dev.crt",
+			CertPath:       cPath,
+			KeyPath:        kPath,
+			RootCACertPath: rcaPath,
 		},
 	}
-	err := nValid.ReadCerts()
+	err = nValid.ReadCerts()
 	require.NoError(t, err)
 
 }
