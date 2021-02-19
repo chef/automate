@@ -35,14 +35,14 @@
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createServerOrg()">
       </app-create-org-modal>
-      <app-delete-object-modal
+      <app-delete-infra-object-modal
         [visible]="deleteModalVisible"
         objectNoun="organization"
         [objectName]="orgToDelete?.name"
         (close)="closeDeleteModal()"
         (deleteClicked)="deleteOrg()"
         objectAction="Delete">
-      </app-delete-object-modal>
+      </app-delete-infra-object-modal>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>
