@@ -14,14 +14,14 @@
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
       </app-create-chef-server-modal>
-      <app-delete-object-modal 
+      <app-delete-infra-object-modal 
         [visible]="deleteModalVisible" 
         objectNoun="server" 
         [objectName]="serverToDelete?.name"
         (close)="closeDeleteModal()" 
         (deleteClicked)="deleteServer()" 
         objectAction="Delete">
-      </app-delete-object-modal>
+      </app-delete-infra-object-modal>
       <app-message-modal 
         [title]="'Could Not Delete Server'" 
         [visible]="messageModalVisible"
