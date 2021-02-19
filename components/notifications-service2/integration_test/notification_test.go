@@ -8,7 +8,7 @@ import (
 
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/components/notifications-client/api"
+	api "github.com/chef/automate/api/interservice/notifications/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -104,14 +104,16 @@ func TestNotificationDispatchWithOneSlackAlertRuleForAllEvents(t *testing.T) {
 	t.Run("CCRFailure alerts are sent to the Slack URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 
 	t.Run("CCRFailure alerts are properly formatted", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		var actual SlackMessage
@@ -146,7 +148,8 @@ func TestNotificationDispatchWithOneSlackAlertRuleForAllEvents(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 	})
@@ -161,7 +164,8 @@ func TestNotificationDispatchWithOneSlackAlertRuleForAllEvents(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		var actual SlackMessage
@@ -232,7 +236,8 @@ func TestNotificationDispatchWithOneSlackAlertRuleForAllEvents(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, event)
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -315,7 +320,8 @@ func TestNotificationDispatchWithOneSlackAlertRuleForAllEvents(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, event)
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -379,14 +385,16 @@ func TestNotificationDispatchWithOneServiceNowAlertRuleForAllEvents(t *testing.T
 	t.Run("CCRFailure alerts are sent to the ServiceNow URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 
 	t.Run("CCRFailure alerts are formatted properly", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -421,13 +429,15 @@ EXAMPLE EXCEPTION MESSAGE
 	t.Run("ComplianceFailure alerts are sent to the ServiceNow URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 	t.Run("ComplianceFailure alerts are formatted properly", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -555,7 +565,8 @@ func TestNotificationDispatchWithOneServiceNowAlertRuleWithASecretID(t *testing.
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 		assert.True(t, postData.BasicAuthUsed)
 		assert.Equal(t, "integration_test_username_secretstore", postData.BasicAuthUsername)
@@ -566,7 +577,8 @@ func TestNotificationDispatchWithOneServiceNowAlertRuleWithASecretID(t *testing.
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
 
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 		assert.True(t, postData.BasicAuthUsed)
 		assert.Equal(t, "integration_test_username_secretstore", postData.BasicAuthUsername)
@@ -596,14 +608,16 @@ func TestNotificationDispatchWithOneWebhookAlertRuleForAllEvents(t *testing.T) {
 	t.Run("CCRFailure alerts are sent to the Webhook URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 
 	t.Run("CCRFailure alerts are formatted properly", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, ccrFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -636,13 +650,15 @@ func TestNotificationDispatchWithOneWebhookAlertRuleForAllEvents(t *testing.T) {
 	t.Run("ComplianceFailure alerts are sent to the Webhook URL", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 	})
 	t.Run("ComplianceFailure alerts are formatted properly", func(t *testing.T) {
 		_, err := suite.Client.Notify(ctx, complianceFailureEvent())
 		require.NoError(t, err)
-		postData := ts.GetLastPost()
+		postData, err := ts.GetLastPost()
+		require.NoError(t, err)
 		assert.NotNil(t, postData)
 
 		// uncomment to see the message the service sent
@@ -750,7 +766,8 @@ func TestNotificationDispatchWithMultipleDestinations(t *testing.T) {
 		require.NoError(t, err)
 		actualURLPaths := make(map[string]bool)
 		for i := 0; i < 3; i++ {
-			postData := ts.GetLastPost()
+			postData, err := ts.GetLastPost()
+			require.NoError(t, err)
 			assert.NotNil(t, postData)
 			actualURLPaths[postData.URL] = true
 		}
@@ -768,7 +785,8 @@ func TestNotificationDispatchWithMultipleDestinations(t *testing.T) {
 		require.NoError(t, err)
 		actualURLPaths := make(map[string]bool)
 		for i := 0; i < 3; i++ {
-			postData := ts.GetLastPost()
+			postData, err := ts.GetLastPost()
+			require.NoError(t, err)
 			assert.NotNil(t, postData)
 			actualURLPaths[postData.URL] = true
 		}

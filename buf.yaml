@@ -66,6 +66,9 @@ lint:
     - PACKAGE_DIRECTORY_MATCH
   ignore_only:
     SERVICE_SUFFIX:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/server.proto
       # The automate-cli accesses the `Deployment` service directly; making
       # changes to it makes the CLI unable to install older versions of
       # Automate, which is breaking.
@@ -98,6 +101,9 @@ lint:
       # /lib/
       - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_STANDARD_NAME:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/server.proto
       # /api/
       - external/applications/applications.proto
       - external/cds/cds.proto
@@ -159,6 +165,9 @@ lint:
       # /lib/
       - grpc/debug/debug_api/debug.proto
     RPC_RESPONSE_STANDARD_NAME:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/server.proto
       # /api/
       - external/applications/applications.proto
       - external/cds/cds.proto
@@ -220,6 +229,9 @@ lint:
       # /lib/
       - grpc/debug/debug_api/debug.proto
     RPC_REQUEST_RESPONSE_UNIQUE:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/server.proto
       # /api/
       - external/applications/applications.proto
       - external/cds/cds.proto
@@ -298,13 +310,23 @@ lint:
       - automate-gateway/api/gateway
       - automate-grpc/protoc-gen-a2-config/api/a2conf
     FIELD_LOWER_SNAKE_CASE:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/events.proto
+      - interservice/notifications/service/rules.proto
       - external/infra_proxy/response/policyfiles.proto
       # /component/
       - automate-gateway/api/notifications/notifications.proto
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
     ENUM_VALUE_UPPER_SNAKE_CASE:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/rules.proto
       - automate-gateway/api/notifications/notifications.proto
     ENUM_VALUE_PREFIX:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/rules.proto
       # /api/
       - external/applications/applications.proto
       - external/common/query/parameters.proto
@@ -341,6 +363,10 @@ lint:
       # /lib/
       - grpc/debug/debug_api/debug.proto
     ENUM_ZERO_VALUE_SUFFIX:
+      # TODO: [notifications rewrite] - this violation can be addressed once
+      # the golang rewrite of notifications is completed
+      - interservice/notifications/service/events.proto
+      - interservice/notifications/service/rules.proto
       # /api/
       - external/applications/applications.proto
       - external/common/query/parameters.proto

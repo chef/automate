@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/secrets"
+	api "github.com/chef/automate/api/interservice/notifications/service"
 	deploymentConst "github.com/chef/automate/components/automate-deployment/pkg/constants"
-	"github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )

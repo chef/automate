@@ -1,18 +1,10 @@
 syntax = "proto3";
-package notifications;
+package chef.automate.domain.notifications.service;
 
-option go_package = ".;api";
-
-///
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// NOTICE!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// These proto files are moving to api/interservice as part of a project to
-// rewrite this service. Changes to this file must be accompanied by
-// corresponding changes to the copy of this file in
-// api/interservice/notifications/service.
-///
-
+option go_package = "github.com/chef/automate/api/interservice/notifications/service";
+////
+// Rules management messages and responses
+////
 message Empty { }
 message SlackAlert {
   string url = 1;

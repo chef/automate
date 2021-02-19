@@ -389,9 +389,6 @@ func (RuleListResponse_Code) EnumDescriptor() ([]byte, []int) {
 	return file_rules_proto_rawDescGZIP(), []int{14, 0}
 }
 
-////
-// Rules management messages and responses
-////
 type Empty struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
