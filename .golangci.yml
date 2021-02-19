@@ -7,6 +7,8 @@ issues:
   max-same-issues: 0
 
 linters-settings:
+  gofmt:
+    simplify: false
   godox:
     keywords:
       - NOCOMMIT
