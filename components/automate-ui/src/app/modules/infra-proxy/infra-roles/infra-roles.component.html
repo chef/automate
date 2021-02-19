@@ -29,7 +29,9 @@
               <a [routerLink]="['/infrastructure','chef-servers', serverId,
               'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
             </chef-td>
-            <chef-td>{{ role.description === '' ?  '...' : role.description }}</chef-td>
+            <chef-td>
+              {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : role.description }}
+            </chef-td>
             <chef-td>{{ role.environments.join(", ") }}</chef-td>
             <chef-td></chef-td>
             <chef-td></chef-td>

@@ -43,11 +43,13 @@
           <div *ngIf="hasRun_List">
             <app-tree-table [tree]="arrayOfNodesTree" [options]="treeOptions"></app-tree-table>
           </div>
-          <div *ngIf="!hasRun_List" class="center">
+          <div *ngIf="!hasRun_List" class="empty-section">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
           </div>
         </div>
-        <div *ngIf="!show && !roleDetailsLoading" class="center">
+        <div *ngIf="!show && !roleDetailsLoading" class="empty-section">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
           <p>Expanded run list not available for the role <b>{{role?.name}}</b>.</p>
         </div>
       </section>

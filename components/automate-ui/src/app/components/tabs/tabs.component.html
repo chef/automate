@@ -1,8 +1,11 @@
 <ul class="nav nav-tabs-list">
   <li *ngFor="let tab of tabs" class="nav-tabs-item">
     <button (click)="selectTab(tab)" class="nav-tab" [class.active]="tab.active">
-      {{tab.tabTitle}}
+      {{tab.tabTitle}} 
     </button>
+    <span *ngIf="tab.tabTitle === 'Policyfiles'" class="beta-tag"><span>Beta</span></span>
+    <span *ngIf="tab.tabTitle === 'Details'" class="beta-tag"><span>Beta</span></span>
+    <span *ngIf="tab.tabTitle === 'Reset Admin Key'" class="beta-tag"><span>Beta</span></span>
   </li>
 </ul>
 <ng-content></ng-content>

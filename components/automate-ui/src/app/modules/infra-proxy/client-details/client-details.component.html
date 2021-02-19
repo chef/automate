@@ -34,18 +34,24 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner *ngIf="clientDetailsLoading" size="50"></chef-loading-spinner>
         <div *ngIf="!clientDetailsLoading" class="key-tab">
-          <div class="key-tab-head">
-            <p>Public key</p>
+          <div class="empty-section" *ngIf="!client?.client_key.public_key">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p>No public Key available</p>
           </div>
-          <div class="key-tab-details">
-            <div class="key-tab-body-top">
-              <p>
-                <chef-icon>vpn_key</chef-icon>
-                <span>Reset Key</span>
-              </p>
+          <div *ngIf="client?.client_key.public_key">
+            <div class="key-tab-head">
+              <p>Public key</p>
             </div>
-            <div class="key-tab-body">
-              <chef-snippet [code]="client?.client_key.public_key" lang="json"></chef-snippet>
+            <div class="key-tab-details">
+              <div class="key-tab-body-top">
+                <p>
+                  <chef-icon>vpn_key</chef-icon>
+                  <span>Reset Key</span>
+                </p>
+              </div>
+              <div class="key-tab-body">
+                <chef-snippet [code]="client?.client_key.public_key" lang="json"></chef-snippet>
+              </div>
             </div>
           </div>
         </div>

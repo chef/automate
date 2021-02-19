@@ -73,9 +73,28 @@ chef-loading-spinner {
 
 chef-tab-selector {
   chef-option {
-    margin-right: 16px;
+    margin-right: 4px;
     color: $chef-primary-dark;
   }
+
+  ::ng-deep .selected {
+    background-color: #F3F6F8;
+  }
+
+  ::ng-deep .selected::before {
+    height: 4px;
+    background-color: #3864F2;
+  }
+
+  chef-option:focus {
+    outline: none;
+  }
+
+  ::ng-deep chef-option::before {
+    height: 4px;
+    background-color: #E7E9E9;
+  }
+
 }
 
 thead {
@@ -155,10 +174,6 @@ tbody > .detail-row {
 .search-items {
   margin-bottom: 8px;
   width: 100%;
-}
-
-chef-tab-selector chef-option:before {
-  height: 3px;
 }
 
 // CSS for accordion
@@ -243,4 +258,18 @@ chef-tab-selector chef-option:before {
 
 .autoHeight {
   height: auto;
+}
+
+.items-list-paging {
+  margin: 0 0 35px;
+}
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  margin-top: 238px;
+  background-color: #FFFFFF;
+  opacity: 0.7;
+  width: initial;
+  height: 100%;
 }

@@ -2,7 +2,11 @@
   <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
-    <chef-table>
+    <div class="empty-section" *ngIf="!cookbooks.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No cookbooks available</p>
+    </div>
+    <chef-table *ngIf="cookbooks.length">
       <chef-thead>
         <chef-tr class="no_border_tr">
           <chef-th class="no_border_th">Name</chef-th>

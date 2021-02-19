@@ -2,7 +2,11 @@
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
-    <chef-table>
+    <div class="empty-section" *ngIf="!policyFiles.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No policyFiles available</p>
+    </div>
+    <chef-table *ngIf="policyFiles.length">
       <chef-thead>
         <chef-tr class="no_border_tr">
           <chef-th class="no_border_th">Name</chef-th>

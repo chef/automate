@@ -63,6 +63,32 @@ chef-table {
   }
 }
 
+chef-tab-selector {
+  chef-option {
+    margin-right: 4px;
+    color: $chef-primary-dark;
+  }
+
+  ::ng-deep .selected {
+    background-color: #F3F6F8;
+  }
+
+  ::ng-deep .selected::before {
+    height: 4px;
+    background-color: #3864F2;
+  }
+
+  chef-option:focus {
+    outline: none;
+  }
+
+  ::ng-deep chef-option::before {
+    height: 4px;
+    background-color: #E7E9E9;
+  }
+
+}
+
 .page-body {
   padding-top: 0;
 
@@ -78,6 +104,15 @@ chef-loading-spinner {
   margin: 100px auto;
   width: 100px;
   z-index: 199;
+}
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
 }
 
 .key-tab {

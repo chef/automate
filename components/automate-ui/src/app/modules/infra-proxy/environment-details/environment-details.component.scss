@@ -20,9 +20,28 @@ chef-toolbar {
 
 chef-tab-selector {
   chef-option {
-    margin-right: 16px;
+    margin-right: 4px;
     color: $chef-primary-dark;
   }
+
+  ::ng-deep .selected {
+    background-color: #F3F6F8;
+  }
+
+  ::ng-deep .selected::before {
+    height: 4px;
+    background-color: #3864F2;
+  }
+
+  chef-option:focus {
+    outline: none;
+  }
+
+  ::ng-deep chef-option::before {
+    height: 4px;
+    background-color: #E7E9E9;
+  }
+
 }
 
 thead {
@@ -116,6 +135,15 @@ chef-loading-spinner {
 .center {
   display: flex;
   justify-content: center;
+}
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
 }
 
 .json-tree-container {

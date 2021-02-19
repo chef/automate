@@ -47,7 +47,8 @@
               </chef-tbody>
             </chef-table>
           </div>
-          <div *ngIf="!hasCookbookConstraints" class="center">
+          <div *ngIf="!hasCookbookConstraints" class="empty-section">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p>Cookbook constraints are not available for the <b>{{environment.name}}</b> environment.</p>
           </div>
         </div>

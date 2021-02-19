@@ -53,3 +53,33 @@
     background: $chef-light-grey;
   }
 }
+
+.beta-tag {
+  width: 24px;
+  height: 12.8px;
+  left: 937px;
+  top: 221.6px;
+  background: #000000;
+  border-radius: 8px;
+  padding-left: 3px;
+
+  span {
+    width: 200px;
+    height: 16px;
+    left: 939px;
+    top: 218px;
+
+    font-family: Mulish;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+    padding-right: 3px;
+    /* or 222% */
+
+    text-transform: capitalize;
+
+    color: #FFFFFF;
+
+  }
+}
