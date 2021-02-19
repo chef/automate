@@ -5,9 +5,8 @@ chef-modal {
 
   .options {
     float: right;
-
     .cancel-button {
-      color: #DC267F;
+      color: $chef-critical;
     }
   }
 

@@ -6,13 +6,11 @@ chef-modal {
     text-align: left;
     font-size: 24px;
     font-weight: 700;
-    margin-left: 10px;
     margin-top: 0px;
     padding-bottom: 27px;
   }
 
   .flex-container {
-    margin: 10px;
     margin-top: 28px;
     justify-content: center;
 
@@ -53,6 +51,7 @@ chef-modal {
   ::ng-deep {
 
     .modal {
+      padding: 32px;
       width: 528px;
       outline: none;
       box-shadow: 0px 0px 30px 0px #CCC;
