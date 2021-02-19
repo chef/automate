@@ -12,9 +12,9 @@ chef-modal {
   }
 
   .flex-container {
-    justify-content: center;
     margin: 10px;
     margin-top: 28px;
+    justify-content: center;
 
     .input-margin, .id-margin {
       margin-bottom: 20px;
@@ -23,25 +23,19 @@ chef-modal {
     form {
       flex-basis: 60%;
 
-      input {
-        font-size: 1em;
+      .chef-input {
+        font-size: 13px;
+        height: 36px;
+        padding: 10px;
       }
 
-      label {
-        padding-bottom: 0;
+      .object-id {
+        font-size: 13px;
       }
 
       .detail {
         color: $chef-primary-dark;
         font-size: 12px;
-      }
-
-      #id-fields {
-        font-size: 0.75em;
-
-        .key-label {
-          font-weight: bold;
-        }
       }
     }
 
@@ -58,14 +52,21 @@ chef-modal {
 
   ::ng-deep {
 
-    .modal { 
+    .modal {
       width: 528px;
       outline: none;
       box-shadow: 0px 0px 30px 0px #CCC;
     }
 
-    .chef-input {
-      height: 36px;
+    label {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      padding-bottom: 0.50em;
     }
 
     chef-button {
@@ -76,7 +77,7 @@ chef-modal {
       margin: 10px 0px 0px 0px;
     }
 
-    chef-button#cancel-popup {
+    chef-button#cancel-server-popup {
       margin: 10px 15px 0px 0px;
     }
 

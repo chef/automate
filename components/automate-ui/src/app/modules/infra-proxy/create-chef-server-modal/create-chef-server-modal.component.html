@@ -39,7 +39,7 @@
         <div *ngIf="!modifyID" class="id-margin">
           <div id="id-fields">
             <span class="key-label">ID:&nbsp;</span>
-            <span data-cy="id-label">{{ this.createForm?.value.id }}</span>
+            <span data-cy="id-label" class="object-id">{{ this.createForm?.value.id }}</span>
           </div>
           <chef-toolbar>
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
@@ -78,7 +78,7 @@
           </chef-form-field>
         </div>
         <div id="button-bar">
-          <chef-button id="cancel-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
+          <chef-button id="cancel-server-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
           <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createChefServer()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Add Chef Server</span>
