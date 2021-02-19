@@ -13,7 +13,7 @@ import (
 	grpc "google.golang.org/grpc"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	. "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
