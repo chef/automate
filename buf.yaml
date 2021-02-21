@@ -415,7 +415,8 @@ lint:
     - external/habitat/event.proto # this file is owned by habitat and copied here
 breaking:
   use:
-    - PACKAGE
+    # TODO: TEMPORARY CHANGE JUST FOR THIS PR!
+    - FILE
   ignore:
     # Changes to interservice APIs are okay until (if ever) we support clusters
     # of interconnected internal services that would not upgrade in unison
