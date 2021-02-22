@@ -6,7 +6,7 @@ import { ServerActionTypes, ServerActions } from './server.actions';
 import { Server } from './server.model';
 
 export interface ServerEntityState extends EntityState<Server> {
-  status: EntityStatus;
+  getAllStatus: EntityStatus;
   saveStatus: EntityStatus;
   saveError: HttpErrorResponse;
   getStatus: EntityStatus;
@@ -25,7 +25,7 @@ export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Se
 
 export const ServerEntityInitialState: ServerEntityState =
   serverEntityAdapter.getInitialState({
-    status: EntityStatus.notLoaded,
+    getAllStatus: EntityStatus.notLoaded,
     saveStatus: EntityStatus.notLoaded,
     saveError: null,
     updateStatus: EntityStatus.notLoaded,

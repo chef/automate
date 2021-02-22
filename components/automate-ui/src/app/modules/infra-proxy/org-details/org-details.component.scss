@@ -89,6 +89,10 @@ chef-table {
     background: $chef-tab-hover;
   }
 
+  ::ng-deep .nav-tab:hover::before {
+    background: $chef-azureish-gray;
+  }
+
   ::ng-deep .nav-tabs-item {
     margin-right: 4px;
     outline: none;

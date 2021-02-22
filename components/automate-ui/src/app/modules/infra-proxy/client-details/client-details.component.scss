@@ -87,6 +87,10 @@ chef-tab-selector {
     background-color: $chef-tab-hover;
   }
 
+  ::ng-deep chef-option:hover::before {
+    background: $chef-azureish-gray;
+  }
+
 }
 
 .page-body {
