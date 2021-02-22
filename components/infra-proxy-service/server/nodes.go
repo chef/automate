@@ -77,44 +77,47 @@ func (s *Server) GetNode(ctx context.Context, req *request.Node) (*response.Node
 		return nil, err
 	}
 
-	defaultAttributes, err := json.Marshal(res.DefaultAttributes)
+	node, err := responseNodeObject(&res)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
-	automaticAttributes, err := json.Marshal(res.AutomaticAttributes)
+	return node, nil
+}
+
+// CreateNode creates the node
+func (s *Server) CreateNode(ctx context.Context, req *request.NodeObject) (*response.Node, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
-	normalAttributes, err := json.Marshal(res.NormalAttributes)
+	reqNode, err := nodeAttributeFromParams(req)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
-	overrideAttributes, err := json.Marshal(res.OverrideAttributes)
+	_, err = c.client.Nodes.Post(*reqNode)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
-	// TODO: Chef Infra Server node detail API is not returning the node ID https://docs.chef.io/api_chef_server/#get-38
-	return &response.Node{
-		NodeId:              res.Name,
-		Name:                res.Name,
-		Environment:         res.Environment,
-		PolicyName:          res.PolicyName,
-		PolicyGroup:         res.PolicyGroup,
-		RunList:             res.RunList,
-		Tags:                SafeSliceFromMap(res.NormalAttributes, "tags"),
-		DefaultAttributes:   string(defaultAttributes),
-		AutomaticAttributes: string(automaticAttributes),
-		NormalAttributes:    string(normalAttributes),
-		OverrideAttributes:  string(overrideAttributes),
-	}, nil
+	// Fetches the created node
+	res, err := c.client.Nodes.Get(reqNode.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := responseNodeObject(&res)
+	if err != nil {
+		return nil, err
+	}
+
+	return node, nil
 }
 
 // DeleteNode deletes the node by name
-func (s *Server) DeleteNode(ctx context.Context, req *request.DeleteNode) (*response.DeleteNode, error) {
+func (s *Server) DeleteNode(ctx context.Context, req *request.Node) (*response.DeleteNode, error) {
 	err := validation.New(validation.Options{
 		Target:  "node",
 		Request: *req,
@@ -144,51 +147,29 @@ func (s *Server) DeleteNode(ctx context.Context, req *request.DeleteNode) (*resp
 	}, nil
 }
 
-// UpdateNode update the node attributes
-func (s *Server) UpdateNode(ctx context.Context, req *request.UpdateNode) (*response.UpdateNode, error) {
+// UpdateNode updates the node
+func (s *Server) UpdateNode(ctx context.Context, req *request.NodeObject) (*response.Node, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
 	}
 
-	automatic, err := StructToJSON(req.AutomaticAttributes)
+	reqNode, err := nodeAttributeFromParams(req)
 	if err != nil {
 		return nil, err
 	}
 
-	normal, err := StructToJSON(req.NormalAttributes)
+	res, err := c.client.Nodes.Put(*reqNode)
 	if err != nil {
 		return nil, err
 	}
 
-	defaults, err := StructToJSON(req.DefaultAttributes)
+	node, err := responseNodeObject(&res)
 	if err != nil {
 		return nil, err
 	}
 
-	override, err := StructToJSON(req.OverrideAttributes)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = c.client.Nodes.Put(chef.Node{
-		Name:                req.Name,
-		Environment:         req.Environment,
-		RunList:             req.RunList,
-		AutomaticAttributes: automatic.(map[string]interface{}),
-		NormalAttributes:    normal.(map[string]interface{}),
-		DefaultAttributes:   defaults.(map[string]interface{}),
-		OverrideAttributes:  override.(map[string]interface{}),
-		PolicyName:          req.PolicyName,
-		PolicyGroup:         req.PolicyGroup,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &response.UpdateNode{
-		Name: req.Name,
-	}, nil
+	return node, nil
 }
 
 // UpdateNodeTags updates the tags
@@ -292,4 +273,77 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 	}
 
 	return results
+}
+
+func nodeAttributeFromParams(req *request.NodeObject) (*chef.Node, error) {
+
+	automatic, err := StructToJSON(req.AutomaticAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	normal, err := StructToJSON(req.NormalAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	defaults, err := StructToJSON(req.DefaultAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	override, err := StructToJSON(req.OverrideAttributes)
+	if err != nil {
+		return nil, err
+	}
+
+	node := &chef.Node{
+		Name:                req.Name,
+		Environment:         req.Environment,
+		RunList:             req.RunList,
+		AutomaticAttributes: automatic.(map[string]interface{}),
+		NormalAttributes:    normal.(map[string]interface{}),
+		DefaultAttributes:   defaults.(map[string]interface{}),
+		OverrideAttributes:  override.(map[string]interface{}),
+		PolicyName:          req.PolicyName,
+		PolicyGroup:         req.PolicyGroup,
+	}
+
+	return node, nil
+}
+
+func responseNodeObject(node *chef.Node) (*response.Node, error) {
+	defaultAttributes, err := json.Marshal(node.DefaultAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	automaticAttributes, err := json.Marshal(node.AutomaticAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	normalAttributes, err := json.Marshal(node.NormalAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	overrideAttributes, err := json.Marshal(node.OverrideAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.Node{
+		NodeId:              node.Name,
+		Name:                node.Name,
+		Environment:         node.Environment,
+		PolicyName:          node.PolicyName,
+		PolicyGroup:         node.PolicyGroup,
+		RunList:             node.RunList,
+		Tags:                SafeSliceFromMap(node.NormalAttributes, "tags"),
+		DefaultAttributes:   string(defaultAttributes),
+		AutomaticAttributes: string(automaticAttributes),
+		NormalAttributes:    string(normalAttributes),
+		OverrideAttributes:  string(overrideAttributes),
+	}, nil
 }

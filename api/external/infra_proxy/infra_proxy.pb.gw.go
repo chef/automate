@@ -3827,7 +3827,7 @@ func local_request_InfraProxy_GetAffectedNodes_0(ctx context.Context, marshaler 
 }
 
 func request_InfraProxy_DeleteNode_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.DeleteNode
+	var protoReq request.Node
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -3876,7 +3876,7 @@ func request_InfraProxy_DeleteNode_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func local_request_InfraProxy_DeleteNode_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.DeleteNode
+	var protoReq request.Node
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -3925,7 +3925,7 @@ func local_request_InfraProxy_DeleteNode_0(ctx context.Context, marshaler runtim
 }
 
 func request_InfraProxy_UpdateNode_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.UpdateNode
+	var protoReq request.NodeObject
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -3982,7 +3982,7 @@ func request_InfraProxy_UpdateNode_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func local_request_InfraProxy_UpdateNode_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq request.UpdateNode
+	var protoReq request.NodeObject
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

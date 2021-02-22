@@ -34,16 +34,7 @@ message AffectedNodes {
     string version = 5;
 }
 
-message DeleteNode {
-    // Chef organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Node name.
-    string name = 3;
-}
-
-message UpdateNode {
+message NodeObject {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.

@@ -39,11 +39,6 @@ message DeleteNode {
     string name = 1;
 }
 
-message UpdateNode {
-    // Node name.
-    string name = 1;
-}
-
 message Node {
     // Node ID.
     string node_id = 1;
