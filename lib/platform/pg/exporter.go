@@ -295,7 +295,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
 			txt := scanner.Text()
-			if !strings.Contains(txt, "2615 2200") {
+			if !isIncompatibleTOCLine(txt) {
 				_, err := fmt.Fprintln(pgListFile, txt)
 				if err != nil {
 					errChan <- err
@@ -326,6 +326,34 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 	}
 
 	return pgListFile.Name(), func() { removeFile(pgListFile.Name()) }, nil
+}
+
+// isIncompatibleTOCLine takes in a line from TOC of a pg backup and decides if
+// it should be excluded from the restore attempt. Some items in a backup
+// cannot be restored in (e.g.) AWS RDS, where the superuser is not all that
+// "super."
+//
+// To gather the data you will likely need to modify this function, you first
+// need to make a database dump in the custom format. The command for that is
+// of the form `pg_dump DB_URI --format c > database_dump.fc`. To view the TOC
+// of that file, use a command like `pg_restore --list database_dump.fc`
+//
+// If using the habitat dev studio, you can access the postgresql CLI tools via
+// `hab pkg exec core/postgresql-client COMMAND`
+func isIncompatibleTOCLine(line string) bool {
+	// I think this refers to a TOC line like this:
+	//   4; 2615 2200 SCHEMA - public automate
+	if strings.Contains(line, "2615 2200") {
+		return true
+	}
+	// This refers to TOC lines like this:
+	//   2214; 0 0 COMMENT - SCHEMA public automate
+	// AWS RDS superuser cannot run comands like this:
+	//   COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+	if strings.Contains(line, "COMMENT - EXTENSION") {
+		return true
+	}
+	return false
 }
 
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
@@ -374,7 +402,7 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 			command.Stderr(stderrBuff),
 			command.Timeout(db.Timeout))...)
 	if err != nil {
-		return errors.Wrapf(err, "failed to import SQL file from %q, stderr: %s", source, stderrBuff.String())
+		return errors.Wrapf(err, "failed to import FC format file from %q, stderr: %s", source, stderrBuff.String())
 	}
 	logrus.WithField("stderr", stderrBuff.String()).Debug("psql import complete")
 	return nil
