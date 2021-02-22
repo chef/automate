@@ -70,12 +70,12 @@ chef-tab-selector {
   }
 
   ::ng-deep .selected {
-    background-color: #F3F6F8;
+    background-color: $gray-highlight;
   }
 
   ::ng-deep .selected::before {
     height: 4px;
-    background-color: #3864F2;
+    background-color: $chef-dark-blue;
   }
 
   chef-option:focus {
@@ -84,7 +84,7 @@ chef-tab-selector {
 
   ::ng-deep chef-option::before {
     height: 4px;
-    background-color: #E7E9E9;
+    background-color: $chef-tab-hover;
   }
 
 }
@@ -128,15 +128,15 @@ img {
     display: flex;
     padding: 1.5em;
     background: $chef-white;
-    border: 0.5px solid #CFD2D2;
+    border: 0.5px solid $chef-key-tab;
   }
 
   .key-tab-body-top {
     padding: 1em;
     background: $chef-white;
-    border-left: 0.5px solid #CFD2D2;
-    border-right: 0.5px solid #CFD2D2;
-    border-top: 0.5px solid #CFD2D2;
+    border-left: 0.5px solid $chef-key-tab;
+    border-right: 0.5px solid $chef-key-tab;
+    border-top: 0.5px solid $chef-key-tab;
 
     p {
       margin: 0;

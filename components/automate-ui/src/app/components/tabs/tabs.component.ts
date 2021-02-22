@@ -11,6 +11,8 @@ export class TabsComponent {
     @Output() tabChange: EventEmitter<number> = new EventEmitter<number>();
 
     @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
+    betaTabs = ['Policyfiles', 'Details', 'Reset Admin Key'];
+
 
     selectTab(tab: TabComponent) {
       const tabs = this.tabs.toArray();

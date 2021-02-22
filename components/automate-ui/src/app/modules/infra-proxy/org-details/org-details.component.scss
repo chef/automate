@@ -86,7 +86,7 @@ chef-table {
 
   ::ng-deep .nav-tab:before {
     height: 4px;
-    background: #E7E9E9;
+    background: $chef-tab-hover;
   }
 
   ::ng-deep .nav-tabs-item {

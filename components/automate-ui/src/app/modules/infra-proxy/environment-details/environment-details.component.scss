@@ -25,12 +25,12 @@ chef-tab-selector {
   }
 
   ::ng-deep .selected {
-    background-color: #F3F6F8;
+    background-color: $gray-highlight;
   }
 
   ::ng-deep .selected::before {
     height: 4px;
-    background-color: #3864F2;
+    background-color: $chef-dark-blue;
   }
 
   chef-option:focus {
@@ -39,7 +39,7 @@ chef-tab-selector {
 
   ::ng-deep chef-option::before {
     height: 4px;
-    background-color: #E7E9E9;
+    background-color: $chef-tab-hover;
   }
 
 }
