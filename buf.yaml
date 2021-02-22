@@ -427,3 +427,4 @@ breaking:
     - config/esgateway/config_request.proto
     - external/infra_proxy/request/nodes.proto
     - external/infra_proxy/response/nodes.proto
+    - external/infra_proxy/infra_proxy.proto
