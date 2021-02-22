@@ -121,10 +121,8 @@ describe('ChefServersListComponent', () => {
       component.createChefServer();
 
       store.dispatch(new CreateServerSuccess({ 'server': server }));
+      expect(component.createModalVisible).toBe(true);
 
-      component.sortedChefServers$.subscribe(servers => {
-        expect(servers).toContain(server);
-      });
     });
 
     it('on conflict error, modal is open with conflict error', () => {
