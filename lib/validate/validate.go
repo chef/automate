@@ -13,10 +13,6 @@ type hasName interface {
 	GetName() string
 }
 
-type hasProjects interface {
-	GetProjects() []string
-}
-
 // EmptyOrWhitespaceOnlyRE is a regex that checks for blank or whitespace only strings
 var EmptyOrWhitespaceOnlyRE = regexp.MustCompile(`^\s*$`)
 
