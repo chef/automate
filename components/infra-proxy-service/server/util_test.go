@@ -46,46 +46,131 @@ func TestSafeSliceFromMap(t *testing.T) {
 }
 
 func TestSubtractSlice(t *testing.T) {
-	assert.Equal(t, []string{"tag2", "tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1"}))
-	assert.Equal(t, []string{"tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1", "tag2"}))
-	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"unknown"}))
-	assert.Equal(t, []string{"tag1", "tag2"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag3", "unknown"}))
-	assert.Equal(t, []string{"tag1", "tag2"}, SubtractSlice([]string{"tag1", "tag2"}, []string{}))
-	assert.Equal(t, []string{}, SubtractSlice([]string{}, []string{"tag1"}))
-	assert.Equal(t, []string{}, SubtractSlice([]string{"tag1", "tag2"}, []string{"tag1", "tag2"}))
-	assert.Equal(t, []string{}, SubtractSlice([]string{}, []string{}))
+	testData := []struct {
+		slice1 []string
+		slice2 []string
+		output []string
+	}{
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			[]string{"tag1"},
+			[]string{"tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			[]string{"tag1", "tag2"},
+			[]string{"tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			[]string{"unknown"},
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			[]string{"tag3", "unknown"},
+			[]string{"tag1", "tag2"},
+		},
+		{
+			[]string{"tag1", "tag2"},
+			[]string{},
+			[]string{"tag1", "tag2"},
+		},
+		{
+			[]string{"tag1", "tag2"},
+			[]string{"tag1", "tag2"},
+			[]string{},
+		},
+		{
+			[]string{},
+			[]string{"tag1"},
+			[]string{},
+		},
+		{
+			[]string{},
+			[]string{},
+			[]string{},
+		},
+	}
+
+	for _, test := range testData {
+		result := SubtractSlice(test.slice1, test.slice2)
+		assert.Equal(t, test.output, result)
+	}
 }
 
 func TestRemoveElement(t *testing.T) {
-	testData1 := []string{"tag1", "tag2", "tag3"}
-	assert.Equal(t, []string{"tag1", "tag2"}, RemoveElement(testData1, "tag3"))
+	testData := []struct {
+		slice   []string
+		element string
+		output  []string
+	}{
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			"tag1",
+			[]string{"tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			"unknown",
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			"",
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{},
+			"tag",
+			[]string{},
+		},
+		{
+			[]string{"tag1"},
+			"tag1",
+			[]string{},
+		},
+		{
+			[]string{},
+			"",
+			[]string{},
+		},
+	}
 
-	testData2 := []string{"tag1", "tag2", "tag3"}
-	assert.Equal(t, testData2, RemoveElement(testData2, "unknown"))
-
-	testData3 := []string{"tag1", "tag2", "tag3"}
-	assert.Equal(t, testData3, RemoveElement(testData3, ""))
-
-	testData4 := []string{}
-	assert.Equal(t, testData4, RemoveElement(testData4, "tag1"))
-
-	testData5 := []string{}
-	assert.Equal(t, testData5, RemoveElement(testData5, ""))
+	for _, test := range testData {
+		result := RemoveElement(test.slice, test.element)
+		assert.Equal(t, test.output, result)
+	}
 }
 
 func TestUnique(t *testing.T) {
-	testData1 := []string{"tag1", "tag2", "tag3"}
-	assert.Equal(t, testData1, Unique(testData1))
+	testData := []struct {
+		slice  []string
+		output []string
+	}{
+		{
+			[]string{"tag1", "tag2", "tag3"},
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag1", "tag2", "tag3"},
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{"tag1", "tag2", "tag3", "tag1"},
+			[]string{"tag1", "tag2", "tag3"},
+		},
+		{
+			[]string{"tag", "tag", "tag"},
+			[]string{"tag"},
+		},
+		{
+			[]string{},
+			[]string{},
+		},
+	}
 
-	testData2 := []string{"tag1", "tag1", "tag2", "tag3"}
-	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, Unique(testData2))
-
-	testData3 := []string{"tag1", "tag2", "tag3", "tag1"}
-	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, Unique(testData3))
-
-	testData4 := []string{"tag", "tag", "tag"}
-	assert.Equal(t, []string{"tag"}, Unique(testData4))
-
-	testData5 := []string{}
-	assert.Equal(t, []string{}, Unique(testData5))
+	for _, test := range testData {
+		assert.Equal(t, test.output, Unique(test.slice))
+	}
 }
