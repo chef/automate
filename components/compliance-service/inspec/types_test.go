@@ -15,7 +15,7 @@ func TestControlImpact(t *testing.T) {
 	assert.Equal(t, float32(100), control.Impact, "impact should be equal")
 
 	for i := 0; i < 11; i++ {
-		control = Control{ID: string(i), Impact: float32(i) * 0.1}
+		control = Control{ID: string(rune(i)), Impact: float32(i) * 0.1}
 		assert.Equal(t, float32(i)*0.1, control.Impact, "impact should be equal")
 
 		name := "minor"

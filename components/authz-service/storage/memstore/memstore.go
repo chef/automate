@@ -237,7 +237,7 @@ func (s *State) DeletePolicy(ctx context.Context, policyID string) error {
 }
 
 func (s *State) GetPolicyChangeID(_ context.Context) (string, error) {
-	return string(atomic.LoadInt64(&s.policyChangeID)), nil
+	return string(rune(atomic.LoadInt64(&s.policyChangeID))), nil
 }
 
 func (s *State) GetPolicyChangeNotifier(ctx context.Context) (storage.PolicyChangeNotifier, error) {
