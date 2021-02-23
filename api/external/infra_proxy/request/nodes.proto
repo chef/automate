@@ -34,7 +34,7 @@ message AffectedNodes {
     string version = 5;
 }
 
-message NodeObject {
+message NodeDetails {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.

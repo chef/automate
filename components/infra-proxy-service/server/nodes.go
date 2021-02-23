@@ -74,7 +74,7 @@ func (s *Server) GetNode(ctx context.Context, req *request.Node) (*response.Node
 
 	res, err := c.client.Nodes.Get(req.Name)
 	if err != nil {
-		return nil, err
+		return nil, ParseAPIError(err)
 	}
 
 	node, err := responseNodeObject(&res)
@@ -86,7 +86,7 @@ func (s *Server) GetNode(ctx context.Context, req *request.Node) (*response.Node
 }
 
 // CreateNode creates the node
-func (s *Server) CreateNode(ctx context.Context, req *request.NodeObject) (*response.Node, error) {
+func (s *Server) CreateNode(ctx context.Context, req *request.NodeDetails) (*response.Node, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func (s *Server) DeleteNode(ctx context.Context, req *request.Node) (*response.D
 }
 
 // UpdateNode updates the node
-func (s *Server) UpdateNode(ctx context.Context, req *request.NodeObject) (*response.Node, error) {
+func (s *Server) UpdateNode(ctx context.Context, req *request.NodeDetails) (*response.Node, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -204,7 +204,7 @@ func (s *Server) UpdateNodeTags(ctx context.Context, req *request.UpdateNodeTags
 	case "add":
 		tags = Unique(append(tags, req.Tags...))
 	case "delete":
-		tags = SubstractSlice(tags, req.Tags)
+		tags = SubtractSlice(tags, req.Tags)
 	case "set":
 		tags = req.Tags
 	default:
@@ -275,8 +275,7 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 	return results
 }
 
-func nodeAttributeFromParams(req *request.NodeObject) (*chef.Node, error) {
-
+func nodeAttributeFromParams(req *request.NodeDetails) (*chef.Node, error) {
 	automatic, err := StructToJSON(req.AutomaticAttributes)
 	if err != nil {
 		return nil, err

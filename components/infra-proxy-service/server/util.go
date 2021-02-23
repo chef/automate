@@ -40,8 +40,8 @@ func SafeSliceFromMap(values map[string]interface{}, key string) []string {
 	return []string{}
 }
 
-// SubstractSlice return the slice without containing all element of b.
-func SubstractSlice(a []string, b []string) []string {
+// SubtractSlice returns the slice a with all elements of b removed.
+func SubtractSlice(a []string, b []string) []string {
 	for _, element := range b {
 		a = RemoveElement(a, element)
 	}

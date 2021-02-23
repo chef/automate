@@ -45,10 +45,15 @@ func TestSafeSliceFromMap(t *testing.T) {
 	assert.Equal(t, []string{}, SafeSliceFromMap(testData, "no-key"))
 }
 
-func TestSubstractSlice(t *testing.T) {
-	assert.Equal(t, []string{"tag2", "tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1"}))
-	assert.Equal(t, []string{"tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1", "tag2"}))
-	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, SubstractSlice([]string{"tag1", "tag2", "tag3"}, []string{"unknown"}))
+func TestSubtractSlice(t *testing.T) {
+	assert.Equal(t, []string{"tag2", "tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1"}))
+	assert.Equal(t, []string{"tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag1", "tag2"}))
+	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"unknown"}))
+	assert.Equal(t, []string{"tag1", "tag2"}, SubtractSlice([]string{"tag1", "tag2", "tag3"}, []string{"tag3", "unknown"}))
+	assert.Equal(t, []string{"tag1", "tag2"}, SubtractSlice([]string{"tag1", "tag2"}, []string{}))
+	assert.Equal(t, []string{}, SubtractSlice([]string{}, []string{"tag1"}))
+	assert.Equal(t, []string{}, SubtractSlice([]string{"tag1", "tag2"}, []string{"tag1", "tag2"}))
+	assert.Equal(t, []string{}, SubtractSlice([]string{}, []string{}))
 }
 
 func TestRemoveElement(t *testing.T) {
@@ -60,6 +65,12 @@ func TestRemoveElement(t *testing.T) {
 
 	testData3 := []string{"tag1", "tag2", "tag3"}
 	assert.Equal(t, testData3, RemoveElement(testData3, ""))
+
+	testData4 := []string{}
+	assert.Equal(t, testData4, RemoveElement(testData4, "tag1"))
+
+	testData5 := []string{}
+	assert.Equal(t, testData5, RemoveElement(testData5, ""))
 }
 
 func TestUnique(t *testing.T) {
@@ -68,4 +79,13 @@ func TestUnique(t *testing.T) {
 
 	testData2 := []string{"tag1", "tag1", "tag2", "tag3"}
 	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, Unique(testData2))
+
+	testData3 := []string{"tag1", "tag2", "tag3", "tag1"}
+	assert.Equal(t, []string{"tag1", "tag2", "tag3"}, Unique(testData3))
+
+	testData4 := []string{"tag", "tag", "tag"}
+	assert.Equal(t, []string{"tag"}, Unique(testData4))
+
+	testData5 := []string{}
+	assert.Equal(t, []string{}, Unique(testData5))
 }

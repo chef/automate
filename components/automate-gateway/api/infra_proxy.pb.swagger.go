@@ -1757,7 +1757,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.NodeObject"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.NodeDetails"
             }
           }
         ],
@@ -2393,7 +2393,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.request.NodeObject": {
+    "chef.automate.api.infra_proxy.request.NodeDetails": {
       "type": "object",
       "properties": {
         "org_id": {
