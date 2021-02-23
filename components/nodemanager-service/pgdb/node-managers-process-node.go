@@ -55,12 +55,6 @@ FROM nodes
 WHERE id = $1 OR source_id = $2 AND source_region = $3 AND source_account_id = $4;
 `
 
-const sqlGetManagerTypeFromId = `
-SELECT type
-FROM node_managers
-WHERE id = $1;
-`
-
 type lastContactData struct {
 	ID                string
 	Status            string

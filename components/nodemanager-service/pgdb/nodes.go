@@ -1057,7 +1057,7 @@ func (tx *DBTrans) ensureProjects(allProjectIDs []string) error {
 	if err != nil {
 		return err
 	}
-	defer insertProject.Close()
+	defer insertProject.Close() // nolint:errcheck
 
 	for _, projectID := range allProjectIDs {
 		_, err := insertProject.Exec(createUUID(), projectID)
@@ -1075,7 +1075,7 @@ func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
 	if err != nil {
 		return err
 	}
-	defer deleteStmt.Close()
+	defer deleteStmt.Close() // nolint:errcheck
 
 	updateStmt, err := tx.Prepare(`	
 		INSERT into nodes_projects (node_id, project_id)
@@ -1085,7 +1085,7 @@ func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
 	if err != nil {
 		return err
 	}
-	defer updateStmt.Close()
+	defer updateStmt.Close() // nolint:errcheck
 
 	for _, n := range nodeUpdates {
 		_, err := deleteStmt.Exec(n.nodeID)
