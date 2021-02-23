@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -23,7 +24,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/scanner"
 	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
@@ -275,13 +275,13 @@ func (srv *Server) ListInitiatedScans(ctx context.Context, in *jobs.TimeQuery) (
 		}
 		ids[i] = job.ID
 		idsWithTime[i] = &jobs.IdsWithTime{
-			Id: job.ID,
+			Id:      job.ID,
 			EndTime: translatedTime,
 		}
 	}
 
 	return &jobs.Ids{
-		Ids: ids,
+		Ids:         ids,
 		IdsWithTime: idsWithTime,
 	}, nil
 }

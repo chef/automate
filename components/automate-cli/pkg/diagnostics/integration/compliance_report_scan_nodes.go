@@ -113,8 +113,8 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				NodeID  string
 				Filters []filter
 			}{
-				Name:    name,
-				NodeID:  nodeID,
+				Name:   name,
+				NodeID: nodeID,
 			})
 
 			if err != nil {

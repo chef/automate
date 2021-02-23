@@ -30,12 +30,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -58,12 +58,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "env2",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env2",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -87,13 +87,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -121,13 +121,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -154,12 +154,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -190,12 +190,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -231,13 +231,13 @@ func TestProjectUpdate(t *testing.T) {
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Environment: "env1",
 				Projects:    []string{"old_tag"},
 				Roles:       []string{"backend"},
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -274,12 +274,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -302,12 +302,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -330,12 +330,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"Area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"Area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -358,12 +358,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -386,12 +386,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -414,12 +414,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				Roles:    []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -441,11 +441,11 @@ func TestProjectUpdate(t *testing.T) {
 			description: "reports_projects_update_test.go => roles: setting the project to unassigned when there are no roles",
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -470,12 +470,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -498,12 +498,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server2.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server2.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -526,12 +526,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "Chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "Chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -554,12 +554,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				SourceFQDN: "chef-server.org",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -583,13 +583,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -621,13 +621,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				SourceFQDN:       "chef-server.org",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -660,12 +660,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -688,12 +688,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -716,12 +716,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"old_tag": {
@@ -746,12 +746,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -774,12 +774,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -802,12 +802,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -830,12 +830,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:    []string{"old_tag"},
 				PolicyGroup: "prod",
-				EndTime: time.Now(),
+				EndTime:     time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -859,13 +859,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -897,13 +897,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				PolicyGroup:      "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -936,12 +936,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -964,12 +964,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -992,12 +992,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1020,12 +1020,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:   []string{"old_tag"},
 				PolicyName: "prod",
-				EndTime: time.Now(),
+				EndTime:    time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1049,13 +1049,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				PolicyName:       "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				PolicyName:       "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1087,13 +1087,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				PolicyName:       "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				PolicyName:       "prod",
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1122,12 +1122,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1150,12 +1150,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1178,12 +1178,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"Area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"Area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1206,12 +1206,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1235,13 +1235,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1273,13 +1273,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1311,13 +1311,13 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects:         []string{"old_tag"},
 				ChefTags:         []string{"area_51"},
 				OrganizationName: "org1",
-				EndTime: time.Now(),
+				EndTime:          time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1344,12 +1344,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1372,12 +1372,12 @@ func TestProjectUpdate(t *testing.T) {
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {
@@ -1399,11 +1399,11 @@ func TestProjectUpdate(t *testing.T) {
 			description: "reports_projects_update_test.go => chefTags: setting the project to unassigned when there are no chef tags",
 			report: &relaxting.ESInSpecReport{
 				Projects: []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			projects: map[string]*authz.ProjectRules{
 				"project9": {

@@ -15,11 +15,11 @@ import (
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -256,8 +256,8 @@ type job struct {
 }
 
 type jobWithTime struct {
-	ID          string          `db:"id"`
-	Endtime     time.Time       `db:"end_time"`
+	ID      string    `db:"id"`
+	Endtime time.Time `db:"end_time"`
 }
 
 // jobSelectDetail used to read from DB one complete job

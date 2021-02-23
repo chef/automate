@@ -58,32 +58,32 @@ func TestReportingServerExport(t *testing.T) {
 		{
 			NodeID:   nodeIds[0],
 			Projects: []string{},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[1],
 			Projects: []string{"project1"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[2],
 			Projects: []string{"project1", "project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[3],
 			Projects: []string{"project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[4],
 			Projects: []string{"project2", "project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[5],
 			Projects: []string{"project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 	}
 

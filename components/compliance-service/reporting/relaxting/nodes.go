@@ -11,9 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 type ProfileSource struct {

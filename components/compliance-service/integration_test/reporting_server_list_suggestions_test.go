@@ -34,17 +34,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "1/75th Airborne Rangers",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -59,17 +59,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "org3",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -84,17 +84,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "org3",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -111,17 +111,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -136,17 +136,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -161,17 +161,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.1",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -188,17 +188,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "bob",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -213,17 +213,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "org3",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -238,17 +238,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "org3",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -265,17 +265,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org3"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"bob"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -290,17 +290,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org5"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"org3", "org6"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -315,17 +315,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org4"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org5"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"org3", "org6"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -342,17 +342,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "bob",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -367,17 +367,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "org3",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -392,17 +392,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "org3",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -419,17 +419,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "bob",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -444,17 +444,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "org3",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -469,17 +469,17 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "org3",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			request: reporting.SuggestionRequest{
@@ -795,7 +795,7 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 			description: "reporting_server_list_suggestions_test.go => chef_tags",
 			summary: &relaxting.ESInSpecSummary{
 				ChefTags: terms,
-				EndTime: time.Now(),
+				EndTime:  time.Now(),
 			},
 			request: &reporting.SuggestionRequest{
 				Type: "chef_tags",
@@ -814,7 +814,7 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 		{
 			description: "reporting_server_list_suggestions_test.go => roles",
 			summary: &relaxting.ESInSpecSummary{
-				Roles: terms,
+				Roles:   terms,
 				EndTime: time.Now(),
 			},
 			request: &reporting.SuggestionRequest{

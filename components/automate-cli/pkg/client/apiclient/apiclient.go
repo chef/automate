@@ -7,10 +7,10 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/compliance/reporting"
+	iam "github.com/chef/automate/api/external/iam/v2"
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
-	iam "github.com/chef/automate/api/external/iam/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
