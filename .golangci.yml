@@ -38,6 +38,7 @@ linters:
     - gochecknoglobals
     - gochecknoinits
     - gocritic
+    - rowserrcheck # too many false positives as of Feb 2021
     - scopelint
     - stylecheck
     - unparam
