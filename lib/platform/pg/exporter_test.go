@@ -338,4 +338,39 @@ func TestImport(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("it filters items from the TOC that cannot be imported", func(t *testing.T) {
+		rejectedTOCLines := []string{
+			"4; 2615 2200 SCHEMA - public automate",
+			"2215; 0 0 COMMENT - EXTENSION plpgsql ",
+			"2216; 0 0 COMMENT - EXTENSION pgcrypto ",
+		}
+
+		for _, line := range rejectedTOCLines {
+			assert.True(t, pg.IsIncompatibleTOCLine(line), "line %q should return true for IsIncompatibleTOCLine()", line)
+		}
+
+		acceptedTOCLines := []string{
+			"2213; 1262 17864 DATABASE - notifications_service notifications",
+			"2214; 0 0 COMMENT - SCHEMA public automate",
+			"1; 3079 12415 EXTENSION - plpgsql ",
+			"2; 3079 18164 EXTENSION - pgcrypto ",
+			"600; 1247 21250 TYPE public rule_action notifications",
+			"597; 1247 21238 TYPE public rule_event notifications",
+			"237; 1255 21273 FUNCTION public log_and_clean_event(character varying, public.rule_event, smallint) notifications",
+			"188; 1259 21309 TABLE public processed_events notifications",
+			"187; 1259 21299 TABLE public rules notifications",
+			"186; 1259 21286 TABLE public schema_migrations notifications",
+			"2207; 0 21309 TABLE DATA public processed_events notifications",
+			"2206; 0 21299 TABLE DATA public rules notifications",
+			"2205; 0 21286 TABLE DATA public schema_migrations notifications",
+			"2087; 2606 21314 CONSTRAINT public processed_events processed_events_pkey notifications",
+			"2083; 2606 21308 CONSTRAINT public rules rules_name_key notifications",
+			"2085; 2606 21306 CONSTRAINT public rules rules_pkey notifications",
+			"2081; 2606 21290 CONSTRAINT public schema_migrations schema_migrations_pkey notifications",
+		}
+
+		for _, line := range acceptedTOCLines {
+			assert.False(t, pg.IsIncompatibleTOCLine(line), "line %q should return false for IsIncompatibleTOCLine()", line)
+		}
+	})
 }

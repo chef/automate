@@ -295,7 +295,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
 			txt := scanner.Text()
-			if !isIncompatibleTOCLine(txt) {
+			if !IsIncompatibleTOCLine(txt) {
 				_, err := fmt.Fprintln(pgListFile, txt)
 				if err != nil {
 					errChan <- err
@@ -340,7 +340,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 //
 // If using the habitat dev studio, you can access the postgresql CLI tools via
 // `hab pkg exec core/postgresql-client COMMAND`
-func isIncompatibleTOCLine(line string) bool {
+func IsIncompatibleTOCLine(line string) bool {
 	// I think this refers to a TOC line like this:
 	//   4; 2615 2200 SCHEMA - public automate
 	if strings.Contains(line, "2615 2200") {
