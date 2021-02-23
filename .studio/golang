@@ -312,6 +312,8 @@ function go_component_make() {
 
   install_go
 
+  install_if_missing core/curl curl
+
   local component_relpath=$1
   local component_path="/src/$component_relpath"
   shift
