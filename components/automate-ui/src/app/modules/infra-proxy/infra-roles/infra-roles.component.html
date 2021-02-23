@@ -43,7 +43,9 @@
             <chef-td>{{ role.environments.join(", ") }}</chef-td>
             <chef-td></chef-td>
             <chef-td class="three-dot-column">
-              <mat-option data-cy="delete" (onSelectionChange)="startRoleDelete(role)">Delete Role</mat-option>
+              <mat-select panelClass="chef-control-menu" id="menu-{{role.id}}">
+                <mat-option (onSelectionChange)="startRoleDelete(role)" data-cy="delete-role">Delete</mat-option>
+              </mat-select>
             </chef-td>
           </chef-tr>
         </chef-tbody>

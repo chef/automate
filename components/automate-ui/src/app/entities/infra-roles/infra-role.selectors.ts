@@ -19,9 +19,9 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const roleList = createSelector(
+export const deleteStatus = createSelector(
   infraRoleState,
-  (state) => state.roleList
+  (state) => state.deleteStatus
 );
 
 export const infraRoleFromRoute = createSelector(
@@ -30,7 +30,7 @@ export const infraRoleFromRoute = createSelector(
   (state, { name }) => find({ name }, state)
 );
 
-export const deleteStatus = createSelector(
+export const roleList = createSelector(
   infraRoleState,
-  (state) => state.deleteStatus
+  (state) => state.roleList
 );
