@@ -124,11 +124,15 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 		perPage = 1000
 	}
 
-	searchStr := string(req.GetSearchQuery().GetQ())
+	searchStr := req.GetSearchQuery().GetQ()
 	if searchStr == "" {
 		searchStr = "*:*"
 	}
 	query, err := c.client.Search.NewQuery(req.Name, searchStr)
+	if err != nil {
+		return nil, err
+	}
+
 	query.Rows = perPage
 
 	// Query accepts start param, The row at which return results begin.

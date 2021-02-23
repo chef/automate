@@ -74,7 +74,7 @@ func (c *ChefClient) SearchRoles(searchQuery *request.SearchQuery) (RoleListResu
 		perPage = 1000
 	}
 
-	searchStr := string(searchQuery.GetQ())
+	searchStr := searchQuery.GetQ()
 	if searchStr == "" {
 		searchStr = "*:*"
 	}
