@@ -740,23 +740,6 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	return suggs, nil
 }
 
-// Finds the closest engram match for `text` in `arr`
-func findBestArrayMatch(text string, arr []string) string {
-	if len(arr) == 0 {
-		return ""
-	} else if len(arr) > 1 {
-		// Choose a set of bag sizes, more is more accurate but slower
-		bagSizes := []int{2, 3}
-		// Create a closestmatch object
-		cm := closestmatch.New(arr, bagSizes)
-		arr = cm.ClosestN(text, 1)
-		if len(arr) == 0 {
-			return ""
-		}
-	}
-	return arr[0]
-}
-
 // For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.
 // The space and the colon are the only delineators
 func buildRegexForTextTokens(text string) string {

@@ -201,9 +201,6 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		Skipped: nodeSummary.Skipped,
 		Waived:  nodeSummary.Waived,
 	}, nil
-
-	logrus.Debugf("%s Found no nodes\n", myName)
-	return nodes, emptyTotals, nil
 }
 
 func convertToRSControlSummary(summ reporting.NodeControlSummary) *reportingapi.ControlSummary {

@@ -270,8 +270,8 @@ type TargetBaseConfig struct {
 	Region                 string              `json:"region,omitempty"`
 	SubscriptionId         string              `json:"subscription_id,omitempty"`
 	AttributesJson         *json.RawMessage    `json:"attributes,omitempty"`
-	ResultIncludeBacktrace bool                `json:"attributes,reporter_backtrace_inclusion"`
-	ResultMessageLimit     int                 `json:"attributes,reporter_message_truncation"`
+	ResultIncludeBacktrace bool                `json:"reporter_backtrace_inclusion"`
+	ResultMessageLimit     int                 `json:"reporter_message_truncation"`
 }
 
 // TargetConfig is inspec's JSON config options
