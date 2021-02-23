@@ -5,10 +5,9 @@ chef-modal {
 
   .options {
     float: right;
-    margin-top: 30px;
-    
+
     .cancel-button {
-      color: #dc267f;
+      color: #DC267F;
     }
   }
 
@@ -17,7 +16,7 @@ chef-modal {
     height: auto;
     width: 40%;
   }
-  
+
   .right-box {
     float: left;
     height: auto;
@@ -27,33 +26,38 @@ chef-modal {
   .title-text {
     font-size: 36px;
     font-weight: 900;
-    margin-top: 52px;
-    margin-bottom: 20px;
+    margin-top: 72px;
+    margin-bottom: 11px;
+    line-height: 40px;
   }
 
-  .action-text1, .action-text2 {
+  .action-text {
     font-size: 24px;
     font-weight: 900;
   }
 
-  .action-text3 {
-    font-size: 12px;
-  }
-
   .left-align {
     line-height: 30px;
+    margin-bottom: 63px;
     margin-left: 43px;
     text-align: left;
   }
 
-  .shade1, .shade2, .shade3 {
-    color: #697272;
+  .del-icon {
+    z-index: 999999;
+    position: relative;
   }
 
+  .del-vector {
+    position: absolute;
+    left: 220px;
+    top: 41px;
+  }
 }
 
 ::ng-deep {
   chef-modal .modal {
+    padding: 32px;
     box-shadow: 0px 0px 30px 0px #CCC;
     outline: none;
   }

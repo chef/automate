@@ -1,15 +1,13 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
   <div class="left-box">
-    <img src="assets/img/infra-delete-icon.svg" alt="delete-icon" />
+    <img class="del-icon" src="assets/img/infra-delete-icon.svg" alt="delete-icon" />
   </div>
 
   <div class="right-box">
     <div class="left-align">
-      <div class="title-text">Are you sure?</div>
+      <div class="title-text">Deleting {{objectNoun | titlecase}}?</div>
       <ng-container *ngIf="custom === false">
-        <div class="action-text1"><span class="shade1">De</span>leting {{objectNoun | titlecase}} action</div>
-        <div class="action-text2"><span class="shade2">is irr</span><span>eversible.</span></div>
-        <div class="action-text3"><span class="shade3">you can't undo </span>this action</div>
+        <div class="action-text">This action is irreversible.</div>
       </ng-container>
     </div>
 
@@ -20,4 +18,5 @@
       </chef-button>
     </div>
   </div>
+  <img class="del-vector" src="assets/img/delete_vector.png" alt="delete-vector-icon" />
 </chef-modal>

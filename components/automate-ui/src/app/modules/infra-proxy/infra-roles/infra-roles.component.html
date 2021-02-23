@@ -7,7 +7,7 @@
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteRole()"
     objectAction="Delete">
-  </app-delete-object-modal>
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
