@@ -121,7 +121,8 @@ describe('ChefServersListComponent', () => {
       component.createChefServer();
 
       store.dispatch(new CreateServerSuccess({ 'server': server }));
-      expect(component.createModalVisible).toBe(true);
+      expect(component.creatingChefServer).toBe(true);
+      expect(component.createModalVisible).toBe(false);
 
     });
 

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InfraSearchBarComponent } from './infra-search-bar.component';
+import { MockComponent } from 'ng2-mock-component';
 
 describe('InfraSearchBarComponent', () => {
   let component: InfraSearchBarComponent;
@@ -8,7 +9,9 @@ describe('InfraSearchBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InfraSearchBarComponent ]
+      declarations: [
+        MockComponent({ selector: 'chef-icon' }),
+        InfraSearchBarComponent ]
     })
     .compileComponents();
   });
