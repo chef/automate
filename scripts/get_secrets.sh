@@ -5,8 +5,9 @@ error() {
     echo "$*" >&2
 }
 
-export VAULT_ADDR=${VAULT_ADDR:-https://vault.chef.co:8200}
+export VAULT_ADDR=${VAULT_ADDR:-https://vault.es.chef.co}
 export VAULT_CACERT=""
+export VAULT_NAMESPACE=releng
 CHEF_USERNAME=${CHEF_USERNAME:-unknown}
 STUDIO_TYPE=${STUDIO_TYPE:-none}
 
@@ -41,12 +42,13 @@ fi
 
 echo "Using VAULT_ADDR=$VAULT_ADDR"
 echo "Using VAULT_CACERT=$VAULT_CACERT"
+echo "Using VAULT_NAMESPACE=$VAULT_NAMESPACE"
 echo "Using CHEF_USERNAME=$CHEF_USERNAME"
 
 if [[ ! -f "$HOME/.vault-token" ]]; then
     echo "No cached token found. Attempting to log in."
     echo "Please enter your Chef password:"
-    vault login -method=okta username="$CHEF_USERNAME"
+    vault login -method=okta -namespace="$VAULT_NAMESPACE" username="$CHEF_USERNAME"
 else
     echo "Cached token found at $HOME/.vault-token, skipping login"
 fi
