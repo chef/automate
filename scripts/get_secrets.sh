@@ -51,7 +51,7 @@ echo "Using CHEF_USERNAME=$CHEF_USERNAME"
 if [[ ! -f "$HOME/.vault-token" ]]; then
     echo "No cached token found. Attempting to log in."
     echo "Please enter your Chef password:"
-    vault login -method=okta -namespace="$VAULT_NAMESPACE" username="$CHEF_USERNAME"
+    vault login -method=okta username="$CHEF_USERNAME"
 else
     echo "Cached token found at $HOME/.vault-token, skipping login"
 fi
