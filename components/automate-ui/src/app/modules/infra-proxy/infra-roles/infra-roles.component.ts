@@ -65,13 +65,17 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, RolesState]) => {
-
       if (!isNil(RolesState)) {
         this.roleListState = RolesState;
-        this.roles = RolesState?.items;
-        this.total = RolesState?.total;
-        this.rolesListLoading = false;
-        this.searching = false;
+        if (this.roleListState.items.length === 0 && this.roleListState.total !== 0) {
+          this.store.dispatch(new GetRoles(payload));
+          this.rolesListLoading = true;
+        } else {
+          this.roles = RolesState?.items;
+          this.total = RolesState?.total;
+          this.rolesListLoading = false;
+          this.searching = false;
+        }
       }
     });
   }

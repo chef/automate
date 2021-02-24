@@ -48,8 +48,13 @@ export function infraRoleEntityReducer(
       return set(DELETE_STATUS, EntityStatus.loading, state);
 
     case RoleActionTypes.DELETE_SUCCESS:
-      return set(DELETE_STATUS, EntityStatus.loadingSuccess,
-      infraRoleEntityAdapter.removeOne(action.payload.name, state));
+      const roles = state.roleList.items.filter(role => role.name !== action.payload.name );
+      const total = state.roleList.total - 1;
+      return pipe(
+        set(DELETE_STATUS, EntityStatus.loadingSuccess),
+        set('roleList.items', roles || []),
+        set('roleList.total', total || 0 )
+        )(state) as InfraRoleEntityState;
 
     case RoleActionTypes.DELETE_FAILURE:
       return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
