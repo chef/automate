@@ -31,7 +31,7 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 	}
 	query, err := c.client.Search.NewQuery("environment", searchStr)
 	if err != nil {
-		return nil, err
+		return &response.Environments{Environments: []*response.EnvironmentListItem{}}, nil
 	}
 	query.Rows = perPage
 

@@ -37,7 +37,7 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 	}
 	query, err := c.client.Search.NewQuery("client", searchStr)
 	if err != nil {
-		return nil, err
+		return &response.Clients{Clients: []*response.ClientListItem{}}, nil
 	}
 	query.Rows = perPage
 

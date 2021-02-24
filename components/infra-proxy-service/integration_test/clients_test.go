@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetClients(t *testing.T) {
@@ -77,7 +78,7 @@ func TestGetClients(t *testing.T) {
 			PerPage: 5,
 		}
 		res, err := infraProxy.GetClients(ctx, req)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 0, int(res.Total))
 		assert.Equal(t, 0, len(res.Clients))

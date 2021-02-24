@@ -130,7 +130,9 @@ func (s *Server) GetDataBagItems(ctx context.Context, req *request.DataBagItems)
 	}
 	query, err := c.client.Search.NewQuery(req.Name, searchStr)
 	if err != nil {
-		return nil, err
+		return &response.DataBagItems{Name: req.Name,
+			Items: []*response.DataBagListItem{},
+		}, nil
 	}
 
 	query.Rows = perPage
