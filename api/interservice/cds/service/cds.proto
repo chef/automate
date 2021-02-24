@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package chef.automate.domain.autoamte_cds.service;
-option go_package = "github.com/chef/automate/api/interservice/autoamte_cds/service";
+package chef.automate.domain.automate_cds.service;
+option go_package = "github.com/chef/automate/api/interservice/automate_cds/service";
 
 import "external/cds/request/root.proto";
 import "external/cds/response/root.proto";

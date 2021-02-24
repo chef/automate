@@ -38,8 +38,8 @@ var file_interservice_cds_service_cds_proto_rawDesc = []byte{
 	0x0a, 0x22, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63,
 	0x64, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x64, 0x73, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x29, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d,
-	0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x61,
-	0x6d, 0x74, 0x65, 0x5f, 0x63, 0x64, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x1a,
+	0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d,
+	0x61, 0x74, 0x65, 0x5f, 0x63, 0x64, 0x73, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x1a,
 	0x1f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x63, 0x64, 0x73, 0x2f, 0x72, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x2f, 0x72, 0x6f, 0x6f, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x20, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x63, 0x64, 0x73, 0x2f, 0x72,
@@ -96,7 +96,7 @@ var file_interservice_cds_service_cds_proto_rawDesc = []byte{
 	0x74, 0x69, 0x61, 0x6c, 0x73, 0x42, 0x40, 0x5a, 0x3e, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
 	0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
 	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x61, 0x6d, 0x74, 0x65, 0x5f, 0x63, 0x64, 0x73, 0x2f,
+	0x63, 0x65, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x5f, 0x63, 0x64, 0x73, 0x2f,
 	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
@@ -115,18 +115,18 @@ var file_interservice_cds_service_cds_proto_goTypes = []interface{}{
 	(*response.Credentials)(nil),        // 11: chef.automate.api.cds.response.Credentials
 }
 var file_interservice_cds_service_cds_proto_depIdxs = []int32{
-	0,  // 0: chef.automate.domain.autoamte_cds.service.AutomateCdsService.GetVersion:input_type -> chef.automate.api.common.version.VersionInfoRequest
-	1,  // 1: chef.automate.domain.autoamte_cds.service.AutomateCdsService.ListContentItems:input_type -> chef.automate.api.cds.request.ContentItems
-	2,  // 2: chef.automate.domain.autoamte_cds.service.AutomateCdsService.InstallContentItem:input_type -> chef.automate.api.cds.request.InstallContentItem
-	3,  // 3: chef.automate.domain.autoamte_cds.service.AutomateCdsService.DownloadContentItem:input_type -> chef.automate.api.cds.request.DownloadContentItem
-	4,  // 4: chef.automate.domain.autoamte_cds.service.AutomateCdsService.IsContentEnabled:input_type -> chef.automate.api.cds.request.ContentEnabled
-	5,  // 5: chef.automate.domain.autoamte_cds.service.AutomateCdsService.SubmitCredentials:input_type -> chef.automate.api.cds.request.Credentials
-	6,  // 6: chef.automate.domain.autoamte_cds.service.AutomateCdsService.GetVersion:output_type -> chef.automate.api.common.version.VersionInfo
-	7,  // 7: chef.automate.domain.autoamte_cds.service.AutomateCdsService.ListContentItems:output_type -> chef.automate.api.cds.response.ContentItems
-	8,  // 8: chef.automate.domain.autoamte_cds.service.AutomateCdsService.InstallContentItem:output_type -> chef.automate.api.cds.response.InstallContentItem
-	9,  // 9: chef.automate.domain.autoamte_cds.service.AutomateCdsService.DownloadContentItem:output_type -> chef.automate.api.common.ExportData
-	10, // 10: chef.automate.domain.autoamte_cds.service.AutomateCdsService.IsContentEnabled:output_type -> chef.automate.api.cds.response.ContentEnabled
-	11, // 11: chef.automate.domain.autoamte_cds.service.AutomateCdsService.SubmitCredentials:output_type -> chef.automate.api.cds.response.Credentials
+	0,  // 0: chef.automate.domain.automate_cds.service.AutomateCdsService.GetVersion:input_type -> chef.automate.api.common.version.VersionInfoRequest
+	1,  // 1: chef.automate.domain.automate_cds.service.AutomateCdsService.ListContentItems:input_type -> chef.automate.api.cds.request.ContentItems
+	2,  // 2: chef.automate.domain.automate_cds.service.AutomateCdsService.InstallContentItem:input_type -> chef.automate.api.cds.request.InstallContentItem
+	3,  // 3: chef.automate.domain.automate_cds.service.AutomateCdsService.DownloadContentItem:input_type -> chef.automate.api.cds.request.DownloadContentItem
+	4,  // 4: chef.automate.domain.automate_cds.service.AutomateCdsService.IsContentEnabled:input_type -> chef.automate.api.cds.request.ContentEnabled
+	5,  // 5: chef.automate.domain.automate_cds.service.AutomateCdsService.SubmitCredentials:input_type -> chef.automate.api.cds.request.Credentials
+	6,  // 6: chef.automate.domain.automate_cds.service.AutomateCdsService.GetVersion:output_type -> chef.automate.api.common.version.VersionInfo
+	7,  // 7: chef.automate.domain.automate_cds.service.AutomateCdsService.ListContentItems:output_type -> chef.automate.api.cds.response.ContentItems
+	8,  // 8: chef.automate.domain.automate_cds.service.AutomateCdsService.InstallContentItem:output_type -> chef.automate.api.cds.response.InstallContentItem
+	9,  // 9: chef.automate.domain.automate_cds.service.AutomateCdsService.DownloadContentItem:output_type -> chef.automate.api.common.ExportData
+	10, // 10: chef.automate.domain.automate_cds.service.AutomateCdsService.IsContentEnabled:output_type -> chef.automate.api.cds.response.ContentEnabled
+	11, // 11: chef.automate.domain.automate_cds.service.AutomateCdsService.SubmitCredentials:output_type -> chef.automate.api.cds.response.Credentials
 	6,  // [6:12] is the sub-list for method output_type
 	0,  // [0:6] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
@@ -188,7 +188,7 @@ func NewAutomateCdsServiceClient(cc grpc.ClientConnInterface) AutomateCdsService
 
 func (c *automateCdsServiceClient) GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error) {
 	out := new(version.VersionInfo)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/GetVersion", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.automate_cds.service.AutomateCdsService/GetVersion", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (c *automateCdsServiceClient) GetVersion(ctx context.Context, in *version.V
 
 func (c *automateCdsServiceClient) ListContentItems(ctx context.Context, in *request.ContentItems, opts ...grpc.CallOption) (*response.ContentItems, error) {
 	out := new(response.ContentItems)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/ListContentItems", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.automate_cds.service.AutomateCdsService/ListContentItems", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +206,7 @@ func (c *automateCdsServiceClient) ListContentItems(ctx context.Context, in *req
 
 func (c *automateCdsServiceClient) InstallContentItem(ctx context.Context, in *request.InstallContentItem, opts ...grpc.CallOption) (*response.InstallContentItem, error) {
 	out := new(response.InstallContentItem)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/InstallContentItem", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.automate_cds.service.AutomateCdsService/InstallContentItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (c *automateCdsServiceClient) InstallContentItem(ctx context.Context, in *r
 }
 
 func (c *automateCdsServiceClient) DownloadContentItem(ctx context.Context, in *request.DownloadContentItem, opts ...grpc.CallOption) (AutomateCdsService_DownloadContentItemClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_AutomateCdsService_serviceDesc.Streams[0], "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/DownloadContentItem", opts...)
+	stream, err := c.cc.NewStream(ctx, &_AutomateCdsService_serviceDesc.Streams[0], "/chef.automate.domain.automate_cds.service.AutomateCdsService/DownloadContentItem", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (x *automateCdsServiceDownloadContentItemClient) Recv() (*common.ExportData
 
 func (c *automateCdsServiceClient) IsContentEnabled(ctx context.Context, in *request.ContentEnabled, opts ...grpc.CallOption) (*response.ContentEnabled, error) {
 	out := new(response.ContentEnabled)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/IsContentEnabled", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.automate_cds.service.AutomateCdsService/IsContentEnabled", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (c *automateCdsServiceClient) IsContentEnabled(ctx context.Context, in *req
 
 func (c *automateCdsServiceClient) SubmitCredentials(ctx context.Context, in *request.Credentials, opts ...grpc.CallOption) (*response.Credentials, error) {
 	out := new(response.Credentials)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/SubmitCredentials", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.automate_cds.service.AutomateCdsService/SubmitCredentials", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func _AutomateCdsService_GetVersion_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/GetVersion",
+		FullMethod: "/chef.automate.domain.automate_cds.service.AutomateCdsService/GetVersion",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutomateCdsServiceServer).GetVersion(ctx, req.(*version.VersionInfoRequest))
@@ -328,7 +328,7 @@ func _AutomateCdsService_ListContentItems_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/ListContentItems",
+		FullMethod: "/chef.automate.domain.automate_cds.service.AutomateCdsService/ListContentItems",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutomateCdsServiceServer).ListContentItems(ctx, req.(*request.ContentItems))
@@ -346,7 +346,7 @@ func _AutomateCdsService_InstallContentItem_Handler(srv interface{}, ctx context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/InstallContentItem",
+		FullMethod: "/chef.automate.domain.automate_cds.service.AutomateCdsService/InstallContentItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutomateCdsServiceServer).InstallContentItem(ctx, req.(*request.InstallContentItem))
@@ -385,7 +385,7 @@ func _AutomateCdsService_IsContentEnabled_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/IsContentEnabled",
+		FullMethod: "/chef.automate.domain.automate_cds.service.AutomateCdsService/IsContentEnabled",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutomateCdsServiceServer).IsContentEnabled(ctx, req.(*request.ContentEnabled))
@@ -403,7 +403,7 @@ func _AutomateCdsService_SubmitCredentials_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.autoamte_cds.service.AutomateCdsService/SubmitCredentials",
+		FullMethod: "/chef.automate.domain.automate_cds.service.AutomateCdsService/SubmitCredentials",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AutomateCdsServiceServer).SubmitCredentials(ctx, req.(*request.Credentials))
@@ -412,7 +412,7 @@ func _AutomateCdsService_SubmitCredentials_Handler(srv interface{}, ctx context.
 }
 
 var _AutomateCdsService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "chef.automate.domain.autoamte_cds.service.AutomateCdsService",
+	ServiceName: "chef.automate.domain.automate_cds.service.AutomateCdsService",
 	HandlerType: (*AutomateCdsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
