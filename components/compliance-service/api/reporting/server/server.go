@@ -410,8 +410,8 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 func (srv *Server) ReadNode(ctx context.Context, in *reporting.Id) (*reporting.Node, error) {
 	formattedFilters := formatFilters([]*reporting.ListFilter{})
 	// This method takes no filters, setting the widest start->end time range to find this node
-	formattedFilters["start_time"] = []string{ "2017-01-01T00:00:00Z" }
-	formattedFilters["end_time"] = []string{	time.Now().UTC().Format(time.RFC3339) }
+	formattedFilters["start_time"] = []string{"2017-01-01T00:00:00Z"}
+	formattedFilters["end_time"] = []string{time.Now().UTC().Format(time.RFC3339)}
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)

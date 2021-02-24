@@ -391,7 +391,7 @@ func TestRulesCRUDUpdateRuleValidation(t *testing.T) {
 		require.NoError(t, err)
 		// NOTE: the elixir implementation does not check for the case that an
 		// update would violate the uniqueness constraint on the name column, so it
-		// returns an internal error when the db request fails on the contstraint
+		// returns an internal error when the db request fails on the constraint
 		// violation. This is a bug, but we don't plan to change the behavior until
 		// after the elixir implementation is replaced.
 		assert.NotEqual(t, api.RuleUpdateResponse_OK, response.Code)

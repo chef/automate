@@ -7,10 +7,10 @@ import (
 
 	grpc_status "google.golang.org/grpc/status"
 
+	iam_req "github.com/chef/automate/api/external/iam/v2/request"
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	iam_req "github.com/chef/automate/api/external/iam/v2/request"
 	"github.com/chef/automate/lib/stringutils"
 )
 

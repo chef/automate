@@ -25,11 +25,14 @@ func (s *Server) GetEnvironments(ctx context.Context, req *request.Environments)
 		perPage = 1000
 	}
 
-	searchStr := string(req.GetSearchQuery().GetQ())
+	searchStr := req.GetSearchQuery().GetQ()
 	if searchStr == "" {
 		searchStr = "*:*"
 	}
 	query, err := c.client.Search.NewQuery("environment", searchStr)
+	if err != nil {
+		return &response.Environments{Environments: []*response.EnvironmentListItem{}}, nil
+	}
 	query.Rows = perPage
 
 	// Query accepts start param, The row at which return results begin.

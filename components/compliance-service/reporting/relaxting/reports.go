@@ -14,6 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
@@ -21,7 +22,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 

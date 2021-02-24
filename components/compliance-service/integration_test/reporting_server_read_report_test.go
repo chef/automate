@@ -18,11 +18,11 @@ func TestReadReport(t *testing.T) {
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project1", "project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 	}
 	reportIds, err := suite.InsertInspecReports(reports)

@@ -13,7 +13,6 @@ type (
 	contextSubsKey     struct{}
 	contextResKey      struct{}
 	contextActKey      struct{}
-	contextPolicyKey   struct{}
 	contextProjectsKey struct{}
 )
 
@@ -21,7 +20,6 @@ var (
 	subjectsKey = contextSubsKey{}
 	resourceKey = contextResKey{}
 	actionKey   = contextActKey{}
-	policyKey   = contextPolicyKey{}
 	projectsKey = contextProjectsKey{}
 )
 

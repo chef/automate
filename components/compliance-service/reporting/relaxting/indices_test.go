@@ -1,11 +1,11 @@
 package relaxting_test
 
 import (
-	"testing"
 	"fmt"
-	"time"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestIndexDatesBadRange(t *testing.T) {
@@ -69,7 +69,7 @@ func TestIndexDatesYesEndTimeNoStartTime(t *testing.T) {
 	emptyStartTime := ""
 	endTime := "2018-01-02T15:04:05Z"
 	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, emptyStartTime, endTime)
-	assert.EqualError(t, err,  "start_time must be defined", err)
+	assert.EqualError(t, err, "start_time must be defined", err)
 	assert.Equal(t, "", esIndex)
 }
 
@@ -87,7 +87,7 @@ func TestIndexDatesYesEndTimeAnd2017StartTime(t *testing.T) {
 
 func TestIndexDatesNoEndTimeNoStartTime(t *testing.T) {
 	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, "", "")
-	assert.EqualError(t, err,  "start_time must be defined", err)
+	assert.EqualError(t, err, "start_time must be defined", err)
 	assert.Equal(t, "", esIndex)
 }
 

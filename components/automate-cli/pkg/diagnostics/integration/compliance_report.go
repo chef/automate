@@ -102,7 +102,7 @@ type complianceReportEntity struct {
 }
 
 type filter struct {
-	Type string `json:"type"`
+	Type   string   `json:"type"`
 	Values []string `json:"values"`
 }
 type request struct {
@@ -161,7 +161,7 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 				save.CreatedEntities = append(save.CreatedEntities, complianceReportEntity{
 					NodeUUID:   nodeUUID,
 					ReportUUID: reportUUID,
-					EndTime: endTime,
+					EndTime:    endTime,
 				})
 
 				tstCtx.SetValue("compliance-report", save)

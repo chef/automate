@@ -31,12 +31,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -55,12 +55,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "org1",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "org2",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -81,12 +81,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -105,12 +105,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -131,12 +131,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -155,12 +155,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -181,12 +181,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -205,12 +205,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1", "org3"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -229,12 +229,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"org1"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"org2", "org4"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -255,12 +255,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -279,12 +279,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "org1",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "org2",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -305,12 +305,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -329,12 +329,12 @@ func TestListNodesFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "org1",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "org2",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -535,17 +535,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -564,17 +564,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:        "1",
 					InSpecVersion: "3.1.0",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "2",
 					InSpecVersion: "3.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 				{
 					NodeID:        "3",
 					InSpecVersion: "4.1.3",
-					EndTime: time.Now(),
+					EndTime:       time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -595,17 +595,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -624,17 +624,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "4",
 					SourceFQDN: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -653,17 +653,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -682,17 +682,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					SourceFQDN: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					SourceFQDN: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					SourceFQDN: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -713,17 +713,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"a2-prod"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-dev", "chef-server"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"a1-dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -742,17 +742,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"a1-dev", "chef-server"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "4",
 					ChefTags: []string{"b1-dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -771,17 +771,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"A2-prod"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-Dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"A1-dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -800,17 +800,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					ChefTags: []string{"A2-prod"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					ChefTags: []string{"a2-Dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					ChefTags: []string{"A1-dev"},
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -831,17 +831,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					Environment: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -860,17 +860,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "2",
 					Environment: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "4",
 					Environment: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -889,17 +889,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					Environment: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -918,17 +918,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					Environment: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					Environment: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					Environment: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -949,17 +949,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					NodeName: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -978,17 +978,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "2",
 					NodeName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "4",
 					NodeName: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1007,17 +1007,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					NodeName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1036,17 +1036,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:   "1",
 					NodeName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "2",
 					NodeName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 				{
 					NodeID:   "3",
 					NodeName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:  time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1067,17 +1067,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1096,17 +1096,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "4",
 					OrganizationName: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1125,17 +1125,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1154,17 +1154,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:           "1",
 					OrganizationName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "2",
 					OrganizationName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 				{
 					NodeID:           "3",
 					OrganizationName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:          time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1565,17 +1565,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1594,17 +1594,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "4",
 					PolicyGroup: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1623,17 +1623,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1652,17 +1652,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:      "1",
 					PolicyGroup: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "2",
 					PolicyGroup: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 				{
 					NodeID:      "3",
 					PolicyGroup: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:     time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1683,17 +1683,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "a2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1712,17 +1712,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "2",
 					PolicyName: "a2-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "a1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "4",
 					PolicyName: "b1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1741,17 +1741,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1770,17 +1770,17 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				{
 					NodeID:     "1",
 					PolicyName: "A2-prod",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "2",
 					PolicyName: "a2-Dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 				{
 					NodeID:     "3",
 					PolicyName: "A1-dev",
-					EndTime: time.Now(),
+					EndTime:    time.Now(),
 				},
 			},
 			query: reporting.Query{
@@ -1917,18 +1917,18 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			description: "reporting_server_list_nodes_test.go => roles: '*' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
-					NodeID: "1",
-					Roles:  []string{"a2-prod"},
+					NodeID:  "1",
+					Roles:   []string{"a2-prod"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "2",
-					Roles:  []string{"a2-dev", "chef-server"},
+					NodeID:  "2",
+					Roles:   []string{"a2-dev", "chef-server"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "3",
-					Roles:  []string{"a1-dev"},
+					NodeID:  "3",
+					Roles:   []string{"a1-dev"},
 					EndTime: time.Now(),
 				},
 			},
@@ -1946,18 +1946,18 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			description: "reporting_server_list_nodes_test.go => roles: '?' wildcard",
 			reports: []*relaxting.ESInSpecReport{
 				{
-					NodeID: "2",
-					Roles:  []string{"a2-dev"},
+					NodeID:  "2",
+					Roles:   []string{"a2-dev"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "3",
-					Roles:  []string{"a1-dev", "chef-server"},
+					NodeID:  "3",
+					Roles:   []string{"a1-dev", "chef-server"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "4",
-					Roles:  []string{"b1-dev"},
+					NodeID:  "4",
+					Roles:   []string{"b1-dev"},
 					EndTime: time.Now(),
 				},
 			},
@@ -1975,18 +1975,18 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			description: "reporting_server_list_nodes_test.go => role: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
-					NodeID: "1",
-					Roles:  []string{"A2-prod"},
+					NodeID:  "1",
+					Roles:   []string{"A2-prod"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "2",
-					Roles:  []string{"a2-Dev"},
+					NodeID:  "2",
+					Roles:   []string{"a2-Dev"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "3",
-					Roles:  []string{"A1-dev"},
+					NodeID:  "3",
+					Roles:   []string{"A1-dev"},
 					EndTime: time.Now(),
 				},
 			},
@@ -2004,18 +2004,18 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			description: "reporting_server_list_nodes_test.go => role: case insensitive wildcard 2",
 			reports: []*relaxting.ESInSpecReport{
 				{
-					NodeID: "1",
-					Roles:  []string{"A2-prod"},
+					NodeID:  "1",
+					Roles:   []string{"A2-prod"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "2",
-					Roles:  []string{"a2-Dev"},
+					NodeID:  "2",
+					Roles:   []string{"a2-Dev"},
 					EndTime: time.Now(),
 				},
 				{
-					NodeID: "3",
-					Roles:  []string{"A1-dev"},
+					NodeID:  "3",
+					Roles:   []string{"A1-dev"},
 					EndTime: time.Now(),
 				},
 			},
@@ -2453,32 +2453,32 @@ func TestListNodesProjectFiltering(t *testing.T) {
 		{
 			NodeID:   nodeIds[0],
 			Projects: []string{},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[1],
 			Projects: []string{"project1"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[2],
 			Projects: []string{"project1", "project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[3],
 			Projects: []string{"project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[4],
 			Projects: []string{"project2", "project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   nodeIds[5],
 			Projects: []string{"project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 	}
 

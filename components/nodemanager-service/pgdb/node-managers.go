@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 

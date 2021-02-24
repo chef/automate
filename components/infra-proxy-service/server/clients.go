@@ -31,11 +31,14 @@ func (s *Server) GetClients(ctx context.Context, req *request.Clients) (*respons
 		perPage = 1000
 	}
 
-	searchStr := string(req.GetSearchQuery().GetQ())
+	searchStr := req.GetSearchQuery().GetQ()
 	if searchStr == "" {
 		searchStr = "*:*"
 	}
 	query, err := c.client.Search.NewQuery("client", searchStr)
+	if err != nil {
+		return &response.Clients{Clients: []*response.ClientListItem{}}, nil
+	}
 	query.Rows = perPage
 
 	// Query accepts start param, The row at which return results begin.
@@ -205,12 +208,20 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 		ExpirationDate: "infinity",
 		CreateKey:      true,
 	})
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
 
 	var chefKey chef.ChefKey
 	addReq, err := c.client.NewRequest("POST", fmt.Sprintf("clients/%s/keys", req.Name), body)
+
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
 	res, err := c.client.Do(addReq, &chefKey)
 	if res != nil {
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck //nolint:errcheck
 	}
 
 	if err != nil {

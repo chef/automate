@@ -9,12 +9,12 @@ import (
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 type Scheduler struct {

@@ -1,10 +1,7 @@
 package migrator
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"net/url"
-	"strconv"
 
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
@@ -91,7 +88,7 @@ func MigrateWithMigrationsTable(pgURL, migrationsPath, migrationsTable string, l
 // Obviously you don't want this for production, but you should use it instead
 // of the plain Migrate function in your tests if you can.
 func DestructiveMigrateForTests(pgURL, migrationsPath string, l logger.Logger, verbose bool) error {
-	l.Infof("running db migrations in destructo test mode for DB %q from %q", pgURL, migrationsPath)
+	l.Infof("running db migrations in destructive test mode for DB %q from %q", pgURL, migrationsPath)
 	m, err := newMigratorBackend(pgURL, migrationsPath, l, verbose)
 	if err != nil {
 		return err
@@ -129,6 +126,9 @@ func Drop(pgURL, migrationsPath string, l logger.Logger, verbose bool) error {
 
 func newMigratorBackend(pgURL, migrationsPath string, l logger.Logger, verbose bool) (*migrate.Migrate, error) {
 	purl, err := addMigrationsTable(pgURL, "")
+	if err != nil {
+		return nil, errors.Wrapf(err, "migrator setup failed for %q", pgURL)
+	}
 
 	m, err := migrate.New(addScheme(migrationsPath), purl)
 	if err != nil {
@@ -156,17 +156,4 @@ func addMigrationsTable(u, table string) (string, error) {
 		pgURL.RawQuery = q.Encode()
 	}
 	return pgURL.String(), nil
-}
-
-func lockIdForURL(pgURL string) (int64, error) {
-	u, err := url.Parse(pgURL)
-	if err != nil {
-		return 0, err
-	}
-	hex := fmt.Sprintf("%x", sha256.Sum256([]byte(u.Path)))
-	dec, err := strconv.ParseInt(hex, 16, 64)
-	if err != nil {
-		return 0, err
-	}
-	return dec, nil
 }

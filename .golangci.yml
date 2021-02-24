@@ -7,9 +7,14 @@ issues:
   max-same-issues: 0
 
 linters-settings:
+  gofmt:
+    simplify: false
   godox:
     keywords:
       - NOCOMMIT
+  govet:
+    disable:
+      - copylocks
 
 linters:
   enable-all: true
@@ -19,14 +24,21 @@ linters:
     - funlen
     - gocognit
     - goconst
+    - godot
+    - goerr113
+    - goimports
+    - gomnd
     - maligned
     - megacheck
+    - nestif
+    - nolintlint
     - interfacer
     - golint
     - gas
     - gochecknoglobals
     - gochecknoinits
     - gocritic
+    - rowserrcheck # too many false positives as of Feb 2021
     - scopelint
     - stylecheck
     - unparam

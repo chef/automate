@@ -12,13 +12,13 @@ import (
 	"github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
+	"github.com/chef/automate/api/external/lib/errorutils"
 	ingestinspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/api/external/lib/errorutils"
 )
 
 type ESInspecControl struct {

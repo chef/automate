@@ -18,27 +18,27 @@ func TestListReports(t *testing.T) {
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project1"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project1", "project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project2", "project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project3"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 	}
 

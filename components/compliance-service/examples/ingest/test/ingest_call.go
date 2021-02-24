@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
-	"strings"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/jsonpb"
@@ -53,11 +53,11 @@ func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error 
 	// This is needed to test the last 24 hours functionality of Automate when an end_time is not specified for API calls
 	if strings.HasPrefix(json_file, "NOW") {
 		split_file := strings.Split(json_file, "_")
-		if (len(split_file) < 6) {
-		  logrus.Fatalf("Dynamic report file (%s) is invalid. starting with NOW must have at least 5 underscores. Example: NOW_MINUS_1440_PLUS_0060_osx(2)-omega-pro1(p)-passed.json", json_file)
+		if len(split_file) < 6 {
+			logrus.Fatalf("Dynamic report file (%s) is invalid. starting with NOW must have at least 5 underscores. Example: NOW_MINUS_1440_PLUS_0060_osx(2)-omega-pro1(p)-passed.json", json_file)
 		}
 		new_end_date := time.Now()
-		if (split_file[1] == "MINUS") {
+		if split_file[1] == "MINUS" {
 			first_minutes, err := strconv.Atoi(split_file[2])
 			if err != nil {
 				logrus.Fatalf("Can't convert '%s' to integer, aborting report %s", split_file[2], json_file)
@@ -67,9 +67,9 @@ func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error 
 				logrus.Fatalf("Can't convert '%s' to integer, aborting report %s", split_file[4], json_file)
 			}
 			new_end_date = new_end_date.Add(-time.Duration(first_minutes) * time.Minute)
-			if (split_file[3] == "MINUS") {
+			if split_file[3] == "MINUS" {
 				new_end_date = new_end_date.Add(-time.Duration(second_minutes) * time.Minute)
-			} else if (split_file[3] == "PLUS") {
+			} else if split_file[3] == "PLUS" {
 				if first_minutes == 1440 && second_minutes == 1 {
 					// Need less than a minute, otherwise some tests run before this minute expires, creating flaky tests
 					new_end_date = new_end_date.Add(15 * time.Second)

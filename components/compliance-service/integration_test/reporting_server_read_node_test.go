@@ -23,12 +23,12 @@ func TestReadNode(t *testing.T) {
 		{
 			NodeID:   unassignedNodeId,
 			Projects: []string{},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 		{
 			NodeID:   assignedNodeId,
 			Projects: []string{"project1", "project2"},
-			EndTime: time.Now(),
+			EndTime:  time.Now(),
 		},
 	}
 	reportIds, err := suite.InsertInspecReports(reports)
