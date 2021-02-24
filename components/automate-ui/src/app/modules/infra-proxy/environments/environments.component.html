@@ -1,13 +1,13 @@
 <section class="environments">
   <chef-loading-spinner *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
-  <app-delete-object-modal
+  <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
     objectNoun="environment"
     [objectName]="environmentToDelete?.name"
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteEnvironment()"
     objectAction="Delete">
-  </app-delete-object-modal>
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-items">
@@ -16,7 +16,7 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searching && !environments.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
       <p *ngIf="searchValue === ''">No environment available.</p>
     </div>
     <chef-table *ngIf="environments.length">
@@ -47,12 +47,12 @@
         </chef-tr>
       </chef-tbody>
     </chef-table>
-     <app-page-picker
-        class="environment-list-paging"
-        [total]="total"
-        [perPage]="per_page"
-        [page]="page"
-        (pageChanged)="onPageChange($event)">
-      </app-page-picker>
+    <app-page-picker
+      class="environment-list-paging"
+      [total]="total"
+      [perPage]="per_page"
+      [page]="page"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
   </ng-container>
 </section>

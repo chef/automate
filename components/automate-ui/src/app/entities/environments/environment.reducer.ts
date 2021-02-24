@@ -15,7 +15,7 @@ export interface EnvironmentEntityState extends EntityState<Environment> {
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
-const DELETE_STATUS = 'deleteStatus'
+const DELETE_STATUS = 'deleteStatus';
 export const environmentEntityAdapter: EntityAdapter<Environment> =
   createEntityAdapter<Environment>({
   selectId: (environment: Environment) => environment.name
@@ -47,9 +47,10 @@ export function environmentEntityReducer(
 
     case EnvironmentActionTypes.DELETE:
       return set(DELETE_STATUS, EntityStatus.loading, state);
-      
+
     case EnvironmentActionTypes.DELETE_SUCCESS:
-      const environments = state.environmentList.items.filter(environment => environment.name !== action.payload.name );
+      const environments = 
+        state.environmentList.items.filter(environment => environment.name !== action.payload.name);
       const total = state.environmentList.total - 1;
       return pipe(
         set(DELETE_STATUS, EntityStatus.loadingSuccess),
@@ -59,7 +60,7 @@ export function environmentEntityReducer(
 
     case EnvironmentActionTypes.DELETE_FAILURE:
       return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
-    
+
     default:
       return state;
   }

@@ -1,0 +1,85 @@
+@import "~styles/variables";
+
+chef-modal {
+  text-align: center;
+
+  .options {
+    float: right;
+
+    .cancel-button {
+      color: #DC267F;
+    }
+  }
+
+  .left-box {
+    float: left;
+    height: auto;
+    width: 40%;
+  }
+
+  .right-box {
+    float: left;
+    height: auto;
+    width: 60%;
+  }
+
+  .title-text {
+    font-size: 36px;
+    font-weight: 900;
+    margin-top: 72px;
+    margin-bottom: 11px;
+    line-height: 40px;
+  }
+
+  .action-text {
+    font-size: 24px;
+    font-weight: 900;
+  }
+
+  .left-align {
+    line-height: 30px;
+    margin-bottom: 63px;
+    margin-left: 43px;
+    text-align: left;
+  }
+
+  .del-icon {
+    z-index: 999999;
+    position: relative;
+  }
+
+  .del-vector {
+    position: absolute;
+    left: 220px;
+    top: 41px;
+  }
+}
+
+::ng-deep {
+  chef-modal .modal {
+    padding: 32px;
+    box-shadow: 0px 0px 30px 0px #CCC;
+    outline: none;
+  }
+
+  chef-modal .modal .close {
+    border: none;
+    color: black;
+    margin-right: 22px;
+    margin-top: 16px;
+  }
+
+  chef-button.close:hover {
+    background: none;
+    outline: none;
+  }
+
+  chef-button.cancel-button.hydrated {
+    background: none;
+  }
+
+  chef-modal .modal-overlay {
+    background-color: #E5E5E5;
+    opacity: 0.5;
+  }
+}

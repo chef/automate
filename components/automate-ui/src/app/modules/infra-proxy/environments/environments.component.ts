@@ -109,7 +109,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public deleteEnvironment(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteEnvironment({
-      server_id: this.serverId, org_id: this.orgId, name: this.environmentToDelete.name  
+      server_id: this.serverId, org_id: this.orgId, name: this.environmentToDelete.name
     }));
   }
 
