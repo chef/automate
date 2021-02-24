@@ -392,6 +392,7 @@ func generateCert(priv *rsa.PrivateKey, fqdn string) ([]byte, error) {
 		// convinced this is correct.
 		IsCA:                  true,
 		BasicConstraintsValid: true,
+		DNSNames:              []string{fqdn}, // This is added so later in GoLang v1.15 DNSNames are made mandatory, certificates will be compatible.
 	}
 
 	if ip := net.ParseIP(fqdn); ip != nil {
