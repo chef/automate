@@ -54,7 +54,10 @@ func (ms *Status) SendAllActionsThroughPipeline() error {
 		}
 
 		ms.update(fmt.Sprintf("Deleting the %q index", fullActionIndexName))
-		ms.client.DeleteIndex(ctx, fullActionIndexName)
+		err := ms.client.DeleteIndex(ctx, fullActionIndexName)
+		if err != nil {
+			logWarning(err.Error(), fmt.Sprintf("Unable to delete index: %v", fullActionIndexName))
+		}
 	}
 
 	return nil
