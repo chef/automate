@@ -5,6 +5,9 @@ error() {
     echo "$*" >&2
 }
 
+# typical usage (inside hab studio) -- supply your username to the script:
+#     [19][default:/src:0]#  CHEF_USERNAME=msorens ./scripts/get_secrets.sh
+
 export VAULT_ADDR=${VAULT_ADDR:-https://vault.es.chef.co}
 export VAULT_CACERT=""
 export VAULT_NAMESPACE=releng
@@ -59,7 +62,7 @@ vault kv get -field=license secret/a2/license > dev/license.jwt
 # A1 license
 vault kv get -field=license secret/a2/delivery_license | base64 --decode >components/automate-deployment/a1-migration/delivery.license
 
-# Automate acceptence env secrets
+# Automate acceptance env secrets
 target_host=$(vault kv get -field=data secret/a2/testing/target_host)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
