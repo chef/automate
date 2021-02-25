@@ -12,8 +12,8 @@ pkg_upstream_url="https://www.chef.io/automate"
 
 
 jdomain_version="master"
-jdomain_filename="ngx_upstream_jdomain-master.tar.gz"
-jdomain_source="https://github.com/wdaike/ngx_upstream_jdomain/archive/master.tar.gz"
+jdomain_filename="ngx_upstream_jdomain-${jdomain_version}.tar.gz"
+jdomain_source="https://github.com/wdaike/ngx_upstream_jdomain/archive/${jdomain_version}.tar.gz"
 jdomain_shasum=3e7bedcddedf26d82da214d299e4cbee7605ac85a04ff3415c6b85de4f5a4ed5
 
 nginx_version="1.19.2"
