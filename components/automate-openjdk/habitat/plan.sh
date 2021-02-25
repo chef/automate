@@ -54,7 +54,7 @@ do_install() {
   build_line "Setting rpath for all libraries to '$LD_RUN_PATH'"
 
   find "$pkg_prefix"/{lib,bin} -type f -executable \
-    -exec sh -c 'file -i "$1" | grep -q "x-executable; charset=binary"' _ {} \; \
+    -exec sh -c 'file -i "$1" | grep -q "x-pie-executable; charset=binary"' _ {} \; \
     -exec patchelf --interpreter "$(pkg_path_for glibc)/lib/ld-linux-x86-64.so.2" --set-rpath "${LD_RUN_PATH}" {} \;
 
   find "$pkg_prefix/lib" -type f -name "*.so" \
