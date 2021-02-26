@@ -1,39 +1,55 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
-import { DataBagsActionTypes, DataBagsActions } from './data-bags.actions';
-import { DataBags } from './data-bags.model';
+import { DataBagActionTypes, DataBagActions } from './data-bags.actions';
+import { DataBag } from './data-bags.model';
 
-export interface DataBagsEntityState extends EntityState<DataBags> {
+export interface DataBagEntityState extends EntityState<DataBag> {
   getAllStatus: EntityStatus;
+  deleteStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const DELETE_STATUS = 'deleteStatus';
 
-export const dataBagsEntityAdapter: EntityAdapter<DataBags> = createEntityAdapter<DataBags>({
-  selectId: (dataBags: DataBags) => dataBags.name
+export const dataBagEntityAdapter: EntityAdapter<DataBag> = createEntityAdapter<DataBag>({
+  selectId: (dataBag: DataBag) => dataBag.name
 });
 
-export const DataBagsEntityInitialState: DataBagsEntityState =
-dataBagsEntityAdapter.getInitialState(<DataBagsEntityState>{
-  getAllStatus: EntityStatus.notLoaded
+export const DataBagEntityInitialState: DataBagEntityState =
+dataBagEntityAdapter.getInitialState(<DataBagEntityState>{
+  getAllStatus: EntityStatus.notLoaded,
+  deleteStatus: EntityStatus.notLoaded
 });
 
-export function dataBagsEntityReducer(
-  state: DataBagsEntityState = DataBagsEntityInitialState,
-  action: DataBagsActions): DataBagsEntityState {
+export function dataBagEntityReducer(
+  state: DataBagEntityState = DataBagEntityInitialState,
+  action: DataBagActions): DataBagEntityState {
 
   switch (action.type) {
-    case DataBagsActionTypes.GET_ALL:
-      return set(GET_ALL_STATUS, EntityStatus.loading, dataBagsEntityAdapter.removeAll(state));
+    case DataBagActionTypes.GET_ALL:
+      return set(GET_ALL_STATUS, EntityStatus.loading, dataBagEntityAdapter.removeAll(state));
 
-    case DataBagsActionTypes.GET_ALL_SUCCESS:
+    case DataBagActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (dataBagsEntityAdapter.setAll(action.payload.data_bags, state)) as DataBagsEntityState;
+        (dataBagEntityAdapter.setAll(action.payload.data_bags, state)) as DataBagEntityState;
 
-    case DataBagsActionTypes.GET_ALL_FAILURE:
+    case DataBagActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case DataBagActionTypes.DELETE: {
+      return set(DELETE_STATUS, EntityStatus.loading, state);
+    }
+
+    case DataBagActionTypes.DELETE_SUCCESS: {
+      return set(DELETE_STATUS, EntityStatus.loadingSuccess,
+        dataBagEntityAdapter.removeOne(action.payload.name, state));
+    }
+
+    case DataBagActionTypes.DELETE_FAILURE: {
+      return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
+    }
 
     default:
       return state;
@@ -41,4 +57,4 @@ export function dataBagsEntityReducer(
 }
 
 export const getEntityById = (id: string) =>
-  (state: DataBagsEntityState) => state.entities[id];
+  (state: DataBagEntityState) => state.entities[id];

@@ -15,6 +15,7 @@ import { CreateChefServerModalComponent } from './create-chef-server-modal/creat
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
+import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component'
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
@@ -40,6 +41,7 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     CreateOrgModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
+    DeleteInfraObjectModalComponent,
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,

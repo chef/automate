@@ -11,7 +11,10 @@ import {
   GetDataBagsSuccess,
   GetDataBagsFailure,
   DataBagsSuccessPayload,
-  DataBagsActionTypes
+  DataBagActionTypes,
+  DeleteDataBag,
+  DeleteDataBagSuccess,
+  DeleteDataBagFailure
 } from './data-bags.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
@@ -25,21 +28,50 @@ export class DataBagsEffects {
 
   @Effect()
   getDataBags$ = this.actions$.pipe(
-      ofType(DataBagsActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id, org_id } }: GetDataBags) =>
-        this.requests.getDataBags(server_id, org_id).pipe(
-          map((resp: DataBagsSuccessPayload) => new GetDataBagsSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetDataBagsFailure(error))))));
+    ofType(DataBagActionTypes.GET_ALL),
+    mergeMap(({ payload: { server_id, org_id } }: GetDataBags) =>
+      this.requests.getDataBags(server_id, org_id).pipe(
+        map((resp: DataBagsSuccessPayload) => new GetDataBagsSuccess(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new GetDataBagsFailure(error))))));
 
   @Effect()
   getDataBagsFailure$ = this.actions$.pipe(
-      ofType(DataBagsActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetDataBagsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra data bags: ${msg || payload.error}`
-        });
-      }));
+    ofType(DataBagActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetDataBagsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra data bags: ${msg || payload.error}`
+      });
+    }));
+  
+  @Effect()
+  deleteDataBag$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.DELETE),
+    mergeMap(({ payload: { server_id, org_id, name } }: DeleteDataBag) =>
+      this.requests.deleteDataBag(server_id, org_id, name).pipe(
+        map(() => new DeleteDataBagSuccess({ name })),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteDataBagFailure(error))))));
 
+  @Effect()
+  deleteDataBagSuccess$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.DELETE_SUCCESS),
+    map(({ payload: { name } }: DeleteDataBagSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Deleted data bag ${name}.`
+      });
+    }));
+
+  @Effect()
+  deleteDataBagFailure$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteDataBagFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete data bag: ${msg || error}`
+      });
+    }));
 }
