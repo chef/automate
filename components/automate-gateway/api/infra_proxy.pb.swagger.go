@@ -1720,7 +1720,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNode"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Node"
             }
           },
           "default": {
@@ -1757,7 +1757,60 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNode"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.NodeDetails"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags": {
+      "put": {
+        "operationId": "InfraProxy_UpdateNodeTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNodeTags"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNodeTags"
             }
           }
         ],
@@ -2340,6 +2393,58 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.NodeDetails": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Node name."
+        },
+        "environment": {
+          "type": "string",
+          "description": "Node environment."
+        },
+        "policy_name": {
+          "type": "string",
+          "description": "Node policy name."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Node policy group."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node run-list."
+        },
+        "automatic_attributes": {
+          "type": "object",
+          "description": "Node automatic attributes JSON."
+        },
+        "default_attributes": {
+          "type": "object",
+          "description": "Node default attributes JSON."
+        },
+        "normal_attributes": {
+          "type": "object",
+          "description": "Node normal attributes JSON."
+        },
+        "override_attributes": {
+          "type": "object",
+          "description": "Node override attributes JSON."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.ResetOrgAdminKey": {
       "type": "object",
       "properties": {
@@ -2441,7 +2546,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.request.UpdateNode": {
+    "chef.automate.api.infra_proxy.request.UpdateNodeTags": {
       "type": "object",
       "properties": {
         "org_id": {
@@ -2456,40 +2561,16 @@ func init() {
           "type": "string",
           "description": "Node name."
         },
-        "environment": {
+        "action": {
           "type": "string",
-          "description": "Node environment."
+          "description": "Node tags action (e.g. 'add', 'delete', 'set')."
         },
-        "policy_name": {
-          "type": "string",
-          "description": "Node policy name."
-        },
-        "policy_group": {
-          "type": "string",
-          "description": "Node policy group."
-        },
-        "run_list": {
+        "tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Node run-list."
-        },
-        "automatic_attributes": {
-          "type": "object",
-          "description": "Node automatic attributes JSON."
-        },
-        "default_attributes": {
-          "type": "object",
-          "description": "Node default attributes JSON."
-        },
-        "normal_attributes": {
-          "type": "object",
-          "description": "Node normal attributes JSON."
-        },
-        "override_attributes": {
-          "type": "object",
-          "description": "Node override attributes JSON."
+          "description": "Node tags."
         }
       }
     },
@@ -3703,12 +3784,15 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.UpdateNode": {
+    "chef.automate.api.infra_proxy.response.UpdateNodeTags": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Node name."
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Node tags."
         }
       }
     },

@@ -34,16 +34,7 @@ message AffectedNodes {
     string version = 5;
 }
 
-message DeleteNode {
-    // Chef organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Node name.
-    string name = 3;
-}
-
-message UpdateNode {
+message NodeDetails {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
@@ -66,4 +57,17 @@ message UpdateNode {
     google.protobuf.Struct normal_attributes = 10;
     // Node override attributes JSON.
     google.protobuf.Struct override_attributes = 11;
+}
+
+message UpdateNodeTags {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Node name.
+    string name = 3;
+    // Node tags action (e.g. 'add', 'delete', 'set').
+    string action = 4;
+    // Node tags.
+    repeated string tags = 5;
 }

@@ -39,11 +39,6 @@ message DeleteNode {
     string name = 1;
 }
 
-message UpdateNode {
-    // Node name.
-    string name = 1;
-}
-
 message Node {
     // Node ID.
     string node_id = 1;
@@ -67,4 +62,9 @@ message Node {
     string normal_attributes = 10;
     // Node override attributes JSON.
     string override_attributes = 11;
+}
+
+message UpdateNodeTags {
+    // Node tags.
+    repeated string tags = 5;
 }
