@@ -59,10 +59,15 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
         if (!isNil(EnvironmentsState)) {
           this.environmentListState = EnvironmentsState;
-          this.environments = EnvironmentsState?.items;
-          this.total = EnvironmentsState?.total;
-          this.environmentsListLoading = false;
-          this.searching = false;
+          if (this.environmentListState.items.length === 0 && this.environmentListState.total !== 0) {
+            this.store.dispatch(new GetEnvironments(payload));
+            this.environmentsListLoading = true;
+          } else {
+            this.environments = EnvironmentsState?.items;
+            this.total = EnvironmentsState?.total;
+            this.environmentsListLoading = false;
+            this.searching = false;
+          }
         }
       });
   }
