@@ -5,7 +5,7 @@
     objectNoun="data bag"
     [objectName]="dataBagToDelete?.name"
     (close)="closeDeleteModal()"
-    (deleteClicked)="deleteEnvironment()"
+    (deleteClicked)="deleteDataBag()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
@@ -28,7 +28,7 @@
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
           <chef-td class="three-dot-column">
             <mat-select panelClass="chef-control-menu" id="menu-{{dataBag.id}}">
-              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(environment)">Delete</mat-option>
+              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
             </mat-select>
           </chef-td>
         </chef-tr>

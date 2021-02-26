@@ -3,7 +3,7 @@ import { DataBagEntityState, dataBagEntityAdapter } from './data-bags.reducer';
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
-export const dataBagState = createFeatureSelector<DataBagEntityState>('dataBags');
+export const dataBagState = createFeatureSelector<DataBagEntityState>('dataBag');
 export const {
   selectAll: allDataBags,
   selectEntities: dataBagsEntities
