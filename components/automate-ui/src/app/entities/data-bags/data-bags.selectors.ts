@@ -19,6 +19,16 @@ export const deleteStatus = createSelector(
   (state) => state.deleteStatus
 );
 
+export const saveStatus = createSelector(
+  dataBagState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  dataBagState,
+  (state) => state.saveError
+);
+
 export const dataBagsFromRoute = createSelector(
   dataBagsEntities,
   routeParams,

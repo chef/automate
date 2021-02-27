@@ -12,6 +12,9 @@ import {
   GetDataBagsFailure,
   DataBagsSuccessPayload,
   DataBagActionTypes,
+  CreateDataBag,
+  CreateDataBagSuccess,
+  CreateDataBagFailure,
   DeleteDataBag,
   DeleteDataBagSuccess,
   DeleteDataBagFailure
@@ -72,6 +75,36 @@ export class DataBagsEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not delete data bag: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  createDataBag$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.CREATE),
+    mergeMap(({ payload: { dataBag } }: CreateDataBag) =>
+      this.requests.createDataBag(dataBag).pipe(
+        map(() => new CreateDataBagSuccess({ databag: dataBag })),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateDataBagFailure(error))))));
+    
+  @Effect()
+  createDataBagSuccess$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.CREATE_SUCCESS),
+    map(({ payload: { databag: dataBag } }: CreateDataBagSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Created data bag ${dataBag.name}.`
+      });
+    }));
+
+  @Effect()
+  createDataBagFailure$ = this.actions$.pipe(
+    ofType(DataBagActionTypes.CREATE_FAILURE),
+    map(({ payload: { error } }: CreateDataBagFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not create data bag: ${msg || error}`
       });
     }));
 }
