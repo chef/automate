@@ -25,11 +25,12 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  public authFailure = false;
   public dataBags: DataBag[];
   public dataBagsListLoading = true;
-  public authFailure = false;
   public dataBagToDelete: DataBag;
   public deleteModalVisible = false;
+  public openDataBagModal = new EventEmitter<void>();
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -84,4 +85,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public openCreateModal(): void {
+    this.openDataBagModal.emit();
+  }
 }

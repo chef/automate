@@ -8,13 +8,19 @@
     (deleteClicked)="deleteDataBag()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
+  <app-create-data-bag-modal 
+    [openEvent]="openDataBagModal"
+    [server_Id]="serverId"
+    [org_Id]="orgId">
+  </app-create-data-bag-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
-    <div class="empty-section" *ngIf="!dataBags.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p>No databags available</p>
-    </div>
-    <div class="head-container"  *ngIf="dataBags.length">
+    <chef-toolbar>
+      <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
+        <chef-button primary (click)="openCreateModal()">Create Databag</chef-button>
+      </app-authorized>
+    </chef-toolbar>
+    <div class="head-container">
       <chef-tr class="no_border_tr">
         <chef-th class="no_border_th">Name</chef-th>
         <chef-th class="no_border_th three-dot-column"></chef-th>

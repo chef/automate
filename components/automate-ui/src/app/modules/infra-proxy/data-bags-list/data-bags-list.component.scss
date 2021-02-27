@@ -19,3 +19,8 @@ img {
 .three-dot-column {
   text-align: right;
 }
+
+chef-toolbar chef-button:first-child {
+  float: right;
+  margin: 0;
+}
