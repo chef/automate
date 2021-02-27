@@ -14,7 +14,10 @@ import {
   ClientActionTypes,
   GetClient,
   GetClientSuccess,
-  GetClientFailure
+  GetClientFailure,
+  DeleteClient,
+  DeleteClientSuccess,
+  DeleteClientFailure
 } from './client.action';
 
 import { ClientRequests } from './client.requests';
@@ -63,6 +66,36 @@ export class ClientEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get client: ${msg || payload.error}`
+      });
+    }));
+  
+  @Effect()
+  deleteClient$ = this.actions$.pipe(
+    ofType(ClientActionTypes.DELETE),
+    mergeMap(({ payload: { server_id, org_id, name } }: DeleteClient) =>
+      this.requests.deleteClient(server_id, org_id, name).pipe(
+        map(() => new DeleteClientSuccess({ name })),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteClientFailure(error))))));
+
+  @Effect()
+  deleteClientSuccess$ = this.actions$.pipe(
+    ofType(ClientActionTypes.DELETE_SUCCESS),
+    map(({ payload: { name } }: DeleteClientSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Deleted client ${name}.`
+      });
+    }));
+
+  @Effect()
+  deleteClientFailure$ = this.actions$.pipe(
+    ofType(ClientActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteClientFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete client: ${msg || error}`
       });
     }));
 }

@@ -11,9 +11,11 @@ export interface ClientEntityState extends EntityState<Client> {
     items: Client[],
     total: number
   };
+  deleteStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const DELETE_STATUS = 'deleteStatus';
 
 export const clientEntityAdapter: EntityAdapter<Client> =
   createEntityAdapter<Client>({
@@ -22,7 +24,8 @@ export const clientEntityAdapter: EntityAdapter<Client> =
 
 export const ClientEntityInitialState: ClientEntityState =
   clientEntityAdapter.getInitialState(<ClientEntityState>{
-  getAllStatus: EntityStatus.notLoaded
+  getAllStatus: EntityStatus.notLoaded,
+  deleteStatus: EntityStatus.notLoaded
 });
 
 export function clientEntityReducer(
@@ -41,6 +44,22 @@ export function clientEntityReducer(
 
     case ClientActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case ClientActionTypes.DELETE:
+      return set(DELETE_STATUS, EntityStatus.loading, state);
+
+    case ClientActionTypes.DELETE_SUCCESS:
+      const clients = 
+        state.clientList.items.filter(client => client.name !== action.payload.name);
+      const total = state.clientList.total - 1;
+      return pipe(
+        set(DELETE_STATUS, EntityStatus.loadingSuccess),
+        set('clientList.items', clients || []),
+        set('clientList.total', total || 0 )
+      )(state) as ClientEntityState;
+
+    case ClientActionTypes.DELETE_FAILURE:
+      return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

@@ -36,4 +36,9 @@ export class ClientRequests {
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`, {headers});
   }
 
+  public deleteClient(server_id: string, org_id: string, name: string): Observable<{}> {
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`,
+    {headers});
+  }
+
 }

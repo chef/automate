@@ -6,7 +6,7 @@ import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { GetClients } from 'app/entities/clients/client.action';
+import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import {
   getAllStatus,
@@ -25,7 +25,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed = new Subject<boolean>();
   public clients: Client[] = [];
   public clientListState: { items: Client[], total: number };
   public clientsListLoading = true;
@@ -36,6 +35,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public page = 1;
   public per_page = 9;
   public total: number;
+  public clientToDelete: Client;
+  public deleteModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
+
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -62,10 +65,15 @@ export class ClientsComponent implements OnInit, OnDestroy {
     .subscribe(([_getClientsSt, ClientsState]) => {
       if (!isNil(ClientsState)) {
         this.clientListState = ClientsState;
-        this.clients = ClientsState?.items;
-        this.total = ClientsState?.total;
-        this.clientsListLoading = false;
-        this.searching = false;
+        if (this.clientListState.items.length === 0 && this.clientListState.total !== 0) {
+          this.store.dispatch(new GetClients(payload));
+          this.clientsListLoading = false;
+        } else {
+          this.clients = ClientsState?.items;
+          this.total = ClientsState?.total;
+          this.clientsListLoading = false;
+          this.searching = false;
+        }
       }
     });
   }
@@ -102,5 +110,21 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public startClientDelete(client: Client): void {
+    this.clientToDelete = client;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteClient(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteClient({
+      server_id: this.serverId, org_id: this.orgId, name: this.clientToDelete.name
+    }));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 }
