@@ -36,10 +36,9 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   public visible = false;
   public creating = false;
   public sending = false;
-  public conflictErrorEvent = false;
   public close = new EventEmitter();
   public createForm: FormGroup;
-  public dataBag: DataBag
+  public dataBag: DataBag;
   public conflictError = false;
   private isDestroyed = new Subject<boolean>();
 
@@ -49,7 +48,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   ) {
     this.createForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
@@ -80,7 +79,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
       filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
-          this.conflictErrorEvent = true;
+          this.conflictError = true;
         } else {
           // Close the modal on any error other than conflict and display in banner.
           this.closeCreateModal();
@@ -120,7 +119,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   private resetCreateModal(): void {
     this.creating = false;
     this.createForm.reset();
-    this.conflictErrorEvent = false;
+    this.conflictError = false;
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

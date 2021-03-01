@@ -63,7 +63,7 @@ describe('CreateDataBagModalComponent', () => {
       server_id: 'test_server',
       org_id: 'test_server',
       name: 'test_data_bag'
-    }
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);

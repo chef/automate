@@ -39,8 +39,7 @@ export class DataBagsRequests {
   }
 
   public createDataBag(dataBag: DataBag): Observable<{}> {
-    return this.http.post(`${env.infra_proxy_url}/servers/${dataBag.server_id}/orgs/${dataBag.org_id}/data_bags/${dataBag.name}`,
-    {headers});
+    return this.http.post(`${env.infra_proxy_url}/servers/${dataBag.server_id}/orgs/${dataBag.org_id}/data_bags`, dataBag);
   }
 
   public deleteDataBag(server_id: string, org_id: string, name: string): Observable<{}> {

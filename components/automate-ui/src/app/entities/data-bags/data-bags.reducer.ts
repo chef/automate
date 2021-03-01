@@ -60,7 +60,7 @@ export function dataBagEntityReducer(
 
     case DataBagActionTypes.CREATE_FAILURE: {
       return pipe(
-        set(SAVE_ERROR, action.payload.name),
+        set(SAVE_ERROR, action.payload),
         set(SAVE_STATUS, EntityStatus.loadingFailure)
       )(state) as DataBagEntityState;
     }
