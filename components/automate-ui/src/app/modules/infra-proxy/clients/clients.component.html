@@ -1,4 +1,15 @@
 <section class="clients">
+  <app-create-client-modal
+  [visible]="createClientModalVisible"
+  (close)="closeCreateClientModal()"
+  [createForm]="createClientForm"
+  [created]="created"
+  [privateKey]="privateKey"
+  [conflictErrorEvent]="conflictErrorEvent"
+  (createClicked)="createClient()"
+  (onDownloadItem) = "downloadContentItem()">
+  </app-create-client-modal>
+  
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
   <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
@@ -13,6 +24,7 @@
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="Clients">
       </app-infra-search-bar>
+      <chef-button primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !clients.length">

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { ClientsPayload } from './client.action';
+import { ClientsPayload, CreateClientPayload } from './client.action';
 import { Client } from './client.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
@@ -11,6 +11,16 @@ const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 export interface ClientsResponse {
   clients: Client[];
   total: number;
+}
+
+export interface CreateClientResponse {
+  name: string,
+  client_key: {
+    name: string,
+    public_key: string,
+    expiration_date: string,
+    private_key: string
+  }
 }
 
 @Injectable()
@@ -40,5 +50,11 @@ export class ClientRequests {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`,
     {headers});
   }
+
+  public createClient(payload: CreateClientPayload): Observable<CreateClientResponse> {
+    return this.http.post<CreateClientResponse>(
+      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients`, payload);
+  }
+
 
 }

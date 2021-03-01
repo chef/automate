@@ -1,0 +1,70 @@
+<chef-modal [visible]="visible" [created]="created" (closeModal)="closeEvent()">
+  <h2 slot="title">Create Client</h2>
+  <div class="flex-container">
+    <form [formGroup]="createForm">
+      <div class="id-margin">
+        <chef-form-field>
+          <label *ngIf="!created">
+            <span class="label">Client Name</span>
+            <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" autocomplete="off"/>
+          </label>
+           <!-- <chef-error *ngIf="conflictError"> Client Name "{{createForm.get('clientName').value}}" already exists.-->
+            <chef-error>
+              Client Name 'clientName' already exists.
+            </chef-error>         
+            <chef-checkbox *ngIf="!created" (change)="updateValidatorCheckbox($event.detail)" formControlName="validator" [checked]="checkedValidaotr">Validation Client</chef-checkbox>         
+        
+            <div *ngIf="created" class="detail">
+            <!-- <div class="detail"> -->
+            <div class="icon-wrap"><i></i></div>            
+            <p>Client successfully created. Copy the private key below and keep it somewhere safe. It is NOT stored on the server.</p>
+          </div>
+       
+          <textarea chefInput rows="20" cols="10" *ngIf="created" value={{privateKey}}>
+              <!-- <textarea chefInput rows="20" cols="10">  
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEpgIBAAKCAQEA0ILMXnIQ0u+JHbKQ9WbZAuWEQYN+SLaoZFOV8JTiymz9NrP+
+            2leLTyiigY3oNqUZkrlLckXh1VIH0AJ6bWP08yzWqvj2Wp1mw9Sv5xLct+4d1lia
+            gBnKO9lYmEd+FcbD85/k2Q/bQRAGeOziXeKhIdAhzg06pVITdLVP833UraqzY+qg
+            NsjzcFWEVWaqylLRxiL+WUy5bSNFw+IbRTVupnhxp1ZQ9ymwfyaCglu/g2RDRs88
+            ZxArJ10NIbUjN0R/cXucmiF2rz6VYLgm1ewXPIm+fgCXZTG/+DC8WSqKRfSNQD00
+            zBnC8c27CsI5oUUbBePIROc8CASD4Rb5mZbu2wIDAQABAoIBAQCJG1jzSaIScfwB
+            kSeMlmJgazd6NNLXUXSM9AGGPwCaBuzCCb2tKR+rn5asBfoJ5KpaNomLzLPhJ52H
+            g/mo8K9jL7rAlhC4KQQoBTTdhyOntmXcSkrdrRe0HwkIqQoZm6fCDQPYT3rm33jC
+            D1ISVjGKIGf6K+zCRKQSfB7kh3tP7d0jHufJtfweoEzLfD51ZHwJJHiwfqNSlHhK
+            3Da20bkxChLzjc9cUcmcZD24u68CM6CzfpHqUXpuqPvmOqSenEwBWRvyz/vgwk1e
+            7eUSYGcPjinrE6A5BgaeBmpU9nlPrUzLKBRyV1jcU/MIuZegdm7kGLQel+GFe8Zh
+            mofMUYkBAoGBAO6h2KXX9nwVE8EhxpqHE+Kn2PVFdV/YeQbTavvUH4+/tQr96El9
+            t26SG8ejYfv7/2t+fXUYloMomE/rwSc8y6eGctqIUsAd9ctahc9NIOYcv0MTKgnx
+            kFTMzaoAcM9t0bWeJRhNPrUn+Az4V/cFhGmKpW/PI2PesuyYJL6Djn+bAoGBAN+v
+            vNJKx70bMSgDZOJzoa4z5dH3uQ3wYzpYaMLe5iH9KdC5zBwEESqXMM7TRsEVAv9Z
+            +RchNlJ2iFIk0UNQ/vbk3IFp4bsEuyGUc8hRsVeYWiNxaTdASo8Jtcj8LfjTmxZQ
+            jLa+fdcaIjKKhz9siYibjObGXaGkq+Y20oAM3WHBAoGBAI2RttWsqa4zUuThBNHo
+            EQQGT9AyxM93vVUvV+jOj2rYcK90srnmu0v9oj1t0FONzJoZEJTHYYOuMa44Tv7Y
+            MnnQaZL8DRusqoVZzsiNGVdq9oz0cZw0k0u7tMeGO2bT3/W/PIKOUQVoEOCg9I63
+            1zZF6p/KY1R8aemy2RmtMnzBAoGBAKiT+hsGTpf/WUGNpUdg29W8uRRPvMB7jVzY
+            akOK1yeAczYiAGiQzBssDJWi9qznV/X36dj7p8PoHv7BTpCMB0ss2d4SXROkEh/R
+            kJzErIGWiUAy5ZfFNSutprnNDBx95WCg3huPXqlwwZsTebBb7R7uE/eMQd5ji0WZ
+            xXTJvUJBAoGBALwtA4ZBAXJS2xhTKZZfYZ8y1tlhmoGKIQq9DEvAZ7sW7xebY2zt
+            UAuqT75CnpPr5Ir+9JVvrgDrwAtrlqdBG+ruFsFCcptDZZx0zibo1D8mTbDY36dy
+            ryBq91YeTxzAIshey0apEL1WRhN7/xgMRTBI5iTlmMyg4LVl9AIccThx
+            -----END RSA PRIVATE KEY----- -->
+          </textarea>
+        </chef-form-field>
+      </div>
+      <div id="button-bar">
+        <chef-button tertiary *ngIf="!created" (click)="closeEvent()">Cancel</chef-button>
+        <chef-button tertiary *ngIf="created" (click)="closeEvent()">Close</chef-button>
+        <chef-button primary *ngIf="!created" [disabled]="!createForm?.valid || conflictError"
+          id="create-button-object-modal" (click)="createClient()">
+          <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
+          Create          
+        </chef-button>        
+        <chef-button primary *ngIf="created"
+        id="create-button-object-modal" (click)="downloadKey()">
+          Download
+        </chef-button>  
+      </div>
+    </form>
+  </div>
+</chef-modal>

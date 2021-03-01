@@ -11,7 +11,20 @@ export enum ClientActionTypes {
   GET_FAILURE = 'CLIENTS::GET::FAILURE',
   DELETE          = 'CLIENTS::DELETE',
   DELETE_SUCCESS  = 'CLIENTS::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'CLIENTS::DELETE::FAILURE'
+  DELETE_FAILURE  = 'CLIENTS::DELETE::FAILURE',
+  CREATE = 'CLIENTS::CREATE',
+  CREATE_SUCCESS = 'CLIENTS::CREATE::SUCCESS',
+  CREATE_FAILURE = 'CLIENTS::CREATE::FAILURE'
+}
+
+export interface CreateClientSuccessPayload {
+  name: string,
+  client_key: {
+    name: string,
+    public_key: string,
+    expiration_date: string,
+    private_key: string
+  }
 }
 
 export interface ClientsSuccessPayload {
@@ -70,6 +83,28 @@ export class DeleteClientSuccess implements Action {
 
 export class DeleteClientFailure implements Action {
   readonly type = ClientActionTypes.DELETE_FAILURE;
+}
+
+export interface CreateClientPayload {
+  name: string;
+  validator: boolean;
+  org_id: string;
+  server_id: string;
+  create_key: boolean
+}
+
+export class CreateClient implements Action {
+  readonly type = ClientActionTypes.CREATE;
+  constructor(public payload: CreateClientPayload) { }
+}
+true
+export class CreateClientSuccess implements Action {
+  readonly type = ClientActionTypes.CREATE_SUCCESS;
+  constructor(public payload: CreateClientSuccessPayload) { }
+}
+
+export class CreateClientFailure implements Action {
+  readonly type = ClientActionTypes.CREATE_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -82,4 +117,7 @@ export type ClientActions =
   | GetClientFailure
   | DeleteClient
   | DeleteClientSuccess
-  | DeleteClientFailure;
+  | DeleteClientFailure
+  | CreateClient
+  | CreateClientSuccess
+  | CreateClientFailure;
