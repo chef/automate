@@ -5,8 +5,12 @@ error() {
     echo "$*" >&2
 }
 
-export VAULT_ADDR=${VAULT_ADDR:-https://vault.chef.co:8200}
+# typical usage (inside hab studio) -- supply your username to the script:
+#     [19][default:/src:0]#  CHEF_USERNAME=msorens ./scripts/get_secrets.sh
+
+export VAULT_ADDR=${VAULT_ADDR:-https://vault.es.chef.co}
 export VAULT_CACERT=""
+export VAULT_NAMESPACE=releng
 CHEF_USERNAME=${CHEF_USERNAME:-unknown}
 STUDIO_TYPE=${STUDIO_TYPE:-none}
 
@@ -41,6 +45,7 @@ fi
 
 echo "Using VAULT_ADDR=$VAULT_ADDR"
 echo "Using VAULT_CACERT=$VAULT_CACERT"
+echo "Using VAULT_NAMESPACE=$VAULT_NAMESPACE"
 echo "Using CHEF_USERNAME=$CHEF_USERNAME"
 
 if [[ ! -f "$HOME/.vault-token" ]]; then
@@ -57,7 +62,7 @@ vault kv get -field=license secret/a2/license > dev/license.jwt
 # A1 license
 vault kv get -field=license secret/a2/delivery_license | base64 --decode >components/automate-deployment/a1-migration/delivery.license
 
-# Automate acceptence env secrets
+# Automate acceptance env secrets
 target_host=$(vault kv get -field=data secret/a2/testing/target_host)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
