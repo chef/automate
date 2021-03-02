@@ -82,7 +82,7 @@ export class InfraRoleEffects {
       map(({ payload: { name } }: DeleteRoleSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Deleted role ${name}.`
+          message: `Successfully Deleted Role - ${name}.`
         });
       }));
 
