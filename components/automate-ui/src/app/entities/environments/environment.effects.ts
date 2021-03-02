@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { HttpStatus } from 'app/types/types';
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
+  CreateEnvironment,
+  CreateEnvironmentSuccess,
+  CreateEnvironmentFailure,
   GetEnvironments,
   GetEnvironmentsSuccess,
   GetEnvironmentsSuccessPayload,
@@ -20,7 +24,7 @@ import {
   DeleteEnvironmentFailure
 } from './environment.action';
 
-import { EnvironmentRequests } from './environment.requests';
+import { EnvironmentRequests, EnvironmentResponse } from './environment.requests';
 
 @Injectable()
 export class EnvironmentEffects {
@@ -98,4 +102,28 @@ export class EnvironmentEffects {
         message: `Could not delete environment: ${msg || error}`
       });
     }));
+  createEnvironment$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.CREATE),
+    mergeMap(({ payload: { server_id, org_id, environment } }: CreateEnvironment) =>
+      this.requests.createEnvironment(server_id, org_id, environment).pipe(
+        map((resp: EnvironmentResponse) => new CreateEnvironmentSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateEnvironmentFailure(error))))));
+
+  @Effect()
+  createEnvironmentSuccess$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.CREATE_SUCCESS),
+    map(({ payload: { } }: CreateEnvironmentSuccess) => new CreateNotification({
+      type: Type.info,
+      message: 'Created environment.'
+    })));
+
+  @Effect()
+  createEnvironmentFailure$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateEnvironmentFailure) => new CreateNotification({
+      type: Type.error,
+      message: `Could not create notification: ${payload.error.error || payload}.`
+    })));
 }

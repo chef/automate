@@ -13,6 +13,10 @@ export interface GetEnvironmentsResponse {
   total: number;
 }
 
+export interface EnvironmentResponse {
+  environment: Environment;
+}
+
 @Injectable()
 export class EnvironmentRequests {
 
@@ -35,6 +39,13 @@ export class EnvironmentRequests {
     const params = `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`;
     const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/environments?${params}`;
     return this.http.get<GetEnvironmentsResponse>(url, {headers});
+  }
+
+  public createEnvironment(server_id: string, org_id: string, environment: Environment):
+    Observable<EnvironmentResponse> {
+
+    return this.http.post<EnvironmentResponse>(
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments`, environment);
   }
 
   public deleteEnvironment(server_id: string, org_id: string, name: string): Observable<{}> {

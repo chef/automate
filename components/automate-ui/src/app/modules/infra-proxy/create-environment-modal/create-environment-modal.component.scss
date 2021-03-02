@@ -1,0 +1,468 @@
+@import "~styles/variables";
+
+.version-dropdown {
+  color: $chef-primary-dark;
+
+  ::ng-deep label {
+    display: inline;
+    color: $chef-primary-dark;
+    font-size: 15px;
+    margin-right: 15px;
+  }
+
+  chef-select {
+    margin-bottom: 12px;
+    width: 150px;
+    font-size: 14px;
+  }
+}
+
+chef-modal {
+
+  [slot=title] {
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: 44px;
+  }
+
+  .flex-container {
+    justify-content: center;
+
+    .input-margin {
+      margin-bottom: 30px;
+    }
+
+    form {
+      flex-basis: 61%;
+
+      input {
+        font-size: 1em;
+        height: 36px;
+        left: 398px;
+        right: 398px;
+        top: 365px;
+
+
+        border: 1px solid #DEE6F7;
+        box-sizing: border-box;
+        border-radius: 4px;
+        margin-top: 8px;
+        margin-top: 8px;
+      }
+
+      label {
+        padding-bottom: 0;
+        font-size: 16px;
+        line-height: 20px;
+
+        letter-spacing: 0.25px;
+
+        color: #000000;
+        margin-top: 32px;
+      }
+
+      #description {
+        height: 162px;
+        left: 398px;
+        right: 398px;
+        top: 462px;
+        border: 1px solid #DEE6F7;
+        box-sizing: border-box;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+
+      #dattr, #oattr {
+        height: 310px;
+      }
+
+    }
+
+    .button-bar-box {
+      text-align: right;
+      margin-top: 32px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+
+    }
+
+    .button-bar-constraint {
+      text-align: right;
+      margin-top: 100px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+
+.dynamic {
+  display: flex;
+  margin-top: 40px;
+}
+
+.constraint-name {
+  margin-left: 16px;
+  height: 36px;
+}
+
+.operator {
+  margin-left: 16px;
+  height: 36px;
+}
+
+.version {
+height: 36px;
+}
+.constraint-names {
+
+    width: 279px;
+  }
+  
+  .operators{
+    width: 99px;
+  }
+  
+  #version-input {
+    width: 173px;
+  
+  }
+
+
+.input-desc {
+  font-size: 10px;
+  font-weight: 100;
+}
+
+.i-desc {
+  font-size: 12px;
+  font-weight: 300;
+}
+
+img {
+  width: 15px;
+  margin-right: 5px;
+  margin-bottom: -3px;
+}
+
+chef-modal ::ng-deep .modal {
+  height: 70%;
+  overflow-x: hidden;
+  --default-modal-width: 800px;
+  padding: 32px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px #CCC;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar {
+  width: 12px;
+  background-color: #F5F5F5;
+}
+
+chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #CCC;
+}
+
+chef-checkbox ::ng-deep .check-wrap {
+  color: $chef-dark-grey;
+  border: 1px solid;
+}
+
+.small:first-of-type {
+  margin-top: 10px;
+}
+
+chef-modal ::ng-deep .modal-overlay {
+      background-color: #FFFFFF;
+      mix-blend-mode: normal;
+      opacity: 0.7;
+    }
+
+.pages-body {
+  padding-top: 0;
+
+
+  ::ng-deep button.nav-tab.active {
+    background: $chef-primary-bright;
+  }
+
+  ::ng-deep button.nav-tab:focus {
+    outline: none;
+  }
+
+  ::ng-deep .nav-tab:before {
+    height: 4px;
+    background: #E7E9E9;
+  }
+}
+
+::ng-deep {
+
+
+      chef-button {
+      height: 36px;
+    }
+
+    chef-button#create-button-object-modal {
+      margin: 10px 0px 0px 16px;
+    }
+
+    chef-button#cancel-server-popup {
+      margin: 10px 15px 0px 0px;
+    }
+
+    chef-button.close {
+      border: none;
+      color: var(--chef-primary-dark);
+      outline: none;
+      margin-top: 18px;
+      margin-right: 18px;
+    }
+
+    chef-button.close:active {
+      background: none;
+      color: var(--chef-primary-dark);
+    }
+  }
+
+
+::ng-deep mat-select {
+  width: 277px;
+}
+::ng-deep #cdk-overlay-0 .mat-select-panel-wrap  {
+    flex-basis: auto;
+    margin-top: 7px;
+}
+
+::ng-deep #cdk-overlay-1 .mat-select-panel-wrap  {
+  flex-basis: auto;
+  margin-top: 30px;
+}
+  
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
+  line-height: 3em;
+
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid #CFD2D2;
+  height: 37px;
+ }
+
+ ::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+  line-height: 3em;
+
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid #CFD2D2;
+  height: 37px;
+ }
+  
+::ng-deep [panelClass=chef-dropdown] {
+  height: 36px;
+  padding: 8px 16px 9px 16px;
+  border: 1px solid #DEE6F7;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep [panelClass=chef-dropdown]:focus {
+
+  border-color: #DEE6F7;
+
+}  
+
+
+::ng-deep .cdk-overlay-container #cdk-overlay-0 { left:356px !important; transform:none !important;} // sass-lint:disable-line no-important
+::ng-deep .cdk-overlay-container #cdk-overlay-1 { left:673px !important; transform:none !important;} // sass-lint:disable-line no-important
+
+  ::ng-deep .cdk-overlay-container {
+    position: fixed;
+    z-index: 999999999;
+  }
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+
+    right: 10px;
+    width: 0;
+    height: 0;
+    border-color: #fff transparent transparent transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    border: 6px solid blue;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: red;
+}
+
+  .constraint-margin {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .row-margin {
+    display: flex;
+    margin-top: 5px;
+  }
+
+
+.name-margin {
+
+  .name-dropdown {
+    color: $chef-primary-dark;
+  
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+  
+    chef-select {
+      margin-bottom: 12px;
+      width: 310px;
+      font-size: 12px;
+    }
+
+    chef-select ::ng-deep chef-dropdown {
+      overflow: scroll;
+      height: 160px;
+      width: 120px;
+      
+    }
+
+    chef-select ::ng-deep .selected-value chef-icon {
+      color: #3864F2;
+    }
+  }
+}
+
+.operator-margin {
+  margin-left: 16px;
+
+  .operator-dropdown {
+    color: $chef-primary-dark;
+  
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+  
+    chef-select {
+      margin-bottom: 12px;
+      width: 105px;
+      font-size: 12px;
+    }
+
+    chef-select ::ng-deep chef-dropdown {
+      overflow: scroll;
+      height: 160px;
+      width: 105px;
+      
+    }
+
+    chef-select ::ng-deep .selected-value chef-icon {
+      color: #3864F2;
+    }
+  }
+}
+
+.version-margin {
+  margin-left: 16px;
+
+  .version-dropdown {
+    color: $chef-primary-dark;
+  
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+    }
+  
+
+  }
+  chef-form-field input {
+    height: 36px;
+    border: 1px solid #DEE6F7;
+    box-sizing: border-box;
+    border-radius: 4px 0px 0px 4px;
+    width: 185px;
+  }
+}
+
+.scroll {
+  overflow: scroll;
+  height: 256px;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+  width: 5px;
+  background: #DEE6F7;
+  border-radius: 5px;
+}
+
+ ::ng-deep .scroll::-webkit-scrollbar-thumb {
+  background: #B4C3CC;
+  border-radius: 5px;
+}
+
+.add {
+  margin-top: 67px;
+
+  chef-button {
+    width: 61px;
+height: 36px;
+border: 1px solid rgba(56, 100, 242, 0.5);
+border-radius: 0px 4px 4px 0px;
+background-color: white;
+ color: #3864F2;
+  }
+}
+
+.remove {
+
+  chef-button {
+    width: 88px;
+  height: 36px;
+  border: 1px solid rgba(56, 100, 242, 0.5);
+  border-radius: 0px 4px 4px 0px;
+  background-color: white;
+  color: #3864F2;
+  }
+}
+
+form {
+  chef-form-field {
+    textarea {
+      height: 286px;
+      margin-top: 32.22px;
+      /* lavender03 */
+      
+      border: 1px solid #DEE6F7;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+  }
+}

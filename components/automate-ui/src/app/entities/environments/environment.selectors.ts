@@ -17,12 +17,22 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const deleteStatus = createSelector(
-  environmentState,
-  (state) => state.deleteStatus
-);
-
 export const environmentList = createSelector(
   environmentState,
   (state) => state.environmentList
+);
+
+export const saveStatus = createSelector(
+  environmentState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  environmentState,
+  (state) => state.saveError
+);
+
+export const deleteStatus = createSelector(
+  environmentState,
+  (state) => state.deleteStatus
 );

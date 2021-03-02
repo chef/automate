@@ -1,0 +1,107 @@
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
+  <div class="text-right">
+    <h2 slot="title">Create Environment</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <app-infra-tab-change class="tabs-row" (tabChange)="tabChange($event)">
+        <app-infra-tab tabTitle="Details" [active]="detailsTab">
+          <form [formGroup]="firstFormGroup">
+            <div class="input-margin">
+              <chef-form-field>
+                <label>
+                  <span class="label">Name <span aria-hidden="true">*</span></span>
+                  <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
+                </label>
+                <chef-error
+                  *ngIf="(firstFormGroup.get('name').hasError('required') || firstFormGroup.get('name').hasError('pattern')) && firstFormGroup.get('name').dirty">
+                  Display Name is required.
+                </chef-error>
+                <chef-error *ngIf="conflictError">
+                  Environment "{{firstFormGroup.get('name').value}}" already exists.
+                </chef-error>
+              </chef-form-field>
+            </div>
+            <div class="input-margin">
+              <chef-form-field>
+                <label>
+                  <span class="label">Description <span aria-hidden="true">*</span></span>
+                  <textarea chefInput name="description" id="description" formControlName="description" autofocus></textarea>
+                </label>
+                <chef-error
+                  *ngIf="(firstFormGroup.get('description').hasError('required') || firstFormGroup.get('description').hasError('pattern')) && firstFormGroup.get('description').dirty">
+                  Description is required.
+                </chef-error>
+              </chef-form-field>
+            </div>
+            <div class="button-bar-box">
+              <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+              <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
+                <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="creating">Creating Environment...</span>
+              </chef-button>
+            </div>
+          </form>
+        </app-infra-tab>
+        <app-infra-tab tabTitle="Constraints" [active]="constraintsTab" ng-disabled="firstFormGroup.$invalid">
+          <div *ngIf="showConstraint">
+            <app-infra-environment-constraint
+              [constraintName]="constraintKeys"
+              (constraintValues)="constraintItemsHandler($event)">
+            </app-infra-environment-constraint>
+          </div>
+          <div class="button-bar-box">
+            <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+            <chef-button [disabled]="!constraintArray.length || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
+              <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+              <span *ngIf="!creating">Create Environment</span>
+              <span *ngIf="creating">Creating Environment...</span>
+            </chef-button>
+          </div>
+        </app-infra-tab>
+        <app-infra-tab tabTitle="Default Attributes" [active]="defaultTab">
+          <form [formGroup]="thirdFormGroup">
+            <chef-form-field>
+              <textarea chefInput name="dattr" id="dattr" formControlName="dattr" (change)="onChangeJSON($event)"
+                (keyup)="onChangeJSON($event)" [(ngModel)]="default_attr_value">
+              </textarea>
+              <chef-error *ngIf="dattrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+            <div class="button-bar-box">
+              <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+              <chef-button [disabled]="!thirdFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
+                <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="creating">Creating Environment...</span>
+              </chef-button>
+            </div>
+          </form>
+        </app-infra-tab>
+        <app-infra-tab tabTitle="Override Attributes" [active]="overrideTab">
+          <form [formGroup]="fourthFormGroup">
+            <ng-template matStepLabel>Override Attributes</ng-template>
+            <chef-form-field>
+              <textarea chefInput name="oattr" id="oattr" formControlName="oattr" autofocus (change)="onChangeJSON($event)"
+                (keyup)="onChangeJSON($event)" [(ngModel)]="override_attr_value">
+              </textarea>
+              <chef-error *ngIf="oattrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+            <div class="button-bar-box">
+              <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+              <chef-button [disabled]="!fourthFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
+                <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="creating">Creating Environment...</span>
+              </chef-button>
+            </div>
+          </form>
+        </app-infra-tab>
+      </app-infra-tab-change>
+    </div>
+  </div> 
+</chef-modal>

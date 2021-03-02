@@ -1,0 +1,171 @@
+@import "~styles/variables";
+
+.constraint-margin {
+    display: flex;
+}
+
+.label {
+  display: flex;
+  padding-bottom: .75em;
+  margin-bottom: 8px;
+  height: 19px;
+
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: #000000;
+}
+
+.name-margin {
+  margin-bottom: 18px;
+  margin-top: 32px;
+  ::ng-deep label {
+    width: 229px;
+  }
+
+  .drop {
+    width: 300px;;
+  }
+}
+
+.row-name-margin {
+
+  .name-dropdown {
+    color: $chef-primary-dark;
+  
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+  
+    p {
+      margin-bottom: 12px;
+      width: 300px;
+      font-size: 12px;
+    }
+
+    mat-select {
+      height: 36px;
+      width: 300px;
+
+    }
+
+    chef-select ::ng-deep .selected-value chef-icon {
+      color: #3864F2;
+    }
+  }
+}
+
+.operator-margin {
+  margin-left: 16px;
+  width: 123px;
+  margin-bottom: 18px;
+  margin-top: 32px;
+}
+
+.row-operator-margin {
+  margin-left: 16px;
+
+  .operator-dropdown {
+    color: $chef-primary-dark;
+  
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+  
+    mat-select {
+      margin-bottom: 12px;
+      width: 123px;
+      font-size: 12px;
+    }
+  }
+}
+
+.version-margin {
+  margin-left: 16px;
+  width: 215px;
+  margin-bottom: 18px;
+  margin-top: 32px;
+
+  chef-form-field input {
+    height: 36px;
+    border: 1px solid #DEE6F7;
+    box-sizing: border-box;
+    border-radius: 4px 0px 0px 4px;
+  }
+}
+
+.row-version-margin {
+  margin-left: 16px;
+
+  input {
+    height: 36px;
+    border: 1px solid #DEE6F7;
+    box-sizing: border-box;
+    border-radius: 4px 0px 0px 4px;
+    width: 200px;
+  }
+}
+
+.add {
+  margin-top: 50px;
+
+  chef-button {
+    width: 61px;
+    height: 36px;
+    border: 1px solid #3864F2;
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: #3864F2;
+  }
+
+  chef-button[primary][disabled] {
+    border: 1px solid rgba(56, 100, 242, 0.5);
+    border-radius: 0px 4px 4px 0px;
+    color: rgba(56, 100, 242, 0.5);
+  }
+}
+
+.row-margin {
+  display: flex;
+}
+
+.scroll {
+  height: 286px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+
+  width: 5px;
+  background: #B4C3CC;
+  border-radius: 5px;
+}
+
+.remove {
+
+  chef-button {
+    width: 79px;
+  height: 36px;
+  border: 1px solid #3864F2;
+  border-radius: 0px 4px 4px 0px;
+  background-color: white;
+  color: #3864F2;
+  margin-top: 1px;
+  margin-left: 1px;
+  
+  }
+}
+
+.option-tag {
+  min-width: 12px;
+  height: 10px;
+  overflow: scroll;
+}

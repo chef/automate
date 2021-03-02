@@ -32,6 +32,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public environmentToDelete: Environment;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
+  public openEnvironmentModal = new EventEmitter<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -100,6 +101,10 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new GetEnvironments(payload));
+  }
+
+  public openCreateModal(): void {
+    this.openEnvironmentModal.emit();
   }
 
   ngOnDestroy(): void {

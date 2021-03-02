@@ -9,6 +9,9 @@ export enum EnvironmentActionTypes {
   GET = 'ENVIRONMENTS::GET',
   GET_SUCCESS = 'ENVIRONMENTS::GET::SUCCESS',
   GET_FAILURE = 'ENVIRONMENTS::GET::FAILURE',
+  CREATE            = 'ENVIRONMENTS::CREATE',
+  CREATE_SUCCESS    = 'ENVIRONMENTS::CREATE::SUCCESS',
+  CREATE_FAILURE    = 'ENVIRONMENTS::CREATE::FAILURE',
   DELETE          = 'ENVIRONMENTS::DELETE',
   DELETE_SUCCESS  = 'ENVIRONMENTS::DELETE::SUCCESS',
   DELETE_FAILURE  = 'ENVIRONMENTS::DELETE::FAILURE'
@@ -61,6 +64,33 @@ export class GetEnvironmentFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface CreateEnvironmentPayload {
+  org_id: string;
+  server_id: string;
+  name: string;
+  description: string;
+  default_attributes: Object;
+  override_attributes: Object;
+  cookbook_versions: Object;
+}
+
+export class CreateEnvironment implements Action {
+  readonly type = EnvironmentActionTypes.CREATE;
+  constructor(public payload: {
+    server_id: string, org_id: string, environment: CreateEnvironmentPayload
+  } ) { }
+}
+
+export class CreateEnvironmentSuccess implements Action {
+  readonly type = EnvironmentActionTypes.CREATE_SUCCESS;
+  constructor(public payload) { }
+}
+
+export class CreateEnvironmentFailure implements Action {
+  readonly type = EnvironmentActionTypes.CREATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export class DeleteEnvironment implements Action {
   readonly type = EnvironmentActionTypes.DELETE;
   constructor(public payload: { server_id: string, org_id: string, name: string }) { }
@@ -83,6 +113,9 @@ export type EnvironmentActions =
   | GetEnvironment
   | GetEnvironmentSuccess
   | GetEnvironmentFailure
+  | CreateEnvironment
+  | CreateEnvironmentSuccess
+  | CreateEnvironmentFailure
   | DeleteEnvironment
   | DeleteEnvironmentSuccess
   | DeleteEnvironmentFailure;
