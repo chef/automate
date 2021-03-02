@@ -43,7 +43,7 @@ func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *
 		perPage = 1000
 	}
 
-	searchStr := string(searchQuery.GetQ())
+	searchStr := searchQuery.GetQ()
 	if searchStr == "" {
 		searchStr = "*:*"
 	}
