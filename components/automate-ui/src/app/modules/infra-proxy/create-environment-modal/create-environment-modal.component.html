@@ -10,7 +10,7 @@
             <div class="input-margin">
               <chef-form-field>
                 <label>
-                  <span class="label">Name <span aria-hidden="true">*</span></span>
+                  <span class="label">Name</span>
                   <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
                 </label>
                 <chef-error
@@ -25,7 +25,7 @@
             <div class="input-margin">
               <chef-form-field>
                 <label>
-                  <span class="label">Description <span aria-hidden="true">*</span></span>
+                  <span class="label">Description</span>
                   <textarea chefInput name="description" id="description" formControlName="description" autofocus></textarea>
                 </label>
                 <chef-error
@@ -38,7 +38,7 @@
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating Environment...</span>
               </chef-button>
             </div>
@@ -55,7 +55,7 @@
             <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
             <chef-button [disabled]="!constraintArray.length || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
               <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-              <span *ngIf="!creating">Create Environment</span>
+              <span *ngIf="!creating">Create</span>
               <span *ngIf="creating">Creating Environment...</span>
             </chef-button>
           </div>
@@ -74,7 +74,7 @@
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button [disabled]="!thirdFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating Environment...</span>
               </chef-button>
             </div>
@@ -95,7 +95,7 @@
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button [disabled]="!fourthFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                <span *ngIf="!creating">Create Environment</span>
+                <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating Environment...</span>
               </chef-button>
             </div>

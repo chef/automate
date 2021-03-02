@@ -5,19 +5,21 @@
 body {font-family: Arial, Helvetica, sans-serif;}
 
 .navbar {
-  //width: 100%;
+  width: 100%;
   overflow: auto;
+  cursor: pointer;
   //margin: 0px 33px 0px 32px;
 }
 
 .navbar a {
   float: left;
-  padding: 12px;
+  padding: 8px 0px 8px 16px;
   //background: #DEE5FD;
   color: #000000;
+  height: 36px;
   text-decoration: none;
-  font-size: 17px;
-  width: 183px; /* Four links of equal widths */
+  font-size: 14px;
+  width: 24.8%; /* Four links of equal widths */
   text-align: left;
   margin-left: 1px;
   background: #DEE5FD;
@@ -33,6 +35,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
     background: $chef-primary-bright;
     border: none;
     color: #FFFFFF;
+}
+
+.navbar a:first-child {
+  border-radius: 4px 0px 0px 4px;
+}
+
+.navbar a:last-child {
+  border-radius: 0px 4px 4px 0px;
 }
 
 @media screen and (max-width: 500px) {

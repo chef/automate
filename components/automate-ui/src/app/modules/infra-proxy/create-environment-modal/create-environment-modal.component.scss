@@ -23,13 +23,14 @@ chef-modal {
     text-align: left;
     font-weight: bold;
     padding-bottom: 44px;
+    margin-top: 0px;
   }
 
   .flex-container {
     justify-content: center;
 
     .input-margin {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     form {
@@ -41,8 +42,6 @@ chef-modal {
         left: 398px;
         right: 398px;
         top: 365px;
-
-
         border: 1px solid #DEE6F7;
         box-sizing: border-box;
         border-radius: 4px;
@@ -54,9 +53,7 @@ chef-modal {
         padding-bottom: 0;
         font-size: 16px;
         line-height: 20px;
-
         letter-spacing: 0.25px;
-
         color: #000000;
         margin-top: 32px;
       }
@@ -73,14 +70,13 @@ chef-modal {
       }
 
       #dattr, #oattr {
-        height: 310px;
+        height: 286px;
       }
-
     }
 
     .button-bar-box {
       text-align: right;
-      margin-top: 32px;
+      margin-top: 20px;
 
       chef-loading-spinner {
         position: relative;
@@ -101,8 +97,34 @@ chef-modal {
       }
     }
   }
-}
 
+  ::ng-deep {
+    .modal {
+      // height: 70%;
+      overflow-x: hidden;
+      padding: 32px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px #CCCCCC;
+      width: 708px;
+    }
+    
+    .modal::-webkit-scrollbar {
+      width: 8px;
+      background-color: #F5F5F5;
+    }
+    
+    .modal::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: #CCCCCC;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      padding-bottom: 0px;
+    }
+  }
+}
 
 .dynamic {
   display: flex;
@@ -153,25 +175,6 @@ img {
   margin-bottom: -3px;
 }
 
-chef-modal ::ng-deep .modal {
-  height: 70%;
-  overflow-x: hidden;
-  --default-modal-width: 800px;
-  padding: 32px;
-      outline: none;
-      box-shadow: 0px 0px 30px 0px #CCC;
-}
-
-chef-modal ::ng-deep .modal::-webkit-scrollbar {
-  width: 12px;
-  background-color: #F5F5F5;
-}
-
-chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #CCC;
-}
-
 chef-checkbox ::ng-deep .check-wrap {
   color: $chef-dark-grey;
   border: 1px solid;
@@ -182,14 +185,13 @@ chef-checkbox ::ng-deep .check-wrap {
 }
 
 chef-modal ::ng-deep .modal-overlay {
-      background-color: #FFFFFF;
-      mix-blend-mode: normal;
-      opacity: 0.7;
-    }
+  background-color: #FFFFFF;
+  mix-blend-mode: normal;
+  opacity: 0.7;
+}
 
 .pages-body {
   padding-top: 0;
-
 
   ::ng-deep button.nav-tab.active {
     background: $chef-primary-bright;
@@ -206,38 +208,36 @@ chef-modal ::ng-deep .modal-overlay {
 }
 
 ::ng-deep {
-
-
-      chef-button {
-      height: 36px;
-    }
-
-    chef-button#create-button-object-modal {
-      margin: 10px 0px 0px 16px;
-    }
-
-    chef-button#cancel-server-popup {
-      margin: 10px 15px 0px 0px;
-    }
-
-    chef-button.close {
-      border: none;
-      color: var(--chef-primary-dark);
-      outline: none;
-      margin-top: 18px;
-      margin-right: 18px;
-    }
-
-    chef-button.close:active {
-      background: none;
-      color: var(--chef-primary-dark);
-    }
+  chef-button {
+    height: 36px;
   }
 
+  chef-button#create-button-object-modal {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#cancel-server-popup {
+    margin: 10px 15px 0px 0px;
+  }
+
+  chef-button.close {
+    border: none;
+    color: var(--chef-primary-dark);
+    outline: none;
+    margin-top: 18px;
+    margin-right: 18px;
+  }
+
+  chef-button.close:active {
+    background: none;
+    color: var(--chef-primary-dark);
+  }
+}
 
 ::ng-deep mat-select {
   width: 277px;
 }
+
 ::ng-deep #cdk-overlay-0 .mat-select-panel-wrap  {
     flex-basis: auto;
     margin-top: 7px;
@@ -259,51 +259,52 @@ chef-modal ::ng-deep .modal-overlay {
 
  ::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
   line-height: 3em;
-
   font-size: 12px;
   height: 3em;
   border: 1px solid #CFD2D2;
   height: 37px;
- }
+}
   
 ::ng-deep [panelClass=chef-dropdown] {
   height: 36px;
-  padding: 8px 16px 9px 16px;
+  padding: 5px 12px 0px 12px;
   border: 1px solid #DEE6F7;
   box-sizing: border-box;
   border-radius: 4px;
 }
 
 ::ng-deep [panelClass=chef-dropdown]:focus {
-
   border-color: #DEE6F7;
-
 }  
 
 
-::ng-deep .cdk-overlay-container #cdk-overlay-0 { left:356px !important; transform:none !important;} // sass-lint:disable-line no-important
-::ng-deep .cdk-overlay-container #cdk-overlay-1 { left:673px !important; transform:none !important;} // sass-lint:disable-line no-important
+::ng-deep .cdk-overlay-container #cdk-overlay-0 { 
+  left:356px !important; transform:none !important;
+} // sass-lint:disable-line no-important
 
-  ::ng-deep .cdk-overlay-container {
-    position: fixed;
-    z-index: 999999999;
-  }
+::ng-deep .cdk-overlay-container #cdk-overlay-1 { 
+  left:673px !important; transform:none !important;
+} // sass-lint:disable-line no-important
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
 
 ::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
-
-    right: 10px;
-    width: 0;
-    height: 0;
-    border-color: #fff transparent transparent transparent;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid;
-    border: 6px solid blue;
-    border-width: 0 3px 3px 0;
-    display: inline-block;
-    padding: 3px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-color: #fff transparent transparent transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  border: 6px solid blue;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
 }
 
 ::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
@@ -315,19 +316,17 @@ chef-modal ::ng-deep .modal-overlay {
   color: red;
 }
 
-  .constraint-margin {
-    display: flex;
-    margin-bottom: 10px;
-  }
+.constraint-margin {
+  display: flex;
+  margin-bottom: 10px;
+}
 
-  .row-margin {
-    display: flex;
-    margin-top: 5px;
-  }
-
+.row-margin {
+  display: flex;
+  margin-top: 5px;
+}
 
 .name-margin {
-
   .name-dropdown {
     color: $chef-primary-dark;
   
@@ -348,7 +347,6 @@ chef-modal ::ng-deep .modal-overlay {
       overflow: scroll;
       height: 160px;
       width: 120px;
-      
     }
 
     chef-select ::ng-deep .selected-value chef-icon {
@@ -380,7 +378,6 @@ chef-modal ::ng-deep .modal-overlay {
       overflow: scroll;
       height: 160px;
       width: 105px;
-      
     }
 
     chef-select ::ng-deep .selected-value chef-icon {
@@ -400,9 +397,8 @@ chef-modal ::ng-deep .modal-overlay {
       color: $chef-primary-dark;
       font-size: 15px;
     }
-  
-
   }
+
   chef-form-field input {
     height: 36px;
     border: 1px solid #DEE6F7;
@@ -423,33 +419,31 @@ chef-modal ::ng-deep .modal-overlay {
   border-radius: 5px;
 }
 
- ::ng-deep .scroll::-webkit-scrollbar-thumb {
+::ng-deep .scroll::-webkit-scrollbar-thumb {
   background: #B4C3CC;
   border-radius: 5px;
 }
 
 .add {
   margin-top: 67px;
-
   chef-button {
     width: 61px;
-height: 36px;
-border: 1px solid rgba(56, 100, 242, 0.5);
-border-radius: 0px 4px 4px 0px;
-background-color: white;
- color: #3864F2;
+    height: 36px;
+    border: 1px solid rgba(56, 100, 242, 0.5);
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: #3864F2;
   }
 }
 
 .remove {
-
   chef-button {
     width: 88px;
-  height: 36px;
-  border: 1px solid rgba(56, 100, 242, 0.5);
-  border-radius: 0px 4px 4px 0px;
-  background-color: white;
-  color: #3864F2;
+    height: 36px;
+    border: 1px solid rgba(56, 100, 242, 0.5);
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: #3864F2;
   }
 }
 
@@ -458,8 +452,6 @@ form {
     textarea {
       height: 286px;
       margin-top: 32.22px;
-      /* lavender03 */
-      
       border: 1px solid #DEE6F7;
       box-sizing: border-box;
       border-radius: 4px;

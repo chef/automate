@@ -79,3 +79,18 @@ img {
 .three-dot-column {
   text-align: right;
 }
+
+#env-create {
+  float: right;
+}
+
+::ng-deep {
+  .environments .search-input-wrapper {
+    top: 15px;
+    width: 87%;
+  }
+  
+  chef-toolbar chef-button:first-child {
+    margin: 22px 0px 0px 0px;
+  }
+}

@@ -13,7 +13,7 @@
   [environmentsList]="environments" [serverId]="serverId" [orgId]="orgId"></app-create-environment-modal>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <chef-toolbar>
-      <chef-button primary (click)="openCreateModal()">Create Environment</chef-button>
+      <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
     </chef-toolbar>
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>

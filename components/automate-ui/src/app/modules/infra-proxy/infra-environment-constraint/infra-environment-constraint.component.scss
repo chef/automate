@@ -17,6 +17,32 @@
   color: #000000;
 }
 
+span.example-text {
+  font-size: 10px;
+  margin-left: 3px;
+  margin-top: 2px;
+}
+
+#name-input-constraint {
+  margin-left: 8px;
+}
+
+.label-version {
+  margin-left: 8px;
+}
+
+.label-operator {
+  margin-left: 4px;
+}
+
+::ng-deep mat-select#mat-select-2 {
+  margin-left: 5px;
+}
+
+.fixed-height {
+  height: 211px;
+}
+
 .name-margin {
   margin-bottom: 18px;
   margin-top: 32px;
@@ -81,8 +107,9 @@
   
     mat-select {
       margin-bottom: 12px;
-      width: 123px;
+      width: 88px;
       font-size: 12px;
+      margin-left: 4px;
     }
   }
 }
@@ -109,12 +136,14 @@
     border: 1px solid #DEE6F7;
     box-sizing: border-box;
     border-radius: 4px 0px 0px 4px;
-    width: 200px;
+    margin-right: 0px;
+    width: 132px;
+    margin-left: 2px;
   }
 }
 
 .add {
-  margin-top: 50px;
+  margin-top: 51px;
 
   chef-button {
     width: 61px;
@@ -137,8 +166,8 @@
 }
 
 .scroll {
-  height: 286px;
-  overflow-y: scroll;
+  max-height: 211px;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
@@ -153,14 +182,13 @@
 
   chef-button {
     width: 79px;
-  height: 36px;
-  border: 1px solid #3864F2;
-  border-radius: 0px 4px 4px 0px;
-  background-color: white;
-  color: #3864F2;
-  margin-top: 1px;
-  margin-left: 1px;
-  
+    height: 36px;
+    border: 1px solid #3864F2;
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: #3864F2;
+    margin-top: 0px;
+    margin-left: 0px;
   }
 }
 

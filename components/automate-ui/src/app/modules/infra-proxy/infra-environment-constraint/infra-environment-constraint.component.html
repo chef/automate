@@ -1,72 +1,73 @@
 <div class="constraint-margin">
-    <div class="name-margin">
-        <label>
-            <span class="label">Name <span aria-hidden="true">*</span></span>
-        </label>
-        <div class="drop">
-            <mat-select panelClass="chef-dropdown" [(value)]="name_id" [disable]="!constraintKeys.length">
-                <mat-option *ngFor="let list of constraintKeys" [value]="list">{{ list }}</mat-option>
-            </mat-select>
-        </div>
+  <div class="name-margin">
+    <label>
+      <span class="label">Name</span>
+    </label>
+    <div class="drop">
+      <mat-select panelClass="chef-dropdown" [(value)]="name_id" [disable]="!constraintKeys.length">
+        <mat-option *ngFor="let list of constraintKeys" [value]="list">{{ list }}</mat-option>
+      </mat-select>
     </div>
-    <div class="operator-margin">
-        <label>
-            <span class="label">Operator <span aria-hidden="true">*</span></span>
-        </label>
-        <div class="operator-dropdown">
-            <mat-select panelClass="chef-dropdown" [(value)]="operator_id" [disable]="!constraintKeys.length">
-                <mat-option *ngFor="let list of operatorKeys" [value]="list">{{ list }}</mat-option>
-            </mat-select>
-        </div>
+  </div>
+  <div class="operator-margin">
+    <label>
+      <span class="label label-operator">Operator</span>
+    </label>
+    <div class="operator-dropdown">
+      <mat-select panelClass="chef-dropdown" [(value)]="operator_id" [disable]="!constraintKeys.length">
+        <mat-option *ngFor="let list of operatorKeys" [value]="list">{{ list }}</mat-option>
+      </mat-select>
     </div>
-    <div class="version-margin">
-        <label>
-            <span class="label">Version (example 1.2.3)<span aria-hidden="true">*</span></span>
-        </label>
-        <form [formGroup]="secondFormGroup">
-            <chef-form-field>
-                <input chefInput formControlName="version" id="name-input-constraint" (keyup)="handleInput($event)"
-                    autocomplete="off" />
-            </chef-form-field>
-        </form>
-    </div>
-    <div class="add">
-        <chef-button primary (click)="addRow()" [disabled]="!secondFormGroup.valid || !constraintKeys.length">Add
-        </chef-button>
-    </div>
+  </div>
+  <div class="version-margin">
+    <label>
+      <span class="label label-version">Version<span class="example-text">( example 1.2.3 )</span></span>
+    </label>
+    <form [formGroup]="secondFormGroup">
+      <chef-form-field>
+        <input chefInput formControlName="version" id="name-input-constraint" (keyup)="handleInput($event)"
+          autocomplete="off" />
+      </chef-form-field>
+    </form>
+  </div>
+  <div class="add">
+    <chef-button primary (click)="addRow()" [disabled]="!secondFormGroup.valid || !constraintKeys.length">Add
+    </chef-button>
+  </div>
 </div>
-<div class="scroll">
+<div class="fixed-height">
+  <div class="scroll">
     <div class="row-margin" *ngFor="let dynamic of dynamicArray; let i = index;">
-        <div class="row-name-margin">
-
-            <div class="name-dropdown">
-                <mat-select #selectLang panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].name"
-                    (ngModelChange)="selected(selectLang.value,i)">
-                    <ng-container *ngFor="let list of rowKeys">
-                        <mat-option *ngIf="selectLang.value === list || !isSelected(list)" value={{list}}
-                            [ngValue]="list">{{ list }}
-                        </mat-option>
-                    </ng-container>
-                </mat-select>
-
-            </div>
+      <div class="row-name-margin">
+        <div class="name-dropdown">
+          <mat-select #selectLang panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].name"
+            (ngModelChange)="selected(selectLang.value,i)">
+            <ng-container *ngFor="let list of rowKeys">
+              <mat-option *ngIf="selectLang.value === list || !isSelected(list)" value={{list}} [ngValue]="list">{{ list
+                }}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+  
         </div>
-        <div class="row-operator-margin">
-
-            <div class="operator-dropdown">
-                <mat-select panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].operator"
-                    (ngModelChange)="handleOperator($event, i)">
-                    <mat-option *ngFor="let list of operatorKeys" [value]="list">{{ list }}</mat-option>
-                </mat-select>
-            </div>
+      </div>
+      <div class="row-operator-margin">
+  
+        <div class="operator-dropdown">
+          <mat-select panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].operator"
+            (ngModelChange)="handleOperator($event, i)">
+            <mat-option *ngFor="let list of operatorKeys" [value]="list">{{ list }}</mat-option>
+          </mat-select>
         </div>
-        <div class="row-version-margin">
-            <input chefInput type="text" id="name-input" (keyup)="handleInput($event)"
-                (ngModelChange)="handleVersion($event, i)" autocomplete="off" [(ngModel)]="dynamicArray[i].version" />
-        </div>
-        <div class="remove">
-            <chef-button (click)="deleteRow(i, dynamic)" secondary caution>Remove
-            </chef-button>
-        </div>
+      </div>
+      <div class="row-version-margin">
+        <input chefInput type="text" id="name-input" (keyup)="handleInput($event)"
+          (ngModelChange)="handleVersion($event, i)" autocomplete="off" [(ngModel)]="dynamicArray[i].version" />
+      </div>
+      <div class="remove">
+        <chef-button (click)="deleteRow(i, dynamic)" secondary caution>Remove
+        </chef-button>
+      </div>
     </div>
+  </div>
 </div>
