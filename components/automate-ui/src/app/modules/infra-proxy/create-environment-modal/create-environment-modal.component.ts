@@ -19,7 +19,6 @@ import {
 import { isNil } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
-import { MatStepper } from '@angular/material/stepper';
 import { Environment } from 'app/entities/environments/environment.model';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
@@ -52,7 +51,6 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
 
-  @ViewChild('stepper') stepper: MatStepper;
   @ViewChild(MatSelect) select: MatSelect;
 
   public visible = false;
@@ -172,7 +170,6 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
           this.conflictError = true;
-          this.stepper.selectedIndex = 0;
         } else {
           this.store.dispatch(new GetEnvironments(payload));
 

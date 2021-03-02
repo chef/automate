@@ -5,7 +5,7 @@
   <div class="flex-container">
     <div class="main pages-body">
       <app-infra-tab-change class="tabs-row" (tabChange)="tabChange($event)">
-        <app-infra-tab tabTitle="Details" [active]="detailsTab">
+        <app-infra-tab tabTitle="Details" [active]="detailsTab" [disabled]="false">
           <form [formGroup]="firstFormGroup">
             <div class="input-margin">
               <chef-form-field>
@@ -44,7 +44,7 @@
             </div>
           </form>
         </app-infra-tab>
-        <app-infra-tab tabTitle="Constraints" [active]="constraintsTab" ng-disabled="firstFormGroup.$invalid">
+        <app-infra-tab tabTitle="Constraints" [active]="constraintsTab" [disabled]="!firstFormGroup?.valid">
           <div *ngIf="showConstraint">
             <app-infra-environment-constraint
               [constraintName]="constraintKeys"
@@ -60,7 +60,7 @@
             </chef-button>
           </div>
         </app-infra-tab>
-        <app-infra-tab tabTitle="Default Attributes" [active]="defaultTab">
+        <app-infra-tab tabTitle="Default Attributes" [active]="defaultTab" [disabled]="!firstFormGroup?.valid">
           <form [formGroup]="thirdFormGroup">
             <chef-form-field>
               <textarea chefInput name="dattr" id="dattr" formControlName="dattr" (change)="onChangeJSON($event)"
@@ -80,7 +80,7 @@
             </div>
           </form>
         </app-infra-tab>
-        <app-infra-tab tabTitle="Override Attributes" [active]="overrideTab">
+        <app-infra-tab tabTitle="Override Attributes" [active]="overrideTab" [disabled]="!firstFormGroup?.valid">
           <form [formGroup]="fourthFormGroup">
             <ng-template matStepLabel>Override Attributes</ng-template>
             <chef-form-field>

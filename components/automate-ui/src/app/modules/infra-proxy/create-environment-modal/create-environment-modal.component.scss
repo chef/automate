@@ -238,14 +238,9 @@ chef-modal ::ng-deep .modal-overlay {
   width: 277px;
 }
 
-::ng-deep #cdk-overlay-0 .mat-select-panel-wrap  {
-    flex-basis: auto;
-    margin-top: 7px;
-}
-
-::ng-deep #cdk-overlay-1 .mat-select-panel-wrap  {
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
   flex-basis: auto;
-  margin-top: 30px;
+  margin-top: 8px;
 }
   
 ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
@@ -255,6 +250,12 @@ chef-modal ::ng-deep .modal-overlay {
   height: 3em;
   border: 1px solid #CFD2D2;
   height: 37px;
+ }
+
+
+ ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background: #FFFFFF;
+  color: #000000;
  }
 
  ::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
@@ -277,13 +278,8 @@ chef-modal ::ng-deep .modal-overlay {
   border-color: #DEE6F7;
 }  
 
-
-::ng-deep .cdk-overlay-container #cdk-overlay-0 { 
-  left:356px !important; transform:none !important;
-} // sass-lint:disable-line no-important
-
-::ng-deep .cdk-overlay-container #cdk-overlay-1 { 
-  left:673px !important; transform:none !important;
+::ng-deep .cdk-overlay-container  .cdk-overlay-pane { 
+  margin-left: -12px !important; transform:none !important;
 } // sass-lint:disable-line no-important
 
 ::ng-deep .cdk-overlay-container {
@@ -313,7 +309,7 @@ chef-modal ::ng-deep .modal-overlay {
 }
 
 ::ng-deep .mat-select-disabled .mat-select-value {
-  color: red;
+  color: #000000;
 }
 
 .constraint-margin {

@@ -12,4 +12,5 @@ import { Component, Input } from '@angular/core';
 export class InfraTabComponent {
   @Input() tabTitle: string;
   @Input() active = false;
+  @Input() disabled = true;
 }

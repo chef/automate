@@ -1,5 +1,6 @@
 <div class="navbar">
-    <a (click)="selectTab(tab)" *ngFor="let tab of tabs" [class.active]="tab.active">
+    <a (click)="selectTab(tab)" *ngFor="let tab of tabs" [class.active]="tab.active"
+    [class.disabled]="tab.disabled">
         {{tab.tabTitle}}
     </a>
 </div>

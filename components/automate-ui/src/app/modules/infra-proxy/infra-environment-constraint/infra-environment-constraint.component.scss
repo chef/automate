@@ -197,3 +197,19 @@ span.example-text {
   height: 10px;
   overflow: scroll;
 }
+
+.checkmark:before {
+  content:'L';
+  font-family: arial;
+  transform: scaleX(-1) rotate(-35deg);
+  display: inline-block;
+  vertical-align: top;
+  line-height: 1em;
+  width: 13.71px;
+  color: #222435;
+  height: 13.09px;
+  margin-right: 1.3em;
+  text-align: center;
+  position: absolute;
+  right: 0;
+}

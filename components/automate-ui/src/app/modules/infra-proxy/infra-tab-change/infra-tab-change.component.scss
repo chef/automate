@@ -37,6 +37,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
     color: #FFFFFF;
 }
 
+.navbar a.disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
 .navbar a:first-child {
   border-radius: 4px 0px 0px 4px;
 }
