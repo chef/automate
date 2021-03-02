@@ -49,7 +49,7 @@ export function environmentEntityReducer(
       return set(DELETE_STATUS, EntityStatus.loading, state);
 
     case EnvironmentActionTypes.DELETE_SUCCESS:
-      const environments = 
+      const environments =
         state.environmentList.items.filter(environment => environment.name !== action.payload.name);
       const total = state.environmentList.total - 1;
       return pipe(

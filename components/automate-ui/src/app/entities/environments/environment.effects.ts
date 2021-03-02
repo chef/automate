@@ -84,7 +84,7 @@ export class EnvironmentEffects {
     map(({ payload: { name } }: DeleteEnvironmentSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Deleted environment ${name}.`
+        message: `Successfully Deleted Environment - ${name}.`
       });
     }));
 

@@ -59,7 +59,8 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
         if (!isNil(EnvironmentsState)) {
           this.environmentListState = EnvironmentsState;
-          if (this.environmentListState.items.length === 0 && this.environmentListState.total !== 0) {
+          if (this.environmentListState.items.length === 0 &&
+              this.environmentListState.total !== 0) {
             this.store.dispatch(new GetEnvironments(payload));
             this.environmentsListLoading = true;
           } else {
