@@ -29,34 +29,36 @@ chef-toolbar {
   }
 }
 
-chef-tab-selector {
-  chef-option {
-    margin-right: 4px;
-    color: $chef-primary-dark;
-  }
+::ng-deep {
 
-  ::ng-deep .selected {
-    background-color: $gray-highlight;
-  }
+  chef-tab-selector {
+    chef-option {
+      margin-right: 4px;
+      color: $chef-primary-dark;
+    }
 
-  ::ng-deep .selected::before {
-    height: 4px;
-    background-color: $chef-dark-blue;
-  }
+    ::ng-deep .selected {
+      background-color: $gray-highlight;
+    }
 
-  chef-option:focus {
-    outline: none;
-  }
+    ::ng-deep .selected::before {
+      height: 4px;
+      background-color: $chef-dark-blue;
+    }
 
-  ::ng-deep chef-option::before {
-    height: 4px;
-    background-color: $chef-tab-hover;
-  }
+    chef-option:focus {
+      outline: none;
+    }
 
-  ::ng-deep chef-option:hover::before {
-    background: $chef-azureish-gray;
-  }
+    ::ng-deep chef-option::before {
+      height: 4px;
+      background-color: $chef-tab-hover;
+    }
 
+    ::ng-deep chef-option:hover::before {
+      background: $chef-azureish-gray;
+    }
+  }
 }
 
 form {

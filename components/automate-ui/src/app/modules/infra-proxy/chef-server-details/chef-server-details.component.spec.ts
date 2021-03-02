@@ -5,16 +5,18 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { CreateOrgSuccess, CreateOrgFailure } from 'app/entities/orgs/org.actions';
+import { CreateOrgSuccess, CreateOrgFailure, GetOrgsSuccess } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
 import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { MockComponent } from 'ng2-mock-component';
 
 describe('ChefServerDetailsComponent', () => {
   let component: ChefServerDetailsComponent;
   let fixture: ComponentFixture<ChefServerDetailsComponent>;
+  let element;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -67,6 +69,7 @@ describe('ChefServerDetailsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ChefServerDetailsComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
@@ -86,6 +89,31 @@ describe('ChefServerDetailsComponent', () => {
 
     beforeEach(() => {
       store = TestBed.inject(Store);
+    });
+
+
+    describe('org list', () => {
+      const availableOrgs: Org[] = [
+        {
+        id: '1',
+        name: 'new org',
+        admin_user: 'new org user',
+        server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf',
+        projects: ['test_org_project']
+        }
+      ];
+      const emptyOrgs: Org[] = [];
+
+      it('render the Orgs list', () => {
+        store.dispatch(new GetOrgsSuccess({orgs: availableOrgs}));
+        expect(component.orgs.length).not.toBeNull();
+        expect(element.query(By.css('.empty-section'))).toBeNull();
+      });
+
+      it('show no preview image', () => {
+        store.dispatch(new GetOrgsSuccess({orgs: emptyOrgs}));
+        expect(component.orgs.length).toBe(0);
+      });
     });
 
     it('openCreateModal opens modal', () => {

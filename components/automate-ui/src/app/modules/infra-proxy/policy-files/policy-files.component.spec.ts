@@ -5,13 +5,17 @@ import { PolicyFilesComponent } from './policy-files.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
-import { StoreModule } from '@ngrx/store';
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
+import { GetPolicyFilesSuccess } from 'app/entities/policy-files/policy-file.action';
+import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 
 describe('PolicyFilesComponent', () => {
   let component: PolicyFilesComponent;
   let fixture: ComponentFixture<PolicyFilesComponent>;
+  let element;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,10 +59,37 @@ describe('PolicyFilesComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PolicyFilesComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('policyfile list', () => {
+    let store: Store<NgrxStateAtom>;
+    const availablePolicfiles: PolicyFile[] = [{
+        name: 'aix',
+        revision_id: '2.3.12',
+        policy_group: 'test'
+      }
+    ];
+    const emptyPolicfiles: PolicyFile[] = [];
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('render the policyfile list', () => {
+      store.dispatch(new GetPolicyFilesSuccess({policies: availablePolicfiles}));
+      expect(component.policyFiles.length).not.toBeNull();
+      expect(element.query(By.css('.empty-section'))).toBeNull();
+    });
+
+    it('show no preview image', () => {
+      store.dispatch(new GetPolicyFilesSuccess({policies: emptyPolicfiles}));
+      expect(component.policyFiles.length).toBe(0);
+    });
   });
 });

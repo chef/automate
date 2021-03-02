@@ -3,13 +3,17 @@ import { InfraRolesComponent } from './infra-roles.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
-import { StoreModule } from '@ngrx/store';
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
+import {  GetRolesSuccess } from 'app/entities/infra-roles/infra-role.action';
+import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 
 describe('InfraRolesComponent', () => {
   let component: InfraRolesComponent;
   let fixture: ComponentFixture<InfraRolesComponent>;
+  let element;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,10 +52,45 @@ describe('InfraRolesComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(InfraRolesComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('infra role list', () => {
+    let store: Store<NgrxStateAtom>;
+    const availableRoles: InfraRole[] = [{
+      name: 'test',
+      environments: [],
+      description: 'test role',
+      json_class: 'Chef::Environment',
+      chef_type: 'environment',
+      default_attributes: 'test',
+      override_attributes:  'test',
+      run_list: [],
+      expanded_run_list: []
+    }
+    ];
+    const emptyRoles: InfraRole[] = [];
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('render the roles list', () => {
+      store.dispatch(new GetRolesSuccess({roles: availableRoles,  total: availableRoles.length}));
+      expect(component.roles.length).not.toBeNull();
+      expect(element.query(By.css('.empty-section'))).toBeNull();
+    });
+
+    it('show no preview image', () => {
+      store.dispatch(new GetRolesSuccess({roles: emptyRoles,  total: emptyRoles.length}));
+      expect(component.roles.length).toBe(0);
+    });
+  });
 });
+
+
