@@ -44,7 +44,7 @@ export class DataBagsEffects {
         message: `Could not get infra data bags: ${msg || payload.error}`
       });
     }));
-  
+
   @Effect()
   deleteDataBag$ = this.actions$.pipe(
     ofType(DataBagActionTypes.DELETE),
@@ -60,7 +60,7 @@ export class DataBagsEffects {
     map(({ payload: { name } }: DeleteDataBagSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Deleted data bag ${name}.`
+        message: `Successfully Deleted Data Bag - ${name}.`
       });
     }));
 
