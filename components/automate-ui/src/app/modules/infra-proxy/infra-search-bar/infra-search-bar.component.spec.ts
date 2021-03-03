@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockComponent } from 'ng2-mock-component';
 
 import { InfraSearchBarComponent } from './infra-search-bar.component';
 import { MockComponent } from 'ng2-mock-component';

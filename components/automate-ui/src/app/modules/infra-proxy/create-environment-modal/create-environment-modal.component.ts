@@ -46,7 +46,7 @@ export class DynamicGrid {
 })
 export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
-  @Input() openEvent: EventEmitter<boolean>;
+  @Input() openEvent: EventEmitter<void>;
   @Input() environmentsList: Environment[] = [];
   @Input() serverId: string;
   @Input() orgId: string;
@@ -172,6 +172,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
           this.conflictError = true;
         } else {
           this.store.dispatch(new GetEnvironments(payload));
+          this.creating = false;
 
           // Close the modal on any error other than conflict and display in banner.
           this.closeCreateModal();
