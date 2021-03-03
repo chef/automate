@@ -89,8 +89,19 @@ func TestGetRoles(t *testing.T) {
 	})
 
 	t.Run("Roles list with a valid query search param", func(t *testing.T) {
+		name := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
+		createReq := &request.CreateRole{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Description: "auto generated role",
+		}
+	    role, err := infraProxy.CreateRole(ctx, createReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, role)
+
 		req.SearchQuery = &request.SearchQuery{
-			Q:       "name:starter",
+			Q:       fmt.Sprintf("name:%s", name),
 			Page:    0,
 			PerPage: 5,
 		}
@@ -99,7 +110,7 @@ func TestGetRoles(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 1, int(res.Total))
-		assert.Equal(t, "starter", res.Roles[0].GetName())
+		assert.Equal(t, name, res.Roles[0].GetName())
 	})
 }
 

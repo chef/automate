@@ -2,13 +2,15 @@ package integration_test
 
 import (
 	"os"
+	"strconv"
 	"testing"
 )
 
 // Global variables
 var (
-	autoDeployedChefServerID       = "local-dev"
-	autoDeployedChefOrganizationID = "test-org"
+	autoDeployedChefServerID       = getEnv("INFRA_SERVER_ID", "local-dev")
+	autoDeployedChefOrganizationID = getEnv("INFRA_SERVER_ORG_ID", "test-org")
+	totalRecords, _                  = strconv.Atoi(getEnv("TOTAL_RECORDS", "10"))
 	cFile                          = "/src/components/infra-proxy-service/dev/config"
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
@@ -30,4 +32,11 @@ func TestMain(m *testing.M) {
 
 	// call with result of m.Run()
 	os.Exit(exitCode)
+}
+
+func getEnv(key, fallback string) string {
+    if value, ok := os.LookupEnv(key); ok {
+        return value
+    }
+    return fallback
 }

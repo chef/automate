@@ -17,11 +17,26 @@ DOC
 function infra_service_integration() {
   check_if_deployinate_started || return 1;
   export CONTAINER_HOSTNAME=localhost
-  # Setup local chef server
-  # loads data which resides in dev-docs/adding-data/infra/chef-repo
+  Setup local chef server
+  loads data which resides in dev-docs/adding-data/infra/chef-repo
   infra_service_load_chef_repo
-  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+  log_line "Started loading chef repo..."
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test -v "github.com/chef/automate/components/infra-proxy-service/integration_test"
+  log_line "Finished loading chef repo..."
 }
+
+document "infra_service_load_test_data" <<DOC
+  run the infra service's integration tests
+DOC
+function infra_service_load_test_data() {
+  check_if_deployinate_started || return 1;
+  log_line "Started loading infra service test data..."
+  INFRA_SERVER_ID="$1" INFRA_SERVER_ORG_ID="$2" TOTAL_RECORDS="$3" A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+  log_line $INFRA_SERVER_ID
+  log_line $INFRA_SERVER_ORG_ID
+  log_line "Finished loading infra service test data"
+}
+
 
 document "infra_service_load_sample_data" <<DOC
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
