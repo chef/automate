@@ -17,11 +17,11 @@ DOC
 function infra_service_integration() {
   check_if_deployinate_started || return 1;
   export CONTAINER_HOSTNAME=localhost
-  Setup local chef server
-  loads data which resides in dev-docs/adding-data/infra/chef-repo
+  # Setup local chef server
+  # loads data which resides in dev-docs/adding-data/infra/chef-repo
   infra_service_load_chef_repo
   log_line "Started loading chef repo..."
-  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test -v "github.com/chef/automate/components/infra-proxy-service/integration_test"
+  A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
   log_line "Finished loading chef repo..."
 }
 
