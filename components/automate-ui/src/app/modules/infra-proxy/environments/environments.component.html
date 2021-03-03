@@ -10,13 +10,19 @@
   </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="environments" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <app-create-environment-modal [openEvent]="openEnvironmentModal"
-  [environmentsList]="environments" [serverId]="serverId" [orgId]="orgId"></app-create-environment-modal>
+  [environmentsList]="environments" [serverId]="serverId" [orgId]="orgId"
+  ></app-create-environment-modal>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-items">
-      <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
+      <div class="search-box">
+        <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
+        </div>
+      <div class="button-box">
       <chef-toolbar>
         <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
       </chef-toolbar>
+      </div>
+
     </div>
 
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   

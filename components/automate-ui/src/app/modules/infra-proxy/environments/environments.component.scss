@@ -54,8 +54,15 @@ chef-loading-spinner {
 //   }
 // }
 
-.search-items {
-  display: flex;
+.search-box {
+  float: left;
+  width: 96%;
+}
+
+.button-box {
+  float: right;
+
+  width: 4%;
 }
 
 .full-screen-spinner {

@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ComponentFixture, TestBed, waitForAsync,
-  ComponentFixtureAutoDetect } from '@angular/core/testing';
+  } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
 import { CreateEnvironmentModalComponent } from './create-environment-modal.component';
@@ -14,6 +14,8 @@ import { CreateEnvironmentSuccess, CreateEnvironmentFailure } from 'app/entities
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpStatus } from 'app/types/types';
 import { EventEmitter } from '@angular/core';
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
 
 class MockTelemetryService {
   track() { }
@@ -40,8 +42,9 @@ describe('CreateEnvironmentModalComponent', () => {
         CreateEnvironmentModalComponent
       ],
       providers: [
-        { provide: ComponentFixtureAutoDetect, useValue: true },
+        // { provide: ComponentFixtureAutoDetect, useValue: true },
         { provide: TelemetryService, useClass: MockTelemetryService },
+        HttpClient, HttpHandler
       ],
       imports: [
         ReactiveFormsModule,

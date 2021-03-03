@@ -2,7 +2,6 @@ import {
   Component,
   OnInit,
   ViewChild,
-  AfterViewInit,
   Input,
   Output,
   EventEmitter,
@@ -22,22 +21,21 @@ import { DynamicGrid } from '../create-environment-modal/create-environment-moda
   templateUrl: './infra-environment-constraint.component.html',
   styleUrls: ['./infra-environment-constraint.component.scss']
 })
-export class InfraEnvironmentConstraintComponent implements OnInit, AfterViewInit {
+export class InfraEnvironmentConstraintComponent implements OnInit {
 
-  @Input() constraintName: string[] = [];
+  @Input() constraintKeys: string[] = [];
+  @Input() dynamicArray: Array<DynamicGrid> = [];
+  @Input() name_id: string;
   public conflictError = false;
   @ViewChild(MatSelect) select: MatSelect;
   @Output() constraintValues: EventEmitter<DynamicGrid[]> = new EventEmitter();
   @ViewChildren('selectLang') nameSelects: QueryList<ElementRef<HTMLSelectElement>>;
 
   public secondFormGroup: FormGroup;
-  public constraintKeys: string[] = [];
   public operatorKeys: string[] = [];
   public rowKeys: string[] = [];
   selectedLangs: string[] = [];
-  public name_id = '';
   public operator_id = '';
-  dynamicArray: Array<DynamicGrid> = [];
 
   constructor(
     private fb: FormBuilder
@@ -54,29 +52,14 @@ export class InfraEnvironmentConstraintComponent implements OnInit, AfterViewIni
   ngOnInit() {
 
     this.conflictError = false;
-    this.constraintName.forEach(element =>
+    this.constraintKeys.forEach(element =>
 
       this.rowKeys.push(element)
     );
 
 
-    this.constraintName.forEach(element =>
-      this.constraintKeys.push(element)
-    );
-
     this.name_id = this.constraintKeys[0];
 
-  }
-
-  ngAfterViewInit() {
-    this.select.overlayDir.positions = [
-      {
-        originX: 'center',
-        originY: 'bottom',
-        overlayX: 'center',
-        overlayY: 'top'
-      }
-    ];
   }
 
   selected(value, i) {
@@ -104,8 +87,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit, AfterViewIni
     this.constraintKeys.forEach((element, index) => {
       if (element === value) {
         this.constraintKeys.splice(index, 1);
-        this.constraintName.splice(index, 1);
-
       }
     });
 
@@ -173,7 +154,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit, AfterViewIni
       if (element == event) {
 
         this.constraintKeys.splice(index, 1);
-        this.constraintName.splice(index, 1);
       }
 
     });
@@ -199,7 +179,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit, AfterViewIni
       if (element == this.name_id) {
         this.selectedLangs.push(element);
         this.constraintKeys.splice(index, 1);
-        this.constraintName.splice(index, 1);
       }
 
     });

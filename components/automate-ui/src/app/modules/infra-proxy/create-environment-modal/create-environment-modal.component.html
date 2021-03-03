@@ -47,8 +47,11 @@
         <app-infra-tab tabTitle="Constraints" [active]="constraintsTab" [disabled]="!firstFormGroup?.valid">
           <div *ngIf="showConstraint">
             <app-infra-environment-constraint
-              [constraintName]="constraintKeys"
-              (constraintValues)="constraintItemsHandler($event)">
+              [constraintKeys]="constraintKeysp"
+              (constraintValues)="constraintItemsHandler($event)"
+              [dynamicArray]="dynamicArrayp"
+              [name_id]="name_idp">
+
             </app-infra-environment-constraint>
           </div>
           <div class="button-bar-box">

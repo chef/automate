@@ -67,7 +67,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   public firstFormGroup: FormGroup;
   public thirdFormGroup: FormGroup;
   public fourthFormGroup: FormGroup;
-  public constraintKeys: string[] = [];
+  public constraintKeysp: string[] = [];
   public server: string;
   public org: string;
   public showdrag = false;
@@ -84,7 +84,8 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   constraintArray: Array<DynamicGrid> = [];
   public showConstraint = false;
   items: Environment[] = [];
-
+  public name_idp = '';
+  public dynamicArrayp: Array<DynamicGrid> = [];
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -128,23 +129,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     };
 
 
-    this.store.dispatch(new GetCookbooks({
-      server_id: this.serverId, org_id: this.orgId
-    }));
-
-    combineLatest([
-      this.store.select(getAllCookbooksForOrgStatus),
-      this.store.select(allCookbooks)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getCookbooksSt, allCookbooksState]) => {
-      if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
-        this.cookbooks = allCookbooksState;
-        this.cookbooks.forEach((cookbook) => {
-          this.constraintKeys.push(cookbook.name);
-        });
-      }
-    });
-
+    this.loadCookbookConstraint();
 
 
 
@@ -232,6 +217,29 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadCookbookConstraint() {
+    this.name_idp = '';
+    this.store.dispatch(new GetCookbooks({
+      server_id: this.serverId, org_id: this.orgId
+    }));
+
+    combineLatest([
+      this.store.select(getAllCookbooksForOrgStatus),
+      this.store.select(allCookbooks)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([ getCookbooksSt, allCookbooksState]) => {
+      if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
+        this.constraintKeysp = [];
+        this.cookbooks = allCookbooksState;
+        this.cookbooks.forEach((cookbook) => {
+          this.constraintKeysp.push(cookbook.name);
+        });
+      }
+      this.name_idp = this.constraintKeysp[0];
+    });
+
+  }
+
   private resetTabs() {
     this.detailsTab = false;
     this.constraintsTab = false;
@@ -277,6 +285,9 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   private resetCreateModal(): void {
     this.creating = false;
     this.firstFormGroup.reset();
+    this.thirdFormGroup.reset();
+    this.fourthFormGroup.reset();
+
     this.overrideTab = false;
     this.defaultTab = false;
     this.constraintsTab = false;
@@ -285,6 +296,10 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     //this.secondFormGroup.reset();
     this.default_attr_value = '{}';
     this.override_attr_value = '{}';
+    this.dattrParseError = false;
+    this.oattrParseError = false;
+    this.dynamicArrayp = [];
+    this.loadCookbookConstraint();
     // this.stepper.selectedIndex = 0;
     this.conflictErrorEvent.emit(false);
   }
