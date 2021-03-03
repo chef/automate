@@ -74,3 +74,10 @@ chef-button button {
 .clients-list-paging {
   margin: 0 0 35px;
 }
+
+::ng-deep {
+  .search-items app-infra-search-bar .search-wrapper {
+    width: 87%;
+    float: left;
+}
+}

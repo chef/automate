@@ -9,29 +9,29 @@
             <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
           </label>
           <chef-error *ngIf="error">{{error}}</chef-error>
+        </chef-form-field>
+        <chef-form-field>
           <chef-checkbox *ngIf="!created" (change)="updateValidatorCheckbox($event.detail)"
             [checked]="checkedValidator">Validation Client</chef-checkbox>
-
-          <div *ngIf="created" class="detail">
-            <div class="icon-wrap"><i></i></div>
-            <p>Client successfully created. Copy the private key below and keep it somewhere safe. It is NOT stored on
-              the server.</p>
-          </div>
-
-          <textarea chefInput rows="20" cols="10" *ngIf="created" value={{privateKey}}>
-          </textarea>
         </chef-form-field>
+        <div *ngIf="created" class="detail">
+          <div class="icon-wrap"><i></i></div>
+          <p>Client successfully created. Copy the private key below and keep it somewhere safe. It is NOT stored on
+            the server.</p>
+        </div>
+        <textarea chefInput rows="20" cols="10" *ngIf="created" value={{privateKey}}>
+        </textarea>
       </div>
       <div id="button-bar">
         <chef-button tertiary *ngIf="!created" (click)="closeCreateModal()">Cancel</chef-button>
         <chef-button tertiary *ngIf="created" (click)="closeCreateModal()">Close</chef-button>
         <chef-button primary *ngIf="!created" [disabled]="!createForm?.valid || error || conflictError"
           id="create-button-object-modal" (click)="createClient()">
-          <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
-          Create
+          <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+          <span *ngIf="!creating">Create</span>
+          <span *ngIf="creating">Creating...</span>
         </chef-button>
-        <chef-button primary *ngIf="created" id="create-button-object-modal" 
-        (click)="downloadKey()">
+        <chef-button primary *ngIf="created" id="create-button-object-modal" (click)="downloadKey()">
           Download
         </chef-button>
       </div>

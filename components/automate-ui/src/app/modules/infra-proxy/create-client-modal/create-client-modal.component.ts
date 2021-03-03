@@ -7,11 +7,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { Subject, combineLatest } from 'rxjs';
 import { CreateClient } from 'app/entities/clients/client.action';
-import {
-  getAllStatus,
-  saveError,
-  createClient
-} from 'app/entities/clients/client.selectors';
+import { saveError, createClient } from 'app/entities/clients/client.selectors';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
 
@@ -26,20 +22,20 @@ export class CreateClientModalComponent implements OnInit {
   @Input() orgId: string;
 
   public checkedValidator = false;
-  public client_key;  
   public createdClient: string;
   public creating = false;
   public created = false;
   public conflictError = false;
   public createForm: FormGroup;
+  public client_key: any;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public close = new EventEmitter();  
+  public close = new EventEmitter();
   public error: string;
-  public privateKey;
+  public privateKey: string;
   public org: string;
   public server: string;
   public validator = false;
-  public visible = false; 
+  public visible = false;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -62,23 +58,26 @@ export class CreateClientModalComponent implements OnInit {
     this.org = this.orgId;
     this.error = '';
     this.privateKey = '';
+    this.checkedValidator = false;
   });
 
   combineLatest([
-    this.store.select(getAllStatus),
+    // this.store.select(getAllStatus),
     this.store.select(saveError),
     this.store.select(createClient)
   ]).pipe(
     takeUntil(this.isDestroyed))
-    .subscribe(([_, errorSt, createState]) => {
-      if ( !isNil(createState)) {
+    .subscribe(([ errorSt, createState]) => {
+      if ( !isNil(errorSt) ) {
+        this.created = false;
+        this.creating = false;
+        this.error = errorSt?.message;
+      } else {
+        this.creating = false;
         this.created = true;
         this.createdClient = createState?.name;
         this.client_key = createState?.client_key;
         this.privateKey = this.client_key?.private_key;
-      } else {
-        this.created = false;
-        this.error = errorSt?.message;
       }
     });
   }
@@ -110,11 +109,12 @@ export class CreateClientModalComponent implements OnInit {
   }
 
   private resetCreateModal(): void {
+    this.creating = false;
     this.created = false;
     this.error = '';
     this.privateKey = '';
     this.createForm.reset();
-    this.validator = false;
+    this.checkedValidator = false;
     this.conflictErrorEvent.emit(false);
   }
 
@@ -122,7 +122,7 @@ export class CreateClientModalComponent implements OnInit {
     this.creating = true;
     const client = {
       name: this.createForm.controls['name'].value.trim(),
-      validator: this.createForm.controls['validator'].value || this.validator,
+      validator: this.createForm.controls['validator'].value || this.checkedValidator,
       server_id: this.serverId,
       org_id: this.orgId,
       create_key : true

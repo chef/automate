@@ -9,6 +9,7 @@ import { ChefServerDetailsComponent } from './chef-server-details/chef-server-de
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { ClientsComponent } from './clients/clients.component';
 import { ClientDetailsComponent } from './client-details/client-details.component';
+import { CreateClientModalComponent } from './create-client-modal/create-client-modal.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
@@ -29,7 +30,6 @@ import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
-import { CreateClientModalComponent } from './create-client-modal/create-client-modal.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +42,7 @@ import { CreateClientModalComponent } from './create-client-modal/create-client-
     CreateChefServerModalComponent,
     CreateOrgModalComponent,
     CreateDataBagModalComponent,
+    CreateClientModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
     DeleteInfraObjectModalComponent,
@@ -55,8 +56,7 @@ import { CreateClientModalComponent } from './create-client-modal/create-client-
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent,
-    CreateClientModalComponent
+    ResetAdminKeyComponent
   ],
   imports: [
     CommonModule,
