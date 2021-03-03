@@ -49,7 +49,7 @@ export function clientEntityReducer(
       return set(DELETE_STATUS, EntityStatus.loading, state);
 
     case ClientActionTypes.DELETE_SUCCESS:
-      const clients = 
+      const clients =
         state.clientList.items.filter(client => client.name !== action.payload.name);
       const total = state.clientList.total - 1;
       return pipe(

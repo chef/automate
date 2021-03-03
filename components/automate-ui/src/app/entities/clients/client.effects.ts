@@ -68,7 +68,7 @@ export class ClientEffects {
         message: `Could not get client: ${msg || payload.error}`
       });
     }));
-  
+
   @Effect()
   deleteClient$ = this.actions$.pipe(
     ofType(ClientActionTypes.DELETE),
@@ -84,7 +84,7 @@ export class ClientEffects {
     map(({ payload: { name } }: DeleteClientSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Deleted client ${name}.`
+        message: `Successfully Deleted Client - ${name}.`
       });
     }));
 
