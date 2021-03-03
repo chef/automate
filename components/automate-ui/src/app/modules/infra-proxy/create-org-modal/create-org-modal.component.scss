@@ -55,7 +55,6 @@ chef-modal {
   ::ng-deep {
 
     .modal {
-      margin: 32px;
       width: 528px;
       outline: none;
       box-shadow: 0px 0px 30px 0px #CCC;
@@ -127,7 +126,7 @@ chef-modal ::ng-deep #resources-selected {
 }
 
 chef-modal ::ng-deep .modal {
-  height: 81.5%;
+  height: 76.5%;
   overflow-x: hidden;
 }
 
