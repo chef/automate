@@ -61,7 +61,8 @@ func TestMissingNodeRangeCounts(t *testing.T) {
 				},
 				{
 					// checked in within 1 month but not 2 week. Counted in the 3d, 1w, and 2w buckets only
-					Checkin: time.Now().AddDate(0, 0, -28),
+					// Keep this under the number of days of ANY month, i.e. strictly less than 28 days!
+					Checkin: time.Now().AddDate(0, 0, -27),
 				},
 				{
 					// checked in within 3 month but not 1 month. Counted in the 3d, 1w, 2w, 1m buckets only
