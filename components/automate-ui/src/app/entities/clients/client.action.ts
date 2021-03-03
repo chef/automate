@@ -18,13 +18,13 @@ export enum ClientActionTypes {
 }
 
 export interface CreateClientSuccessPayload {
-  name: string,
+  name: string;
   client_key: {
     name: string,
     public_key: string,
     expiration_date: string,
     private_key: string
-  }
+  };
 }
 
 export interface ClientsSuccessPayload {
@@ -90,14 +90,14 @@ export interface CreateClientPayload {
   validator: boolean;
   org_id: string;
   server_id: string;
-  create_key: boolean
+  create_key: boolean;
 }
 
 export class CreateClient implements Action {
   readonly type = ClientActionTypes.CREATE;
   constructor(public payload: CreateClientPayload) { }
 }
-true
+
 export class CreateClientSuccess implements Action {
   readonly type = ClientActionTypes.CREATE_SUCCESS;
   constructor(public payload: CreateClientSuccessPayload) { }

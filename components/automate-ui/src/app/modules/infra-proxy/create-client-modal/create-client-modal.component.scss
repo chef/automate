@@ -1,5 +1,4 @@
 @import "~styles/variables";
-@import "~styles/colors";
 
 chef-modal {
 
@@ -9,7 +8,7 @@ chef-modal {
     font-size: 24px;
     line-height: 24px;
     letter-spacing: 0.15px;
-    padding-bottom: 39px;
+    padding-bottom: 30px;
   }
 
   .flex-container {
@@ -27,7 +26,6 @@ chef-modal {
 
       input {
         font-size: 13px;
-        margin-bottom: 16px;
       }
 
       label {
@@ -36,7 +34,11 @@ chef-modal {
         .label {
           font-weight: normal;
         }
-      }      
+      }  
+      
+      chef-checkbox {
+        margin-top: 16px;
+      }
 
       textarea {
         height: 300px;
@@ -49,8 +51,7 @@ chef-modal {
       }
 
       .detail {
-        // background: $chef-navy-blue;
-        background: #0075DB;
+        background: $chef-success;
         color: $white;
         font-size: 12px;
         line-height: 20px;
@@ -90,8 +91,11 @@ chef-modal {
       text-align: right;
       padding-top: 24px;
 
-      chef-button:last-child {
-        margin-right: 0;
+      chef-button {
+        margin-bottom: 0;        
+        &:last-child {
+          margin-right: 0;
+        }
       }
       chef-loading-spinner {
         position: relative;
@@ -112,7 +116,7 @@ chef-modal {
       chef-button {
         &.close {
           border: none;
-          color: black;
+          color: $chef-black;
           margin-right: 22px;
           margin-top: 16px;
           &:hover, &:focus {
@@ -122,6 +126,7 @@ chef-modal {
         }
 
         button {
+          line-height: 20px;
           letter-spacing: 0.5px;
           &:focus {
             outline: none;
@@ -135,7 +140,7 @@ chef-modal {
 
       chef-checkbox {
         &[aria-checked=false] .check-wrap {
-          border-color: #3864F2;
+          border-color: $chef-primary-bright;
         }     
         &:focus {
           outline: none;
@@ -152,7 +157,7 @@ chef-modal {
     }
 
     .modal-overlay {
-      background-color: #E5E5E5;
+      background-color: $chef-white;
       opacity: 0.5;
     } 
   }

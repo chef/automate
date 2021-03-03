@@ -42,6 +42,7 @@ chef-loading-spinner {
   background-color: $chef-white;
   opacity: 0.7;
   width: initial;
+  height: 100%;
 }
 
 .empty-section {
@@ -59,4 +60,17 @@ img {
 
 .three-dot-column {
   text-align: right;
+}
+
+chef-button button {
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  &:focus {
+    outline: none;
+  }
+}
+
+.clients-list-paging {
+  margin: 0 0 35px;
 }

@@ -1,9 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil 
-  //, filter
- } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -11,17 +9,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { GetClients, CreateClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
-import {
-  getAllStatus,
-  clientList,
-  // saveStatus,
-  saveError,
-  createClient
-} from 'app/entities/clients/client.selectors';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Regex } from 'app/helpers/auth/regex';
-// import { EntityStatus } from 'app/entities/entities';
-import { HttpStatus } from 'app/types/types';
+import { getAllStatus, clientList } from 'app/entities/clients/client.selectors';
 
 @Component({
   selector: 'app-clients',
@@ -57,17 +45,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public privateKey;
   public client_key;
   public validator = false;
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private fb: FormBuilder,
-  ) { 
-    this.createClientForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      validator: ['']
-    });
-  }
+    private layoutFacade: LayoutFacadeService
+  ) {}
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -100,29 +83,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
         }
       }
     });
-
-    combineLatest([
-      this.store.select(getAllStatus),
-      this.store.select(saveError),
-      this.store.select(createClient)
-    ]).pipe(
-      takeUntil(this.isDestroyed))
-      // filter(() => this.createModalVisible),
-      // filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-      .subscribe(([_getClientsSt, error ,createState]) => {
-        if(!isNil(createState)){
-          this.created = true;
-          this.client_key = createState?.client_key
-          this.privateKey = this.client_key?.private_key;
-          console.log(this.privateKey);
-        }
-        if (error.status === HttpStatus.CONFLICT) {
-          this.conflictErrorEvent.emit(true);
-        } else {
-          // Close the modal on any error other than conflict and display in banner.
-          this.closeCreateClientModal();
-        }
-      });
   }
 
   searchClients(currentText: string) {
@@ -151,27 +111,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   openCreateClientModal() {
-    this.createClientModalVisible = true;
-  }
-
-  public closeCreateClientModal(): void {
-    this.createClientModalVisible = false;
-  }
-
-  createClient() {
-    this.creatingClient = true;
-    const client = {
-      name: this.createClientForm.controls['name'].value.trim(),
-      validator: this.createClientForm.controls['validator'].value,
-      server_id: this.serverId,
-      org_id: this.orgId,
-      create_key : true
-    };
-    this.store.dispatch(new CreateClient(client));
-  }
-
-  downloadContentItem() {
-
+    this.openNotificationModal.emit();
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

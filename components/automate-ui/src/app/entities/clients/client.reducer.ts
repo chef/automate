@@ -1,5 +1,5 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set, pipe } from 'lodash/fp';
+import { set, pipe, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ClientActionTypes, ClientActions } from './client.action';
 import { Client } from './client.model';
@@ -18,7 +18,7 @@ export interface ClientEntityState extends EntityState<Client> {
   createClient: {
     client_key: Object,
     name: string
-  }
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -73,22 +73,23 @@ export function clientEntityReducer(
       case ClientActionTypes.CREATE: {
         return set(SAVE_STATUS, EntityStatus.loading, state) as ClientEntityState;
       }
-  
+
       case ClientActionTypes.CREATE_SUCCESS: {
         return pipe(
+          unset(SAVE_ERROR),
           set('createClient.client_key', action.payload.client_key || []),
-          set('createClient.name', action.payload.name || '')
+          set('createClient.name', action.payload.name || ''),
+          set(SAVE_STATUS, EntityStatus.loadingSuccess)
         )(state) as ClientEntityState;
-        // return set(SAVE_STATUS, EntityStatus.loadingSuccess, state) as ClientEntityState;
       }
-  
+
       case ClientActionTypes.CREATE_FAILURE: {
         return pipe(
-          set(SAVE_ERROR, action.payload),
+          set(SAVE_ERROR, action.payload.error),
           set(SAVE_STATUS, EntityStatus.loadingFailure)
         )(state) as ClientEntityState;
       }
-      
+
     default:
       return state;
   }

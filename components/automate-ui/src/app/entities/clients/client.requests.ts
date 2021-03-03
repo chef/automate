@@ -14,13 +14,13 @@ export interface ClientsResponse {
 }
 
 export interface CreateClientResponse {
-  name: string,
+  name: string;
   client_key: {
     name: string,
     public_key: string,
     expiration_date: string,
     private_key: string
-  }
+  };
 }
 
 @Injectable()
@@ -53,7 +53,8 @@ export class ClientRequests {
 
   public createClient(payload: CreateClientPayload): Observable<CreateClientResponse> {
     return this.http.post<CreateClientResponse>(
-      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients`, payload);
+      `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients`,
+      payload);
   }
 
 
