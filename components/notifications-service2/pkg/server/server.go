@@ -57,21 +57,6 @@ func (s *Server) Health() *health.Service {
 func (s *Server) Notify(context.Context, *notifications.Event) (*notifications.Response, error) {
 	return &notifications.Response{}, nil
 }
-func (s *Server) AddRule(context.Context, *notifications.Rule) (*notifications.RuleAddResponse, error) {
-	return &notifications.RuleAddResponse{}, nil
-}
-func (s *Server) DeleteRule(context.Context, *notifications.RuleIdentifier) (*notifications.RuleDeleteResponse, error) {
-	return &notifications.RuleDeleteResponse{}, nil
-}
-func (s *Server) UpdateRule(context.Context, *notifications.Rule) (*notifications.RuleUpdateResponse, error) {
-	return &notifications.RuleUpdateResponse{}, nil
-}
-func (s *Server) GetRule(context.Context, *notifications.RuleIdentifier) (*notifications.RuleGetResponse, error) {
-	return &notifications.RuleGetResponse{}, nil
-}
-func (s *Server) ListRules(context.Context, *notifications.Empty) (*notifications.RuleListResponse, error) {
-	return &notifications.RuleListResponse{}, nil
-}
 func (s *Server) ValidateWebhook(context.Context, *notifications.URLValidationRequest) (*notifications.URLValidationResponse, error) {
 	return &notifications.URLValidationResponse{}, nil
 }

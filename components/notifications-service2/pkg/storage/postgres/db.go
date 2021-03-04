@@ -5,12 +5,13 @@ import (
 
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/notifications-service2/pkg/config"
+	"github.com/chef/automate/components/notifications-service2/pkg/storage"
 	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
-	"github.com/pkg/errors"
 )
 
 type Postgres struct {
@@ -32,6 +33,11 @@ func Start(c *config.Notifications) (*Postgres, error) {
 	if err := p.Connect(); err != nil {
 		return nil, err
 	}
+
+	if err := p.InitDbMap(); err != nil {
+		return nil, err
+	}
+
 	if err := p.Migrate(); err != nil {
 		return nil, err
 	}
@@ -51,14 +57,20 @@ func (db *Postgres) Connect() error {
 	if db.MaxOpenConns > 0 {
 		dbConn.SetMaxOpenConns(db.MaxOpenConns)
 	}
-	// Configure the database mapping object
-	db.DbMap = &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}}
 
 	// Verify database
 	err = db.Ping()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to ping database with uri: %s", db.URI)
 	}
+	return nil
+}
+
+func (db *Postgres) InitDbMap() error {
+	// Configure the database mapping object
+	db.DbMap = &gorp.DbMap{Db: db.dbConn, Dialect: gorp.PostgresDialect{}}
+	db.DbMap.AddTableWithName(storage.Rule{}, "rules")
+
 	return nil
 }
 
