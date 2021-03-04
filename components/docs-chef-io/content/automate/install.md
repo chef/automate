@@ -168,6 +168,7 @@ Add the following to your config.toml:
 
 Because externally-deployed Elasticsearch nodes will not have access to Chef Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Chef Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
+__Please note that Chef Automate does not support Elastic Search services. Automate is not tested against Elasticsearch services provide by cloud provides like AWS Elasticsearch Service.__
 ##### Adding Resolvers for Elasticsearch
 
 In case you want to resolve the Elasticsearch node IPs dynamically using DNS servers, you can add resolvers/nameservers to the configuration.
