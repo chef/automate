@@ -33,6 +33,7 @@ type Client interface {
 	AddRule(*Rule) (*Rule, error)
 	GetRule(*GetRuleQuery) (*Rule, error)
 	ListRules() ([]*Rule, error)
+	UpdateRule(*Rule) (*Rule, error)
 	DeleteRule(*DeleteRuleQuery) error
 }
 
@@ -85,6 +86,10 @@ type DeleteRuleQuery struct {
 	Id string
 }
 
+type uniqueConstraintViolation struct {
+	Err error
+}
+
 func IsUniqueConstraintViolation(err error) bool {
 	_, ok := err.(*uniqueConstraintViolation)
 	return ok
@@ -94,12 +99,25 @@ func NewUniqueConstraintViolation(err error) error {
 	return &uniqueConstraintViolation{Err: err}
 }
 
-type uniqueConstraintViolation struct {
+func (u *uniqueConstraintViolation) Error() string {
+	return u.Err.Error()
+}
+
+type ruleNotFound struct {
 	Err error
 }
 
-func (u *uniqueConstraintViolation) Error() string {
-	return u.Err.Error()
+func IsRuleNotFound(err error) bool {
+	_, ok := err.(*ruleNotFound)
+	return ok
+}
+
+func (r *ruleNotFound) Error() string {
+	return r.Err.Error()
+}
+
+func NewRuleNotFound(err error) error {
+	return &ruleNotFound{Err: err}
 }
 
 type action struct {
@@ -145,7 +163,7 @@ func actionFromReq(req *notifications.Rule) (*action, error) {
 		return &action{ActionType: ActionTypeWebhookAlert, URL: a.Url}, nil
 	}
 	if a := req.GetServiceNowAlert(); a != nil {
-		return &action{ActionType: ActionTypeServiceNowAlert, URL: a.Url}, nil
+		return &action{ActionType: ActionTypeServiceNowAlert, URL: a.Url, SecretId: a.SecretId}, nil
 	}
 	return &action{}, nil
 }
@@ -170,19 +188,42 @@ func (r *Rule) ValidateForInsert() ([]string, bool) {
 	if r.Id != "" {
 		messages = append(messages, "Rule ID may not be included in an add-rule request")
 	}
+
+	fieldValuesErrors := r.validateForInsertOrUpdate()
+	messages = append(messages, fieldValuesErrors...)
+
+	ok := (len(messages) == 0)
+
+	return messages, ok
+}
+
+func (r *Rule) ValidateForUpdate() ([]string, bool) {
+	messages := []string{}
+	if r.Id == "" {
+		messages = append(messages, "Rule ID must be included from the rule being modified")
+	}
+
+	fieldValuesErrors := r.validateForInsertOrUpdate()
+	messages = append(messages, fieldValuesErrors...)
+
+	ok := (len(messages) == 0)
+
+	return messages, ok
+}
+
+func (r *Rule) validateForInsertOrUpdate() []string {
+	messages := []string{}
 	if r.Name == "" {
 		messages = append(messages, "Rule name must be supplied.")
 	}
 	if r.Event == "" {
-		messages = append(messages, "FIXME")
+		messages = append(messages, "Event must be supplied.")
 	}
 
 	actionErrors := r.validateAction()
 	messages = append(messages, actionErrors...)
 
-	ok := (len(messages) == 0)
-
-	return messages, ok
+	return messages
 }
 
 func (r *Rule) validateAction() []string {

@@ -12,7 +12,7 @@ import (
 func (s *Server) AddRule(ctx context.Context, req *notifications.Rule) (*notifications.RuleAddResponse, error) {
 	newRuleQuery, err := storage.NewRuleFromReq(req)
 	if err != nil {
-		return &notifications.RuleAddResponse{}, errors.Wrap(err, "unable to format AddRule request data into database request")
+		return &notifications.RuleAddResponse{}, errors.Wrap(err, "unable to format request data into database request")
 	}
 	if messages, ok := newRuleQuery.ValidateForInsert(); !ok {
 		return &notifications.RuleAddResponse{
@@ -38,16 +38,16 @@ func (s *Server) AddRule(ctx context.Context, req *notifications.Rule) (*notific
 		Rule: ruleRet,
 	}, nil
 }
-func (s *Server) DeleteRule(ctx context.Context, req *notifications.RuleIdentifier) (*notifications.RuleDeleteResponse, error) {
-	err := s.db.DeleteRule(&storage.DeleteRuleQuery{Id: req.Id})
-	return &notifications.RuleDeleteResponse{}, err
-}
-func (s *Server) UpdateRule(context.Context, *notifications.Rule) (*notifications.RuleUpdateResponse, error) {
-	return &notifications.RuleUpdateResponse{}, nil
-}
+
 func (s *Server) GetRule(ctx context.Context, req *notifications.RuleIdentifier) (*notifications.RuleGetResponse, error) {
 	query := &storage.GetRuleQuery{Id: req.Id}
 	rule, err := s.db.GetRule(query)
+	if (err != nil) && storage.IsRuleNotFound(err) {
+		return &notifications.RuleGetResponse{
+			Messages: []string{"The requested rule could not be found"},
+			Code:     notifications.RuleGetResponse_NOT_FOUND,
+		}, nil
+	}
 	if err != nil {
 		return &notifications.RuleGetResponse{}, errors.Wrap(err, "failed to get rule from the database")
 	}
@@ -55,6 +55,7 @@ func (s *Server) GetRule(ctx context.Context, req *notifications.RuleIdentifier)
 		Rule: rule.Proto(),
 	}, nil
 }
+
 func (s *Server) ListRules(context.Context, *notifications.Empty) (*notifications.RuleListResponse, error) {
 	rules, err := s.db.ListRules()
 	if err != nil {
@@ -68,4 +69,49 @@ func (s *Server) ListRules(context.Context, *notifications.Empty) (*notification
 	}
 
 	return ret, nil
+}
+
+func (s *Server) UpdateRule(ctx context.Context, req *notifications.Rule) (*notifications.RuleUpdateResponse, error) {
+	newRuleQuery, err := storage.NewRuleFromReq(req)
+	if err != nil {
+		return &notifications.RuleUpdateResponse{}, errors.Wrap(err, "unable to format request data into database request")
+	}
+	if messages, ok := newRuleQuery.ValidateForUpdate(); !ok {
+		return &notifications.RuleUpdateResponse{
+			Messages: messages,
+			Code:     notifications.RuleUpdateResponse_VALIDATION_ERROR,
+		}, nil
+	}
+
+	_, err = s.db.UpdateRule(newRuleQuery)
+	if (err != nil) && (storage.IsUniqueConstraintViolation(err)) {
+		return &notifications.RuleUpdateResponse{
+			Messages: []string{err.Error()},
+			Code:     notifications.RuleUpdateResponse_DUPLICATE_NAME,
+		}, nil
+	}
+	if (err != nil) && (storage.IsRuleNotFound(err)) {
+		return &notifications.RuleUpdateResponse{
+			Messages: []string{"The requested rule could not be found"},
+			Code:     notifications.RuleUpdateResponse_NOT_FOUND,
+		}, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update database")
+	}
+	return &notifications.RuleUpdateResponse{}, nil
+}
+
+func (s *Server) DeleteRule(ctx context.Context, req *notifications.RuleIdentifier) (*notifications.RuleDeleteResponse, error) {
+	err := s.db.DeleteRule(&storage.DeleteRuleQuery{Id: req.Id})
+	if (err != nil) && storage.IsRuleNotFound(err) {
+		return &notifications.RuleDeleteResponse{
+			Messages: []string{"The requested rule could not be found"},
+			Code:     notifications.RuleDeleteResponse_NOT_FOUND,
+		}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &notifications.RuleDeleteResponse{}, err
 }
