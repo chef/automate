@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit } from '@angular/core';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Store } from '@ngrx/store';
 import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
@@ -16,7 +16,7 @@ import { saveAs } from 'file-saver';
   templateUrl: './create-client-modal.component.html',
   styleUrls: ['./create-client-modal.component.scss']
 })
-export class CreateClientModalComponent implements OnInit {
+export class CreateClientModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<boolean>;
   @Input() serverId: string;
   @Input() orgId: string;
@@ -80,6 +80,11 @@ export class CreateClientModalComponent implements OnInit {
         this.privateKey = this.client_key?.private_key;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   handleNameInput(event: KeyboardEvent): void {
