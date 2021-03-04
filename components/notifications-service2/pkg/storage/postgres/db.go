@@ -34,10 +34,6 @@ func Start(c *config.Notifications) (*Postgres, error) {
 		return nil, err
 	}
 
-	if err := p.InitDbMap(); err != nil {
-		return nil, err
-	}
-
 	if err := p.Migrate(); err != nil {
 		return nil, err
 	}
@@ -56,6 +52,10 @@ func (db *Postgres) Connect() error {
 	}
 	if db.MaxOpenConns > 0 {
 		dbConn.SetMaxOpenConns(db.MaxOpenConns)
+	}
+
+	if err := db.InitDbMap(); err != nil {
+		return err
 	}
 
 	// Verify database
