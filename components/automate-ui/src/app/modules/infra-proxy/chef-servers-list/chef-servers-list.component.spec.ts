@@ -154,7 +154,6 @@ describe('ChefServersListComponent', () => {
       store.dispatch(new CreateServerSuccess({ 'server': server }));
       expect(component.creatingChefServer).toBe(true);
       expect(component.createModalVisible).toBe(false);
-
     });
 
     it('on conflict error, modal is open with conflict error', () => {
@@ -300,4 +299,3 @@ describe('ChefServersListComponent', () => {
   }
 
 });
-

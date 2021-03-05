@@ -7,7 +7,7 @@ chef-modal {
     float: right;
 
     .cancel-button {
-      color: #DC267F;
+      color: $chef-critical;
     }
   }
 
@@ -58,7 +58,7 @@ chef-modal {
 ::ng-deep {
   chef-modal .modal {
     padding: 32px;
-    box-shadow: 0px 0px 30px 0px #CCC;
+    box-shadow: 0px 0px 30px 0px #CCCCCC;
     outline: none;
   }
 

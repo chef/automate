@@ -43,7 +43,6 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-
     this.chefServersLoading = true;
 
     this.createChefServerForm = this.fb.group({
@@ -65,7 +64,6 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.dispatch(new GetServers());
-
 
     combineLatest([
       this.store.select(getAllServersStatus),
