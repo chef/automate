@@ -1,5 +1,13 @@
 <section class="infra-roles">
   <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="role"
+    [objectName]="roleToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteRole()"
+    objectAction="Delete">
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
@@ -10,7 +18,7 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !roles.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue === ''">No roles available</p>
+      <p *ngIf="searchValue === ''">No roles available.</p>
       <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
     </div>
     <chef-table *ngIf="roles.length">
@@ -20,7 +28,7 @@
             <chef-th class="no_border_th">Description</chef-th>
             <chef-th class="no_border_th">Environments</chef-th>
             <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th"></chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
           </chef-tr>
         </chef-thead>
         <chef-tbody>
@@ -34,7 +42,11 @@
             </chef-td>
             <chef-td>{{ role.environments.join(", ") }}</chef-td>
             <chef-td></chef-td>
-            <chef-td></chef-td>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu" id="menu-{{role.id}}">
+                <mat-option (onSelectionChange)="startRoleDelete(role)" data-cy="delete-role">Delete</mat-option>
+              </mat-select>
+            </chef-td>
           </chef-tr>
         </chef-tbody>
       </chef-table>

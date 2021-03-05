@@ -19,13 +19,18 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const roleList = createSelector(
+export const deleteStatus = createSelector(
   infraRoleState,
-  (state) => state.roleList
+  (state) => state.deleteStatus
 );
 
 export const infraRoleFromRoute = createSelector(
   roleEntities,
   routeParams,
   (state, { name }) => find({ name }, state)
+);
+
+export const roleList = createSelector(
+  infraRoleState,
+  (state) => state.roleList
 );

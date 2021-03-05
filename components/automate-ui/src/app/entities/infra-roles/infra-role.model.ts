@@ -1,6 +1,8 @@
 
 
 export interface InfraRole {
+  server_id: string;
+  org_id: string;
   name: string;
   environments: string[];
   chef_type: string;

@@ -63,6 +63,8 @@ describe('InfraRolesComponent', () => {
   describe('infra role list', () => {
     let store: Store<NgrxStateAtom>;
     const availableRoles: InfraRole[] = [{
+      server_id: 'test_server_id',
+      org_id: 'test_org_id',
       name: 'test',
       environments: [],
       description: 'test role',
