@@ -70,9 +70,6 @@ func TestGetDatabagItems(t *testing.T) {
 		assert.Equal(t, 0, int(res.GetTotal()))
 	})
 
-	//Adds data bag items records
-	addDataBagItems(ctx, dataBagName, 10)
-
 	t.Run("items list with a per_page search param", func(t *testing.T) {
 		itemId := fmt.Sprintf("item-%d", time.Now().Nanosecond())
 		createReq := &request.CreateDataBagItem{
@@ -82,6 +79,8 @@ func TestGetDatabagItems(t *testing.T) {
 			Data: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
 					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+					"key1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key1-%d", time.Now().Nanosecond())}},
+					"key2": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key2-%d", time.Now().Nanosecond())}},
 				},
 			},
 		}
@@ -326,6 +325,26 @@ func TestCreateDatabagItem(t *testing.T) {
 		require.Contains(t, err.Error(), errMsg)
 		grpctest.AssertCode(t, codes.InvalidArgument, err)
 	})
+}
+
+// Adds data bag with items records
+func addDatabagsWithItems(ctx context.Context, n int) int {
+	total := 0
+	for i := 0; i < 10; i++ {
+		dataBagName := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		_, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     dataBagName,
+		})
+
+		if err == nil {
+			addDataBagItems(ctx, dataBagName, n)
+			total++
+		}
+	}
+
+	return total
 }
 
 // Adds data bag items records

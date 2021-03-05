@@ -34,8 +34,10 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+// getEnv fetches the ENV variable with fallback default values. 
 func getEnv(key, fallback string) string {
-    if value, ok := os.LookupEnv(key); ok {
+	value := os.Getenv(key)
+    if value != "" {
         return value
     }
     return fallback

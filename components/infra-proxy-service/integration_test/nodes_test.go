@@ -14,6 +14,10 @@ import (
 )
 
 func TestGetNode(t *testing.T) {
+	t.Log("test.....................................")
+	t.Log(autoDeployedChefServerID)
+	t.Log(autoDeployedChefOrganizationID)
+	t.Log(totalRecords)
 	ctx := context.Background()
 	t.Run("when the node exists, return the node successfully", func(t *testing.T) {
 		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())

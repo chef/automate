@@ -29,6 +29,8 @@ func (s *Suite) GlobalSetup() error {
 	// set global infraProxy
 	infraProxy, err = newInfraProxyServer()
 
+	//Adds data bag items records
+	addDataBagItems(dataBagName, 10)
 	if err != nil {
 		return err
 	}
