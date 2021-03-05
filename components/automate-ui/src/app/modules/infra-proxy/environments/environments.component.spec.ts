@@ -69,8 +69,10 @@ describe('EnvironmentsComponent', () => {
 
   describe('environment list', () => {
     let store: Store<NgrxStateAtom>;
-    const availableEnvironments: Environment[] = [
-      {name: 'test4',
+    const availableEnvironments: Environment[] = [{
+      server_id: 'test_server_id',
+      org_id: 'test_org_id',
+      name: 'test4',
       description: 'test override',
       cookbook_versions: [],
       json_class: 'Chef::Environment',
@@ -78,8 +80,8 @@ describe('EnvironmentsComponent', () => {
       default_attributes: 'test',
       override_attributes:  'test',
       run_list: []
-    }
-    ];
+    }];
+
     const emptyEnvironments: Environment[] = [];
 
     beforeEach(() => {
