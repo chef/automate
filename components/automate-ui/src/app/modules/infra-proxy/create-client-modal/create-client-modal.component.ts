@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { Subject, combineLatest } from 'rxjs';
-import { CreateClient } from 'app/entities/clients/client.action';
+import { CreateClient, GetClients } from 'app/entities/clients/client.action';
 import { saveError, createClient } from 'app/entities/clients/client.selectors';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
@@ -37,6 +37,8 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   public validator = false;
   public visible = false;
   private isDestroyed = new Subject<boolean>();
+  public page = 1;
+  public per_page = 9;
 
   constructor(
     private fb: FormBuilder,
@@ -111,6 +113,14 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   closeCreateModal(): void {
     this.resetCreateModal();
     this.visible = false;
+    const payload = {
+      clientName: '',
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.page,
+      per_page: this.per_page
+    };
+    this.store.dispatch(new GetClients(payload));
   }
 
   private resetCreateModal(): void {

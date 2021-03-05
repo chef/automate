@@ -71,21 +71,6 @@ export class GetClientFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class DeleteClient implements Action {
-  readonly type = ClientActionTypes.DELETE;
-  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
-}
-
-export class DeleteClientSuccess implements Action {
-  readonly type = ClientActionTypes.DELETE_SUCCESS;
-  constructor(public payload: { name: string }) { }
-}
-
-export class DeleteClientFailure implements Action {
-  readonly type = ClientActionTypes.DELETE_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
-}
-
 export interface CreateClientPayload {
   name: string;
   validator: boolean;
@@ -109,6 +94,21 @@ export class CreateClientFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class DeleteClient implements Action {
+  readonly type = ClientActionTypes.DELETE;
+  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
+}
+
+export class DeleteClientSuccess implements Action {
+  readonly type = ClientActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { name: string }) { }
+}
+
+export class DeleteClientFailure implements Action {
+  readonly type = ClientActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ClientActions =
   | GetClients
   | GetClientsSuccess
@@ -116,9 +116,9 @@ export type ClientActions =
   | GetClient
   | GetClientSuccess
   | GetClientFailure
-  | DeleteClient
-  | DeleteClientSuccess
-  | DeleteClientFailure
   | CreateClient
   | CreateClientSuccess
-  | CreateClientFailure;
+  | CreateClientFailure
+  | DeleteClient
+  | DeleteClientSuccess
+  | DeleteClientFailure;

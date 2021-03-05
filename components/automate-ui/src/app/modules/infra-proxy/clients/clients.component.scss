@@ -66,9 +66,11 @@ chef-button button {
   line-height: 20px;
   letter-spacing: 0.5px;
   padding: 8px 16px;
+
   &:focus {
     outline: none;
   }
+
 }
 
 .clients-list-paging {
@@ -79,5 +81,6 @@ chef-button button {
   .search-items app-infra-search-bar .search-wrapper {
     width: 87%;
     float: left;
-}
+  }
+
 }

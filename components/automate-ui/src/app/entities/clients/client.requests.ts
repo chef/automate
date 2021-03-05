@@ -46,16 +46,14 @@ export class ClientRequests {
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`, {headers});
   }
 
-  public deleteClient(server_id: string, org_id: string, name: string): Observable<{}> {
-    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`,
-    {headers});
-  }
-
   public createClient(payload: CreateClientPayload): Observable<CreateClientResponse> {
     return this.http.post<CreateClientResponse>(
       `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/clients`,
       payload);
   }
 
-
+  public deleteClient(server_id: string, org_id: string, name: string): Observable<{}> {
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/clients/${name}`,
+    {headers});
+  }
 }

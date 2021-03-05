@@ -16,13 +16,13 @@ import {
   GetClient,
   GetClientSuccess,
   GetClientFailure,
-  DeleteClient,
-  DeleteClientSuccess,
-  DeleteClientFailure,
   CreateClient,
   CreateClientSuccess,
   CreateClientSuccessPayload,
-  CreateClientFailure
+  CreateClientFailure,
+  DeleteClient,
+  DeleteClientSuccess,
+  DeleteClientFailure
 } from './client.action';
 
 import { ClientRequests } from './client.requests';
@@ -75,6 +75,31 @@ export class ClientEffects {
     }));
 
   @Effect()
+  createClient$ = this.actions$.pipe(
+    ofType(ClientActionTypes.CREATE),
+    mergeMap((action: CreateClient) =>
+      this.requests.createClient(action.payload).pipe(
+        map((resp: CreateClientSuccessPayload) => new CreateClientSuccess(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new CreateClientFailure(error))))));
+
+  @Effect()
+  createClientSuccess$ = this.actions$.pipe(
+    ofType(ClientActionTypes.CREATE_SUCCESS),
+    map(({ payload: { name } }: CreateClientSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Created client ${name}`
+    })));
+
+  @Effect()
+  createClientFailure$ = this.actions$.pipe(
+    ofType(ClientActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateClientFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateClientFailure) => new CreateNotification({
+      type: Type.error,
+      message: `Could not create client: ${payload.error.error || payload}`
+    })));
+
+  @Effect()
   deleteClient$ = this.actions$.pipe(
     ofType(ClientActionTypes.DELETE),
     mergeMap(({ payload: { server_id, org_id, name } }: DeleteClient) =>
@@ -103,30 +128,5 @@ export class ClientEffects {
         message: `Could not delete client: ${msg || error}`
       });
     }));
-
-    @Effect()
-  createClient$ = this.actions$.pipe(
-      ofType(ClientActionTypes.CREATE),
-      mergeMap((action: CreateClient) =>
-      this.requests.createClient(action.payload).pipe(
-        map((resp: CreateClientSuccessPayload) => new CreateClientSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new CreateClientFailure(error))))));
-
-  @Effect()
-  createClientSuccess$ = this.actions$.pipe(
-      ofType(ClientActionTypes.CREATE_SUCCESS),
-      map(({ payload: { name } }: CreateClientSuccess) => new CreateNotification({
-      type: Type.info,
-      message: `Created client ${name}`
-    })));
-
-  @Effect()
-  createClientFailure$ = this.actions$.pipe(
-    ofType(ClientActionTypes.CREATE_FAILURE),
-    filter(({ payload }: CreateClientFailure) => payload.status !== HttpStatus.CONFLICT),
-    map(({ payload }: CreateClientFailure) => new CreateNotification({
-        type: Type.error,
-        message: `Could not create client: ${payload.error.error || payload}`
-      })));
 
 }
