@@ -73,7 +73,13 @@ func (a *InfraProxyServer) CreateEnvironment(ctx context.Context, r *gwreq.Creat
 	}
 
 	return &gwres.Environment{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		CookbookVersions:   res.GetCookbookVersions(),
+		JsonClass:          res.GetJsonClass(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
 	}, nil
 }
 
@@ -90,7 +96,13 @@ func (a *InfraProxyServer) DeleteEnvironment(ctx context.Context, r *gwreq.Envir
 	}
 
 	return &gwres.Environment{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		CookbookVersions:   res.GetCookbookVersions(),
+		JsonClass:          res.GetJsonClass(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
 	}, nil
 }
 
@@ -112,7 +124,13 @@ func (a *InfraProxyServer) UpdateEnvironment(ctx context.Context, r *gwreq.Updat
 	}
 
 	return &gwres.Environment{
-		Name: res.GetName(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		CookbookVersions:   res.GetCookbookVersions(),
+		JsonClass:          res.GetJsonClass(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
 	}, nil
 }
 
