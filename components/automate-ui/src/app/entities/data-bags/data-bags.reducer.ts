@@ -1,16 +1,21 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set, pipe } from 'lodash/fp';
+import { HttpErrorResponse } from '@angular/common/http';
+import { set, pipe, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { DataBagActionTypes, DataBagActions } from './data-bags.actions';
 import { DataBag } from './data-bags.model';
 
 export interface DataBagEntityState extends EntityState<DataBag> {
   getAllStatus: EntityStatus;
+  saveStatus:   EntityStatus;
+  saveError:    HttpErrorResponse;
   deleteStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
-const DELETE_STATUS = 'deleteStatus';
+const SAVE_STATUS    = 'saveStatus';
+const SAVE_ERROR     = 'saveError';
+const DELETE_STATUS  = 'deleteStatus';
 
 export const dataBagEntityAdapter: EntityAdapter<DataBag> = createEntityAdapter<DataBag>({
   selectId: (dataBag: DataBag) => dataBag.name
@@ -38,6 +43,27 @@ export function dataBagEntityReducer(
     case DataBagActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
+    case DataBagActionTypes.CREATE: {
+      return set(
+        SAVE_STATUS,
+        EntityStatus.loading,
+        state);
+    }
+
+    case DataBagActionTypes.CREATE_SUCCESS: {
+      return pipe(
+          unset(SAVE_ERROR),
+          set(SAVE_STATUS, EntityStatus.loadingSuccess)
+        )(dataBagEntityAdapter.addOne(action.payload.databag, state)
+      ) as DataBagEntityState;
+    }
+
+    case DataBagActionTypes.CREATE_FAILURE: {
+      return pipe(
+        set(SAVE_ERROR, action.payload),
+        set(SAVE_STATUS, EntityStatus.loadingFailure)
+      )(state) as DataBagEntityState;
+    }
     case DataBagActionTypes.DELETE: {
       return set(DELETE_STATUS, EntityStatus.loading, state);
     }

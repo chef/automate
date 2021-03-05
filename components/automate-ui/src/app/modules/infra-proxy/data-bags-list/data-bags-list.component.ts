@@ -8,6 +8,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetDataBags, DeleteDataBag } from 'app/entities/data-bags/data-bags.actions';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   allDataBags,
@@ -25,17 +26,24 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  public authFailure = false;
+  public chefInfraViewsFeatureFlagOn: boolean;
   public dataBags: DataBag[];
   public dataBagsListLoading = true;
-  public authFailure = false;
   public dataBagToDelete: DataBag;
   public deleteModalVisible = false;
+  public openDataBagModal = new EventEmitter<void>();
   private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
-  ) { }
+    private layoutFacade: LayoutFacadeService,
+    private featureFlagsService: FeatureFlagsService
+  ) {
+    // feature flag enable and disable the create button
+    this.chefInfraViewsFeatureFlagOn =
+    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -84,4 +92,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public openCreateModal(): void {
+    this.openDataBagModal.emit();
+  }
 }
