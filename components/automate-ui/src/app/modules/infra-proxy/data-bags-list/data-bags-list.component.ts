@@ -39,7 +39,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private featureFlagsService: FeatureFlagsService
-  ) { 
+  ) {
     // feature flag enable and disable the create button
     this.chefInfraViewsFeatureFlagOn =
     this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
