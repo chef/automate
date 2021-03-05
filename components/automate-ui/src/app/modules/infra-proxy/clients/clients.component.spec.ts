@@ -70,6 +70,8 @@ describe('ClientsComponent', () => {
     let store: Store<NgrxStateAtom>;
     const availableClients: Client[] = [
       {
+        server_id: 'test_server_id',
+        org_id: 'test_org_id',
         name: 'viv-win',
         client_name: 'viv-win',
         org_name: 'viveksingh_msys',
