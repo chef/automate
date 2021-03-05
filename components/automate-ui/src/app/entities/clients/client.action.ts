@@ -83,6 +83,7 @@ export class DeleteClientSuccess implements Action {
 
 export class DeleteClientFailure implements Action {
   readonly type = ClientActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export interface CreateClientPayload {

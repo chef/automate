@@ -47,6 +47,7 @@ export function clientEntityReducer(
 
     case ClientActionTypes.GET_ALL_SUCCESS:
       return pipe(
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
         set('clientList.items', action.payload.clients || []),
         set('clientList.total', action.payload.total || 0)
         )(state) as ClientEntityState;
@@ -77,9 +78,9 @@ export function clientEntityReducer(
       case ClientActionTypes.CREATE_SUCCESS: {
         return pipe(
           unset(SAVE_ERROR),
+          set(SAVE_STATUS, EntityStatus.loadingSuccess),
           set('createClient.client_key', action.payload.client_key || []),
-          set('createClient.name', action.payload.name || ''),
-          set(SAVE_STATUS, EntityStatus.loadingSuccess)
+          set('createClient.name', action.payload.name || '')
         )(state) as ClientEntityState;
       }
 

@@ -1,5 +1,5 @@
 <section class="clients">
-  <app-create-client-modal [openEvent]="openNotificationModal"
+  <app-create-client-modal [openEvent]="openNotificationModal" 
   [serverId]="serverId" [orgId]="orgId"></app-create-client-modal>
   
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
@@ -37,7 +37,7 @@
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'clients', client.name]">{{ client.name }}</a>
           </chef-td>
           <chef-td class="three-dot-column">
-            <mat-select panelClass="chef-control-menu" id="menu-{{client.id}}">
+            <mat-select panelClass="chef-control-menu">
               <mat-option data-cy="delete" (onSelectionChange)="startClientDelete(client)">Delete</mat-option>
             </mat-select>
           </chef-td>

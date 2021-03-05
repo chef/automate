@@ -31,7 +31,7 @@
         <chef-tr *ngFor="let dataBag of dataBags">
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
           <chef-td class="three-dot-column">
-            <mat-select panelClass="chef-control-menu" id="menu-{{dataBag.id}}">
+            <mat-select panelClass="chef-control-menu">
               <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
             </mat-select>
           </chef-td>

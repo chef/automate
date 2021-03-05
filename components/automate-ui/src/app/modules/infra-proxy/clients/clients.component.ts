@@ -7,7 +7,6 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
-import { GetClients, CreateClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import { getAllStatus, clientList } from 'app/entities/clients/client.selectors';
 
@@ -35,16 +34,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clientToDelete: Client;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
-
-  public createClientModalVisible = false;
-  public creatingClient = false;
-  public createClientForm: FormGroup;
-  public conflictErrorEvent = new EventEmitter<boolean>();
-  public createModalVisible = false;
-  public created = false;
-  public privateKey;
-  public client_key;
-  public validator = false;
   public openNotificationModal = new EventEmitter<void>();
 
   constructor(
