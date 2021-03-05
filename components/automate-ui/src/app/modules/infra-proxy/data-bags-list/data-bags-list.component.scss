@@ -8,11 +8,12 @@ chef-loading-spinner {
 }
 
 .empty-section {
-  margin-top: 130px;
   text-align: center;
 }
 
 img {
+  margin-top: 130px;
+  margin-left: 130PX;
   width: 70px;
 }
 
@@ -21,6 +22,6 @@ img {
 }
 
 chef-toolbar chef-button:first-child {
-  margin: 0;
+  margin: 5px 0px 0px 0px;
   float: right;
 }

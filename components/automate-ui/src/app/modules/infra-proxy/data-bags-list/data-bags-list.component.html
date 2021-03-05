@@ -15,19 +15,17 @@
   </app-create-data-bag-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
-    <chef-toolbar>
+    <chef-toolbar *ngIf="chefInfraViewsFeatureFlagOn">
       <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
         <chef-button primary (click)="openCreateModal()">Create Databag</chef-button>
       </app-authorized>
     </chef-toolbar>
-    <div class="head-container">
-      <chef-tr class="no_border_tr">
-        <chef-th class="no_border_th">Name</chef-th>
-        <chef-th class="no_border_th three-dot-column"></chef-th>
-      </chef-tr>
-    </div>
     <chef-table *ngIf="dataBags.length">
       <chef-thead>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th three-dot-column"></chef-th>
+        </chef-tr>
       </chef-thead>
       <chef-tbody>
         <chef-tr *ngFor="let dataBag of dataBags">
@@ -41,4 +39,8 @@
       </chef-tbody>
     </chef-table>
   </ng-container>
+  <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
+    <img alt="No preview" src="/assets/img/no_preview.gif" />
+    <p>No databags available</p>
+  </div>
 </section>
