@@ -1,4 +1,6 @@
 export interface Client {
+  server_id: string;
+  org_id: string;
   name: string;
   client_name: string;
   org_name: string;

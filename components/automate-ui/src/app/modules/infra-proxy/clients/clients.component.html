@@ -1,5 +1,13 @@
 <section class="clients">
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="client"
+    [objectName]="clientToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteClient()"
+    objectAction="Delete">
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
     <div class="search-items">
@@ -9,13 +17,14 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !clients.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
       <p *ngIf="searchValue === ''">No client available.</p>
     </div>
     <chef-table *ngIf="clients.length">
       <chef-thead>
         <chef-tr class="no_border_tr">
           <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th three-dot-column"></chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -23,15 +32,20 @@
           <chef-td>
             <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'clients', client.name]">{{ client.name }}</a>
           </chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu" id="menu-{{client.id}}">
+              <mat-option data-cy="delete" (onSelectionChange)="startClientDelete(client)">Delete</mat-option>
+            </mat-select>
+          </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
     <app-page-picker
-    class="clients-list-paging"
-    [total]="total"
-    [perPage]="per_page"
-    [page]="page"
-    (pageChanged)="onPageChange($event)">
-  </app-page-picker>
+      class="clients-list-paging"
+      [total]="total"
+      [perPage]="per_page"
+      [page]="page"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
   </ng-container>
 </section>

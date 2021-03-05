@@ -17,6 +17,11 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
+export const deleteStatus = createSelector(
+  clientState,
+  (state) => state.deleteStatus
+);
+
 export const clientList = createSelector(
   clientState,
   (state) => state.clientList
