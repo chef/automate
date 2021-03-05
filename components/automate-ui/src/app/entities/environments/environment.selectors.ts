@@ -17,6 +17,11 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
+export const deleteStatus = createSelector(
+  environmentState,
+  (state) => state.deleteStatus
+);
+
 export const environmentList = createSelector(
   environmentState,
   (state) => state.environmentList

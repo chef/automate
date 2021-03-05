@@ -1,6 +1,8 @@
 import { RespAttributes, AllAttributes } from '../infra-roles/infra-role.model';
 
 export interface Environment {
+  server_id: string;
+  org_id: string;
   name: string;
   chef_type: string;
   description: string;

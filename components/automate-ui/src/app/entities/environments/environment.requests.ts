@@ -36,4 +36,9 @@ export class EnvironmentRequests {
     const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/environments?${params}`;
     return this.http.get<GetEnvironmentsResponse>(url, {headers});
   }
+
+  public deleteEnvironment(server_id: string, org_id: string, name: string): Observable<{}> {
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}`,
+    {headers});
+  }
 }
