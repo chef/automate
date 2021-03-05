@@ -102,10 +102,12 @@ export class EnvironmentEffects {
         message: `Could not delete environment: ${msg || error}`
       });
     }));
+
+  @Effect()
   createEnvironment$ = this.actions$.pipe(
     ofType(EnvironmentActionTypes.CREATE),
-    mergeMap(({ payload: { server_id, org_id, environment } }: CreateEnvironment) =>
-      this.requests.createEnvironment(server_id, org_id, environment).pipe(
+    mergeMap(({ payload: { environment } }: CreateEnvironment) =>
+      this.requests.createEnvironment(environment).pipe(
         map((resp: EnvironmentResponse) => new CreateEnvironmentSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateEnvironmentFailure(error))))));

@@ -76,9 +76,7 @@ export interface CreateEnvironmentPayload {
 
 export class CreateEnvironment implements Action {
   readonly type = EnvironmentActionTypes.CREATE;
-  constructor(public payload: {
-    server_id: string, org_id: string, environment: CreateEnvironmentPayload
-  } ) { }
+  constructor(public payload: { environment: CreateEnvironmentPayload} ) { }
 }
 
 export class CreateEnvironmentSuccess implements Action {

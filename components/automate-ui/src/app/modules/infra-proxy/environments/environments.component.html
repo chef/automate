@@ -16,7 +16,7 @@
     <div class="search-items">
       <div class="search-box">
         <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
-        </div>
+      </div>
       <div class="button-box" *ngIf="chefInfraViewsFeatureFlagOn">
       <chef-toolbar>
         <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>

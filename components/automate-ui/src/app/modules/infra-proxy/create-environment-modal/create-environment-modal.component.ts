@@ -202,7 +202,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.constraintArray = value;
   }
 
-  // Getting list of cookbook names 
+  // Getting list of cookbook names
   loadCookbookConstraint() {
     this.name_idp = '';
     this.store.dispatch(new GetCookbooks({
@@ -239,9 +239,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(
-      new CreateEnvironment({
-        server_id: this.serverId, org_id: this.orgId, environment: environment
-      })
+      new CreateEnvironment({environment: environment})
     );
   }
 
@@ -319,12 +317,14 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     try {
         // parse it to json
       this.data = JSON.parse(newValue);
-      this.textareaID === 'dattr' ? (this.dattrParseError = false) : '';
-      this.textareaID === 'oattr' ? (this.oattrParseError = false) : '';
+      if (this.textareaID === 'dattr') { (this.dattrParseError = false); }
+      if (this.textareaID === 'oattr') { (this.oattrParseError = false); }
+
     } catch (ex) {
         // set parse error if it fails
-      this.textareaID === 'dattr' ? (this.dattrParseError = true) : '';
-      this.textareaID === 'oattr' ? (this.oattrParseError = true) : '';
+      if (this.textareaID === 'dattr') { (this.dattrParseError = true); }
+      if (this.textareaID === 'oattr') { (this.oattrParseError = true); }
+
     }
     // update the form
     this.propagateChange(this.data);

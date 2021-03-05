@@ -41,11 +41,11 @@ export class EnvironmentRequests {
     return this.http.get<GetEnvironmentsResponse>(url, {headers});
   }
 
-  public createEnvironment(server_id: string, org_id: string, environment: Environment):
+  public createEnvironment(environment: Environment):
     Observable<EnvironmentResponse> {
 
     return this.http.post<EnvironmentResponse>(
-      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments`, environment);
+      `${env.infra_proxy_url}/servers/${environment.server_id}/orgs/${environment.org_id}/environments`, environment);
   }
 
   public deleteEnvironment(server_id: string, org_id: string, name: string): Observable<{}> {

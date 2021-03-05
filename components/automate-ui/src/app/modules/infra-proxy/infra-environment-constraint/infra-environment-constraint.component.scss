@@ -46,12 +46,13 @@ span.example-text {
 .name-margin {
   margin-bottom: 18px;
   margin-top: 32px;
+
   ::ng-deep label {
     width: 229px;
   }
 
   .drop {
-    width: 300px;;
+    width: 300px;
   }
 }
 
@@ -59,14 +60,14 @@ span.example-text {
 
   .name-dropdown {
     color: $chef-primary-dark;
-  
+
     ::ng-deep label {
       display: inline;
       color: $chef-primary-dark;
       font-size: 15px;
       margin-right: 15px;
     }
-  
+
     p {
       margin-bottom: 12px;
       width: 300px;
@@ -96,14 +97,14 @@ span.example-text {
 
   .operator-dropdown {
     color: $chef-primary-dark;
-  
+
     ::ng-deep label {
       display: inline;
       color: $chef-primary-dark;
       font-size: 15px;
       margin-right: 15px;
     }
-  
+
     mat-select {
       margin-bottom: 12px;
       width: 88px;
@@ -198,10 +199,10 @@ span.example-text {
 }
 
 .checkmark:before {
-  content:'L';
+  display: inline-block;
+  content: 'L';
   font-family: arial;
   transform: scaleX(-1) rotate(-35deg);
-  display: inline-block;
   vertical-align: top;
   line-height: 1em;
   width: 13.71px;

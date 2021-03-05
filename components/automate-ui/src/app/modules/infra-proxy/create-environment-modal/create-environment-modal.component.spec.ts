@@ -76,18 +76,20 @@ describe('CreateEnvironmentModalComponent', () => {
   describe('create environment', () => {
     let store: Store<NgrxStateAtom>;
     const environment: Environment = {
-        name: 'test',
-        description: 'test environment',
-        cookbook_versions: {
-          aix: '> 2.3.4'
-        },
-        default_attributes: {
-          test: 'test'
-        },
-        override_attributes: {
-          test: 'test'
-        }
-      };
+      org_id: 'chef_manage',
+      server_id: 'test',
+      name: 'test',
+      description: 'test environment',
+      cookbook_versions: {
+        aix: '> 2.3.4'
+      },
+      default_attributes: {
+        test: 'test'
+      },
+      override_attributes: {
+        test: 'test'
+      }
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);

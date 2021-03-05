@@ -8,13 +8,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
   width: 100%;
   overflow: auto;
   cursor: pointer;
-  //margin: 0px 33px 0px 32px;
 }
 
 .navbar a {
   float: left;
   padding: 8px 0px 8px 16px;
-  //background: #DEE5FD;
   color: #000000;
   height: 36px;
   text-decoration: none;
@@ -32,9 +30,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 .navbar a.active {
-    background: $chef-primary-bright;
-    border: none;
-    color: #FFFFFF;
+  background: $chef-primary-bright;
+  border: none;
+  color: #FFFFFF;
 }
 
 .navbar a.disabled {
@@ -52,8 +50,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 @media screen and (max-width: 500px) {
   .navbar a {
-    float: none;
     display: block;
+    float: none;
     width: 100%;
     text-align: left;
   }

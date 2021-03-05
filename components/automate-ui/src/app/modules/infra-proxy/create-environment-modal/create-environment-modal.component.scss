@@ -106,12 +106,12 @@ chef-modal {
       box-shadow: 0px 0px 30px 0px $chef-modal;
       width: 708px;
     }
-    
+
     .modal::-webkit-scrollbar {
       width: 8px;
       background-color: $chef-modal-scrollbar;
     }
-    
+
     .modal::-webkit-scrollbar-thumb {
       border-radius: 10px;
       background-color: $chef-modal;
@@ -145,16 +145,15 @@ chef-modal {
 }
 
 .constraint-names {
-    width: 279px;
-  }
-  
+  width: 279px;
+}
+
 .operators {
   width: 99px;
 }
-  
+
 #version-input {
   width: 173px;
-  
 }
 
 .input-desc {
@@ -240,10 +239,9 @@ chef-modal ::ng-deep .modal-overlay {
   flex-basis: auto;
   margin-top: 31px;
 }
-  
+
 ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
   line-height: 3em;
-
   font-size: 12px;
   height: 3em;
   border: 1px solid $chef-key-tab;
@@ -251,19 +249,19 @@ chef-modal ::ng-deep .modal-overlay {
  }
 
 
- ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
   background: $chef-white;
   color: $chef-black;
- }
+}
 
- ::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
   line-height: 3em;
   font-size: 12px;
   height: 3em;
   border: 1px solid $chef-key-tab;
   height: 37px;
 }
-  
+
 ::ng-deep [panelClass=chef-dropdown] {
   height: 36px;
   padding: 5px 12px 0px 12px;
@@ -274,11 +272,13 @@ chef-modal ::ng-deep .modal-overlay {
 
 ::ng-deep [panelClass=chef-dropdown]:focus {
   border-color: $chef-form-input;
-}  
+}
 
-::ng-deep .cdk-overlay-container  .cdk-overlay-pane { 
-  margin-left: -12px !important; transform:none !important;
-} // sass-lint:disable-line no-important
+// sass-lint:disable-line no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
 
 ::ng-deep .cdk-overlay-container {
   position: fixed;
@@ -286,6 +286,7 @@ chef-modal ::ng-deep .modal-overlay {
 }
 
 ::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+  display: inline-block;
   right: 10px;
   width: 0;
   height: 0;
@@ -295,7 +296,6 @@ chef-modal ::ng-deep .modal-overlay {
   border-top: 5px solid;
   border: 6px solid $chef-primary-bright;
   border-width: 0 2px 2px 0;
-  display: inline-block;
   padding: 3px;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
@@ -323,14 +323,14 @@ chef-modal ::ng-deep .modal-overlay {
 .name-margin {
   .name-dropdown {
     color: $chef-primary-dark;
-  
+
     ::ng-deep label {
       display: inline;
       color: $chef-primary-dark;
       font-size: 15px;
       margin-right: 15px;
     }
-  
+
     chef-select {
       margin-bottom: 12px;
       width: 310px;
@@ -354,14 +354,14 @@ chef-modal ::ng-deep .modal-overlay {
 
   .operator-dropdown {
     color: $chef-primary-dark;
-  
+
     ::ng-deep label {
       display: inline;
       color: $chef-primary-dark;
       font-size: 15px;
       margin-right: 15px;
     }
-  
+
     chef-select {
       margin-bottom: 12px;
       width: 105px;
