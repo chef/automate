@@ -5,6 +5,7 @@ chef-modal {
 
   .options {
     float: right;
+
     .cancel-button {
       color: $chef-critical;
     }
@@ -15,7 +16,7 @@ chef-modal {
     height: auto;
     width: 40%;
   }
-  
+
   .right-box {
     float: left;
     height: auto;
