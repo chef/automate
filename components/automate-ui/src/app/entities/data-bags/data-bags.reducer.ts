@@ -42,7 +42,7 @@ export function dataBagEntityReducer(
 
     case DataBagActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
-    
+
     case DataBagActionTypes.CREATE: {
       return set(
         SAVE_STATUS,

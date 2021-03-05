@@ -57,7 +57,7 @@ export class DataBagsEffects {
         map(() => new CreateDataBagSuccess({ databag: dataBag })),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDataBagFailure(error))))));
-    
+
   @Effect()
   createDataBagSuccess$ = this.actions$.pipe(
     ofType(DataBagActionTypes.CREATE_SUCCESS),
