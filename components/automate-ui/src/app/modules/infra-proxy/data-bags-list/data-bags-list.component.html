@@ -2,12 +2,16 @@
   <chef-loading-spinner *ngIf="dataBagsListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
-    <div class="head-container">
+    <div class="empty-section" *ngIf="!dataBags.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p>No databags available</p>
+    </div>
+    <div class="head-container"  *ngIf="dataBags.length">
       <chef-tr class="no_border_tr">
         <chef-th class="no_border_th">Name</chef-th>
       </chef-tr>
     </div>
-    <chef-table>
+    <chef-table *ngIf="dataBags.length">
       <chef-thead>
       </chef-thead>
       <chef-tbody>

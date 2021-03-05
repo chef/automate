@@ -38,7 +38,7 @@ chef-loading-spinner {
   display: flex;
   margin: auto;
   margin-top: 239px;
-  background-color: #FFFFFF;
+  background-color: $chef-white;
   opacity: 0.7;
   width: initial;
 }
@@ -46,6 +46,10 @@ chef-loading-spinner {
 .empty-section {
   margin-top: 130px;
   text-align: center;
+}
+
+.environment-list-paging {
+  margin: 0 0 35px;
 }
 
 img {

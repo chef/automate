@@ -9,14 +9,16 @@ import { StoreModule, Store } from '@ngrx/store';
 
 import { ChefServersListComponent } from './chef-servers-list.component';
 import { Server } from 'app/entities/servers/server.model';
-import { CreateServerSuccess, CreateServerFailure } from 'app/entities/servers/server.actions';
+import { CreateServerSuccess, CreateServerFailure, GetServersSuccess } from 'app/entities/servers/server.actions';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
 
 describe('ChefServersListComponent', () => {
   let component: ChefServersListComponent;
   let fixture: ComponentFixture<ChefServersListComponent>;
+  let element;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -75,11 +77,40 @@ describe('ChefServersListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ChefServersListComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('server list', () => {
+    let store: Store<NgrxStateAtom>;
+    const availableServers: Server[] = [
+      {
+        id: '1',
+        name: 'new server',
+        fqdn: 'xyz.com',
+        ip_address: '1.1.1.1'
+      }
+    ];
+    const emptyServers: Server[] = [];
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('render the server list', () => {
+      store.dispatch(new GetServersSuccess({servers: availableServers}));
+      expect(component.servers.length).not.toBeNull();
+      expect(element.query(By.css('.empty-section'))).toBeNull();
+    });
+
+    it('show no preview image', () => {
+      store.dispatch(new GetServersSuccess({servers: emptyServers}));
+      expect(component.servers.length).toBe(0);
+    });
   });
 
   describe('create server', () => {
@@ -121,10 +152,9 @@ describe('ChefServersListComponent', () => {
       component.createChefServer();
 
       store.dispatch(new CreateServerSuccess({ 'server': server }));
+      expect(component.creatingChefServer).toBe(true);
+      expect(component.createModalVisible).toBe(false);
 
-      component.sortedChefServers$.subscribe(servers => {
-        expect(servers).toContain(server);
-      });
     });
 
     it('on conflict error, modal is open with conflict error', () => {

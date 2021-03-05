@@ -1,5 +1,6 @@
 <div class="content-container">
   <div class="container">
+    <chef-loading-spinner *ngIf="orgsListLoading" size="50" fixed></chef-loading-spinner>
     <main>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
@@ -88,18 +89,17 @@
         </form>
       </section>
       <section class="page-body" *ngIf="tabValue === 'orgs'">
-        <chef-loading-spinner *ngIf="orgsListLoading" size="50"></chef-loading-spinner>
-        <ng-container *ngIf="!orgsListLoading">
-          <chef-toolbar>
-            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
-              <chef-button id="create-button" primary (click)="openCreateModal()">Add Chef Organization
-              </chef-button>
-            </app-authorized>
-          </chef-toolbar>
+        <chef-toolbar>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
+            <chef-button id="create-button" primary (click)="openCreateModal()">Add Chef Organization
+            </chef-button>
+          </app-authorized>
+        </chef-toolbar>
+        <div *ngIf="orgs.length != 0 && !orgsListLoading">
           <chef-table>
             <chef-thead>
               <chef-tr>
-                <chef-th  class="no-border-th">Name</chef-th>
+                <chef-th class="no-border-th">Name</chef-th>
                 <chef-th class="no-border-th">Admin</chef-th>
                 <chef-th class="no-border-th">Projects</chef-th>
                 <chef-th class="three-dot-column no-border-th"></chef-th>
@@ -126,7 +126,11 @@
               </chef-tr>
             </chef-tbody>
           </chef-table>
-        </ng-container>
+        </div>
+        <div class="empty-section" *ngIf="orgs.length === 0 && !orgsListLoading">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p>No Organization available.</p>
+        </div>
       </section>
     </main>
   </div>

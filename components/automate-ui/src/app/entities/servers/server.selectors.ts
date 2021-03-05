@@ -11,9 +11,9 @@ export const {
   selectEntities: serverEntities
 } = serverEntityAdapter.getSelectors(serverState);
 
-export const serverStatus = createSelector(
+export const getAllStatus = createSelector(
   serverState,
-  (state) => state.status
+  (state) => state.getAllStatus
 );
 
 export const saveStatus = createSelector(
@@ -46,5 +46,3 @@ export const deleteStatus = createSelector(
   serverState,
   (state) => state.deleteStatus
 );
-
-

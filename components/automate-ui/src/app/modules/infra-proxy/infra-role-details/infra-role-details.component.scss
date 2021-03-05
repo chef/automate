@@ -18,13 +18,6 @@ chef-toolbar {
   }
 }
 
-chef-tab-selector {
-  chef-option {
-    margin-right: 16px;
-    color: $chef-primary-dark;
-  }
-}
-
 form {
 
   #update-name {
@@ -156,9 +149,13 @@ chef-loading-spinner {
   }
 }
 
-.center {
-  display: flex;
-  justify-content: center;
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
 }
 
 .json-tree-container {

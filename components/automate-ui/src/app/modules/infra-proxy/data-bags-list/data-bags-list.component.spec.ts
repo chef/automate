@@ -1,17 +1,20 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
+import { GetDataBagsSuccess } from 'app/entities/data-bags/data-bags.actions';
+import { DataBags } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsListComponent } from './data-bags-list.component';
 
 describe('DataBagsListComponent', () => {
   let component: DataBagsListComponent;
   let fixture: ComponentFixture<DataBagsListComponent>;
-
+  let element;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -51,10 +54,34 @@ describe('DataBagsListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DataBagsListComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('databag list', () => {
+    let store: Store<NgrxStateAtom>;
+    const availableDataBags: DataBags[] = [
+      {name: 'aix'}
+    ];
+    const emptyDataBags: DataBags[] = [];
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('render the databag list', () => {
+      store.dispatch(new GetDataBagsSuccess({data_bags: availableDataBags}));
+      expect(component.dataBags.length).not.toBeNull();
+      expect(element.query(By.css('.empty-section'))).toBeNull();
+    });
+
+    it('show no preview image', () => {
+      store.dispatch(new GetDataBagsSuccess({data_bags: emptyDataBags}));
+      expect(component.dataBags.length).toBe(0);
+    });
   });
 });

@@ -80,6 +80,15 @@ chef-loading-spinner {
   z-index: 199;
 }
 
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
 .key-tab {
   padding: 2em 0px;
 
@@ -93,15 +102,15 @@ chef-loading-spinner {
     display: flex;
     padding: 1.5em;
     background: $chef-white;
-    border: 0.5px solid #CFD2D2;
+    border: 0.5px solid $chef-key-tab;
   }
 
   .key-tab-body-top {
     padding: 1em;
     background: $chef-white;
-    border-left: 0.5px solid #CFD2D2;
-    border-right: 0.5px solid #CFD2D2;
-    border-top: 0.5px solid #CFD2D2;
+    border-left: 0.5px solid $chef-key-tab;
+    border-right: 0.5px solid $chef-key-tab;
+    border-top: 0.5px solid $chef-key-tab;
 
     p {
       margin: 0;

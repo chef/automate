@@ -14,6 +14,7 @@ import {
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { By } from '@angular/platform-browser';
 import { GetDataBagItemsSuccess } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBagItems } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsDetailsComponent } from './data-bags-details.component';
@@ -46,6 +47,7 @@ describe('DataBagsDetailsComponent', () => {
   let fixture: ComponentFixture<DataBagsDetailsComponent>;
   let router: Router;
   let store: Store<NgrxStateAtom>;
+  let element;
 
   const initialState = {
     ...defaultInitialState,
@@ -81,6 +83,7 @@ describe('DataBagsDetailsComponent', () => {
 
     fixture = TestBed.createComponent(DataBagsDetailsComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
@@ -92,5 +95,21 @@ describe('DataBagsDetailsComponent', () => {
     store.dispatch(new GetDataBagItemsSuccess({ items, total }));
     fixture.detectChanges();
     expect(component.dataBagItems).toEqual(items);
+  });
+
+  describe('data bag item list', () => {
+
+    const emptyDataBags: DataBagItems[] = [];
+
+    it('render the databag item list', () => {
+      store.dispatch(new GetDataBagItemsSuccess({items, total}));
+      expect(component.dataBagItems.length).not.toBeNull();
+      expect(element.query(By.css('.empty-section'))).toBeNull();
+    });
+
+    it('show no preview image', () => {
+      store.dispatch(new GetDataBagItemsSuccess({items: emptyDataBags, total}));
+      expect(component.dataBagItems.length).toBe(0);
+    });
   });
 });

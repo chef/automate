@@ -18,6 +18,10 @@ chef-page-header {
   }
 }
 
+.manager-nodes-list-paging {
+  margin: 0 0 35px;
+}
+
 .page-body {
   chef-table#manager-nodes-list {
     chef-th:first-child,
