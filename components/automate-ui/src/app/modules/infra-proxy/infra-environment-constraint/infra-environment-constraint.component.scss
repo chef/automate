@@ -14,7 +14,7 @@
   font-size: 16px;
   line-height: 20px;
   letter-spacing: 0.25px;
-  color: #000000;
+  color: $chef-black;
 }
 
 span.example-text {
@@ -79,7 +79,7 @@ span.example-text {
     }
 
     chef-select ::ng-deep .selected-value chef-icon {
-      color: #3864F2;
+      color: $chef-primary-bright;
     }
   }
 }
@@ -121,7 +121,7 @@ span.example-text {
 
   chef-form-field input {
     height: 36px;
-    border: 1px solid #DEE6F7;
+    border: 1px solid $chef-form-input;
     box-sizing: border-box;
     border-radius: 4px 0px 0px 4px;
   }
@@ -132,7 +132,7 @@ span.example-text {
 
   input {
     height: 36px;
-    border: 1px solid #DEE6F7;
+    border: 1px solid $chef-form-input;
     box-sizing: border-box;
     border-radius: 4px 0px 0px 4px;
     margin-right: 0px;
@@ -147,10 +147,10 @@ span.example-text {
   chef-button {
     width: 61px;
     height: 36px;
-    border: 1px solid #3864F2;
+    border: 1px solid $chef-primary-bright;
     border-radius: 0px 4px 4px 0px;
     background-color: white;
-    color: #3864F2;
+    color: $chef-primary-bright;
   }
 
   chef-button[primary][disabled] {
@@ -182,10 +182,10 @@ span.example-text {
   chef-button {
     width: 79px;
     height: 36px;
-    border: 1px solid #3864F2;
+    border: 1px solid $chef-primary-bright;
     border-radius: 0px 4px 4px 0px;
     background-color: white;
-    color: #3864F2;
+    color: $chef-primary-bright;
     margin-top: 0px;
     margin-left: 0px;
   }
@@ -205,7 +205,7 @@ span.example-text {
   vertical-align: top;
   line-height: 1em;
   width: 13.71px;
-  color: #222435;
+  color: $chef-primary-dark;
   height: 13.09px;
   margin-right: 1.3em;
   text-align: center;

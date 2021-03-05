@@ -42,7 +42,7 @@ chef-modal {
         left: 398px;
         right: 398px;
         top: 365px;
-        border: 1px solid #DEE6F7;
+        border: 1px solid $chef-form-input;
         box-sizing: border-box;
         border-radius: 4px;
         margin-top: 8px;
@@ -54,7 +54,7 @@ chef-modal {
         font-size: 16px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        color: #000000;
+        color: $chef-black;
         margin-top: 32px;
       }
 
@@ -63,7 +63,7 @@ chef-modal {
         left: 398px;
         right: 398px;
         top: 462px;
-        border: 1px solid #DEE6F7;
+        border: 1px solid $chef-form-input;
         box-sizing: border-box;
         border-radius: 4px;
         margin-top: 10px;
@@ -103,18 +103,18 @@ chef-modal {
       overflow-x: hidden;
       padding: 32px;
       outline: none;
-      box-shadow: 0px 0px 30px 0px #CCCCCC;
+      box-shadow: 0px 0px 30px 0px $chef-modal;
       width: 708px;
     }
     
     .modal::-webkit-scrollbar {
       width: 8px;
-      background-color: #F5F5F5;
+      background-color: $chef-modal-scrollbar;
     }
     
     .modal::-webkit-scrollbar-thumb {
       border-radius: 10px;
-      background-color: #CCCCCC;
+      background-color: $chef-modal;
     }
 
     .label {
@@ -183,7 +183,7 @@ chef-checkbox ::ng-deep .check-wrap {
 }
 
 chef-modal ::ng-deep .modal-overlay {
-  background-color: #FFFFFF;
+  background-color: $chef-white;
   mix-blend-mode: normal;
   opacity: 0.7;
 }
@@ -201,7 +201,7 @@ chef-modal ::ng-deep .modal-overlay {
 
   ::ng-deep .nav-tab:before {
     height: 4px;
-    background: #E7E9E9;
+    background: $chef-tab-hover;
   }
 }
 
@@ -246,34 +246,34 @@ chef-modal ::ng-deep .modal-overlay {
 
   font-size: 12px;
   height: 3em;
-  border: 1px solid #CFD2D2;
+  border: 1px solid $chef-key-tab;
   height: 37px;
  }
 
 
  ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
-  background: #FFFFFF;
-  color: #000000;
+  background: $chef-white;
+  color: $chef-black;
  }
 
  ::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
   line-height: 3em;
   font-size: 12px;
   height: 3em;
-  border: 1px solid #CFD2D2;
+  border: 1px solid $chef-key-tab;
   height: 37px;
 }
   
 ::ng-deep [panelClass=chef-dropdown] {
   height: 36px;
   padding: 5px 12px 0px 12px;
-  border: 1px solid #DEE6F7;
+  border: 1px solid $chef-form-input;
   box-sizing: border-box;
   border-radius: 4px;
 }
 
 ::ng-deep [panelClass=chef-dropdown]:focus {
-  border-color: #DEE6F7;
+  border-color: $chef-form-input;
 }  
 
 ::ng-deep .cdk-overlay-container  .cdk-overlay-pane { 
@@ -289,11 +289,11 @@ chef-modal ::ng-deep .modal-overlay {
   right: 10px;
   width: 0;
   height: 0;
-  border-color: #fff transparent transparent transparent;
+  border-color: $chef-white transparent transparent transparent;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid;
-  border: 6px solid blue;
+  border: 6px solid $chef-primary-bright;
   border-width: 0 2px 2px 0;
   display: inline-block;
   padding: 3px;
@@ -307,7 +307,7 @@ chef-modal ::ng-deep .modal-overlay {
 }
 
 ::ng-deep .mat-select-disabled .mat-select-value {
-  color: #000000;
+  color: $chef-black;
 }
 
 .constraint-margin {
@@ -344,7 +344,7 @@ chef-modal ::ng-deep .modal-overlay {
     }
 
     chef-select ::ng-deep .selected-value chef-icon {
-      color: #3864F2;
+      color: $chef-primary-bright;
     }
   }
 }
@@ -375,7 +375,7 @@ chef-modal ::ng-deep .modal-overlay {
     }
 
     chef-select ::ng-deep .selected-value chef-icon {
-      color: #3864F2;
+      color: $chef-primary-bright;
     }
   }
 }
@@ -387,7 +387,7 @@ chef-modal ::ng-deep .modal-overlay {
 
 ::ng-deep .scroll::-webkit-scrollbar {
   width: 5px;
-  background: #DEE6F7;
+  background: $chef-form-input;
   border-radius: 5px;
 }
 
@@ -401,7 +401,7 @@ form {
     textarea {
       height: 286px;
       margin-top: 32.22px;
-      border: 1px solid #DEE6F7;
+      border: 1px solid $chef-form-input;
       box-sizing: border-box;
       border-radius: 4px;
     }
