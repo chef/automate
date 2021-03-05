@@ -7,8 +7,8 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { GetDataBags } from 'app/entities/data-bags/data-bags.actions';
-import { DataBags } from 'app/entities/data-bags/data-bags.model';
+import { GetDataBags, DeleteDataBag } from 'app/entities/data-bags/data-bags.actions';
+import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   allDataBags,
   getAllStatus as getAllDatabagsForOrgStatus
@@ -25,10 +25,12 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed = new Subject<boolean>();
-  public dataBags: DataBags[];
+  public dataBags: DataBag[];
   public dataBagsListLoading = true;
   public authFailure = false;
+  public dataBagToDelete: DataBag;
+  public deleteModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -65,4 +67,21 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
+
+  public startDataBagDelete(dataBag: DataBag): void {
+    this.dataBagToDelete = dataBag;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteDataBag(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteDataBag({
+      server_id: this.serverId, org_id: this.orgId, name: this.dataBagToDelete.name
+    }));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
 }

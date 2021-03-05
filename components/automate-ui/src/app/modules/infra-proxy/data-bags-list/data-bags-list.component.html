@@ -1,5 +1,13 @@
 <section class="databags">
   <chef-loading-spinner *ngIf="dataBagsListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="data bag"
+    [objectName]="dataBagToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteDataBag()"
+    objectAction="Delete">
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
     <div class="empty-section" *ngIf="!dataBags.length">
@@ -9,6 +17,7 @@
     <div class="head-container"  *ngIf="dataBags.length">
       <chef-tr class="no_border_tr">
         <chef-th class="no_border_th">Name</chef-th>
+        <chef-th class="no_border_th three-dot-column"></chef-th>
       </chef-tr>
     </div>
     <chef-table *ngIf="dataBags.length">
@@ -17,6 +26,11 @@
       <chef-tbody>
         <chef-tr *ngFor="let dataBag of dataBags">
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu" id="menu-{{dataBag.id}}">
+              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
+            </mat-select>
+          </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>

@@ -8,7 +8,7 @@ import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
 import { GetDataBagsSuccess } from 'app/entities/data-bags/data-bags.actions';
-import { DataBags } from 'app/entities/data-bags/data-bags.model';
+import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsListComponent } from './data-bags-list.component';
 
 describe('DataBagsListComponent', () => {
@@ -64,10 +64,15 @@ describe('DataBagsListComponent', () => {
 
   describe('databag list', () => {
     let store: Store<NgrxStateAtom>;
-    const availableDataBags: DataBags[] = [
-      {name: 'aix'}
+    const availableDataBags: DataBag[] = [
+      {
+        server_id: 'test_server_id',
+        org_id: 'test_org_id',
+        name: 'aix'
+      }
     ];
-    const emptyDataBags: DataBags[] = [];
+
+    const emptyDataBags: DataBag[] = [];
 
     beforeEach(() => {
       store = TestBed.inject(Store);
