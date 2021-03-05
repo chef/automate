@@ -100,7 +100,6 @@ chef-modal {
 
   ::ng-deep {
     .modal {
-      // height: 70%;
       overflow-x: hidden;
       padding: 32px;
       outline: none;
@@ -142,22 +141,21 @@ chef-modal {
 }
 
 .version {
-height: 36px;
+  height: 36px;
 }
-.constraint-names {
 
+.constraint-names {
     width: 279px;
   }
   
-  .operators{
-    width: 99px;
-  }
+.operators {
+  width: 99px;
+}
   
-  #version-input {
-    width: 173px;
+#version-input {
+  width: 173px;
   
-  }
-
+}
 
 .input-desc {
   font-size: 10px;
@@ -382,28 +380,6 @@ chef-modal ::ng-deep .modal-overlay {
   }
 }
 
-.version-margin {
-  margin-left: 16px;
-
-  .version-dropdown {
-    color: $chef-primary-dark;
-  
-    ::ng-deep label {
-      display: inline;
-      color: $chef-primary-dark;
-      font-size: 15px;
-    }
-  }
-
-  chef-form-field input {
-    height: 36px;
-    border: 1px solid #DEE6F7;
-    box-sizing: border-box;
-    border-radius: 4px 0px 0px 4px;
-    width: 185px;
-  }
-}
-
 .scroll {
   overflow: scroll;
   height: 256px;
@@ -418,29 +394,6 @@ chef-modal ::ng-deep .modal-overlay {
 ::ng-deep .scroll::-webkit-scrollbar-thumb {
   background: #B4C3CC;
   border-radius: 5px;
-}
-
-.add {
-  margin-top: 67px;
-  chef-button {
-    width: 61px;
-    height: 36px;
-    border: 1px solid rgba(56, 100, 242, 0.5);
-    border-radius: 0px 4px 4px 0px;
-    background-color: white;
-    color: #3864F2;
-  }
-}
-
-.remove {
-  chef-button {
-    width: 88px;
-    height: 36px;
-    border: 1px solid rgba(56, 100, 242, 0.5);
-    border-radius: 0px 4px 4px 0px;
-    background-color: white;
-    color: #3864F2;
-  }
 }
 
 form {

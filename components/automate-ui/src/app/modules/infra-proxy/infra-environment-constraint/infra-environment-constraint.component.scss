@@ -1,7 +1,7 @@
 @import "~styles/variables";
 
 .constraint-margin {
-    display: flex;
+  display: flex;
 }
 
 .label {
@@ -76,7 +76,6 @@ span.example-text {
     mat-select {
       height: 36px;
       width: 300px;
-
     }
 
     chef-select ::ng-deep .selected-value chef-icon {

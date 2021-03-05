@@ -49,8 +49,8 @@ export class RoleAttributes {
 }
 
 export interface RespAttributes {
-  default_attributes: string;
-  override_attributes: string;
+  default_attributes?: string;
+  override_attributes?: string;
 }
 
 export interface AllAttributes {

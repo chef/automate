@@ -1,3 +1,4 @@
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -20,10 +21,13 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  private isDestroyed = new Subject<boolean>();
+  public chefInfraViewsFeatureFlagOn: boolean;
   public environments: Environment[] = [];
   public environmentsListLoading = true;
   public environmentListState: { items: Environment[], total: number };
   public authFailure = false;
+  public openEnvironmentModal = new EventEmitter<void>();
   public per_page = 9;
   public page = 1;
   public searching = false;
@@ -31,13 +35,16 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public total: number;
   public environmentToDelete: Environment;
   public deleteModalVisible = false;
-  private isDestroyed = new Subject<boolean>();
-  public openEnvironmentModal = new EventEmitter<boolean>();
 
   constructor(
+    private featureFlagsService: FeatureFlagsService,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
-  ) { }
+  ) {
+    // feature flag enable and disable the create button
+    this.chefInfraViewsFeatureFlagOn =
+    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -50,7 +57,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
         org_id: this.orgId
       };
 
-      this.store.dispatch(new GetEnvironments(payload));
+    this.store.dispatch(new GetEnvironments(payload));
 
     combineLatest([
         this.store.select(getAllStatus),

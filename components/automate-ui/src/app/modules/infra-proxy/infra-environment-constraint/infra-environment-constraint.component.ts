@@ -4,10 +4,7 @@ import {
   ViewChild,
   Input,
   Output,
-  EventEmitter,
-  QueryList,
-  ElementRef,
-  ViewChildren
+  EventEmitter
 } from '@angular/core';
 
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
@@ -21,21 +18,21 @@ import { DynamicGrid } from '../create-environment-modal/create-environment-moda
   templateUrl: './infra-environment-constraint.component.html',
   styleUrls: ['./infra-environment-constraint.component.scss']
 })
+
 export class InfraEnvironmentConstraintComponent implements OnInit {
 
   @Input() constraintKeys: string[] = [];
   @Input() dynamicArray: Array<DynamicGrid> = [];
   @Input() name_id: string;
-  public conflictError = false;
-  @ViewChild(MatSelect) select: MatSelect;
   @Output() constraintValues: EventEmitter<DynamicGrid[]> = new EventEmitter();
-  @ViewChildren('selectLang') nameSelects: QueryList<ElementRef<HTMLSelectElement>>;
+  @ViewChild(MatSelect) select: MatSelect;
 
-  public secondFormGroup: FormGroup;
-  public operatorKeys: string[] = [];
-  public rowKeys: string[] = [];
-  selectedLangs: string[] = [];
+  public conflictError = false;
   public operator_id = '';
+  public operatorKeys: string[] = [];
+  public secondFormGroup: FormGroup;
+  public selectedLangs: string[] = [];
+  public rowKeys: string[] = [];
 
   constructor(
     private fb: FormBuilder
@@ -56,33 +53,29 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
       this.rowKeys.push(element)
     );
-
-
     this.name_id = this.constraintKeys[0];
 
   }
 
   selected(value, i) {
 
-    let previousValue, oldName;
+    let previousValue;
 
     this.selectedLangs.forEach((element, index) => {
       if (index === i) {
         previousValue = element;
-        if (value && value !== "undefined") this.selectedLangs[i] = value;
-
+        if (value && value !== 'undefined') {
+          this.selectedLangs[i] = value;
+        }
       }
     });
 
     this.dynamicArray.forEach((_, index) => {
       if (index === i) {
-        oldName = this.dynamicArray[i].name;
         this.dynamicArray[i].name = value;
       }
 
     });
-
-
 
     this.constraintKeys.forEach((element, index) => {
       if (element === value) {
@@ -93,12 +86,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.constraintKeys.push(previousValue);
     this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
     this.name_id = this.constraintKeys[0];
-
-    console.log('oldName' + oldName);
-
     this.constraintValues.emit(this.dynamicArray);
-
-
   }
 
   isSelected(lang: string) {
@@ -112,19 +100,18 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.conflictError = false;
   }
 
+  // Handle the version change
   public handleVersion(event, i) {
-
     this.dynamicArray.forEach((_, index) => {
       if (index === i) {
         this.dynamicArray[i].version = event;
       }
 
     });
-
     this.constraintValues.emit(this.dynamicArray);
-
   }
 
+  // Handle the operator change
   public handleOperator(event, i) {
 
     this.dynamicArray.forEach((_, index) => {
@@ -136,23 +123,17 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.constraintValues.emit(this.dynamicArray);
   }
 
-
+  // Handle the name change
   public handleName(event, i) {
-    let oldName;
-
     this.dynamicArray.forEach((_, index) => {
       if (index === i) {
-        oldName = this.dynamicArray[i].name;
         this.dynamicArray[i].name = event;
       }
 
     });
 
-    console.log('oldName' + oldName);
-
     this.constraintKeys.forEach((element, index) => {
-      if (element == event) {
-
+      if (element === event) {
         this.constraintKeys.splice(index, 1);
       }
 
@@ -160,14 +141,9 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
     this.name_id = this.constraintKeys[0];
     this.constraintValues.emit(this.dynamicArray);
-
-
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
-
+  // Adding a new constraint
   addRow() {
     this.dynamicArray.push({
       id: this.dynamicArray.length + 1,
@@ -176,11 +152,10 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
       version: this.secondFormGroup.controls['version'].value
     });
     this.constraintKeys.forEach((element, index) => {
-      if (element == this.name_id) {
+      if (element === this.name_id) {
         this.selectedLangs.push(element);
         this.constraintKeys.splice(index, 1);
       }
-
     });
 
     this.name_id = this.constraintKeys[0];
@@ -190,6 +165,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.constraintValues.emit(this.dynamicArray);
   }
 
+  // Deleting a particular constraint
   deleteRow(index, dynamic) {
     this.constraintKeys.push(dynamic.name);
     this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
@@ -205,6 +181,10 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.dynamicArray.splice(index, 1);
     this.constraintValues.emit(this.dynamicArray);
 
+  }
+
+  private isNavigationKey(event: KeyboardEvent): boolean {
+    return event.key === 'Shift' || event.key === 'Tab';
   }
 
 }

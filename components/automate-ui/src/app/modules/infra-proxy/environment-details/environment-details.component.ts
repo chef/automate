@@ -96,7 +96,10 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
       }
-      //this.attributes = new EnvironmentAttributes(this.environment);
+      this.attributes.default_attributes = this.environment.default_attributes;
+      this.attributes.override_attributes = this.environment.override_attributes;
+      this.attributes.all.default_attributes = this.environment.default_attributes;
+      this.attributes.all.override_attributes = this.environment.override_attributes;
 
       setTimeout(() => this.filter(this.selected_level), 10);
       this.environmentDetailsLoading = false;
