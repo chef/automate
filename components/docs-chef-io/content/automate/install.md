@@ -138,6 +138,10 @@ The directions provided below are intended for use only during initial deploymen
 
 #### Configuring External Elasticsearch
 
+{{< note >}}
+Chef Automate supports the official Elasticsearch Service by Elastic. Chef Automate does not test or support alternative services, such as Amazon Elasticsearch Service (Amazon ES).
+{{< /note >}}
+
 Add the following to your config.toml:
 
 ```toml
