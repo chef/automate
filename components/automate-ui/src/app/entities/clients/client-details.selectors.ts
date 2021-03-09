@@ -26,3 +26,13 @@ export const clientFromRoute = createSelector(
   routeParams,
   (state, { name }) => find({ name }, state)
 );
+
+export const resetKeyClient = createSelector(
+  clientState,
+  (state) => state.resetKeyClient
+);
+
+export const saveError = createSelector(
+  clientState,
+  (state) => state.saveError
+);

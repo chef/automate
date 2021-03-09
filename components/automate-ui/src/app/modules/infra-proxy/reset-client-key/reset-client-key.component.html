@@ -1,0 +1,47 @@
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
+	<div class="flex-container">
+		<div *ngIf="!isReset">
+			<div class="left-box">
+				<img *ngIf="!conflictError" class="del-icon" src="assets/img/infra-client-reset-key.svg"
+					alt="client-reset-key-icon" />
+				<img *ngIf="conflictError" class="del-icon" src="assets/img/infra-client-server-error.svg"
+					alt="server-error-icon" />
+			</div>
+
+			<div class="right-box">
+				<div class="left-align">
+					<div *ngIf="!conflictError" class="title-text">Resetting its Key?</div>
+					<div *ngIf="!conflictError" class="action-text">The current key will no longer be accepted.</div>
+					<div *ngIf="conflictError" class="title-text">Server Error!</div>
+					<div *ngIf="conflictError" class="action-text">Missing Update Permission</div>
+				</div>
+
+				<div id="button-bar" class="options">
+					<chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+					<chef-button primary id="reset-button-object-modal" [disabled]="conflictError" (click)="resetKeyClient()">
+						<chef-loading-spinner *ngIf="reseting"></chef-loading-spinner>
+						<span *ngIf="!reseting">Reset Key</span>
+						<span *ngIf="reseting">Resetting</span>
+					</chef-button>
+				</div>
+			</div>
+		</div>
+
+		<div class="id-margin" *ngIf="isReset">
+			<h2 slot="title">Reset Client</h2>
+			<div class="detail">
+				<div class="icon-wrap"><i></i></div>
+				<p>The key has been reset. This key is not stored by the Chef server, so please make sure to copy or download it
+					somewhere safe.</p>
+			</div>
+			<textarea chefInput rows="20" cols="10" value="{{privateKey}}"></textarea>
+
+			<div id="button-bar">
+				<chef-button tertiary (click)="closeCreateModal()">Close</chef-button>
+				<chef-button primary id="download-button-object-modal" (click)="downloadKey()">
+					Download
+				</chef-button>
+			</div>
+		</div>
+	</div>
+</chef-modal>
