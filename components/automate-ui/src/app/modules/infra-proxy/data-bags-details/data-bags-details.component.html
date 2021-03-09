@@ -1,13 +1,21 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <app-delete-infra-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="data bag item"
+        [objectName]="dataBagItemToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteDataBagItem()"
+        objectAction="Delete">
+      </app-delete-infra-object-modal>
       <chef-loading-spinner *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags
         </chef-breadcrumb>
-        {{ dataBagsName }}
+        {{ dataBagName }}
       </chef-breadcrumbs>
       <chef-page-header>
         <table>
@@ -18,7 +26,7 @@
           </thead>
           <tbody>
             <tr class="detail-row">
-              <td class="id-column">{{ dataBagsName }}</td>
+              <td class="id-column">{{ dataBagName }}</td>
             </tr>
           </tbody>
         </table>
@@ -61,7 +69,12 @@
                           <chef-icon>remove_circle</chef-icon>
                           <span>Collapse All</span>
                         </span>
+                        <a class="float-right" (click)="startDataBagItemDelete(item)">
+                          <span class="material-icons del-item">delete</span>
+                          <span class="del-text">Delete</span>
+                        </a>
                       </div>
+                      
                       <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
                     </div>
                   </div>  

@@ -6,6 +6,7 @@ export interface DataBag {
 
 export interface DataBagItems {
   name: string;
+  databag_name?: string;
   active?: boolean;
 }
 

@@ -54,4 +54,10 @@ export class DataBagsRequests {
       {headers}
     );
   }
+
+  public deleteDataBagItem1(server_id: string, org_id: string, databag_name: string, name: string):
+    Observable<{}> {
+      return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags/${databag_name}/${name}`,
+      {headers});
+  }
 }

@@ -11,6 +11,9 @@ import {
   GetDataBagItemsSuccess,
   GetDataBagItemsFailure,
   DataBagItemsActionTypes,
+  DeleteDataBagItem,
+  DeleteDataBagItemSuccess,
+  DeleteDataBagItemFailure,
   DataBagItemsSuccessPayload
 } from './data-bag-details.actions';
 
@@ -40,6 +43,36 @@ export class DataBagItemsEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get infra data bag items: ${msg || payload.error}`
+      });
+    }));
+
+  @Effect()
+  deleteDataBagItem$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.DELETE),
+    mergeMap(({ payload: { server_id, org_id, databag_name, name } }: DeleteDataBagItem) =>
+      this.requests.deleteDataBagItem1(server_id, org_id, databag_name, name).pipe(
+        map(() => new DeleteDataBagItemSuccess({ name })),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteDataBagItemFailure(error))))));
+
+  @Effect()
+  deleteDataBagItemSuccess$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.DELETE_SUCCESS),
+    map(({ payload: { name } }: DeleteDataBagItemSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Successfully Deleted Data Bag Item - ${name}.`
+      });
+    }));
+
+  @Effect()
+  deleteDataBagItemFailure$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteDataBagItemFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete data bag item: ${msg || error}`
       });
     }));
 
