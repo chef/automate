@@ -132,8 +132,8 @@ func TestNodeAttributeWithTableDriven(t *testing.T) {
 
 	index := 0
 	for _, t := range tests {
-		id := idPrefix + string(index)
-		name := namePrefix + string(index)
+		id := idPrefix + string(rune(index))
+		name := namePrefix + string(rune(index))
 
 		nodes[index] = iBackend.Node{
 			Exists: true,

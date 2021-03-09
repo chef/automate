@@ -92,7 +92,7 @@ func xNodeArray(x int, status string) []iBackend.Node {
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           status,
-				NodeName:         "node" + string(i),
+				NodeName:         "node" + string(rune(i)),
 				OrganizationName: "org1",
 				Environment:      "env1",
 			},
