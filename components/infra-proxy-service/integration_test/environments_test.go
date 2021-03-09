@@ -183,6 +183,7 @@ func TestCreateEnvironment(t *testing.T) {
 
 		nextRes, err := infraProxy.CreateEnvironment(ctx, req)
 		assert.Nil(t, nextRes)
+		assert.Error(t, err, "Environment already exists")
 		grpctest.AssertCode(t, codes.AlreadyExists, err)
 	})
 
@@ -193,7 +194,6 @@ func TestCreateEnvironment(t *testing.T) {
 		}
 		res, err := infraProxy.CreateEnvironment(ctx, req)
 		assert.Nil(t, res)
-		grpctest.AssertCode(t, codes.AlreadyExists, err)
 		assert.Error(t, err, "must supply environment name")
 		grpctest.AssertCode(t, codes.InvalidArgument, err)
 	})
