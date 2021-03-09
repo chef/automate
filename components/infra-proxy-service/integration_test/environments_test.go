@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -143,7 +145,7 @@ func TestGetEnvironment(t *testing.T) {
 func TestCreateEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
 	ctx := context.Background()
-	t.Run("when the valid request submit, creates the environment successfully", func(t *testing.T) {
+	t.Run("when a valid environment is submitted, creates the new environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
@@ -167,12 +169,40 @@ func TestCreateEnvironment(t *testing.T) {
 		assert.Equal(t, "auto generate chef environment", res.GetDescription())
 		assert.Equal(t, req.CookbookVersions, res.CookbookVersions)
 	})
+
+	t.Run("when the environment exists, raise the error environment already exists", func(t *testing.T) {
+		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		req := &request.CreateEnvironment{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		res, err := infraProxy.CreateEnvironment(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+
+		nextRes, err := infraProxy.CreateEnvironment(ctx, req)
+		assert.Nil(t, nextRes)
+		grpctest.AssertCode(t, codes.AlreadyExists, err)
+	})
+
+	t.Run("when the environment required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+		req := &request.CreateEnvironment{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+		}
+		res, err := infraProxy.CreateEnvironment(ctx, req)
+		assert.Nil(t, res)
+		grpctest.AssertCode(t, codes.AlreadyExists, err)
+		assert.Error(t, err, "must supply environment name")
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
 }
 
 func TestUpdateEnvironment(t *testing.T) {
 	// rpc UpdateEnvironment (request.UpdateEnvironment) returns (response.Environment)
 	ctx := context.Background()
-	t.Run("when the valid request submit, updates the environment successfully", func(t *testing.T) {
+	t.Run("when a valid environment is submitted, updates the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
@@ -225,7 +255,7 @@ func TestUpdateEnvironment(t *testing.T) {
 func TestDeleteEnvironment(t *testing.T) {
 	// rpc DeleteEnvironment (request.Environment) returns (response.Environment)
 	ctx := context.Background()
-	t.Run("when the valid request submit, deletes the environment successfully", func(t *testing.T) {
+	t.Run("when a valid environment is submitted, deletes the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
 			ServerId:    autoDeployedChefServerID,
