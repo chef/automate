@@ -26,3 +26,18 @@ export const clientList = createSelector(
   clientState,
   (state) => state.clientList
 );
+
+export const saveStatus = createSelector(
+  clientState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  clientState,
+  (state) => state.saveError
+);
+
+export const createClient = createSelector(
+  clientState,
+  (state) => state.createClient
+);

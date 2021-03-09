@@ -8,11 +8,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
-import {
-  getAllStatus,
-  clientList
-} from 'app/entities/clients/client.selectors';
-
+import { getAllStatus, clientList } from 'app/entities/clients/client.selectors';
 
 @Component({
   selector: 'app-clients',
@@ -38,12 +34,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clientToDelete: Client;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
-
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -101,6 +97,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new GetClients(payload));
+  }
+
+  openCreateClientModal() {
+    this.openNotificationModal.emit();
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

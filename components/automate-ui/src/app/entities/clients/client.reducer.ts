@@ -1,8 +1,9 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set, pipe } from 'lodash/fp';
+import { set, pipe, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ClientActionTypes, ClientActions } from './client.action';
 import { Client } from './client.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface ClientEntityState extends EntityState<Client> {
   clientsStatus: EntityStatus;
@@ -12,21 +13,29 @@ export interface ClientEntityState extends EntityState<Client> {
     total: number
   };
   deleteStatus: EntityStatus;
+  saveStatus: EntityStatus;
+  saveError: HttpErrorResponse;
+  createClient: {
+    client_key: Object,
+    name: string
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
 const DELETE_STATUS = 'deleteStatus';
+const SAVE_STATUS = 'saveStatus';
+const SAVE_ERROR = 'saveError';
 
 export const clientEntityAdapter: EntityAdapter<Client> =
   createEntityAdapter<Client>({
-  selectId: (client: Client) => client.name
+    selectId: (client: Client) => client.name
 });
 
 export const ClientEntityInitialState: ClientEntityState =
   clientEntityAdapter.getInitialState(<ClientEntityState>{
-  getAllStatus: EntityStatus.notLoaded,
-  deleteStatus: EntityStatus.notLoaded
-});
+    getAllStatus: EntityStatus.notLoaded,
+    deleteStatus: EntityStatus.notLoaded
+  });
 
 export function clientEntityReducer(
   state: ClientEntityState = ClientEntityInitialState,
@@ -38,12 +47,33 @@ export function clientEntityReducer(
 
     case ClientActionTypes.GET_ALL_SUCCESS:
       return pipe(
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
         set('clientList.items', action.payload.clients || []),
         set('clientList.total', action.payload.total || 0)
-        )(state) as ClientEntityState;
+      )(state) as ClientEntityState;
 
     case ClientActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case ClientActionTypes.CREATE: {
+      return set(SAVE_STATUS, EntityStatus.loading, state) as ClientEntityState;
+    }
+
+    case ClientActionTypes.CREATE_SUCCESS: {
+      return pipe(
+        unset(SAVE_ERROR),
+        set(SAVE_STATUS, EntityStatus.loadingSuccess),
+        set('createClient.client_key', action.payload.client_key || []),
+        set('createClient.name', action.payload.name || '')
+      )(state) as ClientEntityState;
+    }
+
+    case ClientActionTypes.CREATE_FAILURE: {
+      return pipe(
+        set(SAVE_ERROR, action.payload.error),
+        set(SAVE_STATUS, EntityStatus.loadingFailure)
+      )(state) as ClientEntityState;
+    }
 
     case ClientActionTypes.DELETE:
       return set(DELETE_STATUS, EntityStatus.loading, state);
@@ -55,7 +85,7 @@ export function clientEntityReducer(
       return pipe(
         set(DELETE_STATUS, EntityStatus.loadingSuccess),
         set('clientList.items', clients || []),
-        set('clientList.total', total || 0 )
+        set('clientList.total', total || 0)
       )(state) as ClientEntityState;
 
     case ClientActionTypes.DELETE_FAILURE:
