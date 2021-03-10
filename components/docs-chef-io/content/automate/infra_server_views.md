@@ -48,6 +48,27 @@ chef_server_url = "https://CHEF_SERVER_FQDN_OR_IP_ADDRESS/organizations/ORGANAZA
 
 ## Access Chef Infra Server Objects
 
+In Automate Infra views following are objects can be manage and accessed:
+ - Cookbooks
+ - Roles
+ - Data Bags
+ - Environments
+ - Clients
+
+What are features not covered in Automate Infra Views:
+- Manage permissons
+- User Invitation
+- User Signup
+- Login window for Chef Infra Server Users.
+
+
+Features lineup:
+ - Full control on Roles, Data Bags, Environments and clients objects.
+ - Full control on Nodes ie. Edit Attributes, Edit recipes, Edit environment, Manage Tags etc.
+ - Policyfiles views. 
+ - Manage Global objects like Organizations, Groups, Users and Starter Kit.
+
+
 ## Cookbooks
 
 ## Roles
