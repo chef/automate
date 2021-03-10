@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { Client, ClientKey } from './client.model';
+import { Client } from './client.model';
 
 export enum ClientActionTypes {
   GET_ALL = 'CLIENTS::GET_ALL',
@@ -125,13 +125,15 @@ export class ResetKeyClient implements Action {
 }
 
 export interface ResetKeySuccessPayload {
-  clientKey: ClientKey;
-  client_name: string;
+  name: string;
+  public_key: string;
+  expiration_date: string;
+  private_key: string;
 }
 
 export class ResetKeyClientSuccess implements Action {
   readonly type = ClientActionTypes.RESETKEY_SUCCESS;
-  constructor(public payload: ResetKeySuccessPayload) { }
+  constructor(public payload: ResetKeySuccessPayload ) { }
 }
 
 export class ResetKeyClientFailure implements Action {

@@ -9,7 +9,7 @@ describe('ResetClientKeyComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ 
+      declarations: [
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-loading-spinner'}),

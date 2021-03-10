@@ -1,6 +1,6 @@
 @import "~styles/variables";
 
-chef-modal {
+chef-modal.reset-client-modal {
 
   [slot=title] {
     font-style: normal;
@@ -59,6 +59,19 @@ chef-modal {
       position: relative;
     }
 
+    .key-tab-body {
+      display: flex;
+      background: $chef-white;
+      border: 0.5px solid $chef-key-tab;
+      height: 300px;
+
+      chef-snippet {
+        height: 298px;
+        width: 99.9%;
+      }
+
+    }
+
     textarea {
       height: 300px;
       text-align: left;
@@ -107,7 +120,7 @@ chef-modal {
 
     }
 
-    #button-bar {
+    .button-bar {
       text-align: right;
       padding-top: 24px;
 
@@ -126,81 +139,98 @@ chef-modal {
       }
     }
   }
-}
 
-::ng-deep {
-  chef-modal {
-    .modal {
-      box-shadow: 0px 0px 30px 0px #CCC;
-      outline: none;
+  ::ng-deep {
+    chef-modal {
+      .modal {
+        box-shadow: 0px 0px 30px 0px #CCC;
+        outline: none;
+        width: 700px;
 
-      .options {
-        float: right;
+        .options {
+          float: right;
 
-        chef-button[primary] {
-          background-color: $chef-critical;
-          border-color: $chef-critical;
+          chef-button[primary] {
+            background-color: $chef-critical;
+            border-color: $chef-critical;
 
-          &:hover, &:focus {
-            background-color: $chef-critical-dark;
-            border-color: $chef-critical-dark;
+            &:hover, &:focus {
+              background-color: $chef-critical-dark;
+              border-color: $chef-critical-dark;
+            }
+
+            chef-loading-spinner {
+              color: $chef-critical-light;
+            }
+
           }
+
+          chef-button[tertiary] {
+            color: $chef-critical;
+
+            &:hover, &:focus {
+              background-color: $chef-critical-light;
+              border-color: $chef-critical-light;
+            }
+          }
+
         }
 
-        chef-button[tertiary] {
-          color: $chef-critical;
-
-          &:hover, &:focus {
-            background-color: $chef-critical-light;
-            border-color: $chef-critical-light;
-          }
-        }
-
-      }
-
-      chef-button {
-
-        &:focus {
+        chef-button {
           outline: none;
-        }
-
-        &.close {
-          border: none;
-          color: $chef-black;
-          margin-right: 22px;
-          margin-top: 16px;
-
-          &:hover, &:focus {
-            background: none;
-            outline: none;
-          }
-        }
-
-        button {
-          line-height: 20px;
-          letter-spacing: 0.5px;
 
           &:focus {
             outline: none;
           }
 
-          span:focus {
-            outline: none;
+          &.close {
+            border: none;
+            color: $chef-black;
+            margin-right: 22px;
+            margin-top: 16px;
+
+            &:hover, &:focus {
+              background: none;
+              outline: none;
+            }
+          }
+
+          button {
+            line-height: 20px;
+            letter-spacing: 0.5px;
+
+            &:focus {
+              outline: none;
+            }
+
+            span:focus {
+              outline: none;
+            }
+          }
+
+          .cancel-button.hydrated {
+            background: none;
           }
         }
 
-        .cancel-button.hydrated {
-          background: none;
-        }
+      }
+
+      .modal-overlay {
+        background-color: $chef-white;
+        opacity: 0.5;
       }
 
     }
 
-    .modal-overlay {
-      background-color: $chef-white;
-      opacity: 0.5;
+    chef-snippet pre {
+      font-size: 12px;
+      height: 297px;
+      width: 100%;
+      line-height: 20px;
+      letter-spacing: 0.25px;
+      padding: 1.5em;
+      color: $chef-black;
     }
 
   }
-
 }

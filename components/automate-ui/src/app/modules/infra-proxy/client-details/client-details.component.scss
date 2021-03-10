@@ -96,27 +96,39 @@ img {
     @include base-box-shadow();
     background: $chef-white;
     border-radius: $global-radius;
+    border: 0.5px solid $chef-key-tab;
   }
 
   .key-tab-body {
     display: flex;
     padding: 1.5em;
     background: $chef-white;
-    border: 0.5px solid $chef-key-tab;
   }
 
   .key-tab-body-top {
-    padding: 1em;
+    margin: 0 10px;
     background: $chef-white;
-    border-left: 0.5px solid $chef-key-tab;
-    border-right: 0.5px solid $chef-key-tab;
-    border-top: 0.5px solid $chef-key-tab;
+    border-bottom: 0.5px solid $chef-key-tab;
+    text-align: right;
 
-    p {
-      margin: 0;
-      text-align: right;
-      color: $chef-dark-blue;
+    chef-button:focus {
+      outline: none;
     }
+
+    ::ng-deep {
+      chef-button button:focus {
+        outline: none;
+      }
+    }
+
+    chef-icon:focus {
+      outline: none;
+    }
+
+    span:focus {
+      outline: none;
+    }
+
   }
 
   .key-tab-head {
@@ -129,8 +141,5 @@ img {
       color: $chef-black;
     }
   }
-}
 
-.reset-key {
-  cursor: pointer;
 }

@@ -48,10 +48,10 @@
             </div>
             <div class="key-tab-details">
               <div class="key-tab-body-top">
-                <p class="reset-key" (click)="openResetKeyClientModal()">
+                <chef-button tertiary class="reset-key" (click)="openResetKeyClientModal()">
                   <chef-icon>vpn_key</chef-icon>
                   <span>Reset Key</span>
-                </p>
+                </chef-button>
               </div>
               <div class="key-tab-body">
                 <chef-snippet [code]="client?.client_key.public_key" lang="json"></chef-snippet>

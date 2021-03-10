@@ -4,7 +4,9 @@ import { takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { combineLatest, Subject } from 'rxjs';
 import { ResetKeyClient } from 'app/entities/clients/client.action';
-import { getStatus, resetKeyClient, saveError } from 'app/entities/clients/client-details.selectors';
+import { getStatus,
+  resetKeyClient,
+  saveError } from 'app/entities/clients/client-details.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
@@ -44,10 +46,13 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.conflictError = false;
         this.visible = true;
+        this.reseting = false;
+        this.isReset = false;
         this.server = this.serverId;
         this.org = this.orgId;
         this.name = this.name;
         this.error = '';
+        this.privateKey = '';
       });
 
     combineLatest([
@@ -57,15 +62,15 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(([getStatusSt, resetKeyState, errorSt]) => {
-      if (getStatusSt === EntityStatus.loadingSuccess && 
-        !isNil(resetKeyState)) {        
+      if (getStatusSt === EntityStatus.loadingSuccess &&
+        !isNil(resetKeyState)) {
             this.reseting = false;
             this.isReset = true;
             this.conflictError = false;
             this.privateKey = resetKeyState?.private_key;
-          } else if (getStatusSt === EntityStatus.loadingFailure) {            
+          } else if (getStatusSt === EntityStatus.loadingFailure) {
             this.error = errorSt;
-            if(this.error ==='missing update permission') {
+            if (this.error === 'missing update permission') {
               this.isReset = false;
               this.reseting = false;
               this.conflictError = true;

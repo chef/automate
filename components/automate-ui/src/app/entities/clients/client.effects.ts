@@ -145,10 +145,10 @@ export class ClientEffects {
   @Effect()
   resetKeyClientSuccess$ = this.actions$.pipe(
     ofType(ClientActionTypes.RESETKEY_SUCCESS),
-    map(({ payload: { client_name } }: ResetKeyClientSuccess) => {
+    map(({ payload: { name } }: ResetKeyClientSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully resetting Client key - ${client_name}.`
+        message: `Successfully resetting Client key - ${name}.`
       });
     }));
 
