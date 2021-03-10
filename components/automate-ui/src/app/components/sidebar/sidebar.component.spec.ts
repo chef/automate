@@ -35,7 +35,6 @@ describe('SidebarComponent', () => {
       ]
     }).compileComponents();
     store = TestBed.inject(Store);
-    layoutFacade = TestBed.inject(LayoutFacadeService);
     featureFlags = TestBed.inject(FeatureFlagsService);
     spyOn(store, 'dispatch').and.callThrough();
   }));
@@ -66,6 +65,8 @@ describe('SidebarComponent', () => {
         if (featureFlag) {
           featureFlags.setFeature(featureFlag, true);
         }
+        // must be after feature flag setting!
+        layoutFacade = TestBed.inject(LayoutFacadeService);
 
         fixture = TestBed.createComponent(SidebarComponent);
         element = fixture.debugElement.nativeElement;
