@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { HttpStatus } from 'app/types/types';
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
+  CreateRole,
+  CreateRoleSuccess,
+  CreateRoleFailure,
   GetRoles,
   GetRolesSuccess,
   RolesSuccessPayload,
@@ -20,7 +24,7 @@ import {
   DeleteRoleFailure
 } from './infra-role.action';
 
-import { InfraRoleRequests } from './infra-role.requests';
+import { InfraRoleRequests, RoleResponse } from './infra-role.requests';
 
 @Injectable()
 export class InfraRoleEffects {
@@ -66,6 +70,32 @@ export class InfraRoleEffects {
         message: `Could not get infra role: ${msg || payload.error}`
       });
     }));
+
+  @Effect()
+  createRole$ = this.actions$.pipe(
+    ofType(RoleActionTypes.CREATE),
+    mergeMap(({ payload: { role } }: CreateRole) =>
+      this.requests.createRole(role).pipe(
+        map((resp: RoleResponse) => new CreateRoleSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateRoleFailure(error))))));
+
+  @Effect()
+  createRoleSuccess$ = this.actions$.pipe(
+    ofType(RoleActionTypes.CREATE_SUCCESS),
+    map(({ payload: { } }: CreateRoleSuccess) => new CreateNotification({
+      type: Type.info,
+      message: 'Created role.'
+    })));
+
+  @Effect()
+  createRoleFailure$ = this.actions$.pipe(
+    ofType(RoleActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateRoleFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateRoleFailure) => new CreateNotification({
+      type: Type.error,
+      message: `Could not create notification: ${payload.error.error || payload}.`
+    })));
 
   @Effect()
   deleteRole$ = this.actions$.pipe(

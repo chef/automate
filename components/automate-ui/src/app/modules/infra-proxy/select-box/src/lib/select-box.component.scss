@@ -1,0 +1,247 @@
+.select-box-list-container{
+    display:flex; 
+    flex-direction:row;
+  }
+  
+  .vertical{
+    display:flex; 
+    flex-direction:column;
+  }
+  
+.role-list {
+  border: 1px solid #E6EBEE;
+  border-radius: 4px;
+  max-height: 350px;
+  min-height: 300px;
+  background: white;
+  display: block;
+  height: 100%;
+  overflow-y: scroll;
+
+  height: 235px;
+  left: 398px;
+  right: 762px;
+  top: 389px;
+  width: 280px;
+
+/* lavender03 */
+
+  border: 1px solid #DEE6F7;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+  
+  .run-list-box {
+    padding: 10px 10px;
+    color: rgba(0, 0, 0, 0.87);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+    background: white;
+    font-size: 14px;
+  }
+  
+  
+  .select-box-list {
+    border: 1px solid #E6EBEE;
+    font-size: 14px;
+    height: 408px;
+    overflow-y: scroll;
+    border-radius: 4px;
+  }
+  
+  ::ng-deep .select-box-list::-webkit-scrollbar {
+    width: 10px;
+    background-color: #F5F5F5;
+  }
+  
+  ::ng-deep .select-box-list::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #CCC;
+  }
+  
+  .select-box-list-item{
+    padding: 10px;
+    cursor: move;
+  }
+  
+  .run-list-box.selected{
+    background-color: var(--chef-primary-bright);
+    color: var(--chef-white);
+    margin-top: 1.2px;
+  }
+  
+  .select-box-list-item.selected{
+    background-color: var(--chef-primary-bright);
+      color: var(--chef-white);
+    margin-top: 1.2px;
+  }
+  
+  .select-box-buttons{
+    vertical-align: center;
+    padding: 20px;
+    display:flex; 
+    flex-direction:column;
+    width:50px;
+    height: 250px;
+  }
+  
+  .select-box-preview span{
+    background-color: #3864f2;
+    padding:10px;
+  }
+  
+  .select-box-placeholder span{
+    background-color: #3864f2;;
+    padding:10px;
+  }
+  
+  .selectbox-search{
+    margin-bottom: 21px;
+    margin-top: -8px;
+    width: 100%;
+  }
+  
+  
+  .dropdown-toggle{
+    color: white;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .margin{
+    margin-top: 30px;
+  }
+  
+  .data-box {
+    border-radius: 10px;
+    float: left;
+    height: 400px;
+    width: 41.5%;
+    margin-right: 10px;
+  }
+  
+  .empty-box {
+    border-radius: 10px;
+    float: left;
+    height: 409px;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 41.5%;
+  }
+  
+  .left-right-arrow-box {
+    float: left;
+    height: 400px;
+    padding-top: 200px;
+    text-align: center;
+    width: 8%;
+  }
+  
+  .up-down-arrow-box {
+    float: left;
+    height: 400px;
+    padding-top: 200px;
+    text-align: center;
+    width: 6%;
+    margin-left: 5px;
+  }
+  
+  .primary {
+    background-color: #FFFFFF;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    font-size: 14px;
+    min-height: 32px;
+    min-width: 32px;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: top;
+    
+    
+    width: 24px;
+  height: 24px;
+  left: 0px;
+  top: 0px;
+
+  border: 1px solid #3864F2;
+  box-sizing: border-box;
+  border-radius: 4px;
+
+  mat-icon {
+    left: 40.62%;
+    right: 34.38%;
+    top: 28.12%;
+    bottom: 28.12%;
+
+    color: #3864F2;
+    background: white;
+  }
+}
+  
+  .primary[disabled] {
+    background-color: #bdcbfb;
+    border-color: #bdcbfb;
+    color: var(--chef-white);
+  }
+
+.input-icons {
+  width: 100%; 
+  margin-bottom: 10px; 
+  width: 254px;
+  height: 32px;
+
+  background: #FFFFFF;
+  border: 1px solid #E6EBEE;
+  box-sizing: border-box;
+  border-radius: 4px;
+  margin-left: 8px;
+  margin-top: 8px;
+  margin-right: 8px;
+}
+
+.icon {
+  padding: 10px; 
+  color: #222435; 
+  min-width: 50px; 
+  text-align: center; 
+}
+
+.input-field { 
+  //width: 100%; 
+  padding: 10px;
+  text-align: start;
+
+  width: 227px;
+height: 21px;
+left: 32px;
+top: 5px;
+
+font-family: Mulish;
+font-style: normal;
+font-weight: normal;
+font-size: 12px;
+line-height: 21px;
+/* identical to box height, or 175% */
+
+letter-spacing: 0.2px;
+border: 0px solid #E6EBEE;
+color: #6F7878;
+margin-left: 30px;
+margin-top: 5px;
+
+}
+
+.input-icons chef-icon { 
+  position: absolute; 
+}
+ 

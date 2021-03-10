@@ -10,10 +10,19 @@
   </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
+  <app-create-infra-role-modal [openEvent]="openRoleModal"
+  [rolesList]="roles" [serverId]="serverId" [orgId]="orgId"></app-create-infra-role-modal>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
     <div class="search-items">
-      <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
-      </app-infra-search-bar>
+      <div class="search-box">
+        <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
+        </app-infra-search-bar>
+      </div>
+      <div class="button-box">
+        <chef-toolbar>
+          <chef-button id="role-create" primary (click)="openCreateModal()">Create Role</chef-button>
+        </chef-toolbar>
+      </div>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !roles.length">

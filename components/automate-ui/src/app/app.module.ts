@@ -90,6 +90,7 @@ import { NotificationRuleRequests } from './entities/notification_rules/notifica
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
+import { RecipeRequests } from './entities/recipes/recipe.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { ServerRequests } from './entities/servers/server.requests';
@@ -334,6 +335,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectService,
     ProjectsFilterRequests,
     ProjectsFilterService,
+    RecipeRequests,
     RoleRequests,
     RuleRequests,
     RunHistoryStore,

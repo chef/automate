@@ -1,0 +1,80 @@
+@import "~styles/variables";
+
+
+.multi-list-container {
+  border: solid 1px #ccc;
+  margin-top: 10px;
+}
+
+.run-list-container {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0 25px 0px 50;
+  vertical-align: top;
+  width: 200px;
+}
+
+.role-list {
+  max-height: 400px;
+  min-height: 300px;
+  background: white;
+  display: block;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.run-list-box {
+  align-items: center;
+  background: white;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.87);
+  cursor: move;
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  justify-content: space-between;
+  padding: 10px 10px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.run-list-box:last-child {
+  border: none;
+}
+
+.select-box {
+  width: 285px;
+}
+
+.margin {
+  margin-top: 25px;
+}
+
+::ng-deep .role-list::-webkit-scrollbar {
+  background-color: #F5F5F5;
+  width: 10px;
+}
+
+::ng-deep .role-list::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: #CCC;
+}
+
+// ::ng-deep [panelClass=chef-dropdown] {
+//   padding: 9px 13px;
+//   width: 98% !important;
+// }

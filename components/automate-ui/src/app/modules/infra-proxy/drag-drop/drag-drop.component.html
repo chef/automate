@@ -1,0 +1,22 @@
+<div cdkDropListGroup>
+    <div class="select-box">
+        <!-- drop down for available types -->
+        <mat-select #li panelClass="chef-dropdown" [value]="defaultType"
+            (selectionChange)="selectChangeHandler(li.value)">
+            <mat-option *ngFor="let key of typeAvailable" [value]="key">
+                {{ key }}
+            </mat-option>
+        </mat-select>
+    </div>
+
+    <!-- combined data -->
+    <div *ngIf="showbutton" class="margin">
+        <form [formGroup]="userForm">
+            <app-select-box id="myListBox" [list]="availableType" search="true" sort="true" selectAll="true"
+                formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+            </app-select-box>
+            <br />
+        </form>
+        <br />
+    </div>
+</div>

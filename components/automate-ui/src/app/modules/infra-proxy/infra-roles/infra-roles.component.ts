@@ -25,7 +25,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-
   public roles: InfraRole[] = [];
   public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
@@ -39,6 +38,9 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roleToDelete: InfraRole;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
+
+  public openRoleModal = new EventEmitter<boolean>();
+  public recipes: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -108,6 +110,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  public openCreateModal(): void {
+    this.openRoleModal.emit();
   }
 
   ngOnDestroy(): void {

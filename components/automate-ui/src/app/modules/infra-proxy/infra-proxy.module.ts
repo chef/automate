@@ -17,8 +17,10 @@ import { CreateEnvironmentModalComponent } from './create-environment-modal/crea
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { CreateDataBagModalComponent } from './create-data-bag-modal/create-data-bag-modal.component';
 import { CreateDatabagItemModalComponent } from './create-databag-item-modal/create-databag-item-modal.component';
+import { CreateInfraRoleModalComponent } from './create-infra-role-modal/create-infra-role-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
+import { DragDropComponent } from './drag-drop/drag-drop.component';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component';
 import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal/edit-data-bag-item-modal.component';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
@@ -39,6 +41,9 @@ import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.com
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatInputModule } from '@angular/material/input';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SelectBoxModule } from './select-box/src/public_api';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -54,8 +59,10 @@ import { MatInputModule } from '@angular/material/input';
     CreateDataBagModalComponent,
     CreateClientModalComponent,
     CreateDatabagItemModalComponent,
+    CreateInfraRoleModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
+    DragDropComponent,
     DeleteInfraObjectModalComponent,
     EditDataBagItemModalComponent,
     EmptyStateComponent,
@@ -79,11 +86,15 @@ import { MatInputModule } from '@angular/material/input';
     AppRoutingModule,
     ChefComponentsModule,
     ChefPipesModule,
+    DragDropModule,
+    SelectBoxModule,
     TreeTableModule,
     FormsModule,
     MatTabsModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

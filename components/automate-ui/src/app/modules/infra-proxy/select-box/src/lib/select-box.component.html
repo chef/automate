@@ -1,0 +1,68 @@
+<div class="select-box-list-container">
+    <div class="data-box">
+        <div class="vertical multi-list-container">
+            <div class="vertical role-list" cdkDropList #origList="cdkDropList" [cdkDropListConnectedTo]="[selList]"
+                (cdkDropListDropped)="dragOntoLeftItems($event)">
+                <div class="input-icons">
+                    <!-- <button chef-button class="search-button primary" primary (click)="handleFiltersClick(search_box.value)"> -->
+                    <chef-icon class="icon">search</chef-icon>
+                <!-- </button> -->
+                    <input chefInput *ngIf="!disabled && search" type="text" class="selectbox-search input-field"
+                    [(ngModel)]="leftFilterText" [disabled]="disabled" placeholder="Search.." />
+                </div>
+                <div class="run-list-box" *ngFor="let item of originalItems | listFilter:leftFilterText"
+                    [ngClass]="item.selected ? 'selected' : ''" (click)="item.selected= (!disabled && !item.selected)"
+                    cdkDrag [cdkDragDisabled]="disabled || !item.selected">
+                    {{item.value}}
+                    <div *cdkDragPlaceholder class="select-box-placeholder vertical">
+                        <span *ngFor="let leftPreview of getLeftSelectedList()">{{leftPreview.value}}</span>
+                    </div>
+                    <div *cdkDragPreview class="select-box-preview vertical">
+                        <span *ngFor="let leftPreview of getLeftSelectedList()">{{leftPreview.value}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="left-right-arrow-box">
+        <button chef-button class="dropdown-toggle primary" primary (click)="addItems()" [disabled]="disabled">
+            <mat-icon>play_arrow</mat-icon>
+        </button>
+
+        <div class="margin">
+            <button chef-button class="dropdown-toggle primary" primary (click)="removeItems()" [disabled]="disabled">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="vertical empty-box">
+        <div class="select-box-list vertical" cdkDropList #selList="cdkDropList" [cdkDropListConnectedTo]="[origList]"
+            (cdkDropListDropped)="dragOntoRightItems($event)">
+            <div class="select-box-list-item" *ngFor="let item of selectedItems | listFilter:rightFilterText"
+                [ngClass]="item.selected ? 'selected' : ''" (click)="item.selected= (!disabled && !item.selected)"
+                cdkDrag [cdkDragDisabled]="disabled || !item.selected"> {{item}} 
+                <!-- <div  *ngFor="let item of selectedItems"> -->
+                {{item.value}}
+                <div *cdkDragPlaceholder class="select-box-placeholder vertical">
+                    <span *ngFor="let rightPreview of getRightSelectedList()">{{rightPreview.value}}</span>
+                </div>
+                <div *cdkDragPreview class="select-box-preview vertical">
+                    <span *ngFor="let rightPreview of getRightSelectedList()">{{rightPreview.value}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="up-down-arrow-box">
+        <div>
+            <button chef-button class="dropdown-toggle primary" primary (click)="ascItems()" [disabled]="disabled">
+                <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <div class="margin">
+                <button chef-button class="dropdown-toggle primary" primary (click)="descItems()" [disabled]="disabled">
+                    <mat-icon>arrow_downward</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

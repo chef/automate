@@ -1,5 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set, pipe } from 'lodash/fp';
+import { HttpErrorResponse } from '@angular/common/http';
+import { set, pipe, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { RoleActionTypes, RoleActions } from './infra-role.action';
 import { InfraRole } from './infra-role.model';
@@ -12,10 +13,14 @@ export interface InfraRoleEntityState extends EntityState<InfraRole> {
     total: number
   };
   deleteStatus: EntityStatus;
+  saveStatus: EntityStatus;
+  saveError: HttpErrorResponse;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
 const DELETE_STATUS = 'deleteStatus';
+const SAVE_STATUS = 'saveStatus';
+const SAVE_ERROR = 'saveError';
 
 export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
   selectId: (infraRole: InfraRole) => infraRole.name
@@ -43,6 +48,29 @@ export function infraRoleEntityReducer(
 
     case RoleActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case RoleActionTypes.CREATE: {
+      return set(
+        SAVE_STATUS,
+        EntityStatus.loading,
+        state);
+    }
+
+    case RoleActionTypes.CREATE_SUCCESS: {
+      return pipe(
+        unset(SAVE_ERROR),
+        set(SAVE_STATUS, EntityStatus.loadingSuccess)
+      )(infraRoleEntityAdapter.addOne(action.payload, state)
+      ) as InfraRoleEntityState;
+    }
+
+    case RoleActionTypes.CREATE_FAILURE: {
+      return pipe(
+        set(SAVE_ERROR, action.payload),
+        set(SAVE_STATUS, EntityStatus.loadingFailure)
+      )(state) as InfraRoleEntityState;
+    }
+
 
     case RoleActionTypes.DELETE:
       return set(DELETE_STATUS, EntityStatus.loading, state);

@@ -35,12 +35,13 @@ chef-loading-spinner {
 }
 
 .empty-section {
-  margin-top: 130px;
   text-align: center;
 }
 
 img {
   width: 70px;
+  margin-top: 130px;
+
 }
 
 .full-screen-spinner {
@@ -59,4 +60,19 @@ img {
 
 .three-dot-column {
   text-align: right;
+}
+
+#role-create {
+  float: right;
+  margin-left: 16px;
+}
+
+.search-box {
+  float: left;
+  width: 96%;
+}
+
+.button-box {
+  float: right;
+  width: 4%;
 }
