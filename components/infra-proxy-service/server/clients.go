@@ -169,7 +169,7 @@ func (s *Server) DeleteClient(ctx context.Context, req *request.Client) (*respon
 
 // ResetClientKey resets the client key
 // Deletes the associated key pair and generates new key pair again, and then attaches it to the client.
-func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*response.ClientKey, error) {
+func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*response.ResetClient, error) {
 	err := validation.New(validation.Options{
 		Target:  "client",
 		Request: *req,
@@ -228,9 +228,14 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 		return nil, ParseAPIError(err)
 	}
 
-	return &response.ClientKey{
-		Name:       key,
-		PrivateKey: chefKey.PrivateKey,
+	return &response.ResetClient{
+		Name: req.Name,
+		ClientKey: &response.ClientKey{
+			Name:           chefKey.Name,
+			PublicKey:      chefKey.PublicKey,
+			ExpirationDate: chefKey.ExpirationDate,
+			PrivateKey:     chefKey.PrivateKey,
+		},
 	}, nil
 
 }
