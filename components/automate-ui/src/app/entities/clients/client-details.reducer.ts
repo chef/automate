@@ -7,7 +7,10 @@ import { Client, ClientKey } from './client.model';
 export interface ClientDetailsEntityState extends EntityState<Client> {
   clientStatus: EntityStatus;
   getStatus: EntityStatus;
-  resetKeyClient: ClientKey;
+  resetKeyClient: {
+    client_key: ClientKey,
+    name: string
+  };
   saveError: EntityStatus;
 }
 

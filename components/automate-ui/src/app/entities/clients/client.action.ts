@@ -126,9 +126,12 @@ export class ResetKeyClient implements Action {
 
 export interface ResetKeySuccessPayload {
   name: string;
-  public_key: string;
-  expiration_date: string;
-  private_key: string;
+  client_key: {
+    name: string,
+    public_key: string,
+    expiration_date: string,
+    private_key: string
+  };
 }
 
 export class ResetKeyClientSuccess implements Action {
