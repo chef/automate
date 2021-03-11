@@ -61,28 +61,27 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   public showdrag = false;
   public showConstraint = false;
 
-  public firstFormGroup: FormGroup;
-  public thirdFormGroup: FormGroup;
-  public fourthFormGroup: FormGroup;
-  public constraintKeysp: string[] = [];
+  public detailsFormGroup: FormGroup;
+  public defaultAttrFormGroup: FormGroup;
+  public overrideAttrFormGroup: FormGroup;
+  public constraintKeys: string[] = [];
   public cookbooks: Cookbook[] = [];
-  public default_attr_value = '{}';
-  public override_attr_value = '{}';
+  public attr_value = '{}';
   public server: string;
   public org: string;
   public per_page = 9;
   public page = 1;
-  public name_idp = '';
+  public name_id = '';
   public jsonString: string;
-  public dattrParseError: boolean;
-  public oattrParseError: boolean;
+  public defaultAttrParseError: boolean;
+  public overrideAttrParseError: boolean;
   public data: any;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public close = new EventEmitter();
   public constraintArray: Array<DynamicGrid> = [];
   public items: Environment[] = [];
   public textareaID: string;
-  public dynamicArrayp: Array<DynamicGrid> = [];
+  public dynamicArray: Array<DynamicGrid> = [];
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -92,17 +91,17 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   ) {
 
-    this.firstFormGroup = this.fb.group({
+    this.detailsFormGroup = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
-    this.thirdFormGroup = this.fb.group({
-      dattr: ['']
+    this.defaultAttrFormGroup = this.fb.group({
+      default: ['{}']
     });
 
-    this.fourthFormGroup = this.fb.group({
-      oattr: ['', [Validators.required]]
+    this.overrideAttrFormGroup = this.fb.group({
+      override: ['{}', [Validators.required]]
     });
 
   }
@@ -155,7 +154,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetEnvironments(payload));
           this.creating = false;
 
-          // Close the modal on any error other than conflict and display in banner.
+          // Close the modal on any other error because it will be displayed in the banner.
           this.closeCreateModal();
         }
         this.creating = false;
@@ -204,7 +203,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   // Getting list of cookbook names
   loadCookbookConstraint() {
-    this.name_idp = '';
+    this.name_id = '';
     this.store.dispatch(new GetCookbooks({
       server_id: this.serverId, org_id: this.orgId
     }));
@@ -215,13 +214,13 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getCookbooksSt, allCookbooksState]) => {
       if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
-        this.constraintKeysp = [];
+        this.constraintKeys = [];
         this.cookbooks = allCookbooksState;
         this.cookbooks.forEach((cookbook) => {
-          this.constraintKeysp.push(cookbook.name);
+          this.constraintKeys.push(cookbook.name);
         });
       }
-      this.name_idp = this.constraintKeysp[0];
+      this.name_id = this.constraintKeys[0];
     });
 
   }
@@ -231,11 +230,11 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     const environment = {
       org_id: this.orgId,
       server_id: this.serverId,
-      name: this.firstFormGroup.controls['name'].value,
-      description: this.firstFormGroup.controls['description'].value,
+      name: this.detailsFormGroup.controls['name'].value,
+      description: this.detailsFormGroup.controls['description'].value,
       cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
-      default_attributes: JSON.parse(this.thirdFormGroup.controls['dattr'].value),
-      override_attributes: JSON.parse(this.fourthFormGroup.controls['oattr'].value)
+      default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
+      override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value)
     };
 
     this.store.dispatch(
@@ -259,19 +258,19 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   private resetCreateModal(): void {
     this.creating = false;
-    this.firstFormGroup.reset();
-    this.thirdFormGroup.reset();
-    this.fourthFormGroup.reset();
-
+    this.detailsFormGroup.reset();
+    this.defaultAttrFormGroup.reset();
+    this.overrideAttrFormGroup.reset();
+    this.showConstraint = false;
     this.overrideTab = false;
     this.defaultTab = false;
     this.constraintsTab = false;
     this.detailsTab = true;
-    this.default_attr_value = '{}';
-    this.override_attr_value = '{}';
-    this.dattrParseError = false;
-    this.oattrParseError = false;
-    this.dynamicArrayp = [];
+    this.defaultAttrFormGroup.controls.default.setValue(this.attr_value);
+    this.overrideAttrFormGroup.controls.override.setValue(this.attr_value);
+    this.defaultAttrParseError = false;
+    this.overrideAttrParseError = false;
+    this.dynamicArray = [];
     this.loadCookbookConstraint();
     this.conflictErrorEvent.emit(false);
   }
@@ -309,21 +308,21 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   }
 
   public onChangeJSON(event) {
-    this.dattrParseError = false;
-    this.oattrParseError = false;
+    this.defaultAttrParseError = false;
+    this.overrideAttrParseError = false;
     // get value from text area
     const newValue = event.target.value;
     this.textareaID = event.target.id;
     try {
         // parse it to json
       this.data = JSON.parse(newValue);
-      if (this.textareaID === 'dattr') { (this.dattrParseError = false); }
-      if (this.textareaID === 'oattr') { (this.oattrParseError = false); }
+      if (this.textareaID === 'default') { (this.defaultAttrParseError = false); }
+      if (this.textareaID === 'override') { (this.overrideAttrParseError = false); }
 
     } catch (ex) {
         // set parse error if it fails
-      if (this.textareaID === 'dattr') { (this.dattrParseError = true); }
-      if (this.textareaID === 'oattr') { (this.oattrParseError = true); }
+      if (this.textareaID === 'default') { (this.defaultAttrParseError = true); }
+      if (this.textareaID === 'override') { (this.overrideAttrParseError = true); }
 
     }
     // update the form

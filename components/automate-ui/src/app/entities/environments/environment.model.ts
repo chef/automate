@@ -10,7 +10,7 @@ export interface Environment {
   default_attributes: Object;
   override_attributes: Object;
   run_list?: string[];
-  cookbook_versions: any;
+  cookbook_versions: Object;
 }
 
 export interface CookbookVersion {

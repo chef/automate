@@ -69,8 +69,30 @@ chef-modal {
         margin-top: 10px;
       }
 
-      #dattr, #oattr {
+      #default, #override {
         height: 286px;
+      }
+
+      ::ng-deep #default::-webkit-scrollbar {
+        width: 5px;
+        background: $chef-form-input;
+        border-radius: 5px;
+      }
+
+      ::ng-deep #default::-webkit-scrollbar-thumb {
+        background: #B4C3CC;
+        border-radius: 5px;
+      }
+
+      ::ng-deep #override::-webkit-scrollbar {
+        width: 5px;
+        background: $chef-form-input;
+        border-radius: 5px;
+      }
+
+      ::ng-deep #override::-webkit-scrollbar-thumb {
+        background: #B4C3CC;
+        border-radius: 5px;
       }
     }
 
@@ -213,6 +235,18 @@ chef-modal ::ng-deep .modal-overlay {
     margin: 10px 0px 0px 16px;
   }
 
+  chef-button#create-button-object-modal-1 {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#create-button-object-modal-2 {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#create-button-object-modal-3 {
+    margin: 10px 0px 0px 16px;
+  }
+
   chef-button#cancel-server-popup {
     margin: 10px 15px 0px 0px;
   }
@@ -274,10 +308,21 @@ chef-modal ::ng-deep .modal-overlay {
   border-color: $chef-form-input;
 }
 
-// sass-lint:disable-line no-important
+// sass-lint:disable no-important
 ::ng-deep .cdk-overlay-container .cdk-overlay-pane {
   margin-left: -12px !important;
   transform: none !important;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {
+  width: 4.5px;
+  background: $chef-form-input;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
+  background: #B4C3CC;
+  border-radius: 5px;
 }
 
 ::ng-deep .cdk-overlay-container {
@@ -401,9 +446,9 @@ form {
     textarea {
       height: 286px;
       margin-top: 32.22px;
-      border: 1px solid $chef-form-input;
       box-sizing: border-box;
       border-radius: 4px;
+      margin-bottom: -3px;
     }
   }
 }

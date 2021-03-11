@@ -115,9 +115,9 @@ export class EnvironmentEffects {
   @Effect()
   createEnvironmentSuccess$ = this.actions$.pipe(
     ofType(EnvironmentActionTypes.CREATE_SUCCESS),
-    map(({ payload: { } }: CreateEnvironmentSuccess) => new CreateNotification({
+    map(({ payload: { name } }: CreateEnvironmentSuccess) => new CreateNotification({
       type: Type.info,
-      message: 'Created environment.'
+      message: `Created environment ${name}.`
     })));
 
   @Effect()

@@ -11,7 +11,6 @@ import { environmentFromRoute } from 'app/entities/environments/environment-deta
 import { GetEnvironment } from 'app/entities/environments/environment.action';
 import {
   Environment,
-  CookbookVersion,
   EnvironmentAttributes,
   CookbookVersionDisplay
 } from 'app/entities/environments/environment.model';
@@ -130,7 +129,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  toDisplay(cookbookVersions: CookbookVersion[]): CookbookVersionDisplay[] {
+  toDisplay(cookbookVersions: Object): CookbookVersionDisplay[] {
     return Object.keys(cookbookVersions).map(function (key) {
       const value = cookbookVersions[key].split(' ');
       return {name: key, operator: value[0], versionNumber: value[1]};

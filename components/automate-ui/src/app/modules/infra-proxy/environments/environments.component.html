@@ -18,9 +18,9 @@
         <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
       </div>
       <div class="button-box" *ngIf="chefInfraViewsFeatureFlagOn">
-      <chef-toolbar>
-        <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
-      </chef-toolbar>
+        <chef-toolbar>
+          <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
+        </chef-toolbar>
       </div>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   

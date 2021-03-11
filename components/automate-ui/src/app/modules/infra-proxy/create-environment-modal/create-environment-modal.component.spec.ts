@@ -7,7 +7,6 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { CreateEnvironmentModalComponent } from './create-environment-modal.component';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { Environment } from 'app/entities/environments/environment.model';
 import { CreateEnvironmentSuccess, CreateEnvironmentFailure } from 'app/entities/environments/environment.action';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpStatus } from 'app/types/types';
@@ -54,15 +53,15 @@ describe('CreateEnvironmentModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateEnvironmentModalComponent);
     component = fixture.componentInstance;
-    component.firstFormGroup = new FormBuilder().group({
+    component.detailsFormGroup = new FormBuilder().group({
       name: ['', null],
       description: ['', null]
     });
-    component.thirdFormGroup = new FormBuilder().group({
-      dattr: ['', null]
+    component.defaultAttrFormGroup = new FormBuilder().group({
+      default: ['', null]
     });
-    component.fourthFormGroup = new FormBuilder().group({
-      oattr: ['', null]
+    component.overrideAttrFormGroup = new FormBuilder().group({
+      override: ['', null]
     });
     component.openEvent = new EventEmitter();
     fixture.detectChanges();
@@ -75,14 +74,17 @@ describe('CreateEnvironmentModalComponent', () => {
 
   describe('create environment', () => {
     let store: Store<NgrxStateAtom>;
-    const environment: Environment = {
+    const environment = {
       org_id: 'chef_manage',
       server_id: 'test',
       name: 'test',
       description: 'test environment',
-      cookbook_versions: {
-        aix: '> 2.3.4'
-      },
+      cookbook_versions: [{
+        id: 1,
+        name: 'aix',
+        version: '2.3.4',
+        operator: '<'
+      }],
       default_attributes: {
         test: 'test'
       },
@@ -95,7 +97,7 @@ describe('CreateEnvironmentModalComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('opening creat model and defaults tab to showing section', () => {
+    it('opening create modal and reset tab to details tab', () => {
       component.visible = true;
       expect(component.detailsTab).toBe(true);
       expect(component.constraintsTab).toBe(false);
@@ -103,23 +105,23 @@ describe('CreateEnvironmentModalComponent', () => {
       expect(component.overrideTab).toBe(false);
     });
 
-    it('opening create modal resets to empty string', () => {
+    it('opening create modal resets name, description, default, override to empty string', () => {
       component.visible = true;
-      expect(component.firstFormGroup.controls['name'].value).toEqual('');
-      expect(component.firstFormGroup.controls['description'].value).toEqual('');
-      expect(component.thirdFormGroup.controls['dattr'].value).toEqual('{}');
-      expect(component.fourthFormGroup.controls['oattr'].value).toEqual('{}');
+      expect(component.detailsFormGroup.controls['name'].value).toEqual('');
+      expect(component.detailsFormGroup.controls['description'].value).toEqual('');
+      expect(component.defaultAttrFormGroup.controls['default'].value).toEqual('');
+      expect(component.overrideAttrFormGroup.controls['override'].value).toEqual('');
     });
 
     it('on conflict error, modal remains open and displays conflict error', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.visible = true;
-      component.firstFormGroup.controls['name'].setValue(environment.name);
-      component.firstFormGroup.controls['description'].setValue(environment.description);
+      component.detailsFormGroup.controls['name'].setValue(environment.name);
+      component.detailsFormGroup.controls['description'].setValue(environment.description);
       component.constraintArray = environment.cookbook_versions;
-      component.thirdFormGroup.controls['dattr'].setValue(
+      component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
-      component.fourthFormGroup.controls['oattr'].setValue(
+      component.overrideAttrFormGroup.controls['override'].setValue(
         JSON.stringify(environment.override_attributes));
 
       component.createEnvironment();
@@ -129,35 +131,35 @@ describe('CreateEnvironmentModalComponent', () => {
         ok: false
       };
       store.dispatch(new CreateEnvironmentFailure(conflict));
-      expect(component.visible).toBe(true);
+      expect(component.conflictError).toBe(true);
     });
 
     it('on success, closes modal and adds new environment', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.visible = true;
-      component.firstFormGroup.controls['name'].setValue(environment.name);
-      component.firstFormGroup.controls['description'].setValue(environment.description);
+      component.detailsFormGroup.controls['name'].setValue(environment.name);
+      component.detailsFormGroup.controls['description'].setValue(environment.description);
       component.constraintArray = environment.cookbook_versions;
-      component.thirdFormGroup.controls['dattr'].setValue(
+      component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
-      component.fourthFormGroup.controls['oattr'].setValue(
+      component.overrideAttrFormGroup.controls['override'].setValue(
         JSON.stringify(environment.override_attributes));
       component.createEnvironment();
 
       store.dispatch(new CreateEnvironmentSuccess({environment}));
-      component.closeCreateModal();
+      expect(component.creating).toBe(false);
+      expect(component.visible).toBe(false);
       expect(component.environmentsList.length).not.toBeNull();
     });
 
     it('on create error, modal is closed (because error is handled by failure banner)', () => {
       spyOn(component.conflictErrorEvent, 'emit');
-      component.visible = true;
-      component.firstFormGroup.controls['name'].setValue(environment.name);
-      component.firstFormGroup.controls['description'].setValue(environment.description);
+      component.detailsFormGroup.controls['name'].setValue(environment.name);
+      component.detailsFormGroup.controls['description'].setValue(environment.description);
       component.constraintArray = environment.cookbook_versions;
-      component.thirdFormGroup.controls['dattr'].setValue(
+      component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
-      component.fourthFormGroup.controls['oattr'].setValue(
+      component.overrideAttrFormGroup.controls['override'].setValue(
         JSON.stringify(environment.override_attributes));
 
       component.createEnvironment();
@@ -169,7 +171,7 @@ describe('CreateEnvironmentModalComponent', () => {
 
       store.dispatch(new CreateEnvironmentFailure(error));
 
-      expect(component.creating).toBe(false);
+      expect(component.conflictError).toBe(false);
     });
 
   });

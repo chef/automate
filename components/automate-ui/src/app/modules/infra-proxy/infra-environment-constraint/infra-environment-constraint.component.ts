@@ -53,8 +53,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
       this.rowKeys.push(element)
     );
-    this.name_id = this.constraintKeys[0];
-
   }
 
   selected(value, i) {
@@ -145,7 +143,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
   // Adding a new constraint
   addRow() {
-    this.dynamicArray.push({
+    this.dynamicArray.unshift({
       id: this.dynamicArray.length + 1,
       name: this.name_id,
       operator: this.operator_id,
