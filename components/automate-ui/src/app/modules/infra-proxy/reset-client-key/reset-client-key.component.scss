@@ -54,7 +54,7 @@ chef-modal.reset-client-modal {
       text-align: left;
     }
 
-    .del-icon {
+    .big-icon {
       z-index: 999999;
       position: relative;
     }
@@ -70,16 +70,6 @@ chef-modal.reset-client-modal {
         width: 99.9%;
       }
 
-    }
-
-    textarea {
-      height: 300px;
-      text-align: left;
-      font-size: 12px;
-      text-transform: capitalize;
-      resize: none;
-      line-height: 20px;
-      letter-spacing: 0.25px;
     }
 
     .detail {
@@ -141,85 +131,82 @@ chef-modal.reset-client-modal {
   }
 
   ::ng-deep {
-    chef-modal {
-      .modal {
-        box-shadow: 0px 0px 30px 0px #CCC;
-        outline: none;
-        width: 700px;
+    .modal {
+      box-shadow: 0px 0px 30px 0px #CCC;
+      outline: none;
+      width: 700px;
 
-        .options {
-          float: right;
+      .options {
+        float: right;
 
-          chef-button[primary] {
-            background-color: $chef-critical;
-            border-color: $chef-critical;
+        chef-button[primary] {
+          background-color: $chef-critical;
+          border-color: $chef-critical;
 
-            &:hover, &:focus {
-              background-color: $chef-critical-dark;
-              border-color: $chef-critical-dark;
-            }
-
-            chef-loading-spinner {
-              color: $chef-critical-light;
-            }
-
+          &:hover, &:focus {
+            background-color: $chef-critical-dark;
+            border-color: $chef-critical-dark;
           }
 
-          chef-button[tertiary] {
-            color: $chef-critical;
-
-            &:hover, &:focus {
-              background-color: $chef-critical-light;
-              border-color: $chef-critical-light;
-            }
+          chef-loading-spinner {
+            color: $chef-critical-light;
           }
 
         }
 
-        chef-button {
+        chef-button[tertiary] {
+          color: $chef-critical;
+
+          &:hover, &:focus {
+            background-color: $chef-critical-light;
+            border-color: $chef-critical-light;
+          }
+        }
+
+      }
+
+      chef-button {
+        outline: none;
+
+        &:focus {
           outline: none;
+        }
+
+        &.close {
+          border: none;
+          color: $chef-black;
+          margin-right: 22px;
+          margin-top: 16px;
+
+          &:hover, &:focus {
+            background: none;
+            outline: none;
+          }
+        }
+
+        button {
+          line-height: 20px;
+          letter-spacing: 0.5px;
 
           &:focus {
             outline: none;
           }
 
-          &.close {
-            border: none;
-            color: $chef-black;
-            margin-right: 22px;
-            margin-top: 16px;
-
-            &:hover, &:focus {
-              background: none;
-              outline: none;
-            }
-          }
-
-          button {
-            line-height: 20px;
-            letter-spacing: 0.5px;
-
-            &:focus {
-              outline: none;
-            }
-
-            span:focus {
-              outline: none;
-            }
-          }
-
-          .cancel-button.hydrated {
-            background: none;
+          span:focus {
+            outline: none;
           }
         }
 
+        .cancel-button.hydrated {
+          background: none;
+        }
       }
 
-      .modal-overlay {
-        background-color: $chef-white;
-        opacity: 0.5;
-      }
+    }
 
+    .modal-overlay {
+      background-color: $chef-white;
+      opacity: 0.5;
     }
 
     chef-snippet pre {
@@ -233,4 +220,5 @@ chef-modal.reset-client-modal {
     }
 
   }
+
 }
