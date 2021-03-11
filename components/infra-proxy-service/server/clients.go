@@ -221,7 +221,7 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 
 	res, err := c.client.Do(addReq, &chefKey)
 	if res != nil {
-		defer res.Body.Close() //nolint:errcheck //nolint:errcheck
+		defer res.Body.Close() //nolint:errcheck
 	}
 
 	if err != nil {
@@ -231,7 +231,7 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 	return &response.ResetClient{
 		Name: req.Name,
 		ClientKey: &response.ClientKey{
-			Name:           chefKey.Name,
+			Name:           key,
 			PublicKey:      chefKey.PublicKey,
 			ExpirationDate: chefKey.ExpirationDate,
 			PrivateKey:     chefKey.PrivateKey,
