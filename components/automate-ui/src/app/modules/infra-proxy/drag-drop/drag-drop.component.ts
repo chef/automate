@@ -90,6 +90,7 @@ export class DragDropComponent implements OnInit, OnDestroy {
     mergeArray(recipeList: string[], id: string) {
         this.showbutton = true;
         this.availableType = [];
+        console.log(recipeList);
         if (id === 'available roles and recipes') {
             if (this.recipes.length > 0) {
                 this.roles.forEach((role) => {
@@ -105,6 +106,8 @@ export class DragDropComponent implements OnInit, OnDestroy {
                     });
                 });
             }
+            console.log(this.availableType);
+
         } else if (id === 'available roles') {
             this.roles.forEach((role) => {
                 this.availableType.push({
@@ -112,6 +115,8 @@ export class DragDropComponent implements OnInit, OnDestroy {
                     type: 'role'
                 });
             });
+            console.log(this.availableType);
+
         } else {
             recipeList.forEach((recipe) => {
                 this.availableType.push({
@@ -119,7 +124,12 @@ export class DragDropComponent implements OnInit, OnDestroy {
                     type: 'recipe'
                 });
             });
+            console.log(this.availableType);
+
         }
+
+        console.log(this.availableType);
+
     }
     selectedItemsHandler(value: ListItem[]) {
         this.selected = value;

@@ -18,7 +18,7 @@
                                     Display Name is required.
                                 </chef-error>
                                 <chef-error *ngIf="conflictError">
-                                    Environment "{{firstFormGroup.get('name').value}}" already exists.
+                                    Role "{{firstFormGroup.get('name').value}}" already exists.
                                 </chef-error>
                             </chef-form-field>
                         </div>
@@ -39,7 +39,7 @@
                             <chef-button [disabled]="!firstFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                                 <span *ngIf="!creating">Create</span>
-                                <span *ngIf="creating">Creating Environment...</span>
+                                <span *ngIf="creating">Creating...</span>
                             </chef-button>
                         </div>
                     </form>
@@ -53,7 +53,7 @@
                           <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
                           <chef-button [disabled]="!secondFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-                            <span *ngIf="!creating">Create Role</span>
+                            <span *ngIf="!creating">Create</span>
                             <span *ngIf="creating">Creating Role...</span>
                           </chef-button>
                         </div>
@@ -74,7 +74,7 @@
                             <chef-button [disabled]="!thirdFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                                 <span *ngIf="!creating">Create</span>
-                                <span *ngIf="creating">Creating Environment...</span>
+                                <span *ngIf="creating">Creating...</span>
                             </chef-button>
                         </div>
                     </form>
@@ -95,7 +95,7 @@
                             <chef-button [disabled]="!fourthFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createRole()">
                                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                                 <span *ngIf="!creating">Create</span>
-                                <span *ngIf="creating">Creating Environment...</span>
+                                <span *ngIf="creating">Creating...</span>
                             </chef-button>
                         </div>
                     </form>

@@ -6,21 +6,21 @@ import {
     OnDestroy,
     OnInit
   } from '@angular/core';
-  import { Subject } from 'rxjs';
-//   import { Store } from '@ngrx/store';
+  import { Subject, combineLatest } from 'rxjs';
+  import { Store } from '@ngrx/store';
   import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
-  import { takeUntil } from 'rxjs/operators';
-//   import { NgrxStateAtom } from 'app/ngrx.reducers';
+  import { takeUntil, filter } from 'rxjs/operators';
+  import { NgrxStateAtom } from 'app/ngrx.reducers';
   import { Regex } from 'app/helpers/auth/regex';
   import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
-//   import { CreateRole, GetRoles } from 'app/entities/infra-roles/infra-role.action';
-//   import {
-//       saveStatus,
-//       saveError
-//   } from 'app/entities/infra-roles/infra-role.selectors';
-//   import { isNil } from 'lodash/fp';
-//   import { EntityStatus } from 'app/entities/entities';
-//   import { HttpStatus } from 'app/types/types';
+  import { CreateRole, GetRoles } from 'app/entities/infra-roles/infra-role.action';
+  import {
+      saveStatus,
+      saveError
+  } from 'app/entities/infra-roles/infra-role.selectors';
+  import { isNil } from 'lodash/fp';
+  import { EntityStatus } from 'app/entities/entities';
+  import { HttpStatus } from 'app/types/types';
   import { ListItem } from '../select-box/src/lib/list-item.domain';
   import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
@@ -62,7 +62,9 @@ import {
     public textareaID: string;
     public default_attr_value = '{}';
     public override_attr_value = '{}';
-  
+    public page = 1;
+  public per_page = 9;
+  public total: number;
     private isDestroyed = new Subject<boolean>();
   
     basket = [];
@@ -71,8 +73,8 @@ import {
   
     constructor(
       private fb: FormBuilder,
-    //   private store: Store<NgrxStateAtom>
-    private telemetryService: TelemetryService
+      private store: Store<NgrxStateAtom>,
+      private telemetryService: TelemetryService
 
     ) {
   
@@ -106,42 +108,46 @@ import {
         this.server = this.serverId;
         this.org = this.orgId;
       });
+
+      const payload = {
+        roleName: '',
+        server_id: this.serverId,
+        org_id: this.orgId,
+        page: this.page,
+        per_page: this.per_page
+      };
   
   
-    //   this.store.select(saveStatus)
-    //   .pipe(
-    //     takeUntil(this.isDestroyed),
-    //     filter(state => state === EntityStatus.loadingSuccess))
-    //     .subscribe(state => {
-    //       this.creating = false;
-    //       if (state === EntityStatus.loadingSuccess) {
-    //         this.store.dispatch(new GetRoles({
-    //           server_id: this.serverId, org_id: this.orgId
-    //         }));
-    //         this.closeCreateModal();
-    //       }
-    //     });
   
-    //   combineLatest([
-    //     this.store.select(saveStatus),
-    //     this.store.select(saveError)
-    //   ]).pipe(
-    //     takeUntil(this.isDestroyed),
-    //     filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-    //     .subscribe(([_, error]) => {
-    //       if (error.status === HttpStatus.CONFLICT) {
-    //         this.conflictErrorEvent.emit(true);
-    //         this.conflictError = true;
-    //         this.stepper.selectedIndex = 0;
-    //       } else {
-    //         this.store.dispatch(new GetRoles({
-    //           server_id: this.serverId, org_id: this.orgId
-    //         }));
-    //         // Close the modal on any error other than conflict and display in banner.
-    //         this.closeCreateModal();
-    //       }
-    //       this.creating = false;
-    //     });
+      this.store.select(saveStatus)
+      .pipe(
+        takeUntil(this.isDestroyed),
+        filter(state => state === EntityStatus.loadingSuccess))
+        .subscribe(state => {
+          this.creating = false;
+          if (state === EntityStatus.loadingSuccess) {
+            this.store.dispatch(new GetRoles(payload));
+            this.closeCreateModal();
+          }
+        });
+  
+      combineLatest([
+        this.store.select(saveStatus),
+        this.store.select(saveError)
+      ]).pipe(
+        takeUntil(this.isDestroyed),
+        filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+        .subscribe(([_, error]) => {
+          if (error.status === HttpStatus.CONFLICT) {
+            this.conflictErrorEvent.emit(true);
+            this.conflictError = true;
+          } else {
+            this.store.dispatch(new GetRoles(payload));
+            // Close the modal on any error other than conflict and display in banner.
+            this.closeCreateModal();
+          }
+          this.creating = false;
+        });
     }
   
     ngOnDestroy(): void {
@@ -217,8 +223,8 @@ import {
         ]
       };
 
-      console.log(role + 'role');
-      // this.store.dispatch(new CreateRole({server_id: this.serverId, org_id: this.orgId, role: role}));
+      //console.log(role + 'role');
+      this.store.dispatch(new CreateRole({role: role}));
     }
   
     private resetCreateModal(): void {

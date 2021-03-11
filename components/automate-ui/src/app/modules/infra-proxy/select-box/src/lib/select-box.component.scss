@@ -1,6 +1,7 @@
 .select-box-list-container{
     display:flex; 
     flex-direction:row;
+    height: 252px;
   }
   
   .vertical{
@@ -9,13 +10,13 @@
   }
   
 .role-list {
-  border: 1px solid #E6EBEE;
-  border-radius: 4px;
-  max-height: 350px;
-  min-height: 300px;
+  // border: 1px solid #E6EBEE;
+  // border-radius: 4px;
+  // max-height: 350px;
+  // min-height: 300px;
   background: white;
   display: block;
-  height: 100%;
+  // height: 100%;
   overflow-y: scroll;
 
   height: 235px;
@@ -29,6 +30,7 @@
   border: 1px solid #DEE6F7;
   box-sizing: border-box;
   border-radius: 4px;
+  padding: 8px;
 }
   
   .run-list-box {
@@ -46,10 +48,17 @@
   
   
   .select-box-list {
-    border: 1px solid #E6EBEE;
+    // border: 1px solid #E6EBEE;
     font-size: 14px;
-    height: 408px;
+    // height: 408px;
     overflow-y: scroll;
+    // border-radius: 4px;
+    height: 235px;
+    left: 730px;
+    right: 430px;
+    top: 389px;
+    border: 1px solid #DEE6F7;
+    box-sizing: border-box;
     border-radius: 4px;
   }
   
@@ -113,38 +122,45 @@
   }
   
   .margin{
-    margin-top: 30px;
+    margin-top: 8px;
   }
   
   .data-box {
     border-radius: 10px;
     float: left;
-    height: 400px;
+    // height: 400px;
     width: 41.5%;
     margin-right: 10px;
   }
   
   .empty-box {
-    border-radius: 10px;
+
     float: left;
-    height: 409px;
+    /* height: 409px; */
     margin-right: 10px;
     margin-left: 10px;
     width: 41.5%;
+    height: 235px;
+    left: 730px;
+    right: 430px;
+    top: 389px;
+    border: 1px solid #DEE6F7;
+    box-sizing: border-box;
+    border-radius: 4px;
   }
   
   .left-right-arrow-box {
     float: left;
-    height: 400px;
-    padding-top: 200px;
+    // height: 400px;
+    padding-top: 157px;
     text-align: center;
     width: 8%;
   }
   
   .up-down-arrow-box {
     float: left;
-    height: 400px;
-    padding-top: 200px;
+    // height: 400px;
+    padding-top: 157px;
     text-align: center;
     width: 6%;
     margin-left: 5px;
@@ -196,7 +212,6 @@
 
 .input-icons {
   width: 100%; 
-  margin-bottom: 10px; 
   width: 254px;
   height: 32px;
 
@@ -204,16 +219,22 @@
   border: 1px solid #E6EBEE;
   box-sizing: border-box;
   border-radius: 4px;
-  margin-left: 8px;
-  margin-top: 8px;
-  margin-right: 8px;
+
 }
 
 .icon {
-  padding: 10px; 
-  color: #222435; 
-  min-width: 50px; 
-  text-align: center; 
+
+
+      /* padding: 3px; */
+      color: #222435;
+      /* min-width: 50px; */
+      /* text-align: center; */
+      padding-left: 7.91px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      width: 15.78px;
+      height: 16px;
+      font-size: 16px;
 }
 
 .input-field { 
@@ -226,9 +247,6 @@ height: 21px;
 left: 32px;
 top: 5px;
 
-font-family: Mulish;
-font-style: normal;
-font-weight: normal;
 font-size: 12px;
 line-height: 21px;
 /* identical to box height, or 175% */
@@ -241,7 +259,40 @@ margin-top: 5px;
 
 }
 
-.input-icons chef-icon { 
+.input-icons mat-icon { 
   position: absolute; 
+}
+
+.arrow-back {
+
+  transform: rotate(180deg);
+
+
+  /* Legacy vendor prefixes that you probably don't need... */
+
+  /* Safari */
+  -webkit-transform: rotate(180deg);
+}
+
+.arrow-upward {
+
+  transform: rotate(-90deg);
+
+
+  /* Legacy vendor prefixes that you probably don't need... */
+
+  /* Safari */
+  -webkit-transform: rotate(-90deg);
+}
+
+.arrow-downward {
+
+  transform: rotate(90deg);
+
+
+  /* Legacy vendor prefixes that you probably don't need... */
+
+  /* Safari */
+  -webkit-transform: rotate(90deg);
 }
  

@@ -27,13 +27,19 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
   /* option to turn on select/unselect all feature on the lists*/
   @Input() selectAll;
   /* option to disable the component*/
-  @Input() disabled: boolean;
+  // @Input() disabled: boolean;
+  @Input() disabled: boolean = false;
 
 
-  /* filter text used to filter items on the left side */
-  leftFilterText: string;
-  /* filter text used to filter items on the right side */
-  rightFilterText: string;
+  // /* filter text used to filter items on the left side */
+  // leftFilterText: string;
+  // /* filter text used to filter items on the right side */
+  // rightFilterText: string;
+
+    /* filter text used to filter items on the left side */
+    leftFilterText: string = '';
+    /* filter text used to filter items on the right side */
+    rightFilterText: string = '';
 
   /* working list of items on the left side */
   originalItems: ListItem[] = [];
@@ -45,23 +51,16 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
   @Output() selectedValues: EventEmitter<ListItem[]> =   new EventEmitter();
 
   ngOnInit() {
+    this.originalItems = [];
+
     this.list.forEach(element => {
-      this.originalItems.push(new ListItem(element.name, 'role'));
+      this.originalItems.push(new ListItem(element.name, element.type));
     });
 
     if (this.selectedList != null && this.selectedList !== []) {
       this.setSelectedValues(this.selectedList);
       this.onChange(this.value);
     }
-
-    console.log('list' + this.list);
-    console.log('item' + this.selectedItems);
-    console.log('selected list' + this.selectedList);
-    console.log('value' + this.selectedValues);
-
-    console.log('left' + this.getLeftSelectedList());
-    console.log('riht' + this.getRightSelectedList());
-
 
   }
 
@@ -81,7 +80,7 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
     const leftSelectedList: ListItem[] = [];
     this.originalItems.forEach(
       element => {
-        if (element.selected) { leftSelectedList.push(element); }
+        if (element.selected)  leftSelectedList.push(element);
       }
     );
     return leftSelectedList;
@@ -92,7 +91,7 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
     const rightSelectedList: ListItem[] = [];
     this.selectedItems.forEach(
       element => {
-        if (element.selected) { rightSelectedList.push(element); }
+        if (element.selected) rightSelectedList.push(element);
       }
     );
     return rightSelectedList;
@@ -100,6 +99,10 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
 
   /* This method moves items from original list to selected on button click*/
   addItems() {
+    console.log(this.selectedItems);
+    this.selectedItems.forEach((ele) => {
+      console.log(ele);
+    })
     this.moveItems(this.originalItems, this.selectedItems, 0);
   }
 
@@ -176,11 +179,9 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
   private changeSelection(list: ListItem[], val: boolean): void {
     list.forEach(
       element => {
-        if (val) {
-          element.selected = true;
-        } else {
-          element.selected = false;
-        }
+        if (val) element.selected = true;
+         else element.selected = false;
+        
       }
     );
   }
