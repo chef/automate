@@ -70,13 +70,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
             this.privateKey = resetKeyState?.client_key.private_key;
           } else if (getStatusSt === EntityStatus.loadingFailure) {
             this.error = errorSt;
-            if (this.error === 'missing update permission') {
-              this.isReset = false;
-              this.reseting = false;
-              this.conflictError = true;
-            } else {
-              this.closeCreateModal();
-            }
+            this.closeCreateModal();
             this.authFailure = true;
           }
         });
