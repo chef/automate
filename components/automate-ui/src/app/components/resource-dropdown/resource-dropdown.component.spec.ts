@@ -1,12 +1,101 @@
-import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter, SimpleChange } from '@angular/core';
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter, SimpleChange, Component } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MockComponent } from 'ng2-mock-component';
 
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import {
   ResourceDropdownComponent, ResourceChecked, ResourceCheckedSection
 } from './resource-dropdown.component';
+
+const testResources = [genResourceList(
+  genResource('name1', true),
+  genResource('name2', false),
+  genResource('name3', true),
+  genResource('name4', true),
+  genResource('name5', false)
+)];
+
+@Component({
+  template: `<app-resource-dropdown
+              [resources]="resources"
+              [resourcesUpdated]="resourcesUpdatedEvent"
+              [objectNounPlural]="'hummingbirds'"
+              (onDropdownClosing)="onClosing($event)">
+              Description here...
+            </app-resource-dropdown>`
+})
+
+class TestHostComponent {
+  resources = testResources;
+  resourceIDs: string[];
+
+  // onClosing(resourceIDs: string[]): void {
+  //   this.resourceIDs = resourceIDs;
+  // }
+}
+
+describe('HostedMessageModalComponent', () => {
+  let hostComponent: TestHostComponent;
+  let fixture: ComponentFixture<TestHostComponent>;
+  let dropdownComponent: ResourceDropdownComponent;
+  let dropdownElement: HTMLElement;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ ChefPipesModule ],
+      declarations: [
+      MockComponent({ selector: 'input', inputs: ['ngModel'] }),
+        TestHostComponent,
+        ResourceDropdownComponent
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TestHostComponent);
+    hostComponent = fixture.componentInstance;
+    dropdownComponent = fixture.debugElement.children[0].componentInstance;
+    dropdownElement = fixture.nativeElement;
+    fixture.detectChanges();
+  });
+
+  it('should be created', () => {
+    expect(hostComponent).toBeTruthy();
+    expect(dropdownComponent).toBeTruthy();
+  });
+
+  // This is an example of how to get closer to the UI in a unit test.
+  // Here we are actually clicking an HTML button rather than firing the internal ngOnChanges
+  // as is done in later tests in this file.
+  it('retains checked items after closing then re-opening dropdown', () => {
+    expect(dropdownComponent.dropdownState).toEqual('closed');
+    expect(dropdownComponent.filteredResources).toEqual(testResources);
+    expect(dropdownComponent.label).toEqual('3 hummingbirds');
+
+    (dropdownElement.querySelector('.dropdown-button') as HTMLButtonElement).click();
+    dropdownComponent.handleClickOutside(); // in the browser, this fires automatically after click
+
+    expect(dropdownComponent.dropdownState).toEqual('open');
+
+    // options is actually an array of HTMLChefCheckboxElement, which must come from chef-ui-library
+    // but that is apparently unavailable to import here!
+    const options = Array.from(
+        dropdownElement.querySelectorAll('chef-checkbox')) as unknown as HTMLInputElement[];
+    expect(options.length).toEqual(testResources[0].itemList.length);
+    for (let i = 0; i < options.length; i++) {
+      const { name, checked } = testResources[0].itemList[i];
+      expect(options[i].textContent).toEqual(name);
+      expect(options[i].checked).toEqual(checked);
+    }
+    // could do further manipulations...
+    // dropdownComponent.resourceChecked(true, dropdownComponent.filteredResources[0].itemList[1]);
+  });
+});
+
 
 describe('ResourceDropdownComponent', () => {
   let component: ResourceDropdownComponent;
@@ -374,6 +463,7 @@ describe('ResourceDropdownComponent', () => {
     component.resources = changed;
     component.ngOnChanges({ resources: new SimpleChange(original, changed, firstChange) });
   }
+});
 
   function genResourceList(...resources: ResourceChecked[]): ResourceCheckedSection {
     // Though title is technically optional, we need to supply it here so we can compare
@@ -391,4 +481,3 @@ describe('ResourceDropdownComponent', () => {
       checked
     };
   }
-});
