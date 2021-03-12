@@ -1,14 +1,15 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
-import { getAllStatus, clientList } from 'app/entities/clients/client.selectors';
+import { getAllStatus, clientList, deleteStatus } from 'app/entities/clients/client.selectors';
 
 @Component({
   selector: 'app-clients',
@@ -71,6 +72,14 @@ export class ClientsComponent implements OnInit, OnDestroy {
           this.searching = false;
         }
       }
+    });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetClients(payload)
+      );
     });
   }
 
