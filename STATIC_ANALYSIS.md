@@ -18,7 +18,7 @@ take a look at this [competitive analysis](https://docs.google.com/spreadsheets/
 Want to find where the string "Automate" appears in our code base?
 Run `grep Automate` (grep is the standard Linux tool for file searching) and you will get each line of code containing the string.
 Ah, but what if you want to find "Chef Automate" where there may or may not be a space embedded?
-Instead of a string, pass a regular expression: run `grep 'Chef ?Automate' (notice the question mark in there that looks for an optional space).
+Instead of a string, pass a regular expression: run `grep 'Chef ?Automate'` (notice the question mark in there that looks for an optional space).
 But grep -- and any other such search tool you care to try -- works on one line at a time.
 If "Chef" is at the end of a line and "Automate" at the beginning of the next, you need Semgrep.
 Semgrep (short for *semantic grep*) cares about what you care about: semantics.
@@ -192,9 +192,9 @@ If circumstances reveal that a particular finding is not a problem at that speci
 That is done by annotating the line of code with `# nosemgrep: <rule-name>`.
 Alternately, if there are multiple findings on a single line of code and all of them should be ignored (which is common), drop the rule name argument, so it would just be `# nosemgrep`.
 Note that the first token in each of those is the comment-to-end-of-line token appropriate for the language.
-Thus, those are examples for Go.
-TypeScript would use `//` instead of `#`.
-Search the codebase for the few muted items.
+Thus, those examples would work for Go.
+TypeScript, for instance, would use `// nosemgrep: <rule-name>` and `// nosemgrep`, respectively.
+Search the Automate codebase for the few muted items.
 And note that there are very few--try very hard not to mute items to avoid the technical debt!
 Only mute items that are actually safe to be ignored permanently.
 
@@ -281,6 +281,7 @@ From the root of the automate repository you have these `make` targets that will
 * semgrep-all -- runs full scan but filters out inconsequential (legacy) issues (same as nightly scan)
 * semgrep-legacy -- same as `semgrep-all` but reveals legacy issues, too
 
+Note that these targets all run Semgrep exactly the way Buildkite does, using a Docker container and using the .semgrepignore file for things to exclude.
 Before you can use the above targets, though, you need to define `SEMGREP_TOKEN` and `SEMGREP_ID` environment variables; the values for these come from the `id` and `token` defined here in [Vault](https://vault.es.chef.co/ui/vault/secrets/secret/show/semgrep?namespace=releng).
 
 * semgrep-test/`<ruleset-name>` -- useful for trying out new rulesets
@@ -297,7 +298,7 @@ Just run `make semgrep` in any Go project or in the `automate-ui` project and it
 approximating what you would see in CI.
 It is approximate because it is fundamentally a different run.
 CI uses the `.semgrepignore` file for the list of things to skip; running this command, on the other hand,
-invokes Semgrep passing it an explicit list of things to ignore (and the list is different in Go projects vs. the `automate-ui` project).
+invokes Semgrep locally passing it an explicit list of things to ignore (and the list is different in Go projects vs. the `automate-ui` project).
 
 Besides `make semgrep` there is also the handy `make semgrep-and-fix` command that will apply auto-fixes for those rules written to support it.
 
