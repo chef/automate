@@ -1,6 +1,8 @@
 package integration_test
 
 import (
+	"context"
+
 	"github.com/chef/automate/components/infra-proxy-service/config"
 	"github.com/chef/automate/components/infra-proxy-service/server"
 )
@@ -14,6 +16,7 @@ var (
 	// res, err := infraProxy.GetOrgs(ctx, &req)
 	// ```
 	infraProxy *server.Server
+	ctx        = context.Background()
 )
 
 type Suite struct{}
@@ -28,12 +31,21 @@ func (s *Suite) GlobalSetup() error {
 	var err error
 	// set global infraProxy
 	infraProxy, err = newInfraProxyServer()
-
-	//Adds data bag items records
-	addDataBagItems(dataBagName, 10)
 	if err != nil {
 		return err
 	}
+
+	// Add role records
+	addRoles(totalRecords)
+
+	// Add data bag records
+	addDatabagsWithItems(totalRecords)
+
+	// Add environment records
+	addEnvironments(totalRecords)
+
+	// Add client records
+	addClients(totalRecords)
 
 	return nil
 }

@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -14,11 +13,6 @@ func TestGetRoles(t *testing.T) {
 	// Pre-populated that has been added by scripts
 	// Validating the roles search based on these records.
 	// rpc GetRoles (request.Roles) returns (response.Roles)
-	ctx := context.Background()
-
-	//Adds roles
-	addRoles(ctx, 10)
-
 	req := &request.Roles{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -96,7 +90,7 @@ func TestGetRoles(t *testing.T) {
 			Name:        name,
 			Description: "auto generated role",
 		}
-	    role, err := infraProxy.CreateRole(ctx, createReq)
+		role, err := infraProxy.CreateRole(ctx, createReq)
 		assert.NoError(t, err)
 		assert.NotNil(t, role)
 
@@ -115,7 +109,7 @@ func TestGetRoles(t *testing.T) {
 }
 
 // Adds roles records
-func addRoles(ctx context.Context, n int) int {
+func addRoles(n int) int {
 	total := 0
 	for i := 0; i < n; i++ {
 		req := &request.CreateRole{

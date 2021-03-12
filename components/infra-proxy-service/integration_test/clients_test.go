@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -15,7 +14,6 @@ func TestGetClients(t *testing.T) {
 	// Pre-populated that has been added by scripts
 	// Validating the clients search based on these records.
 	// rpc GetClients (request.Clients) returns (response.Clients)
-	ctx := context.Background()
 	req := &request.Clients{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -150,7 +148,6 @@ func TestGetClients(t *testing.T) {
 }
 
 func TestGetClient(t *testing.T) {
-	ctx := context.Background()
 	// rpc GetClient (request.Client) returns (response.Client)
 	name := fmt.Sprintf("chef-load-%d", time.Now().Nanosecond())
 	createReq := &request.CreateClient{
@@ -178,7 +175,6 @@ func TestGetClient(t *testing.T) {
 func TestResetClient(t *testing.T) {
 	// rpc ResetClient (request.ClientKey) returns (response.ResetClient)
 	name := fmt.Sprintf("client-%d", time.Now().Nanosecond())
-	ctx := context.Background()
 	req := &request.CreateClient{
 		ServerId:  autoDeployedChefServerID,
 		OrgId:     autoDeployedChefOrganizationID,
@@ -199,4 +195,24 @@ func TestResetClient(t *testing.T) {
 	assert.Equal(t, res.GetName(), resetRes.GetName())
 	// The old private key must not match with the reset private key
 	assert.NotEqual(t, res.GetClientKey().GetPrivateKey(), resetRes.GetClientKey().GetPrivateKey())
+}
+
+// Add client records
+func addClients(n int) int {
+	total := 0
+	for i := 0; i < n; i++ {
+		req := &request.CreateClient{
+			ServerId:  autoDeployedChefServerID,
+			OrgId:     autoDeployedChefOrganizationID,
+			Name:      fmt.Sprintf("chef-load-client-%d", time.Now().Nanosecond()),
+			CreateKey: true,
+		}
+		_, err := infraProxy.CreateClient(ctx, req)
+
+		if err == nil {
+			total++
+		}
+	}
+
+	return total
 }

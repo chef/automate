@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -15,11 +14,6 @@ import (
 
 func TestGetEnvironments(t *testing.T) {
 	// rpc GetEnvironments (request.Environments) returns (response.Environments)
-	ctx := context.Background()
-
-	// Adds environments
-	addEnvironments(ctx, 10)
-
 	req := &request.Environments{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -111,7 +105,6 @@ func TestGetEnvironments(t *testing.T) {
 		assert.Equal(t, 1, int(res.Total))
 		assert.Equal(t, name, res.Environments[0].GetName())
 	})
-
 }
 
 func TestGetEnvironment(t *testing.T) {
@@ -304,7 +297,7 @@ func TestDeleteEnvironment(t *testing.T) {
 }
 
 // Adds environments records
-func addEnvironments(ctx context.Context, n int) int {
+func addEnvironments(n int) int {
 	total := 0
 	for i := 0; i < n; i++ {
 		req := &request.CreateEnvironment{

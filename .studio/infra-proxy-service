@@ -12,7 +12,7 @@ function start_infra_proxy_service() {
 }
 
 document "infra_service_integration" <<DOC
-  run the infra service's integration tests
+  run the infra service's integration tests.
 DOC
 function infra_service_integration() {
   check_if_deployinate_started || return 1;
@@ -26,12 +26,41 @@ function infra_service_integration() {
 }
 
 document "infra_service_load_test_data" <<DOC
-  run the infra service's integration tests
+  run the infra service's integration tests with data.
+
+  1. -N No of records Default: 10
+  2. -S Chef Infra Server ID Default: local-dev
+  3. -O Chef organization ID Default: test-org
+
+  Example:
+  -----------------------------
+  infra_service_load_test_data -N 100 -S SERVER_ID -O ORG_ID
 DOC
 function infra_service_load_test_data() {
+  local OPTIND opt
+  local records=10
+  local infra_server_id="local-dev"
+  local infra_org_id="test-org"
+  while getopts ":N:S:O:" opt; do
+    case $opt in
+      N) records="$OPTARG"
+      ;;
+      S) infra_server_id="$OPTARG"
+      ;;
+      O) infra_org_id="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
   check_if_deployinate_started || return 1;
   log_line "Started loading infra service test data..."
-  INFRA_SERVER_ID="$1" INFRA_SERVER_ORG_ID="$2" TOTAL_RECORDS="$3" A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test -v "github.com/chef/automate/components/infra-proxy-service/integration_test"
+
+  TOTAL_RECORDS="$records" INFRA_SERVER_ID="$infra_server_id" INFRA_SERVER_ORG_ID="$infra_org_id" A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go_test "github.com/chef/automate/components/infra-proxy-service/integration_test"
   log_line "Finished loading infra service test data"
 }
 
