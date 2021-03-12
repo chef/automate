@@ -121,7 +121,8 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   downloadKey() {
     const template = `
     Private RSA Key
-    ${this.publicKey}
+
+    ${this.privateKey}
     `;
 
     const blob = new Blob([template], { type: 'text/plain;charset=utf-8' });
