@@ -74,6 +74,10 @@ chef-modal {
     outline: none;
   }
 
+  chef-button.close button:focus {
+    outline: none;
+  }
+
   chef-button.cancel-button.hydrated {
     background: none;
   }

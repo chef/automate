@@ -70,17 +70,21 @@ chef-button button {
   &:focus {
     outline: none;
   }
-
 }
 
 .clients-list-paging {
   margin: 0 0 35px;
 }
 
-::ng-deep {
-  .search-items app-infra-search-bar .search-wrapper {
-    width: 87%;
-    float: left;
-  }
+.create-client {
+  margin: 18px 0px 0px 0px;
+  float: right;
+}
 
+::ng-deep {
+  .clients .search-items app-infra-search-bar .search-wrapper {
+    float: left;
+    margin-top: 10px;
+    width: 90.5%;
+  }
 }

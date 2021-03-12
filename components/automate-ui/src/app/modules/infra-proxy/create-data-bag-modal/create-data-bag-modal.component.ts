@@ -126,4 +126,3 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
     return event.key === 'Shift' || event.key === 'Tab';
   }
 }
-

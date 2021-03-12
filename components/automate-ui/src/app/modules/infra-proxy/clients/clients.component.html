@@ -16,7 +16,7 @@
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="Clients">
       </app-infra-search-bar>
-      <chef-button primary (click)="openCreateClientModal()">Create Client</chef-button>
+      <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !clients.length">
