@@ -2,7 +2,7 @@ import { Component, Input, OnInit,
   OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -11,8 +11,10 @@ import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
-  roleList
+  roleList,
+  deleteStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
+import { EntityStatus } from 'app/entities/entities';
 
 @Component({
   selector: 'app-infra-roles',
@@ -80,6 +82,14 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetRoles(payload));
+      });
   }
 
   searchRoles(currentText: string) {

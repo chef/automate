@@ -16,7 +16,6 @@ export const SELECT_BOX_ACCESSOR: any = {
   providers: [SELECT_BOX_ACCESSOR, ListFilterPipe]
 })
 export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChanges {
-  constructor() { }
 
   /* paramter used to pass in the list items*/
   @Input() list;
@@ -26,33 +25,26 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
   @Input() search;
   /* option to turn on select/unselect all feature on the lists*/
   @Input() selectAll;
-  /* option to disable the component*/
-  // @Input() disabled: boolean;
-  @Input() disabled: boolean = false;
+  @Input() disabled = false;
+  @Input() selectedItems: ListItem[] = [];
 
+  /* selected items that will be passed back to form control */
+  @Input() selectedList: string[] = [];
+  @Output() selectedValues: EventEmitter<ListItem[]> =   new EventEmitter();
 
-  // /* filter text used to filter items on the left side */
-  // leftFilterText: string;
-  // /* filter text used to filter items on the right side */
-  // rightFilterText: string;
-
-    /* filter text used to filter items on the left side */
-    leftFilterText: string = '';
-    /* filter text used to filter items on the right side */
-    rightFilterText: string = '';
+  /* filter text used to filter items on the left side */
+  leftFilterText = '';
+  /* filter text used to filter items on the right side */
+  rightFilterText = '';
 
   /* working list of items on the left side */
   originalItems: ListItem[] = [];
-  /* working list of items on the right side */
-  selectedItems: ListItem[] = [];
 
-  /* selected items that will be passed back to form control */
-  @Input('value') selectedList: string[] = [];
-  @Output() selectedValues: EventEmitter<ListItem[]> =   new EventEmitter();
+  constructor() { }
 
   ngOnInit() {
     this.originalItems = [];
-
+    this.selectedItems = [];
     this.list.forEach(element => {
       this.originalItems.push(new ListItem(element.name, element.type));
     });
@@ -66,84 +58,18 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
 
   ngOnChanges(changes: SimpleChanges): void {
     this.originalItems = [];
-    if (changes.list.currentValue) {
+    if (changes?.list?.currentValue) {
       this.list?.forEach(element => {
           this.originalItems.push(new ListItem(element.name, element.type));
         });
-      } else if (changes.list.currentValue.length > 0 ) {
+    } else if (changes?.list?.currentValue.length > 0 ) {
         this.originalItems = changes.list.currentValue;
-      }
-  }
-
-  /* This method returns the selected items on the original list on left side*/
-  getLeftSelectedList(): ListItem[] {
-    const leftSelectedList: ListItem[] = [];
-    this.originalItems.forEach(
-      element => {
-        if (element.selected)  leftSelectedList.push(element);
-      }
-    );
-    return leftSelectedList;
-  }
-
-  /* This method returns the selected items on the selected list on right side*/
-  getRightSelectedList(): ListItem[] {
-    const rightSelectedList: ListItem[] = [];
-    this.selectedItems.forEach(
-      element => {
-        if (element.selected) rightSelectedList.push(element);
-      }
-    );
-    return rightSelectedList;
+    }
   }
 
   /* This method moves items from original list to selected on button click*/
   addItems() {
-    console.log(this.selectedItems);
-    this.selectedItems.forEach((ele) => {
-      console.log(ele);
-    })
     this.moveItems(this.originalItems, this.selectedItems, 0);
-  }
-
-  /* This method moves items from selected list to original on button click*/
-  removeItems() {
-    this.moveItems(this.selectedItems, this.originalItems, 0);
-  }
-
-  /*helper method that moves items between lists */
-  private moveItems(fromList: ListItem[], toList: ListItem[], insertIndex: number) {
-    for (let removeIndex = fromList.length - 1; removeIndex >= 0; removeIndex--) {
-      const item: ListItem = fromList[removeIndex];
-      if (item.selected) {
-        fromList.splice(removeIndex, 1);
-        item.selected = false;
-        toList.splice(insertIndex, 0, item);
-      }
-    }
-    this.onChange(this.value);
-    this.selectedValues.emit(this.selectedItems);
-  }
-
-  ascItems() {
-    this.selectedItems.sort((a, b) => (a.value > b.value) ? 1 : -1);
-    this.selectedValues.emit(this.selectedItems);
-  }
-
-  descItems() {
-    this.selectedItems.sort((a, b) => (a.value < b.value) ? 1 : -1);
-    this.selectedValues.emit(this.selectedItems);
-  }
-
-  /*This method handles the drag event onto selected list on the right */
-  dragOntoRightItems(event) {
-    if (event.previousContainer === event.container) {
-      if (this.sort && this.getRightSelectedList().length === 1 && this.selectedItems.length > 1) {
-        this.changeItemPosition(this.selectedItems, event.previousIndex, event.currentIndex);
-      }
-    } else {
-      this.moveItems(this.originalItems, this.selectedItems, event.currentIndex);
-    }
   }
 
   /*This method handles the drag event onto original list on the left */
@@ -157,33 +83,64 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
     }
   }
 
-  /* helper method that changes the position of items in the list*/
-  private changeItemPosition(list: ListItem[], currPos: number, newPos: number) {
-    const item: ListItem = list.splice(currPos, 1)[0];
-    item.selected = false;
-    list.splice(newPos, 0, item);
-    this.onChange(this.value);
+  /*This method handles the drag event onto selected list on the right */
+  dragOntoRightItems(event) {
+    if (event.previousContainer === event.container) {
+      if (this.sort && this.getRightSelectedList().length === 1 && this.selectedItems.length > 1) {
+        this.changeItemPosition(this.selectedItems, event.previousIndex, event.currentIndex);
+      }
+    } else {
+      this.moveItems(this.originalItems, this.selectedItems, event.currentIndex);
+    }
   }
 
-  /*This method handles selected all check box on the orignal list on left side */
-  selectAllOnLeft(event) {
-    this.changeSelection(this.originalItems, event.currentTarget.checked);
-  }
-
-  /*This method handles selected all check box on the selected list on right side */
-  selectAllOnRight(event) {
-    this.changeSelection(this.selectedItems, event.currentTarget.checked);
-  }
-
-  /*helper method that handles selected all checkbox */
-  private changeSelection(list: ListItem[], val: boolean): void {
-    list.forEach(
+  /* This method returns the selected items on the original list on left side*/
+  getLeftSelectedList(): ListItem[] {
+    const leftSelectedList: ListItem[] = [];
+    this.originalItems.forEach(
       element => {
-        if (val) element.selected = true;
-         else element.selected = false;
-        
+        if (element.selected) { leftSelectedList.push(element); }
       }
     );
+    return leftSelectedList;
+  }
+
+  /* This method returns the selected items on the selected list on right side*/
+  getRightSelectedList(): ListItem[] {
+    const rightSelectedList: ListItem[] = [];
+    this.selectedItems.forEach(
+      element => {
+        if (element.selected) { rightSelectedList.push(element); }
+      }
+    );
+    return rightSelectedList;
+  }
+
+  /* This method moves items from selected list to original on button click*/
+  removeItems() {
+    this.moveItems(this.selectedItems, this.originalItems, 0);
+  }
+
+  sortItemsInAsccOrder() {
+    this.selectedItems.sort((a, b) => (a.value > b.value) ? 1 : -1);
+    this.selectedItems.forEach((item) => {
+      if (item.selected) {
+        item.selected = false;
+      }
+    });
+    this.onChange(this.value);
+    this.selectedValues.emit(this.selectedItems);
+  }
+
+  sortItemsInDescOrder() {
+    this.selectedItems.sort((a, b) => (a.value < b.value) ? 1 : -1);
+    this.selectedItems.forEach((item) => {
+      if (item.selected) {
+        item.selected = false;
+      }
+    });
+    this.onChange(this.value);
+    this.selectedValues.emit(this.selectedItems);
   }
 
   get value(): any {
@@ -200,7 +157,47 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
     this.setSelectedValues(val);
   }
 
-  setSelectedValues(values: string[]) {
+  /* Methods to implement ControlValueAccessor */
+  onChange = (val: string[]) => { console.log( val); };
+
+  onTouched = () => { };
+
+  writeValue(value: string[]): void {
+    this.setSelectedValues(value);
+    this.onChange(this.value);
+  }
+
+  registerOnChange(fn: (val: string[]) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  /* helper method that changes the position of items in the list*/
+  private changeItemPosition(list: ListItem[], currPos: number, newPos: number) {
+    const item: ListItem = list.splice(currPos, 1)[0];
+    item.selected = false;
+    list.splice(newPos, 0, item);
+    this.onChange(this.value);
+  }
+
+  /*helper method that moves items between lists */
+  private moveItems(fromList: ListItem[], toList: ListItem[], insertIndex: number) {
+    for (let removeIndex = fromList.length - 1; removeIndex >= 0; removeIndex--) {
+      const item: ListItem = fromList[removeIndex];
+      if (item.selected) {
+        fromList.splice(removeIndex, 1);
+        item.selected = false;
+        toList.splice(insertIndex, 0, item);
+      }
+    }
+    this.onChange(this.value);
+    this.selectedValues.emit(this.selectedItems);
+  }
+
+  private setSelectedValues(values: string[]) {
     if (values !== undefined && values != null && values !== []) {
       this.selectedList = values;
       if (this.selectedList.length > 0) {
@@ -222,29 +219,5 @@ export class SelectBoxComponent implements OnInit, ControlValueAccessor, OnChang
       }
 
     }
-
   }
-
-  /* Methods to implement ControlValueAccessor */
-  onChange = (val: string[]) => { console.log(val); };
-
-  onTouched = () => { };
-
-  writeValue(value: string[]): void {
-    this.setSelectedValues(value);
-    this.onChange(this.value);
-  }
-
-  registerOnChange(fn: (val: string[]) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-  }
-
 }

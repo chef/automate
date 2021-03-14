@@ -4,20 +4,30 @@
         <mat-select #li panelClass="chef-dropdown" [value]="defaultType"
             (selectionChange)="selectChangeHandler(li.value)">
             <mat-option *ngFor="let key of typeAvailable" [value]="key">
+
+                <span *ngIf="key==='available roles'">
+                    <img alt="Available roles" src="/assets/img/briefcase.png" />
+                </span>
+                <span *ngIf="key==='available recipes'">
+                    <img alt="Available recipes" src="/assets/img/article.png" />
+                </span>
                 {{ key }}
             </mat-option>
         </mat-select>
     </div>
 
-    <span class="heading-run">
+    <span class="heading-run-list">
     Current Run List
     </span>
 
     <!-- combined data -->
     <div *ngIf="showbutton" class="margin">
         <form [formGroup]="userForm">
-            <app-select-box id="myListBox" [list]="availableType" search="true" sort="true" selectAll="true"
-                formControlName="selected" (selectedValues)="selectedItemsHandler($event)">
+            <app-select-box id="myListBox"
+            [list]="availableType"
+            search="true" sort="true" selectAll="true"
+            [selectedItems]="selectedItems"
+            (selectedValues)="selectedItemsHandler($event)">
             </app-select-box>
             <br />
         </form>

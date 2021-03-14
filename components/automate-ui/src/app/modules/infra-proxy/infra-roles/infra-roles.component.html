@@ -11,7 +11,8 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <app-create-infra-role-modal [openEvent]="openRoleModal"
-  [rolesList]="roles" [serverId]="serverId" [orgId]="orgId"></app-create-infra-role-modal>
+  [rolesList]="roles" [serverId]="serverId" [orgId]="orgId"
+  [page]="page"></app-create-infra-role-modal>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
     <div class="search-items">
       <div class="search-box">
