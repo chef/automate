@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { DataBagItems } from './data-bags.model';
+import { DataBagItems, DataBagsItemDetails } from './data-bags.model';
 
 export enum DataBagItemsActionTypes {
   GET_ALL = 'DATA_BAG_ITEMS::GET_ALL',
@@ -8,7 +8,10 @@ export enum DataBagItemsActionTypes {
   GET_ALL_FAILURE = 'DATA_BAG_ITEMS::GET_ALL::FAILURE',
   DELETE          = 'DATA_BAG_ITEMS::DELETE',
   DELETE_SUCCESS  = 'DATA_BAG_ITEMS::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'DATA_BAG_ITEMS::DELETE::FAILURE'
+  DELETE_FAILURE  = 'DATA_BAG_ITEMS::DELETE::FAILURE',
+  UPDATE = 'DATA_BAG_ITEMS::UPDATE',
+  UPDATE_SUCCESS = 'DATA_BAG_ITEMS::UPDATE::SUCCESS',
+  UPDATE_FAILURE = 'DATA_BAG_ITEMS::UPDATE::FAILURE',
 }
 
 export interface DataBagItemsSuccessPayload {
@@ -57,6 +60,20 @@ export class DeleteDataBagItemSuccess implements Action {
 
 export class DeleteDataBagItemFailure implements Action {
   readonly type = DataBagItemsActionTypes.DELETE_FAILURE;
+}
+
+export class UpdateDataBagItem implements Action {
+  readonly type = DataBagItemsActionTypes.UPDATE;
+  constructor(public payload: { dataBagItem: DataBagsItemDetails }) { }
+}
+
+export class UpdateDataBagItemSuccess implements Action {
+  readonly type = DataBagItemsActionTypes.UPDATE_SUCCESS;
+  constructor(public payload: DataBagItems) { }
+}
+
+export class UpdateDataBagItemFailure implements Action {
+  readonly type = DataBagItemsActionTypes.UPDATE_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -66,4 +83,7 @@ export type DataBagItemsActions =
   | GetDataBagItemsFailure
   | DeleteDataBagItem
   | DeleteDataBagItemSuccess
-  | DeleteDataBagItemFailure;
+  | DeleteDataBagItemFailure
+  | UpdateDataBagItem
+  | UpdateDataBagItemSuccess
+  | UpdateDataBagItemFailure;
