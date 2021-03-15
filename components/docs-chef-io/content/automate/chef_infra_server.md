@@ -47,7 +47,7 @@ To add the created Chef Server to the Infrastructure, click on **Add Chef Server
 
 ![Add Chef Server](/images/automate/add-chef-server-button.png)
 
-Clicking on the *Add Chef Server** button opens a popup menu as shown below:
+Clicking on the **Add Chef Server** button opens a popup menu as shown below:
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu.png)
 
@@ -65,7 +65,19 @@ Selecting a specific added Chef Server opens the list of organizations in the Se
 
 ![Chef Infra Server Organization](/images/automate/chef-server-organization.png)
 
-The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in tmhe Server click [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
+The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in the Server click [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
 
+To add the previously created organization to the Infrastructure, click on **Add Chef Organization** button. Refer to the image below:
 
+![Add Chef Organization](/images/automate/add-chef-organization-button.png)
+
+Clicking on the **Add Chef Organization** button opens a popup menu as shown below:
+
+![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
+
+Mention the correct Name, Projects, Admin User and Admin Key. Click on **Add Chef Organization**. The desired organization gets added to the Chef Server.
+
+Click on any Chef Organization to view the **Objects**.
+
+## Access Chef Infra Server Objects
 
