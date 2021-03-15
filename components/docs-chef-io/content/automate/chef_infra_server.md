@@ -61,7 +61,7 @@ Click on the listed Servers to view the details of the specific **Chef Server**.
 
 ## Connect to the Chef Infra Server Organization
 
-Selecting a specific added Chef Server opens the list of organizations in the Server. Refer to the Image below:
+Selecting a specific added Chef Server opens the list of organizations in the Server. Refer to the image below:
 
 ![Chef Infra Server Organization](/images/automate/chef-server-organization.png)
 
@@ -81,3 +81,26 @@ Click on any Chef Organization to view the **Objects**.
 
 ## Access Chef Infra Server Objects
 
+The **Chef Infra Server Objects** can be managed from the Chef Automate. Selecting a specific Chef Organization opens the details of the Chef Infra Server Objects. Refer to the image below:
+
+![Chef Infra Server Objects](/images/automate/chef-infra-server-objects.png)
+
+### Cookbooks
+
+A cookbook is the fundamental unit of configuration and policy distribution. Cookbooks also comprises of recipies and other optional components or directories. Click [here](https://docs.chef.io/cookbooks/) to know more about Cookbooks.
+
+### Roles
+
+A role is a way to define certain patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list. Click [here](https://docs.chef.io/roles/) to know more about Roles.
+
+### Environments
+
+An environment is a way to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level. Click [here](https://docs.chef.io/environments/) to know more about Environments.
+
+### Data Bags
+
+Data bags store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search. Click [here](https://docs.chef.io/data_bags/) to know more about Data Bags.
+
+### Clients
+
+## Troubleshoot
