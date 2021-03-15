@@ -36,7 +36,7 @@ func TestGetClients(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, int(res.Page), 0)
-		assert.GreaterOrEqual(t, 1, int(res.Total))
+		assert.GreaterOrEqual(t, int(res.Total), 1)
 	})
 
 	t.Run("Clients list with a per_page search param", func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGetClients(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
-		assert.GreaterOrEqual(t, 1, len(res.Clients))
+		assert.GreaterOrEqual(t, len(res.Clients), 1)
 	})
 
 	t.Run("Clients list with a page search param", func(t *testing.T) {
