@@ -109,7 +109,6 @@ func TestGetEnvironments(t *testing.T) {
 
 func TestGetEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when the environment exists, return the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		creReq := &request.CreateEnvironment{
@@ -147,7 +146,6 @@ func TestGetEnvironment(t *testing.T) {
 
 func TestCreateEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, creates the new environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
@@ -211,7 +209,6 @@ func TestCreateEnvironment(t *testing.T) {
 
 func TestUpdateEnvironment(t *testing.T) {
 	// rpc UpdateEnvironment (request.UpdateEnvironment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, updates the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
@@ -264,7 +261,6 @@ func TestUpdateEnvironment(t *testing.T) {
 
 func TestDeleteEnvironment(t *testing.T) {
 	// rpc DeleteEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, deletes the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
