@@ -654,7 +654,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetClient"
             }
           },
           "default": {
@@ -3576,6 +3576,19 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           },
           "description": "Policyfiles list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ResetClient": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Client name."
+        },
+        "client_key": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey",
+          "description": "Client key detail."
         }
       }
     },

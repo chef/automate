@@ -41,6 +41,13 @@ message CreateClient {
     ClientKey client_key = 2;
 }
 
+message ResetClient {
+    // Client name.
+    string name = 1;
+    // Client key detail.
+    ClientKey client_key = 2;
+}
+
 message ClientKey {
     // Client key name.
     string name = 1;
