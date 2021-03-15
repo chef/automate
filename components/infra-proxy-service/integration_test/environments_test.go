@@ -161,6 +161,11 @@ func TestCreateEnvironment(t *testing.T) {
 					"attribute1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "value"}},
 				},
 			},
+			OverrideAttributes: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"attribute1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "override"}},
+				},
+			},
 		}
 		res, err := infraProxy.CreateEnvironment(ctx, req)
 		assert.NoError(t, err)
@@ -168,6 +173,8 @@ func TestCreateEnvironment(t *testing.T) {
 		assert.Equal(t, name, res.GetName())
 		assert.Equal(t, "auto generate chef environment", res.GetDescription())
 		assert.Equal(t, req.CookbookVersions, res.CookbookVersions)
+		assert.Equal(t, "{\"attribute1\":\"value\"}", res.DefaultAttributes)
+		assert.Equal(t, "{\"attribute1\":\"override\"}", res.OverrideAttributes)
 	})
 
 	t.Run("when the environment exists, raise the error environment already exists", func(t *testing.T) {
