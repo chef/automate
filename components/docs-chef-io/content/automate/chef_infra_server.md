@@ -51,7 +51,7 @@ Clicking on the **Add Chef Server** button opens a popup menu as shown below:
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu.png)
 
-Mention the correct Name, FQDN and the IP Address. Click on **Add Chef Server**. The desired server gets added to the Chef Infra Server 
+Mention the correct Name, FQDN and the IP Address of the system. Click on **Add Chef Server**. The desired server gets added to the Chef Infra Server 
 
 **Note:** If the mentioned FQDN and IP Address is incorrect, the box displays and error as shown below:
 
@@ -75,7 +75,7 @@ Clicking on the **Add Chef Organization** button opens a popup menu as shown bel
 
 ![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
 
-Mention the correct Name, Projects, Admin User and Admin Key. Click on **Add Chef Organization**. The desired organization gets added to the Chef Server.
+Mention the correct Name, Projects, Admin User and Admin Key. Always use the exact detaials that were provided at the time of setting up **Kinfe**. In the Admin key, paste the contents of the `pem` file that was stored in the `~/.chef` folder. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
 
 Click on any Chef Organization to view the **Objects**.
 
