@@ -31,6 +31,7 @@ import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
+import { DatabagItemModalComponent } from './databag-item-modal/databag-item-modal.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent
+    ResetAdminKeyComponent,
+    DatabagItemModalComponent
   ],
   imports: [
     CommonModule,
