@@ -50,7 +50,7 @@ export class DataBagItemsEffects {
   deleteDataBagItem$ = this.actions$.pipe(
     ofType(DataBagItemsActionTypes.DELETE),
     mergeMap(({ payload: { server_id, org_id, databag_name, name } }: DeleteDataBagItem) =>
-      this.requests.deleteDataBagItem1(server_id, org_id, databag_name, name).pipe(
+      this.requests.deleteDataBagItem(server_id, org_id, databag_name, name).pipe(
         map(() => new DeleteDataBagItemSuccess({ name })),
         catchError((error: HttpErrorResponse) =>
           observableOf(new DeleteDataBagItemFailure(error))))));
