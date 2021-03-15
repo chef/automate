@@ -71,6 +71,21 @@ func TestGetDatabagItems(t *testing.T) {
 	addDataBagItems(ctx, dataBagName, 10)
 
 	t.Run("items list with a per_page search param", func(t *testing.T) {
+		itemId := fmt.Sprintf("item-%d", time.Now().Nanosecond())
+		createReq := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     dataBagName,
+			Data: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+				},
+			},
+		}
+		dbItem, err := infraProxy.CreateDataBagItem(ctx, createReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, dbItem)
+
 		req.SearchQuery = &request.SearchQuery{
 			PerPage: 1,
 		}
@@ -84,6 +99,36 @@ func TestGetDatabagItems(t *testing.T) {
 	})
 
 	t.Run("items list with a page search param", func(t *testing.T) {
+		itemId1 := fmt.Sprintf("item-%d", time.Now().Nanosecond())
+		createReq1 := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     dataBagName,
+			Data: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId1}},
+				},
+			},
+		}
+		dbItem1, err := infraProxy.CreateDataBagItem(ctx, createReq1)
+		assert.NoError(t, err)
+		assert.NotNil(t, dbItem1)
+
+		itemId2 := fmt.Sprintf("item-%d", time.Now().Nanosecond())
+		createReq2 := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     dataBagName,
+			Data: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId2}},
+				},
+			},
+		}
+		dbItem2, err := infraProxy.CreateDataBagItem(ctx, createReq2)
+		assert.NoError(t, err)
+		assert.NotNil(t, dbItem2)
+
 		req.SearchQuery = &request.SearchQuery{
 			PerPage: 1,
 			Page:    1,

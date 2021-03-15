@@ -152,9 +152,12 @@ func (s *Server) CreateEnvironment(ctx context.Context, req *request.CreateEnvir
 		return nil, ParseAPIError(err)
 	}
 
-	return &response.Environment{
-		Name: req.Name,
-	}, nil
+	environment, err := c.client.Environments.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return fromAPIToEnvironmentResponse(environment)
 }
 
 // DeleteEnvironment deletes the environment
@@ -183,9 +186,7 @@ func (s *Server) DeleteEnvironment(ctx context.Context, req *request.Environment
 		return nil, ParseAPIError(err)
 	}
 
-	return &response.Environment{
-		Name: environment.Name,
-	}, nil
+	return fromAPIToEnvironmentResponse(environment)
 }
 
 // UpdateEnvironment updates the environment attributes
@@ -224,7 +225,7 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	_, err = c.client.Environments.Put(&chef.Environment{
+	environment, err := c.client.Environments.Put(&chef.Environment{
 		Name:               req.Name,
 		Description:        req.Description,
 		DefaultAttributes:  defaultAttributes,
@@ -237,9 +238,7 @@ func (s *Server) UpdateEnvironment(ctx context.Context, req *request.UpdateEnvir
 		return nil, ParseAPIError(err)
 	}
 
-	return &response.Environment{
-		Name: req.Name,
-	}, nil
+	return fromAPIToEnvironmentResponse(environment)
 }
 
 // GetEnvironmentRecipes get environment based recipes list
@@ -280,4 +279,27 @@ func fromAPIToListEnvironments(al []interface{}) []*response.EnvironmentListItem
 	}
 
 	return cl
+}
+
+// fromAPIToEnvironmentResponse a response.Environment from a chef Environment
+func fromAPIToEnvironmentResponse(environment *chef.Environment) (*response.Environment, error) {
+	defaultAttributes, err := json.Marshal(environment.DefaultAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	overrideAttributes, err := json.Marshal(environment.OverrideAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.Environment{
+		Name:               environment.Name,
+		ChefType:           environment.ChefType,
+		Description:        environment.Description,
+		CookbookVersions:   environment.CookbookVersions,
+		JsonClass:          environment.JsonClass,
+		DefaultAttributes:  string(defaultAttributes),
+		OverrideAttributes: string(overrideAttributes),
+	}, nil
 }
