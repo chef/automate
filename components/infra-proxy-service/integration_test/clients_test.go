@@ -126,6 +126,7 @@ func TestGetClients(t *testing.T) {
 			ServerId:  autoDeployedChefServerID,
 			OrgId:     autoDeployedChefOrganizationID,
 			Name:      name,
+			Validator: true,
 			CreateKey: true,
 		}
 		client, err := infraProxy.CreateClient(ctx, createReq)
@@ -143,6 +144,7 @@ func TestGetClients(t *testing.T) {
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 1, int(res.Total))
 		assert.Equal(t, name, res.Clients[0].GetName())
+		assert.Equal(t, true, res.Clients[0].GetValidator())
 	})
 
 }
@@ -169,7 +171,8 @@ func TestGetClient(t *testing.T) {
 	client, err := infraProxy.GetClient(ctx, req)
 	assert.NoError(t, err)
 	assert.NotNil(t, client)
-	assert.Equal(t, name, client.Name)
+	assert.Equal(t, name, client.GetName())
+	assert.Equal(t, false, client.GetValidator())
 }
 
 func TestResetClient(t *testing.T) {

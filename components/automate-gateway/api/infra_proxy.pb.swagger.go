@@ -2756,6 +2756,11 @@ func init() {
         "name": {
           "type": "string",
           "description": "Client name."
+        },
+        "validator": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean indicates client type is validator or not."
         }
       }
     },
