@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DatabagItemModalComponent } from './databag-item-modal.component';
+import { DatabagItemModalComponent } from './create-databag-item-modal.component';
 
 describe('DatabagItemModalComponent', () => {
   let component: DatabagItemModalComponent;

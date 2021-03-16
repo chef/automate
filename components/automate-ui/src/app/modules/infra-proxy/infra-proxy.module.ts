@@ -15,6 +15,7 @@ import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.co
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { CreateDataBagModalComponent } from './create-data-bag-modal/create-data-bag-modal.component';
+import { CreateDatabagItemModalComponent } from './create-databag-item-modal/create-databag-item-modal.component';
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component';
@@ -31,7 +32,6 @@ import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
-import { DatabagItemModalComponent } from './databag-item-modal/databag-item-modal.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +45,7 @@ import { DatabagItemModalComponent } from './databag-item-modal/databag-item-mod
     CreateOrgModalComponent,
     CreateDataBagModalComponent,
     CreateClientModalComponent,
+    CreateDatabagItemModalComponent,
     DataBagsDetailsComponent,
     DataBagsListComponent,
     DeleteInfraObjectModalComponent,
@@ -59,8 +60,7 @@ import { DatabagItemModalComponent } from './databag-item-modal/databag-item-mod
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent,
-    DatabagItemModalComponent
+    ResetAdminKeyComponent
   ],
   imports: [
     CommonModule,

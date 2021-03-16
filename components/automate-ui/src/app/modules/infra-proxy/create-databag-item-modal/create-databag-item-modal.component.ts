@@ -3,12 +3,12 @@ import {
   Component,
   EventEmitter,
   Input,
-  // OnDestroy,
+  OnDestroy,
   OnInit
 } from '@angular/core';
 import { combineLatest, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { FormBuilder,  Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -18,25 +18,27 @@ import { HttpStatus } from 'app/types/types';
 import {
   saveStatus,
   saveError
-} from 'app/entities/data-bags/data-bags.selectors';
-import { DataBag } from 'app/entities/data-bags/data-bags.model';
+} from 'app/entities/data-bags/data-bag-details.selector';
+import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
+import { CreateDataBagItem } from 'app/entities/data-bags/data-bag-details.actions';
 
 @Component({
-  selector: 'app-databag-item-modal',
-  templateUrl: './databag-item-modal.component.html',
-  styleUrls: ['./databag-item-modal.component.scss']
+  selector: 'app-create-databag-item-modal',
+  templateUrl: './create-databag-item-modal.component.html',
+  styleUrls: ['./create-databag-item-modal.component.scss']
 })
-export class DatabagItemModalComponent implements OnInit {
+export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<void>;
   @Input() server_Id: string;
   @Input() org_Id: string;
+  @Input() name: string;
 
   public visible = false;
   public creating = false;
   public sending = false;
   public close = new EventEmitter();
   public createForm: FormGroup;
-  public dataBag: DataBag;
+  public dataBagItem: DataBagItem;
   public conflictError = false;
   public itemAttrParseError = false;
   private isDestroyed = new Subject<boolean>();
@@ -46,9 +48,8 @@ export class DatabagItemModalComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.createForm = this.fb.group({
-      // Must stay in sync with error checks in create-notification-modal.component.html
       itemId: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      itemAttr:['{}']
+      itemAttr: ['{}']
     });
   }
 
@@ -57,6 +58,33 @@ export class DatabagItemModalComponent implements OnInit {
       .subscribe(() => {
         this.conflictError = false;
         this.visible = true;
+      });
+
+    this.store.pipe(
+      select(saveStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.visible && !pending(state)))
+      .subscribe(state => {
+        this.creating = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+        }
+      });
+
+    combineLatest([
+      this.store.select(saveStatus),
+      this.store.select(saveError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.visible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictError = true;
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
       });
   }
 
@@ -77,7 +105,7 @@ export class DatabagItemModalComponent implements OnInit {
     this.visible = false;
   }
 
-  onChangeJSON(event: { target: { value: string } } ) {
+  onChangeJSON(event: { target: { value: string } }) {
     // get value from text area
     const newValue = event.target.value;
     try {
@@ -93,14 +121,16 @@ export class DatabagItemModalComponent implements OnInit {
   createDataBagItem(): void {
     this.creating = true;
 
-    // const dataBagItem = {
-    //   server_id: this.server_Id,
-    //   org_id: this.org_Id,
-    //   name: this.createForm.controls['itemId'].value.trim()
-    //   // attr: this.createForm.controls['itemAttr'].value.trim()
-    // };
+    const dataBagItem = {
+      server_id: this.server_Id,
+      org_id: this.org_Id,
+      name: this.name,
+      data: {"id": this.createForm.controls['itemId'].value.trim()}
+      // id: this.createForm.controls['itemId'].value.trim()
+      // attr: this.createForm.controls['itemAttr'].value.trim()
+    };
 
-    // this.store.dispatch(new CreateDataBagItem({dataBag: dataBag}));
+    this.store.dispatch(new CreateDataBagItem({dataBagItem: dataBagItem}));
   }
 
   private resetCreateModal(): void {

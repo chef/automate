@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { DataBagItems } from './data-bags.model';
+import { HttpStatus } from 'app/types/types';
+
 import {
   GetDataBagItems,
   GetDataBagItemsSuccess,
@@ -17,7 +19,11 @@ import {
   UpdateDataBagItem,
   UpdateDataBagItemFailure,
   UpdateDataBagItemSuccess,
-  DataBagItemsSuccessPayload
+  DataBagItemsSuccessPayload,
+  CreateDataBagItem,
+  CreateDataBagItemSuccess,
+  CreateDataBagItemPayload,
+  CreateDataBagItemFailure
 } from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
@@ -46,6 +52,36 @@ export class DataBagItemsEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get infra data bag items: ${msg || payload.error}`
+      });
+    }));
+
+  @Effect()
+  createDataBagItem$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE),
+    mergeMap(({ payload: { dataBagItem } }: CreateDataBagItem) =>
+      this.requests.createDataBagItem(dataBagItem).pipe(
+        map((resp: CreateDataBagItemPayload) => new CreateDataBagItemSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateDataBagItemFailure(error))))));
+
+  @Effect()
+  createDataBagItemSuccess$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE_SUCCESS),
+    map(({ payload: { name : name } }: CreateDataBagItemSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Successfully Created Data Bag ${name}.`
+      });
+    }));
+
+  @Effect()
+  createDataBagItemFailure$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateDataBagItemFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateDataBagItemFailure) => {
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could Not Create Data Bag: ${payload.error.error || payload}.`
       });
     }));
 

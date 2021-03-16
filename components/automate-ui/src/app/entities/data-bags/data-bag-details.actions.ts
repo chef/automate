@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { DataBagItems, DataBagsItemDetails } from './data-bags.model';
+import { DataBagItems, DataBagsItemDetails, DataBagItem  } from './data-bags.model';
 
 export enum DataBagItemsActionTypes {
   GET_ALL = 'DATA_BAG_ITEMS::GET_ALL',
@@ -11,7 +11,10 @@ export enum DataBagItemsActionTypes {
   DELETE_FAILURE  = 'DATA_BAG_ITEMS::DELETE::FAILURE',
   UPDATE = 'DATA_BAG_ITEMS::UPDATE',
   UPDATE_SUCCESS = 'DATA_BAG_ITEMS::UPDATE::SUCCESS',
-  UPDATE_FAILURE = 'DATA_BAG_ITEMS::UPDATE::FAILURE'
+  UPDATE_FAILURE = 'DATA_BAG_ITEMS::UPDATE::FAILURE',
+  CREATE          = 'DATA_BAG_ITEMS::CREATE',
+  CREATE_SUCCESS  = 'DATA_BAG_ITEMS::CREATE::SUCCESS',
+  CREATE_FAILURE  = 'DATA_BAG_ITEMS::CREATE::FAILURE'
 }
 
 export interface DataBagItemsSuccessPayload {
@@ -26,6 +29,11 @@ export interface DataBagItemPayload {
   name: string;
   page: number;
   per_page: number;
+}
+
+export interface CreateDataBagItemPayload {
+  name: string;
+  id: string;
 }
 
 export class GetDataBagItems implements Action {
@@ -43,6 +51,20 @@ export class GetDataBagItemsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class CreateDataBagItem implements Action {
+  readonly type = DataBagItemsActionTypes.CREATE;
+  constructor(public payload: { dataBagItem: DataBagItem }) { }
+}
+
+export class CreateDataBagItemSuccess implements Action {
+  readonly type = DataBagItemsActionTypes.CREATE_SUCCESS;
+  constructor(public payload: CreateDataBagItemPayload) { }
+}
+
+export class CreateDataBagItemFailure implements Action {
+  readonly type = DataBagItemsActionTypes.CREATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
 export class DeleteDataBagItem implements Action {
   readonly type = DataBagItemsActionTypes.DELETE;
   constructor(public payload: {
@@ -87,4 +109,7 @@ export type DataBagItemsActions =
   | DeleteDataBagItemFailure
   | UpdateDataBagItem
   | UpdateDataBagItemSuccess
-  | UpdateDataBagItemFailure;
+  | UpdateDataBagItemFailure
+  | CreateDataBagItem
+  | CreateDataBagItemSuccess
+  | CreateDataBagItemFailure;

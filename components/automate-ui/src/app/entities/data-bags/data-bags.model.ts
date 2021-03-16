@@ -18,3 +18,11 @@ export interface DataBagsItemDetails {
   name: string;
   data: string;
 }
+
+export interface DataBagItem {
+  server_id: string;
+  org_id: string;
+  // id: string;
+  name: string;
+  data: {}
+}

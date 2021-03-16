@@ -1,4 +1,4 @@
-<div class="content-container">
+<div class="content-container" class="dataBagItems">
   <div class="container">
     <main>
       <app-delete-infra-object-modal
@@ -35,8 +35,11 @@
         </chef-tab-selector>
       </chef-page-header>
 
-      <app-databag-item-modal
-      [openEvent]="openDataBagItemModal"></app-databag-item-modal>
+      <app-create-databag-item-modal
+      [openEvent]="openDataBagItemModal"
+      [server_Id]="serverId"
+      [org_Id]="orgId"
+      [name]="dataBagsName"></app-create-databag-item-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
         <div class="search-items">
