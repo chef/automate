@@ -75,6 +75,6 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
+    return event.key === 'Shift' || event.key === 'Tab' || event.key === 'Enter';
   }
 }

@@ -413,8 +413,6 @@ export class ChefButton {
    */
   @Prop({ reflectToAttr: true }) target: string;
 
-  @Prop({ reflectToAttr: true }) firstFocus = false;
-
   render() {
     const link = (
       <a href={this.url} target={this.target}>
