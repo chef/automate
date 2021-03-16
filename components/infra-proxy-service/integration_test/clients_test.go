@@ -127,7 +127,6 @@ func TestGetClients(t *testing.T) {
 			OrgId:     autoDeployedChefOrganizationID,
 			Name:      name,
 			Validator: true,
-			CreateKey: true,
 		}
 		client, err := infraProxy.CreateClient(ctx, createReq)
 		assert.NoError(t, err)
