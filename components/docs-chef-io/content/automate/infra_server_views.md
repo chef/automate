@@ -99,3 +99,13 @@ Features lineup:
   - List Action: Ability to Delete the client.
   - Create Client: Ability to create a client.
 - Client Detail: Clicking on a list item, navigated to client detail. it showing the public key with the Reset Key option.
+
+## Troubleshooting
+- While fetching any objects like cookbooks etc if it raises the `Could not get cookbooks: organization 'no-org' does not exist.` Ref: ![Could not get cookbooks: organization 'no-org' does not exist.](/images/automate/automate-infra-views-org-not-found.png)
+
+  it means that, provided organization does not exist on Chef Infra Server, either you need to create from `knife opc org create` or using `chef-server-ctl org-create` then need to provide the same detail to connect and perform further actions.
+
+
+
+
+
