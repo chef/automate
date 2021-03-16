@@ -75,7 +75,7 @@ Clicking on the **Add Chef Organization** button opens a popup menu as shown bel
 
 ![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
 
-Mention the correct Name, Projects, Admin User and Admin Key. Always use the exact detaials that were provided at the time of setting up **Kinfe**. In the Admin key, paste the contents of the `pem` file that was stored in the `~/.chef` folder. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
+Add the Name, Projects, Admin User and Admin Key. Always use the exact details that were provided at the time of setting up **Knife**. Copy the contents of the `~/.chef/USER.pem` file and past it into the **Admin Key** field. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
 
 Click on any Chef Organization to view the **Objects**.
 
@@ -102,5 +102,7 @@ An environment is a way to map an organization’s real-life workflow to what ca
 Data bags store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search. Click [here](https://docs.chef.io/data_bags/) to know more about Data Bags.
 
 ### Clients
+
+Chef Infra Clients provide secure API access to the Chef Infra Server.
 
 ## Troubleshoot
