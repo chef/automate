@@ -8,11 +8,15 @@
     (deleteClicked)="deleteRole()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
+  <app-create-infra-role-modal
+    [openEvent]="openRoleModal"
+    [rolesList]="roles"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [currentPage]="currentPage">
+  </app-create-infra-role-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
-  <app-create-infra-role-modal [openEvent]="openRoleModal"
-  [rolesList]="roles" [serverId]="serverId" [orgId]="orgId"
-  [page]="page"></app-create-infra-role-modal>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
     <div class="search-items">
       <div class="search-box">
@@ -32,40 +36,40 @@
       <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
     </div>
     <chef-table *ngIf="roles.length">
-        <chef-thead>
-          <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Name</chef-th>
-            <chef-th class="no_border_th">Description</chef-th>
-            <chef-th class="no_border_th">Environments</chef-th>
-            <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th three-dot-column"></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <chef-tr *ngFor="let role of roles">
-            <chef-td>
-              <a [routerLink]="['/infrastructure','chef-servers', serverId,
-              'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
-            </chef-td>
-            <chef-td>
-              {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
-            </chef-td>
-            <chef-td>{{ role.environments.join(", ") }}</chef-td>
-            <chef-td></chef-td>
-            <chef-td class="three-dot-column">
-              <mat-select panelClass="chef-control-menu">
-                <mat-option (onSelectionChange)="startRoleDelete(role)" data-cy="delete-role">Delete</mat-option>
-              </mat-select>
-            </chef-td>
-          </chef-tr>
-        </chef-tbody>
-      </chef-table>
+      <chef-thead>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th">Description</chef-th>
+          <chef-th class="no_border_th">Environments</chef-th>
+          <chef-th class="no_border_th"></chef-th>
+          <chef-th class="no_border_th three-dot-column"></chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let role of roles">
+          <chef-td>
+            <a [routerLink]="['/infrastructure','chef-servers', serverId,
+            'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
+          </chef-td>
+          <chef-td>
+            {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
+          </chef-td>
+          <chef-td>{{ role.environments.join(", ") }}</chef-td>
+          <chef-td></chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu">
+              <mat-option (onSelectionChange)="startRoleDelete(role)" data-cy="delete-role">Delete</mat-option>
+            </mat-select>
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
 
-      <app-page-picker
+    <app-page-picker
       class="roles-list-paging"
       [total]="total"
       [perPage]="per_page"
-      [page]="page"
+      [page]="currentPage"
       (pageChanged)="onPageChange($event)">
     </app-page-picker>
   </ng-container>

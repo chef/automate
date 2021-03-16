@@ -33,7 +33,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public searching = false;
   public searchValue = '';
-  public page = 1;
+  public currentPage = 1;
   public per_page = 9;
   public total: number;
 
@@ -56,12 +56,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       roleName: '',
       server_id: this.serverId,
       org_id: this.orgId,
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page
     };
-
     this.store.dispatch(new GetRoles(payload));
-
 
     combineLatest([
       this.store.select(getAllStatus),
@@ -71,15 +69,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     .subscribe(([_getRolesSt, RolesState]) => {
       if (!isNil(RolesState)) {
         this.roleListState = RolesState;
-        if (this.roleListState.items.length === 0 && this.roleListState.total !== 0) {
-          this.store.dispatch(new GetRoles(payload));
-          this.rolesListLoading = true;
-        } else {
-          this.roles = RolesState?.items;
-          this.total = RolesState?.total;
-          this.rolesListLoading = false;
-          this.searching = false;
-        }
+        this.roles = RolesState?.items;
+        this.total = RolesState?.total;
+        this.rolesListLoading = false;
+        this.searching = false;
       }
     });
 
@@ -93,7 +86,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   }
 
   searchRoles(currentText: string) {
-    this.page = 1;
+    this.currentPage = 1;
     this.searching = true;
     this.searchValue = currentText;
 
@@ -101,7 +94,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: number): void {
-    this.page = event;
+    this.currentPage = event;
     this.searching = true;
     this.getRolesData();
   }
@@ -111,7 +104,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       roleName: this.searchValue,
       server_id: this.serverId,
       org_id: this.orgId,
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page
     };
 

@@ -4,7 +4,6 @@ import { MockComponent } from 'ng2-mock-component';
 import { SelectBoxComponent } from './select-box.component';
 
 describe('SelectBoxComponent', () => {
-  let component: SelectBoxComponent;
   let fixture: ComponentFixture<SelectBoxComponent>;
 
   beforeEach(waitForAsync(() => {
@@ -19,11 +18,7 @@ describe('SelectBoxComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SelectBoxComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
 });

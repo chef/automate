@@ -83,9 +83,9 @@ export class InfraRoleEffects {
   @Effect()
   createRoleSuccess$ = this.actions$.pipe(
     ofType(RoleActionTypes.CREATE_SUCCESS),
-    map(({ payload: { } }: CreateRoleSuccess) => new CreateNotification({
+    map(({ payload: { name } }: CreateRoleSuccess) => new CreateNotification({
       type: Type.info,
-      message: 'Created role.'
+      message: `Created role ${name}.`
     })));
 
   @Effect()

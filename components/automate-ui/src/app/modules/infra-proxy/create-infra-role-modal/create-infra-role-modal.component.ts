@@ -46,6 +46,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   @Input() rolesList: InfraRole[] = [];
   @Input() serverId: string;
   @Input() orgId: string;
+  @Input() currentPage: number;
 
   public constraintsTab = false;
   public conflictError = false;
@@ -60,7 +61,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public visible = false;
 
   public attr_value = '{}';
-  public page = 1;
   public per_page = 9;
   public org: string;
   public recipes: string[] = [];
@@ -110,7 +110,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       roleName: '',
       server_id: this.serverId,
       org_id: this.orgId,
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page
     };
 
