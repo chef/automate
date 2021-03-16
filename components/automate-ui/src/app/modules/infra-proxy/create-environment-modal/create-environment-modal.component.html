@@ -15,16 +15,16 @@
                 </label>
                 <chef-error
                   *ngIf="(detailsFormGroup.get('name').hasError('required') || detailsFormGroup.get('name').hasError('pattern')) && detailsFormGroup.get('name').dirty">
-                  Display Name is required.
+                  Name is required.
                 </chef-error>
-                <chef-error *ngIf="conflictError">
+                <chef-error *ngIf="nameExist">
                   Environment "{{detailsFormGroup.get('name').value}}" already exists.
                 </chef-error>
               </chef-form-field>
             </div>
             <div class="input-margin">
               <chef-form-field>
-                <label>
+                <label class="description-scroll">
                   <span class="label">Description <span aria-hidden="true">*</span></span>
                   <textarea chefInput name="description" id="description" formControlName="description" autofocus></textarea>
                 </label>
@@ -49,7 +49,7 @@
             <app-infra-environment-constraint
               [constraintKeys]="constraintKeys"
               (constraintValues)="constraintItemsHandler($event)"
-              [dynamicArray]="dynamicArray"
+              [cookbookConstraintArray]="cookbookConstraintArray"
               [name_id]="name_id">
             </app-infra-environment-constraint>
           </div>
@@ -65,8 +65,8 @@
         <app-infra-tab tabTitle="Default Attributes" [active]="defaultTab" [disabled]="!detailsFormGroup?.valid">
           <form [formGroup]="defaultAttrFormGroup">
             <chef-form-field>
-              <textarea chefInput name="default" id="default" formControlName="default" (change)="onChangeJSON($event)"
-                (keyup)="onChangeJSON($event)">
+              <textarea chefInput name="default" id="default" formControlName="default"
+                (keyup)="onChangeDefaultJson($event)">
               </textarea>
               <chef-error *ngIf="defaultAttrParseError">
                 Must be a valid JSON object
@@ -74,7 +74,7 @@
             </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <chef-button [disabled]="!defaultAttrFormGroup?.valid || conflictError"  primary id="create-button-object-modal-2" (click)="createEnvironment()">
+              <chef-button [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError"  primary id="create-button-object-modal-2" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating...</span>
@@ -86,8 +86,8 @@
           <form [formGroup]="overrideAttrFormGroup">
             <ng-template matStepLabel>Override Attributes</ng-template>
             <chef-form-field>
-              <textarea chefInput name="override" id="override" formControlName="override" autofocus (change)="onChangeJSON($event)"
-                (keyup)="onChangeJSON($event)">
+              <textarea chefInput name="override" id="override" formControlName="override" autofocus
+                (keyup)="onChangeOverrideJson($event)">
               </textarea>
               <chef-error *ngIf="overrideAttrParseError">
                 Must be a valid JSON object
@@ -95,7 +95,7 @@
             </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <chef-button [disabled]="!overrideAttrFormGroup?.valid || conflictError"  primary id="create-button-object-modal-3" (click)="createEnvironment()">
+              <chef-button [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError"  primary id="create-button-object-modal-3" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating...</span>

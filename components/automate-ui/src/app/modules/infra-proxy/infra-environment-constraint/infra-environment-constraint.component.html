@@ -5,8 +5,8 @@
     </label>
     <div class="drop">
       <mat-select panelClass="chef-dropdown" [(value)]="name_id" [disabled]="!constraintKeys.length">
-        <mat-option *ngFor="let list of constraintKeys" [value]="list" [ngClass]="{'checkmark':list==name_id}">
-          {{ list }}</mat-option>
+        <mat-option *ngFor="let key of constraintKeys" [value]="key" [ngClass]="{'checkmark': key === name_id}">
+          {{ key }}</mat-option>
       </mat-select>
     </div>
   </div>
@@ -16,8 +16,8 @@
     </label>
     <div class="operator-dropdown">
       <mat-select panelClass="chef-dropdown" [(value)]="operator_id" [disabled]="!constraintKeys.length">
-        <mat-option *ngFor="let list of operatorKeys" [value]="list" [ngClass]="{'checkmark':list==operator_id}">
-          {{ list }}</mat-option>
+        <mat-option *ngFor="let key of operatorKeys" [value]="key" [ngClass]="{'checkmark': key === operator_id}">
+          {{ key }}</mat-option>
       </mat-select>
     </div>
   </div>
@@ -33,21 +33,21 @@
     </form>
   </div>
   <div class="add">
-    <chef-button primary (click)="addRow()" [disabled]="!secondFormGroup.valid || !constraintKeys.length">Add
+    <chef-button primary (click)="addCookbookVersion()" [disabled]="!secondFormGroup.valid || !constraintKeys.length">Add
     </chef-button>
   </div>
 </div>
 <div class="fixed-height">
   <div class="scroll">
-    <div class="row-margin" *ngFor="let dynamic of dynamicArray; let i = index;">
+    <div class="row-margin" *ngFor="let cookbook of cookbookConstraintArray; let i = index;">
       <div class="row-name-margin">
         <div class="name-dropdown">
-          <mat-select #selectLang panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].name"
-            (ngModelChange)="selected(selectLang.value,i)">
-            <ng-container *ngFor="let list of rowKeys">
-              <mat-option *ngIf="selectLang.value === list || !isSelected(list)" value={{list}} [ngValue]="list"
-                [ngClass]="{'checkmark':list==dynamicArray[i].name}">
-                {{ list}}
+          <mat-select #selectName panelClass="chef-dropdown" [(ngModel)]="cookbookConstraintArray[i].name"
+            (ngModelChange)="handleEditName(selectName.value,i)">
+            <ng-container *ngFor="let key of nameKeys">
+              <mat-option *ngIf="selectName.value === key || !isSelected(key)" value={{key}} [ngValue]="key"
+                [ngClass]="{'checkmark': key === cookbookConstraintArray[i].name}">
+                {{ key}}
               </mat-option>
             </ng-container>
           </mat-select>
@@ -57,19 +57,19 @@
       <div class="row-operator-margin">
 
         <div class="operator-dropdown">
-          <mat-select panelClass="chef-dropdown" [(ngModel)]="dynamicArray[i].operator"
-            (ngModelChange)="handleOperator($event, i)">
-            <mat-option *ngFor="let list of operatorKeys" [value]="list"
-              [ngClass]="{'checkmark':list==dynamicArray[i].operator}">{{ list }}</mat-option>
+          <mat-select panelClass="chef-dropdown" [(ngModel)]="cookbookConstraintArray[i].operator"
+            (ngModelChange)="handleEditOperator($event, i)">
+            <mat-option *ngFor="let key of operatorKeys" [value]="key"
+              [ngClass]="{'checkmark': key === cookbookConstraintArray[i].operator}">{{ key }}</mat-option>
           </mat-select>
         </div>
       </div>
       <div class="row-version-margin">
         <input chefInput type="text" id="name-input" (keyup)="handleInput($event)"
-          (ngModelChange)="handleVersion($event, i)" autocomplete="off" [(ngModel)]="dynamicArray[i].version" />
+          (ngModelChange)="handleEditVersion($event, i)" autocomplete="off" [(ngModel)]="cookbookConstraintArray[i].version" />
       </div>
       <div class="remove">
-        <chef-button (click)="deleteRow(i, dynamic)" secondary caution>Remove
+        <chef-button (click)="deleteCookbookVersionw(i, cookbook)" secondary caution>Remove
         </chef-button>
       </div>
     </div>

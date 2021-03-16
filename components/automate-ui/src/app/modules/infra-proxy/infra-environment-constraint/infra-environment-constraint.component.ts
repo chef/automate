@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  ViewChild,
   Input,
   Output,
   EventEmitter
@@ -10,8 +9,7 @@ import {
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Regex } from 'app/helpers/auth/regex';
 
-import { MatSelect } from '@angular/material/select';
-import { DynamicGrid } from '../create-environment-modal/create-environment-modal.component';
+import { CookbookConstraintGrid } from '../create-environment-modal/create-environment-modal.component';
 
 @Component({
   selector: 'app-infra-environment-constraint',
@@ -22,17 +20,16 @@ import { DynamicGrid } from '../create-environment-modal/create-environment-moda
 export class InfraEnvironmentConstraintComponent implements OnInit {
 
   @Input() constraintKeys: string[] = [];
-  @Input() dynamicArray: Array<DynamicGrid> = [];
+  @Input() cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
   @Input() name_id: string;
-  @Output() constraintValues: EventEmitter<DynamicGrid[]> = new EventEmitter();
-  @ViewChild(MatSelect) select: MatSelect;
+  @Output() constraintValues: EventEmitter<CookbookConstraintGrid[]> = new EventEmitter();
 
   public conflictError = false;
   public operator_id = '';
   public operatorKeys: string[] = [];
   public secondFormGroup: FormGroup;
-  public selectedLangs: string[] = [];
-  public rowKeys: string[] = [];
+  public selectedCookbookNames: string[] = [];
+  public nameKeys: string[] = [];
 
   constructor(
     private fb: FormBuilder
@@ -41,54 +38,56 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
       version: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_VERSION)]]
     });
 
+    // operators for Cookbook version
     this.operatorKeys = ['~>', '>=', '>', '=', '<', '<='];
 
     this.operator_id = this.operatorKeys[0];
   }
 
   ngOnInit() {
-
     this.conflictError = false;
     this.constraintKeys.forEach(element =>
-
-      this.rowKeys.push(element)
+      this.nameKeys.push(element)
     );
   }
 
-  selected(value, i) {
-
-    let previousValue;
-
-    this.selectedLangs.forEach((element, index) => {
-      if (index === i) {
-        previousValue = element;
-        if (value && value !== 'undefined') {
-          this.selectedLangs[i] = value;
-        }
-      }
+  // Adding a new cookbook version
+  public addCookbookVersion() {
+    this.cookbookConstraintArray.unshift({
+      id: this.cookbookConstraintArray.length + 1,
+      name: this.name_id,
+      operator: this.operator_id,
+      version: this.secondFormGroup.controls['version'].value
     });
-
-    this.dynamicArray.forEach((_, index) => {
-      if (index === i) {
-        this.dynamicArray[i].name = value;
-      }
-
-    });
-
     this.constraintKeys.forEach((element, index) => {
-      if (element === value) {
+      if (element === this.name_id) {
+        this.selectedCookbookNames.unshift(element);
         this.constraintKeys.splice(index, 1);
       }
     });
 
-    this.constraintKeys.push(previousValue);
-    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
     this.name_id = this.constraintKeys[0];
-    this.constraintValues.emit(this.dynamicArray);
+    this.operator_id = this.operatorKeys[0];
+
+    this.secondFormGroup.controls.version.setValue('');
+    this.constraintValues.emit(this.cookbookConstraintArray);
   }
 
-  isSelected(lang: string) {
-    return this.selectedLangs.includes(lang);
+  // Deleting a particular CookbookVersion
+  public deleteCookbookVersionw(cookbookIndex: number, cookbookConstraint: CookbookConstraintGrid) {
+    this.constraintKeys.push(cookbookConstraint.name);
+    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+
+    this.selectedCookbookNames.forEach((_, index) => {
+      if (cookbookIndex === index) {
+      this.selectedCookbookNames.splice(index, 1);
+
+      }
+    });
+
+    this.name_id = this.constraintKeys[0];
+    this.cookbookConstraintArray.splice(cookbookIndex, 1);
+    this.constraintValues.emit(this.cookbookConstraintArray);
   }
 
   public handleInput(event: KeyboardEvent): void {
@@ -98,87 +97,60 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.conflictError = false;
   }
 
-  // Handle the version change
-  public handleVersion(event, i) {
-    this.dynamicArray.forEach((_, index) => {
-      if (index === i) {
-        this.dynamicArray[i].version = event;
+  public handleEditName(newCookbookvalue: string, cookbookIndex: number) {
+    let previousCookbookvalue: string;
+
+    this.selectedCookbookNames.forEach((element, index) => {
+      if (index === cookbookIndex) {
+        previousCookbookvalue = element;
+        if (newCookbookvalue && newCookbookvalue !== 'undefined') {
+          this.selectedCookbookNames[cookbookIndex] = newCookbookvalue;
+        }
       }
-
     });
-    this.constraintValues.emit(this.dynamicArray);
-  }
 
-  // Handle the operator change
-  public handleOperator(event, i) {
-
-    this.dynamicArray.forEach((_, index) => {
-      if (index === i) {
-        this.dynamicArray[i].operator = event;
-      }
-
-    });
-    this.constraintValues.emit(this.dynamicArray);
-  }
-
-  // Handle the name change
-  public handleName(event, i) {
-    this.dynamicArray.forEach((_, index) => {
-      if (index === i) {
-        this.dynamicArray[i].name = event;
+    this.cookbookConstraintArray.forEach((_, index) => {
+      if (index === cookbookIndex) {
+        this.cookbookConstraintArray[cookbookIndex].name = newCookbookvalue;
       }
 
     });
 
     this.constraintKeys.forEach((element, index) => {
-      if (element === event) {
-        this.constraintKeys.splice(index, 1);
-      }
-
-    });
-    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
-    this.name_id = this.constraintKeys[0];
-    this.constraintValues.emit(this.dynamicArray);
-  }
-
-  // Adding a new constraint
-  addRow() {
-    this.dynamicArray.unshift({
-      id: this.dynamicArray.length + 1,
-      name: this.name_id,
-      operator: this.operator_id,
-      version: this.secondFormGroup.controls['version'].value
-    });
-    this.constraintKeys.forEach((element, index) => {
-      if (element === this.name_id) {
-        this.selectedLangs.push(element);
+      if (element === newCookbookvalue) {
         this.constraintKeys.splice(index, 1);
       }
     });
 
+    this.constraintKeys.push(previousCookbookvalue);
+    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
     this.name_id = this.constraintKeys[0];
-    this.operator_id = this.operatorKeys[0];
-
-    this.secondFormGroup.controls.version.setValue('');
-    this.constraintValues.emit(this.dynamicArray);
+    this.constraintValues.emit(this.cookbookConstraintArray);
   }
 
-  // Deleting a particular constraint
-  deleteRow(index, dynamic) {
-    this.constraintKeys.push(dynamic.name);
-    this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+  public handleEditOperator(newCookbookOperator: string, cookbookIndex: number) {
 
-    this.selectedLangs.forEach((_, indes) => {
-      if (index === indes) {
-      this.selectedLangs.splice(indes, 1);
-
+    this.cookbookConstraintArray.forEach((_, index) => {
+      if (index === cookbookIndex) {
+        this.cookbookConstraintArray[cookbookIndex].operator = newCookbookOperator;
       }
+
     });
+    this.constraintValues.emit(this.cookbookConstraintArray);
+  }
 
-    this.name_id = this.constraintKeys[0];
-    this.dynamicArray.splice(index, 1);
-    this.constraintValues.emit(this.dynamicArray);
+  public handleEditVersion(newCookbookVersion: string, cookbookIndex: number) {
+    this.cookbookConstraintArray.forEach((_, index) => {
+      if (index === cookbookIndex) {
+        this.cookbookConstraintArray[cookbookIndex].version = newCookbookVersion;
+      }
 
+    });
+    this.constraintValues.emit(this.cookbookConstraintArray);
+  }
+
+  public isSelected(name: string) {
+    return this.selectedCookbookNames.includes(name);
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

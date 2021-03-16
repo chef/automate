@@ -213,3 +213,94 @@ span.example-text {
   position: absolute;
   right: 0;
 }
+
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
+  flex-basis: auto;
+  margin-top: 31px;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
+  line-height: 3em;
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid $chef-key-tab;
+  height: 37px;
+}
+
+
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background: $chef-white;
+  color: $chef-black;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+  line-height: 3em;
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid $chef-key-tab;
+  height: 37px;
+}
+
+::ng-deep [panelClass=chef-dropdown] {
+  height: 36px;
+  padding: 5px 12px 0px 12px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep [panelClass=chef-dropdown]:focus {
+  border-color: $chef-form-input;
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {
+  width: 4.5px;
+  background: $chef-form-input;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
+  background: #B4C3CC;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+  display: inline-block;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-color: $chef-white transparent transparent transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  border: 6px solid $chef-primary-bright;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: $chef-black;
+}

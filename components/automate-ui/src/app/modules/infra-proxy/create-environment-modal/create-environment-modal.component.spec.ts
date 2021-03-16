@@ -97,7 +97,7 @@ describe('CreateEnvironmentModalComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('opening create modal and reset tab to details tab', () => {
+    it('opening create modal resets default tab to details tab', () => {
       component.visible = true;
       expect(component.detailsTab).toBe(true);
       expect(component.constraintsTab).toBe(false);
@@ -149,7 +149,6 @@ describe('CreateEnvironmentModalComponent', () => {
       store.dispatch(new CreateEnvironmentSuccess({environment}));
       expect(component.creating).toBe(false);
       expect(component.visible).toBe(false);
-      expect(component.environmentsList.length).not.toBeNull();
     });
 
     it('on create error, modal is closed (because error is handled by failure banner)', () => {

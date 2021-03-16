@@ -4,11 +4,12 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 import { GetEnvironments, DeleteEnvironment } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
-import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
+import { getAllStatus, deleteStatus, environmentList } from 'app/entities/environments/environment.selectors';
+import { EntityStatus } from 'app/entities/entities';
 
 @Component({
   selector: 'app-environments',
@@ -21,27 +22,29 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-  private isDestroyed = new Subject<boolean>();
-  public chefInfraViewsFeatureFlagOn: boolean;
-  public environments: Environment[] = [];
-  public environmentsListLoading = true;
-  public environmentListState: { items: Environment[], total: number };
   public authFailure = false;
-  public openEnvironmentModal = new EventEmitter<void>();
-  public per_page = 9;
-  public page = 1;
+  public deleteModalVisible = false;
+  public environmentsListLoading = true;
   public searching = false;
+
+  public chefInfraViewsFeatureFlagOn: boolean;
+  public current_page = 1;
+  public environments: Environment[] = [];
+  public per_page = 9;
   public searchValue = '';
   public total: number;
+
   public environmentToDelete: Environment;
-  public deleteModalVisible = false;
+  public environmentListState: { items: Environment[], total: number };
+  public openEnvironmentModal = new EventEmitter<void>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private featureFlagsService: FeatureFlagsService,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    // feature flag enable and disable the create button
+    // feature flag enables and disables the create button
     this.chefInfraViewsFeatureFlagOn =
     this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
   }
@@ -49,35 +52,35 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    const payload = {
-        environmentName: '',
-        page: this.page,
-        per_page: this.per_page,
-        server_id: this.serverId,
-        org_id: this.orgId
-      };
-
-    this.store.dispatch(new GetEnvironments(payload));
+    this.getEnvironmentData();
 
     combineLatest([
         this.store.select(getAllStatus),
         this.store.select(environmentList)
       ]).pipe(
+        filter(([getEnvironmentsStatus, allEnvironmentsState]) =>
+        getEnvironmentsStatus === EntityStatus.loadingSuccess &&
+        !isNil(allEnvironmentsState)),
         takeUntil(this.isDestroyed))
       .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
         if (!isNil(EnvironmentsState)) {
           this.environmentListState = EnvironmentsState;
-          if (this.environmentListState.items.length === 0 &&
-              this.environmentListState.total !== 0) {
-            this.store.dispatch(new GetEnvironments(payload));
-            this.environmentsListLoading = true;
-          } else {
-            this.environments = EnvironmentsState?.items;
-            this.total = EnvironmentsState?.total;
-            this.environmentsListLoading = false;
-            this.searching = false;
-          }
+          this.environments = EnvironmentsState?.items;
+          this.total = EnvironmentsState?.total;
+          this.environmentsListLoading = false;
+          this.searching = false;
         }
+      });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.searching = true;
+        if (this.environments.length === 0) {
+          this.current_page = this.current_page - 1;
+        }
+        this.getEnvironmentData();
       });
   }
 
@@ -86,14 +89,14 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   }
 
   searchEnvironment(currentText: string) {
-    this.page = 1;
+    this.current_page = 1;
     this.searching = true;
     this.searchValue = currentText;
     this.getEnvironmentData();
   }
 
   onPageChange(event: number): void {
-    this.page = event;
+    this.current_page = event;
     this.searching = true;
     this.getEnvironmentData();
   }
@@ -101,7 +104,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   getEnvironmentData() {
     const payload = {
       environmentName: this.searchValue,
-      page: this.page,
+      page: this.current_page,
       per_page: this.per_page,
       server_id: this.serverId,
       org_id: this.orgId

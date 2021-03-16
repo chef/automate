@@ -26,11 +26,11 @@ import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
-import { CreateEnvironment, GetEnvironments } from 'app/entities/environments/environment.action';
+import { CreateEnvironment, GetEnvironments, GetEnvironmentsPayload, CreateEnvironmentPayload } from 'app/entities/environments/environment.action';
 
 const CREATE_TAB_NAME = 'environmentTab';
 
-export class DynamicGrid {
+export class CookbookConstraintGrid {
   id: number;
   name: string;
   operator: string;
@@ -49,39 +49,36 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   @Input() environmentsList: Environment[] = [];
   @Input() serverId: string;
   @Input() orgId: string;
+  @Input() currentPage: number;
 
-  public visible = false;
-  public creating = false;
   public conflictError = false;
   public constraintsTab = false;
-  public detailsTab = true;
-  public isLinear = true;
+  public creating = false;
+  public defaultAttrParseError = false;
   public defaultTab = false;
+  public detailsTab = true;
+  public nameExist = false;
+  public overrideAttrParseError = false;
   public overrideTab = false;
-  public showdrag = false;
   public showConstraint = false;
+  public visible = false;
 
+  public attr_value = '{}';
+  public constraintArray: Array<CookbookConstraintGrid> = [];
+  public constraintKeys: string[] = [];
+  public cookbooks: Cookbook[] = [];
+  public cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
+  public items: Environment[] = [];
+  public name_id = '';
+  public per_page = 9;
+  public org: string;
+  public server: string;
+
+  public close = new EventEmitter();
+  public conflictErrorEvent = new EventEmitter<boolean>();
   public detailsFormGroup: FormGroup;
   public defaultAttrFormGroup: FormGroup;
   public overrideAttrFormGroup: FormGroup;
-  public constraintKeys: string[] = [];
-  public cookbooks: Cookbook[] = [];
-  public attr_value = '{}';
-  public server: string;
-  public org: string;
-  public per_page = 9;
-  public page = 1;
-  public name_id = '';
-  public jsonString: string;
-  public defaultAttrParseError: boolean;
-  public overrideAttrParseError: boolean;
-  public data: any;
-  public conflictErrorEvent = new EventEmitter<boolean>();
-  public close = new EventEmitter();
-  public constraintArray: Array<DynamicGrid> = [];
-  public items: Environment[] = [];
-  public textareaID: string;
-  public dynamicArray: Array<DynamicGrid> = [];
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -112,20 +109,19 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       this.conflictError = false;
       this.visible = true;
       this.items = this.environmentsList;
-      this.showdrag = true;
       this.showConstraint = true;
       this.server = this.serverId;
       this.org = this.orgId;
     });
 
-    const payload = {
+    const payload: GetEnvironmentsPayload = {
       environmentName: '',
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page,
       server_id: this.serverId,
       org_id: this.orgId
     };
-
+console.log(this.currentPage);
     this.loadCookbookConstraint();
 
     this.store.select(saveStatus)
@@ -161,11 +157,61 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       });
   }
 
-  public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
-      return;
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  closeCreateModal(): void {
+    this.resetCreateModal();
+    this.visible = false;
+  }
+
+  createEnvironment() {
+    this.creating = true;
+    const environment: CreateEnvironmentPayload = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.detailsFormGroup.controls['name'].value,
+      description: this.detailsFormGroup.controls['description'].value,
+      cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
+      default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
+      override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value)
+    };
+
+    this.store.dispatch(
+      new CreateEnvironment({environment: environment})
+    );
+  }
+
+  handleInput(event: { target: { value: string } } ): void {
+    this.nameExist = this.environmentsList.some(el => el.name === event.target.value);
+  }
+
+  onChangeDefaultJson(event: { target: { value: string } } ) {
+    // get value from text area
+    const newValue = event.target.value;
+    try {
+      // parse it to json
+      JSON.parse(newValue);
+      this.defaultAttrParseError = false;
+    } catch (ex) {
+      // set parse error if it fails
+      this.defaultAttrParseError = true;
     }
-    this.conflictError = false;
+  }
+
+  onChangeOverrideJson(event: { target: { value: string } } ) {
+    // get value from text area
+    const newValue = event.target.value;
+    try {
+      // parse it to json
+      JSON.parse(newValue);
+      this.overrideAttrParseError = false;
+    } catch (ex) {
+      // set parse error if it fails
+      this.overrideAttrParseError = true;
+    }
   }
 
   tabChange(tab: number) {
@@ -197,12 +243,12 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
 
   // Handles the data of cookbook version array coming from constraint tab.
-  constraintItemsHandler(value: Array<DynamicGrid> = []    ) {
+  constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
     this.constraintArray = value;
   }
 
   // Getting list of cookbook names
-  loadCookbookConstraint() {
+  private loadCookbookConstraint() {
     this.name_id = '';
     this.store.dispatch(new GetCookbooks({
       server_id: this.serverId, org_id: this.orgId
@@ -220,29 +266,12 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
           this.constraintKeys.push(cookbook.name);
         });
       }
+      // first cookbook constrains keys selected on drop-down when loading constrain data
       this.name_id = this.constraintKeys[0];
     });
-
   }
 
-  createEnvironment() {
-    this.creating = true;
-    const environment = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.detailsFormGroup.controls['name'].value,
-      description: this.detailsFormGroup.controls['description'].value,
-      cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
-      default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
-      override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value)
-    };
-
-    this.store.dispatch(
-      new CreateEnvironment({environment: environment})
-    );
-  }
-
-  toDisplay(cookbookVersions: Array<DynamicGrid> = []) {
+  toDisplay(cookbookVersions: Array<CookbookConstraintGrid> = []) {
     const current = {};
     cookbookVersions.forEach((element) => {
       current[element.name] =
@@ -251,26 +280,24 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     return current;
   }
 
-  closeCreateModal(): void {
-    this.resetCreateModal();
-    this.visible = false;
-  }
-
   private resetCreateModal(): void {
+    this.cookbookConstraintArray = [];
+
+    this.constraintsTab = false;
     this.creating = false;
+    this.defaultAttrParseError = false;
+    this.defaultTab = false;
+    this.detailsTab = true;
+    this.overrideTab = false;
+    this.overrideAttrParseError = false;
+    this.showConstraint = false;
+
     this.detailsFormGroup.reset();
     this.defaultAttrFormGroup.reset();
     this.overrideAttrFormGroup.reset();
-    this.showConstraint = false;
-    this.overrideTab = false;
-    this.defaultTab = false;
-    this.constraintsTab = false;
-    this.detailsTab = true;
+
     this.defaultAttrFormGroup.controls.default.setValue(this.attr_value);
     this.overrideAttrFormGroup.controls.override.setValue(this.attr_value);
-    this.defaultAttrParseError = false;
-    this.overrideAttrParseError = false;
-    this.dynamicArray = [];
     this.loadCookbookConstraint();
     this.conflictErrorEvent.emit(false);
   }
@@ -281,55 +308,5 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.defaultTab = false;
     this.overrideTab = false;
   }
-
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
-
-  // this is the initial value set to the component
-  public writeValue(obj: any) {
-
-    if (obj) {
-      this.data = obj;
-      // this will format it with 4 character spacing
-      this.jsonString = JSON.stringify(this.data, undefined, 4);
-    }
-  }
-
-  // registers 'fn' that will be fired wheb changes are made
-  // this is how we emit the changes back to the form
-  public registerOnChange(fn: any) {
-    this.propagateChange = fn;
-  }
-
-  public onChangeJSON(event) {
-    this.defaultAttrParseError = false;
-    this.overrideAttrParseError = false;
-    // get value from text area
-    const newValue = event.target.value;
-    this.textareaID = event.target.id;
-    try {
-        // parse it to json
-      this.data = JSON.parse(newValue);
-      if (this.textareaID === 'default') { (this.defaultAttrParseError = false); }
-      if (this.textareaID === 'override') { (this.overrideAttrParseError = false); }
-
-    } catch (ex) {
-        // set parse error if it fails
-      if (this.textareaID === 'default') { (this.defaultAttrParseError = true); }
-      if (this.textareaID === 'override') { (this.overrideAttrParseError = true); }
-
-    }
-    // update the form
-    this.propagateChange(this.data);
-  }
-
-  // the method set in registerOnChange to emit changes back to the form
-  private propagateChange = (_: any) => { };
 
 }

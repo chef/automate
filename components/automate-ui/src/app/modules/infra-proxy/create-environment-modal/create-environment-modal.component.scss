@@ -80,7 +80,7 @@ chef-modal {
       }
 
       ::ng-deep #default::-webkit-scrollbar-thumb {
-        background: #B4C3CC;
+        background: $chef-modal;
         border-radius: 5px;
       }
 
@@ -91,7 +91,7 @@ chef-modal {
       }
 
       ::ng-deep #override::-webkit-scrollbar-thumb {
-        background: #B4C3CC;
+        background: $chef-modal;
         border-radius: 5px;
       }
     }
@@ -145,6 +145,24 @@ chef-modal {
       padding-bottom: 0px;
     }
   }
+}
+
+.description-scroll {
+  textarea {
+    max-height: 162px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+::ng-deep .description-scroll textarea::-webkit-scrollbar {
+  width: 5px;
+  background-color: $chef-form-input;
+}
+
+::ng-deep .description-scroll textarea::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
 }
 
 .dynamic {
@@ -265,182 +283,6 @@ chef-modal ::ng-deep .modal-overlay {
   }
 }
 
-::ng-deep mat-select {
-  width: 277px;
-}
-
-::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
-  flex-basis: auto;
-  margin-top: 31px;
-}
-
-::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
-  line-height: 3em;
-  font-size: 12px;
-  height: 3em;
-  border: 1px solid $chef-key-tab;
-  height: 37px;
- }
-
-
-::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
-  background: $chef-white;
-  color: $chef-black;
-}
-
-::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
-  line-height: 3em;
-  font-size: 12px;
-  height: 3em;
-  border: 1px solid $chef-key-tab;
-  height: 37px;
-}
-
-::ng-deep [panelClass=chef-dropdown] {
-  height: 36px;
-  padding: 5px 12px 0px 12px;
-  border: 1px solid $chef-form-input;
-  box-sizing: border-box;
-  border-radius: 4px;
-}
-
-::ng-deep [panelClass=chef-dropdown]:focus {
-  border-color: $chef-form-input;
-}
-
-// sass-lint:disable no-important
-::ng-deep .cdk-overlay-container .cdk-overlay-pane {
-  margin-left: -12px !important;
-  transform: none !important;
-}
-
-::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {
-  width: 4.5px;
-  background: $chef-form-input;
-  border-radius: 5px;
-}
-
-::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
-  background: #B4C3CC;
-  border-radius: 5px;
-}
-
-::ng-deep .cdk-overlay-container {
-  position: fixed;
-  z-index: 999999999;
-}
-
-::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
-  display: inline-block;
-  right: 10px;
-  width: 0;
-  height: 0;
-  border-color: $chef-white transparent transparent transparent;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid;
-  border: 6px solid $chef-primary-bright;
-  border-width: 0 2px 2px 0;
-  padding: 3px;
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
-  transform: rotate(-135deg);
-  -webkit-transform: rotate(-135deg);
-}
-
-::ng-deep .mat-select-disabled .mat-select-value {
-  color: $chef-black;
-}
-
-.constraint-margin {
-  display: flex;
-  margin-bottom: 10px;
-}
-
-.row-margin {
-  display: flex;
-  margin-top: 5px;
-}
-
-.name-margin {
-  .name-dropdown {
-    color: $chef-primary-dark;
-
-    ::ng-deep label {
-      display: inline;
-      color: $chef-primary-dark;
-      font-size: 15px;
-      margin-right: 15px;
-    }
-
-    chef-select {
-      margin-bottom: 12px;
-      width: 310px;
-      font-size: 12px;
-    }
-
-    chef-select ::ng-deep chef-dropdown {
-      overflow: scroll;
-      height: 160px;
-      width: 120px;
-    }
-
-    chef-select ::ng-deep .selected-value chef-icon {
-      color: $chef-primary-bright;
-    }
-  }
-}
-
-.operator-margin {
-  margin-left: 16px;
-
-  .operator-dropdown {
-    color: $chef-primary-dark;
-
-    ::ng-deep label {
-      display: inline;
-      color: $chef-primary-dark;
-      font-size: 15px;
-      margin-right: 15px;
-    }
-
-    chef-select {
-      margin-bottom: 12px;
-      width: 105px;
-      font-size: 12px;
-    }
-
-    chef-select ::ng-deep chef-dropdown {
-      overflow: scroll;
-      height: 160px;
-      width: 105px;
-    }
-
-    chef-select ::ng-deep .selected-value chef-icon {
-      color: $chef-primary-bright;
-    }
-  }
-}
-
-.scroll {
-  overflow: scroll;
-  height: 256px;
-}
-
-::ng-deep .scroll::-webkit-scrollbar {
-  width: 5px;
-  background: $chef-form-input;
-  border-radius: 5px;
-}
-
-::ng-deep .scroll::-webkit-scrollbar-thumb {
-  background: #B4C3CC;
-  border-radius: 5px;
-}
-
 form {
   chef-form-field {
     textarea {
@@ -448,7 +290,7 @@ form {
       margin-top: 32.22px;
       box-sizing: border-box;
       border-radius: 4px;
-      margin-bottom: -3px;
+      margin-bottom: -5px;
     }
   }
 }
