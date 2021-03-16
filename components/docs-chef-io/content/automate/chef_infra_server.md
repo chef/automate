@@ -41,7 +41,7 @@ Click on the **Chef Servers** located at the left panel of the page. The page lo
 
 ![Chef Infra Server](/images/automate/chef-server-page.png)
 
-The above image is the **Chef Server** page which contains all the Chef Infra Servers connected to the Chef Automate. The Chef Infra Servers listed are the ones which are already configured and added to the Chef Automate. To create a new Infra Server click [here](https://docs.chef.io/automate/infra_server/).
+The above image is the **Chef Server** page which contains all the Chef Infra Servers connected to the Chef Automate. The Chef Infra Servers listed are the ones that are already configured and added to the Chef Automate. To create a new Infra Server click [here](https://docs.chef.io/automate/infra_server/).
 
 To add the created Chef Server to the Infrastructure, click on **Add Chef Server** button. Refer to the image below:
 
@@ -51,9 +51,9 @@ Clicking on the **Add Chef Server** button opens a popup menu as shown below:
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu.png)
 
-Mention the correct Name, FQDN and the IP Address of the system. Click on **Add Chef Server**. The desired server gets added to the Chef Infra Server 
+Mention the correct Name, FQDN, and IP Address of the system. Click on **Add Chef Server**. The desired server gets added to the Chef Infra Server.
 
-**Note:** If the mentioned FQDN and IP Address is incorrect, the box displays and error as shown below:
+**Note:** If the mentioned FQDN and IP Address is incorrect, the box displays an error as shown below:
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu-with-error.png)
 
@@ -67,7 +67,7 @@ Selecting a specific added Chef Server opens the list of organizations in the Se
 
 The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in the Server click [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
 
-To add the previously created organization to the Infrastructure, click on **Add Chef Organization** button. Refer to the image below:
+To add the previously created organization to the Infrastructure, click on the **Add Chef Organization** button. Refer to the image below:
 
 ![Add Chef Organization](/images/automate/add-chef-organization-button.png)
 
@@ -75,19 +75,27 @@ Clicking on the **Add Chef Organization** button opens a popup menu as shown bel
 
 ![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
 
-Add the Name, Projects, Admin User and Admin Key. Always use the exact details that were provided at the time of setting up **Knife**. Copy the contents of the `~/.chef/USER.pem` file and past it into the **Admin Key** field. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
+Add the Name, Projects, Admin User, and Admin Key. Always use the exact details that were provided at the time of setting up **Knife**. Copy the contents of the `~/.chef/USER.pem` file and past it into the **Admin Key** field. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
 
 Click on any Chef Organization to view the **Objects**.
 
 ## Access Chef Infra Server Objects
 
-The **Chef Infra Server Objects** can be managed from the Chef Automate. Selecting a specific Chef Organization opens the details of the Chef Infra Server Objects. Refer to the image below:
+The **Chef Infra Server Objects** can be managed from the Chef Automate. In Automate Infra views, following objects can be managed:
+
+- Cookbooks
+- Roles
+- Environments
+- Data Bags
+- Clients
+
+Refer to the image below:
 
 ![Chef Infra Server Objects](/images/automate/chef-infra-server-objects.png)
 
 ### Cookbooks
 
-A cookbook is the fundamental unit of configuration and policy distribution. Cookbooks also comprises of recipies and other optional components or directories. Click [here](https://docs.chef.io/cookbooks/) to know more about Cookbooks.
+A cookbook is the fundamental unit of configuration and policy distribution. Cookbooks also comprise recipes and other optional components or directories. Click [here](https://docs.chef.io/cookbooks/) to know more about Cookbooks.
 
 ### Roles
 
@@ -106,3 +114,9 @@ Data bags store global variables as JSON data. Data bags are indexed for searchi
 Chef Infra Clients provide secure API access to the Chef Infra Server.
 
 ## Troubleshoot
+
+- While fetching any object like cookbooks or any, if it raises the `Could not get cookbooks: organization 'no-org' does not exist` error, the provided organization does not exist on Chef Infra Server. The error looks like as shown below:
+
+![Could not get cookbooks: Organization](/images/automate/could-not-get-cookbooks-organization.png)
+
+Create the Chef Organization either from `knife opc org create` or using `chef-server-ctl org-create`. Once done add the exact details to fetch the objects.
