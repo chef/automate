@@ -1,6 +1,6 @@
 <chef-modal [visible]="visible" (closeModal)="closeCreateModal()" class="reset-client-modal">
   <div class="flex-container">
-    <div *ngIf="!isReset">
+    <div *ngIf="!isReset" class="reset-div">
       <div class="left-box">
         <img *ngIf="!conflictError" class="big-icon" src="assets/img/infra-client-reset-key.svg"
           alt="client-reset-key-icon" />

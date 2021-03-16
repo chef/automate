@@ -103,6 +103,11 @@ img {
     display: flex;
     padding: 1.5em;
     background: $chef-white;
+
+    chef-snippet {
+      width: 100%;
+    }
+
   }
 
   .key-tab-body-top {
@@ -112,12 +117,12 @@ img {
     text-align: right;
 
     chef-button:focus {
-      outline: none;
+      outline: 0.5px solid $chef-primary-bright;
     }
 
     ::ng-deep {
       chef-button button:focus {
-        outline: none;
+        outline: 0.5px solid $chef-primary-bright;
       }
     }
 
