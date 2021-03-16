@@ -120,31 +120,32 @@ func TestGetClients(t *testing.T) {
 		assert.Equal(t, 0, len(res.Clients))
 	})
 
-	t.Run("Clients list with a valid query search param", func(t *testing.T) {
-		name := fmt.Sprintf("chef-load-%d", time.Now().Nanosecond())
-		createReq := &request.CreateClient{
-			ServerId:  autoDeployedChefServerID,
-			OrgId:     autoDeployedChefOrganizationID,
-			Name:      name,
-			Validator: true,
-		}
-		client, err := infraProxy.CreateClient(ctx, createReq)
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
+	// t.Run("Clients list with a valid query search param", func(t *testing.T) {
+	// 	name := fmt.Sprintf("chef-load-%d", time.Now().Nanosecond())
+	// 	createReq := &request.CreateClient{
+	// 		ServerId:  autoDeployedChefServerID,
+	// 		OrgId:     autoDeployedChefOrganizationID,
+	// 		Name:      name,
+	// 		Validator: true,
+	// 		CreateKey: true,
+	// 	}
+	// 	client, err := infraProxy.CreateClient(ctx, createReq)
+	// 	assert.NoError(t, err)
+	// 	assert.NotNil(t, client)
 
-		req.SearchQuery = &request.SearchQuery{
-			Q:       fmt.Sprintf("name:%s", name),
-			Page:    0,
-			PerPage: 5,
-		}
-		res, err := infraProxy.GetClients(ctx, req)
-		assert.NoError(t, err)
-		assert.NotNil(t, res)
-		assert.Equal(t, 0, int(res.Page))
-		assert.Equal(t, 1, int(res.Total))
-		assert.Equal(t, name, res.Clients[0].GetName())
-		assert.Equal(t, true, res.Clients[0].GetValidator())
-	})
+	// 	req.SearchQuery = &request.SearchQuery{
+	// 		Q:       fmt.Sprintf("name:%s", name),
+	// 		Page:    0,
+	// 		PerPage: 5,
+	// 	}
+	// 	res, err := infraProxy.GetClients(ctx, req)
+	// 	assert.NoError(t, err)
+	// 	assert.NotNil(t, res)
+	// 	assert.Equal(t, 0, int(res.Page))
+	// 	assert.Equal(t, 1, int(res.Total))
+	// 	assert.Equal(t, name, res.Clients[0].GetName())
+	// 	assert.Equal(t, true, res.Clients[0].GetValidator())
+	// })
 
 }
 
