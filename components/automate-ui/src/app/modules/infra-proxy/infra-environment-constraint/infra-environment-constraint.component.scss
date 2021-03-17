@@ -219,19 +219,21 @@ span.example-text {
   width: 277px;
 }
 
+::ng-deep .chef-dropdown {
+  margin-top: 31px;
+
+  .mat-option {
+    line-height: 3em;
+    font-size: 12px;
+    height: 3em;
+    border: 1px solid $chef-key-tab;
+    height: 37px;
+  }
+}
+
 ::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
   flex-basis: auto;
-  margin-top: 31px;
 }
-
-::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
-  line-height: 3em;
-  font-size: 12px;
-  height: 3em;
-  border: 1px solid $chef-key-tab;
-  height: 37px;
-}
-
 
 ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
   background: $chef-white;

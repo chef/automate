@@ -44,6 +44,7 @@ export function environmentEntityReducer(
 
     case EnvironmentActionTypes.GET_ALL_SUCCESS:
       return pipe(
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
         set('environmentList.items', action.payload.environments || []),
         set('environmentList.total', action.payload.total || 0)
         )(state) as EnvironmentEntityState;

@@ -20,6 +20,11 @@ describe('EnvironmentsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
+        MockComponent({ selector: 'app-create-environment-modal',
+        inputs: ['openEvent', 'server_Id', 'org_Id', 'currentPage', 'environmentsList'] }),
+        MockComponent({ selector: 'app-delete-infra-object-modal',
+        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
@@ -39,7 +44,6 @@ describe('EnvironmentsComponent', () => {
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-create-environment-modal', inputs: ['openEvent'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({
           selector: 'app-delete-infra-object-modal',

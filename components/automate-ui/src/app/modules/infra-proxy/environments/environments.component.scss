@@ -34,16 +34,6 @@ chef-loading-spinner {
   z-index: 199;
 }
 
-.search-box {
-  float: left;
-  width: 96%;
-}
-
-.button-box {
-  float: right;
-  width: 4%;
-}
-
 .full-screen-spinner {
   display: flex;
   margin: auto;
@@ -70,18 +60,26 @@ img {
   text-align: right;
 }
 
-#env-create {
-  float: right;
-  margin-left: 16px;
-}
-
-::ng-deep {
-  .environments .search-input-wrapper {
-    top: 15px;
-    width: 87%;
+.environments {
+  .search-items {
+    margin-bottom: 18px;
+    height: 55px;
   }
 
-  chef-toolbar chef-button:first-child {
-    margin: 22px 0px 0px 0px;
+  span chef-toolbar chef-button:first-child {
+    margin: 4px 0px 0px 32px;
+    float: right;
+
+    button {
+      padding: 7px 16px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  ::ng-deep {
+    .search-items app-infra-search-bar .search-wrapper {
+      float: left;
+      width: calc(100% - 187px);
+    }
   }
 }

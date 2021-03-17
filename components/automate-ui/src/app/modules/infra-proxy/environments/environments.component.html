@@ -18,14 +18,12 @@
   </app-create-environment-modal>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-items">
-      <div class="search-box">
         <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
-      </div>
-      <div class="button-box" *ngIf="chefInfraViewsFeatureFlagOn">
+      <span *ngIf="chefInfraViewsFeatureFlagOn">
         <chef-toolbar>
           <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
         </chef-toolbar>
-      </div>
+      </span>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   
     <div class="empty-section" *ngIf="!searching && !environments.length  && current_page === 1">
@@ -62,6 +60,7 @@
       </chef-tbody>
     </chef-table>
     <app-page-picker
+      *ngIf="!searching"
       class="environment-list-paging"
       [total]="total"
       [perPage]="per_page"
