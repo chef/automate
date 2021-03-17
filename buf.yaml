@@ -424,4 +424,6 @@ breaking:
     # it's the best/least bad option, you can add it here and remove it in a
     # later PR:
     # - external/oops/oops.proto
+    - external/infra_proxy/request/nodes.proto
+    - external/infra_proxy/response/nodes.proto
     - external/infra_proxy/infra_proxy.proto
