@@ -76,7 +76,7 @@ export class EditDataBagItemModalComponent implements OnChanges, OnInit, OnDestr
     this.isDestroyed.complete();
   }
 
-  public handleInput(event: KeyboardEvent): void {
+  handleInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
     }
