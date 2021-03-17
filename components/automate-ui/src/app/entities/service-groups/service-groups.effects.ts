@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Injectable } from '@angular/core';
-import { Actions, ofType, Effect } from '@ngrx/effects';
+import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ServiceGroupsRequests } from './service-groups.requests';
@@ -51,8 +51,8 @@ export class ServiceGroupsEffects {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  @Effect()
-  getServiceGroups$ = this.actions$.pipe(
+  getServiceGroups$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS),
     withLatestFrom(this.store.select(serviceGroupsFilters)),
     switchMap(([_action, filters]: [any, ServiceGroupsFilters]) => {
@@ -61,14 +61,16 @@ export class ServiceGroupsEffects {
         catchError((error: HttpErrorResponse) => of(new GetServiceGroupsFailure(error)))
       );
     }));
+  });
 
-  @Effect()
-  updateServiceGroupsFilters$ = this.actions$.pipe(
+  updateServiceGroupsFilters$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER),
       mergeMap(() => [ new GetServiceGroups(), new GetServiceGroupsCounts() ]));
+  });
 
-  @Effect()
-  getServiceGroupsCounts$ = this.actions$.pipe(
+  getServiceGroupsCounts$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS),
       withLatestFrom(this.store.select(serviceGroupsFilters)),
       switchMap(([_action, filters]: [any, ServiceGroupsFilters]) => {
@@ -77,16 +79,18 @@ export class ServiceGroupsEffects {
           catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
         );
       }));
+  });
 
-  @Effect()
-  updateSelectedServiceGroups$ = this.actions$.pipe(
+  updateSelectedServiceGroups$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP),
     mergeMap(() => [
       new GetServicesBySG()
     ]));
+  });
 
-  @Effect()
-  getServicesBySG$ = this.actions$.pipe(
+  getServicesBySG$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP),
     withLatestFrom(this.store.select(selectedServiceGroupFilters)),
     switchMap(([_action, filters]: [any, GroupServicesFilters]) => {
@@ -95,9 +99,10 @@ export class ServiceGroupsEffects {
         catchError((error: HttpErrorResponse) => of(new GetServicesBySGFailure(error)))
       );
     }));
+  });
 
-  @Effect()
-  fetchNodeSuggestions$ = this.actions$.pipe(
+  fetchNodeSuggestions$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS),
       withLatestFrom(this.store.select(serviceGroupsFilters)),
       switchMap(([getServiceGroupsSuggestions, filters]:
@@ -109,9 +114,21 @@ export class ServiceGroupsEffects {
           new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
+  });
 
-  @Effect()
-  deleteServicesById$ = this.actions$.pipe(
+  // @Effect()
+  // deleteServicesById$ = this.actions$.pipe(
+  //   ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
+  //   mergeMap((action: DeleteServicesById) => {
+  //     return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
+  //       map((response: GroupServicesPayload) =>
+  //         new DeleteServicesByIdSuccess({ amount: response.services.length })),
+  //       catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
+  //     );
+  //   }));
+
+  deleteServicesById$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
     mergeMap((action: DeleteServicesById) => {
       return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
@@ -120,9 +137,10 @@ export class ServiceGroupsEffects {
         catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
       );
     }));
+  });
 
-  @Effect()
-  deleteServicesByIdFailure$ = this.actions$.pipe(
+  deleteServicesByIdFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_FAILURE),
     map((action: DeleteServicesByIdFailure) => {
       const msg = `Could not delete service: ${action.payload.error}`;
@@ -132,21 +150,22 @@ export class ServiceGroupsEffects {
       });
     })
   );
+  });
 
-  @Effect()
-  deleteServicesByIdSuccess$ = this.actions$.pipe(
-    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
-    mergeMap((action: DeleteServicesByIdSuccess) => {
-      const amount = action.payload.amount;
-      const msg = amount === 1 ? '1 service deleted.' : `${amount} services deleted.`;
-      return [
-        new GetServiceGroups(),
-        new GetServiceGroupsCounts(),
-        new CreateNotification({
-          type: Type.info,
-          message: msg
-        })
-      ];
-    })
-  );
+  deleteServicesByIdSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID_SUCCESS),
+      mergeMap((action: DeleteServicesByIdSuccess) => {
+        const amount = action.payload.amount;
+        const msg = amount === 1 ? '1 service deleted.' : `${amount} services deleted.`;
+        return [
+          new GetServiceGroups(),
+          new GetServiceGroupsCounts(),
+          new CreateNotification({
+            type: Type.info,
+            message: msg
+          })
+        ];
+      }));
+  });
 }
