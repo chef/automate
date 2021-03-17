@@ -245,7 +245,8 @@ func fromAPIToListClients(al []interface{}) []*response.ClientListItem {
 	cl := make([]*response.ClientListItem, len(al))
 	for index, c := range al {
 		cl[index] = &response.ClientListItem{
-			Name: SafeStringFromMap(c.(map[string]interface{}), "name"),
+			Name:      SafeStringFromMap(c.(map[string]interface{}), "name"),
+			Validator: SafeBooleanFromMap(c.(map[string]interface{}), "validator"),
 		}
 	}
 

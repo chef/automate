@@ -24,6 +24,15 @@ func SafeStringFromMapFloat(values map[string]interface{}, key string) string {
 	return strconv.FormatFloat(values[key].(float64), 'E', -1, 64)
 }
 
+// SafeStringFromMap returns the value referenced by `key` in `values`. as a boolean.
+// If not found, it returns a boolean false.
+func SafeBooleanFromMap(values map[string]interface{}, key string) bool {
+	if values[key] == nil {
+		return false
+	}
+	return values[key].(bool)
+}
+
 // SafeSliceFromMap returns the value referenced by `key` in `values`. as a slice.
 // If not found, it returns an empty slice.
 func SafeSliceFromMap(values map[string]interface{}, key string) []string {

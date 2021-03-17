@@ -130,7 +130,8 @@ func fromUpstreamClients(clients []*infra_res.ClientListItem) []*gwres.ClientLis
 	ts := make([]*gwres.ClientListItem, len(clients))
 	for i, c := range clients {
 		ts[i] = &gwres.ClientListItem{
-			Name: c.GetName(),
+			Name:      c.GetName(),
+			Validator: c.GetValidator(),
 		}
 	}
 

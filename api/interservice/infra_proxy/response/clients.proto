@@ -15,6 +15,8 @@ message Clients {
 message ClientListItem {
     // Client name.
     string name = 1;
+    // Boolean indicates client type is validator or not.
+    bool validator = 2;
 }
 
 message Client {

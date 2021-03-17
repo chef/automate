@@ -32,6 +32,19 @@ func TestSafeStringFromMapFloat(t *testing.T) {
 	assert.Equal(t, "", SafeStringFromMap(testData, "no-key"))
 }
 
+func TestSafeBooleanFromMap(t *testing.T) {
+	testData := map[string]interface{}{
+		"test1": true,
+		"test2": false,
+		"test3": nil,
+	}
+
+	assert.Equal(t, true, SafeBooleanFromMap(testData, "test1"))
+	assert.Equal(t, false, SafeBooleanFromMap(testData, "test2"))
+	assert.Equal(t, false, SafeBooleanFromMap(testData, "test3"))
+	assert.Equal(t, false, SafeBooleanFromMap(testData, "no-key"))
+}
+
 func TestSafeSliceFromMap(t *testing.T) {
 	testData := map[string]interface{}{
 		"test1": []string{"tag1", "tag2", "tag3"},
