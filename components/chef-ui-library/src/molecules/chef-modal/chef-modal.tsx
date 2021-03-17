@@ -129,29 +129,8 @@ export class ChefModal {
     if (visible) {
       this.prevFocusedElement = document.activeElement as HTMLElement;
 
-      // when Angular detects the modal is open
-      // sets the focus by default on the close button for unlocked modals,
-      // or the div for locked modals
-      // User can specify element to focus first using firstFocus attribute
-      
-      const focusElement = getFirstFocus(this.locked, this.el);
-      
-      function getFirstFocus(lockStatus: boolean, thisEl: HTMLElement) {
-        const modal = thisEl.getElementsByClassName('modal').item(0) as HTMLElement;
-        const closeFocus = thisEl.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
-        let firstFocus = thisEl.querySelector('[firstFocus]') as HTMLElement;
-
-        if(lockStatus) {
-          return modal
-        } else if (firstFocus) {
-          return firstFocus.tagName === 'CHEF-BUTTON' 
-            ? firstFocus.firstElementChild as HTMLElement 
-            : firstFocus
-        }
-
-        return closeFocus;
-      }
-
+      const focusElement = this.getFocusElement(this.locked);
+ 
       const focusElementInterval = setInterval(() => {
         focusElement.focus();
         if (focusElement === document.activeElement) {
@@ -196,6 +175,26 @@ export class ChefModal {
     }
 
     return '';
+  }
+
+  // when Angular detects the modal is open
+  // it sets the focus by default on the close button for unlocked modals,
+  // or the modal div for locked modals
+  // Developer can specify element to focus first using firstFocus attribute
+  private getFocusElement(lockStatus: boolean): HTMLElement {
+    const modal = this.el.getElementsByClassName('modal').item(0) as HTMLElement;
+    const closeFocus = this.el.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
+    let firstFocus = this.el.querySelector('[firstFocus]') as HTMLElement;
+
+    if (lockStatus) {
+      return modal
+    } else if (firstFocus) {
+      return firstFocus.tagName === 'CHEF-BUTTON'
+        ? firstFocus.firstElementChild as HTMLElement
+        : firstFocus
+    }
+
+    return closeFocus;
   }
 
   private handleClose() {
