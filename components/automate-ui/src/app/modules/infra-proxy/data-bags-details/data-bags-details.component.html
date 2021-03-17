@@ -83,10 +83,11 @@
             </ul>
           </div>
           <app-page-picker
+            *ngIf="!searching"
             class="item-list-paging"
             [total]="total"
             [perPage]="per_page"
-            [page]="page"
+            [page]="current_page"
             (pageChanged)="onPageChange($event)">
           </app-page-picker>
         </div>
