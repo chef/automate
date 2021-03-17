@@ -1,7 +1,7 @@
 import { mergeMap, catchError, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 
 import {
@@ -21,19 +21,21 @@ export class CredentialEffects {
     private requests: CredentialRequests
   ) {}
 
-  @Effect()
-  searchCredentials$ = this.actions$.pipe(
+  searchCredentials$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(CredentialActionTypes.SEARCH),
     mergeMap((action: SearchCredentials) =>
               this.requests.search(action.payload).pipe(
               map(({secrets}) => new SearchCredentialsSuccess(secrets)),
               catchError((error: HttpErrorResponse) => of(new SearchCredentialsFailure(error))))));
+  });
 
-  @Effect()
-  searchCredentialsFailure$ = this.actions$.pipe(
+  searchCredentialsFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(CredentialActionTypes.SEARCH_FAILURE),
     map(({ payload: { error } }: SearchCredentialsFailure) => new CreateNotification({
       type: Type.error,
       message: `Could not get credentials: ${error.error || error}`
     })));
+  });
 }
