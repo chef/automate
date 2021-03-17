@@ -323,7 +323,7 @@ func (c *ChefClient) fetchAffectedNodes(ctx context.Context, statement string) (
 
 // This return the response node attributes array
 // parse by the getting the attributes from partial search query.
-func fromSearchAPIToNodes(sr chef.SearchResult) []*response.NodeAttribute {
+func fromSearchAPIToNodes(sr *chef.SearchResult) []*response.NodeAttribute {
 	results := make([]*response.NodeAttribute, len(sr.Rows))
 	index := 0
 	for _, element := range sr.Rows {

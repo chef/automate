@@ -35,9 +35,8 @@ type ChefClient struct {
 // Default per_page is set 1000
 // Default search term q is "*:*"
 // Default page is set to 0
-func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *request.SearchQuery, params map[string]interface{}) (chef.SearchResult, error) {
+func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *request.SearchQuery, params map[string]interface{}) (*chef.SearchResult, error) {
 	var result chef.SearchResult
-	var err error
 	perPage := int(searchQuery.GetPerPage())
 	if perPage == 0 {
 		perPage = 1000
@@ -48,6 +47,9 @@ func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *
 		searchStr = "*:*"
 	}
 	query, err := c.client.Search.NewQuery(searchIndex, searchStr)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
 	query.Rows = perPage
 
 	// Query accepts start param, The row at which return results begin.
@@ -55,12 +57,14 @@ func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *
 
 	if params == nil {
 		result, err = query.Do(c.client)
+		if err != nil {
+			return nil, ParseAPIError(err)
+		}
 	} else {
 		result, err = query.DoPartial(c.client, params)
-	}
-
-	if err != nil {
-		return result, ParseAPIError(err)
+		if err != nil {
+			return nil, ParseAPIError(err)
+		}
 	}
 
 	// Chef infra Server search API returning starting page like, starting of records offset value
@@ -69,7 +73,7 @@ func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *
 		result.Start = result.Start / perPage
 	}
 
-	return result, nil
+	return &result, nil
 }
 
 // NewChefClient is an infra-proxy server
