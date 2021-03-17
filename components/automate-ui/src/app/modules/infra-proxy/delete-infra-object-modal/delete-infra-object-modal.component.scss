@@ -82,8 +82,25 @@ chef-modal {
     outline: none;
   }
 
-  .del-modal {
-    width: 708px;
+  .del-modal .modal {
+    width: 49%;
+
+    .cancel-button {
+
+      &:hover {
+        background-color: $chef-critical-light;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .options button:focus {
+      outline: none;
+      border: 0.5px solid $chef-critical-dark;
+      border-radius: 4px;
+    }
   }
 
   chef-modal .modal .close {
@@ -98,7 +115,15 @@ chef-modal {
     outline: none;
   }
 
+  chef-button.close:focus {
+    border: 0.5px solid $chef-primary-bright;
+    border-radius: 4px;
+    outline: none;
+  }
+
   chef-button.close button:focus {
+    border: 0.5px solid $chef-primary-bright;
+    border-radius: 4px;
     outline: none;
   }
 

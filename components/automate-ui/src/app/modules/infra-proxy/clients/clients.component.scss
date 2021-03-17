@@ -85,6 +85,7 @@ chef-button button {
   .clients .search-items app-infra-search-bar .search-wrapper {
     float: left;
     margin-top: 10px;
-    width: 90.5%;
+    width: calc(100% - 145px);
+    margin-right: 32px;
   }
 }
