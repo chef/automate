@@ -41,7 +41,6 @@ chef-loading-spinner {
 img {
   width: 70px;
   margin-top: 130px;
-  margin-right: 88px;
 }
 
 .full-screen-spinner {
@@ -62,18 +61,25 @@ img {
   text-align: right;
 }
 
-#role-create {
-  float: right;
-  margin-left: 16px;
-}
+.infra-roles {
+  .search-items {
+    margin-bottom: 18px;
+    height: 55px;
+  }
 
-.search-box {
-  float: left;
-  width: 87%;
-}
+  chef-toolbar chef-button:first-child {
+    margin: 4px 0px 0px 32px;
+    float: right;
+    button {
+      padding: 7px 16px;
+      letter-spacing: 0.5px;
+    }
+  }
 
-.button-box {
-  float: right;
-  width: 10%;
+  ::ng-deep {
+    .search-items app-infra-search-bar .search-wrapper {
+      float: left;
+      width: calc( 100% - 135px);
+    }
+  }
 }
-

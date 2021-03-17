@@ -65,12 +65,17 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       this.store.select(getAllStatus),
       this.store.select(roleList)
     ]).pipe(
+      filter(([getRolesStatus, allRolesState]) =>
+        getRolesStatus === EntityStatus.loadingSuccess &&
+        !isNil(allRolesState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, RolesState]) => {
       if (!isNil(RolesState)) {
         this.roleListState = RolesState;
         this.roles = RolesState?.items;
         this.total = RolesState?.total;
+        this.roles.length = 0;
+        this.total = 0;
         this.rolesListLoading = false;
         this.searching = false;
       }

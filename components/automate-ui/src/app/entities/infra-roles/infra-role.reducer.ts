@@ -42,6 +42,7 @@ export function infraRoleEntityReducer(
 
     case RoleActionTypes.GET_ALL_SUCCESS:
       return pipe(
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
         set('roleList.items', action.payload.roles || []),
         set('roleList.total', action.payload.total || 0)
         )(state) as InfraRoleEntityState;

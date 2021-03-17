@@ -93,17 +93,21 @@
   width: 277px;
 }
 
-::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
-  flex-basis: auto;
+::ng-deep .chef-dropdown {
   margin-top: 31px;
+
+  .mat-option {
+    line-height: 3em;
+    font-size: 12px;
+    height: 3em;
+    border: 1px solid $chef-key-tab;
+    height: 37px;
+  }
 }
 
-::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option {
-  line-height: 3em;
-  font-size: 12px;
-  height: 3em;
-  border: 1px solid $chef-key-tab;
-  height: 37px;
+
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
+  flex-basis: auto;
 }
 
 ::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
