@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 
@@ -43,17 +43,18 @@ export class DestinationEffects {
     private requests: DestinationRequests
   ) { }
 
-  @Effect()
-  getDestinations$ = this.actions$.pipe(
+  getDestinations$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.GET_ALL),
       mergeMap(() =>
         this.requests.getDestinations().pipe(
           map((resp: GetDestinationsSuccessPayload) => new GetDestinationsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new GetDestinationsFailure(error))))));
+  });
 
-  @Effect()
-  getDestinationsFailure$ = this.actions$.pipe(
+  getDestinationsFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetDestinationsFailure) => {
         const msg = payload.error.error;
@@ -62,18 +63,20 @@ export class DestinationEffects {
           message: `Could not get destinations: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  getDestination$ = this.actions$.pipe(
+  getDestination$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.GET),
       mergeMap(({ payload: { id }}: GetDestination) =>
         this.requests.getDestination(id).pipe(
           map((resp: Destination) => new GetDestinationSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
           observableOf(new GetDestinationFailure(error, id))))));
+  });
 
-  @Effect()
-  getDestinationFailure$ = this.actions$.pipe(
+  getDestinationFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.GET_FAILURE),
       map(({ payload, id }: GetDestinationFailure) => {
         const msg = payload.error.error;
@@ -82,52 +85,58 @@ export class DestinationEffects {
           message: `Could not get data feed ${id}: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  createDestination$ = this.actions$.pipe(
+  createDestination$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE),
       mergeMap(({ payload, username, password }: CreateDestination) =>
       this.requests.createDestination( payload, username, password ).pipe(
         map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDestinationFailure(error))))));
+  });
 
-  @Effect()
-  createDestinationSuccess$ = this.actions$.pipe(
+  createDestinationSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
       type: Type.info,
       message: `Created data feed ${payload.name}.`
     })));
+  });
 
-  @Effect()
-  createDestinationFailure$ = this.actions$.pipe(
+  createDestinationFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateDestinationFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateDestinationFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create data feed: ${payload.error.error || payload}.`
       })));
+  });
 
-  @Effect()
-  updateDestination$ = this.actions$.pipe(
+  updateDestination$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.UPDATE),
     mergeMap(({ payload: { destination } }: UpdateDestination) =>
       this.requests.updateDestination(destination).pipe(
         map((resp) => new UpdateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateDestinationFailure(error))))));
+  });
 
-  @Effect()
-  updateDestinationSuccess$ = this.actions$.pipe(
+  updateDestinationSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.UPDATE_SUCCESS),
       map(({ payload  }: UpdateDestinationSuccess) => new CreateNotification({
       type: Type.info,
       message: `Updated data feed ${payload.name}.`
     })));
+  });
 
-  @Effect()
-  updateDestinationFailure$ = this.actions$.pipe(
+  updateDestinationFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.UPDATE_FAILURE),
     map(({ payload }: UpdateDestinationFailure) => {
       const msg = payload.error.error;
@@ -136,18 +145,20 @@ export class DestinationEffects {
         message: `Could not update data feed: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  deleteDestination$ = this.actions$.pipe(
+  deleteDestination$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.DELETE),
     mergeMap(({ payload: {id, name} }: DeleteDestination) =>
       this.requests.deleteDestination(id).pipe(
         map(() => new DeleteDestinationSuccess({ id, name })),
         catchError((error: HttpErrorResponse) =>
           observableOf(new DeleteDestinationFailure(error))))));
+  });
 
-  @Effect()
-  deleteDestinationSuccess$ = this.actions$.pipe(
+  deleteDestinationSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.DELETE_SUCCESS),
       map(({ payload: { name } }: DeleteDestinationSuccess) => {
         return new CreateNotification({
@@ -155,9 +166,10 @@ export class DestinationEffects {
           message: `Deleted data feed ${name}.`
         });
       }));
+  });
 
-  @Effect()
-  deleteDestinationFailure$ = this.actions$.pipe(
+  deleteDestinationFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.DELETE_FAILURE),
     map(({ payload: { error } }: DeleteDestinationFailure) => {
       const msg = error.error;
@@ -166,26 +178,29 @@ export class DestinationEffects {
         message: `Could not delete data feed: ${msg || error}.`
       });
     }));
+  });
 
-  @Effect()
-  testDestination$ = this.actions$.pipe(
+  testDestination$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.SEND_TEST),
     mergeMap(({ payload: { destination } }: TestDestination) =>
       this.requests.testDestination(destination).pipe(
         map(() => new TestDestinationSuccess(destination)),
         catchError(() =>
           observableOf(new TestDestinationFailure(destination))))));
+  });
 
-  @Effect()
-  testDestinationSuccess$ = this.actions$.pipe(
+  testDestinationSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(DestinationActionTypes.SEND_TEST_SUCCESS),
       map(({ payload  }: TestDestinationSuccess) => new CreateNotification({
       type: Type.info,
       message: `Data feed test connected successfully for ${payload.name}.`
     })));
+  });
 
-  @Effect()
-  testDestinationFailure$ = this.actions$.pipe(
+  testDestinationFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(DestinationActionTypes.SEND_TEST_FAILURE),
     map(({ payload }: TestDestinationFailure) => {
       return new CreateNotification({
@@ -193,4 +208,6 @@ export class DestinationEffects {
         message: `Unable to connect to data feed ${payload.name}.`
       });
     }));
+  });
+
 }
