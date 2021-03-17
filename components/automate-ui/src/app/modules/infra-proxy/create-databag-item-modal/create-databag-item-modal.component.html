@@ -10,7 +10,7 @@
             </label>
             <chef-error
             *ngIf="(createForm.get('itemId').hasError('required') || createForm.get('itemId').hasError('pattern')) && createForm.get('itemId').dirty">
-            Display Name is required.
+            Name is required.
           </chef-error>
           <chef-error *ngIf="conflictError">
             ID "{{createForm.get('itemId').value}}" already exists.
@@ -29,13 +29,13 @@
         </div>
   
         <div id="button-bar">
-          <chef-button tertiary id="cancel-data-bag-popup" 
+          <chef-button tertiary id="cancel-data-bag-item-popup" 
           (click)="closeCreateModal()">Cancel</chef-button>
           <chef-button [disabled]="!createForm?.valid || creating || conflictError" 
           primary id="create-button-object-modal" (click)="createDataBagItem()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Create</span>
-            <span *ngIf="creating">Creating Data Bag...</span>
+            <span *ngIf="creating">Creating Data Bag Item...</span>
           </chef-button>
         </div>
       </form>

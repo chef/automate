@@ -68,8 +68,8 @@ export function dataBagItemsEntityReducer(
           set(SAVE_STATUS, EntityStatus.loadingSuccess)
         )(dataBagItemsEntityAdapter.addOne(action.payload, state)
       ) as DataBagItemsEntityState;
-    }  
-    
+    }
+
     case DataBagItemsActionTypes.CREATE_FAILURE: {
       return pipe(
         set(SAVE_ERROR, action.payload),

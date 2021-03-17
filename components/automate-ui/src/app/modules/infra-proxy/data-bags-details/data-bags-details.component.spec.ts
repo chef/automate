@@ -36,6 +36,8 @@ const declarations: any[] = [
     inputs: [ 'visible', 'objectNoun', 'objectName'],
     outputs: ['close', 'deleteClicked']
   }),
+  MockComponent({ selector: 'chef-button'}),
+  MockComponent({ selector: 'app-create-databag-item-modal', inputs: ['openEvent']}),
   DataBagsDetailsComponent
 ];
 const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';

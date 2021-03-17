@@ -20,7 +20,9 @@ import {
   saveError
 } from 'app/entities/data-bags/data-bag-details.selector';
 import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
-import { CreateDataBagItem } from 'app/entities/data-bags/data-bag-details.actions';
+import {
+  CreateDataBagItem,
+  GetDataBagItems } from 'app/entities/data-bags/data-bag-details.actions';
 
 @Component({
   selector: 'app-create-databag-item-modal',
@@ -32,6 +34,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   @Input() server_Id: string;
   @Input() org_Id: string;
   @Input() name: string;
+  @Input() currentPage: number;
 
   public visible = false;
   public creating = false;
@@ -41,6 +44,9 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   public dataBagItem: DataBagItem;
   public conflictError = false;
   public itemAttrParseError = false;
+  public per_page = 9;
+  public id: {};
+  public attr: {};
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -103,6 +109,15 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   closeCreateModal(): void {
     this.resetCreateModal();
     this.visible = false;
+    const payload = {
+      databagName: '',
+      server_id: this.server_Id,
+      org_id: this.org_Id,
+      name: this.name,
+      page: this.currentPage,
+      per_page: this.per_page
+    };
+    this.store.dispatch(new GetDataBagItems(payload));
   }
 
   onChangeJSON(event: { target: { value: string } }) {
@@ -120,14 +135,18 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
 
   createDataBagItem(): void {
     this.creating = true;
-
+    if(this.createForm.controls['itemAttr'].value) {
+      this.attr = JSON.parse(this.createForm.controls['itemAttr'].value.trim());
+    }
+    this.id = {'id': this.createForm.controls['itemId'].value.trim()};
     const dataBagItem = {
       server_id: this.server_Id,
       org_id: this.org_Id,
       name: this.name,
-      data: {"id": this.createForm.controls['itemId'].value.trim()}
-      // id: this.createForm.controls['itemId'].value.trim()
-      // attr: this.createForm.controls['itemAttr'].value.trim()
+      data: {
+        ...this.id,
+        ...this.attr
+      }
     };
 
     this.store.dispatch(new CreateDataBagItem({dataBagItem: dataBagItem}));

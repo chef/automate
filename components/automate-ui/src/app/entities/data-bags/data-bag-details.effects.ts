@@ -67,10 +67,10 @@ export class DataBagItemsEffects {
   @Effect()
   createDataBagItemSuccess$ = this.actions$.pipe(
     ofType(DataBagItemsActionTypes.CREATE_SUCCESS),
-    map(({ payload: { name : name } }: CreateDataBagItemSuccess) => {
+    map(({ payload: { id : id } }: CreateDataBagItemSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully Created Data Bag ${name}.`
+        message: `Successfully Created Data Bag Item ${id}.`
       });
     }));
 
@@ -81,7 +81,7 @@ export class DataBagItemsEffects {
     map(({ payload }: CreateDataBagItemFailure) => {
       return new CreateNotification({
         type: Type.error,
-        message: `Could Not Create Data Bag: ${payload.error.error || payload}.`
+        message: `Could Not Create Data Bag Item: ${payload.error.error || payload}.`
       });
     }));
 
