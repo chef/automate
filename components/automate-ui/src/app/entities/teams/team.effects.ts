@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 
@@ -44,8 +44,8 @@ export class TeamEffects {
     private requests: TeamRequests
   ) { }
 
-  @Effect()
-  getTeams$ = this.actions$.pipe(ofType<GetTeams>(TeamActionTypes.GET_ALL),
+  getTeams$ = createEffect(() => {
+    return this.actions$.pipe(ofType<GetTeams>(TeamActionTypes.GET_ALL),
     mergeMap((_action: GetTeams) =>
       this.requests.getTeams().pipe(
         map((resp: GetTeamsSuccessPayload) => {
@@ -53,9 +53,10 @@ export class TeamEffects {
         }),
         catchError((error: HttpErrorResponse) => observableOf(new GetTeamsFailure(error))))
     ));
+  });
 
-  @Effect()
-  getTeamsFailure$ = this.actions$.pipe(
+  getTeamsFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<GetTeamsFailure>(TeamActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetTeamsFailure) => {
       const msg = payload.error.error;
@@ -64,17 +65,19 @@ export class TeamEffects {
         message: `Could not get teams: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  getTeam$ = this.actions$.pipe(ofType<GetTeam>(TeamActionTypes.GET),
+  getTeam$ = createEffect(() => {
+    return this.actions$.pipe(ofType<GetTeam>(TeamActionTypes.GET),
     mergeMap(({ payload: { id } }: GetTeam) =>
       this.requests.getTeam(id).pipe(
         map(({ team }: TeamResponse) => new GetTeamSuccess(team)),
         catchError((error: HttpErrorResponse) => observableOf(new GetTeamFailure(error))))
     ));
+  });
 
-  @Effect()
-  getTeamFailure$ = this.actions$.pipe(
+  getTeamFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<GetTeamFailure>(TeamActionTypes.GET_FAILURE),
     map(({ payload }: GetTeamFailure) => {
       const msg = payload.error.error;
@@ -83,16 +86,18 @@ export class TeamEffects {
         message: `Could not get team: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  getTeamUsers$ = this.actions$.pipe(ofType<GetTeamUsers>(TeamActionTypes.GET_USERS),
+  getTeamUsers$ = createEffect(() => {
+    return this.actions$.pipe(ofType<GetTeamUsers>(TeamActionTypes.GET_USERS),
     mergeMap(({ payload: { id } }: GetTeamUsers) =>
       this.requests.getTeamUsers(id).pipe(
         map((resp: UsersResponse) => new GetTeamUsersSuccess(resp)),
         catchError((error: HttpErrorResponse) => observableOf(new GetTeamUsersFailure(error))))));
+  });
 
-  @Effect()
-  getTeamUsersFailure$ = this.actions$.pipe(
+  getTeamUsersFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.GET_USERS_FAILURE),
     map(({ payload }: GetTeamFailure) => {
       const msg = payload.error.error;
@@ -101,17 +106,19 @@ export class TeamEffects {
         message: `Could not get users for team: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  createTeam$ = this.actions$.pipe(ofType<CreateTeam>(TeamActionTypes.CREATE),
+  createTeam$ = createEffect(() => {
+    return this.actions$.pipe(ofType<CreateTeam>(TeamActionTypes.CREATE),
     mergeMap(({ payload }: CreateTeam) =>
       this.requests.createTeam(payload).pipe(
         map(({ team }: TeamResponse) => new CreateTeamSuccess(team)),
         catchError((error) => observableOf(new CreateTeamFailure(error))))
     ));
+  });
 
-  @Effect()
-  createTeamSuccess$ = this.actions$.pipe(
+  createTeamSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS),
     map(( { payload: resp }: CreateTeamSuccess) =>
     new CreateNotification({
@@ -119,9 +126,10 @@ export class TeamEffects {
       message: `Created team ${resp.id}.`
     })
   ));
+  });
 
-  @Effect()
-  createTeamFailure$ = this.actions$.pipe(
+  createTeamFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<CreateTeamFailure>(TeamActionTypes.CREATE_FAILURE),
     // ID conflict handled in the modal, see team-management.component.ts
     filter(({ payload: { status } }) => status !== HttpStatus.CONFLICT),
@@ -132,25 +140,28 @@ export class TeamEffects {
         message: `Could not create team: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  updateTeam$ = this.actions$.pipe(ofType<UpdateTeam>(TeamActionTypes.UPDATE),
+  updateTeam$ = createEffect(() => {
+    return this.actions$.pipe(ofType<UpdateTeam>(TeamActionTypes.UPDATE),
     mergeMap(({ payload }: UpdateTeam) =>
       this.requests.updateTeam(payload).pipe(
         map(({ team }: TeamResponse) => new UpdateTeamSuccess(team)),
         catchError((error) => observableOf(new UpdateTeamFailure(error))))
     ));
+  });
 
-  @Effect()
-  updateTeamSuccess$ = this.actions$.pipe(
+  updateTeamSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.UPDATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Updated team.'
     })));
+  });
 
-  @Effect()
-  updateTeamFailure$ = this.actions$.pipe(
+  updateTeamFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.UPDATE_FAILURE),
     map(({ payload }: UpdateTeamFailure) => {
       const msg = payload.error.error;
@@ -159,25 +170,28 @@ export class TeamEffects {
         message: `Could not update team: ${msg || payload.error}.`
       });
     }));
+  });
 
-  @Effect()
-  deleteTeam$ = this.actions$.pipe(ofType<DeleteTeam>(TeamActionTypes.DELETE),
+  deleteTeam$ = createEffect(() => {
+    return this.actions$.pipe(ofType<DeleteTeam>(TeamActionTypes.DELETE),
     mergeMap(({ payload }: DeleteTeam) =>
       this.requests.deleteTeam(payload).pipe(
         map(({ team }: TeamResponse) => new DeleteTeamSuccess(team)),
         catchError((error: HttpErrorResponse) => observableOf(new DeleteTeamFailure(error))))
     ));
+  });
 
-  @Effect()
-  deleteTeamSuccess$ = this.actions$.pipe(
+  deleteTeamSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.DELETE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Deleted team.'
     })));
+  });
 
-  @Effect()
-  deleteTeamFailure$ = this.actions$.pipe(
+  deleteTeamFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.DELETE_FAILURE),
     map(({ payload: { error } }: DeleteTeamFailure) => {
       const msg = error.error;
@@ -186,17 +200,19 @@ export class TeamEffects {
         message: `Could not delete team: ${msg || error}.`
       });
     }));
+  });
 
-  @Effect()
-  addTeamUsers$ = this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS),
+  addTeamUsers$ = createEffect(() => {
+    return this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS),
     mergeMap(({ payload }: AddTeamUsers) =>
       this.requests.addTeamUsers(payload).pipe(
         map((_: UsersResponse) => new AddTeamUsersSuccess(payload)),
         catchError((error: HttpErrorResponse) => observableOf(new AddTeamUsersFailure(error))))
     ));
+  });
 
-  @Effect()
-  addTeamUsersSuccess$ = this.actions$.pipe(
+  addTeamUsersSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.ADD_USERS_SUCCESS),
     map(({ payload: { membership_ids } }: AddTeamUsersSuccess ) => {
       const message = membership_ids.length === 1 ? 'Added 1 user.' : `Added ${membership_ids.length} users.`;
@@ -205,35 +221,39 @@ export class TeamEffects {
         message: message
       });
     }));
+  });
 
-  @Effect()
-  addTeamUsersFailure$ = this.actions$.pipe(
+  addTeamUsersFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.ADD_USERS_FAILURE),
     map(({ payload: { error } }: AddTeamUsersFailure) =>
       new CreateNotification({
         type: Type.error,
         message: `Could not add users to team: ${error.error || error}.`
       })));
+  });
 
-  @Effect()
-  removeTeamUsers$ = this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS),
+  removeTeamUsers$ = createEffect(() => {
+    return this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS),
     mergeMap(({ payload }: RemoveTeamUsers) =>
       this.requests.removeTeamUsers(payload).pipe(
         map((resp: UsersResponse ) => new RemoveTeamUsersSuccess({...resp, id: payload.id})),
         catchError((error: HttpErrorResponse) =>
           observableOf(new RemoveTeamUsersFailure(error))))
     ));
+  });
 
-  @Effect()
-  removeTeamUsersSuccess$ = this.actions$.pipe(
+  removeTeamUsersSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.REMOVE_USERS_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Removed user from team.'
     })));
+  });
 
-  @Effect()
-  removeTeamUsersFailure$ = this.actions$.pipe(
+  removeTeamUsersFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(TeamActionTypes.REMOVE_USERS_FAILURE),
     map(({ payload }: RemoveTeamUsersFailure) => {
       const msg = payload.error.error;
@@ -242,4 +262,6 @@ export class TeamEffects {
         message: `Could not remove user from team: ${msg || payload.error}.`
       });
     }));
+  });
+
 }

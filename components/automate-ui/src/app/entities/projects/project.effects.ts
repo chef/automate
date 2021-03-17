@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
 import { get } from 'lodash/fp';
@@ -60,16 +60,17 @@ export class ProjectEffects {
     private store: Store<NgrxStateAtom>
   ) { }
 
-  @Effect()
-  getProjects$ = this.actions$.pipe(
+  getProjects$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.GET_ALL),
       mergeMap(() =>
         this.requests.getProjects().pipe(
           map((resp: GetProjectsSuccessPayload) => new GetProjectsSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetProjectsFailure(error))))));
+  });
 
-  @Effect()
-  getProjectsFailure$ = this.actions$.pipe(
+  getProjectsFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetProjectsFailure) => {
         const msg = payload.error.error;
@@ -78,17 +79,19 @@ export class ProjectEffects {
           message: `Could not get projects: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  getProject$ = this.actions$.pipe(
+  getProject$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.GET),
       mergeMap(({ payload: { id } }: GetProject) =>
         this.requests.getProject(id).pipe(
           map((resp: ProjectSuccessPayload) => new GetProjectSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetProjectFailure(error))))));
+  });
 
- @Effect()
-  getProjectFailure$ = this.actions$.pipe(
+  getProjectFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.GET_FAILURE),
       map(({ payload }: GetProjectFailure) => {
         const msg = payload.error.error;
@@ -97,9 +100,10 @@ export class ProjectEffects {
           message: `Could not get project: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  createProject$ = this.actions$.pipe(
+  createProject$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE),
       mergeMap(({ payload }: CreateProject) =>
         this.requests.createProject(payload.id, payload.name, payload.skip_policies).pipe(
@@ -109,9 +113,10 @@ export class ProjectEffects {
           }),
           catchError((error: HttpErrorResponse) =>
             observableOf(new CreateProjectFailure(error))))));
+  });
 
-  @Effect()
-  createProjectSuccess$ = this.actions$.pipe(
+  createProjectSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE_SUCCESS),
       map(({ payload: { resp, skip_policies } }: CreateProjectSuccess) => {
         return new CreateNotification({
@@ -121,27 +126,30 @@ export class ProjectEffects {
             : `Created project ${resp.project.id} and associated policies.`
         });
     }));
+  });
 
-  @Effect()
-  createProjectFailure$ = this.actions$.pipe(
+  createProjectFailure$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ProjectActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateProjectFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateProjectFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create project: ${payload.error.error || payload}`
       })));
+  });
 
-  @Effect()
-  deleteProject$ = this.actions$.pipe(
+  deleteProject$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE),
       mergeMap(({ payload: { id } }: DeleteProject) =>
         this.requests.deleteProject(id).pipe(
           map(() => new DeleteProjectSuccess({id})),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteProjectFailure(error))))));
+  });
 
-  @Effect()
-  deleteProjectSuccess$ = this.actions$.pipe(
+  deleteProjectSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE_SUCCESS),
       switchMap(({ payload: { id } }: DeleteProjectSuccess) => [
         new LoadOptions(),
@@ -150,9 +158,10 @@ export class ProjectEffects {
           message: `Deleted project ${id}.`
         })
       ]));
+  });
 
-  @Effect()
-  deleteProjectFailure$ = this.actions$.pipe(
+  deleteProjectFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE_FAILURE),
       map(({ payload }: DeleteProjectFailure) => {
         const msg = payload.error.error;
@@ -161,18 +170,20 @@ export class ProjectEffects {
           message: `Could not delete project: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  updateProject$ = this.actions$.pipe(
+  updateProject$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.UPDATE),
       mergeMap(({ payload: { id, name } }: UpdateProject) =>
         this.requests.updateProject(id, name).pipe(
           map((resp: ProjectSuccessPayload) => new UpdateProjectSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UpdateProjectFailure(error))))));
+  });
 
-  @Effect()
-  updateProjectFailure$ = this.actions$.pipe(
+  updateProjectFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ProjectActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateProjectFailure) => {
         const msg = payload.error.error;
@@ -181,9 +192,10 @@ export class ProjectEffects {
           message: `Could not update project: ${msg || payload.error}`
         });
       }));
+  });
 
-  @Effect()
-  applyRulesStart$ = this.actions$.pipe(
+  applyRulesStart$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<ApplyRulesStart>(ProjectActionTypes.APPLY_RULES_START),
     mergeMap(() =>
       this.requests.applyRulesStart().pipe(
@@ -194,9 +206,10 @@ export class ProjectEffects {
         ]),
         catchError((error: HttpErrorResponse) =>
           observableOf(new ApplyRulesStartFailure(error))))));
+  });
 
-  @Effect()
-  applyRulesStop$ = this.actions$.pipe(
+  applyRulesStop$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<ApplyRulesStop>(ProjectActionTypes.APPLY_RULES_STOP),
     mergeMap(() =>
       this.requests.applyRulesStop().pipe(
@@ -206,33 +219,36 @@ export class ProjectEffects {
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
+  });
 
-  @Effect()
-  getApplyRulesStatus$ = this.actions$.pipe(
+  getApplyRulesStatus$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
     switchMap(this.getRulesStatus$()));
+  });
 
-  @Effect()
-  getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([_, { state }]) =>
-      state === ApplyRulesStatusState.Running
-    ),
-    switchMap(this.getRulesStatus$()));
+  getActiveApplyRulesStatus$ = createEffect(() =>
+    observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
+      withLatestFrom(this.store.select(applyRulesStatus)),
+      filter(([_, { state }]) =>
+        state === ApplyRulesStatusState.Running
+      ),
+      switchMap(this.getRulesStatus$())));
 
-  @Effect()
-  getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(allPerms)),
-    withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_interval, _allPerms], { state }]) =>
-      state === ApplyRulesStatusState.NotRunning
-    ),
-    switchMap(([[_interval, list], _status]) => {
-      return get(['/apis/iam/v2/projects', 'get'], list) ?
-        [new GetProjects(), new GetApplyRulesStatus()] :
-        [new GetApplyRulesStatus()];
-    }),
-    catchError((error: HttpErrorResponse) => observableOf(new GetApplyRulesStatusFailure(error))));
+  getDormantApplyRulesStatus$ = createEffect(() =>
+    observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
+      withLatestFrom(this.store.select(allPerms)),
+      withLatestFrom(this.store.select(applyRulesStatus)),
+      filter(([[_interval, _allPerms], { state }]) =>
+        state === ApplyRulesStatusState.NotRunning
+      ),
+      switchMap(([[_interval, list], _status]) => {
+        return get(['/apis/iam/v2/projects', 'get'], list) ?
+          [new GetProjects(), new GetApplyRulesStatus()] :
+          [new GetApplyRulesStatus()];
+      }),
+      catchError((error: HttpErrorResponse) =>
+        observableOf(new GetApplyRulesStatusFailure(error)))));
 
   private getRulesStatus$(): () => Observable<ProjectActions> {
     return () => this.requests.getApplyRulesStatus().pipe(
