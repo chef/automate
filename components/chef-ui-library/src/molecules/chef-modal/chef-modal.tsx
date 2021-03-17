@@ -136,13 +136,13 @@ export class ChefModal {
       
       const focusElement = getFirstFocus(this.locked, this.el);
       
-      function getFirstFocus(lockStatus: boolean, modal: HTMLElement) {
-        const thisModal = modal.getElementsByClassName('modal').item(0) as HTMLElement;
-        const closeFocus = modal.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
-        let firstFocus = modal.querySelector('[firstFocus]') as HTMLElement;
+      function getFirstFocus(lockStatus: boolean, thisEl: HTMLElement) {
+        const modal = thisEl.getElementsByClassName('modal').item(0) as HTMLElement;
+        const closeFocus = thisEl.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
+        let firstFocus = thisEl.querySelector('[firstFocus]') as HTMLElement;
 
         if(lockStatus) {
-          return thisModal
+          return modal
         } else if (firstFocus) {
           return firstFocus.tagName === 'CHEF-BUTTON' 
             ? firstFocus.firstElementChild as HTMLElement 
