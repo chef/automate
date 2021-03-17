@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -291,24 +292,38 @@ func TestCreateDatabagItem(t *testing.T) {
 	})
 
 	t.Run("when the data bag required field item is missing or empty, raise an invalid argument error", func(t *testing.T) {
-		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
-		dataReq := &request.CreateDataBag{
-			ServerId: autoDeployedChefServerID,
-			OrgId:    autoDeployedChefOrganizationID,
-			Name:     name,
-		}
-		data, err := infraProxy.CreateDataBag(ctx, dataReq)
-		assert.NoError(t, err)
-		assert.NotNil(t, data)
-
 		req := &request.CreateDataBagItem{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
-			Name:     name,
+			Name:     fmt.Sprintf("data-bag-%d", time.Now().Nanosecond()),
 		}
 		res, err := infraProxy.CreateDataBagItem(ctx, req)
 		assert.Nil(t, res)
+		errMsg := "databag item is required and must contain at least one non-whitespace character"
 		assert.Error(t, err, "must supply data bag item")
+		require.Contains(t, err.Error(), errMsg)
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+		//Data contains no id
+		req.Data = &structpb.Struct{
+			Fields: map[string]*structpb.Value{},
+		}
+		res1, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.Nil(t, res1)
+		assert.Error(t, err, "must supply data bag item")
+		require.Contains(t, err.Error(), errMsg)
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+		//Data contains item id attribute with empty string
+		req.Data = &structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: ""}},
+			},
+		}
+		res2, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.Nil(t, res2)
+		assert.Error(t, err, "must supply data bag item")
+		require.Contains(t, err.Error(), errMsg)
 		grpctest.AssertCode(t, codes.InvalidArgument, err)
 	})
 }
