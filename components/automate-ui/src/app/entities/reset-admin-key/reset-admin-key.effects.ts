@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 
@@ -25,25 +25,27 @@ export class AdminKeyEffects {
     private requests: AdminKeyRequests
   ) { }
 
-  @Effect()
-  updateAdminKey$ = this.actions$.pipe(
+  updateAdminKey$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE),
       mergeMap(({ payload: {server_id, org_id, admin_key} }: UpdateAdminKey) =>
         this.requests.updateAdminKey(server_id, org_id, admin_key).pipe(
           map((resp) => new UpdateAdminKeySuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UpdateAdminKeyFailure(error))))));
+  });
 
-  @Effect()
-  updateAdminKeySuccess$ = this.actions$.pipe(
+  updateAdminKeySuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE_SUCCESS),
       map(({ payload }: UpdateAdminKeySuccess) => new CreateNotification({
       type: Type.info,
       message: `Reset admin key for organization ${payload.org.name}.`
     })));
+  });
 
-  @Effect()
-  updateAdminKeyFailure$ = this.actions$.pipe(
+  updateAdminKeyFailure$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateAdminKeyFailure) => {
         const msg = payload.error.error;
@@ -52,5 +54,6 @@ export class AdminKeyEffects {
           message: `Could not update organization admin key: ${msg || payload.error}`
         });
       }));
-}
+  });
 
+}

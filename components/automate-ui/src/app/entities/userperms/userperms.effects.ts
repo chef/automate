@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   throttleTime,
   mergeMap,
@@ -47,8 +47,8 @@ export class UserPermEffects {
   // extend the fresh limit by a nudge for the IntrospectSome calls
   private freshLimitPlusANudge = 33000;
 
-  @Effect()
-  fetchAllPerms$ = this.actions$.pipe(
+  fetchAllPerms$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(UserPermsTypes.GET_ALL),
     throttleTime(this.freshLimitInMilliseconds),
     switchMap(() => {
@@ -56,9 +56,10 @@ export class UserPermEffects {
         map((resp: UserPermsResponsePayload) => new GetAllUserPermsSuccess(resp.endpoints)),
         catchError((error: HttpErrorResponse) => of(new GetAllUserPermsFailure(error))));
     }));
+  });
 
-  @Effect()
-  fetchSomePerms$ = this.actions$.pipe(
+  fetchSomePerms$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(UserPermsTypes.GET_SOME),
     withLatestFrom(this.store.select(getlastFetchTime)),
     withLatestFrom(this.store.select(allPerms)),
@@ -74,13 +75,15 @@ export class UserPermEffects {
             map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
             catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
       }));
+  });
 
-  @Effect()
-  fetchParameterizedPerms$ = this.actions$.pipe(
+  fetchParameterizedPerms$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(UserPermsTypes.GET_PARAMETERIZED),
     mergeMap((action: GetUserParamPerms) => this.requests.fetchParameterized(action.payload).pipe(
       map((resp: UserPermsResponsePayload) => new GetUserParamPermsSuccess(resp.endpoints)),
       catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))))));
+  });
 
   private stale(lastTime: Date): boolean {
     return moment().diff(moment(lastTime)) > this.freshLimitPlusANudge;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, tap } from 'rxjs/operators';
 import { intersectionBy } from 'lodash/fp';
@@ -30,13 +30,13 @@ export class ProjectsFilterEffects {
 
   private POLLING_INTERVAL_IN_SECONDS = 120; // 2 minutes
 
-  @Effect()
-  latestOptions$ = observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
-    mergeMap(this.loadOptionsAction$()));
+  latestOptions$ = createEffect(() =>
+    observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
+    mergeMap(this.loadOptionsAction$())));
 
   // Fast-initialize project filter just from local storage
-  @Effect()
-  initOptions$ = this.actions$.pipe(
+  initOptions$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType<LoadOptions>(ProjectsFilterActionTypes.INIT_OPTIONS),
     map(() => {
       return new InitOptionsSuccess({
@@ -45,17 +45,16 @@ export class ProjectsFilterEffects {
       });
     })
   );
+  });
 
-  @Effect()
-  loadOptions$ = this.actions$.pipe(
+  loadOptions$ = createEffect(() => this.actions$.pipe(
     ofType<LoadOptions>(ProjectsFilterActionTypes.LOAD_OPTIONS),
-    mergeMap(this.loadOptionsAction$()));
+    mergeMap(this.loadOptionsAction$())));
 
-  @Effect({ dispatch: false })
-  saveOptions$ = this.actions$.pipe(
+  saveOptions$ = createEffect(() => this.actions$.pipe(
     ofType<SaveOptions>(ProjectsFilterActionTypes.SAVE_OPTIONS),
     tap(({ payload }) => this.projectsFilter.storeOptions(payload))
-  );
+    ), { dispatch: false });
 
   private loadOptionsAction$(): () => Observable<ProjectsFilterActions> {
     return () => this.requests.fetchOptions().pipe(
