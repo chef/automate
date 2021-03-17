@@ -1,0 +1,30 @@
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
+  <h2 slot="title">Edit Data Bag Item</h2>
+  <div class="flex-container">
+    <form [formGroup]="updateForm">
+      <div class="id-margin">
+        <chef-form-field>
+          <div class="margin">
+            <p class="itemName">{{dataBagItemName}}</p>
+            <chef-form-field>
+              <textarea chefInput name="data" formControlName="data" 
+              (change)="onChangeJSON($event)" (keyup)="onChangeJSON($event)"></textarea>
+              <chef-error *ngIf="itemAttrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </chef-form-field>
+      </div>
+      <div id="button-bar">
+        <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+        <chef-button primary [disabled]="!updateForm?.valid || conflictError || itemAttrParseError || !updateForm.dirty"
+          id="edit-button" (click)="updateDataBagItem()">
+          <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
+          <span *ngIf="!updating">Save Item</span>
+          <span *ngIf="updating">saving...</span>
+        </chef-button>
+      </div>
+    </form>
+  </div>
+</chef-modal>

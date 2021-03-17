@@ -1,0 +1,126 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 10px;
+    letter-spacing: 0.15px;
+    padding-bottom: 30px;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+
+    .input-margin {
+      margin-bottom: 30px;
+    }
+
+    form {
+      flex-basis: 100%;
+
+      input {
+        font-size: 13px;
+      }
+
+      label {
+        font-size: 16px;
+        padding-bottom: 0;
+      }
+
+      label .label {
+        font-weight: normal;
+      }
+
+      textarea {
+        height: 300px;
+        text-align: left;
+        font-size: 12px;
+        text-transform: capitalize;
+        resize: none;
+        line-height: 28px;
+        letter-spacing: 0.25px;
+        margin-bottom: -4px;
+      }
+
+      chef-checkbox {
+        margin-top: 16px;
+      }
+    }
+
+    #button-bar {
+      text-align: right;
+      padding-top: 24px;
+
+      chef-button {
+        margin-bottom: 0;
+      }
+
+      #edit-button {
+        margin-right: 0;
+      }
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  chef-modal {
+    .modal {
+      box-shadow: 0px 0px 30px 0px #CCC;
+      outline: none;
+      width: 528px;
+
+      chef-button {
+        &.close {
+          border: none;
+          color: $chef-black;
+          margin-right: 22px;
+          margin-top: 16px;
+
+          &:hover, &:focus {
+            background: none;
+            outline: none;
+          }
+        }
+
+        button {
+          line-height: 20px;
+          letter-spacing: 0.5px;
+
+          &:focus {
+            outline: none;
+          }
+        }
+
+        .cancel-button.hydrated {
+          background: none;
+        }
+      }
+    }
+
+    .modal-overlay {
+      background-color: $chef-white;
+      opacity: 0.5;
+    }
+  }
+}
+
+p.itemName {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.errors {
+  margin-top: -4px;
+}
