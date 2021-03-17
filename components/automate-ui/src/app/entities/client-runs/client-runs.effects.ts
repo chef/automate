@@ -31,7 +31,6 @@ export class ClientRunsEffects {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  @Effect()
   fetchClientRunsNodes$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODES),
