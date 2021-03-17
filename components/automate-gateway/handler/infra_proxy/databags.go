@@ -139,6 +139,7 @@ func (a *InfraProxyServer) CreateDataBagItem(ctx context.Context, r *gwreq.Creat
 
 	return &gwres.CreateDataBagItem{
 		Name: res.GetName(),
+		Id:   res.GetId(),
 	}, nil
 }
 

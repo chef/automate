@@ -82,6 +82,7 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 
 	return &response.CreateDataBagItem{
 		Name: req.Name,
+		Id:   req.Data.Fields["id"].GetStringValue(),
 	}, nil
 }
 

@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -167,6 +169,147 @@ func TestGetDatabagItems(t *testing.T) {
 		assert.Equal(t, 0, int(res.GetPage()))
 		assert.Equal(t, 0, int(res.GetTotal()))
 		assert.Equal(t, 0, len(res.GetItems()))
+	})
+}
+
+func TestCreateDatabag(t *testing.T) {
+	ctx := context.Background()
+	t.Run("when a valid data bag is submitted, creates the new data bag successfully", func(t *testing.T) {
+		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		req := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		res, err := infraProxy.CreateDataBag(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, name, res.GetName())
+	})
+
+	t.Run("when the data bag already exists, raise the error data bag already exists", func(t *testing.T) {
+		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		req := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		res, err := infraProxy.CreateDataBag(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+
+		nextRes, err := infraProxy.CreateDataBag(ctx, req)
+		assert.Nil(t, nextRes)
+		assert.Error(t, err, "Data bag already exists")
+		grpctest.AssertCode(t, codes.AlreadyExists, err)
+	})
+
+	t.Run("when the data bag required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+		req := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+		}
+		res, err := infraProxy.CreateDataBag(ctx, req)
+		assert.Nil(t, res)
+		assert.Error(t, err, "must supply data bag name")
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
+}
+
+func TestCreateDatabagItem(t *testing.T) {
+	ctx := context.Background()
+	t.Run("when a valid data bag item is submitted, creates the new data bag item successfully", func(t *testing.T) {
+		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		dataReq := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		data, err := infraProxy.CreateDataBag(ctx, dataReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, data)
+
+		item := fmt.Sprintf("data-bag-item-%d", time.Now().Nanosecond())
+		req := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+			Data: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: item}},
+				},
+			},
+		}
+		res, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, name, res.GetName())
+		assert.Equal(t, item, res.GetId())
+	})
+
+	t.Run("when the data bag item already exists, raise the error data bag item already exists", func(t *testing.T) {
+		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		dataReq := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		data, err := infraProxy.CreateDataBag(ctx, dataReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, data)
+
+		item := fmt.Sprintf("data-bag-item-%d", time.Now().Nanosecond())
+		req := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+			Data: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: item}},
+				},
+			},
+		}
+		res, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+
+		nextRes, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.Nil(t, nextRes)
+		assert.Error(t, err, "Data bag item already exists")
+		grpctest.AssertCode(t, codes.AlreadyExists, err)
+	})
+
+	t.Run("when the data bag required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+		req := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+		}
+		res, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.Nil(t, res)
+		assert.Error(t, err, "must supply data bag name")
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
+
+	t.Run("when the data bag required field item is missing or empty, raise an invalid argument error", func(t *testing.T) {
+		name := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		dataReq := &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		data, err := infraProxy.CreateDataBag(ctx, dataReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, data)
+
+		req := &request.CreateDataBagItem{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		res, err := infraProxy.CreateDataBagItem(ctx, req)
+		assert.Nil(t, res)
+		assert.Error(t, err, "must supply data bag item")
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
 	})
 }
 
