@@ -49,7 +49,7 @@ import {
  * <chef-modal label="unique-id">
  *    <h2 id="unique-id"> TITLE OF MODAL </h2>
  * ```
- * 
+ *
  * Using custom autofocus
  * By default, autofocus will apply to the modal itself on locked modals
  * and to the close button on unlocked modals.  We can customize where
@@ -71,7 +71,7 @@ import {
  * <p> Switch to the `Console` pane and type `$0.visible = true`. </p>
  * <p> Type `$0.visible = false` to turn off the modal again.</p>
  * </chef-modal>
- * 
+ *
  * @example
  * <chef-modal label="with-custom-focus" label="example-id">
  *    <h2 slot="title" id="example-id"> Using custom autofocus </h2>
@@ -130,7 +130,7 @@ export class ChefModal {
       this.prevFocusedElement = document.activeElement as HTMLElement;
 
       const focusElement = this.getFocusElement(this.locked);
- 
+
       const focusElementInterval = setInterval(() => {
         focusElement.focus();
         if (focusElement === document.activeElement) {
@@ -184,14 +184,14 @@ export class ChefModal {
   private getFocusElement(lockStatus: boolean): HTMLElement {
     const modal = this.el.getElementsByClassName('modal').item(0) as HTMLElement;
     const closeFocus = this.el.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
-    let firstFocus = this.el.querySelector('[firstFocus]') as HTMLElement;
+    const firstFocus = this.el.querySelector('[firstFocus]') as HTMLElement;
 
     if (lockStatus) {
-      return modal
+      return modal;
     } else if (firstFocus) {
       return firstFocus.tagName === 'CHEF-BUTTON'
         ? firstFocus.firstElementChild as HTMLElement
-        : firstFocus
+        : firstFocus;
     }
 
     return closeFocus;
