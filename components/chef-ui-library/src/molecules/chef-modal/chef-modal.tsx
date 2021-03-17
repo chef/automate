@@ -49,6 +49,13 @@ import {
  * <chef-modal label="unique-id">
  *    <h2 id="unique-id"> TITLE OF MODAL </h2>
  * ```
+ * 
+ * Using custom autofocus
+ * By default, autofocus will apply to the modal itself on locked modals
+ * and to the close button on unlocked modals.  We can customize where
+ * the autofocus goes first, by adding the attribute "firstFocus" to the
+ * desired element.  Currently this works with all standard HTML input elements as
+ * well as our custom chef-button element.
  *
  * @example
  * <chef-modal locked="false" label="unique-id">
@@ -63,6 +70,13 @@ import {
  * </p>
  * <p> Switch to the `Console` pane and type `$0.visible = true`. </p>
  * <p> Type `$0.visible = false` to turn off the modal again.</p>
+ * </chef-modal>
+ * 
+ * @example
+ * <chef-modal label="with-custom-focus" label="example-id">
+ *    <h2 slot="title" id="example-id"> Using custom autofocus </h2>
+ *    <label>this input will be focused upon opening</label>
+ *    <input type="text" firstFocus/>
  * </chef-modal>
  */
 @Component({
