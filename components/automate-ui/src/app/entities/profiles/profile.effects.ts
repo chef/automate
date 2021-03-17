@@ -1,6 +1,6 @@
 import { map, mergeMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 
 import {
   ProfileActionTypes,
@@ -17,9 +17,10 @@ export class ProfileEffects {
     private requests: ProfileRequests
   ) {}
 
-  @Effect()
-  profilesSearch$ = this.actions$.pipe(
+  profilesSearch$ = createEffect(() => {
+    return this.actions$.pipe(
     ofType(ProfileActionTypes.PROFILES_SEARCH),
     mergeMap((action: ProfilesSearch) => this.requests.profilesSearch(action.payload)),
     map((resp: ProfilesSearchSuccessPayload) => new ProfilesSearchSuccess(resp)));
+  });
 }

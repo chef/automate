@@ -1,7 +1,7 @@
 import { map, catchError, withLatestFrom, switchMap, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   ClientRunsActionTypes,
   GetNodes,
@@ -32,7 +32,8 @@ export class ClientRunsEffects {
   ) {}
 
   @Effect()
-  fetchClientRunsNodes$ = this.actions$.pipe(
+  fetchClientRunsNodes$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODES),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
@@ -40,9 +41,10 @@ export class ClientRunsEffects {
         map(responseNodes => new GetNodesSuccess({ nodes: responseNodes })),
         catchError((error) => of(new GetNodesFailure(error))));
       }));
+  });
 
-  @Effect()
-  fetchClientRunsNodeCount$ = this.actions$.pipe(
+  fetchClientRunsNodeCount$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODES_COUNT),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
@@ -50,17 +52,19 @@ export class ClientRunsEffects {
         map(responseNodeCount => new GetNodeCountSuccess({ nodeCount: responseNodeCount })),
         catchError((error) => of(new GetNodeCountFailure(error))));
       }));
+  });
 
-  @Effect()
-  fetchWorkflowEnabled$ = this.actions$.pipe(
+  fetchWorkflowEnabled$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_WORKFLOW_ENABLED),
       mergeMap(() => this.requests.isWorkflowEnabled()),
       map(workflowEnabled => new GetWorkflowEnabledSuccess({ workflowEnabled })),
       catchError((error) => of(new GetWorkflowEnabledFailure(error)))
     );
+  });
 
-  @Effect()
-  fetchNodeSuggestions$ = this.actions$.pipe(
+  fetchNodeSuggestions$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODE_SUGGESTIONS),
       withLatestFrom(this.store),
       switchMap(([action, storeState]) => {
@@ -71,23 +75,28 @@ export class ClientRunsEffects {
         map(nodeSuggestions => new GetNodeSuggestionsSuccess({ nodeSuggestions })),
         catchError((error) => of(new GetNodeSuggestionsFailure(error))));
       }));
+  });
 
-  @Effect()
-  deleteNodes$ = this.actions$.pipe(
+  deleteNodes$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.DELETE_NODES),
       mergeMap((action: DeleteNodes) =>
         this.requests.deleteNodes(action.payload.nodeIdsToDelete)),
       map(_success => new DeleteNodesSuccess()),
       catchError((error) => of(new DeleteNodesFailure(error)))
     );
+  });
 
-  @Effect()
-  updateNodeFilters$ = this.actions$.pipe(
+  updateNodeFilters$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.UPDATE_NODES_FILTER),
       mergeMap(() => [ new GetNodes(), new GetNodeCount() ]));
+  });
 
-  @Effect()
-  deleteNodesSuccess$ = this.actions$.pipe(
+  deleteNodesSuccess$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(ClientRunsActionTypes.DELETE_NODES_SUCCESS),
       mergeMap(() => [ new GetNodes(), new GetNodeCount() ]));
+  });
+
 }
