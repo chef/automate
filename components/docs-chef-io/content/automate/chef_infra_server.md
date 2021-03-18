@@ -53,7 +53,7 @@ Mention the correct Name, FQDN, and IP Address of the system. Click _Add Chef Se
 
 Click on the listed Servers to view the details of the specific _Chef Server_.
 
-## Connect to the Chef Infra Server Organization
+## Connect to the Chef Organization
 
 Selecting a specific added Chef Server opens the list of organizations in the Server. Refer to the image below:
 
