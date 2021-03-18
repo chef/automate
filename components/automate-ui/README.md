@@ -55,17 +55,9 @@ Certain packages in package.json are constrained for the reasons detailed here.
 At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
 While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
 
-### Packages @ngrx/* =10.1.0
+### Package typescript: ^4.0.7
 
-awaiting the release of ngrx 11.  Until then, we will get incompatible peer dependencies if we try to update to latest.
-
-### Package karma: ^5.1.1
-
-"@angular-devkit/build-angular" has an incompatible peer dependency to Karma which requires ~5.1.0.
-
-### Package typescript: ^4.0.5
-
-"@angular-devkit/build-angular" has an incompatible peer dependency to typescript which requires ~4.0.0
+Package "@angular-devkit/build-angular" has an incompatible peer dependency to "typescript" (requires "~4.0.0 || ~4.1.0")
 
 ### Package jwt-decode: ^2.2.0
 
@@ -79,11 +71,6 @@ Reason: Later releases are release candidates; should only be using production-r
 
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
 
-### Package zone.js: ^0.10.3
-
-Per: https://www.npmjs.com/package/zone.js?activeTab=readme, Starting with v0.11.1, A breaking change is introduced for legacy browsers such as IE11.  If we are no longer supporting IE 11, we are safe to upgrade, otherwise we can instead `import 'zone.js/dist/zone';`
-
-There is a also an incompatible peer dependency with angular/core that will be cleared up in Angular 11.1.0 re: https://github.com/angular/angular/issues/39094#issuecomment-742227156
 
 ## Angular Module Architecture
 
