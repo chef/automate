@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:cosmic
 MAINTAINER Chef Software <docker@chef.io>
 
 ENV DEBIAN_FRONTEND noninteractive
