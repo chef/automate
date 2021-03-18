@@ -31,7 +31,7 @@ export interface DataBagItemPayload {
   per_page: number;
 }
 
-export interface CreateDataBagItemPayload {
+export interface CreateDataBagItemSuccessPayload {
   name: string;
   id: string;
 }
@@ -58,7 +58,7 @@ export class CreateDataBagItem implements Action {
 
 export class CreateDataBagItemSuccess implements Action {
   readonly type = DataBagItemsActionTypes.CREATE_SUCCESS;
-  constructor(public payload: CreateDataBagItemPayload) { }
+  constructor(public payload: CreateDataBagItemSuccessPayload) { }
 }
 
 export class CreateDataBagItemFailure implements Action {

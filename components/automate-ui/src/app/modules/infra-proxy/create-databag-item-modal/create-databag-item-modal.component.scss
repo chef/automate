@@ -1,6 +1,6 @@
 @import "~styles/variables";
 
-chef-modal {
+chef-modal.createDataBagItem {
 
   [slot=title] {
     text-align: left;
@@ -14,10 +14,6 @@ chef-modal {
   .flex-container {
     margin-top: 28px;
     justify-content: center;
-
-    .input-margin, .id-margin {
-      margin-bottom: 20px;
-    }
 
     form {
       flex-basis: 60%;
@@ -97,6 +93,12 @@ chef-modal {
     chef-button.close:active {
       background: none;
       color: var(--chef-primary-dark);
+    }
+
+    button:focus {
+      outline: none;
+      border: 0.5px solid $chef-primary-bright;
+      border-radius: 4px;
     }
 
   }

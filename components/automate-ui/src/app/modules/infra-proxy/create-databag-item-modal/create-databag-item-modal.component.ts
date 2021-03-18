@@ -45,6 +45,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   public conflictError = false;
   public itemAttrParseError = false;
   public per_page = 9;
+  public itemAttr = '{}';
   public id: {};
   public attr: {};
   private isDestroyed = new Subject<boolean>();
@@ -99,7 +100,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public handleInput(event: KeyboardEvent): void {
+  handleInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
     }
@@ -135,7 +136,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
 
   createDataBagItem(): void {
     this.creating = true;
-    if(this.createForm.controls['itemAttr'].value) {
+    if (this.createForm.controls['itemAttr'].value) {
       this.attr = JSON.parse(this.createForm.controls['itemAttr'].value.trim());
     }
     this.id = {'id': this.createForm.controls['itemId'].value.trim()};
@@ -156,6 +157,8 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
     this.creating = false;
     this.createForm.reset();
     this.conflictError = false;
+    this.createForm.controls.itemAttr.setValue(this.itemAttr);
+    this.itemAttrParseError = false;
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

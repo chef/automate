@@ -10,7 +10,7 @@ import { HttpStatus } from 'app/types/types';
 import { CreateDatabagItemModalComponent } from './create-databag-item-modal.component';
 import {
   CreateDataBagItemSuccess,
-  CreateDataBagItemPayload,
+  CreateDataBagItemSuccessPayload,
   CreateDataBagItemFailure
 } from 'app/entities/data-bags/data-bag-details.actions';
 import {
@@ -64,7 +64,7 @@ describe('CreateDatabagItemModalComponent', () => {
       data: 'test_data'
     };
 
-    const responseData: CreateDataBagItemPayload = {
+    const responseData: CreateDataBagItemSuccessPayload = {
       name: 'test_name',
       id: 'test_id'
     };

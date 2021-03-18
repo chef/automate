@@ -22,7 +22,7 @@ import {
   DataBagItemsSuccessPayload,
   CreateDataBagItem,
   CreateDataBagItemSuccess,
-  CreateDataBagItemPayload,
+  CreateDataBagItemSuccessPayload,
   CreateDataBagItemFailure
 } from './data-bag-details.actions';
 
@@ -60,7 +60,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.CREATE),
     mergeMap(({ payload: { dataBagItem } }: CreateDataBagItem) =>
       this.requests.createDataBagItem(dataBagItem).pipe(
-        map((resp: CreateDataBagItemPayload) => new CreateDataBagItemSuccess(resp)),
+        map((resp: CreateDataBagItemSuccessPayload) => new CreateDataBagItemSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDataBagItemFailure(error))))));
 

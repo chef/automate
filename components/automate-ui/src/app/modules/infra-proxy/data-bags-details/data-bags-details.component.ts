@@ -205,7 +205,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     this.openEditDataBagItemModal.emit();
   }
 
-  openDatabagItemModal() {
+  openDatabagItemModal(): void {
     this.openDataBagItemModal.emit();
   }
 }
