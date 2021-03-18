@@ -53,12 +53,12 @@ func TestGetNodes(t *testing.T) {
 			Page:    0,
 			PerPage: 5,
 		}
-		res, err := infraProxy.GetEnvironments(ctx, req)
+		res, err := infraProxy.GetNodes(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 0, int(res.Total))
-		assert.Equal(t, 0, len(res.Environments))
+		assert.Equal(t, 0, len(res.Nodes))
 	})
 
 	t.Run("Nodes list with an invalid query search param", func(t *testing.T) {
@@ -67,11 +67,11 @@ func TestGetNodes(t *testing.T) {
 			Page:    0,
 			PerPage: 5,
 		}
-		res, err := infraProxy.GetEnvironments(ctx, req)
+		res, err := infraProxy.GetNodes(ctx, req)
 		assert.NoError(t, err)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 0, int(res.Total))
-		assert.Equal(t, 0, len(res.Environments))
+		assert.Equal(t, 0, len(res.Nodes))
 	})
 }
 func TestGetNode(t *testing.T) {
