@@ -112,7 +112,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ResetKeyClient(payload));
   }
 
-  downloadKey() {
+  downloadKey(): void {
     const template = `
     Private RSA Key
 
