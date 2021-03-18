@@ -59,10 +59,6 @@ While it is problematic to document this information due to the maintenance burd
 
 Package "@angular-devkit/build-angular" has an incompatible peer dependency to "typescript" (requires "~4.0.0 || ~4.1.0")
 
-### Package jwt-decode: ^2.2.0
-
-Newer versions of jwt_decode introduce a new import format, which is breaking some of our testing.
-
 ### Package immutable: ^3.8.2
 
 Reason: Later releases are release candidates; should only be using production-releases.
