@@ -1,21 +1,21 @@
 +++
-title = "Client Runs"
+title = "Chef Infra Server"
 
-date = 2021-03-12T12:01:58-07:00
+weight = 20
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef Infra Server"
-    parent = "automate"
-    identifier = "automate/chef_infra_server.md Chef Infra Server"
-    weight = 60
+    parent = "automate/infrastructure"
+    identifier = "automate/infrastructure/chef_infra_server.md Chef Infra Server"
+    weight = 20
 +++
 
 ## Overview
 
-The __Chef Server__ page shows all the Chef Infra Servers connected to Chef Automate. The __Chef Server__ user interface can be used to view and manage all the Chef Infra Server Objects like:
+The __Chef Infra Server__ page shows all the Chef Infra Servers connected to Chef Automate. The __Chef Infra Server__ user interface can be used to view and manage all the Chef Infra Server Objects like:
 
 - Cookbooks
 - Roles
@@ -23,11 +23,13 @@ The __Chef Server__ page shows all the Chef Infra Servers connected to Chef Auto
 - Data Bags
 - Clients
 
+The __Chef Infra Server__ acts as a hub for configuration data. The Chef Infra Server stores **cookbooks**, the policies that are applied to **nodes**, and metadata that describes each registered node that is being managed by Chef Infra Client. Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much of the configuration work as possible on the nodes themselves (and not on the Chef Infra Server). This scalable approach distributes the configuration effort throughout the **organization**.
+
 ## Connect to the Chef Infra Server
 
-To start making use out of the Chef Infra Server, firstly deploy and run the [Chef Automate](https://docs.chef.io/automate/install/#installation-guide).
+To start making use out of the Chef Infra Server, firstly deploy and run [Chef Automate](https://docs.chef.io/automate/install/#installation-guide) instance.
 
-**Note:** No explicit configuration is required to install the Automate Infra views.
+**Note:** Chef Automate automatically displays your connected Chef Infra Servers.
 
 Login to Chef Automate using the credentials. Once logged in, the page looks like as shown below:
 
@@ -95,19 +97,19 @@ Refer to the image below:
 
 ### Cookbooks
 
-A cookbook is the fundamental unit of configuration and policy distribution. Cookbooks also comprise recipes and other optional components or directories. Click [here](https://docs.chef.io/cookbooks/) to know more about Cookbooks.
+A [cookbook](https://docs.chef.io/cookbooks/) is the fundamental unit of configuration and policy distribution. include recipes and other files, components, or directories.
 
 ### Roles
 
-A role is a way to define certain patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list. Click [here](https://docs.chef.io/roles/) to know more about Roles.
+[Roles](https://docs.chef.io/roles/) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
 ### Environments
 
-An environment is a way to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level. Click [here](https://docs.chef.io/environments/) to know more about Environments.
+An [environment](https://docs.chef.io/environments/) can be used to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
 
 ### Data Bags
 
-Data bags store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search. Click [here](https://docs.chef.io/data_bags/) to know more about Data Bags.
+[Data bags](https://docs.chef.io/data_bags/) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
 
 ### Clients
 
@@ -119,4 +121,4 @@ While fetching any object like cookbooks or any, if it raises the `Could not get
 
 ![Could not get cookbooks: Organization](/images/automate/could-not-get-cookbooks-organization.png)
 
-Create the Chef Organization either from `knife opc org create` or using `chef-server-ctl org-create`. Once done add the exact details to fetch the objects.
+Create the Chef Organization using the knife command, `knife opc org create` or the Chef Infra Server CLI `chef-server-ctl org-create`. Then add the **Name**, **Projects**, **Admin User**, and **Admin Key** to fetch the objects.
