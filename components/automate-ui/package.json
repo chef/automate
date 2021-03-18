@@ -52,7 +52,7 @@
     "file-saver": "^2.0.5",
     "fp-ts": "^2.9.5",
     "immutable": "^3.8.2",
-    "jwt-decode": "^2.2.0",
+    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
