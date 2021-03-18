@@ -105,7 +105,7 @@ Chef Infra Clients provide secure API access to the Chef Infra Server.
 
 ## Troubleshoot
 
-While fetching any object like cookbooks or any, if it raises the `Could not get cookbooks: organization 'no-org' does not exist` error, the provided organization does not exist on Chef Infra Server. The error looks like as shown below:
+While fetching any object like cookbooks or any, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server. The error looks like as shown below:
 
 ![Could not get cookbooks: Organization](/images/automate/could-not-get-cookbooks-organization.png)
 
