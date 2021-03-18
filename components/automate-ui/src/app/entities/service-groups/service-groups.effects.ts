@@ -116,17 +116,6 @@ export class ServiceGroupsEffects {
       }));
   });
 
-  // @Effect()
-  // deleteServicesById$ = this.actions$.pipe(
-  //   ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
-  //   mergeMap((action: DeleteServicesById) => {
-  //     return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
-  //       map((response: GroupServicesPayload) =>
-  //         new DeleteServicesByIdSuccess({ amount: response.services.length })),
-  //       catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
-  //     );
-  //   }));
-
   deleteServicesById$ = createEffect(() => {
     return this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
@@ -137,7 +126,7 @@ export class ServiceGroupsEffects {
         catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
       );
     }));
-  });
+  }, {dispatch: false});
 
   deleteServicesByIdFailure$ = createEffect(() => {
     return this.actions$.pipe(
