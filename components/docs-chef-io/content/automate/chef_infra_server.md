@@ -29,13 +29,11 @@ The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Ser
 
 To start making use out of the Chef Infra Server, firstly deploy and run [Chef Automate](https://docs.chef.io/automate/install/#installation-guide) instance.
 
-**Note:** Chef Automate automatically displays your connected Chef Infra Servers.
-
 Login to Chef Automate using the credentials. Once logged in, the page looks like as shown below:
 
 ![Chef Automate](/images/automate/chef-automate-on-chef-infra-page.png)
 
-Click on _Infrastructure_ located at the top bar of the page. Then select _Chef Servers_ located at the left panel of the page. The page looks like as shown below:
+Click on _Infrastructure_ located at the top navigation tab of the page. Then select _Chef Servers_ located at the left panel of the page. The page looks like as shown below:
 
 ![Chef Infra Server](/images/automate/chef-server-page.png)
 
@@ -45,7 +43,7 @@ To add the created Chef Server to the Infrastructure, click on _Add Chef Server_
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu.png)
 
-Mention the correct Name, FQDN, and IP Address of the system. Click _Add Chef Server_. The desired server gets added to the Chef Infra Server.
+Mention the correct Name, FQDN, and IP Address of the system. Click _Add Chef Server_. The desired server gets added to the list of  Chef Infra Server.
 
 **Note:** If the mentioned FQDN and IP Address is incorrect, the box displays an error as shown below:
 
@@ -65,7 +63,7 @@ To add the previously created organization to the Infrastructure, click **Add Ch
 
 ![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
 
-Add the Name, Projects, Admin User, and Admin Key. Always use the exact details that were provided at the time of setting up _Knife_. Copy the contents of the `~/.chef/USER.pem` file and past it into the _Admin Key_ field. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
+Add the Name, Projects, Admin User, and Admin Key. Always use the exact details that were provided at the time of setting up _Knife_. Copy the contents of the `~/.chef/USER.pem` file and paste it into the _Admin Key_ field. Once done click **Add Chef Organization**. The desired organization will be added to the Chef Server.
 
 Click on any Chef Organization to view the _Objects_.
 
@@ -85,7 +83,7 @@ Refer to the image below:
 
 ### Cookbooks
 
-A [cookbook](https://docs.chef.io/cookbooks/) is the fundamental unit of configuration and policy distribution. include recipes and other files, components, or directories.
+A [cookbook](https://docs.chef.io/cookbooks/) is the fundamental unit of configuration and policy distribution. Include recipes and other files, components, or directories.
 
 ### Roles
 
