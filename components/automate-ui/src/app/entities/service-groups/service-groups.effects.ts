@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Injectable } from '@angular/core';
-import { Actions, ofType, createEffect } from '@ngrx/effects';
+import { Actions, ofType, createEffect, Effect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ServiceGroupsRequests } from './service-groups.requests';
@@ -116,17 +116,28 @@ export class ServiceGroupsEffects {
       }));
   });
 
-  deleteServicesById$ = createEffect(() => {
-    return this.actions$.pipe(
-      ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
-      map((action: DeleteServicesById) => {
-        return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
-          map((response: GroupServicesPayload) =>
-            new DeleteServicesByIdSuccess({ amount: response.services.length })),
-          catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
-        );
-      }));
-  });
+  @Effect()
+  deleteServicesById$ = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
+    mergeMap((action: DeleteServicesById) => {
+      return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
+        map((response: GroupServicesPayload) =>
+          new DeleteServicesByIdSuccess({ amount: response.services.length })),
+        catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
+      );
+    }));
+
+  // deleteServicesById$ = createEffect(() => {
+  //   return this.actions$.pipe(
+  //     ofType(ServiceGroupsActionTypes.DELETE_SERVICES_BY_ID),
+  //     mergeMap((action: DeleteServicesById) => {
+  //       return this.requests.deleteServicesById(action.payload.servicesToDelete).pipe(
+  //         map((response: GroupServicesPayload) =>
+  //           new DeleteServicesByIdSuccess({ amount: response.services.length })),
+  //         catchError((error: HttpErrorResponse) => of(new DeleteServicesByIdFailure(error)))
+  //       );
+  //     }));
+  // });
 
   deleteServicesByIdFailure$ = createEffect(() => {
     return this.actions$.pipe(
