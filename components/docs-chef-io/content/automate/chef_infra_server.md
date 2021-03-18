@@ -35,21 +35,13 @@ Login to Chef Automate using the credentials. Once logged in, the page looks lik
 
 ![Chef Automate](/images/automate/chef-automate-on-chef-infra-page.png)
 
-Click on _Infrastructure_ located at the top bar of the page. Refer to the image below:
-
-![Chef Automate with Highlighted Infrastructure](/images/automate/chef-automate-infrastructure.png)
-
-Click on the _Chef Servers_ located at the left panel of the page. The page looks like as shown below:
+Click on _Infrastructure_ located at the top bar of the page. Then select _Chef Servers_ located at the left panel of the page. The page looks like as shown below:
 
 ![Chef Infra Server](/images/automate/chef-server-page.png)
 
 The above image is the _Chef Server_ page which contains all the Chef Infra Servers connected to the Chef Automate. The Chef Infra Servers listed are the ones that are already configured and added to the Chef Automate. To create a new Infra Server click [here](https://docs.chef.io/automate/infra_server/).
 
-To add the created Chef Server to the Infrastructure, click on _Add Chef Server_ button. Refer to the image below:
-
-![Add Chef Server](/images/automate/add-chef-server-button.png)
-
-Clicking on the _Add Chef Server_ button opens a popup menu as shown below:
+To add the created Chef Server to the Infrastructure, click on _Add Chef Server_ button. Clicking on the Add Chef Server button opens a popup menu as shown below:
 
 ![Add Chef Server Popup Menu](/images/automate/add-chef-server-popup-menu.png)
 
@@ -69,11 +61,7 @@ Selecting a specific added Chef Server opens the list of organizations in the Se
 
 The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in the Server click [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
 
-To add the previously created organization to the Infrastructure, click **Add Chef Organization** button. Refer to the image below:
-
-![Add Chef Organization](/images/automate/add-chef-organization-button.png)
-
-Clicking on the **Add Chef Organization** button opens a popup menu as shown below:
+To add the previously created organization to the Infrastructure, click **Add Chef Organization** button. Clicking on the button opens a popup menu as shown below:
 
 ![Add Chef Organization Popup Menu](/images/automate/add-chef-organization-popup-menu.png)
 
