@@ -65,6 +65,11 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 		return nil, err
 	}
 
+	// Custom data params id attribute check
+	if req.Data == nil || len(req.Data.Fields) == 0 || req.Data.Fields["id"].GetStringValue() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "databag item is required and must contain at least one non-whitespace character")
+	}
+
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
 		return nil, err
@@ -82,6 +87,7 @@ func (s *Server) CreateDataBagItem(ctx context.Context, req *request.CreateDataB
 
 	return &response.CreateDataBagItem{
 		Name: req.Name,
+		Id:   req.Data.Fields["id"].GetStringValue(),
 	}, nil
 }
 
