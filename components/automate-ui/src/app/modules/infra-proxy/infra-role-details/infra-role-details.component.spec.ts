@@ -79,7 +79,6 @@ describe('InfraRoleDetailsComponent', () => {
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
-        MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
         InfraRoleDetailsComponent,
         JsonTreeTable
       ],
