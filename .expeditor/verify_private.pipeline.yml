@@ -633,6 +633,7 @@ steps:
     command:
       - integration/run_test integration/tests/ha_chef_server.sh
     timeout_in_minutes: 35
+    soft_fail: true
     expeditor:
       executor:
         linux:
@@ -818,6 +819,7 @@ steps:
     command:
       - integration/run_test integration/tests/cluster.sh
     timeout_in_minutes: 35
+    soft_fail: true
     expeditor:
       executor:
         linux:
