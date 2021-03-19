@@ -49,7 +49,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     default_attributes: '',
     override_attributes: ''
   });
- 
+
   public cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
   public name_id = '';
 
@@ -181,8 +181,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
   public openEditAttributeModal(value, label): void {
     this.openEdit = true;
-    var obj = JSON.parse(value);
-    this.jsonText = JSON.stringify(obj, undefined, "  ");
+    const obj = JSON.parse(value);
+    this.jsonText = JSON.stringify(obj, undefined, '    ');
     this.label = label;
     this.openEnvironmentModal.emit(true);
   }

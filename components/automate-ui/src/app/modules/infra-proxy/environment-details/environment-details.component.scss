@@ -91,6 +91,7 @@ chef-loading-spinner {
 .page-body {
   margin-right: 33px;
   padding: 0px 0px 0px 0px;
+
   chef-loading-spinner {
     display: block;
     margin: 100px auto;
@@ -166,12 +167,9 @@ img {
   font-weight: bold;
   font-size: 12px;
   line-height: 20px;
-/* identical to box height, or 167% */
-
+  /* identical to box height, or 167% */
   letter-spacing: 0.5px;
-
   color: #000000;
-  
 }
 
 .constraint {
@@ -186,15 +184,13 @@ img {
 }
 
 .override {
-margin-top: 54px;
-width: 119px;
+  margin-top: 54px;
+  width: 119px;
 }
 
 .constraint-table {
   margin-top: 15px;
   margin-left: 28px;
-
-
   background: #FFFFFF;
   border: 1.8px solid #CFD2D2;
   box-sizing: border-box;
@@ -294,12 +290,11 @@ width: 119px;
   margin-right: 18px;
 
 }
-.divider-constraints {
 
+.divider-constraints {
   margin-left: 16px;
   margin-top: 2px;
   margin-right: 18px;
-
 }
 
 chef-button:hover {

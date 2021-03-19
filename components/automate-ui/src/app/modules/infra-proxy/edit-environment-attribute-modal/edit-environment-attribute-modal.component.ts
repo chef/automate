@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { combineLatest, Subject } from 'rxjs';
@@ -32,7 +32,7 @@ export class CookbookConstraintGrid {
   templateUrl: './edit-environment-attribute-modal.component.html',
   styleUrls: ['./edit-environment-attribute-modal.component.scss']
 })
-export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit {
+export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit, OnDestroy {
 
 
   @Input() openEvent: EventEmitter<boolean>;
@@ -65,7 +65,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   public org: string;
   public data: any;
   public textareaID: string;
-  public selectedCookbookNames: string[] = []; 
+  public selectedCookbookNames: string[] = [];
 
   public defaulttAttributeForm: FormGroup;
   public overrideAttributeForm: FormGroup;
@@ -76,7 +76,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>,
+    private store: Store<NgrxStateAtom>
 
   ) {
     this.defaulttAttributeForm = this.fb.group({
@@ -100,14 +100,14 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.visible = true;
       this.server = this.serverId;
       this.org = this.orgId;
-      this.showConstraint =  (this.label ===  "Default" || "Override") ? false : true;
+      this.showConstraint =  (this.label ===  'Default' || 'Override') ? false : true;
       this.selectedCookbookNames = [];
       this.cookbookConstraintArray.forEach((element) => {
         this.selectedCookbookNames.push(element.name);
       });
       this.selectedCookbookNames.forEach((ele) => {
         this.constraintKeys.forEach((element, index) => {
-          if(ele === element) {
+          if (ele === element) {
             this.constraintKeys.splice(index, 1);
           }
         });
@@ -137,10 +137,10 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   ngOnChanges(): void {
-    if(this.label === "Default") {
+    if (this.label === 'Default') {
       this.defaulttAttributeForm.controls.default.setValue(this.jsonText);
     }
-    if(this.label === "Override") {
+    if (this.label === 'Override') {
       this.overrideAttributeForm.controls.override.setValue(this.jsonText);
     }
   }
@@ -207,7 +207,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.updateSuccessful = false;
     this.updateInProgress = true;
 
-    if(this.label === "Constraints") {
+    if (this.label === 'Constraints') {
 
       const environment: Environment = {
         server_id: this.serverId,
@@ -223,9 +223,9 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.updatingData(environment);
     }
 
-    if(this.label === "Default") {
-      let json_data = this.defaulttAttributeForm.controls['default'].value;
-      var obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
+    if (this.label === 'Default') {
+      const json_data = this.defaulttAttributeForm.controls['default'].value;
+      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
 
       const environment: Environment = {
         server_id: this.serverId,
@@ -241,9 +241,9 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.updatingData(environment);
     }
 
-    if(this.label === "Override") {
-      let json_data = this.overrideAttributeForm.controls['override'].value;
-      var obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
+    if (this.label === 'Override') {
+      const json_data = this.overrideAttributeForm.controls['override'].value;
+      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
 
       const environment: Environment = {
         server_id: this.serverId,
@@ -265,7 +265,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.store.dispatch(new GetCookbooks({
       server_id: this.serverId, org_id: this.orgId
     }));
-  
+
     combineLatest([
       this.store.select(getAllCookbooksForOrgStatus),
       this.store.select(allCookbooks)

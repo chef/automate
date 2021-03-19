@@ -53,7 +53,8 @@ export function environmentDetailsEntityReducer(
         }, state)) as EnvironmentDetailsEntityState;
 
     case EnvironmentActionTypes.UPDATE_FAILURE:
-      return set(UPDATE_STATUS, EntityStatus.loadingFailure, state) as EnvironmentDetailsEntityState;
+      return set(UPDATE_STATUS,
+        EntityStatus.loadingFailure, state) as EnvironmentDetailsEntityState;
 
 
     default:

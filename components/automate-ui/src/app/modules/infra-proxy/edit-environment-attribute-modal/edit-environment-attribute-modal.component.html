@@ -57,7 +57,7 @@
 
       <div class="button-bar-box">
         <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
-        <chef-button primary primary id="create-button-object-modal" (click)="updateEnvironment()">
+        <chef-button primary id="create-button-object-modal" (click)="updateEnvironment()">
           <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
           <span *ngIf="updateInProgress">Saving...</span>
           <span *ngIf="!updateInProgress">Save</span>
