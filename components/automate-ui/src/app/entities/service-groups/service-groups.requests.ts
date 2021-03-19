@@ -151,7 +151,7 @@ export class ServiceGroupsRequests {
     }, searchParam, filters);
   }
 
-  public deleteServicesById(listOfIds: number[]): any {
+  public deleteServicesById(listOfIds: number[]): Observable<any> {
     const url = `${APPLICATIONS_URL}/delete_services_by_id`;
 
     const params = { ids: listOfIds };
