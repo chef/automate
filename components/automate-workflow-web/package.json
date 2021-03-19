@@ -28,7 +28,7 @@
     "angular-ui-router": "=1.0.23",
     "ansi_up": "=1.3.0",
     "brace": "=0.4.0",
-    "core-js": "=2.4.1",
+    "core-js": "2.6.12",
     "eventsource-polyfill": "^0.9.6",
     "font-awesome": "=4.7.0",
     "highlight.js": "=10.1.2",
