@@ -114,14 +114,21 @@ tbody > .detail-row {
   color: $royal-blue;
   margin-bottom: 10px;
   padding-bottom: 10px;
+  padding-left: 17px;
 
   .action {
     cursor: pointer;
+
+    &:first-child {
+      margin-right: 45px;
+    }
+
+    chef-icon {
+      position: relative;
+      top: 3px;
+    }
   }
 
-  .separator {
-    margin: 0 5px;
-  }
 }
 
 .jsontree_tree .jsontree_label {
