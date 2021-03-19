@@ -79,6 +79,7 @@ export class DataBagItemsEffects {
       });
     }));
 
+  @Effect()
   updateDataBagItem$ = this.actions$.pipe(
     ofType(DataBagItemsActionTypes.UPDATE),
     mergeMap(({ payload: { dataBagItem } }: UpdateDataBagItem) =>

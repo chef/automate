@@ -60,6 +60,7 @@ export class DeleteDataBagItemSuccess implements Action {
 
 export class DeleteDataBagItemFailure implements Action {
   readonly type = DataBagItemsActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class UpdateDataBagItem implements Action {
