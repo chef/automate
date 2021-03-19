@@ -56,7 +56,7 @@ describe('ResetClientKeyComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('hide modal after create a data bag.', () => {
+    it('hide modal after reset key.', () => {
       component.resetKeyClient();
 
       store.dispatch(new ResetKeyClientSuccess(
@@ -65,7 +65,7 @@ describe('ResetClientKeyComponent', () => {
     });
 
 
-    it('on create error, modal is closed with failure banner', () => {
+    it('on reset error, modal is closed with failure banner', () => {
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
