@@ -19,7 +19,7 @@ describe('EditEnvironmentAttributeModalComponent', () => {
     fixture.detectChanges();
   });
 
-  //TODO
+  // TODO
   xit('should create', () => {
     expect(component).toBeTruthy();
   });
