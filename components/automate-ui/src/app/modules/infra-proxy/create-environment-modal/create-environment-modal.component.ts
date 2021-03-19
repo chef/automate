@@ -121,7 +121,6 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       org_id: this.orgId
     };
-console.log(this.currentPage);
     this.loadCookbookConstraint();
 
     this.store.select(saveStatus)

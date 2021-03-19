@@ -1,4 +1,3 @@
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -27,7 +26,6 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public environmentsListLoading = true;
   public searching = false;
 
-  public chefInfraViewsFeatureFlagOn: boolean;
   public current_page = 1;
   public environments: Environment[] = [];
   public per_page = 9;
@@ -40,13 +38,9 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private featureFlagsService: FeatureFlagsService,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    // feature flag enables and disables the create button
-    this.chefInfraViewsFeatureFlagOn =
-    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
   }
 
   ngOnInit() {

@@ -144,6 +144,14 @@ chef-modal {
       font-weight: 400;
       padding-bottom: 0px;
     }
+
+    chef-button {
+      ::ng-deep button:focus {
+        outline: none;
+        border: 1px solid $chef-primary-bright;
+        border-radius: 4px;
+      }
+    }
   }
 }
 
