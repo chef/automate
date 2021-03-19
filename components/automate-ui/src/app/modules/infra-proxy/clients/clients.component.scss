@@ -89,3 +89,8 @@ chef-button button {
     margin-right: 32px;
   }
 }
+
+chef-toolbar chef-button:first-child {
+  margin: 18px 0px 0px 0px;
+  float: right;
+}
