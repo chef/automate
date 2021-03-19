@@ -27,45 +27,106 @@
           <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
+      <div *ngIf="openEdit">
+        <app-edit-environment-attribute-modal
+          [jsonText]="jsonText"
+          [openEvent]="openEnvironmentModal"
+          [serverId]="serverId" [orgId]="orgId"
+          [name]="name" [environment]="environment"
+          [label]="label"
+          [cookbookConstraintArray]="cookbookConstraintArray"
+          [cookbookVersions]="cookbookVersions">
+        </app-edit-environment-attribute-modal>
+      </div>
       <section class="page-body" *ngIf="tabValue === 'cookbookConstraints'">
         <div *ngIf="show">
-          <div *ngIf="hasCookbookConstraints">
-            <chef-table>
-              <chef-thead>
-                <chef-tr>
-                  <chef-th>Cookbook</chef-th>
-                  <chef-th>Operator</chef-th>
-                  <chef-th>Version</chef-th>
-                </chef-tr>
-              </chef-thead>
-              <chef-tbody>
-                <chef-tr *ngFor= "let version of cookbookVersions">
-                  <chef-td>{{ version.name }}</chef-td>
-                  <chef-td>{{ version.operator }}</chef-td>
-                  <chef-td>{{ version.versionNumber }}</chef-td>
-                </chef-tr>
-              </chef-tbody>
-            </chef-table>
-          </div>
-          <div *ngIf="!hasCookbookConstraints" class="empty-section">
-            <img alt="No preview" src="/assets/img/no_preview.gif" />
-            <p>Cookbook constraints are not available for the <b>{{environment.name}}</b> environment.</p>
+          <div>
+            <label>
+              <span class="label constraint">Cookbook Constraints</span>
+            </label>
+            <div class="constraint-table">
+              <div class="edit">
+                <chef-button class="action" primary (click)="openEditAttributeModal(environment?.default_attributes, 'Constraints')">
+                  <img alt="Edit" src="/assets/img/content and icon.png" />
+                </chef-button>
+              </div>
+              <hr class="divider-constraint" />
+              <div class="constraint-container" *ngIf="hasCookbookConstraints">
+                <chef-table>
+                  <chef-thead>
+                    <chef-tr class="header-gap">
+                      <chef-th class="no-border-th header-color">Name</chef-th>
+                      <chef-th class="no-border-th header-color">Operator</chef-th>
+                      <chef-th class="no-border-th header-color">Version</chef-th>
+                    </chef-tr>
+                  </chef-thead>
+                  <chef-tbody>
+                    <chef-tr *ngFor= "let version of cookbookVersions" class="row-gap">
+                      <chef-td class="no-border-th">{{ version.name }}</chef-td>
+                      <chef-td class="no-border-th">{{ version.operator }}</chef-td>
+                      <chef-td class="no-border-th">{{ version.versionNumber }}</chef-td>
+                    </chef-tr>
+                  </chef-tbody>
+                </chef-table>
+              </div> 
+              <div *ngIf="!hasCookbookConstraints" class="empty-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>Cookbook constraints are not available for the <b>{{environment.name}}</b> environment.</p>
+              </div>   
+            </div>
           </div>
         </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'attributes'">
-        <div class="expand-collapse">
-          <span class="action" (click)="tree.expand()">
-            <chef-icon>add_circle</chef-icon>
-            <span>Expand All</span>
-          </span>
-          <span class="separator">|</span>
-          <span class="action" (click)="tree.collapse()">
-            <chef-icon>remove_circle</chef-icon>
-            <span>Collapse All</span>
-          </span>
+        <label>
+          <span class="label default">Default Attributes</span>
+        </label>
+        <div class="attr">
+          <div class="expand-collapse">
+            <chef-button class="add-circle" primary (click)="tre.expand()">
+              <img alt="Edit" src="/assets/img/expand_all.png" />
+            </chef-button>
+
+            <chef-button class="collapse-circle" primary (click)="tre.collapse()">
+              <img alt="Collapse" src="/assets/img/collapse_tree.png" />
+            </chef-button>
+            <chef-button class="action" primary (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
+              <img alt="Edit" src="/assets/img/content and icon.png" />
+            </chef-button>
+          </div>
+          <hr class="divider-constraints" />
+          <div class="json-container">
+            <div class="scroll">
+              <app-json-tree-table class="json-tree-container" #tre [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
+            </div>
+          </div>
         </div>
-        <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs"></app-json-tree-table>
+
+        <label>
+          <span class="label override">Override Attributes</span>
+        </label>
+        <div class="attr">
+          <div class="expand-collapse">
+            <chef-button class="add-circle" primary (click)="tree.expand()">
+              <img alt="Edit" src="/assets/img/expand_all.png" />
+            </chef-button>
+
+            <chef-button class="collapse-circle" primary (click)="tree.collapse()">
+              <img alt="Collapse" src="/assets/img/collapse_tree.png" />
+            </chef-button>
+
+            <chef-button class="action" primary (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
+              <img alt="Edit" src="/assets/img/content and icon.png" />
+            </chef-button>
+
+          </div>
+          <hr class="divider-constraints" />
+          <div class="json-container">
+            <div class="scroll">
+              <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>

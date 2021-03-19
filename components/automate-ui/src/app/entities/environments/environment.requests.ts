@@ -52,4 +52,10 @@ export class EnvironmentRequests {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}`,
     {headers});
   }
+
+  public updateEnvironment(environment: Environment): Observable<Environment> {
+
+    return this.http.put<Environment>(
+      `${env.infra_proxy_url}/servers/${environment.server_id}/orgs/${environment.org_id}/environments/${environment.name}`, environment);
+  }
 }

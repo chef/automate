@@ -1,0 +1,68 @@
+<chef-modal [visible]="visible" (closeModal)="closeEditModal()">
+  <div class="text-right">
+    <h2 slot="title">Edit Environment {{label}}</h2>
+  </div>
+  <div class="flex-container">
+    <div class="main pages-body">
+      <label>
+        <span class="constraint">{{capitalizeFirstLetter(environment?.name)}}</span>
+      </label>
+      <hr class="divider-constraint" />
+
+      <div *ngIf="label === 'Default'">
+        <form [formGroup]="defaulttAttributeForm">
+          <div class="input-margin">
+            <chef-form-field>
+              <label>
+                <textarea chefInput name="default" formControlName="default" id="default" type="text" autocomplete="off"
+                (keyup)="onChangeDefaultJson($event)">
+                  </textarea>
+              </label>
+              <chef-error *ngIf="defaultAttrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </form>
+      </div>
+
+      <div *ngIf="label === 'Override'">
+        <form [formGroup]="overrideAttributeForm">
+          <div class="input-margin">
+            <chef-form-field>
+              <label>
+                <textarea chefInput name="override" formControlName="override" id="override" type="text" autocomplete="off"
+                  (keyup)="onChangeOverrideJson($event)">
+                </textarea>
+              </label>
+              <chef-error *ngIf="overrideAttrParseError">
+                Must be a valid JSON object
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </form>
+      </div>
+
+      <div *ngIf="label === 'Constraints'">
+        <app-infra-environment-constraint
+          [constraintKeys]="constraintKeys"
+          (constraintValues)="constraintItemsHandler($event)"
+          [cookbookConstraintArray]="cookbookConstraintArray"
+          [name_id]="name_id"
+          [nameKeys]="nameKeys"
+          [constraintFormGroup]="constraintFormGroup"
+          [selectedCookbookNames]="selectedCookbookNames">
+        </app-infra-environment-constraint>
+      </div>
+
+      <div class="button-bar-box">
+        <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+        <chef-button primary primary id="create-button-object-modal" (click)="updateEnvironment()">
+          <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+          <span *ngIf="updateInProgress">Saving...</span>
+          <span *ngIf="!updateInProgress">Save</span>
+        </chef-button>
+      </div>
+    </div>
+  </div>
+</chef-modal>

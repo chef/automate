@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { catchError, filter, mergeMap, map } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { HttpStatus } from 'app/types/types';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -21,10 +21,14 @@ import {
   GetEnvironmentFailure,
   DeleteEnvironment,
   DeleteEnvironmentSuccess,
-  DeleteEnvironmentFailure
+  DeleteEnvironmentFailure,
+  UpdateEnvironment,
+  UpdateEnvironmentSuccess,
+  UpdateEnvironmentFailure
 } from './environment.action';
 
 import { EnvironmentRequests, EnvironmentResponse } from './environment.requests';
+import { Environment } from './environment.model';
 
 @Injectable()
 export class EnvironmentEffects {
@@ -127,5 +131,30 @@ export class EnvironmentEffects {
     map(({ payload }: CreateEnvironmentFailure) => new CreateNotification({
       type: Type.error,
       message: `Could not create notification: ${payload.error.error || payload}.`
+    })));
+  @Effect()
+  updateEnvironment$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.UPDATE),
+    mergeMap(({ payload }: UpdateEnvironment) =>
+      this.requests.updateEnvironment(payload).pipe(
+        map((resp: Environment) => new UpdateEnvironmentSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new UpdateEnvironmentFailure(error))))));
+
+  @Effect()
+  updateEnvironmentSuccess$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.UPDATE_SUCCESS),
+    map(({ payload: environment }: UpdateEnvironmentSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Updated environment ${environment.name}.`
+    })));
+
+  @Effect()
+  updateEnvironmentFailure$ = this.actions$.pipe(
+    ofType(EnvironmentActionTypes.UPDATE_FAILURE),
+    filter(({ payload }: UpdateEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: UpdateEnvironmentFailure) => new CreateNotification({
+      type: Type.error,
+      message: `Could not Update notification: ${payload.error.error || payload}.`
     })));
 }
