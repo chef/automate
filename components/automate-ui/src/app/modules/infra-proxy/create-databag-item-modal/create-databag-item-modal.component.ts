@@ -22,7 +22,8 @@ import {
 import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBagItem,
-  GetDataBagItems } from 'app/entities/data-bags/data-bag-details.actions';
+  GetDataBagItems 
+} from 'app/entities/data-bags/data-bag-details.actions';
 
 @Component({
   selector: 'app-create-databag-item-modal',
@@ -165,4 +166,3 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
     return event.key === 'Shift' || event.key === 'Tab';
   }
 }
-
