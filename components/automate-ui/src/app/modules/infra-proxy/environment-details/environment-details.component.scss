@@ -305,3 +305,15 @@ chef-button:focus {
   outline: none;
   border: none;
 }
+
+chef-button {
+  ::ng-deep button:focus {
+    outline: none;
+    border: none;
+  }
+
+  img:focus {
+    outline: none;
+    border: none;
+  }
+}
