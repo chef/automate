@@ -17,7 +17,9 @@ func (s *CfgMgmtServer) Getdata(ctx context.Context, req *pRequest.GetPagination
 
 	outputJSON, _ := json.Marshal(out)
 
-	response := s. GetPaginationResponse{Data: string(outputJSON)}
-
-	return response, nil
+	returnData := interserviceResp.GetPaginationResponse{
+		Data: string(outputJSON),
+	}
+	// {Data: string(outputJSON)}
+	return &returnData, nil
 }

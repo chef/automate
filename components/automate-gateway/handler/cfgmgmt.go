@@ -30,21 +30,23 @@ type CfgMgmtServer struct {
 func NewCfgMgmtServer(cfgMgmtClient cmsService.CfgMgmtServiceClient) *CfgMgmtServer {
 	return &CfgMgmtServer{
 		cfgMgmtClient: cfgMgmtClient,
-
 	}
 }
 
 func (s *CfgMgmtServer) Getdata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
 	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
-	req = &cfgReq.GetPaginationRequest{
-		Offset: req.Offset,
-		Size:   req.Size,
+	getData := cmsReq.GetPaginationRequest{
+		Offset: req.GetOffset(),
+		Size:   req.GetSize(),
 	}
-	res, err := s.cfgMgmtClient.Getdata(ctx, req)
+
+	res, err := s.cfgMgmtClient.Getdata(ctx, &getData)
 	if err != nil {
-		return nil, err
+		return &cfgRes.GetPaginationResponse{}, err
 	}
-	return res, nil
+	return &cfgRes.GetPaginationResponse{
+		Data: res.Data,
+	}, nil
 }
 
 // GetPolicyCookbooks returns PolicyCookbooks with their policy identifiers based on a policy revision ID.
