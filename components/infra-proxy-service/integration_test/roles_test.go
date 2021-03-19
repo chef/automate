@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
 )
 
 func TestGetRoles(t *testing.T) {
@@ -110,25 +112,50 @@ func TestGetRoles(t *testing.T) {
 
 func TestGetRole(t *testing.T) {
 	ctx := context.Background()
-	name := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
-	req := &request.CreateRole{
-		ServerId:    autoDeployedChefServerID,
-		OrgId:       autoDeployedChefOrganizationID,
-		Name:        name,
-		Description: "auto generated role",
-		RunList:     []string{"recipe[audit::default]", "recipe[chef-client::default]"},
-	}
-	role, err := infraProxy.CreateRole(ctx, req)
-	assert.NoError(t, err)
-	assert.NotNil(t, role)
+	t.Run("when the role exists, returns the org successfully", func(t *testing.T) {
+		name := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
+		req := &request.CreateRole{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Description: "auto generated role",
+			RunList:     []string{"recipe[audit::default]", "recipe[chef-client::default]"},
+		}
+		role, err := infraProxy.CreateRole(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, role)
 
-	res, err := infraProxy.GetRole(ctx, &request.Role{
-		ServerId: autoDeployedChefServerID,
-		OrgId:    autoDeployedChefOrganizationID,
-		Name:     name,
+		res, err := infraProxy.GetRole(ctx, &request.Role{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
 	})
-	assert.NoError(t, err)
-	assert.NotNil(t, res)
+
+	t.Run("when the role required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+		resp, err := infraProxy.GetRole(ctx, &request.Role{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     "",
+		})
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
+
+	t.Run("when the role does not exists, return role not found", func(t *testing.T) {
+		name := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
+		res, err := infraProxy.GetRole(ctx, &request.Role{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		})
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		grpctest.AssertCode(t, codes.NotFound, err)
+	})
 }
 
 // Adds roles records
