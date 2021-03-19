@@ -22,7 +22,7 @@ import {
 import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBagItem,
-  GetDataBagItems 
+  GetDataBagItems
 } from 'app/entities/data-bags/data-bag-details.actions';
 
 @Component({
