@@ -36,11 +36,12 @@
       </chef-page-header>
 
       <app-create-databag-item-modal
-      [openEvent]="openDataBagItemModal"
-      [server_Id]="serverId"
-      [org_Id]="orgId"
-      [name]="dataBagsName"
-      [currentPage]="current_page"></app-create-databag-item-modal>
+          [openEvent]="openDataBagItemModal"
+          [server_Id]="serverId"
+          [org_Id]="orgId"
+          [name]="dataBagsName"
+          [currentPage]="current_page">
+      </app-create-databag-item-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
         <div class="search-items">
