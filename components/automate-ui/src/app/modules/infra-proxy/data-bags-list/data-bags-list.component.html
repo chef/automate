@@ -6,7 +6,8 @@
     [objectName]="dataBagToDelete?.name"
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteDataBag()"
-    objectAction="Delete">
+    objectAction="Delete"
+    class="delete-modal">
   </app-delete-infra-object-modal>
   <app-create-data-bag-modal 
     [openEvent]="openDataBagModal"
@@ -40,7 +41,7 @@
     </chef-table>
   </ng-container>
   <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
-    <img alt="No preview" src="/assets/img/no_preview.gif" />
+    <img alt="No preview" src="/assets/img/no_preview.gif" [ngClass]="chefInfraViewsFeatureFlagOn ? '' : 'no-margin-img'"/>
     <p>No databags available</p>
   </div>
 </section>

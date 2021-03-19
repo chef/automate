@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -12,7 +12,8 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   allDataBags,
-  getAllStatus as getAllDatabagsForOrgStatus
+  getAllStatus as getAllDatabagsForOrgStatus,
+  deleteStatus
 } from 'app/entities/data-bags/data-bags.selectors';
 
 @Component({
@@ -64,6 +65,16 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
         this.dataBagsListLoading = false;
         this.authFailure = true;
       }
+    });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetDataBags({
+          server_id: this.serverId, org_id: this.orgId
+        })
+      );
     });
   }
 

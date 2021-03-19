@@ -1,6 +1,10 @@
 <section class="clients">
-  <app-create-client-modal [openEvent]="openNotificationModal" 
-  [serverId]="serverId" [orgId]="orgId"></app-create-client-modal>
+  <app-create-client-modal
+    [openEvent]="openClientModal"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [currentPage]="current_page">
+  </app-create-client-modal>
   
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
   <app-delete-infra-object-modal
@@ -16,10 +20,10 @@
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="Clients">
       </app-infra-search-bar>
-      <chef-button primary (click)="openCreateClientModal()">Create Client</chef-button>
+      <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
-    <div class="empty-section" *ngIf="!searching && !clients.length">
+    <div class="empty-section" *ngIf="!searching && !clients.length && current_page === 1">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
       <p *ngIf="searchValue === ''">No client available.</p>
@@ -45,10 +49,11 @@
       </chef-tbody>
     </chef-table>
     <app-page-picker
+      *ngIf="!searching"
       class="clients-list-paging"
       [total]="total"
       [perPage]="per_page"
-      [page]="page"
+      [page]="current_page"
       (pageChanged)="onPageChange($event)">
     </app-page-picker>
   </ng-container>

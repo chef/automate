@@ -20,6 +20,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<boolean>;
   @Input() serverId: string;
   @Input() orgId: string;
+  @Input() currentPage: number;
 
   public checkedValidator = false;
   public createdClient: string;
@@ -36,9 +37,8 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   public server: string;
   public validator = false;
   public visible = false;
-  private isDestroyed = new Subject<boolean>();
-  public page = 1;
   public per_page = 9;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -64,7 +64,6 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
   });
 
   combineLatest([
-    // this.store.select(getAllStatus),
     this.store.select(saveError),
     this.store.select(createClient)
   ]).pipe(
@@ -117,7 +116,7 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
       clientName: '',
       server_id: this.serverId,
       org_id: this.orgId,
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page
     };
     this.store.dispatch(new GetClients(payload));

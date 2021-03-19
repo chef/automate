@@ -1,6 +1,6 @@
 @import "~styles/variables";
 
-chef-modal {
+chef-modal.create-client-modal {
 
   [slot=title] {
     font-style: normal;
@@ -22,10 +22,12 @@ chef-modal {
     }
 
     form {
-      flex-basis: 100%;
+      width: 100%;
 
       input {
         font-size: 13px;
+        height: 36px;
+        padding: 10px;
       }
 
       label {
@@ -37,14 +39,16 @@ chef-modal {
         font-weight: normal;
       }
 
-      textarea {
+      .key-tab-body {
+        display: flex;
+        background: $chef-white;
+        border: 0.5px solid $chef-key-tab;
         height: 300px;
-        text-align: left;
-        font-size: 12px;
-        text-transform: capitalize;
-        resize: none;
-        line-height: 20px;
-        letter-spacing: 0.25px;
+
+        chef-snippet {
+          height: 298px;
+          width: 100%;
+        }
       }
 
       chef-checkbox {
@@ -81,7 +85,7 @@ chef-modal {
           font-size: 12px;
           line-height: 20px;
           letter-spacing: 0.25px;
-          width: 80%;
+          width: calc(100% - 45px);
           color: $white;
           text-transform: capitalize;
           margin-bottom: 0;
@@ -110,14 +114,12 @@ chef-modal {
       }
     }
   }
-}
 
-::ng-deep {
-  chef-modal {
+  ::ng-deep {
     .modal {
       box-shadow: 0px 0px 30px 0px #CCC;
       outline: none;
-      width: 528px;
+      width: 41%;
 
       chef-button {
         &.close {
@@ -138,6 +140,8 @@ chef-modal {
 
           &:focus {
             outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
           }
         }
 
@@ -153,6 +157,8 @@ chef-modal {
 
         &:focus {
           outline: none;
+          border: 0.5px solid $chef-primary-bright;
+          border-radius: 4px;
         }
 
         .label-wrap {
@@ -165,7 +171,6 @@ chef-modal {
           height: 16px;
         }
       }
-
     }
 
     .modal-overlay {
@@ -173,5 +178,13 @@ chef-modal {
       opacity: 0.5;
     }
 
+    chef-snippet pre {
+      font-size: 12px;
+      height: 297px;
+      width: 100%;
+      line-height: 20px;
+      letter-spacing: 0.25px;
+      padding: 1.5em;
+    }
   }
 }

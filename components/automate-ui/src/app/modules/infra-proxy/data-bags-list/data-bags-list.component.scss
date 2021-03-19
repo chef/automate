@@ -22,6 +22,10 @@ img {
 }
 
 chef-toolbar chef-button:first-child {
-  margin: 5px 0px 0px 0px;
+  margin: 10px 0px 0px 0px;
   float: right;
+}
+
+.no-margin-img {
+  margin-left: 0px;
 }
