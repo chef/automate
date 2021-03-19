@@ -72,6 +72,7 @@ describe('ResetClientKeyComponent', () => {
         ok: false
       };
       store.dispatch(new ResetKeyClientFailure(error));
+      expect(component.visible).toBe(false);
     });
 
   });
