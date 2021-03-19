@@ -19,3 +19,9 @@ export interface ClientKey {
   expiration_date: string;
   private_key: string;
 }
+
+export interface ResetKey {
+  server_id: string;
+  org_id: string;
+  name: string;
+}

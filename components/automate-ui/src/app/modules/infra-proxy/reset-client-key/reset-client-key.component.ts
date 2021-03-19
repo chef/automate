@@ -10,6 +10,7 @@ import { getStatus,
 import { EntityStatus } from 'app/entities/entities';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
+import { ResetKey } from 'app/entities/clients/client.model';
 
 @Component({
   selector: 'app-reset-client-key',
@@ -104,7 +105,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
 
   resetKeyClient(): void {
     this.reseting = true;
-    const payload = {
+    const payload: ResetKey = {
       'org_id': this.orgId,
       'server_id': this.serverId,
       'name': this.name

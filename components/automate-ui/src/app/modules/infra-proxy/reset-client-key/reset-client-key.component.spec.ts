@@ -2,8 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { EventEmitter } from '@angular/core';
 import { ResetClientKeyComponent } from './reset-client-key.component';
-import { StoreModule } from '@ngrx/store';
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { StoreModule, Store } from '@ngrx/store';
+import { ngrxReducers, runtimeChecks, NgrxStateAtom } from 'app/ngrx.reducers';
+import { HttpErrorResponse } from '@angular/common/http';
+import { HttpStatus } from 'app/types/types';
+import { ResetKeyClientSuccess,
+  ResetKeySuccessPayload,
+  ResetKeyClientFailure } from 'app/entities/clients/client.action';
 
 describe('ResetClientKeyComponent', () => {
   let component: ResetClientKeyComponent;
@@ -32,5 +37,48 @@ describe('ResetClientKeyComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('#ResetClientKeyComponentData', () => {
+    let store: Store<NgrxStateAtom>;
+
+    const responseData: ResetKeySuccessPayload = {
+      name: 'test_name',
+      client_key: {
+        name: 'default',
+        public_key: 'test_public_key',
+        expiration_date: 'test_expiration_date',
+        private_key: 'test_private_key'
+      }
+    }
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('opening create modal with visible true',
+      () => {
+      component.visible = true;
+    });
+
+    it('hide modal after create a data bag.', () => {
+      component.resetKeyClient();
+
+      store.dispatch(new ResetKeyClientSuccess(
+        {name: responseData.name, client_key: responseData.client_key}));
+      expect(component.visible).toBe(false);
+    });
+
+
+    it('on create error, modal is closed with failure banner', () => {
+
+      const error = <HttpErrorResponse>{
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        ok: false
+      };
+      store.dispatch(new ResetKeyClientFailure(error));
+      expect(component.conflictError).toBe(false);
+    });
+
   });
 });

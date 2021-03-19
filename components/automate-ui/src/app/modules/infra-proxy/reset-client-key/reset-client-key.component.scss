@@ -25,6 +25,10 @@ chef-modal.reset-client-modal {
       margin-bottom: 30px;
     }
 
+    .id-margin {
+      width: 100%;
+    }
+
     .left-box {
       float: left;
       height: auto;
@@ -138,7 +142,7 @@ chef-modal.reset-client-modal {
     .modal {
       box-shadow: 0px 0px 30px 0px #CCC;
       outline: none;
-      width: 54%;
+      width: 700px;
 
       .options {
         float: right;
@@ -183,7 +187,15 @@ chef-modal.reset-client-modal {
 
           &:hover, &:focus {
             background: none;
-            outline: 0.5px solid $chef-primary-bright;
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
+          }
+
+          button:focus {
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
           }
         }
 
@@ -202,6 +214,22 @@ chef-modal.reset-client-modal {
 
         .cancel-button.hydrated {
           background: none;
+        }
+      }
+
+      .reset-div {
+        button:focus {
+          outline: none;
+          border: 0.5px solid $chef-critical-dark;
+          border-radius: 4px;
+        }
+      }
+
+      .id-margin {
+        button:focus {
+          outline: none;
+          border: 0.5px solid $chef-primary-bright;
+          border-radius: 4px;
         }
       }
 
