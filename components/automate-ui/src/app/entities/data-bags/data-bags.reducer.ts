@@ -64,6 +64,7 @@ export function dataBagEntityReducer(
         set(SAVE_STATUS, EntityStatus.loadingFailure)
       )(state) as DataBagEntityState;
     }
+
     case DataBagActionTypes.DELETE: {
       return set(DELETE_STATUS, EntityStatus.loading, state);
     }

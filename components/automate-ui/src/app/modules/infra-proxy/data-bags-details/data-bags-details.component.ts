@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
@@ -8,11 +8,14 @@ import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
 
-import { GetDataBagItems } from 'app/entities/data-bags/data-bag-details.actions';
+import {
+  DeleteDataBagItem,
+  GetDataBagItems
+} from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBagItems, DataBagsItemDetails } from 'app/entities/data-bags/data-bags.model';
-import {  getAllStatus, dataBagItemList } from 'app/entities/data-bags/data-bag-details.selector';
+import { getAllStatus, dataBagItemList, deleteStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
-import { dataBagItemDetailsFromRoute, getStatus } from 'app/entities/data-bags/data-bag-item-details.selector';
+import { dataBagItemDetailsFromRoute, getStatus  } from 'app/entities/data-bags/data-bag-item-details.selector';
 
 export type DataBagsDetailsTab = 'details';
 
@@ -28,7 +31,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagItemDetails: DataBagsItemDetails;
   public serverId: string;
   public orgId: string;
-  public dataBagsName: string;
+  public dataBagName: string;
   public tabValue: DataBagsDetailsTab = 'details';
   public dataBagsDetailsLoading = true;
   public selectedItem: string;
@@ -37,9 +40,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public activeClassName: string;
   public searching = false;
   public searchValue = '';
-  public page = 1;
+  public current_page = 1;
   public per_page = 9;
   public total: number;
+  public dataBagItemToDelete: DataBagItems;
+  public deleteModalVisible = false;
+  public openDataBagModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -58,16 +64,8 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(([server_id, org_id, dataBags_name]) => {
       this.serverId = server_id;
       this.orgId = org_id;
-      this.dataBagsName = dataBags_name;
-      const payload = {
-        databagName: '',
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.dataBagsName,
-        page: this.page,
-        per_page: this.per_page
-      };
-      this.store.dispatch(new GetDataBagItems(payload));
+      this.dataBagName = dataBags_name;
+      this.getDataBagItemsData();
     });
 
     combineLatest([
@@ -85,6 +83,17 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.appendActiveToItems(this.dataBagItems);
         this.dataBagsDetailsLoading = false;
         this.searching = false;
+      });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.searching = true;
+        if (this.dataBagItems.length === 0) {
+          this.current_page = this.current_page - 1;
+        }
+        this.getDataBagItemsData();
       });
 
     combineLatest([
@@ -108,7 +117,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetDataBagItemDetails({
       server_id: this.serverId,
       org_id: this.orgId,
-      name: this.dataBagsName,
+      name: this.dataBagName,
       item_name: item
     }));
 
@@ -136,14 +145,14 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   searchDataBagItems(currentText: string) {
     this.searching = true;
-    this.page = 1;
+    this.current_page = 1;
     this.searchValue = currentText;
     this.getDataBagItemsData();
   }
 
   onPageChange(event: number): void {
     this.searching = true;
-    this.page = event;
+    this.current_page = event;
     this.getDataBagItemsData();
   }
 
@@ -152,10 +161,33 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       databagName: this.searchValue,
       server_id: this.serverId,
       org_id: this.orgId,
-      name: this.dataBagsName,
-      page: this.page,
+      name: this.dataBagName,
+      page: this.current_page,
       per_page: this.per_page
     };
     this.store.dispatch(new GetDataBagItems(payload));
+  }
+
+  public startDataBagItemDelete(dataBagItem: DataBagItems): void {
+    this.dataBagItemToDelete = dataBagItem;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteDataBagItem(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteDataBagItem({
+      server_id: this.serverId,
+      org_id: this.orgId,
+      databag_name: this.dataBagName,
+      name: this.dataBagItemToDelete.name
+    }));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
+  public openCreateModal(): void {
+    this.openDataBagModal.emit();
   }
 }

@@ -53,10 +53,11 @@ chef-modal {
   ::ng-deep {
 
     .modal {
+      box-shadow: 0px 0px 30px 0px $light-grey;
+      max-width: 528px;
+      min-width: 528px;
       padding: 32px;
-      width: 528px;
       outline: none;
-      box-shadow: 0px 0px 30px 0px #CCCCCC;
     }
 
     label {

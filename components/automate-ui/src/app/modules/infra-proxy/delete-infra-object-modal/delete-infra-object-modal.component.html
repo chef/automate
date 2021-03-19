@@ -9,6 +9,11 @@
       <div class="title-text">Deleting {{objectNoun | titlecase}}?</div>
       <ng-container *ngIf="custom === false">
         <div class="action-text">This action is irreversible.</div>
+        <div *ngIf="validator" class="client-message">
+          <span>you are about to delete a validate client.</span><br>
+          <span>Without a validate client, you may have</span><br> 
+          <span>difficulties creating new nodes.</span>
+        </div>
       </ng-container>
     </div>
 
