@@ -1,5 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+// import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Router } from '@angular/router';
@@ -15,7 +16,7 @@ import {
 } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
-import { GetDataBagItemsSuccess } from 'app/entities/data-bags/data-bag-details.actions';
+import { GetDataBagItemsSuccess, DeleteDataBagItemSuccess } from 'app/entities/data-bags/data-bag-details.actions';
 import { DataBagItems } from 'app/entities/data-bags/data-bags.model';
 import { DataBagsDetailsComponent } from './data-bags-details.component';
 
@@ -30,6 +31,11 @@ const declarations: any[] = [
   MockComponent({ selector: 'chef-heading' }),
   MockComponent({ selector: 'chef-subheading' }),
   MockComponent({ selector: 'chef-loading-spinner' }),
+  MockComponent({
+    selector: 'app-delete-infra-object-modal',
+    inputs: [ 'visible', 'objectNoun', 'objectName'],
+    outputs: ['close', 'deleteClicked']
+  }),
   DataBagsDetailsComponent
 ];
 const serverId = '6e98f609-586d-4816-a6de-e841e659b11d';
@@ -95,6 +101,40 @@ describe('DataBagsDetailsComponent', () => {
     store.dispatch(new GetDataBagItemsSuccess({ items, total }));
     fixture.detectChanges();
     expect(component.dataBagItems).toEqual(items);
+  });
+
+  describe('delete item', () => {
+    const dataBagItem: DataBagItems = {
+      name: 'test_data_bag_item',
+      databag_name: 'test_data_bag',
+      active: true
+    };
+
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+      store.dispatch(new GetDataBagItemsSuccess({
+        items, total
+      }));
+      fixture.detectChanges();
+    });
+
+    it('opens the delete modal', () => {
+      component.startDataBagItemDelete(dataBagItem);
+      fixture.detectChanges();
+
+      expect(component.deleteModalVisible).toBe(true);
+    });
+
+    it('confirming delete closes modal and removes the item', () => {
+      component.startDataBagItemDelete(dataBagItem);
+      component.deleteDataBagItem();
+
+      store.dispatch(new DeleteDataBagItemSuccess({name: dataBagItem.name}));
+      fixture.detectChanges();
+
+      expect(component.deleteModalVisible).toBe(false);
+    });
   });
 
   describe('data bag item list', () => {

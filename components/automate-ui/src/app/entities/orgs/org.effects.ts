@@ -91,7 +91,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.CREATE_SUCCESS),
       map(({ payload: { org } }: CreateOrgSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created organization ${org.name}.`
+      message: `Successfully Created Organization - ${org.name}.`
     })));
 
   @Effect()
@@ -118,7 +118,7 @@ export class OrgEffects {
       map(({ payload: { name } }: DeleteOrgSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Deleted organization ${name}.`
+          message: `Successfully Deleted Organization ${name}.`
         });
       }));
 
@@ -147,7 +147,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.UPDATE_SUCCESS),
       map(({ payload: { org } }: UpdateOrgSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Updated organization ${org.name}.`
+      message: `Successfully Updated Organization ${org.name}.`
     })));
 
   @Effect()

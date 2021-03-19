@@ -55,9 +55,10 @@ chef-modal {
   ::ng-deep {
 
     .modal {
-      width: 528px;
+      box-shadow: 0px 0px 30px 0px $light-grey;
+      max-width: 528px;
+      min-width: 528px;
       outline: none;
-      box-shadow: 0px 0px 30px 0px #CCC;
     }
 
     input#projects {
@@ -92,7 +93,7 @@ chef-modal {
     }
 
     .modal-overlay {
-      background-color: #FFFFFF;
+      background-color: $chef-white;
       mix-blend-mode: normal;
       opacity: 0.7;
     }
@@ -106,7 +107,7 @@ chef-modal {
     }
 
     chef-button.close:hover {
-      background-color: #FFFFFF;
+      background-color: $chef-white;
     }
 
     chef-button.close:active {
@@ -137,5 +138,5 @@ chef-modal ::ng-deep .modal::-webkit-scrollbar {
 
 chef-modal ::ng-deep .modal::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #CCC;
+  background-color: $light-grey;
 }

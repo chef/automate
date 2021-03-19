@@ -1,4 +1,4 @@
-<chef-modal [visible]="visible" (closeModal)="closeCreateModal()">
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()" class="create-client-modal">
   <h2 slot="title">Create Client</h2>
   <div class="flex-container">
     <form [formGroup]="createForm">
@@ -19,8 +19,9 @@
           <p>Client successfully created. Copy the private key below and keep it somewhere safe. It is NOT stored on
             the server.</p>
         </div>
-        <textarea chefInput rows="20" cols="10" *ngIf="created" value="{{privateKey}}">
-        </textarea>
+        <div *ngIf="created" class="key-tab-body">
+          <chef-snippet [code]="privateKey" lang="json"></chef-snippet>
+        </div>
       </div>
       <div id="button-bar">
         <chef-button tertiary *ngIf="!created" (click)="closeCreateModal()">Cancel</chef-button>

@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { ProjectConstants } from 'app/entities/projects/project.model';

@@ -23,7 +23,12 @@ export const dataBagItemsFromRoute = createSelector(
   (state, { name }) => find({ name }, state)
 );
 
+export const deleteStatus = createSelector(
+  dataBagItemsState,
+  (state) => state.deleteStatus
+);
+
 export const dataBagItemList = createSelector(
   dataBagItemsState,
-  (state) => state.dataBagItems
+  (state) => state.dataBagItemList
 );
