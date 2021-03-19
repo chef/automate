@@ -50,7 +50,7 @@ describe('ResetClientKeyComponent', () => {
         expiration_date: 'test_expiration_date',
         private_key: 'test_private_key'
       }
-    }
+    };
 
     beforeEach(() => {
       store = TestBed.inject(Store);
