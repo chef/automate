@@ -58,7 +58,7 @@ export function clientDetailsEntityReducer(
         GET_STATUS,
         EntityStatus.loading,
         clientDetailsEntityAdapter.removeAll(state)
-      ) as ClientDetailsEntityState;
+      );
 
     case ClientActionTypes.RESETKEY_SUCCESS: {
       return pipe (
