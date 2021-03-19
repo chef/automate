@@ -20,6 +20,32 @@ func NewDatafeedHandler(datafeedClient data_feed.DatafeedServiceClient) *Datafee
 	}
 }
 
+func (a *Datafeed) GetCompliance(ctx context.Context, in *data_feed.GetPaginationRequest) (*data_feed.GetPaginationResponse, error) {
+	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
+	req := &data_feed.GetPaginationRequest{
+		Offset: in.Offset,
+		Size:   in.Size,
+	}
+	res, err := a.client.GetCompliance(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (a *Datafeed) GetNodeClientId(ctx context.Context, in *data_feed.GetPaginationRequest) (*data_feed.GetPaginationResponse, error) {
+	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
+	req := &data_feed.GetPaginationRequest{
+		Offset: in.Offset,
+		Size:   in.Size,
+	}
+	res, err := a.client.GetNodeClientId(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // Create - create a new destination
 func (a *Datafeed) AddDestination(ctx context.Context, in *data_feed.AddDestinationRequest) (*data_feed.AddDestinationResponse, error) {
 	inDomain := &data_feed.AddDestinationRequest{}

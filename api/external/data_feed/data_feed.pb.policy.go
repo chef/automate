@@ -6,6 +6,12 @@ package data_feed
 import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/GetCompliance", "datafeed:destination", "datafeed:destination:get", "GET", "/api/v0/datafeed/getPaginationCompliance/{offset}/{size}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/GetNodeClientId", "datafeed:destination", "datafeed:destination:get", "GET", "/api/v0/datafeed/getPaginationNodeClientId/{offset}/{size}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/AddDestination", "datafeed:destination", "datafeed:destination:add", "POST", "/api/v0/datafeed/destination", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*AddDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {

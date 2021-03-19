@@ -8,6 +8,24 @@ import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 
 service DatafeedService {
+	rpc GetCompliance(GetPaginationRequest) returns (GetPaginationResponse){
+		option (google.api.http) = {
+			get: "/api/v0/datafeed/getPaginationCompliance/{offset}/{size}"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destination"
+			action: "datafeed:destination:get"
+		};
+	  };
+	  rpc GetNodeClientId(GetPaginationRequest) returns (GetPaginationResponse){
+		option (google.api.http) = {
+			get: "/api/v0/datafeed/getPaginationNodeClientId/{offset}/{size}"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destination"
+			action: "datafeed:destination:get"
+		};
+	  };
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
 		  post: "/api/v0/datafeed/destination"
@@ -143,4 +161,11 @@ message URLValidationRequest {
 
 message TestDestinationResponse {
   bool success = 1;
+}
+message GetPaginationRequest {
+	int32 offset = 1;
+	int32 size = 2;
+}
+message GetPaginationResponse {
+	string data = 1;
 }

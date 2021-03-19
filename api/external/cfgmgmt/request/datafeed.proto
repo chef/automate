@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
+
+message GetPaginationRequest {
+	int32 offset = 1;
+	int32 size = 2;
+}
