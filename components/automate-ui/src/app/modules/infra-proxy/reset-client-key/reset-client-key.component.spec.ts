@@ -56,11 +56,6 @@ describe('ResetClientKeyComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('opening create modal with visible true',
-      () => {
-      component.visible = true;
-    });
-
     it('hide modal after create a data bag.', () => {
       component.resetKeyClient();
 

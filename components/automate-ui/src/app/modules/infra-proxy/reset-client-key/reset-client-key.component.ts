@@ -26,7 +26,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
 
   public authFailure = false;
   public isReset = false;
-  public reseting = false;
+  public resetting = false;
   public conflictError = false;
   public error: string;
   public publicKey: string;
@@ -47,7 +47,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.conflictError = false;
         this.visible = true;
-        this.reseting = false;
+        this.resetting = false;
         this.isReset = false;
         this.server = this.serverId;
         this.org = this.orgId;
@@ -65,7 +65,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
       .subscribe(([getStatusSt, resetKeyState, errorSt]) => {
       if (getStatusSt === EntityStatus.loadingSuccess &&
         !isNil(resetKeyState)) {
-            this.reseting = false;
+            this.resetting = false;
             this.isReset = true;
             this.conflictError = false;
             this.privateKey = resetKeyState?.client_key.private_key;
@@ -95,7 +95,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   }
 
   private resetCreateModal(): void {
-    this.reseting = false;
+    this.resetting = false;
     this.isReset = false;
     this.conflictError = false;
     this.error = '';
@@ -104,7 +104,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   }
 
   resetKeyClient(): void {
-    this.reseting = true;
+    this.resetting = true;
     const payload: ResetKey = {
       'org_id': this.orgId,
       'server_id': this.serverId,
