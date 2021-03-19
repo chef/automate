@@ -1,5 +1,5 @@
 # This is mostly copy pasta from https://github.com/elastic/elasticsearch-docker
-FROM centos:7 AS prep_es_files
+FROM centos:latest AS prep_es_files
 
 ENV PATH /usr/share/elasticsearch/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/jre-1.8.0-openjdk
@@ -36,7 +36,7 @@ RUN chown -R elasticsearch:0 . && \
 
 # Use a centos base that has openjdk-1.8.0.b141 pre-installed and excluded from yum.conf
 # until potential issues with build 144 have been troubleshooted
-FROM centos:7
+FROM centos:latest
 
 ENV ELASTIC_CONTAINER true
 ENV PATH /usr/share/elasticsearch/bin:$PATH
