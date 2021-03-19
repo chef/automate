@@ -24,17 +24,14 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Input() name: string;
 
-  public authFailure = false;
   public isReset = false;
   public resetting = false;
-  public conflictError = false;
   public error: string;
   public publicKey: string;
   public privateKey: string;
   public org: string;
   public server: string;
   public visible = false;
-  public conflictErrorEvent = new EventEmitter<boolean>();
   public close = new EventEmitter();
   private isDestroyed = new Subject<boolean>();
 
@@ -45,7 +42,6 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.conflictError = false;
         this.visible = true;
         this.resetting = false;
         this.isReset = false;
@@ -67,12 +63,10 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
         !isNil(resetKeyState)) {
             this.resetting = false;
             this.isReset = true;
-            this.conflictError = false;
             this.privateKey = resetKeyState?.client_key.private_key;
           } else if (getStatusSt === EntityStatus.loadingFailure) {
             this.error = errorSt;
             this.closeCreateModal();
-            this.authFailure = true;
           }
         });
   }
@@ -86,7 +80,6 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
     if (this.isNavigationKey(event)) {
       return;
     }
-    this.conflictError = false;
   }
 
   closeCreateModal(): void {
@@ -97,10 +90,8 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   private resetCreateModal(): void {
     this.resetting = false;
     this.isReset = false;
-    this.conflictError = false;
     this.error = '';
     this.privateKey = '';
-    this.conflictErrorEvent.emit(false);
   }
 
   resetKeyClient(): void {
