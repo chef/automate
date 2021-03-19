@@ -21,7 +21,7 @@
           <chef-button primary id="reset-button-object-modal" [disabled]="conflictError" (click)="resetKeyClient()">
             <chef-loading-spinner *ngIf="reseting"></chef-loading-spinner>
             <span *ngIf="!reseting">Reset Key</span>
-            <span *ngIf="reseting">Resetting</span>
+            <span *ngIf="resetting">Resetting...</span>
           </chef-button>
         </div>
       </div>
