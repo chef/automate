@@ -40,6 +40,11 @@ describe('ClientsComponent', () => {
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'app-create-client-modal', inputs: ['openEvent'] }),
+        MockComponent({
+          selector: 'app-delete-infra-object-modal',
+          inputs: ['default', 'visible', 'objectNoun', 'objectName'],
+          outputs: ['close', 'deleteClicked']
+        }),
         ClientsComponent
       ],
       providers: [
