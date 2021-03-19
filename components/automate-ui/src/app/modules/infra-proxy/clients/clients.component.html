@@ -11,6 +11,7 @@
     [visible]="deleteModalVisible"
     objectNoun="client"
     [objectName]="clientToDelete?.name"
+    [validator]="clientToDelete?.validator"
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteClient()"
     objectAction="Delete">

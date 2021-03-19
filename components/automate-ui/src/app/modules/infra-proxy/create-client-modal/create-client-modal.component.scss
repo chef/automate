@@ -117,9 +117,10 @@ chef-modal.create-client-modal {
 
   ::ng-deep {
     .modal {
-      box-shadow: 0px 0px 30px 0px #CCC;
+      box-shadow: 0px 0px 30px 0px $light-grey;
+      max-width: 528px;
+      min-width: 528px;
       outline: none;
-      width: 41%;
 
       chef-button {
         &.close {

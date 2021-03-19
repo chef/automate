@@ -13,7 +13,6 @@ chef-modal {
     }
   }
 
-  // margin-top: -32px;
   .left-box {
     float: left;
     height: auto;
@@ -76,14 +75,16 @@ chef-modal {
 }
 
 ::ng-deep {
+
   chef-modal .modal {
-    padding: 32px;
-    box-shadow: 0px 0px 30px 0px #CCCCCC;
+    box-shadow: 0px 0px 30px 0px $light-grey;
     outline: none;
+    padding: 32px;
   }
 
   .del-modal .modal {
-    width: 49%;
+    max-width: 708px;
+    min-width: 708px;
 
     .cancel-button {
 
@@ -139,4 +140,10 @@ chef-modal {
   .url-failed-icon {
     color: $chef-critical;
   }
+}
+
+.client-message {
+  font-size: 14px;
+  line-height: 20px;
+  margin-top: 10px;
 }
