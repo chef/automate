@@ -79,19 +79,19 @@ Refer to the image below:
 
 ### Cookbooks
 
-A [cookbook](https://docs.chef.io/cookbooks/) is the fundamental unit of configuration and policy distribution. Include recipes and other files, components, or directories.
+A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuration and policy distribution. Include recipes and other files, components, or directories.
 
 ### Roles
 
-[Roles](https://docs.chef.io/roles/) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
+[Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
 ### Environments
 
-An [environment](https://docs.chef.io/environments/) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
+An [environment]({{< relref "environment" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
 
 ### Data Bags
 
-[Data bags](https://docs.chef.io/data_bags/) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
+[Data bags]({{< relref "data_bags" >}}) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
 
 ### Clients
 
