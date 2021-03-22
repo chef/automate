@@ -23,7 +23,7 @@ Nodes use Chef Infra Client to ask the Chef Infra Server for configuration detai
 
 This scalable approach distributes the configuration effort throughout the _organization_.
 
-{{< figure src="/images/automate/chef-server-page.png" width="500" alt="Chef Infra Server Page">}}
+{{< figure src="/images/automate/chef-server-page.png" alt="Chef Infra Server Page">}}
 
 The objects that you can manage from the Chef Infra Server are:
 
@@ -51,7 +51,7 @@ Once you're finished, select **Add Chef Server** and you'll see your server in t
 
 Selecting a server from the list of organizations in the Server. Refer to the image below:
 
-{{< figure src="/images/automate/chef-server-organization.png" width="500" alt="Chef Infra Server Organization">}}
+{{< figure src="/images/automate/chef-server-organization.png" alt="Chef Infra Server Organization">}}
 
 The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in the Server select [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
 
@@ -75,7 +75,7 @@ The Chef Infra Server Objects can be managed from the Chef Automate. In Automate
 
 Refer to the image below:
 
-{{< figure src="/images/automate/chef-infra-server-objects.png" width="500" alt="Chef Infra Server Objects">}}
+{{< figure src="/images/automate/chef-infra-server-objects.png" alt="Chef Infra Server Objects">}}
 
 ### Cookbooks
 
@@ -101,6 +101,6 @@ Chef Infra Clients provide secure API access to the Chef Infra Server.
 
 While fetching any object like cookbooks or any, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server. The error looks like as shown below:
 
-{{< figure src="/images/automate/could-not-get-cookbooks-organization.png" width="500" alt="Could not get cookbooks: Organization">}}
+{{< figure src="/images/automate/could-not-get-cookbooks-organization.png" alt="Could not get cookbooks: Organization">}}
 
 Create the Chef Organization using the knife command, `knife opc org create` or the Chef Infra Server CLI command, `chef-server-ctl org-create`. Then add the _Name_, _Projects_, _Admin User_, and _Admin Key_ to fetch the objects.
