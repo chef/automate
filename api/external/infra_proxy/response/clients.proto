@@ -16,6 +16,8 @@ message Clients {
 message ClientListItem {
     // Client name.
     string name = 1;
+    // Boolean indicates client type is validator or not.
+    bool validator = 2;
 }
 
 message Client {
@@ -36,6 +38,13 @@ message Client {
 }
 
 message CreateClient {
+    // Client name.
+    string name = 1;
+    // Client key detail.
+    ClientKey client_key = 2;
+}
+
+message ResetClient {
     // Client name.
     string name = 1;
     // Client key detail.

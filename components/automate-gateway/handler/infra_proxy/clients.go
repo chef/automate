@@ -103,7 +103,7 @@ func (a *InfraProxyServer) DeleteClient(ctx context.Context, r *gwreq.Client) (*
 
 // ResetClientKey resets an infra client key
 // Deletes the associated key pair and generates new key pair again, and then attaches it to the client.
-func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKey) (*gwres.ClientKey, error) {
+func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKey) (*gwres.ResetClient, error) {
 	req := &infra_req.ClientKey{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
@@ -115,9 +115,14 @@ func (a *InfraProxyServer) ResetClientKey(ctx context.Context, r *gwreq.ClientKe
 		return nil, err
 	}
 
-	return &gwres.ClientKey{
-		Name:       res.GetName(),
-		PrivateKey: res.GetPrivateKey(),
+	return &gwres.ResetClient{
+		Name: res.GetName(),
+		ClientKey: &gwres.ClientKey{
+			Name:           res.GetClientKey().GetName(),
+			PublicKey:      res.GetClientKey().GetPublicKey(),
+			ExpirationDate: res.GetClientKey().GetExpirationDate(),
+			PrivateKey:     res.GetClientKey().GetPrivateKey(),
+		},
 	}, nil
 }
 
@@ -125,7 +130,8 @@ func fromUpstreamClients(clients []*infra_res.ClientListItem) []*gwres.ClientLis
 	ts := make([]*gwres.ClientListItem, len(clients))
 	for i, c := range clients {
 		ts[i] = &gwres.ClientListItem{
-			Name: c.GetName(),
+			Name:      c.GetName(),
+			Validator: c.GetValidator(),
 		}
 	}
 

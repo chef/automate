@@ -1,3 +1,4 @@
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
@@ -25,7 +26,10 @@ describe('CreateDataBagModalComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
+        MockComponent({ selector: 'chef-modal',
+          inputs: ['visible'],
+          outputs: ['close']
+        }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
@@ -41,7 +45,8 @@ describe('CreateDataBagModalComponent', () => {
       providers: [
         HttpClient,
         HttpHandler
-      ]
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
       .compileComponents();
   }));

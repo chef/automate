@@ -12,7 +12,8 @@ export class DeleteInfraObjectModalComponent extends ContinuousPipe {
   @Input() objectNoun: string;
   @Input() objectAction: string;
   @Input() custom = false; // use for custom markup and messaging
-
+  @Input() objectName: string;
+  @Input() validator = false; // use for client validator
   @Output() close = new EventEmitter();
   @Output() deleteClicked = new EventEmitter<User>();
 

@@ -169,7 +169,7 @@ func (s *Server) DeleteClient(ctx context.Context, req *request.Client) (*respon
 
 // ResetClientKey resets the client key
 // Deletes the associated key pair and generates new key pair again, and then attaches it to the client.
-func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*response.ClientKey, error) {
+func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*response.ResetClient, error) {
 	err := validation.New(validation.Options{
 		Target:  "client",
 		Request: *req,
@@ -221,16 +221,21 @@ func (s *Server) ResetClientKey(ctx context.Context, req *request.ClientKey) (*r
 
 	res, err := c.client.Do(addReq, &chefKey)
 	if res != nil {
-		defer res.Body.Close() //nolint:errcheck //nolint:errcheck
+		defer res.Body.Close() //nolint:errcheck
 	}
 
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
-	return &response.ClientKey{
-		Name:       key,
-		PrivateKey: chefKey.PrivateKey,
+	return &response.ResetClient{
+		Name: req.Name,
+		ClientKey: &response.ClientKey{
+			Name:           key,
+			PublicKey:      chefKey.PublicKey,
+			ExpirationDate: chefKey.ExpirationDate,
+			PrivateKey:     chefKey.PrivateKey,
+		},
 	}, nil
 
 }
@@ -240,7 +245,8 @@ func fromAPIToListClients(al []interface{}) []*response.ClientListItem {
 	cl := make([]*response.ClientListItem, len(al))
 	for index, c := range al {
 		cl[index] = &response.ClientListItem{
-			Name: SafeStringFromMap(c.(map[string]interface{}), "name"),
+			Name:      SafeStringFromMap(c.(map[string]interface{}), "name"),
+			Validator: SafeBooleanFromMap(c.(map[string]interface{}), "validator"),
 		}
 	}
 

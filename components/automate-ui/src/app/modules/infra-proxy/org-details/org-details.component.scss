@@ -77,7 +77,7 @@ chef-table {
   }
 
   ::ng-deep button.nav-tab.active {
-    background: #F4F6F8;
+    background: $chef-active-grey;
   }
 
   ::ng-deep button.nav-tab:focus {

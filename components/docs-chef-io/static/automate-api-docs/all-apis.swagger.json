@@ -4127,7 +4127,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ResetClient"
             }
           },
           "default": {
@@ -17238,6 +17238,19 @@
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ResetClient": {
+      "type": "object",
+      "properties": {
+        "client_key": {
+          "description": "Client key detail.",
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientKey"
+        },
+        "name": {
+          "description": "Client name.",
+          "type": "string"
         }
       }
     },
