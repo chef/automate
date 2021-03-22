@@ -65,7 +65,7 @@ describe('ResetClientKeyComponent', () => {
     });
 
 
-    it('on reset error, modal is closed with failure banner', () => {
+    it('on reset error, modal is closed (because error is handled by failure banner)', () => {
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
