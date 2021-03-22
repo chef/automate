@@ -157,7 +157,7 @@ EOM
 EOM
       fi
       # put the integration test data into auto deployed Chef Infra Server
-      populate_integration_data_data
+      # populate_integration_data_data
   fi
 }
 
