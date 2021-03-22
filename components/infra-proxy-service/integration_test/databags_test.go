@@ -18,12 +18,10 @@ func TestGetDatabags(t *testing.T) {
 	// Pre-populated that has been added by scripts
 	// Validating the data bags search based on these records.
 	// rpc GetDataBags (request.DataBags) returns (response.DataBags)
-	ctx := context.Background()
 	req := &request.DataBags{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
 	}
-
 	res, err := infraProxy.GetDataBags(ctx, req)
 	assert.NoError(t, err)
 	existingTotal := len(res.DataBags)
@@ -39,12 +37,11 @@ func TestGetDatabags(t *testing.T) {
 	assert.NotNil(t, dataBag)
 
 	fetchRes, err := infraProxy.GetDataBags(ctx, req)
+	assert.NoError(t, err)
 	assert.Equal(t, existingTotal+1, len(fetchRes.DataBags))
 }
 
 func TestGetDatabagItems(t *testing.T) {
-	ctx := context.Background()
-
 	// Add a data bag
 	dataBagName := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
 	dataBag, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
@@ -70,9 +67,6 @@ func TestGetDatabagItems(t *testing.T) {
 		assert.Equal(t, 0, int(res.GetTotal()))
 	})
 
-	//Adds data bag items records
-	addDataBagItems(ctx, dataBagName, 10)
-
 	t.Run("items list with a per_page search param", func(t *testing.T) {
 		itemId := fmt.Sprintf("item-%d", time.Now().Nanosecond())
 		createReq := &request.CreateDataBagItem{
@@ -81,7 +75,9 @@ func TestGetDatabagItems(t *testing.T) {
 			Name:     dataBagName,
 			Data: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+					"id":   &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+					"key1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key1-%d", time.Now().Nanosecond())}},
+					"key2": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key2-%d", time.Now().Nanosecond())}},
 				},
 			},
 		}
@@ -328,8 +324,28 @@ func TestCreateDatabagItem(t *testing.T) {
 	})
 }
 
+// Adds data bag with items records
+func addDatabagsWithItems(n int) int {
+	total := 0
+	for i := 0; i < 10; i++ {
+		dataBagName := fmt.Sprintf("data-bag-%d", time.Now().Nanosecond())
+		_, err := infraProxy.CreateDataBag(ctx, &request.CreateDataBag{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     dataBagName,
+		})
+
+		if err == nil {
+			addDataBagItems(dataBagName, n)
+			total++
+		}
+	}
+
+	return total
+}
+
 // Adds data bag items records
-func addDataBagItems(ctx context.Context, dabaBagName string, n int) int {
+func addDataBagItems(dabaBagName string, n int) int {
 	total := 0
 	for i := 0; i < n; i++ {
 		itemId := fmt.Sprintf("item-%d", time.Now().Nanosecond())
@@ -339,7 +355,9 @@ func addDataBagItems(ctx context.Context, dabaBagName string, n int) int {
 			Name:     dabaBagName,
 			Data: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
-					"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+					"id":   &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: itemId}},
+					"key1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key1-%d", time.Now().Nanosecond())}},
+					"key2": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: fmt.Sprintf("key2-%d", time.Now().Nanosecond())}},
 				},
 			},
 		}

@@ -124,6 +124,11 @@ configure_retention() {
   }'
 }
 
+populate_integration_data_data() {
+  hab pkg install core/go -b
+  TOTAL_RECORDS=100 INFRA_SERVER_ID="auto-deployed-chef-server" INFRA_SERVER_ORG_ID="auto-deployed-chef-org" A2_SVC_NAME="infra-proxy-service" A2_SVC_PATH="/hab/svc/infra-proxy-service" go test "github.com/chef/automate/components/infra-proxy-service/integration_test"
+}
+
 configure_automate_infra_views() {
   if chef-automate dev grpcurl automate-gateway list | grep "chef.automate.api.infra_proxy.InfraProxy" &> /dev/null; then
       chef_server_admin_key="$(</hab/chef-server-admin-key.txt tr '\n' ':' | sed 's/:/\\n/g')"
@@ -151,6 +156,8 @@ EOM
           }
 EOM
       fi
+      # put the integration test data into auto deployed Chef Infra Server
+      populate_integration_data_data
   fi
 }
 

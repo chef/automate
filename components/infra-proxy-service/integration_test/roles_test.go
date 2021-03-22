@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -14,11 +13,6 @@ func TestGetRoles(t *testing.T) {
 	// Pre-populated that has been added by scripts
 	// Validating the roles search based on these records.
 	// rpc GetRoles (request.Roles) returns (response.Roles)
-	ctx := context.Background()
-
-	//Adds roles
-	addRoles(ctx, 10)
-
 	req := &request.Roles{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -89,8 +83,19 @@ func TestGetRoles(t *testing.T) {
 	})
 
 	t.Run("Roles list with a valid query search param", func(t *testing.T) {
+		name := fmt.Sprintf("chef-load-role-%d", time.Now().Nanosecond())
+		createReq := &request.CreateRole{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Description: "auto generated role",
+		}
+		role, err := infraProxy.CreateRole(ctx, createReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, role)
+
 		req.SearchQuery = &request.SearchQuery{
-			Q:       "name:starter",
+			Q:       fmt.Sprintf("name:%s", name),
 			Page:    0,
 			PerPage: 5,
 		}
@@ -99,12 +104,12 @@ func TestGetRoles(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 1, int(res.Total))
-		assert.Equal(t, "starter", res.Roles[0].GetName())
+		assert.Equal(t, name, res.Roles[0].GetName())
 	})
 }
 
 // Adds roles records
-func addRoles(ctx context.Context, n int) int {
+func addRoles(n int) int {
 	total := 0
 	for i := 0; i < n; i++ {
 		req := &request.CreateRole{

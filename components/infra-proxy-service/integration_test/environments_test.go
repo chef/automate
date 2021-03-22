@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -15,11 +14,6 @@ import (
 
 func TestGetEnvironments(t *testing.T) {
 	// rpc GetEnvironments (request.Environments) returns (response.Environments)
-	ctx := context.Background()
-
-	// Adds environments
-	addEnvironments(ctx, 10)
-
 	req := &request.Environments{
 		ServerId: autoDeployedChefServerID,
 		OrgId:    autoDeployedChefOrganizationID,
@@ -89,8 +83,18 @@ func TestGetEnvironments(t *testing.T) {
 	})
 
 	t.Run("Environments list with a valid query search param", func(t *testing.T) {
+		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
+		createReq := &request.CreateEnvironment{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+		env, err := infraProxy.CreateEnvironment(ctx, createReq)
+		assert.NoError(t, err)
+		assert.NotNil(t, env)
+
 		req.SearchQuery = &request.SearchQuery{
-			Q:       "name:_default",
+			Q:       fmt.Sprintf("name:%s", name),
 			Page:    0,
 			PerPage: 5,
 		}
@@ -99,14 +103,12 @@ func TestGetEnvironments(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, 0, int(res.Page))
 		assert.Equal(t, 1, int(res.Total))
-		assert.Equal(t, "_default", res.Environments[0].GetName())
+		assert.Equal(t, name, res.Environments[0].GetName())
 	})
-
 }
 
 func TestGetEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when the environment exists, return the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		creReq := &request.CreateEnvironment{
@@ -144,7 +146,6 @@ func TestGetEnvironment(t *testing.T) {
 
 func TestCreateEnvironment(t *testing.T) {
 	// rpc GetEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, creates the new environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
@@ -208,7 +209,6 @@ func TestCreateEnvironment(t *testing.T) {
 
 func TestUpdateEnvironment(t *testing.T) {
 	// rpc UpdateEnvironment (request.UpdateEnvironment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, updates the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
@@ -261,7 +261,6 @@ func TestUpdateEnvironment(t *testing.T) {
 
 func TestDeleteEnvironment(t *testing.T) {
 	// rpc DeleteEnvironment (request.Environment) returns (response.Environment)
-	ctx := context.Background()
 	t.Run("when a valid environment is submitted, deletes the environment successfully", func(t *testing.T) {
 		name := fmt.Sprintf("chef-environment-%d", time.Now().Nanosecond())
 		req := &request.CreateEnvironment{
@@ -294,7 +293,7 @@ func TestDeleteEnvironment(t *testing.T) {
 }
 
 // Adds environments records
-func addEnvironments(ctx context.Context, n int) int {
+func addEnvironments(n int) int {
 	total := 0
 	for i := 0; i < n; i++ {
 		req := &request.CreateEnvironment{

@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -14,10 +13,8 @@ import (
 )
 
 func TestGetNode(t *testing.T) {
-	ctx := context.Background()
 	t.Run("when the node exists, return the node successfully", func(t *testing.T) {
 		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
-
 		reqNode := &request.NodeDetails{
 			ServerId: autoDeployedChefServerID,
 			OrgId:    autoDeployedChefOrganizationID,
@@ -56,7 +53,6 @@ func TestGetNode(t *testing.T) {
 }
 
 func TestUpdateNodeTags(t *testing.T) {
-	ctx := context.Background()
 	t.Run("when add, adds values to the current group of tags", func(t *testing.T) {
 		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
 		reqNode := &request.NodeDetails{
