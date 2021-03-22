@@ -71,7 +71,8 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.searching = true;
-        if (this.environments.length === 0) {
+        if (this.environments && this.environments.length === 0 &&
+          this.current_page !== 1) {
           this.current_page = this.current_page - 1;
         }
         this.getEnvironmentData();

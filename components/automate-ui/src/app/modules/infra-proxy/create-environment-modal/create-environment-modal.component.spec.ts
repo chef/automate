@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed, waitForAsync
   } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
-import { CreateEnvironmentModalComponent } from './create-environment-modal.component';
+import { CreateEnvironmentModalComponent, CookbookConstraintGrid } from './create-environment-modal.component';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { CreateEnvironmentSuccess, CreateEnvironmentFailure } from 'app/entities/environments/environment.action';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -13,6 +13,15 @@ import { HttpStatus } from 'app/types/types';
 import { EventEmitter } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
+export interface CreateEnvironment {
+  server_id: string;
+  org_id: string;
+  name: string;
+  description: string;
+  default_attributes: Object;
+  override_attributes: Object;
+  cookbook_versions: CookbookConstraintGrid[];
+}
 
 class MockTelemetryService {
   track() { }
@@ -74,7 +83,7 @@ describe('CreateEnvironmentModalComponent', () => {
 
   describe('create environment', () => {
     let store: Store<NgrxStateAtom>;
-    const environment = {
+    const environment: CreateEnvironment = {
       org_id: 'chef_manage',
       server_id: 'test',
       name: 'test',
@@ -146,7 +155,7 @@ describe('CreateEnvironmentModalComponent', () => {
         JSON.stringify(environment.override_attributes));
       component.createEnvironment();
 
-      store.dispatch(new CreateEnvironmentSuccess({environment}));
+      store.dispatch(new CreateEnvironmentSuccess(environment));
       expect(component.creating).toBe(false);
       expect(component.visible).toBe(false);
     });

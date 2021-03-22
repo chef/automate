@@ -49,8 +49,11 @@
             <app-infra-environment-constraint
               [constraintKeys]="constraintKeys"
               (constraintValues)="constraintItemsHandler($event)"
-              [cookbookConstraintArray]="cookbookConstraintArray"
-              [name_id]="name_id">
+              [cookbookConstraints]="cookbookConstraints"
+              [name_id]="name_id"
+              [nameKeys]="nameKeys"
+              [constraintFormGroup]="constraintFormGroup"
+              [selectedCookbookNames]="selectedCookbookNames">
             </app-infra-environment-constraint>
           </div>
           <div class="button-bar-box">

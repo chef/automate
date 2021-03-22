@@ -19,9 +19,10 @@ describe('InfraRolesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
-        MockComponent({ selector: 'app-delete-infra-object-modal',
-        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
+        MockComponent({
+          selector: 'app-delete-infra-object-modal',
+          inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
+          outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -37,11 +38,6 @@ describe('InfraRolesComponent', () => {
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
-        MockComponent({
-          selector: 'app-delete-infra-object-modal',
-          inputs: ['default', 'visible', 'objectNoun', 'objectName'],
-          outputs: ['close', 'deleteClicked']
-        }),
         InfraRolesComponent
       ],
       providers: [

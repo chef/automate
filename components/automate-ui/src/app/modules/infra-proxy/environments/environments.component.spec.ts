@@ -45,11 +45,6 @@ describe('EnvironmentsComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({
-          selector: 'app-delete-infra-object-modal',
-          inputs: ['default', 'visible', 'objectNoun', 'objectName'],
-          outputs: ['close', 'deleteClicked']
-        }),
         EnvironmentsComponent
       ],
       providers: [

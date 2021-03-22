@@ -25,7 +25,7 @@
     <label>
       <span class="label label-version">Version<span class="example-text">( example 1.2.3 )</span></span>
     </label>
-    <form [formGroup]="secondFormGroup">
+    <form [formGroup]="constraintFormGroup">
       <chef-form-field>
         <input chefInput formControlName="version" id="name-input-constraint" (keyup)="handleInput($event)"
           autocomplete="off" />
@@ -33,20 +33,20 @@
     </form>
   </div>
   <div class="add">
-    <chef-button primary (click)="addCookbookVersion()" [disabled]="!secondFormGroup.valid || !constraintKeys.length">Add
+    <chef-button primary (click)="addCookbookVersion()" [disabled]="!constraintFormGroup.valid || !constraintKeys.length">Add
     </chef-button>
   </div>
 </div>
 <div class="fixed-height">
   <div class="scroll">
-    <div class="row-margin" *ngFor="let cookbook of cookbookConstraintArray; let i = index;">
+    <div class="row-margin" *ngFor="let cookbook of cookbookConstraints; let i = index;">
       <div class="row-name-margin">
         <div class="name-dropdown">
-          <mat-select #selectName panelClass="chef-dropdown" [(ngModel)]="cookbookConstraintArray[i].name"
+          <mat-select #selectName panelClass="chef-dropdown" [(ngModel)]="cookbookConstraints[i].name"
             (ngModelChange)="handleEditName(selectName.value,i)">
             <ng-container *ngFor="let key of nameKeys">
               <mat-option *ngIf="selectName.value === key || !isSelected(key)" value={{key}} [ngValue]="key"
-                [ngClass]="{'checkmark': key === cookbookConstraintArray[i].name}">
+                [ngClass]="{'checkmark': key === cookbookConstraints[i].name}">
                 {{ key}}
               </mat-option>
             </ng-container>
@@ -57,19 +57,19 @@
       <div class="row-operator-margin">
 
         <div class="operator-dropdown">
-          <mat-select panelClass="chef-dropdown" [(ngModel)]="cookbookConstraintArray[i].operator"
+          <mat-select panelClass="chef-dropdown" [(ngModel)]="cookbookConstraints[i].operator"
             (ngModelChange)="handleEditOperator($event, i)">
             <mat-option *ngFor="let key of operatorKeys" [value]="key"
-              [ngClass]="{'checkmark': key === cookbookConstraintArray[i].operator}">{{ key }}</mat-option>
+              [ngClass]="{'checkmark': key === cookbookConstraints[i].operator}">{{ key }}</mat-option>
           </mat-select>
         </div>
       </div>
       <div class="row-version-margin">
         <input chefInput type="text" id="name-input" (keyup)="handleInput($event)"
-          (ngModelChange)="handleEditVersion($event, i)" autocomplete="off" [(ngModel)]="cookbookConstraintArray[i].version" />
+          (ngModelChange)="handleEditVersion($event, i)" autocomplete="off" [(ngModel)]="cookbookConstraints[i].version" />
       </div>
       <div class="remove">
-        <chef-button (click)="deleteCookbookVersionw(i, cookbook)" secondary caution>Remove
+        <chef-button (click)="deleteCookbookVersion(i, cookbook)" secondary caution>Remove
         </chef-button>
       </div>
     </div>

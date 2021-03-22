@@ -6,8 +6,7 @@ import {
   EventEmitter
 } from '@angular/core';
 
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { Regex } from 'app/helpers/auth/regex';
+import { FormGroup } from '@angular/forms';
 
 import { CookbookConstraintGrid } from '../create-environment-modal/create-environment-modal.component';
 
@@ -20,44 +19,37 @@ import { CookbookConstraintGrid } from '../create-environment-modal/create-envir
 export class InfraEnvironmentConstraintComponent implements OnInit {
 
   @Input() constraintKeys: string[] = [];
-  @Input() cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
+  @Input() cookbookConstraints: Array<CookbookConstraintGrid> = [];
   @Input() name_id: string;
+  @Input() nameKeys: string[] = [];
+  @Input() selectedCookbookNames: string[] = [];
+  @Input() constraintFormGroup: FormGroup;
   @Output() constraintValues: EventEmitter<CookbookConstraintGrid[]> = new EventEmitter();
 
   public conflictError = false;
   public operator_id = '';
   public operatorKeys: string[] = [];
-  public secondFormGroup: FormGroup;
-  public selectedCookbookNames: string[] = [];
-  public nameKeys: string[] = [];
 
   constructor(
-    private fb: FormBuilder
   ) {
-    this.secondFormGroup = this.fb.group({
-      version: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_VERSION)]]
-    });
 
-    // operators for Cookbook version
-    this.operatorKeys = ['~>', '>=', '>', '=', '<', '<='];
+    this.operatorKeys = ['~>', // approximately greater than;
+    // also known as "pessimistically greater than", or "pessimistic"
+      '>=', '>', '=', '<', '<='];
 
     this.operator_id = this.operatorKeys[0];
   }
 
   ngOnInit() {
     this.conflictError = false;
-    this.constraintKeys.forEach(element =>
-      this.nameKeys.push(element)
-    );
   }
 
-  // Adding a new cookbook version
   public addCookbookVersion() {
-    this.cookbookConstraintArray.unshift({
-      id: this.cookbookConstraintArray.length + 1,
+    this.cookbookConstraints.unshift({
+      id: this.cookbookConstraints.length + 1,
       name: this.name_id,
       operator: this.operator_id,
-      version: this.secondFormGroup.controls['version'].value
+      version: this.constraintFormGroup.controls['version'].value
     });
     this.constraintKeys.forEach((element, index) => {
       if (element === this.name_id) {
@@ -69,25 +61,19 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.name_id = this.constraintKeys[0];
     this.operator_id = this.operatorKeys[0];
 
-    this.secondFormGroup.controls.version.setValue('');
-    this.constraintValues.emit(this.cookbookConstraintArray);
+    this.constraintFormGroup.controls.version.setValue('');
+    this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
-  // Deleting a particular CookbookVersion
-  public deleteCookbookVersionw(cookbookIndex: number, cookbookConstraint: CookbookConstraintGrid) {
+  public deleteCookbookVersion(cookbookIndex: number, cookbookConstraint: CookbookConstraintGrid) {
     this.constraintKeys.push(cookbookConstraint.name);
     this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
 
-    this.selectedCookbookNames.forEach((_, index) => {
-      if (cookbookIndex === index) {
-      this.selectedCookbookNames.splice(index, 1);
-
-      }
-    });
+    this.selectedCookbookNames.splice(cookbookIndex, 1);
 
     this.name_id = this.constraintKeys[0];
-    this.cookbookConstraintArray.splice(cookbookIndex, 1);
-    this.constraintValues.emit(this.cookbookConstraintArray);
+    this.cookbookConstraints.splice(cookbookIndex, 1);
+    this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
   public handleInput(event: KeyboardEvent): void {
@@ -97,60 +83,62 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.conflictError = false;
   }
 
-  public handleEditName(newCookbookvalue: string, cookbookIndex: number) {
-    let previousCookbookvalue: string;
+  public handleEditName(newName: string, cookbookIndex: number) {
+    let previousName: string;
 
-    this.selectedCookbookNames.forEach((element, index) => {
-      if (index === cookbookIndex) {
-        previousCookbookvalue = element;
-        if (newCookbookvalue && newCookbookvalue !== 'undefined') {
-          this.selectedCookbookNames[cookbookIndex] = newCookbookvalue;
-        }
-      }
-    });
+    previousName = this.toUpdateSelectedCookbookNames(newName, cookbookIndex, previousName);
 
-    this.cookbookConstraintArray.forEach((_, index) => {
-      if (index === cookbookIndex) {
-        this.cookbookConstraintArray[cookbookIndex].name = newCookbookvalue;
-      }
+    this.cookbookConstraints[cookbookIndex].name = newName;
 
-    });
+    this.toUpdateCookbookKeys(newName);
 
-    this.constraintKeys.forEach((element, index) => {
-      if (element === newCookbookvalue) {
-        this.constraintKeys.splice(index, 1);
-      }
-    });
-
-    this.constraintKeys.push(previousCookbookvalue);
+    this.constraintKeys.push(previousName);
     this.constraintKeys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
     this.name_id = this.constraintKeys[0];
-    this.constraintValues.emit(this.cookbookConstraintArray);
+    this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
   public handleEditOperator(newCookbookOperator: string, cookbookIndex: number) {
 
-    this.cookbookConstraintArray.forEach((_, index) => {
-      if (index === cookbookIndex) {
-        this.cookbookConstraintArray[cookbookIndex].operator = newCookbookOperator;
-      }
+    this.cookbookConstraints[cookbookIndex].operator = newCookbookOperator;
 
-    });
-    this.constraintValues.emit(this.cookbookConstraintArray);
+    this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
   public handleEditVersion(newCookbookVersion: string, cookbookIndex: number) {
-    this.cookbookConstraintArray.forEach((_, index) => {
-      if (index === cookbookIndex) {
-        this.cookbookConstraintArray[cookbookIndex].version = newCookbookVersion;
-      }
 
-    });
-    this.constraintValues.emit(this.cookbookConstraintArray);
+    this.cookbookConstraints[cookbookIndex].version = newCookbookVersion;
+
+    this.toUpdateCookbookData(this.cookbookConstraints);
   }
 
   public isSelected(name: string) {
     return this.selectedCookbookNames.includes(name);
+  }
+
+  private toUpdateCookbookData(cookbookConstraints: CookbookConstraintGrid[]) {
+    this.constraintValues.emit(cookbookConstraints);
+  }
+
+  private toUpdateCookbookKeys(newName: string) {
+    this.constraintKeys.forEach((element, index) => {
+      if (element === newName) {
+        this.constraintKeys.splice(index, 1);
+      }
+    });
+  }
+
+  private toUpdateSelectedCookbookNames(newName: string, cookbookIndex: number,
+    previousName: string) {
+    this.selectedCookbookNames.forEach((element, index) => {
+      if (index === cookbookIndex) {
+        previousName = element;
+        if (newName && newName !== 'undefined') {
+          this.selectedCookbookNames[cookbookIndex] = newName;
+        }
+      }
+    });
+    return previousName;
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

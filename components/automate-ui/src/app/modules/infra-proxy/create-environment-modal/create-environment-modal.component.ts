@@ -67,15 +67,18 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   public constraintArray: Array<CookbookConstraintGrid> = [];
   public constraintKeys: string[] = [];
   public cookbooks: Cookbook[] = [];
-  public cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
+  public cookbookConstraints: Array<CookbookConstraintGrid> = [];
   public items: Environment[] = [];
   public name_id = '';
+  public nameKeys: string[] = [];
   public per_page = 9;
   public org: string;
+  public selectedCookbookNames: string[] = [];
   public server: string;
 
   public close = new EventEmitter();
   public conflictErrorEvent = new EventEmitter<boolean>();
+  public constraintFormGroup: FormGroup;
   public detailsFormGroup: FormGroup;
   public defaultAttrFormGroup: FormGroup;
   public overrideAttrFormGroup: FormGroup;
@@ -87,6 +90,10 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     private telemetryService: TelemetryService
 
   ) {
+
+    this.constraintFormGroup = this.fb.group({
+      version: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_VERSION)]]
+    });
 
     this.detailsFormGroup = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -110,6 +117,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       this.visible = true;
       this.items = this.environmentsList;
       this.showConstraint = true;
+      this.selectedCookbookNames = [];
       this.server = this.serverId;
       this.org = this.orgId;
     });
@@ -188,27 +196,21 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.defaultAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.defaultAttrParseError = true;
     }
   }
 
   onChangeOverrideJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.overrideAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.overrideAttrParseError = true;
     }
   }
@@ -260,12 +262,14 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     .subscribe(([ getCookbooksSt, allCookbooksState]) => {
       if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
         this.constraintKeys = [];
+        this.nameKeys = [];
         this.cookbooks = allCookbooksState;
         this.cookbooks.forEach((cookbook) => {
           this.constraintKeys.push(cookbook.name);
+          this.nameKeys.push(cookbook.name);
         });
       }
-      // first cookbook constrains keys selected on drop-down when loading constrain data
+      // first cookbook constrains keys selected on drop-down when loading constraint data
       this.name_id = this.constraintKeys[0];
     });
   }
@@ -280,7 +284,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   }
 
   private resetCreateModal(): void {
-    this.cookbookConstraintArray = [];
+    this.cookbookConstraints = [];
 
     this.constraintsTab = false;
     this.creating = false;
@@ -295,6 +299,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.defaultAttrFormGroup.reset();
     this.overrideAttrFormGroup.reset();
 
+    this.constraintFormGroup.controls.version.setValue('');
     this.defaultAttrFormGroup.controls.default.setValue(this.attr_value);
     this.overrideAttrFormGroup.controls.override.setValue(this.attr_value);
     this.loadCookbookConstraint();
