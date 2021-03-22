@@ -25,27 +25,25 @@ export class AdminKeyEffects {
     private requests: AdminKeyRequests
   ) { }
 
-  updateAdminKey$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateAdminKey$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE),
       mergeMap(({ payload: {server_id, org_id, admin_key} }: UpdateAdminKey) =>
         this.requests.updateAdminKey(server_id, org_id, admin_key).pipe(
           map((resp) => new UpdateAdminKeySuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new UpdateAdminKeyFailure(error))))));
-  });
+            observableOf(new UpdateAdminKeyFailure(error)))))));
 
-  updateAdminKeySuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateAdminKeySuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE_SUCCESS),
       map(({ payload }: UpdateAdminKeySuccess) => new CreateNotification({
       type: Type.info,
       message: `Reset admin key for organization ${payload.org.name}.`
-    })));
-  });
+    }))));
 
-  updateAdminKeyFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateAdminKeyFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(AdminKeyActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateAdminKeyFailure) => {
         const msg = payload.error.error;
@@ -53,7 +51,6 @@ export class AdminKeyEffects {
           type: Type.error,
           message: `Could not update organization admin key: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
 }

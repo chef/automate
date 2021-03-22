@@ -23,18 +23,17 @@ export class PolicyFileEffects {
     private requests: PolicyFileRequests
   ) { }
 
-  getPolicyFiles$ = createEffect(() => {
-    return this.actions$.pipe(
+  getPolicyFiles$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(PolicyFileActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id, org_id } }: GetPolicyFiles) =>
         this.requests.getPolicyFiles(server_id, org_id).pipe(
           map((resp: PolicyFilesSuccessPayload) => new GetPolicyFilesSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetPolicyFilesFailure(error))))));
-  });
+          observableOf(new GetPolicyFilesFailure(error)))))));
 
-  getPolicyFilesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getPolicyFilesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(PolicyFileActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetPolicyFilesFailure) => {
         const msg = payload.error.error;
@@ -42,7 +41,6 @@ export class PolicyFileEffects {
           type: Type.error,
           message: `Could not get policy files: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
 }

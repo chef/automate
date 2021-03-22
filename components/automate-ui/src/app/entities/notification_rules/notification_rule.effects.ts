@@ -38,168 +38,152 @@ export class NotificationRuleEffects {
     private requests: NotificationRuleRequests
   ) { }
 
-  getNotifications$ = createEffect(() => {
-    return this.actions$.pipe(
+  getNotifications$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL),
     mergeMap(() =>
       this.requests.getNotificationRules().pipe(
         map(resp => new GetNotificationRulesSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new GetNotificationRulesFailure(error))))));
-  });
+          observableOf(new GetNotificationRulesFailure(error)))))));
 
-  getNotificationsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getNotificationsFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetNotificationRulesFailure) => {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get notifications: ${payload.error.error || payload.error}`
       });
-    }));
-  });
+    })));
 
-  createNotificationRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  createNotificationRule$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.CREATE),
     mergeMap(({ payload, username, password }: CreateNotificationRule) =>
     this.requests.createNotificationRule( payload, username, password ).pipe(
       map((resp) => new CreateNotificationRuleSuccess(NotificationRule.fromResponse(resp.rule))),
       catchError((error: HttpErrorResponse) =>
-        observableOf(new CreateNotificationRuleFailure(error))))));
-  });
+        observableOf(new CreateNotificationRuleFailure(error)))))));
 
-  createNotificationRuleSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createNotificationRuleSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(NotificationRuleActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateNotificationRuleSuccess) => new CreateNotification({
       type: Type.info,
       message: `Created notification ${payload.name}.`
-    })));
-  });
+    }))));
 
-  createNotificationRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createNotificationRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateNotificationRuleFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateNotificationRuleFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create notification: ${payload.error.error || payload}.`
-      })));
-  });
+      }))));
 
-  deleteNotificationRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNotificationRule$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.DELETE),
     mergeMap(({ payload: { id, name } }: DeleteNotificationRule) =>
       this.requests.deleteNotificationRule(id).pipe(
         map(() => new DeleteNotificationRuleSuccess({id, name})),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new DeleteNotificationRuleFailure(error))))));
-  });
+          observableOf(new DeleteNotificationRuleFailure(error)))))));
 
-  deleteNotificationRuleSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNotificationRuleSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.DELETE_SUCCESS),
     map(({ payload: { name } }: DeleteNotificationRuleSuccess) => {
       return new CreateNotification({
         type: Type.info,
         message: `Deleted rule ${name}.`
       });
-    }));
-  });
+    })));
 
-  deleteNotificationRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNotificationRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.DELETE_FAILURE),
     map(({ payload }: DeleteNotificationRuleFailure) => {
       return new CreateNotification({
         type: Type.error,
         message: `Could not delete rule: ${payload.error.error || payload.error}`
       });
-    }));
-  });
+    })));
 
-  getNotification$ = createEffect(() => {
-    return this.actions$.pipe(
+  getNotification$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET),
     mergeMap(({ payload: { id }}: GetNotification) =>
       this.requests.getNotificationRule(id).pipe(
         map((resp: NotificationRule) => new GetNotificationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-        observableOf(new GetNotificationFailure(error, id))))));
-  });
+        observableOf(new GetNotificationFailure(error, id)))))));
 
-  getNotificationFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getNotificationFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.GET_FAILURE),
     map(({ payload, id }: GetNotificationFailure) => {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get notification ${id}: ${payload.error.error || payload.error}`
       });
-    }));
-  });
+    })));
 
-  updateNotification$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateNotification$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.UPDATE),
     mergeMap(({ payload: { notification } }: UpdateNotification) =>
       this.requests.updateNotificationRule(notification).pipe(
         map(() => new UpdateNotificationSuccess(notification)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateNotificationFailure(error)))
-      )));
-  });
+      ))));
 
-  updateNotificationSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateNotificationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(NotificationRuleActionTypes.UPDATE_SUCCESS),
       map(({ payload  }: UpdateNotificationSuccess) => new CreateNotification({
       type: Type.info,
       message: `Updated notification ${payload.name}.`
-    })));
-  });
+    }))));
 
-  updateNotificationFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateNotificationFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.UPDATE_FAILURE),
     map(({ payload }: UpdateNotificationFailure) => {
       return new CreateNotification({
         type: Type.error,
         message: `Could not update notification: ${payload.error.error || payload.error}.`
       });
-    }));
-  });
+    })));
 
-  testNotification$ = createEffect(() => {
-    return this.actions$.pipe(
+  testNotification$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.SEND_TEST),
     mergeMap(({ payload: { name, targetUrl, targetSecretID } }: TestNotification) =>
       this.requests.testNotification(targetUrl, targetSecretID).pipe(
         map(() => new TestNotificationSuccess({ name })),
         catchError(() =>
-          observableOf(new TestNotificationFailure( { name }))))));
-  });
+          observableOf(new TestNotificationFailure( { name })))))));
 
-  testNotificationSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  testNotificationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(NotificationRuleActionTypes.SEND_TEST_SUCCESS),
       map(({ payload: { name }  }: TestNotificationSuccess) => new CreateNotification({
       type: Type.info,
       message: `Notification test connected successfully for ${name}.`
-    })));
-  });
+    }))));
 
-  testNotificationFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  testNotificationFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NotificationRuleActionTypes.SEND_TEST_FAILURE),
     map(({ payload: { name } }: TestNotificationFailure) => {
       return new CreateNotification({
         type: Type.error,
         message: `Unable to connect to notification ${name}.`
       });
-    }));
-  });
+    })));
 
 }

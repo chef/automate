@@ -53,14 +53,13 @@ export class LicenseStatusEffects {
     observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
     mergeMap(() => this.getResponseAction$())));
 
-  fetchLicenseStatus$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchLicenseStatus$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(LicenseStatusActionTypes.GET),
-      mergeMap(() => this.getResponseAction$()));
-  });
+      mergeMap(() => this.getResponseAction$())));
 
-  fetchLicenseSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchLicenseSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(LicenseStatusActionTypes.GET_SUCCESS_EXPIRING_SOON),
     map((action: GetLicenseStatusSuccessExpiringSoon) => {
       return new CreateNotification({
@@ -68,28 +67,25 @@ export class LicenseStatusEffects {
         message: action.payload.expiry_message,
         timeout: 0
       });
-    }));
-  });
+    })));
 
-  applyLicense$ = createEffect(() => {
-    return this.actions$.pipe(
+  applyLicense$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(LicenseStatusActionTypes.APPLY),
     mergeMap((action: ApplyLicense) => {
       return this.requests.applyLicense(action.payload).pipe(
         map((resp: ApplyLicenseResponse) => new ApplyLicenseSuccess(resp)),
         catchError((error) => of(new ApplyLicenseFailure(error))));
-    }));
-  });
+    })));
 
-  requestTrialLicense$ = createEffect(() => {
-    return this.actions$.pipe(
+  requestTrialLicense$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(LicenseStatusActionTypes.REQUEST),
     mergeMap((action: RequestLicense) =>
       this.requests.requestLicense(action.payload).pipe(
         map((resp: RequestLicenseResponse) => new RequestLicenseSuccess(resp)),
         catchError((error) => of(new RequestLicenseFailure(error))))
-    ));
-  });
+    )));
 
   private getResponseAction$(): Observable<LicenseStatusAction> {
     return this.requests.fetchLicenseStatus().pipe(

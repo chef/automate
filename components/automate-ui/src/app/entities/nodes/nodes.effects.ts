@@ -16,19 +16,18 @@ export class NodesEffects {
     private requests: NodesRequests
   ) { }
 
-  listNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  listNodes$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(NodesActionTypes.LIST_NODES),
     mergeMap((action: ListNodes) =>
               this.requests.listNodes(action.payload).pipe(
               map((resp: RespNodes) =>
                    new ListNodesSuccess(resp)),
               catchError((error: HttpErrorResponse) =>
-                     of(new ListNodesFailure(error))))));
-  });
+                     of(new ListNodesFailure(error)))))));
 
-  listNodesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  listNodesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(NodesActionTypes.LIST_NODES_FAILURE),
       map(({ payload }: ListNodesFailure) => {
         const msg = payload.error.error;
@@ -36,6 +35,6 @@ export class NodesEffects {
           type: Type.error,
           message: `Could not get nodes: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
+
 }

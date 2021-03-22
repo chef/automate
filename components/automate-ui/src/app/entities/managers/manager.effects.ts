@@ -65,8 +65,8 @@ export class ManagerEffects {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  routeManagerList$ = createEffect(() => {
-    return this.actions$.pipe(
+  routeManagerList$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ROUTER_NAVIGATION),
     filter((action: RouterNavigationAction) => {
       return action.payload.routerState.url.split('?')[0] === '/settings/node-integrations';
@@ -77,11 +77,10 @@ export class ManagerEffects {
       const order = toUpper(queryParams['order']) || undefined;
       return new NavManagerList({ sort, order });
     })
-  );
-  });
+  ));
 
-  routeManagerDetail$ = createEffect(() => {
-    return this.actions$.pipe(
+  routeManagerDetail$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ROUTER_NAVIGATION),
       filter((action: RouterNavigationAction) => {
         const { routerState } = action.payload;
@@ -98,11 +97,10 @@ export class ManagerEffects {
         const per_page = parseInt(routerState['queryParams']['per_page'], 10) || 100;
         return new NavManagerDetail({ managerId, page, per_page });
       })
-    );
-  });
+    ));
 
-  routeManagerEdit$ = createEffect(() => {
-    return this.actions$.pipe(
+  routeManagerEdit$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ROUTER_NAVIGATION),
       filter((action: RouterNavigationAction) => {
         const { routerState } = action.payload;
@@ -115,20 +113,18 @@ export class ManagerEffects {
         const managerId = routerState['params']['id'];
         return new NavManagerEdit({ managerId });
       })
-    );
-  });
+    ));
 
-  navManagerList$ = createEffect(() => {
-    return this.actions$.pipe(
+  navManagerList$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.NAV_LIST),
       map((action: NavManagerList) => {
         return new ManagersSearch(action.payload);
       })
-    );
-  });
+    ));
 
-  navManagerDetail$ = createEffect(() => {
-    return this.actions$.pipe(
+  navManagerDetail$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.NAV_DETAIL),
       mergeMap((action: NavManagerDetail) => {
         const { managerId, page, per_page } = action.payload;
@@ -137,30 +133,27 @@ export class ManagerEffects {
           new ManagerGetNodes({ managerId, page, per_page })
         ];
       })
-    );
-  });
+    ));
 
-  navManagerEdit$ = createEffect(() => {
-    return this.actions$.pipe(
+  navManagerEdit$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.NAV_EDIT),
       map((action: NavManagerEdit) => {
         const { managerId } = action.payload;
         return new GetManager({ id: managerId });
       })
-    );
-  });
+    ));
 
-  managersSearch$ = createEffect(() => {
-    return this.actions$.pipe(
+  managersSearch$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.SEARCH),
     mergeMap((action: ManagersSearch) =>
               this.requests.search(action.payload).pipe(
               map((payload: ManagersSearchSuccessPayload) => new ManagersSearchSuccess(payload)),
-              catchError((error: HttpErrorResponse) => of(new ManagersSearchFailure(error))))));
-  });
+              catchError((error: HttpErrorResponse) => of(new ManagersSearchFailure(error)))))));
 
-  managersSearchFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  managersSearchFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.SEARCH_FAILURE),
       map(({ payload }: ManagersSearchFailure) => {
         const msg = payload.error.error;
@@ -168,22 +161,20 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get managers: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  managerGetNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerGetNodes$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.GET_NODES),
     mergeMap((action: ManagerGetNodes) =>
               this.requests.getNodes(action.payload).pipe(
               map((resp: ManagerGetNodesResponse) =>
                    new ManagerGetNodesSuccess(Object.assign(resp, action.payload))),
               catchError((error: HttpErrorResponse) =>
-                     of(new ManagerGetNodesFailure(error))))));
-  });
+                     of(new ManagerGetNodesFailure(error)))))));
 
-  managerGetNodesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerGetNodesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.GET_NODES_FAILURE),
       map(({ payload }: ManagerGetNodesFailure) => {
         const msg = payload.error.error;
@@ -191,21 +182,19 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get manager nodes: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  deleteNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNodes$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.DELETE_NODES),
       mergeMap((action: ManagerDeleteNodes) =>
         this.requests.deleteNodes(action.payload.ids)),
       map(_success => new ManagerDeleteNodesSuccess()),
       catchError((error) => of(new ManagerDeleteNodesFailure(error)))
-    );
-  });
+    ));
 
-  deleteNodesSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNodesSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.DELETE_NODES_SUCCESS),
       withLatestFrom(this.store),
       map(([_action, storeState]) => {
@@ -214,22 +203,20 @@ export class ManagerEffects {
         const page = integrationsDetailState.managerNodesPage;
         const per_page = integrationsDetailState.managerNodesPerPage;
         return new ManagerGetNodes({ managerId, page, per_page });
-      }));
-  });
+      })));
 
-  managerSearchNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerSearchNodes$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.SEARCH_NODES),
     mergeMap((action: ManagerSearchNodes) =>
               this.requests.searchNodes(action.payload).pipe(
               map((resp: ManagerSearchNodesResponse) =>
                    new ManagerSearchNodesSuccess(Object.assign(resp, action.payload))),
               catchError((error: HttpErrorResponse) =>
-                     of(new ManagerSearchNodesFailure(error))))));
-  });
+                     of(new ManagerSearchNodesFailure(error)))))));
 
-  managerSearchNodesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerSearchNodesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.SEARCH_NODES_FAILURE),
       map(({ payload }: ManagerSearchNodesFailure) => {
         const msg = payload.error.error;
@@ -237,11 +224,10 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get manager nodes: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  managerAllNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerAllNodes$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.ALL_NODES),
     mergeMap((action: ManagerAllNodes) => {
       return this.requests.searchNodes(action.payload).pipe(
@@ -249,11 +235,10 @@ export class ManagerEffects {
              new ManagerAllNodesSuccess(Object.assign(resp, action.payload))),
         catchError((error: HttpErrorResponse) =>
                of(new ManagerAllNodesFailure(error))));
-    }));
-  });
+    })));
 
-  managerAllNodesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerAllNodesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.ALL_NODES_FAILURE),
       map(({ payload }: ManagerAllNodesFailure) => {
         const msg = payload.error.error;
@@ -261,23 +246,20 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get manager nodes: ${msg || payload.error}`
         });
-      }));
+      })));
 
-  });
-
-  managerSearchFields$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerSearchFields$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.SEARCH_FIELDS),
     mergeMap((action: ManagerSearchFields) =>
               this.requests.searchFields(action.payload).pipe(
               map((resp: ManagerSearchFieldsResponse) =>
                    new ManagerSearchFieldsSuccess(Object.assign(resp, action.payload))),
               catchError((error: HttpErrorResponse) =>
-                     of(new ManagerSearchFieldsFailure(error))))));
-  });
+                     of(new ManagerSearchFieldsFailure(error)))))));
 
-  managerSearchFieldsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  managerSearchFieldsFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.SEARCH_FIELDS_FAILURE),
       map(({ payload }: ManagerSearchFieldsFailure) => {
         const msg = payload.error.error;
@@ -285,20 +267,18 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get manager fields: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  fetchManager$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchManager$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.GET),
     mergeMap((action: GetManager) =>
               this.requests.fetch(action.payload).pipe(
               map((resp) => new GetManagerSuccess({manager: resp})),
-              catchError((error: HttpErrorResponse) => of(new GetManagerFailure(error))))));
-  });
+              catchError((error: HttpErrorResponse) => of(new GetManagerFailure(error)))))));
 
-  fetchManagerFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchManagerFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.GET_FAILURE),
       map(({ payload }: GetManagerFailure) => {
         const msg = payload.error.error;
@@ -306,29 +286,26 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get node manager: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  deleteManager$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteManager$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.DELETE),
     mergeMap(({payload}: DeleteManager) =>
       this.requests.delete(payload).pipe(
         map((_resp) => new DeleteManagerSuccess({ id: payload.id })),
-        catchError((error: HttpErrorResponse) => of(new DeleteManagerFailure(error))))));
-  });
+        catchError((error: HttpErrorResponse) => of(new DeleteManagerFailure(error)))))));
 
-  deleteManagerSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteManagerSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.DELETE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Successfully deleted node manager'
-    })));
-  });
+    }))));
 
-  deleteManagerFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteManagerFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.DELETE_FAILURE),
       map(({ payload }: DeleteManagerFailure) => {
         const msg = payload.error.error;
@@ -336,30 +313,27 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not delete node manager: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  createManager$ = createEffect(() => {
-    return this.actions$.pipe(
+  createManager$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.CREATE),
     mergeMap((action: CreateManager) => {
       return this.requests.create(action.payload).pipe(
         map((_resp) => new CreateManagerSuccess()),
         catchError((error) => of(new CreateManagerFailure(error))));
-    }));
-  });
+    })));
 
-  createManagerSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createManagerSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.CREATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Successfully created new node manager'
-    })));
-  });
+    }))));
 
-  createManagerFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createManagerFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.CREATE_FAILURE),
       map(({ payload }: CreateManagerFailure) => {
         const msg = payload.error.error;
@@ -367,20 +341,18 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not create node manager: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  updateManager$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateManager$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ManagerActionTypes.UPDATE),
     mergeMap((action: UpdateManager) =>
               this.requests.update(action.payload).pipe(
               map((_resp) => new UpdateManagerSuccess()),
-              catchError((error: HttpErrorResponse) => of(new UpdateManagerFailure(error))))));
-  });
+              catchError((error: HttpErrorResponse) => of(new UpdateManagerFailure(error)))))));
 
-  updateManagerFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateManagerFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ManagerActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateManagerFailure) => {
         const msg = payload.error.error;
@@ -388,6 +360,5 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not update node manager: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 }

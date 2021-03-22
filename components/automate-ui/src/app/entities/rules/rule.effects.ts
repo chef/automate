@@ -40,17 +40,16 @@ export class RuleEffects {
     private requests: RuleRequests
   ) { }
 
-  getRulesForProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  getRulesForProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.GET_ALL),
       mergeMap(({ payload: { project_id } }: GetRulesForProject) =>
         this.requests.getRulesForProject(project_id).pipe(
           map((resp: RulesSuccessPayload) => new GetRulesSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetRulesFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetRulesFailure(error)))))));
 
-  getRulesFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getRulesFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetRulesFailure) => {
         const msg = payload.error.error;
@@ -58,20 +57,18 @@ export class RuleEffects {
           type: Type.error,
           message: `Could not get rules: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  getRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  getRule$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.GET),
       mergeMap(({ payload: { project_id, id } }: GetRule) =>
         this.requests.getRule(project_id, id).pipe(
           map((resp: RuleSuccessPayload) => new GetRuleSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetRuleFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetRuleFailure(error)))))));
 
-  getRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.GET_FAILURE),
       map(({ payload }: GetRuleFailure) => {
         const msg = payload.error.error;
@@ -79,60 +76,54 @@ export class RuleEffects {
           type: Type.error,
           message: `Could not get rule: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  createRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  createRule$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.CREATE),
       mergeMap(({ payload: { rule } }: CreateRule) =>
       this.requests.createRule(rule).pipe(
         map((resp: RuleSuccessPayload) => new CreateRuleSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new CreateRuleFailure(error))))));
-  });
+        catchError((error: HttpErrorResponse) => observableOf(new CreateRuleFailure(error)))))));
 
-  createRuleSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createRuleSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.CREATE_SUCCESS),
       map(({ payload: { rule } }: CreateRuleSuccess) => new CreateNotification({
       type: Type.info,
       message: `Created rule ${rule.name}`
-    })));
-  });
+    }))));
 
-  createRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(RuleActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateRuleFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateRuleFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create rule: ${payload.error.error || payload}`
-      })));
-  });
+      }))));
 
-  deleteRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteRule$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.DELETE),
       mergeMap(({ payload: { project_id, id } }: DeleteRule) =>
         this.requests.deleteRule(project_id, id).pipe(
           map(() => new DeleteRuleSuccess({id})),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new DeleteRuleFailure(error))))));
-  });
+            observableOf(new DeleteRuleFailure(error)))))));
 
-  deleteRuleSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteRuleSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.DELETE_SUCCESS),
       map(({ payload: { id } }: DeleteRuleSuccess) => {
         return new CreateNotification({
           type: Type.info,
           message: `Deleted rule ${id}.`
         });
-      }));
-  });
+      })));
 
-  deleteRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.DELETE_FAILURE),
       map(({ payload }: DeleteRuleFailure) => {
         const msg = payload.error.error;
@@ -140,21 +131,19 @@ export class RuleEffects {
           type: Type.error,
           message: `Could not delete rule: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  updateRule$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateRule$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.UPDATE),
       mergeMap(({ payload: { rule } }: UpdateRule) =>
         this.requests.updateRule(rule).pipe(
           map((resp: RuleSuccessPayload) => new UpdateRuleSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new UpdateRuleFailure(error))))));
-  });
+            observableOf(new UpdateRuleFailure(error)))))));
 
-  updateRuleFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateRuleFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(RuleActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateRuleFailure) => {
         const msg = payload.error.error;
@@ -162,7 +151,6 @@ export class RuleEffects {
           type: Type.error,
           message: `Could not update rule: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 }
 

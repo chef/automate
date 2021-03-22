@@ -21,50 +21,44 @@ export class JobEffects {
     private requests: JobRequests
   ) {}
 
-  fetchJobs$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchJobs$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(JobActionTypes.GET_JOBS),
     mergeMap((action: JobActions) => this.requests.fetchJobs(action.payload)),
-    map(({ jobs }) => new GetJobsSuccess({ jobs })));
-  });
+    map(({ jobs }) => new GetJobsSuccess({ jobs }))));
 
-  jobGet$ = createEffect(() => {
-    return this.actions$.pipe(
+  jobGet$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(JobActionTypes.JOB_GET),
     mergeMap((action: JobActions) => this.requests.jobGet(action.payload)),
-    map((payload) => new JobGetSuccess(payload)));
-  });
+    map((payload) => new JobGetSuccess(payload))));
 
-  jobCreate$ = createEffect(() => {
-    return this.actions$.pipe(
+  jobCreate$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(JobActionTypes.JOB_CREATE),
     mergeMap((action: JobActions) => this.requests.jobCreate(action.payload)),
-    map((payload: { id: string, name: string }) => new JobCreateSuccess(payload)));
-  });
+    map((payload: { id: string, name: string }) => new JobCreateSuccess(payload))));
 
-  jobCreateSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  jobCreateSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<JobCreateSuccess>(JobActionTypes.JOB_CREATE_SUCCESS),
     map((payload) => new CreateNotification({
       type: Type.info,
       message: `Created scan job ${payload.payload.name}.`
-    })));
-  });
+    }))));
 
-  jobUpdate$ = createEffect(() => {
-    return this.actions$.pipe(
+  jobUpdate$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(JobActionTypes.JOB_UPDATE),
     mergeMap((action: JobActions) => this.requests.jobUpdate(action.payload)),
-    map(payload => new JobUpdateSuccess(payload)));
-  });
+    map(payload => new JobUpdateSuccess(payload))));
 
-  jobUpdateSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  jobUpdateSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(JobActionTypes.JOB_UPDATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Updated a scan job.'
-    })));
-  });
+    }))));
 
 }

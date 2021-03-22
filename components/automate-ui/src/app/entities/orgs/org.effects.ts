@@ -40,17 +40,16 @@ export class OrgEffects {
     private requests: OrgRequests
   ) { }
 
-  getOrgsForProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  getOrgsForProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id } }: GetOrgs) =>
         this.requests.getOrgs(server_id).pipe(
           map((resp: OrgsSuccessPayload) => new GetOrgsSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetOrgsFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetOrgsFailure(error)))))));
 
-  getOrgsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getOrgsFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetOrgsFailure) => {
         const msg = payload.error.error;
@@ -58,20 +57,18 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not get organizations: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  getOrg$ = createEffect(() => {
-    return this.actions$.pipe(
+  getOrg$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.GET),
       mergeMap(({ payload: { server_id, id } }: GetOrg) =>
         this.requests.getOrg(server_id, id).pipe(
           map((resp: OrgSuccessPayload) => new GetOrgSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetOrgFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetOrgFailure(error)))))));
 
-  getOrgFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getOrgFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.GET_FAILURE),
       map(({ payload }: GetOrgFailure) => {
         const msg = payload.error.error;
@@ -79,60 +76,54 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not get organization: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  createOrg$ = createEffect(() => {
-    return this.actions$.pipe(
+  createOrg$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.CREATE),
       mergeMap(({ payload }: CreateOrg) =>
       this.requests.createOrg( payload ).pipe(
         map((resp: OrgSuccessPayload) => new CreateOrgSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new CreateOrgFailure(error))))));
-  });
+        catchError((error: HttpErrorResponse) => observableOf(new CreateOrgFailure(error)))))));
 
-  createOrgSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createOrgSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.CREATE_SUCCESS),
       map(({ payload: { org } }: CreateOrgSuccess) => new CreateNotification({
       type: Type.info,
       message: `Successfully Created Organization - ${org.name}.`
-    })));
-  });
+    }))));
 
-  createOrgFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createOrgFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(OrgActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateOrgFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateOrgFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create organization: ${payload.error.error || payload}`
-      })));
-  });
+      }))));
 
-  deleteOrg$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteOrg$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.DELETE),
       mergeMap(({ payload: { server_id, id, name } }: DeleteOrg) =>
         this.requests.deleteOrg(server_id, id).pipe(
           map(() => new DeleteOrgSuccess({id, name})),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new DeleteOrgFailure(error))))));
-  });
+            observableOf(new DeleteOrgFailure(error)))))));
 
-  deleteOrgSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteOrgSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.DELETE_SUCCESS),
       map(({ payload: { name } }: DeleteOrgSuccess) => {
         return new CreateNotification({
           type: Type.info,
           message: `Successfully Deleted Organization ${name}.`
         });
-      }));
-  });
+      })));
 
-  deleteOrgFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteOrgFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.DELETE_FAILURE),
       map(({ payload }: DeleteOrgFailure) => {
         const msg = payload.error.error;
@@ -140,30 +131,27 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not delete organization: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  updateOrg$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateOrg$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.UPDATE),
       mergeMap(({ payload: { org } }: UpdateOrg) =>
         this.requests.updateOrg(org).pipe(
           map((resp: OrgSuccessPayload) => new UpdateOrgSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new UpdateOrgFailure(error))))));
-  });
+            observableOf(new UpdateOrgFailure(error)))))));
 
-  updateOrgSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateOrgSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.UPDATE_SUCCESS),
       map(({ payload: { org } }: UpdateOrgSuccess) => new CreateNotification({
       type: Type.info,
       message: `Successfully Updated Organization ${org.name}.`
-    })));
-  });
+    }))));
 
-  updateOrgFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateOrgFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(OrgActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateOrgFailure) => {
         const msg = payload.error.error;
@@ -171,7 +159,6 @@ export class OrgEffects {
           type: Type.error,
           message: `Could not update organization: ${msg || payload.error}`
         });
-      }));
-    });
+      })));
 
 }

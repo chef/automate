@@ -60,17 +60,16 @@ export class ProjectEffects {
     private store: Store<NgrxStateAtom>
   ) { }
 
-  getProjects$ = createEffect(() => {
-    return this.actions$.pipe(
+  getProjects$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.GET_ALL),
       mergeMap(() =>
         this.requests.getProjects().pipe(
           map((resp: GetProjectsSuccessPayload) => new GetProjectsSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetProjectsFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetProjectsFailure(error)))))));
 
-  getProjectsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getProjectsFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetProjectsFailure) => {
         const msg = payload.error.error;
@@ -78,20 +77,18 @@ export class ProjectEffects {
           type: Type.error,
           message: `Could not get projects: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  getProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  getProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.GET),
       mergeMap(({ payload: { id } }: GetProject) =>
         this.requests.getProject(id).pipe(
           map((resp: ProjectSuccessPayload) => new GetProjectSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetProjectFailure(error))))));
-  });
+          catchError((error: HttpErrorResponse) => observableOf(new GetProjectFailure(error)))))));
 
-  getProjectFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getProjectFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.GET_FAILURE),
       map(({ payload }: GetProjectFailure) => {
         const msg = payload.error.error;
@@ -99,11 +96,10 @@ export class ProjectEffects {
           type: Type.error,
           message: `Could not get project: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  createProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  createProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE),
       mergeMap(({ payload }: CreateProject) =>
         this.requests.createProject(payload.id, payload.name, payload.skip_policies).pipe(
@@ -112,11 +108,10 @@ export class ProjectEffects {
             return new CreateProjectSuccess({resp, skip_policies});
           }),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new CreateProjectFailure(error))))));
-  });
+            observableOf(new CreateProjectFailure(error)))))));
 
-  createProjectSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createProjectSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.CREATE_SUCCESS),
       map(({ payload: { resp, skip_policies } }: CreateProjectSuccess) => {
         return new CreateNotification({
@@ -125,31 +120,28 @@ export class ProjectEffects {
             ? `Created project ${resp.project.id}.`
             : `Created project ${resp.project.id} and associated policies.`
         });
-    }));
-  });
+    })));
 
-  createProjectFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createProjectFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ProjectActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateProjectFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateProjectFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create project: ${payload.error.error || payload}`
-      })));
-  });
+      }))));
 
-  deleteProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE),
       mergeMap(({ payload: { id } }: DeleteProject) =>
         this.requests.deleteProject(id).pipe(
           map(() => new DeleteProjectSuccess({id})),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new DeleteProjectFailure(error))))));
-  });
+            observableOf(new DeleteProjectFailure(error)))))));
 
-  deleteProjectSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteProjectSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE_SUCCESS),
       switchMap(({ payload: { id } }: DeleteProjectSuccess) => [
         new LoadOptions(),
@@ -157,11 +149,10 @@ export class ProjectEffects {
           type: Type.info,
           message: `Deleted project ${id}.`
         })
-      ]));
-  });
+      ])));
 
-  deleteProjectFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteProjectFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE_FAILURE),
       map(({ payload }: DeleteProjectFailure) => {
         const msg = payload.error.error;
@@ -169,21 +160,19 @@ export class ProjectEffects {
           type: Type.error,
           message: `Could not delete project: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  updateProject$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateProject$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.UPDATE),
       mergeMap(({ payload: { id, name } }: UpdateProject) =>
         this.requests.updateProject(id, name).pipe(
           map((resp: ProjectSuccessPayload) => new UpdateProjectSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new UpdateProjectFailure(error))))));
-  });
+            observableOf(new UpdateProjectFailure(error)))))));
 
-  updateProjectFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateProjectFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ProjectActionTypes.UPDATE_FAILURE),
       map(({ payload }: UpdateProjectFailure) => {
         const msg = payload.error.error;
@@ -191,11 +180,10 @@ export class ProjectEffects {
           type: Type.error,
           message: `Could not update project: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
-  applyRulesStart$ = createEffect(() => {
-    return this.actions$.pipe(
+  applyRulesStart$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<ApplyRulesStart>(ProjectActionTypes.APPLY_RULES_START),
     mergeMap(() =>
       this.requests.applyRulesStart().pipe(
@@ -205,11 +193,10 @@ export class ProjectEffects {
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new ApplyRulesStartFailure(error))))));
-  });
+          observableOf(new ApplyRulesStartFailure(error)))))));
 
-  applyRulesStop$ = createEffect(() => {
-    return this.actions$.pipe(
+  applyRulesStop$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<ApplyRulesStop>(ProjectActionTypes.APPLY_RULES_STOP),
     mergeMap(() =>
       this.requests.applyRulesStop().pipe(
@@ -218,14 +205,13 @@ export class ProjectEffects {
           new GetProjects(),
           new GetApplyRulesStatus()
         ]),
-        catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
-  });
+        catchError(
+          (error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error)))))));
 
-  getApplyRulesStatus$ = createEffect(() => {
-    return this.actions$.pipe(
+  getApplyRulesStatus$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
-    switchMap(this.getRulesStatus$()));
-  });
+    switchMap(this.getRulesStatus$())));
 
   getActiveApplyRulesStatus$ = createEffect(() =>
     observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(

@@ -17,10 +17,9 @@ export class ProfileEffects {
     private requests: ProfileRequests
   ) {}
 
-  profilesSearch$ = createEffect(() => {
-    return this.actions$.pipe(
-    ofType(ProfileActionTypes.PROFILES_SEARCH),
-    mergeMap((action: ProfilesSearch) => this.requests.profilesSearch(action.payload)),
-    map((resp: ProfilesSearchSuccessPayload) => new ProfilesSearchSuccess(resp)));
-  });
+  profilesSearch$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ProfileActionTypes.PROFILES_SEARCH),
+      mergeMap((action: ProfilesSearch) => this.requests.profilesSearch(action.payload)),
+      map((resp: ProfilesSearchSuccessPayload) => new ProfilesSearchSuccess(resp))));
 }
