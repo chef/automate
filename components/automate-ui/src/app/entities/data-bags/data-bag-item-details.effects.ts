@@ -22,26 +22,24 @@ export class DataBagItemDetailsEffects {
     private requests: DataBagsRequests
   ) { }
 
-  getDataBagItemDetails$ = createEffect(() => {
-    return this.actions$.pipe(
+  getDataBagItemDetails$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(DataBagItemDetailsActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, name, item_name } }: GetDataBagItemDetails) =>
         this.requests.getDataBagItemDetails(server_id, org_id, name, item_name).pipe(
           map((resp) => new GetDataBagItemDetailsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetDataBagItemDetailsFailure(error))))));
-  });
+          observableOf(new GetDataBagItemDetailsFailure(error)))))));
 
-    getDataBagItemDetailsFailure$ = createEffect(() => {
-      return this.actions$.pipe(
-      ofType(DataBagItemDetailsActionTypes.GET_FAILURE),
-      map(({ payload }: GetDataBagItemDetailsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra data bag item details: ${msg || payload.error}`
-        });
-      }));
-    });
+    getDataBagItemDetailsFailure$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(DataBagItemDetailsActionTypes.GET_FAILURE),
+        map(({ payload }: GetDataBagItemDetailsFailure) => {
+          const msg = payload.error.error;
+          return new CreateNotification({
+            type: Type.error,
+            message: `Could not get infra data bag item details: ${msg || payload.error}`
+          });
+      })));
 
 }

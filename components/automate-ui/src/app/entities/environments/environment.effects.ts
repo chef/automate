@@ -39,22 +39,22 @@ export class EnvironmentEffects {
 
   getEnvironments$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GET_ALL),
-      mergeMap((action: GetEnvironments) =>
-        this.requests.getEnvironments(action.payload).pipe(
-          map((resp: GetEnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-            observableOf(new GetEnvironmentsFailure(error)))))));
+    ofType(EnvironmentActionTypes.GET_ALL),
+    mergeMap((action: GetEnvironments) =>
+      this.requests.getEnvironments(action.payload).pipe(
+        map((resp: GetEnvironmentsSuccessPayload) => new GetEnvironmentsSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetEnvironmentsFailure(error)))))));
 
   getEnvironmentsFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
-      map(({ payload }: GetEnvironmentsFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get infra Environment details: ${msg || payload.error}`
-        });
+    ofType(EnvironmentActionTypes.GET_ALL_FAILURE),
+    map(({ payload }: GetEnvironmentsFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get infra Environment details: ${msg || payload.error}`
+      });
     })));
 
   getEnvironment$ = createEffect(() =>

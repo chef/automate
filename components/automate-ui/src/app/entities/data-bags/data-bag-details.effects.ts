@@ -35,18 +35,17 @@ export class DataBagItemsEffects {
     private requests: DataBagsRequests
   ) { }
 
-  getDataBagItems$ = createEffect(() => {
-    return this.actions$.pipe(
+  getDataBagItems$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(DataBagItemsActionTypes.GET_ALL),
     mergeMap(( action: GetDataBagItems) =>
       this.requests.getDataBagItems(action.payload).pipe(
         map((resp: DataBagItemsSuccessPayload) => new GetDataBagItemsSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new GetDataBagItemsFailure(error))))));
-  });
+          observableOf(new GetDataBagItemsFailure(error)))))));
 
-  getDataBagItemsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getDataBagItemsFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(DataBagItemsActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetDataBagItemsFailure) => {
       const msg = payload.error.error;
@@ -54,8 +53,7 @@ export class DataBagItemsEffects {
         type: Type.error,
         message: `Could not get infra data bag items: ${msg || payload.error}`
       });
-    }));
-  });
+    })));
 
   createDataBagItem$ = createEffect(() => this.actions$.pipe(
     ofType(DataBagItemsActionTypes.CREATE),
