@@ -10,6 +10,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
   cursor: pointer;
 }
 
+.navbar:focus {
+  outline: -webkit-focus-ring-color auto 1px;
+}
+
 .navbar a {
   float: left;
   padding: 8px 0px 8px 16px;
@@ -27,6 +31,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 .navbar a:hover {
   background-color: #FFFFFF;
   color: $chef-primary-bright;
+}
+
+.navbar a:focus {
+  outline: none;
+  border: 1px solid $chef-primary-bright;
+  border-radius: 4px;
 }
 
 .navbar a.active {
