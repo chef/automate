@@ -31,6 +31,7 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
   public show = false;
   private isDestroyed = new Subject<boolean>();
   clientDetailsLoading = true;
+  public openNotificationModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -74,5 +75,9 @@ export class ClientDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  openResetKeyClientModal() {
+    this.openNotificationModal.emit();
   }
 }

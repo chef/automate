@@ -31,6 +31,10 @@
           <chef-option value='details' data-cy="details-tab">Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
+
+      <app-reset-client-key [openEvent]="openNotificationModal" 
+      [serverId]="serverId" [orgId]="orgId" [name]="name"></app-reset-client-key>
+
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner *ngIf="clientDetailsLoading" size="50"></chef-loading-spinner>
         <div *ngIf="!clientDetailsLoading" class="key-tab">
@@ -44,10 +48,10 @@
             </div>
             <div class="key-tab-details">
               <div class="key-tab-body-top">
-                <p>
+                <chef-button tertiary class="reset-key" (click)="openResetKeyClientModal()">
                   <chef-icon>vpn_key</chef-icon>
                   <span>Reset Key</span>
-                </p>
+                </chef-button>
               </div>
               <div class="key-tab-body">
                 <chef-snippet [code]="client?.client_key.public_key" lang="json"></chef-snippet>

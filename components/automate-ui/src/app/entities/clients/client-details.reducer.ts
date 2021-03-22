@@ -1,15 +1,21 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set } from 'lodash/fp';
+import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ClientActionTypes, ClientActions } from './client.action';
-import { Client } from './client.model';
+import { Client, ClientKey } from './client.model';
 
 export interface ClientDetailsEntityState extends EntityState<Client> {
   clientStatus: EntityStatus;
   getStatus: EntityStatus;
+  resetKeyClient: {
+    client_key: ClientKey,
+    name: string
+  };
+  saveError: EntityStatus;
 }
 
 const GET_STATUS = 'getStatus';
+const SAVE_ERROR = 'saveError';
 
 export const clientDetailsEntityAdapter: EntityAdapter<Client> =
 createEntityAdapter<Client>({
@@ -46,6 +52,26 @@ export function clientDetailsEntityReducer(
         EntityStatus.loadingFailure,
         state
       ) as ClientDetailsEntityState;
+
+    case ClientActionTypes.RESETKEY:
+      return set(
+        GET_STATUS,
+        EntityStatus.loading,
+        clientDetailsEntityAdapter.removeAll(state)
+      );
+
+    case ClientActionTypes.RESETKEY_SUCCESS: {
+      return pipe (
+        set( GET_STATUS, EntityStatus.loadingSuccess),
+        set('resetKeyClient', action.payload || [])
+        ) (state) as ClientDetailsEntityState;
+      }
+
+    case ClientActionTypes.RESETKEY_FAILURE:
+      return pipe(
+        set(GET_STATUS, EntityStatus.loadingFailure),
+        set(SAVE_ERROR, action.payload.error)
+        )( state ) as ClientDetailsEntityState;
 
     default:
       return state;

@@ -31,6 +31,7 @@ import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
+import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 
 @NgModule({
@@ -60,7 +61,8 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     OrgDetailsComponent,
     OrgEditComponent,
     PolicyFilesComponent,
-    ResetAdminKeyComponent
+    ResetAdminKeyComponent,
+    ResetClientKeyComponent
   ],
   imports: [
     CommonModule,

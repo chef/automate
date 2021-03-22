@@ -36,6 +36,7 @@ describe('ClientDetailsComponent', () => {
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
+        MockComponent({ selector: 'app-reset-client-key', inputs: ['openEvent'] }),
         ClientDetailsComponent
       ],
       providers: [
