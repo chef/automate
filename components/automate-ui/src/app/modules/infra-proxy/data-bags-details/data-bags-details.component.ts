@@ -136,7 +136,9 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   refreshData(data: string) {
-    this.selectedItemDetails = JSON.parse(data);
+    if (data) {
+      this.selectedItemDetails = JSON.parse(data);
+    }
   }
 
   ngOnDestroy(): void {
