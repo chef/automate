@@ -82,6 +82,7 @@ func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.G
 	// data := datafeedServer.paginationData.Data
 	out["offset"] = req.Offset
 	out["size"] = req.Size
+	out["Attribute"] = req.Attribute
 	out["inventoryNodes"] = inventoryNodes
 	outputJSON, _ := json.Marshal(out)
 	returnData := interserviceResp.GetPaginationResponse{

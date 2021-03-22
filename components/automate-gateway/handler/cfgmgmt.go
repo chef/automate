@@ -52,8 +52,9 @@ func (s *CfgMgmtServer) Getdata(ctx context.Context, req *cfgReq.GetPaginationRe
 func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
 	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
 	getData := cmsReq.GetPaginationRequest{
-		Offset: req.Offset,
-		Size:   req.Size,
+		Offset: 	req.Offset,
+		Size:   	req.Size,
+		Attribute: 	req.Attribute,
 	}
 
 	res, err := s.cfgMgmtClient.FetchCompliancedata(ctx, &getData)

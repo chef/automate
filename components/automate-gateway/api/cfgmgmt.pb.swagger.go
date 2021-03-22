@@ -688,6 +688,16 @@ func init() {
             "required": true,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "attribute",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -1115,6 +1125,12 @@ func init() {
         "size": {
           "type": "integer",
           "format": "int32"
+        },
+        "attribute": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
