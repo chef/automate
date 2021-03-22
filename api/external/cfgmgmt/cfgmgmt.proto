@@ -57,6 +57,15 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
 
+  rpc FetchCompliancedata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/cfgmgmt/complianceData"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
   rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/api/v0/cfgmgmt/nodes";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";

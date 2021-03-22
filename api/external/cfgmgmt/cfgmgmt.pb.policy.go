@@ -13,6 +13,9 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/Getdata", "infra:nodes", "infra:nodes:list", "GET", "/api/v0/cfgmgmt/offset/{offset}/size/{size}", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/FetchCompliancedata", "infra:nodes", "infra:nodes:list", "POST", "/api/v0/cfgmgmt/complianceData", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodes", "infra:nodes", "infra:nodes:list", "GET", "/api/v0/cfgmgmt/nodes", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Nodes); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {

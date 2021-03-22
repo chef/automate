@@ -49,6 +49,22 @@ func (s *CfgMgmtServer) Getdata(ctx context.Context, req *cfgReq.GetPaginationRe
 	}, nil
 }
 
+func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
+	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
+	getData := cmsReq.GetPaginationRequest{
+		Offset: req.Offset,
+		Size:   req.Size,
+	}
+
+	res, err := s.cfgMgmtClient.FetchCompliancedata(ctx, &getData)
+	if err != nil {
+		return &cfgRes.GetPaginationResponse{}, err
+	}
+	return &cfgRes.GetPaginationResponse{
+		Data: res.Data,
+	}, nil
+}
+
 // GetPolicyCookbooks returns PolicyCookbooks with their policy identifiers based on a policy revision ID.
 func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context, request *cfgReq.PolicyRevision) (*cfgRes.PolicyCookbooks, error) {
 	log.WithFields(log.Fields{

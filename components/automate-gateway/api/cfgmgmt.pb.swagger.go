@@ -230,6 +230,38 @@ func init() {
         ]
       }
     },
+    "/api/v0/cfgmgmt/complianceData": {
+      "post": {
+        "operationId": "ConfigMgmt_FetchCompliancedata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.GetPaginationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.GetPaginationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/errors": {
       "get": {
         "summary": "List Errors",
@@ -1072,6 +1104,19 @@ func init() {
     },
     "chef.automate.api.cfgmgmt.request.CreateRolloutTest": {
       "type": "object"
+    },
+    "chef.automate.api.cfgmgmt.request.GetPaginationRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     },
     "chef.automate.api.cfgmgmt.request.SCMType": {
       "type": "string",

@@ -80,6 +80,26 @@ func (mr *MockCfgMgmtServiceClientMockRecorder) CreateRolloutTest(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServiceClient)(nil).CreateRolloutTest), varargs...)
 }
 
+// FetchCompliancedata mocks base method
+func (m *MockCfgMgmtServiceClient) FetchCompliancedata(arg0 context.Context, arg1 *request0.GetPaginationRequest, arg2 ...grpc.CallOption) (*response0.GetPaginationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FetchCompliancedata", varargs...)
+	ret0, _ := ret[0].(*response0.GetPaginationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchCompliancedata indicates an expected call of FetchCompliancedata
+func (mr *MockCfgMgmtServiceClientMockRecorder) FetchCompliancedata(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchCompliancedata", reflect.TypeOf((*MockCfgMgmtServiceClient)(nil).FetchCompliancedata), varargs...)
+}
+
 // GetAttributes mocks base method
 func (m *MockCfgMgmtServiceClient) GetAttributes(arg0 context.Context, arg1 *request0.Node, arg2 ...grpc.CallOption) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
@@ -877,6 +897,21 @@ func (m *MockCfgMgmtServiceServer) CreateRolloutTest(arg0 context.Context, arg1 
 func (mr *MockCfgMgmtServiceServerMockRecorder) CreateRolloutTest(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServiceServer)(nil).CreateRolloutTest), arg0, arg1)
+}
+
+// FetchCompliancedata mocks base method
+func (m *MockCfgMgmtServiceServer) FetchCompliancedata(arg0 context.Context, arg1 *request0.GetPaginationRequest) (*response0.GetPaginationResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchCompliancedata", arg0, arg1)
+	ret0, _ := ret[0].(*response0.GetPaginationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchCompliancedata indicates an expected call of FetchCompliancedata
+func (mr *MockCfgMgmtServiceServerMockRecorder) FetchCompliancedata(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchCompliancedata", reflect.TypeOf((*MockCfgMgmtServiceServer)(nil).FetchCompliancedata), arg0, arg1)
 }
 
 // GetAttributes mocks base method
