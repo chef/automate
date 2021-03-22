@@ -38,18 +38,17 @@ export class ClientEffects {
     private requests: ClientRequests
   ) { }
 
-  getClients$ = createEffect(() => {
-    return this.actions$.pipe(
+  getClients$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.GET_ALL),
       mergeMap((action: GetClients) =>
       this.requests.getClients(action.payload).pipe(
           map((resp: ClientsSuccessPayload) => new GetClientsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetClientsFailure(error))))));
-  });
+          observableOf(new GetClientsFailure(error)))))));
 
-  getClientsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getClientsFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetClientsFailure) => {
         const msg = payload.error.error;
@@ -57,21 +56,19 @@ export class ClientEffects {
           type: Type.error,
           message: `Could not get clients: ${msg || payload.error}`
         });
-    }));
-  });
+    })));
 
-  getClient$ = createEffect(() => {
-    return this.actions$.pipe(
+  getClient$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, name } }: GetClient) =>
         this.requests.getClient(server_id, org_id, name).pipe(
           map((resp) => new GetClientSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetClientFailure(error))))));
-  });
+          observableOf(new GetClientFailure(error)))))));
 
-  getClientFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getClientFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.GET_FAILURE),
       map(({ payload }: GetClientFailure) => {
         const msg = payload.error.error;
@@ -79,60 +76,55 @@ export class ClientEffects {
           type: Type.error,
           message: `Could not get client: ${msg || payload.error}`
         });
-    }));
-  });
+    })));
 
-  createClient$ = createEffect(() => {
-    return this.actions$.pipe(
+  createClient$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.CREATE),
       mergeMap((action: CreateClient) =>
         this.requests.createClient(action.payload).pipe(
           map((resp: CreateClientSuccessPayload) => new CreateClientSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new CreateClientFailure(error))))));
-  });
+          catchError(
+            (error: HttpErrorResponse) => observableOf(new CreateClientFailure(error)))))));
 
-  createClientSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createClientSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.CREATE_SUCCESS),
       map(({ payload: { name } }: CreateClientSuccess) => new CreateNotification({
         type: Type.info,
         message: `Created client ${name}`
-    })));
-  });
+    }))));
 
-  createClientFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createClientFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.CREATE_FAILURE),
       filter(({ payload }: CreateClientFailure) => payload.status !== HttpStatus.CONFLICT),
       map(({ payload }: CreateClientFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not create client: ${payload.error.error || payload}`
-    })));
-  });
+    }))));
 
-  deleteClient$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteClient$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.DELETE),
       mergeMap(({ payload: { server_id, org_id, name } }: DeleteClient) =>
         this.requests.deleteClient(server_id, org_id, name).pipe(
           map(() => new DeleteClientSuccess({ name })),
           catchError((error: HttpErrorResponse) =>
-            observableOf(new DeleteClientFailure(error))))));
-    });
+            observableOf(new DeleteClientFailure(error)))))));
 
-  deleteClientSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteClientSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.DELETE_SUCCESS),
       map(({ payload: { name } }: DeleteClientSuccess) => {
         return new CreateNotification({
           type: Type.info,
           message: `Successfully Deleted Client - ${name}.`
         });
-    }));
-  });
+    })));
 
-  deleteClientFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteClientFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientActionTypes.DELETE_FAILURE),
       map(({ payload: { error } }: DeleteClientFailure) => {
         const msg = error.error;
@@ -140,8 +132,7 @@ export class ClientEffects {
           type: Type.error,
           message: `Could not delete client: ${msg || error}`
         });
-    }));
-  });
+    })));
 
   @Effect()
   resetKeyClient$ = this.actions$.pipe(

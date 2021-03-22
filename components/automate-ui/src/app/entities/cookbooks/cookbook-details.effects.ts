@@ -25,8 +25,8 @@ export class CookbookDetailsEffects {
     private requests: CookbookDetailsRequests
   ) { }
 
-  getCookbooksDetails$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbooksDetails$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookDetailsActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, cookbook_name, cookbook_version } }
         : GetCookbookDetails) => this.requests
@@ -35,11 +35,10 @@ export class CookbookDetailsEffects {
             map((resp) => new GetCookbookDetailsSuccess(resp)),
             catchError((error: HttpErrorResponse) =>
               observableOf(new GetCookbookDetailsFailure(error))
-      ))));
-  });
+      )))));
 
-  getCookbooksFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbooksFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookDetailsActionTypes.GET_FAILURE),
       map(({ payload }: GetCookbookDetailsFailure) => {
         const msg = payload.error.error;
@@ -47,7 +46,6 @@ export class CookbookDetailsEffects {
           type: Type.error,
           message: `Could not get cookbook details: ${msg || payload.error}`
         });
-    }));
-  });
+    })));
 
 }

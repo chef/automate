@@ -31,39 +31,36 @@ export class ClientRunsEffects {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  fetchClientRunsNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchClientRunsNodes$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODES),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
         return this.requests.getNodes(storeState.clientRunsEntity.nodeFilter).pipe(
         map(responseNodes => new GetNodesSuccess({ nodes: responseNodes })),
         catchError((error) => of(new GetNodesFailure(error))));
-      }));
-  });
+      })));
 
-  fetchClientRunsNodeCount$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchClientRunsNodeCount$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODES_COUNT),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
         return this.requests.getNodeCount(storeState.clientRunsEntity.nodeFilter).pipe(
         map(responseNodeCount => new GetNodeCountSuccess({ nodeCount: responseNodeCount })),
         catchError((error) => of(new GetNodeCountFailure(error))));
-      }));
-  });
+      })));
 
-  fetchWorkflowEnabled$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchWorkflowEnabled$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_WORKFLOW_ENABLED),
       mergeMap(() => this.requests.isWorkflowEnabled()),
       map(workflowEnabled => new GetWorkflowEnabledSuccess({ workflowEnabled })),
       catchError((error) => of(new GetWorkflowEnabledFailure(error)))
-    );
-  });
+    ));
 
-  fetchNodeSuggestions$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchNodeSuggestions$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODE_SUGGESTIONS),
       withLatestFrom(this.store),
       switchMap(([action, storeState]) => {
@@ -73,29 +70,25 @@ export class ClientRunsEffects {
           storeState.clientRunsEntity.nodeFilter).pipe(
         map(nodeSuggestions => new GetNodeSuggestionsSuccess({ nodeSuggestions })),
         catchError((error) => of(new GetNodeSuggestionsFailure(error))));
-      }));
-  });
+      })));
 
-  deleteNodes$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNodes$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.DELETE_NODES),
       mergeMap((action: DeleteNodes) =>
         this.requests.deleteNodes(action.payload.nodeIdsToDelete)),
       map(_success => new DeleteNodesSuccess()),
       catchError((error) => of(new DeleteNodesFailure(error)))
-    );
-  });
+    ));
 
-  updateNodeFilters$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateNodeFilters$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.UPDATE_NODES_FILTER),
-      mergeMap(() => [ new GetNodes(), new GetNodeCount() ]));
-  });
+      mergeMap(() => [ new GetNodes(), new GetNodeCount() ])));
 
-  deleteNodesSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteNodesSuccess$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(ClientRunsActionTypes.DELETE_NODES_SUCCESS),
-      mergeMap(() => [ new GetNodes(), new GetNodeCount() ]));
-  });
+      mergeMap(() => [ new GetNodes(), new GetNodeCount() ])));
 
 }

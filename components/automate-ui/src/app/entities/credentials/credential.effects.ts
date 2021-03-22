@@ -21,21 +21,20 @@ export class CredentialEffects {
     private requests: CredentialRequests
   ) {}
 
-  searchCredentials$ = createEffect(() => {
-    return this.actions$.pipe(
+  searchCredentials$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(CredentialActionTypes.SEARCH),
     mergeMap((action: SearchCredentials) =>
               this.requests.search(action.payload).pipe(
               map(({secrets}) => new SearchCredentialsSuccess(secrets)),
-              catchError((error: HttpErrorResponse) => of(new SearchCredentialsFailure(error))))));
-  });
+              catchError((error: HttpErrorResponse) => of(new SearchCredentialsFailure(error)))))));
 
-  searchCredentialsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  searchCredentialsFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(CredentialActionTypes.SEARCH_FAILURE),
     map(({ payload: { error } }: SearchCredentialsFailure) => new CreateNotification({
       type: Type.error,
       message: `Could not get credentials: ${error.error || error}`
-    })));
-  });
+    }))));
+
 }

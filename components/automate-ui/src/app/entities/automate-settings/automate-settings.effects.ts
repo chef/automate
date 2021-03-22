@@ -21,22 +21,21 @@ export class AutomateSettingsEffects {
     private requests: AutomateSettingsRequests
   ) {}
 
-  fetchSettings$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchSettings$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(AutomateSettingsActionTypes.GET_SETTINGS),
       mergeMap((action: GetSettings) => this.requests.fetchJobSchedulerStatus(action.payload)),
       map(jobSchedulerStatus => new GetSettingsSuccess({ jobSchedulerStatus })),
       catchError((error) => of(new GetSettingsFailure(error)))
-    );
-  });
+    ));
 
-  configureSettings$ = createEffect(() => {
-    return this.actions$.pipe(
+  configureSettings$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS),
       mergeMap(
         (action: ConfigureSettings) => this.requests.configureIngestJobs(action.payload.jobs)),
       map((_resp) => (new ConfigureSettingsSuccess({}))),
       catchError((error) => of(new ConfigureSettingsFailure(error))
-    ));
-  });
+    )));
+
 }

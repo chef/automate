@@ -26,19 +26,18 @@ export class CookbookEffects {
     private requests: CookbookRequests
   ) { }
 
-  getCookbooks$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbooks$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id, org_id } }: GetCookbooks) =>
         this.requests.getCookbooks(server_id, org_id).pipe(
           map((resp: CookbooksSuccessPayload) => new GetCookbooksSuccess(resp)),
           catchError(
             (error: HttpErrorResponse) => observableOf(new GetCookbooksFailure(error)
-            )))));
-  });
+            ))))));
 
-  getCookbooksFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbooksFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetCookbooksFailure) => {
         const msg = payload.error.error;
@@ -46,7 +45,6 @@ export class CookbookEffects {
           type: Type.error,
           message: `Could not get cookbooks: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
 }

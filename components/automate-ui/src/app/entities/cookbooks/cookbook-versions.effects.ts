@@ -25,19 +25,18 @@ export class CookbookVersionsEffects {
     private requests: CookbookVersionsRequests
   ) { }
 
-  getCookbookVersions$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbookVersions$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookVersionsActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, cookbook_name } }: GetCookbookVersions) =>
         this.requests.getCookbookVersions(server_id, org_id, cookbook_name).pipe(
           map((resp) => new GetCookbookVersionsSuccess(resp)),
           catchError(
             (error: HttpErrorResponse) => observableOf(new GetCookbookVersionsFailure(error)
-            )))));
-    });
+            ))))));
 
-  getCookbookVersionsFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getCookbookVersionsFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookVersionsActionTypes.GET_FAILURE),
       map(({ payload }: GetCookbookVersionsFailure) => {
         const msg = payload.error.error;
@@ -45,7 +44,6 @@ export class CookbookVersionsEffects {
           type: Type.error,
           message: `Could not get cookbook versions: ${msg || payload.error}`
         });
-      }));
-  });
+      })));
 
 }
