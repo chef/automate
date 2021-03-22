@@ -18,6 +18,7 @@ import { CreateDataBagModalComponent } from './create-data-bag-modal/create-data
 import { DataBagsDetailsComponent } from './data-bags-details/data-bags-details.component';
 import { DataBagsListComponent } from './data-bags-list/data-bags-list.component';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component';
+import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal/edit-data-bag-item-modal.component';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
@@ -46,6 +47,7 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     DataBagsDetailsComponent,
     DataBagsListComponent,
     DeleteInfraObjectModalComponent,
+    EditDataBagItemModalComponent,
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,

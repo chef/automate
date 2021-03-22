@@ -32,6 +32,8 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public serverId: string;
   public orgId: string;
   public dataBagName: string;
+  public dataBagItemName: string;
+  public itemDataJson: string;
   public tabValue: DataBagsDetailsTab = 'details';
   public dataBagsDetailsLoading = true;
   public selectedItem: string;
@@ -46,6 +48,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagItemToDelete: DataBagItems;
   public deleteModalVisible = false;
   public openDataBagModal = new EventEmitter<void>();
+  public openEditDataBagItemModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -61,10 +64,10 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([server_id, org_id, dataBags_name]) => {
+    ).subscribe(([server_id, org_id, dataBag_name]) => {
       this.serverId = server_id;
       this.orgId = org_id;
-      this.dataBagName = dataBags_name;
+      this.dataBagName = dataBag_name;
       this.getDataBagItemsData();
     });
 
@@ -129,6 +132,10 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     this.activeClassName = 'autoHeight';
   }
 
+  refreshData(data: string) {
+    this.selectedItemDetails = JSON.parse(data);
+  }
+
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
@@ -189,5 +196,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   public openCreateModal(): void {
     this.openDataBagModal.emit();
+  }
+
+  public startUpdateDataBagItem(item: DataBagItems, jsonData: Object): void {
+    this.dataBagItemName = item.name;
+    this.itemDataJson = JSON.stringify(jsonData, undefined, 4);
+    this.openEditDataBagItemModal.emit();
   }
 }

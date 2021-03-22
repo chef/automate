@@ -249,15 +249,30 @@ tbody > .detail-row {
 }
 
 .float-right {
+  position: relative;
   float: right;
+}
+
+.edit-item {
+  font-size: 18px;
+  position: absolute;
+  right: 150px;
+}
+
+.edit-text {
+  margin-top: 0px;
+  position: absolute;
+  right: 120px;
 }
 
 .del-item {
   font-size: 18px;
-  margin-left: -22px;
+  position: absolute;
+  right: 60px;
 }
 
 .del-text {
-  display: block;
-  margin-top: -24px;
+  margin-top: 0px;
+  position: absolute;
+  right: 12px;
 }

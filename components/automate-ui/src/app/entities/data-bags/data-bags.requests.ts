@@ -60,4 +60,9 @@ export class DataBagsRequests {
       return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags/${databag_name}/${name}`,
       {headers});
   }
+
+  public updateDataBagItem(dataBagItem: DataBagsItemDetails): Observable<DataBagsItemDetails> {
+    return this.http.put<DataBagsItemDetails>(
+      `${env.infra_proxy_url}/servers/${dataBagItem.server_id}/orgs/${dataBagItem.org_id}/data_bags/${dataBagItem.data_bag_name}/${dataBagItem.name}`, dataBagItem);
+  }
 }

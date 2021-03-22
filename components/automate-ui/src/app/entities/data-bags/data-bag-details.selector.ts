@@ -28,6 +28,11 @@ export const deleteStatus = createSelector(
   (state) => state.deleteStatus
 );
 
+export const updateStatus = createSelector(
+  dataBagItemsState,
+  (state) => state.updateStatus
+);
+
 export const dataBagItemList = createSelector(
   dataBagItemsState,
   (state) => state.dataBagItemList

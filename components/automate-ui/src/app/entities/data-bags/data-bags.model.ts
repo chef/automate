@@ -11,7 +11,10 @@ export interface DataBagItems {
 }
 
 export interface DataBagsItemDetails {
+  server_id?: string;
+  org_id?: string;
+  data_bag_name?: string;
+  id?: string;
   name: string;
-  id: string;
   data: string;
 }
