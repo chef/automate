@@ -15,13 +15,13 @@ gh_repo = "automate"
 
 ## Overview
 
-The _Chef Infra Server_ page (**Infrastructure > Chef Infra Server**) lets you connect existing Chef Infra Servers to Chef Automate, view all of the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
+The _Chef Infra Server_ page (**Infrastructure > Chef Servers**) lets you connect existing Chef Infra Servers to Chef Automate, view all of the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
 
 The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Server stores _cookbooks_, the policies that are applied to _nodes_, and metadata that describes each registered node that is being managed by Chef Infra Client.
 
 Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much of the configuration work as possible on the nodes themselves (and not on the Chef Infra Server).
 
-This scalable approach distributes the configuration effort throughout the _organization_.
+This scalable approach distributes the configuration effort throughout the organization.
 
 {{< figure src="/images/automate/chef-server-page.png" alt="Chef Infra Server Page">}}
 
@@ -35,37 +35,37 @@ The objects that you can manage from the Chef Infra Server are:
 
 ## Connect Chef Infra Servers to Chef Automate
 
-The _Chef Infra Server_ starts out with an empty list. Adding your Chef Infra Servers to Chef Automate populates the list.
+The _Chef Infra Server_ panel starts out with an empty list of servers.
 
-To add existing Chef Servers to the Infrastructure, select **Add Chef Serve**, which and the name, FQDN, and IP address of your Chef Infra Server in the form:
+To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server** which will request the name, FQDN, and IP address of your Chef Infra Server:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
-Entering an invalid FQDN and IP Address results in an error:
+Chef Automate will warn you if you enter an invalid FQDN or IP address:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
-Once you're finished, select **Add Chef Server** and you'll see your server in the list of Chef Infra Servers
+Once you are finished, select **Add Chef Server** and you will see your server in the list of Chef Infra Servers.
 
 ## Connect a Chef Organization to a Chef Infra Server
 
-Selecting a server from the list of organizations in the Server. Refer to the image below:
+To see a list of existing [organizations]({{< relref "server_orgs" >}}) that are applied to a Chef Infra Server,
+select a Chef Infra Server from the **Chef Servers** list, then select the **Orgs** tab. Refer to the image below:
 
 {{< figure src="/images/automate/chef-server-organization.png" alt="Chef Infra Server Organization">}}
 
-The Organization in the Chef server listed are the ones which are already created in that specific server. To create a new Organization in the Server select [here](https://docs.chef.io/automate/infra_server/#set-up-the-chef-infra-server).
+To create a new organization, see the documentation on [setting up a Chef Infra Server]({{< relref "infra_server#set-up-the-chef-infra-server" >}}).
 
-To add the previously created organization to the Infrastructure, select **Add Chef Organization** button. Selecting on the button opens a popup menu as shown below:
+To add an existing organization, select **Add Chef Organization** which will open a popup menu as shown below:
 
 {{< figure src="/images/automate/add-chef-organization-popup-menu.png" width="500" alt="Add Chef Organization Form">}}
 
-Add the Name, Projects, Admin User, and Admin Key. Always use the exact details that were provided at the time of setting up _Knife_. Copy the contents of the `~/.chef/USER.pem` file and paste it into the _Admin Key_ field. Once done select **Add Chef Organization** to add the Chef Infra Server.
+Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values that were provided when the organization was configured using _Knife_.
+Copy the contents of the `~/.chef/USER.pem` file and paste it into the **Admin Key** field. Then select **Add Chef Organization** to add the organization to the Chef Infra Server.
 
-Select any Chef Organization to view the _Objects_.
+## Access Chef Infra Server components
 
-## Access Chef Infra Server Objects
-
-The Chef Infra Server Objects can be managed from the Chef Automate. In Automate Infra views, following objects can be managed:
+The following Chef Infra Server components for an organization can be managed using Chef Automate:
 
 - Cookbooks
 - Roles
@@ -73,7 +73,7 @@ The Chef Infra Server Objects can be managed from the Chef Automate. In Automate
 - Data Bags
 - Clients
 
-Refer to the image below:
+To access these components for an organization, select **Chef Servers > Organizations** and then select an organization. Refer to the image below:
 
 {{< figure src="/images/automate/chef-infra-server-objects.png" alt="Chef Infra Server Objects">}}
 
@@ -99,8 +99,8 @@ Chef Infra Clients provide secure API access to the Chef Infra Server.
 
 ## Troubleshoot
 
-While fetching any object like cookbooks or any, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server. The error looks like as shown below:
+While fetching any objects like cookbooks, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server.
 
 {{< figure src="/images/automate/could-not-get-cookbooks-organization.png" alt="Could not get cookbooks: Organization">}}
 
-Create the Chef Organization using the knife command, `knife opc org create` or the Chef Infra Server CLI command, `chef-server-ctl org-create`. Then add the _Name_, _Projects_, _Admin User_, and _Admin Key_ to fetch the objects.
+Create the organization using the knife command, `knife opc org create` or the Chef Infra Server CLI command, `chef-server-ctl org-create`, then add the _Name_, _Projects_, _Admin User_, and _Admin Key_ to fetch the objects.
