@@ -1,12 +1,10 @@
 import {
     Component,
     Input,
-    OnDestroy,
     OnInit,
     Output,
     EventEmitter
 } from '@angular/core';
-import { Subject } from 'rxjs';
 import { FormGroup, FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
@@ -22,7 +20,7 @@ export interface AvailableType {
     templateUrl: './drag-drop.component.html',
     styleUrls: ['./drag-drop.component.scss']
 })
-export class DragDropComponent implements OnInit, OnDestroy {
+export class DragDropComponent implements OnInit {
     @Input() roles: InfraRole[] = [];
     @Input() serverId: string;
     @Input() orgId: string;
@@ -38,8 +36,6 @@ export class DragDropComponent implements OnInit, OnDestroy {
     public typeAvailable: string[] = ['available roles and recipes', 'available roles', 'available recipes'];
     public userForm: FormGroup;
 
-    private isDestroyed = new Subject<boolean>();
-
     constructor(
     ) {
     }
@@ -52,11 +48,6 @@ export class DragDropComponent implements OnInit, OnDestroy {
             'selected': new FormControl({ value: [] }),
             'test': new FormControl(null)
         });
-    }
-
-    ngOnDestroy(): void {
-        this.isDestroyed.next(true);
-        this.isDestroyed.complete();
     }
 
     drop(event: CdkDragDrop<string[]>) {
