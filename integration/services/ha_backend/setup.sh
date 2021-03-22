@@ -68,7 +68,7 @@ systemctl daemon-reload
 systemctl enable hab-sup.service
 systemctl start hab-sup.service
 
-channel="unstable"
+channel="dev"
 # To pin the version, set version to your desired version, including a
 # leading /. For example:
 #
