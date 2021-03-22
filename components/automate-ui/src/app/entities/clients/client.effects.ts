@@ -134,27 +134,24 @@ export class ClientEffects {
         });
     })));
 
-  @Effect()
-  resetKeyClient$ = this.actions$.pipe(
+  resetKeyClient$ = createEffect(() => this.actions$.pipe(
     ofType(ClientActionTypes.RESETKEY),
     mergeMap(( { payload: { server_id, org_id, name } }: ResetKeyClient) =>
       this.requests.resetKeyClient(server_id, org_id, name).pipe(
         map((resp: ResetKeySuccessPayload) => new ResetKeyClientSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new ResetKeyClientFailure(error))))));
+          observableOf(new ResetKeyClientFailure(error)))))));
 
-  @Effect()
-  resetKeyClientSuccess$ = this.actions$.pipe(
+  resetKeyClientSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(ClientActionTypes.RESETKEY_SUCCESS),
     map(({ payload: { name } }: ResetKeyClientSuccess) => {
       return new CreateNotification({
         type: Type.info,
         message: `Successfully resetting Client key - ${name}.`
       });
-    }));
+    })));
 
-  @Effect()
-  resetKeyClientFailure$ = this.actions$.pipe(
+  resetKeyClientFailure$ = createEffect(() => this.actions$.pipe(
     ofType(ClientActionTypes.RESETKEY_FAILURE),
     map(({ payload: { error } }: ResetKeyClientFailure) => {
       const msg = error.error;
@@ -162,5 +159,5 @@ export class ClientEffects {
         type: Type.error,
         message: `Could not reset client key: ${msg || error}`
       });
-    }));
+    })));
 }
