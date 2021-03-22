@@ -42,7 +42,7 @@ type Client interface {
 	// returns (Node, error)
 	GetInventoryNodes(context.Context, time.Time,
 		time.Time, map[string][]string, time.Time,
-		string, int, string, bool) ([]InventoryNode, error)
+		string, int, string, bool, int) ([]InventoryNode, error)
 	// @params (ctx, start, end, filters, cursorField, cursorID, pageSize, sortField, ascending)
 	// returns (Node, error)
 	GetNodesPageByCursor(context.Context, time.Time,

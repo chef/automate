@@ -124,7 +124,7 @@ func (es Backend) GetDateOfOldestConvergeIndices() (time.Time, bool, error) {
 func (m Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	end time.Time, filters map[string][]string, cursorDate time.Time,
 	cursorID string, pageSize int, sortField string,
-	ascending bool) ([]backend.InventoryNode, error) {
+	ascending bool, from int) ([]backend.InventoryNode, error) {
 	var nodes []backend.InventoryNode
 	n := *new(backend.InventoryNode)
 	n.EntityUUID = "mock"

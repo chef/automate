@@ -14,4 +14,5 @@ message InventoryNodes {
   string cursor_id                      = 5;
   int32 page_size                       = 6;
   Sorting sorting                       = 7;
+  int32 from                            = 8;
 }

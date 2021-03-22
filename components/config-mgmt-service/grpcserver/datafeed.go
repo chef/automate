@@ -66,7 +66,8 @@ func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.G
 	}
 
 	nodesRequest := &pRequest.InventoryNodes{
-		PageSize: 300,
+		PageSize: req.Size,
+		From:     req.Offset,
 		Start:    feedStartString,
 		End:      feedEndString,
 		Sorting: &pRequest.Sorting{
