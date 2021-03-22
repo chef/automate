@@ -59,16 +59,16 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(([getStatusSt, resetKeyState, errorSt]) => {
-      if (getStatusSt === EntityStatus.loadingSuccess &&
+        if (getStatusSt === EntityStatus.loadingSuccess &&
         !isNil(resetKeyState)) {
             this.resetting = false;
             this.isReset = true;
             this.privateKey = resetKeyState?.client_key.private_key;
-          } else if (getStatusSt === EntityStatus.loadingFailure) {
+        } else if (getStatusSt === EntityStatus.loadingFailure) {
             this.error = errorSt;
             this.closeCreateModal();
-          }
-        });
+        }
+      });
   }
 
   ngOnDestroy(): void {
