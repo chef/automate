@@ -94,7 +94,9 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.searching = true;
-        if (this.dataBagItems.length === 0) {
+        if (this.dataBagItems &&
+          this.dataBagItems.length === 0 &&
+          this.current_page !== 1) {
           this.current_page = this.current_page - 1;
         }
         this.getDataBagItemsData();

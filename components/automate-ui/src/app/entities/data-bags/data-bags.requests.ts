@@ -58,7 +58,7 @@ export class DataBagsRequests {
   public createDataBagItem(databagItem: DataBagItem): Observable<{}> {
     return this.http.post(`${env.infra_proxy_url}/servers/${databagItem.server_id}/orgs/${databagItem.org_id}/data_bags/${databagItem.name}`, databagItem);
   }
-  
+
   public deleteDataBagItem(server_id: string, org_id: string, databag_name: string, name: string):
     Observable<{}> {
       return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/data_bags/${databag_name}/${name}`,

@@ -5,7 +5,7 @@ import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { DataBagItems } from './data-bags.model';
+import { DataBagsItemDetails } from './data-bags.model';
 import { HttpStatus } from 'app/types/types';
 
 import {
@@ -13,17 +13,17 @@ import {
   GetDataBagItemsSuccess,
   GetDataBagItemsFailure,
   DataBagItemsActionTypes,
+  CreateDataBagItem,
+  CreateDataBagItemSuccess,
+  CreateDataBagItemSuccessPayload,
+  CreateDataBagItemFailure,
   DeleteDataBagItem,
   DeleteDataBagItemSuccess,
   DeleteDataBagItemFailure,
   UpdateDataBagItem,
   UpdateDataBagItemFailure,
   UpdateDataBagItemSuccess,
-  DataBagItemsSuccessPayload,
-  CreateDataBagItem,
-  CreateDataBagItemSuccess,
-  CreateDataBagItemSuccessPayload,
-  CreateDataBagItemFailure
+  DataBagItemsSuccessPayload
 } from './data-bag-details.actions';
 
 import { DataBagsRequests } from './data-bags.requests';
@@ -120,7 +120,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.UPDATE),
     mergeMap(({ payload: { dataBagItem } }: UpdateDataBagItem) =>
       this.requests.updateDataBagItem(dataBagItem).pipe(
-        map((resp: DataBagItems) => new UpdateDataBagItemSuccess(resp)),
+        map((resp: DataBagsItemDetails) => new UpdateDataBagItemSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateDataBagItemFailure(error))))));
 
@@ -129,7 +129,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.UPDATE_SUCCESS),
     map(({ payload: dataBagItem }: UpdateDataBagItemSuccess) => new CreateNotification({
     type: Type.info,
-    message: `Successfully Updated Data Bag Item - ${dataBagItem.name}.`
+    message: `Successfully Updated Data Bag Item - ${dataBagItem.item_id}.`
   })));
 
   @Effect()

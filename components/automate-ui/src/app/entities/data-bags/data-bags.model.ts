@@ -17,6 +17,7 @@ export interface DataBagsItemDetails {
   id?: string;
   name: string;
   data: string;
+  item_id?: string;
 }
 
 export interface DataBagItem {

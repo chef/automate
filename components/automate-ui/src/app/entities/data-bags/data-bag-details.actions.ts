@@ -92,7 +92,7 @@ export class UpdateDataBagItem implements Action {
 
 export class UpdateDataBagItemSuccess implements Action {
   readonly type = DataBagItemsActionTypes.UPDATE_SUCCESS;
-  constructor(public payload: DataBagItems) { }
+  constructor(public payload: DataBagsItemDetails) { }
 }
 
 export class UpdateDataBagItemFailure implements Action {

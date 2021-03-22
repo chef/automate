@@ -12,7 +12,7 @@ export interface DataBagItemsEntityState extends EntityState<DataBagItems> {
     total: number;
   };
   deleteStatus: EntityStatus;
-  updateStatus: EntityStatus;  
+  updateStatus: EntityStatus;
   saveStatus: EntityStatus;
   saveError: HttpErrorResponse;
 }
@@ -101,7 +101,7 @@ export function dataBagItemsEntityReducer(
     case DataBagItemsActionTypes.UPDATE_SUCCESS:
       return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
         dataBagItemsEntityAdapter.updateOne({
-          id: action.payload.name,
+          id: action.payload.item_id,
           changes: action.payload
         }, state));
 
