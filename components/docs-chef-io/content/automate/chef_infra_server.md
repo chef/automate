@@ -87,7 +87,7 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 ### Environments
 
-An [environment]({{< relref "environment" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
+An [environment]({{< relref "environments" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
 
 ### Data Bags
 
