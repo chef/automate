@@ -142,7 +142,7 @@ beforeEach(() => {
           JSON.stringify(role.override_attributes));
         component.createRole();
 
-        store.dispatch(new CreateRoleSuccess({role}));
+        store.dispatch(new CreateRoleSuccess(role));
         expect(component.creating).toBe(false);
         expect(component.visible).toBe(false);
     });

@@ -52,14 +52,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    const payload = {
-      roleName: '',
-      server_id: this.serverId,
-      org_id: this.orgId,
-      page: this.currentPage,
-      per_page: this.per_page
-    };
-    this.store.dispatch(new GetRoles(payload));
+    this.getRolesData();
 
     combineLatest([
       this.store.select(getAllStatus),
@@ -74,19 +67,21 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.roleListState = RolesState;
         this.roles = RolesState?.items;
         this.total = RolesState?.total;
-        this.roles.length = 0;
-        this.total = 0;
         this.rolesListLoading = false;
         this.searching = false;
       }
     });
 
-
     this.store.select(deleteStatus).pipe(
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.store.dispatch(new GetRoles(payload));
+        this.searching = true;
+        if (this.roles && this.roles.length === 0 &&
+          this.currentPage !== 1) {
+            this.currentPage = this.currentPage - 1;
+        }
+        this.getRolesData();
       });
   }
 

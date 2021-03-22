@@ -106,7 +106,10 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       this.expandedList = role.expanded_run_list;
       this.runList = this.role.run_list;
       this.idList = [];
-      // this.attributes = new RoleAttributes(this.role);
+      this.attributes.default_attributes = this.role.default_attributes;
+      this.attributes.override_attributes = this.role.override_attributes;
+      this.attributes.all.default_attributes = this.role.default_attributes;
+      this.attributes.all.override_attributes = this.role.override_attributes;
       this.getRunListTree(this.expandedList);
 
       // Settimeout - In the case of passing large attribute data sets

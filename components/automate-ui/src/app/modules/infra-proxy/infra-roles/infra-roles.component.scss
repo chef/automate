@@ -70,6 +70,7 @@ img {
   chef-toolbar chef-button:first-child {
     margin: 4px 0px 0px 32px;
     float: right;
+
     button {
       padding: 7px 16px;
       letter-spacing: 0.5px;
@@ -79,7 +80,7 @@ img {
   ::ng-deep {
     .search-items app-infra-search-bar .search-wrapper {
       float: left;
-      width: calc( 100% - 135px);
+      width: calc(100% - 135px);
     }
   }
 }
