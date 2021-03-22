@@ -1,0 +1,105 @@
+@import "~styles/variables";
+
+chef-modal.createDataBagItem {
+
+  [slot=title] {
+    text-align: left;
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 0px;
+    padding-bottom: 15px;
+    line-height: 20px;
+  }
+
+  .flex-container {
+    margin-top: 28px;
+    justify-content: center;
+
+    form {
+      flex-basis: 60%;
+
+      .chef-input {
+        font-size: 13px;
+        height: 36px;
+        padding: 10px;
+      }
+
+      textarea.chef-input {
+        height: 162px;
+        margin-top: 32px;
+        resize: none;
+        margin-bottom: -5px;
+      }
+    }
+
+    #button-bar {
+      text-align: right;
+      margin-top: 20px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  ::ng-deep {
+
+    .modal {
+      padding: 32px;
+      width: 528px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px #CCCCCC;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      padding-bottom: 0.50em;
+    }
+
+    chef-button {
+      height: 36px;
+    }
+
+    chef-button#create-button-object-modal {
+      margin: 10px 0px 0px 0px;
+    }
+
+    chef-button#cancel-data-bag-item-popup {
+      margin: 10px 15px 0px 0px;
+    }
+
+    .modal-overlay {
+      background-color: $chef-white;
+      mix-blend-mode: normal;
+      opacity: 0.7;
+    }
+
+    chef-button.close {
+      border: none;
+      color: var(--chef-primary-dark);
+      outline: none;
+      margin-top: 15px;
+      margin-right: 18px;
+    }
+
+    chef-button.close:active {
+      background: none;
+      color: var(--chef-primary-dark);
+    }
+
+    button:focus {
+      outline: none;
+      border: 0.5px solid $chef-primary-bright;
+      border-radius: 4px;
+    }
+
+  }
+}

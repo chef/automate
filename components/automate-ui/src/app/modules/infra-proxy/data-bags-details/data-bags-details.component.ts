@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
@@ -49,6 +49,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public openDataBagModal = new EventEmitter<void>();
   public openEditDataBagItemModal = new EventEmitter<void>();
+  public openDataBagItemModal = new EventEmitter<void>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -93,7 +94,9 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.searching = true;
-        if (this.dataBagItems.length === 0) {
+        if (this.dataBagItems &&
+          this.dataBagItems.length === 0 &&
+          this.current_page !== 1) {
           this.current_page = this.current_page - 1;
         }
         this.getDataBagItemsData();
@@ -133,7 +136,9 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   refreshData(data: string) {
-    this.selectedItemDetails = JSON.parse(data);
+    if (data) {
+      this.selectedItemDetails = JSON.parse(data);
+    }
   }
 
   ngOnDestroy(): void {
@@ -202,5 +207,9 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     this.dataBagItemName = item.name;
     this.itemDataJson = JSON.stringify(jsonData, undefined, 4);
     this.openEditDataBagItemModal.emit();
+  }
+
+  openDatabagItemModal(): void {
+    this.openDataBagItemModal.emit();
   }
 }

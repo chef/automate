@@ -70,7 +70,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.searching = true;
-        if (this.clients.length === 0) {
+        if (this.clients.length === 0 &&
+          this.current_page !== 1) {
           this.current_page = this.current_page - 1;
         }
         this.getClientsData();

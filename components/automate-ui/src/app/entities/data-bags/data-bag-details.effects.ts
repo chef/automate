@@ -2,15 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { DataBagItems } from './data-bags.model';
+import { DataBagsItemDetails } from './data-bags.model';
+import { HttpStatus } from 'app/types/types';
+
 import {
   GetDataBagItems,
   GetDataBagItemsSuccess,
   GetDataBagItemsFailure,
   DataBagItemsActionTypes,
+  CreateDataBagItem,
+  CreateDataBagItemSuccess,
+  CreateDataBagItemSuccessPayload,
+  CreateDataBagItemFailure,
   DeleteDataBagItem,
   DeleteDataBagItemSuccess,
   DeleteDataBagItemFailure,
@@ -50,6 +56,36 @@ export class DataBagItemsEffects {
     }));
 
   @Effect()
+  createDataBagItem$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE),
+    mergeMap(({ payload: { dataBagItem } }: CreateDataBagItem) =>
+      this.requests.createDataBagItem(dataBagItem).pipe(
+        map((resp: CreateDataBagItemSuccessPayload) => new CreateDataBagItemSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateDataBagItemFailure(error))))));
+
+  @Effect()
+  createDataBagItemSuccess$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE_SUCCESS),
+    map(({ payload: { id: id } }: CreateDataBagItemSuccess) => {
+      return new CreateNotification({
+        type: Type.info,
+        message: `Successfully Created Data Bag Item ${id}.`
+      });
+    }));
+
+  @Effect()
+  createDataBagItemFailure$ = this.actions$.pipe(
+    ofType(DataBagItemsActionTypes.CREATE_FAILURE),
+    filter(({ payload }: CreateDataBagItemFailure) => payload.status !== HttpStatus.CONFLICT),
+    map(({ payload }: CreateDataBagItemFailure) => {
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could Not Create Data Bag Item: ${payload.error.error || payload}.`
+      });
+    }));
+
+  @Effect()
   deleteDataBagItem$ = this.actions$.pipe(
     ofType(DataBagItemsActionTypes.DELETE),
     mergeMap(({ payload: { server_id, org_id, databag_name, name } }: DeleteDataBagItem) =>
@@ -84,7 +120,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.UPDATE),
     mergeMap(({ payload: { dataBagItem } }: UpdateDataBagItem) =>
       this.requests.updateDataBagItem(dataBagItem).pipe(
-        map((resp: DataBagItems) => new UpdateDataBagItemSuccess(resp)),
+        map((resp: DataBagsItemDetails) => new UpdateDataBagItemSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new UpdateDataBagItemFailure(error))))));
 
@@ -93,7 +129,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.UPDATE_SUCCESS),
     map(({ payload: dataBagItem }: UpdateDataBagItemSuccess) => new CreateNotification({
     type: Type.info,
-    message: `Successfully Updated Data Bag Item - ${dataBagItem.name}.`
+    message: `Successfully Updated Data Bag Item - ${dataBagItem.item_id}.`
   })));
 
   @Effect()
