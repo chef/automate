@@ -108,7 +108,6 @@ steps:
     command:
       - integration/run_test integration/tests/ha_data_services.sh
     timeout_in_minutes: 35
-    soft_fail: true
     expeditor:
       executor:
         linux:
@@ -119,7 +118,6 @@ steps:
     command:
       - integration/run_test integration/tests/ha_data_services_migrate.sh
     timeout_in_minutes: 35
-    soft_fail: true
     expeditor:
       executor:
         linux:
