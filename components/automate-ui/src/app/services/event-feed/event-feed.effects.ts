@@ -19,24 +19,22 @@ export class EventFeedEffects {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  navToEventFeed$ = createEffect(() => {
-    return this.actions$.pipe(
+  navToEventFeed$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ROUTER_NAVIGATION),
     map((action: RouterNavigationAction) => action.payload.routerState.url),
     filter(path => path.startsWith('/dashboards/event-feed')),
-    map((_path) => actions.getInitialEventFeedLoad()));
-  });
+    map((_path) => actions.getInitialEventFeedLoad())));
 
-  getInitialEventFeedLoad$ =  createEffect(() => {
-    return this.actions$.pipe(
+  getInitialEventFeedLoad$ =  createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_INITIAL_EVENT_FEED_LOAD),
     mergeMap((_action: actions.EventFeedAction) =>
       [actions.getInitialFeed(), actions.getTaskCounts(),
-        actions.getGuitarStrings(), actions.getTypeCounts()]));
-  });
+        actions.getGuitarStrings(), actions.getTypeCounts()])));
 
-  getInitialFeed$ = createEffect(() => {
-    return this.actions$.pipe(
+  getInitialFeed$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_INITIAL_FEED),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
@@ -51,11 +49,10 @@ export class EventFeedEffects {
           return observableOf({type: actions.GET_INITIAL_FEED_ERROR});
         }
       }));
-    }));
-  });
+    })));
 
-  loadMoreFeed$ = createEffect(() => {
-    return this.actions$.pipe(
+  loadMoreFeed$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.LOAD_MORE_FEED),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
@@ -67,11 +64,10 @@ export class EventFeedEffects {
         lastEvent).pipe(
       map(actions.loadMoreFeedSuccess),
       catchError(() => observableOf({type: actions.LOAD_MORE_FEED_ERROR})));
-    }));
-  });
+    })));
 
-  getGuitarStrings$ = createEffect(() => {
-    return this.actions$.pipe(
+  getGuitarStrings$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_GUITAR_STRINGS),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
@@ -80,11 +76,10 @@ export class EventFeedEffects {
       return this.eventFeedService.getGuitarStrings(eventFeedState.filters).pipe(
       map(actions.getGuitarStringsSuccess),
       catchError(() => observableOf({type: actions.GET_GUITAR_STRINGS_ERROR})));
-    }));
-  });
+    })));
 
-  getTypeCounts$ = createEffect(() => {
-    return this.actions$.pipe(
+  getTypeCounts$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_TYPE_COUNTS),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
@@ -93,11 +88,10 @@ export class EventFeedEffects {
       return this.eventFeedService.getEventTypeCount(eventFeedState.filters).pipe(
       map(actions.getTypeCountsSuccess),
       catchError(() => observableOf({type: actions.GET_TYPE_COUNTS_ERROR})));
-    }));
-  });
+    })));
 
-  getTaskCounts$ = createEffect(() => {
-    return this.actions$.pipe(
+  getTaskCounts$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_TASK_COUNTS),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
@@ -106,11 +100,10 @@ export class EventFeedEffects {
       return this.eventFeedService.getEventTaskCount(eventFeedState.filters).pipe(
       map(actions.getTaskCountsSuccess),
       catchError(() => observableOf({type: actions.GET_TASK_COUNTS_ERROR})));
-    }));
-  });
+    })));
 
-  getSuggestions$ = createEffect(() => {
-    return this.actions$.pipe(
+  getSuggestions$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_SUGGESTIONS),
     withLatestFrom(this.store),
     switchMap(([action, _storeState]) => {
@@ -119,21 +112,18 @@ export class EventFeedEffects {
         getSuggestions.payload.type, getSuggestions.payload.text).pipe(
       map(suggestions => actions.getSuggestionsSuccess({suggestions})),
       catchError(() => observableOf({type: actions.GET_SUGGESTIONS_ERROR})));
-    }));
-  });
+    })));
 
-  addFeedFilter$ = createEffect(() => {
-    return this.actions$.pipe(
+  addFeedFilter$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.ADD_SEARCH_BAR_FILTERS),
     mergeMap((_action: actions.EventFeedAction) =>
-      [actions.getInitialFeed(), actions.getGuitarStrings(), actions.getTaskCounts()]));
-  });
+      [actions.getInitialFeed(), actions.getGuitarStrings(), actions.getTaskCounts()])));
 
-  addFeedDateRangeFilter$ = createEffect(() => {
-    return this.actions$.pipe(
+  addFeedDateRangeFilter$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.ADD_FEED_DATE_RANGE_FILTER),
     mergeMap((_action: actions.EventFeedAction) =>
-      [actions.getInitialFeed(), actions.getTaskCounts(), actions.getGuitarStrings()]));
-  });
+      [actions.getInitialFeed(), actions.getTaskCounts(), actions.getGuitarStrings()])));
 
 }

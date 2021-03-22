@@ -38,17 +38,16 @@ export class UserEffects {
     private requests: UserRequests
   ) { }
 
-  getUsers$ = createEffect(() => {
-    return this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL),
+  getUsers$ = createEffect(() =>
+    this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL),
     mergeMap((_action: GetUsers) =>
       this.requests.getUsers().pipe(
         map((resp: GetUsersSuccessPayload) => new GetUsersSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new GetUsersFailure(error))))
-    ));
-  });
+    )));
 
-  getUsersFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getUsersFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.GET_ALL_FAILURE),
     map(({ payload }: GetUsersFailure) => {
         const msg = payload.error.error;
@@ -56,20 +55,18 @@ export class UserEffects {
         type: Type.error,
         message: `Could not get users: ${msg || payload.error}`
       });
-    }));
-  });
+    })));
 
-  getUser$ = createEffect(() => {
-    return this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET),
+  getUser$ = createEffect(() =>
+    this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET),
     mergeMap((action: GetUser) =>
       this.requests.getUser(action.payload.id).pipe(
         map((resp: User) => new GetUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new GetUserFailure(error))))
-    ));
-  });
+    )));
 
-  getUserFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  getUserFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.GET_FAILURE),
     map(({ payload: { error } }: GetUserFailure) => {
       const msg = error.error;
@@ -77,30 +74,27 @@ export class UserEffects {
         type: Type.error,
         message: `Could not get user: ${msg || error}`
       });
-    }));
-  });
+    })));
 
-  updatePasswordUser$ = createEffect(() => {
-    return this.actions$.pipe(
+  updatePasswordUser$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<UpdatePasswordUser>(UserActionTypes.UPDATE_PASSWORD_USER),
     mergeMap((action: UpdatePasswordUser) =>
       this.requests.updateUser(action.payload).pipe(
         map((resp: User) => new UpdatePasswordUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))
-    ));
-  });
+    )));
 
-  updatePasswordUserSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  updatePasswordUserSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.UPDATE_PASSWORD_USER_SUCCESS),
     map(( { payload: user }: UpdatePasswordUserSuccess) => new CreateNotification({
       type: Type.info,
       message: `Reset password for user: ${user.id}.`
-    })));
-  });
+    }))));
 
-  updateUserFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateUserFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.UPDATE_USER_FAILURE),
     map(({ payload: { error } }: UpdateUserFailure) => {
       const msg = error.error;
@@ -108,39 +102,35 @@ export class UserEffects {
         type: Type.error,
         message: `Could not update user: ${msg || error}`
       });
-    }));
-  });
+    })));
 
-  updateNameUser$ = createEffect(() => {
-    return this.actions$.pipe(
+  updateNameUser$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<UpdateNameUser>(UserActionTypes.UPDATE_NAME_USER),
     mergeMap((action: UpdateNameUser) =>
       this.requests.updateUser(action.payload).pipe(
         map((resp: User) => new UpdateNameUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))
-    ));
-  });
+    )));
 
-  deleteUser$ = createEffect(() => {
-    return this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE),
+  deleteUser$ = createEffect(() =>
+    this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE),
     mergeMap((action: DeleteUser) =>
       this.requests.deleteUser(action.payload).pipe(
         map((user: User) => new DeleteUserSuccess(user)),
         catchError((error: HttpErrorResponse) => of(new DeleteUserFailure(error))))
-    ));
-  });
+    )));
 
-  deleteUserSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteUserSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.DELETE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Successfully deleted user'
-    })));
-  });
+    }))));
 
-  deleteUserFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  deleteUserFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.DELETE_FAILURE),
     map(({ payload: { error } }: DeleteUserFailure) => {
       const msg = error.error;
@@ -148,31 +138,28 @@ export class UserEffects {
         type: Type.error,
         message: `Could not delete user: ${msg || error}`
       });
-    }));
-  });
+    })));
 
-  createUser$ = createEffect(() => {
-    return this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE),
+  createUser$ = createEffect(() =>
+    this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE),
     mergeMap((action: CreateUser) =>
       this.requests.createUser(action.payload).pipe(
         map((resp: User) => new CreateUserSuccess(resp)),
         catchError((error) => of(new CreateUserFailure(error))))
-    ));
-  });
+    )));
 
-  createUserSuccess$ = createEffect(() => {
-    return this.actions$.pipe(
+  createUserSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserActionTypes.CREATE_SUCCESS),
     map(( { payload: user }: CreateUserSuccess)  =>
       new CreateNotification({
         type: Type.info,
         message: `Created user ${user.id}.`
       })
-    ));
-  });
+    )));
 
-  createUserFailure$ = createEffect(() => {
-    return this.actions$.pipe(
+  createUserFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<CreateUserFailure>(UserActionTypes.CREATE_FAILURE),
     // username conflict and bad password handled in the modal, see user-management.component.ts
     filter(({ payload: { status } }) => {
@@ -181,7 +168,6 @@ export class UserEffects {
     map(({ payload: { error } }) => new CreateNotification({
       type: Type.error,
       message: `Could not create user: ${error.error || error}.`
-    })));
-  });
+    }))));
 
 }

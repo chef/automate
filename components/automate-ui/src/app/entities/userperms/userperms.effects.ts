@@ -47,19 +47,18 @@ export class UserPermEffects {
   // extend the fresh limit by a nudge for the IntrospectSome calls
   private freshLimitPlusANudge = 33000;
 
-  fetchAllPerms$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchAllPerms$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserPermsTypes.GET_ALL),
     throttleTime(this.freshLimitInMilliseconds),
     switchMap(() => {
       return this.requests.fetchAll().pipe(
         map((resp: UserPermsResponsePayload) => new GetAllUserPermsSuccess(resp.endpoints)),
         catchError((error: HttpErrorResponse) => of(new GetAllUserPermsFailure(error))));
-    }));
-  });
+    })));
 
-  fetchSomePerms$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchSomePerms$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserPermsTypes.GET_SOME),
     withLatestFrom(this.store.select(getlastFetchTime)),
     withLatestFrom(this.store.select(allPerms)),
@@ -74,16 +73,14 @@ export class UserPermEffects {
           : this.requests.fetchSome(action.payload).pipe(
             map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
             catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
-      }));
-  });
+      })));
 
-  fetchParameterizedPerms$ = createEffect(() => {
-    return this.actions$.pipe(
+  fetchParameterizedPerms$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(UserPermsTypes.GET_PARAMETERIZED),
     mergeMap((action: GetUserParamPerms) => this.requests.fetchParameterized(action.payload).pipe(
       map((resp: UserPermsResponsePayload) => new GetUserParamPermsSuccess(resp.endpoints)),
-      catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))))));
-  });
+      catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error)))))));
 
   private stale(lastTime: Date): boolean {
     return moment().diff(moment(lastTime)) > this.freshLimitPlusANudge;

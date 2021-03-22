@@ -35,17 +35,16 @@ export class ProjectsFilterEffects {
     mergeMap(this.loadOptionsAction$())));
 
   // Fast-initialize project filter just from local storage
-  initOptions$ = createEffect(() => {
-    return this.actions$.pipe(
-    ofType<LoadOptions>(ProjectsFilterActionTypes.INIT_OPTIONS),
-    map(() => {
-      return new InitOptionsSuccess({
-        fetched: [],
-        restored: this.projectsFilter.restoreOptions() || []
-      });
-    })
-  );
-  });
+  initOptions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType<LoadOptions>(ProjectsFilterActionTypes.INIT_OPTIONS),
+      map(() => {
+        return new InitOptionsSuccess({
+          fetched: [],
+          restored: this.projectsFilter.restoreOptions() || []
+        });
+      })
+    ));
 
   loadOptions$ = createEffect(() => this.actions$.pipe(
     ofType<LoadOptions>(ProjectsFilterActionTypes.LOAD_OPTIONS),
