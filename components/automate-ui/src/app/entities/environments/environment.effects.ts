@@ -155,6 +155,6 @@ export class EnvironmentEffects {
     filter(({ payload }: UpdateEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: UpdateEnvironmentFailure) => new CreateNotification({
       type: Type.error,
-      message: `Could not Update notification: ${payload.error.error || payload}.`
+      message: `Could not Update environment: ${payload.error.error || payload}.`
     })));
 }

@@ -5,7 +5,7 @@
   <div class="flex-container">
     <div class="main pages-body">
       <label>
-        <span class="constraint">{{capitalizeFirstLetter(environment?.name)}}</span>
+        <span class="constraint">{{environment?.name}}</span>
       </label>
       <hr class="divider-constraint" />
 
@@ -47,7 +47,7 @@
         <app-infra-environment-constraint
           [constraintKeys]="constraintKeys"
           (constraintValues)="constraintItemsHandler($event)"
-          [cookbookConstraintArray]="cookbookConstraintArray"
+          [cookbookConstraints]="cookbookConstraints"
           [name_id]="name_id"
           [nameKeys]="nameKeys"
           [constraintFormGroup]="constraintFormGroup"

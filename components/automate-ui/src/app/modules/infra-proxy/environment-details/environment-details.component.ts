@@ -50,7 +50,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     override_attributes: ''
   });
 
-  public cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
+  public cookbookConstraints: Array<CookbookConstraintGrid> = [];
   public name_id = '';
 
   public openEdit = false;
@@ -108,12 +108,12 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(environment => {
-      this.cookbookConstraintArray = [];
+      this.cookbookConstraints = [];
       this.show = true;
       this.environment = environment;
       this.cookbookVersions = this.toDisplay(environment.cookbook_versions);
       this.cookbookVersions.forEach((obj, index) => {
-        this.cookbookConstraintArray.push({
+        this.cookbookConstraints.push({
           id: index + 1,
           name: obj.name,
           operator: obj.operator,

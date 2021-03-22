@@ -41,7 +41,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   @Input() jsonText: any;
   @Input() label: string;
   @Input() name: string;
-  @Input() cookbookConstraintArray: Array<CookbookConstraintGrid> = [];
+  @Input() cookbookConstraints: Array<CookbookConstraintGrid> = [];
   @Input() cookbookVersions: CookbookVersionDisplay[];
   @Input() environment: Environment;
 
@@ -102,7 +102,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.org = this.orgId;
       this.showConstraint =  (this.label ===  'Default' || 'Override') ? false : true;
       this.selectedCookbookNames = [];
-      this.cookbookConstraintArray.forEach((element) => {
+      this.cookbookConstraints.forEach((element) => {
         this.selectedCookbookNames.push(element.name);
       });
       this.selectedCookbookNames.forEach((ele) => {
@@ -150,10 +150,6 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.isDestroyed.complete();
   }
 
-  capitalizeFirstLetter(name: string) {
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  }
-
   closeEditModal(): void {
     this.resetEditModal();
     this.visible = false;
@@ -172,35 +168,23 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.defaultAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.defaultAttrParseError = true;
     }
   }
 
   onChangeOverrideJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.overrideAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.overrideAttrParseError = true;
     }
-  }
-
-  updatingData(environment: Environment) {
-    this.store.dispatch(
-      new UpdateEnvironment(environment)
-    );
   }
 
   updateEnvironment(): void {
@@ -298,13 +282,13 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   private resetEditModal(): void {
-    this.cookbookConstraintArray = [];
+    this.cookbookConstraints = [];
     this.creating = false;
     this.showConstraint = false;
     this.loadCookbooks();
     this.constraintFormGroup.controls.version.setValue('');
     this.cookbookVersions.forEach((obj, index) => {
-      this.cookbookConstraintArray.push({
+      this.cookbookConstraints.push({
         id: index + 1,
         name: obj.name,
         operator: obj.operator,
@@ -314,6 +298,12 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     });
 
     this.conflictErrorEvent.emit(false);
+  }
+
+  private updatingData(environment: Environment) {
+    this.store.dispatch(
+      new UpdateEnvironment(environment)
+    );
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

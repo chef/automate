@@ -47,7 +47,7 @@
             (ngModelChange)="handleEditName(selectName.value,i)">
             <ng-container *ngFor="let key of nameKeys">
               <mat-option *ngIf="selectName.value === key || !isSelected(key)" [value]="key" [ngValue]="key"
-                [ngClass]="{'checkmark': key === cookbookConstraintArray[i].name}">
+                [ngClass]="{'checkmark': key === cookbookConstraints[i].name}">
                 {{ key}}
               </mat-option>
             </ng-container>
