@@ -16418,6 +16418,11 @@
         "name": {
           "description": "Client name.",
           "type": "string"
+        },
+        "validator": {
+          "description": "Boolean indicates client type is validator or not.",
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
