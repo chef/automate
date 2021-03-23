@@ -64,7 +64,7 @@
         </div>
       </div>
       <div class="row-version-margin">
-        <input chefInput type="text" id="name-input" (keyup)="handleInput($event)"
+        <input chefInput type="text" (keyup)="handleInput($event)"
           (ngModelChange)="handleEditVersion($event, i)" autocomplete="off" [(ngModel)]="cookbookConstraints[i].version" />
       </div>
       <div class="remove">

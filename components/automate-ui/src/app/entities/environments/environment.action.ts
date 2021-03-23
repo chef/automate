@@ -14,7 +14,10 @@ export enum EnvironmentActionTypes {
   CREATE_FAILURE    = 'ENVIRONMENTS::CREATE::FAILURE',
   DELETE          = 'ENVIRONMENTS::DELETE',
   DELETE_SUCCESS  = 'ENVIRONMENTS::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'ENVIRONMENTS::DELETE::FAILURE'
+  DELETE_FAILURE  = 'ENVIRONMENTS::DELETE::FAILURE',
+  UPDATE            = 'ENVIRONMENTS::UPDATE',
+  UPDATE_SUCCESS    = 'ENVIRONMENTS::UPDATE::SUCCESS',
+  UPDATE_FAILURE    = 'ENVIRONMENTS::UPDATE::FAILURE'
 }
 
 export interface GetEnvironmentsPayload {
@@ -69,8 +72,8 @@ export interface CreateEnvironmentPayload {
   server_id: string;
   name: string;
   description: string;
-  default_attributes: Object;
-  override_attributes: Object;
+  default_attributes: string;
+  override_attributes: string;
   cookbook_versions: Object;
 }
 
@@ -104,6 +107,21 @@ export class DeleteEnvironmentFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class UpdateEnvironment implements Action {
+  readonly type = EnvironmentActionTypes.UPDATE;
+  constructor(public payload: Environment ) { }
+}
+
+export class UpdateEnvironmentSuccess implements Action {
+  readonly type = EnvironmentActionTypes.UPDATE_SUCCESS;
+  constructor(public payload: Environment) { }
+}
+
+export class UpdateEnvironmentFailure implements Action {
+  readonly type = EnvironmentActionTypes.UPDATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type EnvironmentActions =
   | GetEnvironments
   | GetEnvironmentsSuccess
@@ -116,4 +134,7 @@ export type EnvironmentActions =
   | CreateEnvironmentFailure
   | DeleteEnvironment
   | DeleteEnvironmentSuccess
-  | DeleteEnvironmentFailure;
+  | DeleteEnvironmentFailure
+  | UpdateEnvironment
+  | UpdateEnvironmentSuccess
+  | UpdateEnvironmentFailure;

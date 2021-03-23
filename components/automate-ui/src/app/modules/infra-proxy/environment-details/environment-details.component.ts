@@ -15,6 +15,10 @@ import {
   CookbookVersionDisplay
 } from 'app/entities/environments/environment.model';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
+
+import { CookbookConstraintGrid } from '../edit-environment-attribute-modal/edit-environment-attribute-modal.component';
 
 export type EnvironmentTabName = 'cookbookConstraints' | 'attributes';
 
@@ -38,14 +42,24 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public hasCookbookConstraints = false;
   private isDestroyed = new Subject<boolean>();
   environmentDetailsLoading = true;
-
+  public editAttrModalVisible = false;
+  public editAttributeForm: FormGroup;
+  public label: string;
   public attributes = new EnvironmentAttributes({
     default_attributes: '',
     override_attributes: ''
   });
 
+  public cookbookConstraints: Array<CookbookConstraintGrid> = [];
+  public name_id = '';
+
+  public openEdit = false;
+
   public selectedAttrs: any;
   public selected_level = 'all';
+
+  public jsonText: any;
+  public openEnvironmentModal = new EventEmitter<boolean>();
 
   // precedence levels
   public default_attributes = 'default_attributes';
@@ -58,8 +72,13 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService
-  ) { }
+    private layoutFacade: LayoutFacadeService,
+    private fb: FormBuilder
+  ) {
+    this.editAttributeForm = this.fb.group({
+      defaultAttributes: ['', [Validators.required]]
+    });
+   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -89,20 +108,34 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(environment => {
+      this.cookbookConstraints = [];
       this.show = true;
       this.environment = environment;
       this.cookbookVersions = this.toDisplay(environment.cookbook_versions);
+      this.cookbookVersions.forEach((obj, index) => {
+        this.cookbookConstraints.push({
+          id: index + 1,
+          name: obj.name,
+          operator: obj.operator,
+          version: obj.versionNumber
+        });
+
+      });
       if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
       }
-      this.attributes.default_attributes = this.environment.default_attributes;
-      this.attributes.override_attributes = this.environment.override_attributes;
-      this.attributes.all.default_attributes = this.environment.default_attributes;
-      this.attributes.all.override_attributes = this.environment.override_attributes;
+      this.attributes = new EnvironmentAttributes(this.environment);
 
       setTimeout(() => this.filter(this.selected_level), 10);
       this.environmentDetailsLoading = false;
     });
+
+  }
+
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   // set selected item to selected_level
@@ -140,10 +173,19 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
     this.filter(this.selected_level);
+    this.label = '';
   }
 
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+  public openEditAttributeModal(value, label): void {
+    this.openEdit = true;
+    const obj = JSON.parse(value);
+    this.jsonText = JSON.stringify(obj, undefined, '    ');
+    this.label = label;
+    this.openEnvironmentModal.emit(true);
   }
+
+  public closeEditAttributeModal(): void {
+    this.editAttrModalVisible = false;
+  }
+
 }

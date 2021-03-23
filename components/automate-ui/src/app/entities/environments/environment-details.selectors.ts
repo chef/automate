@@ -22,6 +22,11 @@ export const getStatus = createSelector(
   (state) => state.getStatus
 );
 
+export const updateStatus = createSelector(
+  environmentState,
+  (state) => state.updateStatus
+);
+
 export const environmentFromRoute = createSelector(
   environmentEntities,
   routeParams,

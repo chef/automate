@@ -23,6 +23,7 @@ import { DataBagsListComponent } from './data-bags-list/data-bags-list.component
 import { DragDropComponent } from './drag-drop/drag-drop.component';
 import { DeleteInfraObjectModalComponent } from './delete-infra-object-modal/delete-infra-object-modal.component';
 import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal/edit-data-bag-item-modal.component';
+import { EditEnvironmentAttributeModalComponent } from './edit-environment-attribute-modal/edit-environment-attribute-modal.component';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
@@ -65,6 +66,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     DragDropComponent,
     DeleteInfraObjectModalComponent,
     EditDataBagItemModalComponent,
+    EditEnvironmentAttributeModalComponent,
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,

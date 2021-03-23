@@ -7,8 +7,8 @@ export interface Environment {
   chef_type?: string;
   description: string;
   json_class?: string;
-  default_attributes: Object;
-  override_attributes: Object;
+  default_attributes: string;
+  override_attributes: string;
   run_list?: string[];
   cookbook_versions: Object;
 }
