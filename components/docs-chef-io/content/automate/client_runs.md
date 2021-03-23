@@ -37,7 +37,7 @@ This situation happens when data retention settings erase the most recent run hi
 In this case, a **no data** icon appears and you will be unable to view any node details.
 
 The node remains listed as a missing node until it is deleted from Automate.
-Automate automatically removes any modes deleted from the Chef Infra Server.
+Automate automatically removes any nodes deleted from the Chef Infra Server.
 
 ## Node Details
 
