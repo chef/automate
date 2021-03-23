@@ -32,10 +32,10 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
   constructor(
   ) {
-    this.operators = ['~>', // approximately greater than;
-    // also known as "pessimistically greater than", or "pessimistic"
+    this.operators = [
+      '~>', // A pessimistic will find the upper limit version number within the range
+      // specified by the minor version number or patch version number.
       '>=', '>', '=', '<', '<='];
-
     this.operator_id = this.operators[0];
   }
 

@@ -80,6 +80,14 @@ describe('CreateEnvironmentModalComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('check cookbook version', () => {
+    const cookbookVersion = '2.3.4';
+
+    it('cookbook version should be valid when version data is filled out', () => {
+      component.constraintFormGroup.controls['version'].setValue(cookbookVersion);
+      expect(component.constraintFormGroup.valid).toBeTruthy();
+    });
+  });
 
   describe('create environment', () => {
     let store: Store<NgrxStateAtom>;
