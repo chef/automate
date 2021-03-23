@@ -4,14 +4,14 @@ export interface InfraRole {
   server_id: string;
   org_id: string;
   name: string;
-  environments: string[];
-  chef_type: string;
+  environments?: string[];
+  chef_type?: string;
   description: string;
-  json_class: string;
-  default_attributes: string;
-  override_attributes: string;
+  json_class?: string;
+  default_attributes: Object;
+  override_attributes: Object;
   run_list: string[];
-  expanded_run_list: ExpandedList[];
+  expanded_run_list?: ExpandedList[];
 }
 
 export interface ExpandedList {

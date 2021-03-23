@@ -8,6 +8,10 @@ import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interc
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
+export interface RoleResponse {
+  role: InfraRole;
+}
+
 export interface RoleSearchResponse {
   roles: InfraRole[];
   total: number;
@@ -36,6 +40,12 @@ export class InfraRoleRequests {
   public getRole(server_id: string, org_id: string, name: string): Observable<InfraRole> {
     return this.http.get<InfraRole>(
         `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`, {headers});
+  }
+
+  public createRole(role: InfraRole): Observable<RoleResponse> {
+
+    return this.http.post<RoleResponse>(
+      `${env.infra_proxy_url}/servers/${role.server_id}/orgs/${role.org_id}/roles`, role);
   }
 
   public deleteRole(server_id: string, org_id: string, name: string): Observable<{}> {

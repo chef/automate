@@ -2,17 +2,20 @@ import { Component, Input, OnInit,
   OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
-  roleList
+  roleList,
+  deleteStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
+import { EntityStatus } from 'app/entities/entities';
 
 @Component({
   selector: 'app-infra-roles',
@@ -25,63 +28,72 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
-
   public roles: InfraRole[] = [];
   public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
   public authFailure = false;
   public searching = false;
   public searchValue = '';
-  public page = 1;
+  public currentPage = 1;
   public per_page = 9;
   public total: number;
 
   public roleToDelete: InfraRole;
+  public chefInfraViewsFeatureFlagOn: boolean;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
 
+  public openRoleModal = new EventEmitter<boolean>();
+  public recipes: any;
+
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
-  ) { }
+    private layoutFacade: LayoutFacadeService,
+    private featureFlagsService: FeatureFlagsService
+  ) {
+    // feature flag enable and disable the create button
+    this.chefInfraViewsFeatureFlagOn =
+    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    const payload = {
-      roleName: '',
-      server_id: this.serverId,
-      org_id: this.orgId,
-      page: this.page,
-      per_page: this.per_page
-    };
-
-    this.store.dispatch(new GetRoles(payload));
-
+    this.getRolesData();
 
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(roleList)
     ]).pipe(
+      filter(([getRolesStatus, allRolesState]) =>
+        getRolesStatus === EntityStatus.loadingSuccess &&
+        !isNil(allRolesState)),
       takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, RolesState]) => {
       if (!isNil(RolesState)) {
         this.roleListState = RolesState;
-        if (this.roleListState.items.length === 0 && this.roleListState.total !== 0) {
-          this.store.dispatch(new GetRoles(payload));
-          this.rolesListLoading = true;
-        } else {
-          this.roles = RolesState?.items;
-          this.total = RolesState?.total;
-          this.rolesListLoading = false;
-          this.searching = false;
-        }
+        this.roles = RolesState?.items;
+        this.total = RolesState?.total;
+        this.rolesListLoading = false;
+        this.searching = false;
       }
     });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.searching = true;
+        if (this.roles && this.roles.length === 0 &&
+          this.currentPage !== 1) {
+            this.currentPage = this.currentPage - 1;
+        }
+        this.getRolesData();
+      });
   }
 
   searchRoles(currentText: string) {
-    this.page = 1;
+    this.currentPage = 1;
     this.searching = true;
     this.searchValue = currentText;
 
@@ -89,7 +101,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: number): void {
-    this.page = event;
+    this.currentPage = event;
     this.searching = true;
     this.getRolesData();
   }
@@ -99,7 +111,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       roleName: this.searchValue,
       server_id: this.serverId,
       org_id: this.orgId,
-      page: this.page,
+      page: this.currentPage,
       per_page: this.per_page
     };
 
@@ -108,6 +120,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  public openCreateModal(): void {
+    this.openRoleModal.emit();
   }
 
   ngOnDestroy(): void {

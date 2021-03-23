@@ -1,0 +1,259 @@
+@import "~styles/variables";
+
+.select-box-list-container {
+  display: flex;
+  flex-direction: row;
+  height: 252px;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.role-list {
+  display: block;
+  background: $chef-white;
+  height: 235px;
+  left: 398px;
+  right: 762px;
+  top: 389px;
+  width: 280px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.role-list-margin {
+  margin: 8px;
+}
+
+.run-list-box {
+  display: flex;
+  padding: 10px 10px;
+  color: rgba(0, 0, 0, 0.87);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  background: $chef-white;
+  font-size: 14px;
+}
+
+.scroll {
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.fixed-height {
+  height: 180px;
+  margin-top: 10px;
+  margin-left: 1px;
+}
+
+.empty-scroll {
+  max-height: 235px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::ng-deep .empty-scroll::-webkit-scrollbar {
+  width: 3px;
+  background-color: $chef-modal-scrollbar;
+}
+
+::ng-deep .empty-scroll::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+.no-data {
+  margin: 32px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.select-box-list {
+  font-size: 14px;
+  height: 235px;
+  left: 730px;
+  right: 430px;
+  top: 389px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+  width: 3px;
+  background-color: $chef-modal-scrollbar;
+}
+
+::ng-deep .scroll::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+.select-box-list-item {
+  padding: 10px;
+  cursor: move;
+}
+
+.run-list-box.selected {
+  margin-top: 6.5px;
+  background: rgba(56, 100, 242, 0.5);
+  background-blend-mode: multiply;
+  border-radius: 4px;
+}
+
+.select-box-list-item.selected {
+  margin-top: 6.5px;
+  background: rgba(56, 100, 242, 0.5);
+  background-blend-mode: multiply;
+  border-radius: 4px;
+}
+
+.select-box-buttons {
+  display: flex;
+  vertical-align: center;
+  padding: 20px;
+  flex-direction: column;
+  width: 50px;
+  height: 250px;
+}
+
+.select-box-preview span {
+  background-color: $chef-primary-bright;
+  padding: 10px;
+}
+
+.select-box-placeholder span {
+  background-color: $chef-primary-bright;
+  padding: 10px;
+}
+
+.selectbox-search {
+  margin-bottom: 21px;
+  margin-top: -8px;
+  width: 100%;
+}
+
+.dropdown-toggle {
+  color: $chef-white;
+}
+
+.margin {
+  margin-top: 8px;
+}
+
+.data-box {
+  border-radius: 10px;
+  float: left;
+  width: 41.5%;
+  margin-right: 10px;
+}
+
+.empty-box {
+
+  float: left;
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 41.5%;
+  height: 235px;
+  left: 730px;
+  right: 430px;
+  top: 389px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.left-right-arrow-box {
+  float: left;
+  padding-top: 157px;
+  text-align: center;
+  width: 8%;
+}
+
+.up-down-arrow-box {
+  float: left;
+  padding-top: 157px;
+  text-align: center;
+  width: 6%;
+  margin-left: 5px;
+}
+
+.primary {
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  background-color: $chef-white;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  font-size: 14px;
+  min-height: 32px;
+  min-width: 32px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: top;
+
+  left: 0px;
+  top: 0px;
+  border: none;
+}
+
+.primary:focus {
+  outline: none;
+}
+
+.input-icons {
+  width: 100%;
+  width: 254px;
+  height: 32px;
+
+  background: $chef-white;
+  border: 1px solid $chef-light-grey;
+  box-sizing: border-box;
+  border-radius: 4px;
+
+}
+
+.icon {
+
+  color: $chef-primary-dark;
+  padding-left: 7.91px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  width: 15.78px;
+  height: 16px;
+  font-size: 16px;
+}
+
+.input-field {
+  padding: 10px;
+  text-align: start;
+
+  width: 227px;
+  height: 21px;
+  left: 32px;
+  top: 5px;
+
+  font-size: 12px;
+  line-height: 21px;
+
+  letter-spacing: 0.2px;
+  border: none;
+  color: #6F7878;
+  margin-left: 30px;
+  margin-top: 5px;
+}
+
+.input-icons mat-icon {
+  position: absolute;
+}
+ 

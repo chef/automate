@@ -24,6 +24,16 @@ export const deleteStatus = createSelector(
   (state) => state.deleteStatus
 );
 
+export const saveStatus = createSelector(
+  infraRoleState,
+  (state) => state.saveStatus
+);
+
+export const saveError = createSelector(
+  infraRoleState,
+  (state) => state.saveError
+);
+
 export const infraRoleFromRoute = createSelector(
   roleEntities,
   routeParams,

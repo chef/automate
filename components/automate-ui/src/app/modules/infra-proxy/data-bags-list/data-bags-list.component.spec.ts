@@ -22,7 +22,7 @@ describe('DataBagsListComponent', () => {
         MockComponent({ selector: 'app-create-data-bag-modal',
         inputs: ['openEvent', 'server_Id', 'org_Id'] }),
         MockComponent({ selector: 'app-delete-infra-object-modal',
-        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
+        inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
         outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),

@@ -1,0 +1,240 @@
+@import "~styles/variables";
+
+chef-modal {
+  [slot=title] {
+    text-align: left;
+    padding-bottom: 44px;
+    margin-top: 0px;
+    width: 257px;
+    height: 27px;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    color: $chef-black;
+  }
+
+  ::ng-deep .modal {
+    overflow-x: hidden;
+    padding: 32px;
+    outline: none;
+    box-shadow: 0px 0px 30px 0px $chef-modal;
+    width: 708px;
+    height: 570px;
+  }
+
+  ::ng-deep .modal::-webkit-scrollbar {
+    width: 8px;
+    background-color: $chef-modal-scrollbar;
+  }
+
+  ::ng-deep  .modal::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: $chef-modal;
+  }
+
+  ::ng-deep .modal-overlay {
+    background-color: $chef-white;
+    mix-blend-mode: normal;
+    opacity: 0.7;
+  }
+
+  .flex-container {
+    justify-content: center;
+
+    .input-margin {
+      margin-bottom: 20px;
+    }
+
+    form {
+      flex-basis: 61%;
+
+      input {
+        font-size: 1em;
+        height: 36px;
+        left: 398px;
+        right: 398px;
+        top: 365px;
+        border: 1px solid $chef-form-input;
+        box-sizing: border-box;
+        border-radius: 4px;
+        margin-top: 8px;
+        margin-top: 8px;
+      }
+
+      label {
+        padding-bottom: 0;
+        font-size: 16px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: $chef-black;
+        margin-top: 32px;
+      }
+
+      #description {
+        height: 162px;
+        left: 398px;
+        right: 398px;
+        top: 462px;
+        border: 1px solid $chef-form-input;
+        box-sizing: border-box;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+
+      #default, #override {
+        height: 286px;
+      }
+    }
+
+    .button-bar-box {
+      text-align: right;
+      margin-top: 20px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+
+    }
+
+    .button-bar-constraint {
+      text-align: right;
+      margin-top: 100px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+}
+
+.pages-body {
+  padding-top: 0;
+
+  ::ng-deep button.nav-tab.active {
+    background: $chef-primary-bright;
+  }
+
+  ::ng-deep button.nav-tab:focus {
+    outline: none;
+  }
+
+  ::ng-deep .nav-tab:before {
+    height: 4px;
+    background: $chef-tab-hover;
+  }
+}
+
+::ng-deep {
+  chef-button {
+    height: 36px;
+  }
+
+  chef-button#create-button-object-modal {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#create-button-object-modal-1 {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#create-button-object-modal-2 {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#create-button-object-modal-3 {
+    margin: 10px 0px 0px 16px;
+  }
+
+  chef-button#cancel-server-popup {
+    margin: 10px 15px 0px 0px;
+  }
+
+  chef-button.close {
+    border: none;
+    color: var(--chef-primary-dark);
+    outline: none;
+    margin-top: 18px;
+    margin-right: 18px;
+  }
+
+  chef-button.close:active {
+    background: none;
+    color: var(--chef-primary-dark);
+  }
+}
+
+form {
+  chef-form-field {
+    textarea {
+      height: 286px;
+      margin-top: 32.22px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      margin-bottom: -5px;
+    }
+  }
+}
+
+.drag-margin {
+  margin-top: 31px;
+}
+
+.description-scroll {
+  textarea {
+    max-height: 162px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+::ng-deep .description-scroll textarea::-webkit-scrollbar {
+  width: 3px;
+  background-color: $chef-modal-scrollbar;
+}
+
+::ng-deep .description-scroll textarea::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+#default {
+  max-height: 286px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::ng-deep #default::-webkit-scrollbar {
+  width: 3px;
+  margin-right: 10px;
+  background-color: $chef-modal-scrollbar;
+  border-radius: 5px;
+}
+
+::ng-deep #default::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+#override {
+  max-height: 286px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::ng-deep #override::-webkit-scrollbar {
+  width: 3px;
+  margin-right: 10px;
+  background-color: $chef-modal-scrollbar;
+  border-radius: 5px;
+}
+
+::ng-deep #override::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}

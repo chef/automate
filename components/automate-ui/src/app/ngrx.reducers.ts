@@ -44,6 +44,7 @@ import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
+import * as recipeEntity from './entities/recipes/recipe.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
@@ -109,6 +110,7 @@ export interface NgrxStateAtom {
   policyFiles: policyFileEntity.PolicyFileEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
+  recipes: recipeEntity.RecipeEntityState;
   roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
   servers: serverEntity.ServerEntityState;
@@ -233,6 +235,7 @@ export const defaultInitialState = {
   policyFiles: policyFileEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
+  recipes: recipeEntity.RecipeEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
   nodeCredential: nodeCredentialEntity.NodeCredentialEntityInitialState,
@@ -295,6 +298,7 @@ export const ngrxReducers = {
   policyFiles: policyFileEntity.policyFileEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
+  recipes: recipeEntity.recipeEntityReducer,
   roles: roleEntity.roleEntityReducer,
   rules: ruleEntity.ruleEntityReducer,
   servers: serverEntity.serverEntityReducer,
