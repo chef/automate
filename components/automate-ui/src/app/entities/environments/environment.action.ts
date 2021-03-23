@@ -72,8 +72,8 @@ export interface CreateEnvironmentPayload {
   server_id: string;
   name: string;
   description: string;
-  default_attributes: Object;
-  override_attributes: Object;
+  default_attributes: string;
+  override_attributes: string;
   cookbook_versions: Object;
 }
 

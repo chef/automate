@@ -54,7 +54,6 @@ export class EnvironmentRequests {
   }
 
   public updateEnvironment(environment: Environment): Observable<Environment> {
-
     return this.http.put<Environment>(
       `${env.infra_proxy_url}/servers/${environment.server_id}/orgs/${environment.org_id}/environments/${environment.name}`, environment);
   }
