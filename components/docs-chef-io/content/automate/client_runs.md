@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Client Runs"
-    parent = "automate"
-    identifier = "automate/client_runs.md Client Runs"
-    weight = 60
+    parent = "automate/infrastructure"
+    identifier = "automate/infrastructure/client_runs.md Client Runs"
+    weight = 10
 +++
 
 ## Overview
