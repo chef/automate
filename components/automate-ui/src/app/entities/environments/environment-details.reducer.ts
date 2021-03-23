@@ -43,3 +43,6 @@ export function environmentDetailsEntityReducer(
       return state;
   }
 }
+
+export const getEntityById = (id: string) =>
+  (state: EnvironmentDetailsEntityState) => state.entities[id];

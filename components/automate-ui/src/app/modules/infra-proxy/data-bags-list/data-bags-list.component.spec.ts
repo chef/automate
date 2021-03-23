@@ -19,6 +19,11 @@ describe('DataBagsListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
+        MockComponent({ selector: 'app-create-data-bag-modal',
+        inputs: ['openEvent', 'server_Id', 'org_Id'] }),
+        MockComponent({ selector: 'app-delete-infra-object-modal',
+        inputs: ['visible', 'objectNoun', 'objectAction', 'objectName'],
+        outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-heading' }),

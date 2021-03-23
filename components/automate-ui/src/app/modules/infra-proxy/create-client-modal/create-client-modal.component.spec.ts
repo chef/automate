@@ -19,6 +19,8 @@ describe('CreateClientModalComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-checkbox', inputs: ['checked']}),
+        MockComponent({ selector: 'chef-snippet',
+        inputs: ['code'] }),
         CreateClientModalComponent
       ],
       imports: [

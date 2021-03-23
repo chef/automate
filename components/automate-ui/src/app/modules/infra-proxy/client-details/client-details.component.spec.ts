@@ -25,6 +25,8 @@ describe('ClientDetailsComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
+        MockComponent({ selector: 'chef-snippet',
+          inputs: ['code'] }),
         MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-table' }),
         MockComponent({ selector: 'chef-thead' }),

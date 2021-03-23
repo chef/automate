@@ -25,7 +25,10 @@ export class Regex {
     // Allows valid FQDN only
     VALID_FQDN: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-zA-Z0-9_]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
     // Allows valid IP Address only (ipv4)
-    VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+    VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+
+    // Allow valid versions only Eg: 1.2.3
+    VALID_VERSION: /^\d{1,9}\.\d{1,9}\.\d{1,9}$/
   };
 
 }

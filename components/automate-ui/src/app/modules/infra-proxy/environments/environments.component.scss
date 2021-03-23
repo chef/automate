@@ -44,7 +44,6 @@ chef-loading-spinner {
 }
 
 .empty-section {
-  margin-top: 130px;
   text-align: center;
 }
 
@@ -54,8 +53,33 @@ chef-loading-spinner {
 
 img {
   width: 70px;
+  margin-top: 130px;
 }
 
 .three-dot-column {
   text-align: right;
+}
+
+.environments {
+  .search-items {
+    margin-bottom: 18px;
+    height: 55px;
+  }
+
+  span chef-toolbar chef-button:first-child {
+    margin: 4px 0px 0px 32px;
+    float: right;
+
+    button {
+      padding: 7px 16px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  ::ng-deep {
+    .search-items app-infra-search-bar .search-wrapper {
+      float: left;
+      width: calc(100% - 187px);
+    }
+  }
 }

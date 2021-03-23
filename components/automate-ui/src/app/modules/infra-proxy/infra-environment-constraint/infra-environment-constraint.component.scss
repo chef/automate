@@ -1,0 +1,308 @@
+@import "~styles/variables";
+
+.constraint-margin {
+  display: flex;
+}
+
+.label {
+  display: flex;
+  padding-bottom: .75em;
+  margin-bottom: 8px;
+  height: 19px;
+
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: $chef-black;
+}
+
+span.example-text {
+  font-size: 10px;
+  margin-left: 3px;
+  margin-top: 2px;
+}
+
+#name-input-constraint {
+  margin-left: 8px;
+}
+
+.label-version {
+  margin-left: 8px;
+}
+
+.label-operator {
+  margin-left: 4px;
+}
+
+::ng-deep mat-select#mat-select-2 {
+  margin-left: 5px;
+}
+
+.fixed-height {
+  height: 211px;
+}
+
+.name-margin {
+  margin-bottom: 18px;
+  margin-top: 32px;
+
+  ::ng-deep label {
+    width: 229px;
+  }
+
+  .drop {
+    width: 300px;
+  }
+}
+
+.row-name-margin {
+
+  .name-dropdown {
+    color: $chef-primary-dark;
+
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      width: 300px;
+      font-size: 12px;
+    }
+
+    mat-select {
+      height: 36px;
+      width: 300px;
+    }
+
+    chef-select ::ng-deep .selected-value chef-icon {
+      color: $chef-primary-bright;
+    }
+  }
+}
+
+.operator-margin {
+  margin-left: 16px;
+  width: 123px;
+  margin-bottom: 18px;
+  margin-top: 32px;
+}
+
+.row-operator-margin {
+  margin-left: 16px;
+
+  .operator-dropdown {
+    color: $chef-primary-dark;
+
+    ::ng-deep label {
+      display: inline;
+      color: $chef-primary-dark;
+      font-size: 15px;
+      margin-right: 15px;
+    }
+
+    mat-select {
+      margin-bottom: 12px;
+      width: 88px;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+  }
+}
+
+.version-margin {
+  margin-left: 16px;
+  width: 215px;
+  margin-bottom: 18px;
+  margin-top: 32px;
+
+  chef-form-field input {
+    height: 36px;
+    border: 1px solid $chef-form-input;
+    box-sizing: border-box;
+    border-radius: 4px 0px 0px 4px;
+  }
+}
+
+.row-version-margin {
+  margin-left: 16px;
+
+  input {
+    height: 36px;
+    border: 1px solid $chef-form-input;
+    box-sizing: border-box;
+    border-radius: 4px 0px 0px 4px;
+    margin-right: 0px;
+    width: 132px;
+    margin-left: 2px;
+  }
+}
+
+.add {
+  margin-top: 51px;
+
+  chef-button {
+    width: 61px;
+    height: 36px;
+    border: 1px solid $chef-primary-bright;
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: $chef-primary-bright;
+  }
+
+  chef-button[primary][disabled] {
+    border: 1px solid rgba(56, 100, 242, 0.5);
+    border-radius: 0px 4px 4px 0px;
+    color: rgba(56, 100, 242, 0.5);
+  }
+}
+
+.row-margin {
+  display: flex;
+}
+
+.scroll {
+  max-height: 211px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+
+  width: 5px;
+  background: #B4C3CC;
+  border-radius: 5px;
+}
+
+.remove {
+
+  chef-button {
+    width: 79px;
+    height: 36px;
+    border: 1px solid $chef-primary-bright;
+    border-radius: 0px 4px 4px 0px;
+    background-color: white;
+    color: $chef-primary-bright;
+    margin-top: 0px;
+    margin-left: 0px;
+  }
+}
+
+.option-tag {
+  min-width: 12px;
+  height: 10px;
+  overflow: scroll;
+}
+
+.checkmark:before {
+  display: inline-block;
+  content: 'L';
+  font-family: arial;
+  transform: scaleX(-1) rotate(-35deg);
+  vertical-align: top;
+  line-height: 1em;
+  width: 13.71px;
+  color: $chef-primary-dark;
+  height: 13.09px;
+  margin-right: 1.3em;
+  text-align: center;
+  position: absolute;
+  right: 0;
+}
+
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 31px;
+
+  .mat-option {
+    line-height: 3em;
+    font-size: 12px;
+    height: 3em;
+    border: 1px solid $chef-key-tab;
+    height: 37px;
+  }
+}
+
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
+  flex-basis: auto;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background: $chef-white;
+  color: $chef-black;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+  line-height: 3em;
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid $chef-key-tab;
+  height: 37px;
+}
+
+::ng-deep [panelClass=chef-dropdown] {
+  height: 36px;
+  padding: 5px 12px 0px 12px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep [panelClass=chef-dropdown]:focus {
+  border-color: $chef-form-input;
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {
+  width: 4.5px;
+  background: $chef-form-input;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
+  background: #B4C3CC;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+  display: inline-block;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-color: $chef-white transparent transparent transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  border: 6px solid $chef-primary-bright;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: $chef-black;
+}
