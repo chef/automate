@@ -37,8 +37,7 @@ export class DragDropComponent implements OnInit {
     public userForm: FormGroup;
 
     constructor(
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.mergeArray(this.recipes, this.defaultType);

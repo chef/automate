@@ -60,7 +60,7 @@
                         <chef-button [disabled]="!selectedRunList?.length || conflictError"  primary id="create-button-object-modal-1" (click)="createRole()">
                             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                             <span *ngIf="!creating">Create</span>
-                            <span *ngIf="creating">Creating Role...</span>
+                            <span *ngIf="creating">Creating...</span>
                         </chef-button>
                     </div>
                 </app-infra-tab>

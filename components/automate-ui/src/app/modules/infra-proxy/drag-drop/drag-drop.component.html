@@ -4,7 +4,6 @@
         <mat-select #li panelClass="chef-dropdown" [value]="defaultType"
             (selectionChange)="selectChangeHandler(li.value)">
             <mat-option *ngFor="let key of typeAvailable" [value]="key">
-
                 <span *ngIf="key==='available roles'">
                     <img alt="Available roles" src="/assets/img/briefcase.png" />
                 </span>
@@ -15,11 +14,9 @@
             </mat-option>
         </mat-select>
     </div>
-
     <span class="heading-run-list">
     Current Run List
     </span>
-
     <!-- combined data -->
     <div *ngIf="showbutton" class="margin">
         <form [formGroup]="userForm">
