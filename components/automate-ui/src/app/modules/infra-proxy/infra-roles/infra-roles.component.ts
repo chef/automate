@@ -8,6 +8,7 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
@@ -38,6 +39,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public total: number;
 
   public roleToDelete: InfraRole;
+  public chefInfraViewsFeatureFlagOn: boolean;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
 
@@ -46,8 +48,13 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
-  ) { }
+    private layoutFacade: LayoutFacadeService,
+    private featureFlagsService: FeatureFlagsService
+  ) {
+    // feature flag enable and disable the create button
+    this.chefInfraViewsFeatureFlagOn =
+    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
+  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);

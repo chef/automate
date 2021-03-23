@@ -19,15 +19,11 @@
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
     <div class="search-items">
-      <!-- <div class="search-box"> -->
-        <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
-        </app-infra-search-bar>
-      <!-- </div> -->
-      <!-- <div class="button-box"> -->
-        <chef-toolbar>
-          <chef-button id="role-create" primary (click)="openCreateModal()">Create Role</chef-button>
-        </chef-toolbar>
-      <!-- </div> -->
+      <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
+      </app-infra-search-bar>
+      <chef-toolbar *ngIf="chefInfraViewsFeatureFlagOn">
+        <chef-button id="role-create" primary (click)="openCreateModal()">Create Role</chef-button>
+      </chef-toolbar>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !roles.length">
