@@ -1,7 +1,10 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*"
+    "projects/**/*",
+    "**/node_modules/*",
+    "dist/*",
+    "src/assets/*"
   ],
   "overrides": [
     {
