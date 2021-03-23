@@ -28,16 +28,15 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
 
   public conflictError = false;
   public operator_id = '';
-  public operatorKeys: string[] = [];
+  public operators: string[] = [];
 
   constructor(
   ) {
-
-    this.operatorKeys = ['~>', // approximately greater than;
+    this.operators = ['~>', // approximately greater than;
     // also known as "pessimistically greater than", or "pessimistic"
       '>=', '>', '=', '<', '<='];
 
-    this.operator_id = this.operatorKeys[0];
+    this.operator_id = this.operators[0];
   }
 
   ngOnInit() {
@@ -59,7 +58,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     });
 
     this.name_id = this.constraintKeys[0];
-    this.operator_id = this.operatorKeys[0];
+    this.operator_id = this.operators[0];
 
     this.constraintFormGroup.controls.version.setValue('');
     this.toUpdateCookbookData(this.cookbookConstraints);
@@ -133,7 +132,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
     this.selectedCookbookNames.forEach((element, index) => {
       if (index === cookbookIndex) {
         previousName = element;
-        if (newName && newName !== 'undefined') {
+        if (newName) {
           this.selectedCookbookNames[cookbookIndex] = newName;
         }
       }

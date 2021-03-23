@@ -16,7 +16,7 @@
     </label>
     <div class="operator-dropdown">
       <mat-select panelClass="chef-dropdown" [(value)]="operator_id" [disabled]="!constraintKeys.length">
-        <mat-option *ngFor="let key of operatorKeys" [value]="key" [ngClass]="{'checkmark': key === operator_id}">
+        <mat-option *ngFor="let key of operators" [value]="key" [ngClass]="{'checkmark': key === operator_id}">
           {{ key }}
         </mat-option>
       </mat-select>
@@ -60,7 +60,7 @@
         <div class="operator-dropdown">
           <mat-select panelClass="chef-dropdown" [(ngModel)]="cookbookConstraints[i].operator"
             (ngModelChange)="handleEditOperator($event, i)">
-            <mat-option *ngFor="let key of operatorKeys" [value]="key"
+            <mat-option *ngFor="let key of operators" [value]="key"
               [ngClass]="{'checkmark': key === cookbookConstraints[i].operator}">{{ key }}</mat-option>
           </mat-select>
         </div>
