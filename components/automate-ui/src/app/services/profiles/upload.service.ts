@@ -15,7 +15,7 @@ export class UploadService {
     private chefSessionService: ChefSessionService
   ) {}
 
-  sendFile(file: File): Observable<any> { /* tslint:disable */
+  sendFile(file: File): Observable<any> { /* eslint-disable */
     let contentType = this.estimateContentType(file.type, file.name);
     let owner = this.chefSessionService.username;
     let url = `${environment.compliance_url}/profiles?contentType=${contentType}&owner=${owner}`;

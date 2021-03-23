@@ -269,7 +269,7 @@ export let control = {
   'tags': {
     'gordon': null
   },
-  // tslint:disable-next-line:max-line-length
+  // eslint-disable-next-line max-len
   'code': 'control "gordon-1.0" do\n  impact 0.7\n  title "Verify the version number of Gordon"\n  desc "An optional description..."\n  tag "gordon"\n  ref "Gordon Requirements 1.0", uri: "http:\/\/..."\n\n  # Test using the custom gordon_config Inspec resource\n  # Find the resource content here: ..\/libraries\/\n  describe gordon_config do\n    it { should exist }\n    its("version") { should eq("1.0") }\n    its("file_size") { should <= 20 }\n    its("comma_count") { should eq 0 }\n  end\n\n  # Test the version again to showcase variables\n  g = gordon_config\n  g_path = g.file_path\n  g_version = g.version\n  describe file(g_path) do\n    its("content") { should match g_version }\n  end\nend\n',
   'source_location': {
     'ref': '\/Users\/vjeffrey\/code\/compliance\/inspec\/examples\/profile\/controls\/gordon.rb',

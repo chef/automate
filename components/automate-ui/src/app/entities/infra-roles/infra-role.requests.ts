@@ -18,7 +18,7 @@ export class InfraRoleRequests {
 
   constructor(private http: HttpClient) { }
 
-  // tslint:disable-next-line: max-line-length
+  // eslint-disable-next-line max-len
   public getRoles(payload: RolesPayload): Observable<RolesSuccessPayload> {
 
     const wildCardSearch = '*';

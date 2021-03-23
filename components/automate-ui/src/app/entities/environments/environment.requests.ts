@@ -18,7 +18,7 @@ export class EnvironmentRequests {
 
   constructor(private http: HttpClient) { }
 
-  // tslint:disable-next-line: max-line-length
+  // eslint-disable-next-line max-len
   public getEnvironment(server_id: string, org_id: string, name: string): Observable<Environment> {
     return this.http.get<Environment>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/environments/${name}`, {headers});

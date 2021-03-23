@@ -43,7 +43,7 @@ describe('NodeDetailsComponent', () => {
           .and.returnValue(new Subscription);
         component.ngOnInit();
         // Next line complains "subscribe is deprecated" -- but this usage is OK!
-        // tslint:disable-next-line
+        // eslint-disable-next-line
         expect(eventService.showModal$.subscribe).toHaveBeenCalled();
       });
     });
