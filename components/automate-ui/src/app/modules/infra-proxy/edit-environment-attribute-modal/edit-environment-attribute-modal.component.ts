@@ -257,7 +257,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
         });
       }
 
-      // first cookbook constrains keys selected on drop-down when loading constrain data
+      // first cookbook constrains keys selected on drop-down when loading constraint data
       this.name_id = this.constraintKeys[0];
     });
 
@@ -266,8 +266,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   private toDisplay(cookbookVersions: Array<CookbookConstraintGrid> = []) {
     const current = {};
     cookbookVersions.forEach((element) => {
-      current[element.name] =
-        `${element.operator}` + ' ' + `${element.version}`;
+      current[element.name] = `${element.operator} ${element.version}`;
     });
     return current;
   }
