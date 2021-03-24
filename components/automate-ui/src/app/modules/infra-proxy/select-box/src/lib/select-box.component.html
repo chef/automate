@@ -6,7 +6,7 @@
                 <div class="input-icons role-list-margin">
                     <mat-icon class="icon">search</mat-icon>
                     <input chefInput *ngIf="!disabled && search" type="text" class="selectbox-search input-field"
-                    [(ngModel)]="leftFilterText" [disabled]="disabled" placeholder="Search.." />
+                    [(ngModel)]="leftFilterText" [disabled]="disabled" placeholder="Search.." /> <!-- TODO: do not use two-way binding! -->
                 </div>
                 <div class="fixed-height">
                     <div class="scroll">
