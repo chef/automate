@@ -66,8 +66,8 @@ describe('EditEnvironmentAttributeModalComponent', () => {
     };
 
     it('default attribute should be valid when json data is filled out', () => {
-      component.defaulttAttributeForm.controls['default'].setValue(environment.default_attributes);
-      expect(component.defaulttAttributeForm.valid).toBeTruthy();
+      component.defaultAttributeForm.controls['default'].setValue(environment.default_attributes);
+      expect(component.defaultAttributeForm.valid).toBeTruthy();
     });
 
     it('override attribute should be valid when json data is filled out', () => {
