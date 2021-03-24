@@ -205,7 +205,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   public startUpdateDataBagItem(item: DataBagItems, jsonData: Object): void {
     this.dataBagItemName = item.name;
-    this.itemDataJson = JSON.stringify(jsonData, undefined, 4);
+    this.itemDataJson = JSON.stringify(jsonData, null, 4);
     this.openEditDataBagItemModal.emit();
   }
 
