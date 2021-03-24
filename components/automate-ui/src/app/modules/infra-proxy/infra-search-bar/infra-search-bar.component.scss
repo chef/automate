@@ -3,46 +3,34 @@
 
 .search-wrapper {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 12px;
   font-size: 1em;
   color: $chef-primary-dark;
-  padding-bottom: 12px;
 }
 
-.search-wrapper:focus {
-  outline: none;
+button {
+  box-shadow: 0 1px 14px #E6EBEE;
+  border: none;
+  border-radius: 0px 4px 4px 0px;
+  background: #E6EBEE;
+  cursor: pointer;
+  width: 45px;
 }
 
-.search-input-wrapper {
-  position: relative;
+input {
+  border-radius: 4px 0px 0px 4px;
+  width: 100%;
+}
 
-  .search-button {
-    box-shadow: 0 1px 14px #E6EBEE;
-    border: none;
-    border-left: none;
-    border-radius: 0px 4px 4px 0px;
-    background: #E6EBEE;
-    cursor: pointer;
-    width: 45px;
-    height: 42px;
-    outline: none;
-    position: absolute;
-    right: 1.5px;
-    top: 0.5px;
-  }
+::ng-deep .chef-input:active {
+  border-width: 0.5px;
+}
 
-  .chef-input {
-    border-radius: 4px 0px 0px 4px;
-    width: 100%;
-  }
-
-  ::ng-deep .chef-input:active {
-    border-width: 0.5px;
-  }
-
-  .search-items {
-    margin-bottom: 25px;
-    width: 100%;
-  }
+.search-items {
+  margin-bottom: 25px;
+  width: 100%;
 }
 
 chef-icon {

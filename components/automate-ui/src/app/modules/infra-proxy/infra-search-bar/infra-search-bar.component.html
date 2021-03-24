@@ -1,17 +1,12 @@
-<div class="search-wrapper" tabindex="0">
-  <div class="search-input-wrapper">      
+<div class="search-wrapper">     
     <input #search_box chefInput
       id="search_box"
       aria-label="Search"
       (keyup)="handleInput($event.key, search_box.value)"
       [value]="inputText"
-      type="text"
-      class="search-input"
       placeholder="Search {{ placeHolder }}"
       autocomplete="off">
-    <button chef-button class="search-button primary" primary (click)="handleFiltersClick(search_box.value)">
+    <button chef-button class="primary" primary (click)="handleFiltersClick(search_box.value)">
       <chef-icon>search</chef-icon>
     </button>
-  </div>
-  <ng-content></ng-content>
 </div>
