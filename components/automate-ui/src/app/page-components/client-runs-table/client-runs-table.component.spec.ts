@@ -461,7 +461,7 @@ describe('ClientRunsTable', () => {
       //   expect(component.displayPolicyNodes).toBe(false);
       // });
 
-      // tslint:disable-next-line:max-line-length
+      // eslint-disable-next-line max-len
       it('display both policy and environment columns when both Policy File and Environment/Roles nodes are present', () => {
         // spyOn(MockNodeListService.prototype, 'policyNodeCount')
         //   .and.returnValue(observableOf(10));
