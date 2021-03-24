@@ -139,7 +139,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
       this.attr = JSON.parse(this.createForm.controls['itemAttr'].value.trim());
     }
     this.id = {'id': this.createForm.controls['itemId'].value.trim()};
-    const dataBagItem = {
+    const dataBagItem: DataBagItem = {
       server_id: this.server_Id,
       org_id: this.org_Id,
       name: this.name,
@@ -149,7 +149,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.store.dispatch(new CreateDataBagItem({dataBagItem: dataBagItem}));
+    this.store.dispatch(new CreateDataBagItem({dataBagItem}));
   }
 
   private resetCreateModal(): void {
