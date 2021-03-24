@@ -31,8 +31,10 @@
         <app-edit-environment-attribute-modal
           [jsonText]="jsonText"
           [openEvent]="openEnvironmentModal"
-          [serverId]="serverId" [orgId]="orgId"
-          [name]="name" [environment]="environment"
+          [serverId]="serverId"
+          [orgId]="orgId"
+          [name]="name"
+          [environment]="environment"
           [label]="label"
           [cookbookConstraints]="cookbookConstraints"
           [cookbookVersions]="cookbookVersions">
@@ -68,11 +70,11 @@
                     </chef-tr>
                   </chef-tbody>
                 </chef-table>
-              </div> 
+              </div>
               <div *ngIf="!hasCookbookConstraints" class="empty-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>Cookbook constraints are not available for the <b>{{environment.name}}</b> environment.</p>
-              </div>   
+              </div>
             </div>
           </div>
         </div>
