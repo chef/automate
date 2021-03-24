@@ -191,57 +191,48 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.updateSuccessful = false;
     this.updateInProgress = true;
 
-    if (this.label === 'Constraints') {
+    let environment: Environment = {
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.environment.name,
+      description: this.environment.description,
+      json_class: this.environment.json_class,
+      chef_type: this.environment.chef_type,
 
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
-        default_attributes: JSON.parse(this.environment.default_attributes),
-        override_attributes: JSON.parse(this.environment.override_attributes),
-        json_class: this.environment.json_class,
-        chef_type: this.environment.chef_type
-      };
-      this.updatingData(environment);
+      // these are filled in by the switch below
+      cookbook_versions: {},
+      default_attributes: '',
+      override_attributes: ''
+    };
+
+    switch (this.label) {
+      case 'Constraints':
+        environment = { ...environment,
+          cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
+          default_attributes: JSON.parse(this.environment.default_attributes),
+          override_attributes: JSON.parse(this.environment.override_attributes)
+        };
+        break;
+
+      case 'Default':
+        environment = { ...environment,
+          cookbook_versions: this.environment.cookbook_versions,
+          default_attributes: JSON.parse(
+              this.defaultAttributeForm.controls['default'].value.replace(/\r?\n|\r/g, '')),
+          override_attributes: JSON.parse(this.environment.override_attributes)
+        };
+        break;
+
+      case 'Override':
+        environment = { ...environment,
+          cookbook_versions: this.environment.cookbook_versions,
+          default_attributes: JSON.parse(this.environment.default_attributes),
+          override_attributes: JSON.parse(
+            this.overrideAttributeForm.controls['override'].value.replace(/\r?\n|\r/g, ''))
+        };
+        break;
     }
-
-    if (this.label === 'Default') {
-      const json_data = this.defaultAttributeForm.controls['default'].value;
-      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
-
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.environment.cookbook_versions,
-        default_attributes: obj,
-        override_attributes: JSON.parse(this.environment.override_attributes),
-        chef_type: this.environment.chef_type,
-        json_class: this.environment.json_class
-      };
-      this.updatingData(environment);
-    }
-
-    if (this.label === 'Override') {
-      const json_data = this.overrideAttributeForm.controls['override'].value;
-      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
-
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.environment.cookbook_versions,
-        default_attributes: JSON.parse(this.environment.default_attributes),
-        override_attributes: obj,
-        chef_type: this.environment.chef_type,
-        json_class: this.environment.json_class
-      };
-      this.updatingData(environment);
-    }
+    this.updatingData(environment);
   }
 
   private loadCookbooks() {
