@@ -67,7 +67,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   public textareaID: string;
   public selectedCookbookNames: string[] = [];
 
-  public defaulttAttributeForm: FormGroup;
+  public defaultAttributeForm: FormGroup;
   public overrideAttributeForm: FormGroup;
   public constraintFormGroup: FormGroup;
   public close = new EventEmitter();
@@ -79,7 +79,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     private store: Store<NgrxStateAtom>
 
   ) {
-    this.defaulttAttributeForm = this.fb.group({
+    this.defaultAttributeForm = this.fb.group({
       default: ['', [Validators.required]]
     });
 
@@ -138,7 +138,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   ngOnChanges(): void {
     if (this.label === 'Default') {
-      this.defaulttAttributeForm.controls.default.setValue(this.jsonText);
+      this.defaultAttributeForm.controls.default.setValue(this.jsonText);
     }
     if (this.label === 'Override') {
       this.overrideAttributeForm.controls.override.setValue(this.jsonText);
@@ -162,8 +162,8 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   handleNameInput(event: KeyboardEvent): void {
     if (!this.isNavigationKey(event)) {
       this.conflictError = false;
-      this.defaulttAttributeForm.controls.default.setValue(
-        IdMapper.transform(this.defaulttAttributeForm.controls.default.value.trim()));
+      this.defaultAttributeForm.controls.default.setValue(
+        IdMapper.transform(this.defaultAttributeForm.controls.default.value.trim()));
     }
   }
 
@@ -208,7 +208,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     }
 
     if (this.label === 'Default') {
-      const json_data = this.defaulttAttributeForm.controls['default'].value;
+      const json_data = this.defaultAttributeForm.controls['default'].value;
       const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
 
       const environment: Environment = {
