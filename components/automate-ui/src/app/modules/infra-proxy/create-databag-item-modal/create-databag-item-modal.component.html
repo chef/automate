@@ -10,7 +10,7 @@
             </label>
             <chef-error
             *ngIf="(createForm.get('itemId').hasError('required') || createForm.get('itemId').hasError('pattern')) && createForm.get('itemId').dirty">
-            Name is required.
+            Data Bag Item ID is required.
           </chef-error>
           <chef-error *ngIf="conflictError">
             ID "{{createForm.get('itemId').value}}" already exists.
@@ -20,18 +20,18 @@
 
         <div class="margin">
           <chef-form-field>
-            <textarea chefInput name="itemAttr" id="itemAttr" formControlName="itemAttr" 
+            <textarea chefInput name="itemAttr" id="itemAttr" formControlName="itemAttr"
             (change)="onChangeJSON($event)" (keyup)="onChangeJSON($event)"></textarea>
             <chef-error *ngIf="itemAttrParseError">
               Must be a valid JSON object
           </chef-error>
           </chef-form-field>
         </div>
-  
+
         <div id="button-bar">
-          <chef-button tertiary id="cancel-data-bag-item-popup" 
+          <chef-button tertiary id="cancel-data-bag-item-popup"
           (click)="closeCreateModal()">Cancel</chef-button>
-          <chef-button [disabled]="!createForm?.valid || creating || conflictError" 
+          <chef-button [disabled]="!createForm?.valid || creating || conflictError"
           primary id="create-button-object-modal" (click)="createDataBagItem()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Create</span>
@@ -41,4 +41,3 @@
       </form>
     </div>
   </chef-modal>
-  

@@ -10,7 +10,7 @@
           </label>
           <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
-            Display Name is required.
+            Name is required.
           </chef-error>
         </chef-form-field>
         <span class="detail light">Don't worry, organization names can be changed later.</span>
@@ -60,7 +60,7 @@
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_user').hasError('required') || createForm.get('admin_user').hasError('pattern')) && createForm.get('admin_user').dirty">
-            Admin user is required.
+            Admin User is required.
           </chef-error>
         </chef-form-field>
       </div>
@@ -72,7 +72,7 @@
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_key').hasError('required') || createForm.get('admin_key').hasError('pattern')) && createForm.get('admin_key').dirty">
-            Admin key is required.
+            Admin Key is required.
           </chef-error>
         </chef-form-field>
       </div>
