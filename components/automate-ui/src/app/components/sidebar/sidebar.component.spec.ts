@@ -1,20 +1,21 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule, Store } from '@ngrx/store';
-import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 
-import { SidebarComponent } from './sidebar.component';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
-import { using } from 'app/testing/spec-helpers';
 import { ComplianceLandingComponent } from 'app/pages/compliance-landing/compliance-landing.component';
+import { SidebarEntryComponent } from 'app/components/sidebar-entry/sidebar-entry.component';
+import { SidebarComponent } from './sidebar.component';
 
 describe('SidebarComponent', () => {
   let store: Store<NgrxStateAtom>;
   let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
-  // let element: HTMLElement;
+  let element: HTMLElement;
   let layoutFacade: LayoutFacadeService;
   let featureFlags: FeatureFlagsService;
 
@@ -34,53 +35,55 @@ describe('SidebarComponent', () => {
       ]
     }).compileComponents();
     store = TestBed.inject(Store);
-    layoutFacade = TestBed.inject(LayoutFacadeService);
     featureFlags = TestBed.inject(FeatureFlagsService);
     spyOn(store, 'dispatch').and.callThrough();
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(SidebarComponent);
-    component = fixture.componentInstance;
-    // element = fixture.debugElement.nativeElement;
+  describe('component is created', () => {
 
-    // enable all feature flags, if any, for testing
-    featureFlags.setFeature('servicenow_cmdb', true);
+    beforeEach(() => {
+      fixture = TestBed.createComponent(SidebarComponent);
+      component = fixture.componentInstance;
+    });
 
-    fixture.detectChanges();
+    it('should be created', () => {
+      expect(component).toBeTruthy();
+    });
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
-  });
-
+  // Only need to check components that copy the route structure defined by LayoutSidebarService.
+  // The unit tests here are a meta-check to ensure that if you make a change in one place,
+  // you must also make the same change in the copy.
   using([
-    [new SettingsLandingComponent(), Sidebar.Settings, 'Settings Landing Component'],
-    [new ComplianceLandingComponent(), Sidebar.Compliance, 'Compliance Landing Component']
+    [new SettingsLandingComponent(), Sidebar.Settings, 'servicenow_cmdb', 'Settings Landing Component'],
+    [new ComplianceLandingComponent(), Sidebar.Compliance, '', 'Compliance Landing Component']
 
-  ], function (_landingComponent: any, sidebar: Sidebar,  description: string) {
+  ], function (landingComponent: any, sidebar: Sidebar,  featureFlag: string, description: string) {
     describe(`${description} route list`, () => {
 
       beforeEach(() => {
+        if (featureFlag) {
+          featureFlags.setFeature(featureFlag, true);
+        }
+        // must be after feature flag setting!
+        layoutFacade = TestBed.inject(LayoutFacadeService);
+
+        fixture = TestBed.createComponent(SidebarComponent);
+        element = fixture.debugElement.nativeElement;
+
         layoutFacade.showSidebar(sidebar);
         fixture.detectChanges();
       });
 
-      // FIXME(tc): Sometimes missing elements. Needs investigation.
-      // it('has length consistent with sidebar', () => {
-      //   const links = element.querySelectorAll('div.nav-items chef-sidebar-entry');
-      //   expect(links.length).toBe(landingComponent.routeList.length);
-      // });
-
-      // FIXME(sr): This test randomly fails, insofar as the elements are all there,
-      //            but in the wrong order.
-      // it('has route order consistent with sidebar', () => {
-      //   const links = element.querySelectorAll('div.nav-items chef-sidebar-entry');
-      //   for (let i = 0; i < links.length; i++) {
-      //     const link: any = links[i];
-      //     expect(link.route).toBe(landingComponent.routeList[i].route);
-      //   }
-      // });
+      it('has route order consistent with sidebar', () => {
+        const links = element.querySelectorAll('div.nav-items chef-sidebar-entry');
+        expect(links.length).toBe(landingComponent.routeList.length);
+        for (let i = 0; i < links.length; i++) {
+          // link is both an Element and a SidebarEntryComponent, but we only care about the latter
+          const link = links[i] as unknown as SidebarEntryComponent;
+          expect(link.route).toBe(landingComponent.routeList[i].route);
+        }
+      });
     });
   });
 });
