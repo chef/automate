@@ -2056,7 +2056,7 @@ func RegisterConfigMgmtHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 var (
 	pattern_ConfigMgmt_Getdata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "cfgmgmt", "offset", "size"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_FetchCompliancedata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "complianceData"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ConfigMgmt_FetchCompliancedata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "clientrun"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ConfigMgmt_GetNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "cfgmgmt", "nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 

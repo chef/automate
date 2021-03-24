@@ -59,7 +59,7 @@ service ConfigMgmt {
 
   rpc FetchCompliancedata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
     option (google.api.http) = {
-      post: "/api/v0/cfgmgmt/complianceData"
+      post: "/api/v0/cfgmgmt/clientrun"
       body: "*"
     };
     option (chef.automate.api.iam.policy).resource = "infra:nodes";

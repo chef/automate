@@ -230,7 +230,7 @@ func init() {
         ]
       }
     },
-    "/api/v0/cfgmgmt/complianceData": {
+    "/api/v0/cfgmgmt/clientrun": {
       "post": {
         "operationId": "ConfigMgmt_FetchCompliancedata",
         "responses": {

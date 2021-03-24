@@ -609,7 +609,7 @@
           "02:42:C4:52:15:40": {
             "family": "lladdr"
           },
-          "55.37.254.176": {
+          "55.37.254.178": {
             "family": "inet",
             "prefixlen": "21",
             "netmask": "255.255.248.0",
@@ -641,7 +641,7 @@
             "family": "inet",
             "scope": "link",
             "proto": "kernel",
-            "src": "55.37.254.176"
+            "src": "55.37.254.178"
           },
           {
             "destination": "55.37.8.0/21",
@@ -649,7 +649,7 @@
             "scope": "link",
             "metric": "100",
             "proto": "kernel",
-            "src": "55.37.254.176"
+            "src": "55.37.254.178"
           },
           {
             "destination": "fe80::/64",
@@ -705,7 +705,7 @@
       }
     }
   },
-  "ipaddress": "55.37.254.176",
+  "ipaddress": "55.37.254.178",
   "macaddress": "02:42:C4:52:15:40",
   "ip6address": "fe80::42:c4ff:fe52:1540",
   "os": "linux",
@@ -935,7 +935,7 @@
       "string_1": "Xen"
     }
   },
-  "json?": "{\n  \"devpayProductCodes\" : null,\n  \"privateIp\" : \"55.37.254.176\",\n  \"availabilityZone\" : \"us-west-2a\",\n  \"version\" : \"2010-08-31\",\n  \"pendingTime\" : \"2017-06-05T23:37:13Z\",\n  \"instanceId\" : \"i-0aee75f0b4b0d9f22\",\n  \"billingProducts\" : [ \"bp-6fa54006\" ],\n  \"instanceType\" : \"t2.medium\",\n  \"accountId\" : \"999999999999\",\n  \"architecture\" : \"x86_64\",\n  \"kernelId\" : null,\n  \"ramdiskId\" : null,\n  \"imageId\" : \"ami-4dbf9e7d\",\n  \"region\" : \"us-west-2\"\n}",
+  "json?": "{\n  \"devpayProductCodes\" : null,\n  \"privateIp\" : \"55.37.254.178\",\n  \"availabilityZone\" : \"us-west-2a\",\n  \"version\" : \"2010-08-31\",\n  \"pendingTime\" : \"2017-06-05T23:37:13Z\",\n  \"instanceId\" : \"i-0aee75f0b4b0d9f22\",\n  \"billingProducts\" : [ \"bp-6fa54006\" ],\n  \"instanceType\" : \"t2.medium\",\n  \"accountId\" : \"999999999999\",\n  \"architecture\" : \"x86_64\",\n  \"kernelId\" : null,\n  \"ramdiskId\" : null,\n  \"imageId\" : \"ami-4dbf9e7d\",\n  \"region\" : \"us-west-2\"\n}",
   "etc": {
   },
   "current_user": "root",
@@ -944,21 +944,21 @@
       null
     ],
     "private_ips": [
-      "55.37.254.176"
+      "55.37.254.178"
     ],
     "public_ipv4": null,
     "public_hostname": null,
-    "local_ipv4": "55.37.254.176",
+    "local_ipv4": "55.37.254.178",
     "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
     "provider": "ec2"
   },
   "cloud_v2": {
     "local_ipv4_addrs": [
-      "55.37.254.176"
+      "55.37.254.178"
     ],
     "provider": "ec2",
     "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
-    "local_ipv4": "55.37.254.176"
+    "local_ipv4": "55.37.254.178"
   },
   "command": {
     "ps": "ps -ef"

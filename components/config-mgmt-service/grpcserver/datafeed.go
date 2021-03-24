@@ -19,6 +19,8 @@ type Datafeed struct {
 	FeedEnd   time.Time
 }
 
+type Animal int
+
 func (s *CfgMgmtServer) Getdata(ctx context.Context, req *pRequest.GetPaginationRequest) (*interserviceResp.GetPaginationResponse, error) {
 
 	params := Datafeed{}
@@ -51,9 +53,8 @@ func (s *CfgMgmtServer) Getdata(ctx context.Context, req *pRequest.GetPagination
 	out["inventoryNodes"] = inventoryNodes
 	outputJSON, _ := json.Marshal(out)
 	returnData := interserviceResp.GetPaginationResponse{
-		Data: string(outputJSON),
+		Data: 	string(outputJSON),
 	}
-	// {Data: string(outputJSON)}
 	return &returnData, nil
 }
 
@@ -132,17 +133,21 @@ func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.G
 		nodeMessages[resourceId] = nodeData
 	}
 	out := map[string]interface{}{}
-	// data := datafeedServer.paginationData.Data
+	// // data := datafeedServer.paginationData.Data
 	out["offset"] = req.Offset
 	out["size"] = req.Size
-	out["Attribute"] = req.Attribute
-	out["inventoryNodes"] = inventoryNodes
+	// out["Attribute"] = req.Attribute
+	// out["inventoryNodes"] = inventoryNodes
 	out["nodeMessages"] = nodeMessages
-	outputJSON, _ := json.Marshal(out)
-	returnData := interserviceResp.GetPaginationResponse{
-		Data: string(outputJSON),
-	}
 	// {Data: string(outputJSON)}
+	outputJSON, _ := json.Marshal(out)
+	// var zoo []Animal
+	// if err := json.Unmarshal([]byte(outputJSON), &zoo); err != nil {
+	// 	log.Fatal(err)
+	// }
+	returnData := interserviceResp.GetPaginationResponse{
+		Data:  	string(outputJSON),
+	}
 	return &returnData, nil
 }
 
