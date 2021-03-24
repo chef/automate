@@ -179,7 +179,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public openEditAttributeModal(value, label): void {
     this.openEdit = true;
     const obj = JSON.parse(value);
-    this.jsonText = JSON.stringify(obj, undefined, '    ');
+    this.jsonText = JSON.stringify(obj, null, 4);
     this.label = label;
     this.openEnvironmentModal.emit(true);
   }
