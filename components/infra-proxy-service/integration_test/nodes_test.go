@@ -284,3 +284,57 @@ func TestUpdateNodeTags(t *testing.T) {
 		assert.Equal(t, []string{}, res.Tags)
 	})
 }
+
+func TestUpdateNodeEnvironment(t *testing.T) {
+	t.Run("when valid the environment value is set, updates the existing node environment", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "_default",
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+		assert.Equal(t, "_default", node.Environment)
+
+		req := &request.UpdateNodeEnvironment{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "dev",
+		}
+		res, err := infraProxy.UpdateNodeEnvironment(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+
+		assert.Equal(t, "dev", res.Environment)
+	})
+
+	t.Run("when attempting to set the environment to empty value, raise invalid argument error", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "_default",
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
+		req := &request.UpdateNodeEnvironment{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "",
+		}
+		res, err := infraProxy.UpdateNodeEnvironment(ctx, req)
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
+}
