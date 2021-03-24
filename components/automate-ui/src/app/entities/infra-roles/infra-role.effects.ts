@@ -35,7 +35,6 @@ export class InfraRoleEffects {
 
   getRoles$ = createEffect(() =>
     this.actions$.pipe(
-<<<<<<< HEAD
       ofType(RoleActionTypes.GET_ALL),
       mergeMap((action: GetRoles) =>
         this.requests.getRoles(action.payload).pipe(
@@ -106,52 +105,6 @@ export class InfraRoleEffects {
           map(() => new DeleteRoleSuccess({ name })),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteRoleFailure(error)))))));
-=======
-    ofType(RoleActionTypes.GET_ALL),
-    mergeMap((action: GetRoles) =>
-      this.requests.getRoles(action.payload).pipe(
-        map((resp: RolesSuccessPayload) => new GetRolesSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new GetRolesFailure(error)))))));
-
-  getRolesFailure$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(RoleActionTypes.GET_ALL_FAILURE),
-    map(({ payload }: GetRolesFailure) => {
-      const msg = payload.error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not get infra roles: ${msg || payload.error}`
-      });
-    })));
-
-  getRole$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(RoleActionTypes.GET),
-    mergeMap(({ payload: { server_id, org_id, name } }: GetRole) =>
-      this.requests.getRole(server_id, org_id, name).pipe(
-        map((resp) => new GetRoleSuccess(resp)),
-        catchError((error: HttpErrorResponse) => observableOf(new GetRoleFailure(error)))))));
-
-  getRoleFailure$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(RoleActionTypes.GET_FAILURE),
-    map(({ payload }: GetRoleFailure) => {
-      const msg = payload.error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not get infra role: ${msg || payload.error}`
-      });
-    })));
-
-  deleteRole$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(RoleActionTypes.DELETE),
-    mergeMap(({ payload: { server_id, org_id, name } }: DeleteRole) =>
-      this.requests.deleteRole(server_id, org_id, name).pipe(
-        map(() => new DeleteRoleSuccess({ name })),
-        catchError((error: HttpErrorResponse) =>
-          observableOf(new DeleteRoleFailure(error)))))));
->>>>>>> More updating effect syntax
 
   deleteRoleSuccess$ = createEffect(() =>
     this.actions$.pipe(
@@ -161,7 +114,6 @@ export class InfraRoleEffects {
           type: Type.info,
           message: `Successfully Deleted Role - ${name}.`
         });
-<<<<<<< HEAD
     })));
 
   deleteRoleFailure$ = createEffect(() =>
@@ -173,19 +125,6 @@ export class InfraRoleEffects {
           type: Type.error,
           message: `Could not delete role: ${msg || error}`
         });
-=======
-      })));
-
-  deleteRoleFailure$ = createEffect(() =>
-    this.actions$.pipe(
-    ofType(RoleActionTypes.DELETE_FAILURE),
-    map(({ payload: { error } }: DeleteRoleFailure) => {
-      const msg = error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not delete role: ${msg || error}`
-      });
->>>>>>> More updating effect syntax
     })));
 
 }
