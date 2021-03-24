@@ -124,14 +124,11 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   }
 
   onChangeJSON(event: { target: { value: string } }) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.itemAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.itemAttrParseError = true;
     }
   }
