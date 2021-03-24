@@ -143,7 +143,6 @@ img {
     width: 103px;
     height: 20px;
   }
-
 }
 
 .collapse-circle {
@@ -167,7 +166,6 @@ img {
   font-weight: bold;
   font-size: 12px;
   line-height: 20px;
-  /* identical to box height, or 167% */
   letter-spacing: 0.5px;
   color: #000000;
 }
@@ -212,8 +210,6 @@ img {
   border-radius: 2px;
 }
 
-
-
 .action {
   float: right;
   margin-right: 32px;
@@ -226,21 +222,13 @@ img {
   }
 }
 
-
 .json-container {
-
-  //width: 380px;
   height: 169px;
-
   font-size: 12px;
   line-height: 20px;
-  /* or 167% */
-
   letter-spacing: 0.5px;
   text-transform: capitalize;
-
   color: #000000;
-
 }
 
 .scroll {
@@ -265,27 +253,21 @@ img {
   margin-left: 16px;
   font-size: 12px;
   line-height: 20px;
-  /* or 167% */
-
   letter-spacing: 0.5px;
   text-transform: capitalize;
-
   color: #000000;
 }
-
 
 .divider {
   margin-left: 16px;
   margin-top: 11px;
   margin-right: 18px;
-
 }
 
 .divider-constraint {
   margin-left: 16px;
   margin-top: 42px;
   margin-right: 18px;
-
 }
 
 .divider-constraints {
@@ -313,4 +295,8 @@ chef-button {
     outline: none;
     border: none;
   }
+}
+
+.img-section {
+  text-align: center;
 }
