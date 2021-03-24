@@ -66,6 +66,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
   @ViewChild(JsonTreeTable, { static: true })
   tree: JsonTreeTable;
+  tre: JsonTreeTable;
 
   constructor(
     private store: Store<NgrxStateAtom>,
