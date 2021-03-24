@@ -1,10 +1,13 @@
 @import "~styles/variables";
 
-chef-table {
-
-  .no-border-th {
-    border: none;
-    font-size: 12px;
+chef-thead {
+  chef-tr {
+    background: transparent;
+    
+    chef-th {
+      font-size: 12px;
+      border: none;
+    }
   }
 }
 
