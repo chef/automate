@@ -30,3 +30,9 @@
   border-right: 1px solid $chef-grey;
   border-radius: 0 $global-radius $global-radius 0;
 }
+
+:host.no-border {
+  background: $chef-lightest-grey;
+  border: none;
+  border-radius: 0;
+}

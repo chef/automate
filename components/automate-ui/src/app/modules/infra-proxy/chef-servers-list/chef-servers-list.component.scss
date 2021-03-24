@@ -1,20 +1,14 @@
 @import "~styles/variables";
 
-chef-thead {
-  chef-tr {
-    background: transparent;
-    
-    chef-th {
-      font-size: 12px;
-      border: none;
-    }
-  }
+
+chef-th {
+  font-size: 12px;
 }
 
 chef-toolbar {
   chef-button {
     display: flex;
-    margin: 0px;
+    margin: 2px;
     flex-direction: column;
     align-items: center;
     padding: 8px 16px;

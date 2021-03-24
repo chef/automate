@@ -147,8 +147,7 @@ chef-table {
     text-decoration: underline;
   }
 
-  .no-border-th {
-    border: none;
+  chef-th {
     font-size: 12px;
   }
 }
