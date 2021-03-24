@@ -133,6 +133,25 @@ func (a *InfraProxyServer) UpdateNodeTags(ctx context.Context, r *gwreq.UpdateNo
 	}, nil
 }
 
+// UpdateNodeEnvironment updates the node environment
+func (a *InfraProxyServer) UpdateNodeEnvironment(ctx context.Context, r *gwreq.UpdateNodeEnvironment) (*gwres.UpdateNodeEnvironment, error) {
+	req := &infra_req.UpdateNodeEnvironment{
+		OrgId:       r.OrgId,
+		ServerId:    r.ServerId,
+		Name:        r.Name,
+		Environment: r.Environment,
+	}
+	res, err := a.client.UpdateNodeEnvironment(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.UpdateNodeEnvironment{
+		Name:        res.GetName(),
+		Environment: res.GetEnvironment(),
+	}, nil
+}
+
 func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAttribute {
 	nl := make([]*gwres.NodeAttribute, len(nodes))
 

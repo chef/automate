@@ -222,6 +222,40 @@ func (s *Server) UpdateNodeTags(ctx context.Context, req *request.UpdateNodeTags
 	}, nil
 }
 
+// UpdateNodeEnvironment updates the node environment
+func (s *Server) UpdateNodeEnvironment(ctx context.Context, req *request.UpdateNodeEnvironment) (*response.UpdateNodeEnvironment, error) {
+	err := validation.New(validation.Options{
+		Target:          "node",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	chefNode, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	chefNode.Environment = req.Environment
+	res, err := c.client.Nodes.Put(chefNode)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.UpdateNodeEnvironment{
+		Name:        res.Name,
+		Environment: res.Environment,
+	}, nil
+}
+
 // fetchAffectedNodes get the nodes used by chef object
 // URL is being constructed based on the chefType, name, and version
 // chefType: should be one of the cookbooks, roles and chef_environment value
