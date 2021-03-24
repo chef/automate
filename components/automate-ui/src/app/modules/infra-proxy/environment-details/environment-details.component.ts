@@ -49,8 +49,6 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     default_attributes: '',
     override_attributes: ''
   });
-  public hasOverrideJson = true;
-  public hasDefaultJson = true;
   public cookbookConstraints: Array<CookbookConstraintGrid> = [];
   public name_id = '';
   public openEdit = false;
@@ -66,7 +64,6 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
 
   @ViewChild(JsonTreeTable, { static: true })
   tree: JsonTreeTable;
-  tre: JsonTreeTable;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -123,10 +120,6 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
       }
-      this.hasDefaultJson =
-        Object.keys(JSON.parse(this.environment.default_attributes)).length > 0 ? true : false;
-      this.hasOverrideJson =
-        Object.keys(JSON.parse(this.environment.override_attributes)).length > 0 ? true : false;
       this.attributes = new EnvironmentAttributes(this.environment);
 
       setTimeout(() => this.filter(this.selected_level), 10);

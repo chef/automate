@@ -95,12 +95,8 @@
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
-            <div *ngIf="hasDefaultJson" class="scroll">
+            <div class="scroll">
               <app-json-tree-table class="json-tree-container" #tre [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
-            </div>
-            <div *ngIf="!hasDefaultJson" class="img-section">
-              <img alt="No preview" src="/assets/img/no_preview.gif" />
-              <p>There are no items for Display.</p>
             </div>
           </div>
         </div>
@@ -123,12 +119,8 @@
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
-            <div *ngIf="hasOverrideJson" class="scroll">
+            <div class="scroll">
               <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
-            </div>
-            <div *ngIf="!hasOverrideJson" class="img-section">
-              <img alt="No preview" src="/assets/img/no_preview.gif" />
-              <p>There are no items for Display.</p>
             </div>
           </div>
         </div>
