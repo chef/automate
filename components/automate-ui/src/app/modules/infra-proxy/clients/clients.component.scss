@@ -45,17 +45,8 @@ chef-loading-spinner {
   height: 100%;
 }
 
-.empty-section {
-  margin-top: 130px;
-  text-align: center;
-}
-
 .clients-list-paging {
   margin: 0 0 35px;
-}
-
-img {
-  width: 70px;
 }
 
 .three-dot-column {
@@ -93,4 +84,14 @@ chef-button button {
 chef-toolbar chef-button:first-child {
   margin: 18px 0px 0px 0px;
   float: right;
+}
+
+.empty-section {
+  text-align: center;
+}
+
+img {
+  margin-top: 130px;
+  margin-left: 44PX;
+  width: 70px;
 }

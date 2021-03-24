@@ -8,7 +8,6 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetDataBags, DeleteDataBag } from 'app/entities/data-bags/data-bags.actions';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   allDataBags,
@@ -28,7 +27,6 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   public authFailure = false;
-  public chefInfraViewsFeatureFlagOn: boolean;
   public dataBags: DataBag[];
   public dataBagsListLoading = true;
   public dataBagToDelete: DataBag;
@@ -38,13 +36,8 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private featureFlagsService: FeatureFlagsService
-  ) {
-    // feature flag enable and disable the create button
-    this.chefInfraViewsFeatureFlagOn =
-    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
-  }
+    private layoutFacade: LayoutFacadeService
+  ) { }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);

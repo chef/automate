@@ -16,7 +16,7 @@
     [orgId]="orgId"
     [currentPage]="current_page">    
   </app-create-environment-modal>
-  <ng-container *ngIf="!environmentsListLoading && !authFailure">
+  <ng-container *ngIf="!environmentsListLoading && !authFailure" class="env">
     <div class="search-items">
       <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
       <chef-toolbar>

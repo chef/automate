@@ -16,7 +16,7 @@
   </app-create-data-bag-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
-    <chef-toolbar *ngIf="chefInfraViewsFeatureFlagOn">
+    <chef-toolbar>
       <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
         <chef-button primary (click)="openCreateModal()">Create Databag</chef-button>
       </app-authorized>
