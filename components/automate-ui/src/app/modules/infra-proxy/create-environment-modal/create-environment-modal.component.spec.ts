@@ -135,7 +135,7 @@ describe('CreateEnvironmentModalComponent', () => {
       component.visible = true;
       component.detailsFormGroup.controls['name'].setValue(environment.name);
       component.detailsFormGroup.controls['description'].setValue(environment.description);
-      component.constraintArray = environment.cookbook_versions;
+      component.constraints = environment.cookbook_versions;
       component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
       component.overrideAttrFormGroup.controls['override'].setValue(
@@ -156,7 +156,7 @@ describe('CreateEnvironmentModalComponent', () => {
       component.visible = true;
       component.detailsFormGroup.controls['name'].setValue(environment.name);
       component.detailsFormGroup.controls['description'].setValue(environment.description);
-      component.constraintArray = environment.cookbook_versions;
+      component.constraints = environment.cookbook_versions;
       component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
       component.overrideAttrFormGroup.controls['override'].setValue(
@@ -172,7 +172,7 @@ describe('CreateEnvironmentModalComponent', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.detailsFormGroup.controls['name'].setValue(environment.name);
       component.detailsFormGroup.controls['description'].setValue(environment.description);
-      component.constraintArray = environment.cookbook_versions;
+      component.constraints = environment.cookbook_versions;
       component.defaultAttrFormGroup.controls['default'].setValue(
         JSON.stringify(environment.default_attributes));
       component.overrideAttrFormGroup.controls['override'].setValue(

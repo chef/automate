@@ -57,7 +57,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   public attrParseError: boolean;
   public cookbooks: Cookbook[] = [];
-  public constraintArray: Array<CookbookConstraintGrid> = [];
+  public constraints: Array<CookbookConstraintGrid> = [];
   public constraintKeys: string[] = [];
   public name_id: string;
   public nameKeys: string[] = [];
@@ -105,9 +105,9 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.cookbookConstraints.forEach((element) => {
         this.selectedCookbookNames.push(element.name);
       });
-      this.selectedCookbookNames.forEach((ele) => {
-        this.constraintKeys.forEach((element, index) => {
-          if (ele === element) {
+      this.selectedCookbookNames.forEach((cookbookName) => {
+        this.constraintKeys.forEach((key, index) => {
+          if (cookbookName === key) {
             this.constraintKeys.splice(index, 1);
           }
         });
@@ -156,7 +156,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraintArray = value;
+    this.constraints = value;
   }
 
   handleNameInput(event: KeyboardEvent): void {
@@ -198,7 +198,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
         org_id: this.orgId,
         name: this.environment.name,
         description: this.environment.description,
-        cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
+        cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
         default_attributes: JSON.parse(this.environment.default_attributes),
         override_attributes: JSON.parse(this.environment.override_attributes),
         json_class: this.environment.json_class,

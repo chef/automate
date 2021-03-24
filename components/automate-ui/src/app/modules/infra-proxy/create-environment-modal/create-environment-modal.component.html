@@ -58,7 +58,7 @@
           </div>
           <div class="button-bar-box">
             <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-            <chef-button [disabled]="!constraintArray.length || conflictError"  primary id="create-button-object-modal-1" (click)="createEnvironment()">
+            <chef-button [disabled]="!constraints.length || conflictError"  primary id="create-button-object-modal-1" (click)="createEnvironment()">
               <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
               <span *ngIf="!creating">Create</span>
               <span *ngIf="creating">Creating...</span>
@@ -108,5 +108,5 @@
         </app-infra-tab>
       </app-infra-tab-change>
     </div>
-  </div> 
+  </div>
 </chef-modal>
