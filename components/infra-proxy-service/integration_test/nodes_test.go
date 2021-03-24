@@ -67,10 +67,8 @@ func TestGetNodes(t *testing.T) {
 			PerPage: 5,
 		}
 		res, err := infraProxy.GetNodes(ctx, req)
-		assert.NoError(t, err)
-		assert.Equal(t, 0, int(res.Page))
-		assert.Equal(t, 0, int(res.Total))
-		assert.Equal(t, 0, len(res.Nodes))
+		assert.Error(t, err)
+		assert.Nil(t, res)
 	})
 }
 func TestGetNode(t *testing.T) {
