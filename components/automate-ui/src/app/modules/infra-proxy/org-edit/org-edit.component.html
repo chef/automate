@@ -9,7 +9,7 @@
       </label>
       <chef-error
         *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
-        Display Name is required.
+        Name is required.
       </chef-error>
     </chef-form-field>
     <chef-form-field id='projects-container'>
