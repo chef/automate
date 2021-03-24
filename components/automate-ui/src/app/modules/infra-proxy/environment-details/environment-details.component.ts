@@ -41,7 +41,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public show = false;
   public hasCookbookConstraints = false;
   private isDestroyed = new Subject<boolean>();
-  environmentDetailsLoading = true;
+  public environmentDetailsLoading = true;
   public editAttrModalVisible = false;
   public editAttributeForm: FormGroup;
   public label: string;
@@ -49,15 +49,11 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     default_attributes: '',
     override_attributes: ''
   });
-
   public cookbookConstraints: Array<CookbookConstraintGrid> = [];
   public name_id = '';
-
   public openEdit = false;
-
   public selectedAttrs: any;
   public selected_level = 'all';
-
   public jsonText: any;
   public openEnvironmentModal = new EventEmitter<boolean>();
 

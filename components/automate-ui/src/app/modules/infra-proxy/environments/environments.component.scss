@@ -79,7 +79,14 @@ img {
   ::ng-deep {
     .search-items app-infra-search-bar .search-wrapper {
       float: left;
+      margin-top: 10px;
       width: calc(100% - 187px);
+      margin-right: 32px;
     }
+  }
+
+  chef-toolbar chef-button:first-child {
+    margin: 18px 0px 0px 0px;
+    float: right;
   }
 }
