@@ -64,7 +64,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   public visible = false;
 
   public attr_value = '{}';
-  public constraintArray: Array<CookbookConstraintGrid> = [];
+  public constraints: Array<CookbookConstraintGrid> = [];
   public constraintKeys: string[] = [];
   public cookbooks: Cookbook[] = [];
   public cookbookConstraints: Array<CookbookConstraintGrid> = [];
@@ -181,7 +181,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       name: this.detailsFormGroup.controls['name'].value,
       description: this.detailsFormGroup.controls['description'].value,
-      cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
+      cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
       default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
       override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value)
     };
@@ -245,7 +245,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   // Handles the data of cookbook version array coming from constraint tab.
   constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraintArray = value;
+    this.constraints = value;
   }
 
   // Getting list of cookbook names
