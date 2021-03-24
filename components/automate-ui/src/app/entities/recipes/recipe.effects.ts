@@ -38,7 +38,7 @@ export class RecipeEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get Recipes: ${msg || payload.error}`
+        message: `Could not get recipes: ${msg || payload.error}`
       });
     }));
 }

@@ -51,7 +51,7 @@ export class DataBagItemsEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra data bag items: ${msg || payload.error}`
+        message: `Could not get data bag items: ${msg || payload.error}`
       });
     }));
 
@@ -70,7 +70,7 @@ export class DataBagItemsEffects {
     map(({ payload: { id: id } }: CreateDataBagItemSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully Created Data Bag Item ${id}.`
+        message: `Successfully created data bag item ${id}.`
       });
     }));
 
@@ -81,7 +81,7 @@ export class DataBagItemsEffects {
     map(({ payload }: CreateDataBagItemFailure) => {
       return new CreateNotification({
         type: Type.error,
-        message: `Could Not Create Data Bag Item: ${payload.error.error || payload}.`
+        message: `Could not create data bag item: ${payload.error.error || payload}.`
       });
     }));
 
@@ -100,7 +100,7 @@ export class DataBagItemsEffects {
     map(({ payload: { name } }: DeleteDataBagItemSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully Deleted Data Bag Item - ${name}.`
+        message: `Successfully deleted data bag item - ${name}.`
       });
     }));
 
@@ -129,7 +129,7 @@ export class DataBagItemsEffects {
     ofType(DataBagItemsActionTypes.UPDATE_SUCCESS),
     map(({ payload: dataBagItem }: UpdateDataBagItemSuccess) => new CreateNotification({
     type: Type.info,
-    message: `Successfully Updated Data Bag Item - ${dataBagItem.item_id}.`
+    message: `Successfully updated data bag item - ${dataBagItem.item_id}.`
   })));
 
   @Effect()

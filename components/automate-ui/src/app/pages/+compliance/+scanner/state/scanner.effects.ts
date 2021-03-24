@@ -192,7 +192,7 @@ export class ScannerEffects {
     }),
     map(() => new CreateNotification({
       type: Type.info,
-      message: 'Deleted a scan job.'
+      message: 'Deleted scan job.'
     })));
 
   @Effect()

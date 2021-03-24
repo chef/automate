@@ -48,7 +48,7 @@ export class InfraRoleEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra roles: ${msg || payload.error}`
+        message: `Could not get roles: ${msg || payload.error}`
       });
     }));
 
@@ -67,7 +67,7 @@ export class InfraRoleEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra role: ${msg || payload.error}`
+        message: `Could not get role: ${msg || payload.error}`
       });
     }));
 
@@ -94,7 +94,7 @@ export class InfraRoleEffects {
     filter(({ payload }: CreateRoleFailure) => payload.status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateRoleFailure) => new CreateNotification({
       type: Type.error,
-      message: `Could not create notification: ${payload.error.error || payload}.`
+      message: `Could not create role: ${payload.error.error || payload}.`
     })));
 
   @Effect()
@@ -112,7 +112,7 @@ export class InfraRoleEffects {
       map(({ payload: { name } }: DeleteRoleSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully Deleted Role - ${name}.`
+          message: `Successfully deleted role - ${name}.`
         });
       }));
 

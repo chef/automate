@@ -58,6 +58,6 @@ export class JobEffects {
     ofType(JobActionTypes.JOB_UPDATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
-      message: 'Updated a scan job.'
+      message: 'Updated scan job.' // TODO: Add the scan job ID here
     })));
 }

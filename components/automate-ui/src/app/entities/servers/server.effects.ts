@@ -92,7 +92,7 @@ export class ServerEffects {
       ofType(ServerActionTypes.CREATE_SUCCESS),
       map(({ payload: { server } }: CreateServerSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Successfully Created Server - ${server.name}`
+      message: `Successfully created server - ${server.name}`
     })));
 
   @Effect()
@@ -118,7 +118,7 @@ export class ServerEffects {
       ofType(ServerActionTypes.UPDATE_SUCCESS),
       map(({ payload: { server } }: UpdateServerSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Successfully Updated Server - ${server.name}.`
+      message: `Successfully updated server - ${server.name}.`
     })));
 
   @Effect()
@@ -147,7 +147,7 @@ export class ServerEffects {
       map(({ payload: { name } }: DeleteServerSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully Deleted Server - ${name}.`
+          message: `Successfully deleted server - ${name}.`
         });
       }));
 
