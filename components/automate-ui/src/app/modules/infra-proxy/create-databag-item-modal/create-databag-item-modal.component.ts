@@ -22,6 +22,7 @@ import {
 import { DataBagItem } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBagItem,
+  DataBagItemPayload,
   GetDataBagItems
 } from 'app/entities/data-bags/data-bag-details.actions';
 
@@ -111,7 +112,7 @@ export class CreateDatabagItemModalComponent implements OnInit, OnDestroy {
   closeCreateModal(): void {
     this.resetCreateModal();
     this.visible = false;
-    const payload = {
+    const payload: DataBagItemPayload = {
       databagName: '',
       server_id: this.server_Id,
       org_id: this.org_Id,
