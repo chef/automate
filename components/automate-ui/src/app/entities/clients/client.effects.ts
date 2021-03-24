@@ -119,7 +119,7 @@ export class ClientEffects {
       map(({ payload: { name } }: DeleteClientSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully Deleted Client - ${name}.`
+          message: `Successfully deleted client - ${name}.`
         });
     })));
 
@@ -147,7 +147,7 @@ export class ClientEffects {
     map(({ payload: { name } }: ResetKeyClientSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully resetting Client key - ${name}.`
+        message: `Successfully reset client key - ${name}.`
       });
     })));
 

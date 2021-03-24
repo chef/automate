@@ -38,7 +38,7 @@ export class DataBagItemDetailsEffects {
           const msg = payload.error.error;
           return new CreateNotification({
             type: Type.error,
-            message: `Could not get infra data bag item details: ${msg || payload.error}`
+            message: `Could not get data bag item details: ${msg || payload.error}`
           });
       })));
 

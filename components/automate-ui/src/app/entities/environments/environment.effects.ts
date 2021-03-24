@@ -53,7 +53,7 @@ export class EnvironmentEffects {
       const msg = payload.error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not get infra Environment details: ${msg || payload.error}`
+        message: `Could not get environment details: ${msg || payload.error}`
       });
     })));
 
@@ -121,7 +121,7 @@ export class EnvironmentEffects {
       ofType(EnvironmentActionTypes.CREATE_SUCCESS),
       map(({ payload: { name } }: CreateEnvironmentSuccess) => new CreateNotification({
         type: Type.info,
-        message: `Created environment ${name}.`
+        message: `Successfully deleted environment - ${name}.`
       }))));
 
   createEnvironmentFailure$ = createEffect(() =>
@@ -130,7 +130,7 @@ export class EnvironmentEffects {
       filter(({ payload }: CreateEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
       map(({ payload }: CreateEnvironmentFailure) => new CreateNotification({
         type: Type.error,
-        message: `Could not create notification: ${payload.error.error || payload}.`
+        message: `Could not create environment: ${payload.error.error || payload}.`
       }))));
 
   updateEnvironment$ = createEffect(() =>
@@ -156,7 +156,7 @@ export class EnvironmentEffects {
       filter(({ payload }: UpdateEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
       map(({ payload }: UpdateEnvironmentFailure) => new CreateNotification({
         type: Type.error,
-        message: `Could not Update environment: ${payload.error.error || payload}.`
+        message: `Could not update environment: ${payload.error.error || payload}.`
       }))));
 
 }
