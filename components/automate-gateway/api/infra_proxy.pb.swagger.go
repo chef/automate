@@ -2222,6 +2222,51 @@ func init() {
           "InfraProxy"
         ]
       }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist": {
+      "get": {
+        "operationId": "InfraProxy_GetRoleRunList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
     }
   },
   "definitions": {
@@ -3380,6 +3425,18 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ExpandedRunListResponse": {
+      "type": "object",
+      "properties": {
+        "expanded_run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+          },
+          "description": "List of expanded run list for the role."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.GetOrg": {
       "type": "object",
       "properties": {
@@ -3749,13 +3806,6 @@ func init() {
             "type": "string"
           },
           "description": "Run list for the role."
-        },
-        "expanded_run_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
-          },
-          "description": "List of expanded run list for the role."
         }
       }
     },
@@ -3806,20 +3856,25 @@ func init() {
       "properties": {
         "type": {
           "type": "string",
-          "description": "Type of run list item (e.g. 'recipe')."
+          "description": "Run list item type (e.g. 'recipe')."
         },
         "name": {
           "type": "string",
-          "description": "Name of run list item."
+          "description": "Run list item name."
         },
         "version": {
           "type": "string",
-          "description": "Version of run list item."
+          "description": "Run list item version."
         },
         "skipped": {
           "type": "boolean",
           "format": "boolean",
           "description": "Boolean denoting whether or not the run list item was skipped."
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Run list item position"
         },
         "children": {
           "type": "array",
