@@ -33,6 +33,7 @@ const declarations: any[] = [
   MockComponent({ selector: 'chef-toolbar' }),
   MockComponent({ selector: 'a', inputs: ['routerLink'] }),
   MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+  MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
   CookbookDetailsComponent
 ];
 const server_id = '6e98f609-586d-4816-a6de-e841e659b11d';

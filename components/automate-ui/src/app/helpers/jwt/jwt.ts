@@ -1,4 +1,4 @@
-import * as jwtDecode from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 
 // This describes an id_token as used in OpenID Connect (OIDC) -- see here for
 // its definition in the spec:
@@ -47,7 +47,7 @@ export class Jwt {
   static parseIDToken(token: string): IDToken | null {
     let tok: IDToken;
     try {
-      tok = jwtDecode(token);
+      tok = jwt_decode(token);
     } catch (e) {
       return null;
     }
@@ -57,7 +57,7 @@ export class Jwt {
   static parseLicenseToken(token: string): LicenseToken | null {
     let tok: LicenseToken;
     try {
-      tok = jwtDecode(token);
+      tok = jwt_decode(token);
     } catch (e) {
       return null;
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 
@@ -26,18 +26,18 @@ export class CookbookEffects {
     private requests: CookbookRequests
   ) { }
 
-  @Effect()
-  getCookbooks$ = this.actions$.pipe(
+  getCookbooks$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookActionTypes.GET_ALL),
       mergeMap(({ payload: { server_id, org_id } }: GetCookbooks) =>
         this.requests.getCookbooks(server_id, org_id).pipe(
           map((resp: CookbooksSuccessPayload) => new GetCookbooksSuccess(resp)),
           catchError(
             (error: HttpErrorResponse) => observableOf(new GetCookbooksFailure(error)
-            )))));
+            ))))));
 
-  @Effect()
-  getCookbooksFailure$ = this.actions$.pipe(
+  getCookbooksFailure$ = createEffect(() =>
+    this.actions$.pipe(
       ofType(CookbookActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetCookbooksFailure) => {
         const msg = payload.error.error;
@@ -45,6 +45,6 @@ export class CookbookEffects {
           type: Type.error,
           message: `Could not get cookbooks: ${msg || payload.error}`
         });
-      }));
+      })));
 
 }

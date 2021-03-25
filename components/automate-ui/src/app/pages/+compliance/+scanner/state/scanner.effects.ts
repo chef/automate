@@ -1,7 +1,7 @@
 import { withLatestFrom, switchMap, mergeMap, filter, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { pick } from 'lodash';
@@ -20,8 +20,8 @@ export class ScannerEffects {
     private httpClient: HttpClient
   ) {}
 
-  @Effect()
-  navToScanner$ = this.actions$.pipe(
+  navToScanner$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(ROUTER_NAVIGATION),
     map((action: RouterNavigationAction) => action.payload.routerState),
     filter(routerState => {
@@ -77,10 +77,10 @@ export class ScannerEffects {
         actions.getJobs(jobsParams),
         actions.getNodes(nodesParams)
       ];
-    }));
+    })));
 
-  @Effect()
-  getJobs$ = this.actions$.pipe(
+  getJobs$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_JOBS),
     switchMap((action: actions.ScannerAction) => {
       const params = pick(action.payload, ['filters', 'page', 'per_page', 'sort', 'order']);
@@ -88,20 +88,20 @@ export class ScannerEffects {
       const url = `${env.compliance_url}/scanner/jobs/search`;
       return this.httpClient.post(url, params);
     }),
-    map(actions.getJobsSuccess));
+    map(actions.getJobsSuccess)));
 
-  @Effect()
-  getJob$ = this.actions$.pipe(
+  getJob$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_JOB),
     switchMap((action: actions.ScannerAction) => {
       const id = action.payload;
       const url = `${env.compliance_url}/scanner/jobs/id/${id}`;
       return this.httpClient.get(url);
     }),
-    map(actions.getJobSuccess));
+    map(actions.getJobSuccess)));
 
-  @Effect()
-  getJobScans$ = this.actions$.pipe(
+  getJobScans$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_JOB_SCANS),
     switchMap((action: actions.ScannerAction) => {
       const params = pick(action.payload, ['filters', 'page', 'per_page', 'sort', 'order']);
@@ -109,10 +109,10 @@ export class ScannerEffects {
       const url = `${env.compliance_url}/scanner/jobs/search`;
       return this.httpClient.post(url, params);
     }),
-    map(actions.getJobScansSuccess));
+    map(actions.getJobScansSuccess)));
 
-  @Effect()
-  getNodes$ = this.actions$.pipe(
+  getNodes$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_NODES),
     switchMap((action: actions.ScannerAction) => {
       const params = pick(action.payload, ['filters', 'page', 'per_page', 'sort', 'order']);
@@ -120,20 +120,20 @@ export class ScannerEffects {
       const url = `${env.nodes_url}/search`;
       return this.httpClient.post(url, params);
     }),
-    map(actions.getNodesSuccess));
+    map(actions.getNodesSuccess)));
 
-  @Effect()
-  getNode$ = this.actions$.pipe(
+  getNode$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.GET_NODE),
     switchMap((action: actions.ScannerAction) => {
       const id = action.payload;
       const url = `${env.nodes_url}/id/${id}`;
       return this.httpClient.get(url);
     }),
-    map(actions.getNodeSuccess));
+    map(actions.getNodeSuccess)));
 
-  @Effect()
-  rerunNode$ = this.actions$.pipe(
+  rerunNode$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.RERUN_NODE),
       switchMap((action: actions.ScannerAction) => {
         const node = action.payload;
@@ -141,44 +141,44 @@ export class ScannerEffects {
         return this.httpClient.get(url);
       }),
       map(actions.rerunNodeSuccess)
-    );
+    ));
 
-  @Effect()
-  createJob$ = this.actions$.pipe(
+  createJob$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.CREATE_JOB),
     switchMap((action: actions.ScannerAction) => {
       const url = `${env.compliance_url}/scanner/jobs`;
       return this.httpClient.post(url, action.payload);
     }),
-    map(actions.createJobSuccess));
+    map(actions.createJobSuccess)));
 
-  @Effect()
-  updateJob$ = this.actions$.pipe(
+  updateJob$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.UPDATE_JOB),
     switchMap((action: actions.ScannerAction) => {
       const job = action.payload;
       const url = `${env.compliance_url}/scanner/jobs/id/${job.id}`;
       return this.httpClient.put(url, job);
     }),
-    map(actions.updateJobSuccess));
+    map(actions.updateJobSuccess)));
 
-  @Effect()
-  confirmDeleteJob$ = this.actions$.pipe(
+  confirmDeleteJob$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.CONFIRM_DELETE_JOB),
-    map((action: actions.ScannerAction) => actions.deleteJob(action.payload)));
+    map((action: actions.ScannerAction) => actions.deleteJob(action.payload))));
 
-  @Effect()
-  deleteJob$ = this.actions$.pipe(
+  deleteJob$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.DELETE_JOB),
     switchMap((action: actions.ScannerAction) => {
       const job = action.payload;
       const url = `${env.compliance_url}/scanner/jobs/id/${job.id}`;
       return this.httpClient.delete(url).pipe(map(() => job));
     }),
-    map(actions.deleteJobSuccess));
+    map(actions.deleteJobSuccess)));
 
-  @Effect()
-  deleteJobSuccess$ = this.actions$.pipe(
+  deleteJobSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.DELETE_JOB_SUCCESS),
     withLatestFrom(
       this.store.select(selectors.jobsListParams),
@@ -193,22 +193,23 @@ export class ScannerEffects {
     map(() => new CreateNotification({
       type: Type.info,
       message: 'Deleted a scan job.'
-    })));
+    }))));
 
-  @Effect()
-  deleteNode$ = this.actions$.pipe(
+  deleteNode$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.DELETE_NODE),
     switchMap((action: actions.ScannerAction) => {
       const node = action.payload;
       const url = `${env.nodes_url}/id/${node.id}`;
       return this.httpClient.delete(url);
     }),
-    map(actions.deleteNodeSuccess));
+    map(actions.deleteNodeSuccess)));
 
-  @Effect()
-  deleteNodeSuccess$ = this.actions$.pipe(
+  deleteNodeSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType(actions.DELETE_NODE_SUCCESS),
     withLatestFrom(this.store.select(selectors.nodesListParams)),
     map(([_action, params]) => params),
-    map(actions.getNodes));
+    map(actions.getNodes)));
+
 }

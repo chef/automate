@@ -34,6 +34,7 @@ describe('ClientDetailsComponent', () => {
         MockComponent({ selector: 'chef-tr' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'chef-snippet', inputs: ['code'] }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']

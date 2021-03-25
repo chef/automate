@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 
@@ -47,39 +47,39 @@ export class PolicyEffects {
   //
   // [1]: https://github.com/ngrx/platform/commit/8d56a6f7e9a0158d30c6a0f335f9805cc7d5a555
 
-  @Effect()
-  getPolicies$ = this.actions$.pipe(
+  getPolicies$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<GetPolicies>(PolicyActionTypes.GET_ALL),
     mergeMap(() => this.requests.getPolicies().pipe(
       map(({ policies }) => new GetPoliciesSuccess({ policies: policies.map(policyFromPayload) })),
-      catchError((error: HttpErrorResponse) => observableOf(new GetPoliciesFailure(error))))));
+      catchError((error: HttpErrorResponse) => observableOf(new GetPoliciesFailure(error)))))));
 
-  @Effect()
-  getPoliciesFailure$ = this.actions$.pipe(
+  getPoliciesFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<GetPoliciesFailure>(PolicyActionTypes.GET_ALL_FAILURE),
     map(({ payload: { error } }) => new CreateNotification({
       type: Type.error,
       message: `Could not get policies: ${error.error || error}`
-    })));
+    }))));
 
-  @Effect()
-  getPolicy$ = this.actions$.pipe(
+  getPolicy$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<GetPolicy>(PolicyActionTypes.GET),
     mergeMap(({ payload: { id }}) =>
       this.requests.getPolicy(id).pipe(
         map(({ policy }) => new GetPolicySuccess(policyFromPayload(policy))),
-        catchError((error: HttpErrorResponse) => observableOf(new GetPoliciesFailure(error))))));
+        catchError((error: HttpErrorResponse) => observableOf(new GetPoliciesFailure(error)))))));
 
-  @Effect()
-  getPolicyFailure$ = this.actions$.pipe(
+  getPolicyFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<GetPolicyFailure>(PolicyActionTypes.GET_FAILURE),
     map(({ payload: { error } }) => new CreateNotification({
       type: Type.error,
       message: `Could not get policy: ${error.error || error}`
-    })));
+    }))));
 
-  @Effect()
-  removePolicyMembers$ = this.actions$.pipe(
+  removePolicyMembers$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<RemovePolicyMembers>(PolicyActionTypes.REMOVE_MEMBERS),
     mergeMap(({ payload: { id, members }}) =>
       this.requests.removePolicyMembers(id, memberListToStringList(members)).pipe(
@@ -88,10 +88,10 @@ export class PolicyEffects {
           members_removed: members,
           members_left: resp.members})),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new RemovePolicyMembersFailure(error))))));
+          observableOf(new RemovePolicyMembersFailure(error)))))));
 
-  @Effect()
-  removePolicyMembersSuccess$ = this.actions$.pipe(
+  removePolicyMembersSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<RemovePolicyMembersSuccess>(PolicyActionTypes.REMOVE_MEMBERS_SUCCESS),
     map(({ payload: { members_removed: removed } }) => {
       const removeStr = removed.length === 1 ? removed[0].displayName : `${removed.length} members`;
@@ -99,18 +99,18 @@ export class PolicyEffects {
           type: Type.info,
           message: `Removed ${removeStr}.`
       });
-    }));
+    })));
 
-  @Effect()
-  removePolicyMembersFailure$ = this.actions$.pipe(
+  removePolicyMembersFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<RemovePolicyMembersFailure>(PolicyActionTypes.REMOVE_MEMBERS_FAILURE),
     map(({ payload: { error } }) => new CreateNotification({
       type: Type.error,
       message: `Could not remove members from policy: ${error.error || error}`
-    })));
+    }))));
 
-  @Effect()
-  addPolicyMembers$ = this.actions$.pipe(
+  addPolicyMembers$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<AddPolicyMembers>(PolicyActionTypes.ADD_MEMBERS),
     mergeMap(({ payload: { id, members }}) =>
       this.requests.addPolicyMembers(id, memberListToStringList(members)).pipe(
@@ -120,10 +120,10 @@ export class PolicyEffects {
           resulting_members: resp.members
         })),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new AddPolicyMembersFailure(error))))));
+          observableOf(new AddPolicyMembersFailure(error)))))));
 
-  @Effect()
-  addPolicyMembersSuccess$ = this.actions$.pipe(
+  addPolicyMembersSuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<AddPolicyMembersSuccess>(PolicyActionTypes.ADD_MEMBERS_SUCCESS),
     map(({ payload: { id, members_added: added } }) => {
       const addedStr = added.length === 1 ? added[0].displayName : `${added.length} members`;
@@ -131,37 +131,37 @@ export class PolicyEffects {
           type: Type.info,
           message: `Added ${addedStr} to "${id}" policy.`
       });
-    }));
+    })));
 
-  @Effect()
-  addPolicyMembersFailure$ = this.actions$.pipe(
+  addPolicyMembersFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<AddPolicyMembersFailure>(PolicyActionTypes.ADD_MEMBERS_FAILURE),
     map(({ payload: { error } }) => new CreateNotification({
       type: Type.error,
       message: `Could not add members to policy: ${error.error || error}`
-    })));
+    }))));
 
-  @Effect()
-  deletePolicy$ = this.actions$.pipe(
+  deletePolicy$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<DeletePolicy>(PolicyActionTypes.DELETE),
     mergeMap(({ payload: { id } }) =>
       this.requests.deletePolicy(id).pipe(
         map(() => new DeletePolicySuccess({ id })),
-        catchError((error: HttpErrorResponse) => observableOf(new DeletePolicyFailure(error))))));
+        catchError((error: HttpErrorResponse) => observableOf(new DeletePolicyFailure(error)))))));
 
-  @Effect()
-  deletePolicySuccess$ = this.actions$.pipe(
+  deletePolicySuccess$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<DeletePolicySuccess>(PolicyActionTypes.DELETE_SUCCESS),
     map(({ payload: { id } }) => new CreateNotification({
       type: Type.info,
       message: `Deleted policy ${id}.`
-    })));
+    }))));
 
-  @Effect()
-  deletePolicyFailure$ = this.actions$.pipe(
+  deletePolicyFailure$ = createEffect(() =>
+    this.actions$.pipe(
     ofType<DeletePolicyFailure>(PolicyActionTypes.DELETE_FAILURE),
     map(({ payload: { error } }) =>  new CreateNotification({
       type: Type.error,
       message: `Could not delete policy: ${error.error || error}`
-    })));
+    }))));
 }
