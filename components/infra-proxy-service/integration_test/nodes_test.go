@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestGetNode(t *testing.T) {
@@ -294,7 +295,6 @@ func TestUpdateNodeEnvironment(t *testing.T) {
 			Name:        name,
 			Environment: "_default",
 		}
-
 		node, err := infraProxy.CreateNode(ctx, reqNode)
 		assert.NoError(t, err)
 		assert.NotNil(t, node)
@@ -314,27 +314,103 @@ func TestUpdateNodeEnvironment(t *testing.T) {
 	})
 
 	t.Run("when attempting to set the environment to empty value, raise invalid argument error", func(t *testing.T) {
-		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
-		reqNode := &request.NodeDetails{
-			ServerId:    autoDeployedChefServerID,
-			OrgId:       autoDeployedChefOrganizationID,
-			Name:        name,
-			Environment: "_default",
-		}
-
-		node, err := infraProxy.CreateNode(ctx, reqNode)
-		assert.NoError(t, err)
-		assert.NotNil(t, node)
-
 		req := &request.UpdateNodeEnvironment{
 			ServerId:    autoDeployedChefServerID,
 			OrgId:       autoDeployedChefOrganizationID,
-			Name:        name,
+			Name:        fmt.Sprintf("node-%d", time.Now().Nanosecond()),
 			Environment: "",
 		}
 		res, err := infraProxy.UpdateNodeEnvironment(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, res)
 		grpctest.AssertCode(t, codes.InvalidArgument, err)
+	})
+
+}
+func TestUpdateNodeAttributes(t *testing.T) {
+	t.Run("when valid the attributes value is set, updates the node attributes", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
+		req := &request.UpdateNodeAttributes{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+			Attributes: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"attr1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "value1"}},
+				},
+			},
+		}
+		res, err := infraProxy.UpdateNodeAttributes(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, "{\"attr1\":\"value1\"}", res.Attributes)
+	})
+
+	t.Run("when attempting to set the attributes to empty value, updates attributes with empty value", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+			NormalAttributes: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"attr1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "value1"}},
+				},
+			},
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
+		req := &request.UpdateNodeAttributes{
+			ServerId:   autoDeployedChefServerID,
+			OrgId:      autoDeployedChefOrganizationID,
+			Name:       name,
+			Attributes: &structpb.Struct{},
+		}
+		res, err := infraProxy.UpdateNodeAttributes(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, "{}", res.Attributes)
+	})
+
+	t.Run("when attempting to set the attributes to nil, updates attributes with empty value", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+			NormalAttributes: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"attr1": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "value1"}},
+				},
+			},
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
+		req := &request.UpdateNodeAttributes{
+			ServerId:   autoDeployedChefServerID,
+			OrgId:      autoDeployedChefOrganizationID,
+			Name:       name,
+			Attributes: nil,
+		}
+		res, err := infraProxy.UpdateNodeAttributes(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, "{}", res.Attributes)
 	})
 }
