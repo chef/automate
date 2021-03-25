@@ -1,12 +1,20 @@
-<div class="search-wrapper">
-    <input #search_box chefInput
-      id="search_box"
-      aria-label="Search"
-      (keyup)="handleInput($event.key, search_box.value)"
-      [value]="inputText"
-      placeholder="Search {{ placeHolder }}"
-      autocomplete="off">
-    <button chef-button class="primary" primary (click)="handleFiltersClick(search_box.value)">
-      <chef-icon>search</chef-icon>
-    </button>
-</div>
+<form role='search'
+  (ngSubmit)="onSubmit(search_box.value)"
+  [class.active]="formActive">
+  <label for="environment-search" aria-hidden="true" class="hidden">
+    <span>Search</span>
+  </label>
+  <input #search_box chefInput
+    id="environment-search"
+    aria-label="Search"
+    [value]="inputText"
+    placeholder="Search {{ placeHolder }}"
+    autocomplete="off"
+    (focus)="toggleFocus()"
+    (blur)="toggleFocus()"
+    (keyup)="handleInput($event.key, search_box.value)">
+  <button type="submit" class="primary" primary>
+    <span class="hidden">Submit Search</span>
+    <chef-icon>search</chef-icon>
+  </button>
+</form>

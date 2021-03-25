@@ -1,42 +1,48 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-.search-wrapper {
-  width: 100%;
+form {
   display: flex;
+  width: 100%;
   flex-direction: row;
   font-size: 1em;
   color: $chef-primary-dark;
-}
+  border-radius: $chef-border-radius;
+  overflow: hidden;
 
-button {
-  box-shadow: 0 1px 14px #E6EBEE;
-  border: none;
-  border-radius: 0px 4px 4px 0px;
-  background: #E6EBEE;
-  cursor: pointer;
-  width: 45px;
+  &.active {
+    box-shadow: 0px 0px 0px 1px $chef-primary-bright; // Mimic default outline
+  }
+
+  .hidden {
+    display: none;
+  }
 }
 
 input {
   border-radius: 4px 0px 0px 4px;
   width: 100%;
+  transition: 0s; // Remove default transition
+
+  &:focus {
+    border: 0; // Accessibility is being noted around containing form
+  }
 }
 
-::ng-deep .chef-input:active {
-  border-width: 0.5px;
-}
+button {
+  background: #E6EBEE;
+  width: 45px;
+  box-shadow: 0 1px 14px #E6EBEE;
+  border: 0px solid transparent;
+  border-radius: 0px 4px 4px 0px;
+  cursor: pointer;
 
-.search-items {
-  margin-bottom: 25px;
-  width: 100%;
+  &:focus {
+    outline: none;
+    border: 1px solid $chef-primary-bright;
+  }
 }
 
 chef-icon {
   margin-top: 6px;
-  margin-left: 3px;
-}
-
-.hidden-label {
-  padding: 0;
 }
