@@ -18,7 +18,7 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
-    <div class="search-items">
+    <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
       </app-infra-search-bar>
       <chef-toolbar *ngIf="chefInfraViewsFeatureFlagOn">
