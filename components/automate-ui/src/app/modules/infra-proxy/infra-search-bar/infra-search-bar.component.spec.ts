@@ -33,7 +33,7 @@ describe('InfraSearchBarComponent', () => {
       expect(component.formActive).toBe(false);
     });
 
-    it('Should active the form when input is focused', () => {
+    it('Should activate the form when input is focused', () => {
       component.toggleFocus();
       expect(component.formActive).toBe(true);
     });
