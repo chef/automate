@@ -1,11 +1,11 @@
 <form role='search'
   (ngSubmit)="onSubmit(search_box.value)"
   [class.active]="formActive">
-  <label for="environment-search" aria-hidden="true" class="hidden">
+  <label for="search-filter" aria-hidden="true" class="hidden">
     <span>Search</span>
   </label>
   <input #search_box chefInput
-    id="environment-search"
+    id="search-filter"
     [value]="inputText"
     (focus)="toggleFocus()"
     (blur)="toggleFocus()"
