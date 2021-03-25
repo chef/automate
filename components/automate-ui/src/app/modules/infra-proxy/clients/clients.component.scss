@@ -1,5 +1,21 @@
 @import "~styles/variables";
 
+.search-create-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 16px;
+  margin: 18px 0;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;

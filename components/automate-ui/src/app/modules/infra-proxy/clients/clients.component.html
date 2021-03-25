@@ -18,7 +18,7 @@
   </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
-    <div class="search-items">
+    <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="Clients">
       </app-infra-search-bar>
       <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
