@@ -26,15 +26,4 @@ export class InfraSearchBarComponent {
     this.formActive = !this.formActive;
   }
 
-  pressEnter(currentText: string): void {
-    this.searchButtonClick.emit(currentText);
-  }
-
-  handleInput(key, currentText): void {
-    switch (key.toLowerCase()) {
-      case 'enter':
-        this.pressEnter(currentText);
-        break;
-    }
-  }
 }

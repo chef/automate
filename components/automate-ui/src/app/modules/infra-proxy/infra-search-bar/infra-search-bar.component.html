@@ -6,13 +6,12 @@
   </label>
   <input #search_box chefInput
     id="environment-search"
-    aria-label="Search"
     [value]="inputText"
-    placeholder="Search {{ placeHolder }}"
-    autocomplete="off"
     (focus)="toggleFocus()"
     (blur)="toggleFocus()"
-    (keyup)="handleInput($event.key, search_box.value)">
+    placeholder="Search {{ placeHolder }}"
+    aria-label="Search"
+    autocomplete="off">
   <button type="submit" class="primary" primary>
     <span aria-hidden="true" class="hidden">Submit Search</span>
     <chef-icon>search</chef-icon>
