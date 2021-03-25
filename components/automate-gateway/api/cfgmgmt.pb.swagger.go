@@ -1347,7 +1347,7 @@ func init() {
       "type": "object",
       "properties": {
         "data": {
-          "type": "string"
+          "type": "object"
         }
       }
     },

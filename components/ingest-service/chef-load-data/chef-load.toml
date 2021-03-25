@@ -1,7 +1,7 @@
 data_collector_url = "https://localhost:2000/api/v0/events/data-collector"
 data_collector_token = "REPLACE_ME_VIA_HAB"
 converge_status_json_file = "./components/ingest-service/examples/converge-success-report.json"
-ohai_json_file = "./components/ingest-service/chef-load-data/ohai-data.json"
+ohai_json_file = "/tmp/ohai-data.json"
 log_file = "/tmp/chef-load.log"
 compliance_sample_reports_dir = "./components/compliance-service/chef-load-data/samples"
 compliance_status_json_file = "./components/compliance-service/chef-load-data/compliance-status.json"

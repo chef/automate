@@ -949,7 +949,7 @@
     "public_ipv4": null,
     "public_hostname": null,
     "local_ipv4": "55.37.254.178",
-    "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
+    "local_hostname": "ip-55.37.254.178.us-west-2.compute.internal",
     "provider": "ec2"
   },
   "cloud_v2": {
@@ -957,7 +957,7 @@
       "55.37.254.178"
     ],
     "provider": "ec2",
-    "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
+    "local_hostname": "ip-55.37.254.178.us-west-2.compute.internal",
     "local_ipv4": "55.37.254.178"
   },
   "command": {
@@ -2124,9 +2124,9 @@
       }
     }
   },
-  "hostname": "ip-55-37-254-176",
-  "machinename": "ip-55-37-254-176.us-west-2.compute.internal",
-  "fqdn": "ip-55-37-254-176.us-west-2.compute.internal",
+  "hostname": "ip-55.37.254.178",
+  "machinename": "ip-55.37.254.178.us-west-2.compute.internal",
+  "fqdn": "ip-55.37.254.178.us-west-2.compute.internal",
   "domain": "us-west-2.compute.internal",
   "init_package": "systemd",
   "block_device": {
@@ -2144,7 +2144,7 @@
     }
   },
   "hostnamectl": {
-    "static_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
+    "static_hostname": "ip-55.37.254.178.us-west-2.compute.internal",
     "icon_name": "computer-vm",
     "chassis": "vm",
     "machine_id": "f9370ed252a14f73b014c1301a9b6d1b",
