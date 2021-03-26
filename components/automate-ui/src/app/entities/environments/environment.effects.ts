@@ -121,7 +121,7 @@ export class EnvironmentEffects {
       ofType(EnvironmentActionTypes.CREATE_SUCCESS),
       map(({ payload: { name } }: CreateEnvironmentSuccess) => new CreateNotification({
         type: Type.info,
-        message: `Successfully deleted environment - ${name}.`
+        message: `Created environment ${name}.`
       }))));
 
   createEnvironmentFailure$ = createEffect(() =>
