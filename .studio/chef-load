@@ -155,12 +155,12 @@ function chef_load_nodes_replace_ipaddress(){
    pushd /src >/dev/null;
       for (( i=1; i<=$nodes; i++ ))
       do
-      echo $i
+        echo $i
         ip_address=''
         getRandom ip_address
         prepare_chef_load_replace_ipaddress $ip_address
         echo "$ip_address"
-          chef-load generate --config /tmp/chef-load.toml -n $nodes
+        chef-load generate --config /tmp/chef-load.toml -n $nodes
       done
       local EXIT_CODE=$?;
     popd >/dev/null;
