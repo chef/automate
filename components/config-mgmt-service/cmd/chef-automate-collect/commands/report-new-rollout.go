@@ -149,7 +149,10 @@ func runReportNewRolloutCommand(cmd *cobra.Command, args []string) error {
 	automate := loader.LoadedConfig.Automate
 
 	tr := httputils.NewDefaultTransport()
-	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: automate.InsecureTLS}
+	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: automate.InsecureTLS,
+	}
 	httpClient := &http.Client{Transport: tr}
 
 	fmt.Println(automate.URL)

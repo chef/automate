@@ -125,6 +125,7 @@ func customClient(targetServiceName string, upstream *url.URL, serviceCerts *cer
 
 	customTransport := httputils.NewDefaultTransport()
 	customTransport.TLSClientConfig = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		ServerName:   targetServiceName,
 		Certificates: []tls.Certificate{*serviceCerts.ServiceKeyPair},
 		RootCAs:      serviceCerts.NewCertPool(),

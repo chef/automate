@@ -58,7 +58,7 @@ func TestMain(t *testing.T) {
 	mux := mux.NewRouter()
 	s := httptest.NewUnstartedServer(mux)
 	dexCerts := devDexCerts(t)
-	s.TLS = &tls.Config{
+	s.TLS = &tls.Config{MinVersion: tls.VersionTLS13,
 		// We have to use the dex certs here because session-service is going
 		// to check that the thing its talking to is automate-dex
 		Certificates: []tls.Certificate{*dexCerts.ServiceKeyPair},
@@ -126,6 +126,7 @@ func TestMain(t *testing.T) {
 	c.Jar = cj
 	c.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
 			ServerName: "automate-dex",
 			RootCAs:    certpool,
 		},

@@ -297,6 +297,7 @@ func initS3Bucket(bucketName string) (*blob.Bucket, error) {
 
 	tr := httputils.NewDefaultTransport()
 	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: true,
 	}
 	c := &aws.Config{

@@ -120,7 +120,10 @@ func LoadTestContext(dsClient api.DeploymentClient, reader io.Reader, opts ...Te
 
 func create(dsClient api.DeploymentClient, save save, opts ...TestContextOpt) *testContext {
 	tr := httputils.NewDefaultTransport()
-	tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
 	httpClient := &http.Client{Transport: tr}
 
 	tstContext := &testContext{

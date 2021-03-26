@@ -50,7 +50,10 @@ type GatewayLocationSpecification struct {
 // backup gateway.
 func (gws GatewayLocationSpecification) ToBucket(key string) Bucket {
 	tr := httputils.NewDefaultTransport()
-	tr.TLSClientConfig = &tls.Config{RootCAs: gws.CertPool}
+	tr.TLSClientConfig = &tls.Config{
+		MinVersion: tls.VersionTLS12,
+		RootCAs:    gws.CertPool,
+	}
 
 	accessKeyName := secrets.SecretName{Group: gws.secretGroupName, Name: "access_key"}
 	secretKeyName := secrets.SecretName{Group: gws.secretGroupName, Name: "secret_key"}

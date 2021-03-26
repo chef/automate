@@ -41,7 +41,10 @@ type token struct {
 }
 
 func main() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} // nolint
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	} // nolint
 
 	flag.Parse()
 

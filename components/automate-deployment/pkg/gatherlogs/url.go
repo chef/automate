@@ -37,6 +37,7 @@ func (u *URL) execute() error {
 
 	tr := httputils.NewDefaultTransport()
 	tr.TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: true,
 	}
 	c := *http.DefaultClient // copy

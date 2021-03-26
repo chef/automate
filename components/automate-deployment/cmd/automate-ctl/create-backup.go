@@ -53,7 +53,10 @@ func automateCtlCreateBackup(cmd *cobra.Command, args []string) {
 	}
 
 	// the a1 stub server only supports localhost:443
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	tlsConfig := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
 	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: tr}
 	_, err := client.Get("https://localhost/th-createbackup") // nolint: bodyclose

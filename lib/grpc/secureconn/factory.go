@@ -121,6 +121,7 @@ func (f *Factory) ServerOptions() []grpc.ServerOption {
 // DialOptions returns a list of DialOptions this factory uses to connect to clients.
 func (f *Factory) DialOptions(serviceName string) []grpc.DialOption {
 	creds := credentials.NewTLS(&tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		ServerName:   serviceName,
 		Certificates: []tls.Certificate{f.ServiceKeyPair},
 		RootCAs:      f.CertPool,

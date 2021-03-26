@@ -137,6 +137,7 @@ func httpClientForIssuer(targetServiceName string, targetURL *url.URL,
 
 	customTransport := httputils.NewDefaultTransport()
 	customTransport.TLSClientConfig = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		ServerName:   targetServiceName,
 		Certificates: []tls.Certificate{*serviceCerts.ServiceKeyPair},
 		RootCAs:      serviceCerts.NewCertPool(),

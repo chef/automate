@@ -273,7 +273,10 @@ func (p *PreflightRunner) checkA1InstallHealthy() {
 		return
 	}
 
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	tlsConfig := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
 	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	c := &http.Client{Transport: tr, Timeout: 10 * time.Second}
 	resp, err := c.Get(A1StatusURL)
