@@ -32,6 +32,7 @@ type TestProbe interface {
 	LookupUser(username string) (*user.User, error)
 	LookPath(file string) (string, error)
 	HTTPConnectivity(url string) error
+	SELinuxStatus() ([]byte, error)
 }
 
 type ConsoleReporter struct {
@@ -124,6 +125,10 @@ func (*localTestProbe) IsSymlink(filePath string) (bool, error) {
 
 func (*localTestProbe) Euid() int {
 	return os.Geteuid()
+}
+
+func (*localTestProbe) SELinuxStatus() ([]byte, error) {
+	return exec.Command("getenforce").Output()
 }
 
 func (*localTestProbe) AvailableDiskSpace(path string) (uint64, error) {
