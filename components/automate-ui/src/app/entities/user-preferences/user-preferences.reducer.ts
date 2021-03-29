@@ -19,7 +19,7 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   status: EntityStatus.notLoaded
 };
 
-export function serviceGroupsEntityReducer(
+export function userPreferencesEntityReducer(
   state: UserPreferencesEntityState = UserPreferencesEntityInitialState,
   action: UserPreferencesActions): UserPreferencesEntityState {
 
