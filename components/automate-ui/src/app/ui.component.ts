@@ -8,6 +8,7 @@ import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
+import { GetUserPreferences } from './entities/user-preferences/user-preferences.actions';
 
 @Component({
   selector: 'app-ui',
@@ -71,5 +72,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
 
     // Initial call
     this.store.dispatch(new GetAllUserPerms());
+    this.store.dispatch(new GetUserPreferences());
   }
 }
