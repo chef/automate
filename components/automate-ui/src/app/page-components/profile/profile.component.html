@@ -23,58 +23,16 @@
           (keydown.arrowdown)="handleArrowDown($event)"
           class="profile"
           role="menuitem"
-          #focusElement>Profile</a>
+          #focusElement>User Preferences</a>
       </li>
       <li class="dropdown-list-item">
-        <ul class="dropdown-sub-list">
-          <li>
-            <span class="version">Version: 2</span>
-          </li>
-          <li>
-            <span class="build">Build: {{ buildVersion }}</span>
-          </li>
-        </ul>
-        <ul class="dropdown-sub-list">
-          <li>
-            <button (click)="showWelcomeModal()"
-              (keydown.arrowup)="handleArrowUp($event)"
-              (keydown.arrowdown)="handleArrowDown($event)"
-              data-cy="welcome-modal-button"
-              class="welcome-modal-button"
-              role="menuitem"
-              #focusElement>About</button>
-          </li>
-          <li>
-            <a href="https://www.chef.io/online-master-agreement/" target="_blank" rel="noopener"
-              (click)="closeDropdown()"
-              (keydown.arrowup)="handleArrowUp($event)"
-              (keydown.arrowdown)="handleArrowDown($event)"
-              role="menuitem"
-              #focusElement>
-              License <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
-            </a>
-          </li>
-          <li>
-            <a href="https://www.chef.io/patents" target="_blank" rel="noopener"
-              (click)="closeDropdown()"
-              (keydown.arrowup)="handleArrowUp($event)"
-              (keydown.arrowdown)="handleArrowDown($event)"
-              role="menuitem"
-              #focusElement>
-              Chef Patents <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
-            </a>
-          </li>
-          <li>
-            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" rel="noopener" class="release-notes"
-              (click)="closeDropdown()"
-              (keydown.arrowup)="handleArrowUp($event)"
-              (keydown.arrowdown)="handleArrowDown($event)"
-              role="menuitem"
-              #focusElement>
-              Release Notes <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
-            </a>
-          </li>
-        </ul>
+        <button (click)="toggleAboutModal()"
+          (keydown.arrowup)="handleArrowUp($event)"
+          (keydown.arrowdown)="handleArrowDown($event)"
+          data-cy="welcome-modal-button"
+          class="about-modal-button"
+          role="menuitem" 
+          #focusElement>About Chef Automate</button>
       </li>
       <li class="dropdown-list-item">
         <button data-cy="sign-out-button" class="logout"
@@ -92,3 +50,35 @@
 </chef-click-outside>
 
 <app-welcome-modal></app-welcome-modal>
+
+<chef-modal locked="false" label="about-modal" [visible]="aboutModalVisible" (closeModal)="toggleAboutModal()">
+  <span id="about-modal" slot="">About Chef Automate</span>
+  <ul>
+    <li>
+      <span>Version: 2</span>
+    </li>
+    <li>
+      <span>Build: {{ buildVersion }}</span>
+    </li>
+    <li>
+      <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" rel="noopener">Release Notes <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+      </a>
+    </li>
+    <li>
+      <a href="https://www.chef.io/patents" target="_blank" rel="noopener">Chef Patents <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+      </a>
+    </li>
+    <li>
+      <span>Use of Chef Automate is subject to the terms of the
+        <a href="https://www.chef.io/online-master-agreement/" target="_blank" rel="noopener">
+          Master License and Services Agreement <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+        </a>
+      </span>
+    </li>
+    <li>
+      <button (click)="showWelcomeModal()">
+        Welcome message
+      </button>
+    </li>
+  </ul>
+</chef-modal>
