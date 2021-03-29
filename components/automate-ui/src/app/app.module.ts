@@ -98,6 +98,7 @@ import { NodeCredentialRequests } from './entities/node-credentials/node-credent
 import { OrgRequests } from './entities/orgs/org.requests';
 import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
+import { UserPreferencesRequests } from './entities/user-preferences/user-preferences.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
@@ -344,6 +345,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,
+    UserPreferencesRequests,
     SessionStorageService,
     TeamRequests,
     TelemetryService,
