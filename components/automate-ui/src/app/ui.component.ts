@@ -8,9 +8,13 @@ import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
+<<<<<<< HEAD
 import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
 import * as moment from 'moment-timezone';
+=======
+import { GetUserPreferences } from './entities/user-preferences/user-preferences.actions';
+>>>>>>> Move initial call to get preferences to the ui component
 
 @Component({
   selector: 'app-ui',
