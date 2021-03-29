@@ -249,6 +249,7 @@ export const defaultInitialState = {
   desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
+  userPreferences: userPreferencesEntity.UserPreferencesEntityInitialState,
   userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
@@ -312,6 +313,7 @@ export const ngrxReducers = {
   desktops: desktopEntity.desktopEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
+  userPreferences: userPreferencesEntity.userPreferencesEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
 
