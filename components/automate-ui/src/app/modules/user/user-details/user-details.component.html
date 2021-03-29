@@ -30,6 +30,16 @@
               Display Name is required.
             </chef-error>
           </chef-form-field>
+          <chef-form-field>
+            <label for="timezone">Time Zone</label>
+            <chef-select>
+              <chef-option value="1">UTC (demo)</chef-option>
+              <chef-option value="2">some other time zone</chef-option>
+              <chef-option value="3">some other time zone</chef-option>
+              <chef-option value="4">some other time zone</chef-option>
+              <chef-option value="5">some other time zone</chef-option>
+            </chef-select>
+          </chef-form-field>
         </form>
         <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline
           (click)="userDetails.saveDisplayName()" data-cy="user-details-submit-button">
