@@ -52,8 +52,6 @@ chef-loading-spinner {
   }
 
   li {
-    cursor: pointer;
-
     &:hover, &.selected {
       color: $chef-primary-bright;
 
@@ -256,6 +254,7 @@ tbody > .detail-row {
 }
 
 .float-right {
+  cursor: pointer;
   position: relative;
   float: right;
 }
