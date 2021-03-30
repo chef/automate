@@ -10,9 +10,24 @@
 
 ### :white_check_mark: Checklist
 
+**All PRs** must tick these:
+
 - [ ] I have read the [CONTRIBUTING document](https://github.com/chef/automate/blob/master/CONTRIBUTING.md).
-- [ ] Tests added/updated?
-- [ ] Docs added/updated?
-- [ ] All commits have been signed-off for the [Developer Certification of Origin](https://github.com/chef/chef/blob/master/CONTRIBUTING.md#developer-certification-of-origin-dco).
+- [ ] All commits signed-off for the [Developer Certification of Origin](https://github.com/chef/chef/blob/master/CONTRIBUTING.md#developer-certification-of-origin-dco).
+
+With occasional exceptions, all PRs **from Progress employees** must tick these:
+
+- [ ] Is the code clear? *(complicated code or lots of comments--subdivide and use well-named methods, meaningful variable names, etc.)*
+- [ ] Consistency checked? *(user notifications, user prompts, visual patterns, code patterns, variable names)*
+- [ ] Repeated code blocks eliminated? *(adapt and reuse existing components, blocks, functions, etc.)*
+- [ ] Spelling, grammar, typos checked? *(at a minimum use `make spell` in any component directory)*
+- [ ] Code well-formatted? *(indents, line breaks, etc. improve rather than hinder readability)*
+
+All PRs **from Progress employees** should tick these if appropriate:
+
+- [ ] Tests added/updated? (all new code needs new tests)
+- [ ] Docs added/updated? (all customer-facing changes)
+
+*Please add a note next to any checkbox above if you are NOT ticking it.*
 
 ### :camera: Screenshots, if applicable
