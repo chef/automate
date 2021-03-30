@@ -14,7 +14,10 @@ export interface UserPreferencesEntityState {
 }
 
 export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
-  list: [],
+  list: [
+    // Subject to change, enabled for development purposes
+    { id: 'timezone', name: 'timezone', value: 'default (UTC)', enabled: true }
+  ],
   error: null,
   status: EntityStatus.notLoaded
 };
@@ -26,9 +29,7 @@ export function userPreferencesEntityReducer(
   switch (action.type) {
 
     case UserPreferencesActionTypes.GET_USER_PREFERENCES:
-      return pipe(
-        set('status', EntityStatus.loading),
-        set('list', {}))(state) as UserPreferencesEntityState;
+      return set('status', EntityStatus.loading, state) as UserPreferencesEntityState;
 
     case UserPreferencesActionTypes.GET_USER_PREFERENCES_SUCCESS:
       return pipe(
@@ -41,9 +42,7 @@ export function userPreferencesEntityReducer(
         set('error', action.payload))(state) as UserPreferencesEntityState;
 
     case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES:
-      return pipe(
-        set('status', EntityStatus.loading),
-        set('list', {}))(state) as UserPreferencesEntityState;
+      return set('status', EntityStatus.loading, state) as UserPreferencesEntityState;
 
     case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_SUCCESS:
       return pipe(
