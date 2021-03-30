@@ -89,6 +89,28 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 An [environment]({{< relref "environments" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
 
+The Chef Infra Server UI let's you access the _Environment_ object in following ways:
+
+- All the _Environments_ of an Organization can be listed at one place.
+
+- You can create a new Environment using the button as shown below:
+
+{{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
+
+- In the above image, the search bar stating __Search environments__ can be used to search a specific environment from the list.
+
+- The Chef Infra Server also allows you to delete the created environments one at a time.
+
+- Select a specific environment to get the details of that particular environment.
+
+  - __Cookbook Constraints:__ The selected bar contains the list of all the cookbook constraints with _Name_, their _Operator_ and, _Version_ respectively. Refer to the image below:
+
+  {{< figure src="/images/automate/cookbook-constraints-in-environment.png" alt="Cookbook Constraints In Environment">}}
+
+  - __Attributes:__ The attributes bar shows all the default and overridden attributes. Select the __Expand All__ or __Collapse All__ option to view the attributes. Refer to the image below:
+
+  {{< figure src="/images/automate/attributes-in-environment.png" alt="Attributes In Environment">}}
+
 ### Data Bags
 
 [Data bags]({{< relref "data_bags" >}}) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
@@ -96,6 +118,22 @@ An [environment]({{< relref "environments" >}}) can be used to map an organizati
 ### Clients
 
 Chef Infra Clients provide secure API access to the Chef Infra Server.
+
+The Chef Infra Server UI let's you access the _Clients_ object in the following ways:
+
+- All the _Clients_ of an organization can be listed at one place.
+
+- You can create a client using the button as shown below:
+
+{{< figure src="/images/automate/create-client-button.png" alt="Create Client Button">}}
+
+- In the above image, the search bar stating __Search Clients__ can be used to search a specific client from the list.
+
+- The Chef Infra Server also allows you to delete the created clients one at a time.
+
+- Select a specific client to get the details of that particular client. The client details shows a __Public Key__. You can reset the public key using the __Reset Key__ option. Refer to the image below:
+
+{{< figure src="/images/automate/client-details-public-key.png" alt="Public Key of Clients">}}
 
 ## Troubleshoot
 
