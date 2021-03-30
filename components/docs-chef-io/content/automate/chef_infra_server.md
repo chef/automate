@@ -50,7 +50,7 @@ Once you are finished, select **Add Chef Server** and you will see your server i
 ## Connect a Chef Organization to a Chef Infra Server
 
 To see a list of existing [organizations]({{< relref "server_orgs" >}}) that are applied to a Chef Infra Server,
-select a Chef Infra Server from the **Chef Servers** list, then select the **Orgs** tab. Refer to the image below:
+select a Chef Infra Server from the **Chef Servers** list, then select the **Organizations** tab. Refer to the image below:
 
 {{< figure src="/images/automate/chef-server-organization.png" alt="Chef Infra Server Organization">}}
 
