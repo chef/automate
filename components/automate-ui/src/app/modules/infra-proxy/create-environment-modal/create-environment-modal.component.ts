@@ -192,7 +192,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   }
 
   handleInput(event: { target: { value: string } } ): void {
-    this.nameExist = this.environmentsList.some(el => el.name === event.target.value);
+    this.nameExist = this.environmentsList.some(el => el.name === event.target.value.trim());
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
