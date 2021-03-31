@@ -4,8 +4,8 @@ describe('chef server', () => {
   const serverName = `${cypressPrefix} server ${now}`;
   const generatedServerID = serverName.split(' ').join('-');
   const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'chef-server-1617089723092818000.com'
-  const serverIP = '176.119.50.159'
+  const serverFQDN = 'chef-server-1617089723092818000.com';
+  const serverIP = '176.119.50.159';
 
   before(() => {
     cy.adminLogin('/infrastructure/chef-servers').then(() => {
@@ -26,7 +26,7 @@ describe('chef server', () => {
   describe('chef server list page', () => {
     it('lists servers', () => {
       cy.get('[data-cy=add-server-button]').contains('Add Chef Server');
-    
+
       cy.get('#servers-table-container chef-th').contains('Name');
       cy.get('#servers-table-container chef-th').contains('FQDN');
       cy.get('#servers-table-container chef-th').contains('IP Address');
