@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { EntityStatus } from '../entities';
+import { EntityStatus } from 'app/entities/entities';
 import * as fromServiceGroups from './user-preferences.reducer';
 
 import {
