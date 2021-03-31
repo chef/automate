@@ -18,3 +18,9 @@ export const userPreferencesError = createSelector(
   userPreferencesState,
   (userPreferences) => userPreferences.error
 );
+
+/////////////////////////// Testing with timezone available
+export const userPreferencesTimezone = createSelector(
+  userPreferencesState,
+  (userPreferences) => userPreferences.list.timezone
+);
