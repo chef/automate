@@ -8,7 +8,7 @@ import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
-import { GetUserPreferences } from './entities/user-preferences/user-preferences.actions';
+import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
 
 @Component({
   selector: 'app-ui',
