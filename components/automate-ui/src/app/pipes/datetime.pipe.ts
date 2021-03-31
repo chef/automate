@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment/moment';
+import * as moment from 'moment-timezone';
 
 /**
  * The datetime pipe formats datetime strings or moment objects. It's
@@ -21,16 +21,24 @@ export class DatetimePipe implements PipeTransform {
   // convert object to selected timzone
   // format the time
 
-  // public transform(value: moment.Moment | Date | string,
-                      // timezone: any,
-                      // formatStr: string): string {
-  //   const datetime = moment.isMoment(value) ? value : moment(value);
-  //   return datetime.tz(timezone).format(formatStr);
-  // }
+  // REFER TO DOCS FOR USE WITH UTC https://momentjs.com/timezone/docs/#/using-timezones/
 
-  public transform(value: moment.Moment | Date | string, formatStr: string): string {
-    const datetime = moment.isMoment(value) ? value : moment.utc(value);
-    return datetime.format(formatStr);
+  public transform(value: moment.Moment | Date | string,
+    timezone: string, formatStr: string): string {
+
+    // const datetime = moment.utc(value);
+
+    if (timezone !== 'default') {
+      return moment.utc(value).clone().tz(timezone).format(formatStr);
+      // return datetime.clone().tz(timezone).format(formatStr);
+    }
+    return moment.utc(value).format(formatStr);
+    // return datetime.format(formatStr);
   }
+
+  // public transform(value: moment.Moment | Date | string, formatStr: string): string {
+  //   const datetime = moment.isMoment(value) ? value : moment.utc(value);
+  //   return datetime.format(formatStr);
+  // }
 
 }
