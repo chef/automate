@@ -6,7 +6,14 @@
         <chef-form-field>
           <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleNameInput($event)" autocomplete="off"/>
+            <input
+              chefInput
+              formControlName="name"
+              data-cy="add-name"
+              type="text"
+              id="name-input"
+              (keyup)="handleNameInput($event)" 
+              autocomplete="off"/>
           </label>
           <chef-error
           *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
@@ -19,7 +26,14 @@
         <chef-form-field>
           <label>
             <span class="label">ID <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="id" type="text" (keyup)="handleInput($event)" id="id-input" data-cy="create-id" autocomplete="off"/>
+            <input
+              chefInput
+              formControlName="id"
+              type="text"
+              (keyup)="handleInput($event)" 
+              id="id-input"
+              data-cy="add-id"
+              autocomplete="off"/>
           </label>
           <chef-error *ngIf="createForm.get('id').hasError('maxlength') && createForm.get('id').dirty">
             ID must be 64 characters or less.
@@ -49,7 +63,14 @@
         <chef-form-field>
           <label>
             <span class="label">FQDN <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="fqdn" type="text" id="fqdn-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            <input
+              chefInput
+              formControlName="fqdn"
+              data-cy="add-fqdn"
+              type="text"
+              id="fqdn-input"
+              (keyup)="handleInput($event)"
+              autocomplete="off"/>
           </label>
           <chef-error
           *ngIf="createForm.get('fqdn').hasError('required') && createForm.get('fqdn').dirty">
@@ -65,7 +86,15 @@
         <chef-form-field>
           <label>
             <span class="label">IP Address <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="ip_address" type="text" id="ip-address-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            <input
+              chefInput
+              formControlName="ip_address" 
+              type="text"
+              data-cy="add-ip-address"
+              id="ip-address-input"
+              (keyup)="handleInput($event)"
+              autocomplete="off"
+            />
           </label>
           <chef-error
             *ngIf="createForm.get('ip_address').hasError('required') && createForm.get('ip_address').dirty">
@@ -79,7 +108,11 @@
       </div>
       <div id="button-bar">
         <chef-button id="cancel-server-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
-        <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createChefServer()">
+        <chef-button [disabled]="!createForm?.valid || creating || conflictError"
+          primary
+          data-cy="add-button"
+          id="create-button-object-modal"
+          (click)="createChefServer()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
           <span *ngIf="!creating">Add Chef Server</span>
           <span *ngIf="creating">Adding Chef Server ...</span>

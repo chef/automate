@@ -31,10 +31,10 @@
       <div class="page-body">
         <chef-toolbar>
           <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-            <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+            <chef-button primary (click)="openCreateModal()" data-cy="add-server-button">Add Chef Server</chef-button>
           </app-authorized>
         </chef-toolbar>
-        <div *ngIf="servers.length != 0">
+        <div id="servers-table-container" *ngIf="servers.length != 0">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -56,7 +56,7 @@
                 <chef-td class="three-dot-column">
                   <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', server.id]"> -->
                     <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
-                      <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Delete</mat-option>
+                      <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="delete-server">Delete</mat-option>
                     </mat-select>
                   <!-- </app-authorized>   -->
                 </chef-td>
