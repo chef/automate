@@ -2,22 +2,24 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { UserPreferencesActionTypes, UserPreferencesActions } from './user-preferences.actions';
-
-import {
-  UserPreference
-} from './user-preferences.model';
+import { UserPreference } from './user-preferences.model';
 
 export interface UserPreferencesEntityState {
-  list: UserPreference[];
+  list: {
+    timezone: UserPreference
+  };
   error: HttpErrorResponse;
   status: EntityStatus;
 }
 
 export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
-  list: [
+  list: {
     // Subject to change, enabled for development purposes
-    { id: 'timezone', name: 'timezone', value: 'default (UTC)', enabled: true }
-  ],
+    timezone: {
+      value: 'UTC',
+      disabled: false
+    }
+  },
   error: null,
   status: EntityStatus.notLoaded
 };
