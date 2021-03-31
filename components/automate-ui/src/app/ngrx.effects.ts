@@ -38,7 +38,7 @@ import { RoleEffects } from './entities/roles/role.effects';
 import { RuleEffects } from './entities/rules/rule.effects';
 import { ServerEffects } from './entities/servers/server.effects';
 import { ServiceGroupsEffects } from './entities/service-groups/service-groups.effects';
-import { UserPreferencesEffects } from './entities/user-preferences/user-preferences.effects';
+import { UserPreferencesEffects } from './services/user-preferences/user-preferences.effects';
 import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effects';
 import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';

@@ -65,6 +65,7 @@ import { ProjectsFilterService } from './services/projects-filter/projects-filte
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
+import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 
 // Requests
 import { AdminKeyRequests } from './entities/reset-admin-key/reset-admin-key.requests';
@@ -98,7 +99,6 @@ import { NodeCredentialRequests } from './entities/node-credentials/node-credent
 import { OrgRequests } from './entities/orgs/org.requests';
 import { PolicyFileRequests } from './entities/policy-files/policy-file.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
-import { UserPreferencesRequests } from './entities/user-preferences/user-preferences.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';

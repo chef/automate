@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe } from 'lodash/fp';
-import { EntityStatus } from '../entities';
+import { EntityStatus } from 'app/entities/entities';
 import { UserPreferencesActionTypes, UserPreferencesActions } from './user-preferences.actions';
 
 import {

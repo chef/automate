@@ -55,7 +55,7 @@ import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-c
 import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
-import * as userPreferencesEntity from './entities/user-preferences/user-preferences.reducer';
+import * as userPreferencesEntity from './services/user-preferences/user-preferences.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
 
 import { LayoutActionTypes, UpdateSidebars } from './entities/layout/layout.actions';
