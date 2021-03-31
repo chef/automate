@@ -51,6 +51,9 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly DEMO_MODE = DateTime.DEMO_MODE;
 
+  // user preferences timezone
+  public timezone: string;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
@@ -169,6 +172,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
+    console.log(this.timezone);
     this.createModalVisible = true;
     this.resetCreateModal();
   }
