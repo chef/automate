@@ -29,7 +29,7 @@ import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policie
 import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
-import { userPreferencesList } from 'app/services/user-preferences/user-preferences.selector';
+import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 
 @Component({
   selector: 'app-api-tokens',
@@ -46,9 +46,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public creatingToken = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
-
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
+
+  // user preferences timezone
+  public timezone: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -78,10 +80,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       policies: [[]]
     });
 
+    // Getting user preferences timezone from state
     store.pipe(
-      select(userPreferencesList),
+      select(userPreferencesTimezone),
       takeUntil(this.isDestroyed)
-    ).subscribe(prefs => console.log(prefs));
+    ).subscribe(tz => this.timezone = tz.value);
 
   }
 
@@ -165,6 +168,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
+    console.log(this.timezone);
     this.createModalVisible = true;
     this.resetCreateModal();
   }
