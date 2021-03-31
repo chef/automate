@@ -28,6 +28,9 @@ import { ProjectConstants } from 'app/entities/projects/project.model';
 import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
 import { stringToMember } from 'app/entities/policies/policy.model';
 
+// user preferences
+import { userPreferencesList } from 'app/services/user-preferences/user-preferences.selector';
+
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
@@ -74,6 +77,12 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       projects: [[]],
       policies: [[]]
     });
+
+    store.pipe(
+      select(userPreferencesList),
+      takeUntil(this.isDestroyed)
+    ).subscribe(prefs => console.log(prefs));
+
   }
 
   ngOnInit() {
