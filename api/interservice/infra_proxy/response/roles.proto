@@ -38,11 +38,6 @@ message Role {
     repeated string run_list  = 7;
 }
 
-message ExpandedRunListResponse {
-    // List of expanded run list for the role.
-    repeated ExpandedRunList expanded_run_list = 1;
-}
-
 message ExpandedRunList {
     // ID of the run list collection.
     string id = 1;
@@ -63,4 +58,9 @@ message RunList {
     int32 position = 5;
     // List of the run list.
     repeated RunList children = 6;
+}
+
+message RoleEnvironments {
+    // Role environment list.
+    repeated string environments = 1; 
 }

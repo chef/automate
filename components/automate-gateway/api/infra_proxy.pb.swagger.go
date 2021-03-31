@@ -2223,14 +2223,14 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist": {
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments": {
       "get": {
-        "operationId": "InfraProxy_GetRoleRunList",
+        "operationId": "InfraProxy_GetRoleEnvironments",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunListResponse"
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RoleEnvironments"
             }
           },
           "default": {
@@ -2258,6 +2258,58 @@ func init() {
           {
             "name": "name",
             "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}": {
+      "get": {
+        "operationId": "InfraProxy_GetRoleExpandedRunList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "description": "Role environment.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -3425,18 +3477,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.ExpandedRunListResponse": {
-      "type": "object",
-      "properties": {
-        "expanded_run_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
-          },
-          "description": "List of expanded run list for the role."
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.GetOrg": {
       "type": "object",
       "properties": {
@@ -3806,6 +3846,18 @@ func init() {
             "type": "string"
           },
           "description": "Run list for the role."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.RoleEnvironments": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Role environment list."
         }
       }
     },

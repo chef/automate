@@ -189,10 +189,10 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	expandedRunList, err := toResponseExpandedRunList(role, &result)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// expandedRunList, err := toResponseExpandedRunList(role, &result)
+	// if err != nil {
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
 
 	return &response.Role{
 		Name:               role.Name,
@@ -202,9 +202,61 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		OverrideAttributes: string(overrideAttributes),
 		JsonClass:          role.JsonClass,
 		RunList:            role.RunList,
-		ExpandedRunList:    expandedRunList,
 	}, nil
+}
 
+// GetRoleEnvironments fetches the role environments.
+func (s *Server) GetRoleEnvironments(ctx context.Context, req *request.Role) (*response.RoleEnvironments, error) {
+	err := validation.New(validation.Options{
+		Target:          "role",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Roles.GetEnvironments(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.RoleEnvironments{
+		Environments: res,
+	}, nil
+}
+
+// GetRoleExpandedRunList fetches the role run-list.
+func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.ExpandedRunList) (*response.ExpandedRunList, error) {
+	err := validation.New(validation.Options{
+		Target:          "role",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.client.Roles.GetEnvironmentRunlist(req.Name, req.Environment)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.ExpandedRunList{
+		Id: "",
+	}, nil
 }
 
 // DeleteRole deletes the role

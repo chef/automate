@@ -259,54 +259,6 @@ func (x *Role) GetRunList() []string {
 	return nil
 }
 
-type ExpandedRunListResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// List of expanded run list for the role.
-	ExpandedRunList []*ExpandedRunList `protobuf:"bytes,1,rep,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty"`
-}
-
-func (x *ExpandedRunListResponse) Reset() {
-	*x = ExpandedRunListResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ExpandedRunListResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ExpandedRunListResponse) ProtoMessage() {}
-
-func (x *ExpandedRunListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ExpandedRunListResponse.ProtoReflect.Descriptor instead.
-func (*ExpandedRunListResponse) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *ExpandedRunListResponse) GetExpandedRunList() []*ExpandedRunList {
-	if x != nil {
-		return x.ExpandedRunList
-	}
-	return nil
-}
-
 type ExpandedRunList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -321,7 +273,7 @@ type ExpandedRunList struct {
 func (x *ExpandedRunList) Reset() {
 	*x = ExpandedRunList{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[4]
+		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -334,7 +286,7 @@ func (x *ExpandedRunList) String() string {
 func (*ExpandedRunList) ProtoMessage() {}
 
 func (x *ExpandedRunList) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[4]
+	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -347,7 +299,7 @@ func (x *ExpandedRunList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExpandedRunList.ProtoReflect.Descriptor instead.
 func (*ExpandedRunList) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{4}
+	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ExpandedRunList) GetId() string {
@@ -386,7 +338,7 @@ type RunList struct {
 func (x *RunList) Reset() {
 	*x = RunList{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[5]
+		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -399,7 +351,7 @@ func (x *RunList) String() string {
 func (*RunList) ProtoMessage() {}
 
 func (x *RunList) ProtoReflect() protoreflect.Message {
-	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[5]
+	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -412,7 +364,7 @@ func (x *RunList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RunList.ProtoReflect.Descriptor instead.
 func (*RunList) Descriptor() ([]byte, []int) {
-	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{5}
+	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RunList) GetType() string {
@@ -457,6 +409,54 @@ func (x *RunList) GetChildren() []*RunList {
 	return nil
 }
 
+type RoleEnvironments struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Role environment list.
+	Environments []string `protobuf:"bytes,1,rep,name=environments,proto3" json:"environments,omitempty"`
+}
+
+func (x *RoleEnvironments) Reset() {
+	*x = RoleEnvironments{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_infra_proxy_response_roles_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RoleEnvironments) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RoleEnvironments) ProtoMessage() {}
+
+func (x *RoleEnvironments) ProtoReflect() protoreflect.Message {
+	mi := &file_external_infra_proxy_response_roles_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RoleEnvironments.ProtoReflect.Descriptor instead.
+func (*RoleEnvironments) Descriptor() ([]byte, []int) {
+	return file_external_infra_proxy_response_roles_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RoleEnvironments) GetEnvironments() []string {
+	if x != nil {
+		return x.Environments
+	}
+	return nil
+}
+
 var File_external_infra_proxy_response_roles_proto protoreflect.FileDescriptor
 
 var file_external_infra_proxy_response_roles_proto_rawDesc = []byte{
@@ -495,14 +495,6 @@ var file_external_infra_proxy_response_roles_proto_rawDesc = []byte{
 	0x5f, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6a, 0x73,
 	0x6f, 0x6e, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x72, 0x75, 0x6e, 0x5f, 0x6c,
 	0x69, 0x73, 0x74, 0x18, 0x07, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x72, 0x75, 0x6e, 0x4c, 0x69,
-	0x73, 0x74, 0x22, 0x7e, 0x0a, 0x17, 0x45, 0x78, 0x70, 0x61, 0x6e, 0x64, 0x65, 0x64, 0x52, 0x75,
-	0x6e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x63, 0x0a,
-	0x11, 0x65, 0x78, 0x70, 0x61, 0x6e, 0x64, 0x65, 0x64, 0x5f, 0x72, 0x75, 0x6e, 0x5f, 0x6c, 0x69,
-	0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x37, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e,
-	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x66,
-	0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x2e, 0x45, 0x78, 0x70, 0x61, 0x6e, 0x64, 0x65, 0x64, 0x52, 0x75, 0x6e, 0x4c, 0x69, 0x73,
-	0x74, 0x52, 0x0f, 0x65, 0x78, 0x70, 0x61, 0x6e, 0x64, 0x65, 0x64, 0x52, 0x75, 0x6e, 0x4c, 0x69,
 	0x73, 0x74, 0x22, 0x6d, 0x0a, 0x0f, 0x45, 0x78, 0x70, 0x61, 0x6e, 0x64, 0x65, 0x64, 0x52, 0x75,
 	0x6e, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x4a, 0x0a, 0x08, 0x72, 0x75, 0x6e, 0x5f, 0x6c, 0x69, 0x73,
@@ -523,11 +515,14 @@ var file_external_infra_proxy_response_roles_proto_rawDesc = []byte{
 	0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x69, 0x6e, 0x66, 0x72,
 	0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x2e, 0x52, 0x75, 0x6e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x08, 0x63, 0x68, 0x69, 0x6c, 0x64, 0x72,
-	0x65, 0x6e, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72,
-	0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x6e, 0x22, 0x36, 0x0a, 0x10, 0x52, 0x6f, 0x6c, 0x65, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f,
+	0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x22, 0x0a, 0x0c, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f,
+	0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0c, 0x65, 0x6e,
+	0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
+	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72,
+	0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f,
+	0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -544,23 +539,22 @@ func file_external_infra_proxy_response_roles_proto_rawDescGZIP() []byte {
 
 var file_external_infra_proxy_response_roles_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_external_infra_proxy_response_roles_proto_goTypes = []interface{}{
-	(*Roles)(nil),                   // 0: chef.automate.api.infra_proxy.response.Roles
-	(*RoleListItem)(nil),            // 1: chef.automate.api.infra_proxy.response.RoleListItem
-	(*Role)(nil),                    // 2: chef.automate.api.infra_proxy.response.Role
-	(*ExpandedRunListResponse)(nil), // 3: chef.automate.api.infra_proxy.response.ExpandedRunListResponse
-	(*ExpandedRunList)(nil),         // 4: chef.automate.api.infra_proxy.response.ExpandedRunList
-	(*RunList)(nil),                 // 5: chef.automate.api.infra_proxy.response.RunList
+	(*Roles)(nil),            // 0: chef.automate.api.infra_proxy.response.Roles
+	(*RoleListItem)(nil),     // 1: chef.automate.api.infra_proxy.response.RoleListItem
+	(*Role)(nil),             // 2: chef.automate.api.infra_proxy.response.Role
+	(*ExpandedRunList)(nil),  // 3: chef.automate.api.infra_proxy.response.ExpandedRunList
+	(*RunList)(nil),          // 4: chef.automate.api.infra_proxy.response.RunList
+	(*RoleEnvironments)(nil), // 5: chef.automate.api.infra_proxy.response.RoleEnvironments
 }
 var file_external_infra_proxy_response_roles_proto_depIdxs = []int32{
 	1, // 0: chef.automate.api.infra_proxy.response.Roles.roles:type_name -> chef.automate.api.infra_proxy.response.RoleListItem
-	4, // 1: chef.automate.api.infra_proxy.response.ExpandedRunListResponse.expanded_run_list:type_name -> chef.automate.api.infra_proxy.response.ExpandedRunList
-	5, // 2: chef.automate.api.infra_proxy.response.ExpandedRunList.run_list:type_name -> chef.automate.api.infra_proxy.response.RunList
-	5, // 3: chef.automate.api.infra_proxy.response.RunList.children:type_name -> chef.automate.api.infra_proxy.response.RunList
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 1: chef.automate.api.infra_proxy.response.ExpandedRunList.run_list:type_name -> chef.automate.api.infra_proxy.response.RunList
+	4, // 2: chef.automate.api.infra_proxy.response.RunList.children:type_name -> chef.automate.api.infra_proxy.response.RunList
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_external_infra_proxy_response_roles_proto_init() }
@@ -606,18 +600,6 @@ func file_external_infra_proxy_response_roles_proto_init() {
 			}
 		}
 		file_external_infra_proxy_response_roles_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ExpandedRunListResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_external_infra_proxy_response_roles_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ExpandedRunList); i {
 			case 0:
 				return &v.state
@@ -629,8 +611,20 @@ func file_external_infra_proxy_response_roles_proto_init() {
 				return nil
 			}
 		}
-		file_external_infra_proxy_response_roles_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_external_infra_proxy_response_roles_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RunList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_infra_proxy_response_roles_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RoleEnvironments); i {
 			case 0:
 				return &v.state
 			case 1:

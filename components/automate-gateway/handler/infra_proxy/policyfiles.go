@@ -42,7 +42,6 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 		Name:                res.GetName(),
 		RevisionId:          res.GetRevisionId(),
 		RunList:             res.GetRunList(),
-		ExpandedRunList:     GetUpstreamExpandedRunList(res.GetExpandedRunList()),
 		NamedRunList:        fromUpstreamNamedRunList(res.GetNamedRunList()),
 		IncludedPolicyLocks: fromUpstreamIncludedPolicyLocks(res.GetIncludedPolicyLocks()),
 		CookbookLocks:       fromUpstreamCookbookLocks(res.GetCookbookLocks()),
