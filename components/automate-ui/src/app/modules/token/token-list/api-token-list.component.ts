@@ -72,6 +72,9 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public timezone: string;
   // public timezone2: any;
 
+  // user preferences timezone
+  public timezone: string;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
@@ -183,6 +186,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
+    console.log(this.timezone);
     this.createModalVisible = true;
     this.resetCreateModal();
   }
