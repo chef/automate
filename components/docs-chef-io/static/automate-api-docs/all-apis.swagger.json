@@ -5198,6 +5198,59 @@
         }
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment": {
+      "put": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_UpdateNodeEnvironment",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Node name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.UpdateNodeEnvironment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UpdateNodeEnvironment"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags": {
       "put": {
         "tags": [
@@ -16208,6 +16261,27 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.UpdateNodeEnvironment": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "description": "Node environment name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Node name.",
+          "type": "string"
+        },
+        "org_id": {
+          "description": "Chef organization ID.",
+          "type": "string"
+        },
+        "server_id": {
+          "description": "Chef Infra Server ID.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.UpdateNodeTags": {
       "type": "object",
       "properties": {
@@ -17460,6 +17534,19 @@
         },
         "name": {
           "description": "Data bag name.",
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.UpdateNodeEnvironment": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "description": "Node environment name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Node name.",
           "type": "string"
         }
       }
