@@ -68,3 +68,10 @@ message UpdateNodeTags {
     // Node tags.
     repeated string tags = 5;
 }
+
+message UpdateNodeEnvironment {
+    // Node name.
+    string name = 1;
+    // Node environment name.
+    string environment = 2;
+}
