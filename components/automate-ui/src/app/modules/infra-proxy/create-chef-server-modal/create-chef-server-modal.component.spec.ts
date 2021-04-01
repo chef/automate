@@ -1,6 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Regex } from 'app/helpers/auth/regex';
@@ -10,6 +10,9 @@ import { CreateChefServerModalComponent } from './create-chef-server-modal.compo
 describe('CreateChefServerModalComponent', () => {
   let component: CreateChefServerModalComponent;
   let fixture: ComponentFixture<CreateChefServerModalComponent>;
+
+  let createForm: FormGroup;
+  let errors = {};
 
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -51,6 +54,7 @@ describe('CreateChefServerModalComponent', () => {
       ]]
     });
     component.conflictErrorEvent = new EventEmitter();
+    createForm = component.createForm;
     fixture.detectChanges();
   });
 
@@ -61,52 +65,65 @@ describe('CreateChefServerModalComponent', () => {
   describe('form validity', () => {
     describe('the form should be invalid', () => {
       it('when all inputs are empty', () => {
-        expect(component.createForm.valid).toBeFalsy();
+        expect(createForm.valid).toBeFalsy();
       });
 
       it('when only 3 of the 4 inputs are complete', () => {
-        component.createForm.controls['name'].setValue('test');
-        component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['fqdn'].setValue('test.net');
-        expect(component.createForm.valid).toBeFalsy();
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+
+        errors = createForm.controls['ip_address'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
       });
 
       it('when the ip_address in invalid', () => {
-        component.createForm.controls['name'].setValue('test');
-        component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['fqdn'].setValue('chef.internal');
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('chef.internal');
 
-        component.createForm.controls['ip_address'].setValue('1.2234.3.4');
-        expect(component.createForm.valid).toBeFalsy();
+        createForm.controls['ip_address'].setValue('1.2234.3.4');
+        errors = createForm.controls['ip_address'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['pattern']).toBeTruthy();
       });
 
       it('when the fqdn Top Level Domain is less than 2 characters', () => {
-        component.createForm.controls['name'].setValue('test');
-        component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['ip_address'].setValue('1.2.3.4');
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
 
-        component.createForm.controls['fqdn'].setValue('chef.i');
-        expect(component.createForm.valid).toBeFalsy();
+        createForm.controls['fqdn'].setValue('chef.i');
+        errors = createForm.controls['fqdn'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['pattern']).toBeTruthy();
       });
 
       it('when the fqdn Top Level Domain is longer than 25 characters', () => {
-        component.createForm.controls['name'].setValue('test');
-        component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['ip_address'].setValue('1.2.3.4');
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
 
-        component.createForm.controls['fqdn'].setValue('chef.thistldisgoingtobetoolongwow');
-        expect(component.createForm.valid).toBeFalsy();
+        createForm.controls['fqdn'].setValue('chef.thistldisgoingtobetoolongwow');
+        errors = createForm.controls['fqdn'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['pattern']).toBeTruthy();
       });
     });
 
     describe('the form should be valid', () => {
       it('when all 4 inputs are filled and valid', () => {
-        expect(component.createForm.valid).toBeFalsy();
-        component.createForm.controls['name'].setValue('test');
-        component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['fqdn'].setValue('chef.internal');
-        component.createForm.controls['ip_address'].setValue('1.2.3.4');
-        expect(component.createForm.valid).toBeTruthy();
+        expect(createForm.valid).toBeFalsy();
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('chef.internal');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+        expect(createForm.valid).toBeTruthy();
       });
     });
   });
