@@ -53,6 +53,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   // user preferences timezone
   public timezone: string;
+  // public timezone2: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
