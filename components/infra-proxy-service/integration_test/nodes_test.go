@@ -314,10 +314,22 @@ func TestUpdateNodeEnvironment(t *testing.T) {
 	})
 
 	t.Run("when attempting to set the environment to empty value, raise invalid argument error", func(t *testing.T) {
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId:    autoDeployedChefServerID,
+			OrgId:       autoDeployedChefOrganizationID,
+			Name:        name,
+			Environment: "_default",
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
 		req := &request.UpdateNodeEnvironment{
 			ServerId:    autoDeployedChefServerID,
 			OrgId:       autoDeployedChefOrganizationID,
-			Name:        fmt.Sprintf("node-%d", time.Now().Nanosecond()),
+			Name:        name,
 			Environment: "",
 		}
 		res, err := infraProxy.UpdateNodeEnvironment(ctx, req)
