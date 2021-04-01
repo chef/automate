@@ -30,7 +30,7 @@
                   {{ token.projects.length }} projects
                 </ng-container>
               </td>
-              <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
+              <td class="header-column">{{ token?.created_at | datetime: 'default' :'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
               <td class="header-column" data-cy="token-status">{{ status | capitalize }}</td>
             </tr>
           </tbody>

@@ -49,7 +49,7 @@
               <div class="control-waiver-details" *ngFor="let waiver of control.waivers">
                 <div class="waiver-details">
                   <span class="label">Expires:</span>
-                  <span class="message">{{ waiver.expiration_date | datetime: Datetime.RFC2822 }}</span>
+                  <span class="message">{{ waiver.expiration_date | datetime: 'default' : Datetime.RFC2822 }}</span>
                 </div>
                 <div class="waiver-details">
                   <span class="label">Reason:</span>
