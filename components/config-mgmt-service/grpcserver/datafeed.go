@@ -18,54 +18,20 @@ type Datafeed struct {
 	FeedStart time.Time
 	FeedEnd   time.Time
 }
-
-type Animal int
-
-func (s *CfgMgmtServer) Getdata(ctx context.Context, req *pRequest.GetPaginationRequest) (*interserviceResp.GetPaginationResponse, error) {
-
-	params := Datafeed{}
-	feedStartString, err := ptypes.TimestampProto(params.FeedStart)
-	if err != nil {
-		return nil, err
-	}
-	feedEndString, err := ptypes.TimestampProto(params.FeedEnd)
-	if err != nil {
-		return nil, err
-	}
-
-	nodesRequest := &pRequest.InventoryNodes{
-		PageSize: 300,
-		Start:    feedStartString,
-		End:      feedEndString,
-		Sorting: &pRequest.Sorting{
-			Order: pRequest.Order_DESC,
-		},
-	}
-
-	inventoryNodes, err := s.GetInventoryNodes(ctx, nodesRequest)
-	if err != nil {
-		return nil, err
-	}
-	out := map[string]interface{}{}
-	// data := datafeedServer.paginationData.Data
-	out["offset"] = req.GetOffset()
-	out["size"] = req.GetSize()
-	out["inventoryNodes"] = inventoryNodes
-	outputJSON, _ := json.Marshal(out)
-	returnData := interserviceResp.GetPaginationResponse{
-		Data: 	string(outputJSON),
-	}
-	return &returnData, nil
-}
-
 type NodeIDs struct {
 	ClientID     string
 	ComplianceID string
 }
 
-func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.GetPaginationRequest) (*interserviceResp.GetPaginationResponse, error) {
+func (s *CfgMgmtServer) FetchClientRundata(ctx context.Context, req *pRequest.GetPaginationRequest) (*interserviceResp.GetPaginationResponse, error) {
 
-	params := Datafeed{}
+	layout := "2006-01-02T15:04:05Z"
+	parsedFeedStart, _ := time.Parse(layout, req.FeedStart)
+	parsedFeedEnd, _ := time.Parse(layout, req.FeedEnd)
+	params := Datafeed{
+		FeedStart: parsedFeedStart,
+		FeedEnd:   parsedFeedEnd,
+	}
 	feedStartString, err := ptypes.TimestampProto(params.FeedStart)
 	if err != nil {
 		return nil, err
@@ -95,29 +61,23 @@ func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.G
 
 	ipnet[0] = &net.IPNet{IP: []byte("0.0.0.0"), Mask: []byte("0")}
 
-	fmt.Println("length ::::::::", len(inventoryNodes.Nodes), ipnet)
-
 	if len(inventoryNodes.Nodes) > 0 {
 		for _, node := range inventoryNodes.Nodes {
-			fmt.Println("node ::::::::", node)
 			if true {
-				fmt.Println("inside if ::::::::")
 				nodeIDs[node.Ipaddress] = NodeIDs{ClientID: node.Id}
 			}
-			fmt.Println("outside if ::::::::")
 		}
-		// lastNode := inventoryNodes.Nodes[len(inventoryNodes.Nodes)-1]
-		// nodesRequest.CursorId = lastNode.Id
-		// nodesRequest.CursorDate = lastNode.Checkin
-
-		// inventoryNodes, err = s.GetInventoryNodes(ctx, nodesRequest)
-		// log.Debugf("inventory nodes %v, cursor %v", len(inventoryNodes.Nodes), lastNode.Id)
-		// if err != nil {
-		// 	return nil, err
-		// }
 	}
 
-	fmt.Println("::::::::::::", nodeIDs, "......", ipnet)
+	nodesCountRequest := &pRequest.NodesCounts{
+		Filter: []string{},
+		Start:  params.FeedStart.Format(layout),
+		End:    params.FeedEnd.Format(layout),
+	}
+	getTotalCount, err := s.GetNodesCounts(ctx, nodesCountRequest)
+	if err != nil {
+		return nil, err
+	}
 
 	nodeMessages := make(map[string]map[string]interface{})
 	for resourceId, nodeID := range nodeIDs {
@@ -133,20 +93,11 @@ func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *pRequest.G
 		nodeMessages[resourceId] = nodeData
 	}
 	out := map[string]interface{}{}
-	// // data := datafeedServer.paginationData.Data
-	out["offset"] = req.Offset
-	out["size"] = req.Size
-	// out["Attribute"] = req.Attribute
-	// out["inventoryNodes"] = inventoryNodes
 	out["nodeMessages"] = nodeMessages
-	// {Data: string(outputJSON)}
 	outputJSON, _ := json.Marshal(out)
-	// var zoo []Animal
-	// if err := json.Unmarshal([]byte(outputJSON), &zoo); err != nil {
-	// 	log.Fatal(err)
-	// }
 	returnData := interserviceResp.GetPaginationResponse{
-		Data:  	string(outputJSON),
+		Data:  string(outputJSON),
+		Total: getTotalCount.Total,
 	}
 	return &returnData, nil
 }

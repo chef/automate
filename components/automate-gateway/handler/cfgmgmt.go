@@ -33,36 +33,23 @@ func NewCfgMgmtServer(cfgMgmtClient cmsService.CfgMgmtServiceClient) *CfgMgmtSer
 	}
 }
 
-func (s *CfgMgmtServer) Getdata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
+func (s *CfgMgmtServer) FetchClientRundata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
 	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
 	getData := cmsReq.GetPaginationRequest{
-		Offset: req.GetOffset(),
-		Size:   req.GetSize(),
+		Offset:    req.Offset,
+		Size:      req.Size,
+		Attribute: req.Attribute,
+		FeedStart: req.FeedStart,
+		FeedEnd:   req.FeedEnd,
 	}
 
-	res, err := s.cfgMgmtClient.Getdata(ctx, &getData)
+	res, err := s.cfgMgmtClient.FetchClientRundata(ctx, &getData)
 	if err != nil {
 		return &cfgRes.GetPaginationResponse{}, err
 	}
 	return &cfgRes.GetPaginationResponse{
 		Data: res.Data,
-	}, nil
-}
-
-func (s *CfgMgmtServer) FetchCompliancedata(ctx context.Context, req *cfgReq.GetPaginationRequest) (*cfgRes.GetPaginationResponse, error) {
-	// return &pb.HelloReply{Message: "Hello again " + in.GetName()}, nil
-	getData := cmsReq.GetPaginationRequest{
-		Offset: 	req.Offset,
-		Size:   	req.Size,
-		Attribute: 	req.Attribute,
-	}
-
-	res, err := s.cfgMgmtClient.FetchCompliancedata(ctx, &getData)
-	if err != nil {
-		return &cfgRes.GetPaginationResponse{}, err
-	}
-	return &cfgRes.GetPaginationResponse{
-		Data: res.Data,
+		Total: res.Total,
 	}, nil
 }
 

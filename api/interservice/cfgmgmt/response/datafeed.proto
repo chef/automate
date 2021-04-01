@@ -4,5 +4,6 @@ package chef.automate.domain.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
 
 message GetPaginationResponse {
-	string  data = 1;
+	string  data = 1;	
+	int32 Total = 2;
 }

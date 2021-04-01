@@ -6,5 +6,7 @@ option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 message GetPaginationRequest {
 	int32 offset = 1;
 	int32 size = 2;
-	repeated string attribute = 7;
+	string feedStart = 3;
+	string feedEnd = 4;
+	repeated string attribute = 5;
 }

@@ -138,37 +138,6 @@ function chef_load_nodes() {
 
 
 
-# Generate config-mgmt chef nodes (CCRs)
-document "chef_load_nodes_replace_ipaddress" <<DOC
-  Load the provided number of nodes to Chef Automate. (depends on automate-gateway & ingest-service)
-
-  This method will ensure that the automate-gateway is up and running (with its
-  dependencies) and then it will load a number of nodes through the data-collector
-  endpoint. (/events/data-collector)
-
-  Example: Load 100 nodes
-  -----------------------
-  chef_load_nodes 100
-DOC
-function chef_load_nodes_replace_ipaddress(){
-  local nodes=${1:-50}
-   pushd /src >/dev/null;
-      for (( i=1; i<=$nodes; i++ ))
-      do
-        echo $i
-        ip_address=''
-        getRandom ip_address
-        prepare_chef_load_replace_ipaddress $ip_address
-        echo "$ip_address"
-        chef-load generate --config /tmp/chef-load.toml -n $nodes
-      done
-      local EXIT_CODE=$?;
-    popd >/dev/null;
-    return $EXIT_CODE;
-}
-
-
-
 document "chef_load_liveness_ping" <<DOC
   Load the provided number of nodes triggering a liveness ping to Chef Automate. (depends on automate-gateway & ingest-service)
 
@@ -194,23 +163,4 @@ function prepare_chef_load() {
   sed -i "s/REPLACE_ME_VIA_HAB/$(get_admin_token)/g" /tmp/chef-load.toml
   install_if_missing core/busybox-static netstat;
   install_if_missing chef/chef-load chef-load;
-}
-
-
-# prepare_chef_load verifies that the gateway and ingest services are up and running for
-# ingestion into the data-collector endpoint. it also installs chef-load for execution
-function prepare_chef_load_replace_ipaddress() {
-  echo $1
-  check_if_deployinate_started || return 1
-  cp components/ingest-service/chef-load-data/chef-load.toml /tmp/chef-load.toml
-  sed -i "s/REPLACE_ME_VIA_HAB/$(get_admin_token)/g" /tmp/chef-load.toml
-  cp components/ingest-service/chef-load-data/ohai-data.json /tmp/ohai-data.json
-  sed -i "s/55.37.254.178/$1/g" /tmp/ohai-data.json
-  install_if_missing core/busybox-static netstat;
-  install_if_missing chef/chef-load chef-load;
-}
-
-
-getRandom(){
-   eval "$1=$(printf "%d.%d.%d.%d\n" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")"
 }

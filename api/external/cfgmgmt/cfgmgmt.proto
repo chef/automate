@@ -32,32 +32,8 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 
 service ConfigMgmt {
-  /*
-  List Checked-in Nodes
 
-  Returns a list of infra nodes that have checked in to Automate.
-  Adding a filter makes a list of all nodes that meet the filter criteria.
-  Filters for the same field are ORd together, while filters across different fields are ANDed together.
-  Supports pagination, filtering (with wildcard support), and sorting.
-	Limited to 10k results.
-
-  Example:
-  ```
-  cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
-  ```
-
-	Authorization Action:
-	```
-	infra:nodes:list
-	```
-	*/
-  rpc Getdata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
-    option (google.api.http).get = "/api/v0/cfgmgmt/offset/{offset}/size/{size}";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
-  };
-
-  rpc FetchCompliancedata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
+  rpc FetchClientRundata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
     option (google.api.http) = {
       post: "/api/v0/cfgmgmt/clientrun"
       body: "*"
