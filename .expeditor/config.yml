@@ -1,6 +1,6 @@
 ---
 project:
-  alias: automate
+  alias: PhoenixDOM automate
 
 # Slack channel in Chef Software slack to send notifications about build failures, etc
 slack:
