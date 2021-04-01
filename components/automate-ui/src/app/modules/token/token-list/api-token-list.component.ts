@@ -30,6 +30,7 @@ import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
 import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
+// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-api-tokens',
@@ -51,11 +52,13 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   // user preferences timezone
   public timezone: string;
+  // public timezone2: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
+    // private userPrefsService: UserPreferencesService
   ) {
     store.pipe(
       select(apiTokenStatus),
@@ -86,6 +89,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(tz => this.timezone = tz.value);
 
+    // this.timezone2 = this.userPrefsService.getTimezone();
   }
 
   ngOnInit() {
