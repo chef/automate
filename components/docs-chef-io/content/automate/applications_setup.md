@@ -124,10 +124,18 @@ Use **one** of these three options:
 
 Chef Habitat automatically searches that directory and uses the certificate at start up.
 
-**On Linux systems**, copy the certificate to`/hab/cache/ssl` if you are the root user, or to `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory. Non-root users may need to use `sudo` with the command. For example, as the root user, copy the file with:
+**On Linux systems**, as a root user, copy the certificate to`/hab/cache/ssl` . As a non-root user, copy it to `~/.hab/cache/ssl`. The full file path for a non-root user certificate in your local directory is `/Users/username/.hab/cache/ssl/automate.cert`. You may need to use `sudo` with the command.
 
-```shell
+As the root user, copy the file with:
+
+```bash
 cp /path/to/automate.cert /hab/cache/ssl/automate.cert
+```
+
+As a non-root user, copy it with:
+
+```bash
+sudo /path/to/automate.cert ~/.hab/cache/ssl
 ```
 
 **On Windows systems**, store your certs in `C:\hab\cache\ssl`. For example, copy the file with:
@@ -224,7 +232,7 @@ To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TO
 that contains the partial configuration below.
 Run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
-`bldr_client_id` and `bldr_client_secret` simply need to match what you configured for the corresponding values in Habitat Builder (see below). However, we strongly recommend those values follow [best practices](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/) for `client_id` and `client_secret` in the Oauth2 standard.
+`bldr_client_id` and `bldr_client_secret` need to match the settings of the values in Habitat Builder.  Follow the [best practices](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/) for setting these values `client_id` and `client_secret` in the Oauth2 standard.
 
 ```toml
 [session.v1.sys.service]
@@ -248,6 +256,7 @@ MIIDfDCCAmSgAcasldkaf...
 If you are using a certificate signed by a trusted certificate authority instead of the default certificate, you can provide Builder with the root certificate authority for the signed certificate.
 
 For more information, check out this further explanation on how to [configure Builder to authenticate via Chef Automate](https://github.com/habitat-sh/on-prem-builder).
+
 ## Related Resources
 
 For more information, see the [Chef Habitat documentation]({{< relref "/habitat" >}}).

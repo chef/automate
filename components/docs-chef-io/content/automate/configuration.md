@@ -31,7 +31,7 @@ This section describes those settings and how to change them on an existing Chef
 
 #### Chef Automate FQDN
 
-To change the fully qualified domain name (FQDN) of your Chef Automate installation, create a TOML file that contains the partial configuration:
+The maximum size of a customized fully qualified domain name (FQDN) is 25 characters. To change the  of your Chef Automate installation, create a TOML file that contains the partial configuration:
 
 ```TOML
 [global.v1]
