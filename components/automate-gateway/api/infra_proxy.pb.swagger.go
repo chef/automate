@@ -3928,6 +3928,10 @@ func init() {
           "format": "int32",
           "title": "Run list item position"
         },
+        "error": {
+          "type": "string",
+          "title": "Run list error"
+        },
         "children": {
           "type": "array",
           "items": {

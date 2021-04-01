@@ -56,8 +56,10 @@ message RunList {
     bool skipped = 4;
     // Run list item position
     int32 position = 5;
+    // Run list error
+    string error = 6;
     // List of the run list.
-    repeated RunList children = 6;
+    repeated RunList children = 7;
 }
 
 message RoleEnvironments {

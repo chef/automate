@@ -189,11 +189,6 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// expandedRunList, err := toResponseExpandedRunList(role, &result)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, err.Error())
-	// }
-
 	return &response.Role{
 		Name:               role.Name,
 		ChefType:           role.ChefType,
@@ -249,7 +244,7 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, err
 	}
 
-	_, err = c.client.Roles.GetEnvironmentRunlist(req.Name, req.Environment)
+	envRunList, err := c.client.Roles.GetEnvironmentRunlist(req.Name, req.Environment)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -370,8 +365,27 @@ func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	return nil
 }
 
-func toResponseExpandedRunList(role *chef.Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
-	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
+func toResponseExpandedRunList(client *ChefClient, runlist []string) ([]*response.ExpandedRunList, error) {
+	resRunList := make([]*response.RunList, len(runlist))
+	for i, item := range runlist {
+		newItem, err := chef.NewRunListItem(item)
+		if err != nil {
+			return nil, err
+		}
+		newRunList := response.RunList{
+			Type:    newItem.Type,
+			Name:    newItem.Name,
+			Version: newItem.Version,
+		}
+
+		if newItem.IsRole() {
+			currentRole, err := client.client.Roles.Get(newItem.Name)
+			if currentRole != nil {
+				newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
+			}
+		}
+		resRunList[i] = &newRunList
+	}
 	runList, err := GetExpandRunlistFromRole(role.RunList, result)
 	if err != nil {
 		return nil, err
