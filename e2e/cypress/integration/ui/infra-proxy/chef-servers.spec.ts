@@ -24,14 +24,6 @@ describe('chef server', () => {
   });
 
   describe('chef server list page', () => {
-    it('lists servers', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server');
-
-      cy.get('#servers-table-container chef-th').contains('Name');
-      cy.get('#servers-table-container chef-th').contains('FQDN');
-      cy.get('#servers-table-container chef-th').contains('IP Address');
-      cy.get('#servers-table-container chef-th').contains('Number Of Orgs');
-    });
 
     it('can add a server', () => {
       cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
@@ -50,6 +42,15 @@ describe('chef server', () => {
       cy.get('app-notification.info chef-icon').click();
 
       cy.contains(serverName).should('exist');
+    });
+
+    it('lists servers', () => {
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Server');
+
+      cy.get('#servers-table-container chef-th').contains('Name');
+      cy.get('#servers-table-container chef-th').contains('FQDN');
+      cy.get('#servers-table-container chef-th').contains('IP Address');
+      cy.get('#servers-table-container chef-th').contains('Number Of Orgs');
     });
 
     it('can create a chef server with a custom ID', () => {
