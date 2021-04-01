@@ -1,6 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Regex } from 'app/helpers/auth/regex';
@@ -26,7 +26,7 @@ describe('CreateChefServerModalComponent', () => {
         CreateChefServerModalComponent
       ],
       imports: [
-        [ReactiveFormsModule, FormsModule]
+        ReactiveFormsModule
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
