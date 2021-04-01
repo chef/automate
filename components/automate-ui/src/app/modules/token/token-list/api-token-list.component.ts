@@ -42,6 +42,7 @@ const myAnim = trigger('myAnim', [
 ]);
 
 import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
+// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 // import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
@@ -69,11 +70,13 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   // user preferences timezone
   public timezone: string;
+  // public timezone2: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
+    // private userPrefsService: UserPreferencesService
   ) {
     store.pipe(
       select(apiTokenStatus),
