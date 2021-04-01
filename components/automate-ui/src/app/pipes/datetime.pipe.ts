@@ -24,9 +24,10 @@ export class DatetimePipe implements PipeTransform {
   // REFER TO DOCS FOR USE WITH UTC https://momentjs.com/timezone/docs/#/using-timezones/
 
   public transform(value: moment.Moment | Date | string,
-    timezone: string, formatStr: string): string {
+    timezone: string = 'default', formatStr: string): string {
 
-    // const datetime = moment.utc(value);
+      ///// next line for development only;
+      console.log(timezone);
 
     if (timezone !== 'default') {
       return moment.utc(value).clone().tz(timezone).format(formatStr);

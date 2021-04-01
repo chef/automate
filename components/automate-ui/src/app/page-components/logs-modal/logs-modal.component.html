@@ -8,7 +8,7 @@
       <ul>
         <li><strong class="nodename">{{nodeRun.nodeName}}</strong></li>
         <li><strong>Run ID:</strong> {{nodeRun.runId}}</li>
-        <li>{{ nodeRun.startTime | datetime: ChefHoursMins }} - {{ nodeRun.endTime | datetime: ChefHoursMins }} UTC</li>
+        <li>{{ nodeRun.startTime | datetime: 'default' : ChefHoursMins }} - {{ nodeRun.endTime | datetime: 'default' : ChefHoursMins }} UTC</li>
       </ul>
     </div>
 

@@ -21,7 +21,7 @@
             <div class="metadata-header" (click)="metadatabody.toggle()">
               <span class="metadata-title">
                 <chef-icon>{{ statusIcon(activeReport.status) }}</chef-icon>
-                Scan {{ activeReport.status }} {{ activeReport.end_time | datetime: RFC2822 }}
+                Scan {{ activeReport.status }} {{ activeReport.end_time | datetime: 'default' : RFC2822 }}
               </span>
               <span class="metadata-toggle">
                 <ng-container *ngIf="!metadatabody.opened">View more +</ng-container>
@@ -34,7 +34,7 @@
                 <table>
                   <tr>
                     <th>Last Scan</th>
-                    <td>{{ activeReport.end_time | datetime: RFC2822 }}</td>
+                    <td>{{ activeReport.end_time | datetime: 'default' : RFC2822 }}</td>
                   </tr>
                 </table>
               </div>
@@ -225,7 +225,7 @@
                         <p>This control was waived.</p>
                         <dl class="waiver-details">
                           <dt>Expires:</dt>
-                          <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                          <dd>{{ control.waiver_data.expiration_date | datetime: 'default' : RFC2822 }}</dd>
                           <dt>Reason:</dt>
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
@@ -298,7 +298,7 @@
                 <chef-icon class="status-icon list-item-icon" [ngClass]="report.status">{{ statusIcon(report.status) }}</chef-icon>
                 <div class="list-item-text">
                   <p class="node-name">
-                    <strong>{{ report.end_time | datetime: RFC2822 }}</strong>
+                    <strong>{{ report.end_time | datetime: 'default' : RFC2822 }}</strong>
                   </p>
                   <p>{{formatDaysAgo(report.end_time)}}</p>
                 </div>
