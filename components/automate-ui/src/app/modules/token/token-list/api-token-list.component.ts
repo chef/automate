@@ -29,13 +29,15 @@ import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policie
 import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
-<<<<<<< HEAD
+
 // import {
   // userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-=======
+
 import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
->>>>>>> Adjust user preferences list object to make selectors more specific
+
+// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+
 
 @Component({
   selector: 'app-api-tokens',
@@ -57,6 +59,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   // user preferences timezone
   public timezone: string;
+  // public timezone2: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -88,17 +91,10 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     });
 
     // Getting user preferences timezone from state
-<<<<<<< HEAD
     // store.pipe(
     //   select(userPreferencesTimezone),
     //   takeUntil(this.isDestroyed)
     // ).subscribe(tz => this.timezone = tz.value);
-=======
-    store.pipe(
-      select(userPreferencesTimezone),
-      takeUntil(this.isDestroyed)
-    ).subscribe(tz => this.timezone = tz.value);
->>>>>>> Adjust user preferences list object to make selectors more specific
 
     // this.timezone2 = this.userPrefsService.getTimezone();
   }
