@@ -70,7 +70,7 @@
       <span *ngIf="last24h">Last 24 hours</span>
       <ng-container *ngIf="!last24h">
         <chef-icon>date_range</chef-icon>
-        <span>{{ date | datetime: CHEF_SHORT_DATE }} (UTC)</span>
+        <span>{{ date | datetime: 'default' : CHEF_SHORT_DATE }} (UTC)</span>
       </ng-container>
     </chef-button>
     <chef-dropdown class="calendar-menu-dropdown" [attr.visible]="calendarMenuVisible">

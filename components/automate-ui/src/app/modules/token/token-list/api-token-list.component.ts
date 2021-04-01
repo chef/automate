@@ -168,7 +168,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    console.log(this.timezone);
     this.createModalVisible = true;
     this.resetCreateModal();
   }

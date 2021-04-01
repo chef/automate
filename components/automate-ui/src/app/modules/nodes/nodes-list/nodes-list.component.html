@@ -54,7 +54,7 @@
               <chef-td (click)="filterFor('name', node.name)"> {{ node.name }}</chef-td>
               <chef-td (click)="filterFor('platform_name', node.platform)">{{ node.platform }} {{ node.platform_version }}</chef-td>
               <chef-td (click)="filterFor('manager_type', node.manager)">{{ node.manager }}</chef-td>
-              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact | datetime: DateTime.RFC2822 }}</chef-td>
+              <chef-td (click)="filterFor('last_contact', node.last_contact)">{{ node.last_contact | datetime: 'default' : DateTime.RFC2822 }}</chef-td>
               <chef-td [attr.id]="'node-'+i+'-scan'" class="help-pointer">
                 <chef-icon class="status-icon" [ngClass]="node.scan_data.status"
                 (click)="filterFor('last_scan_status', node.scan_data.status)">
@@ -70,7 +70,7 @@
                   interactable>
                   <p class="run-info-tooltip-info">
                     <span class="run-info-tooltip-text">{{ node.scan_data.status | lowercase }}</span>
-                    <span class="run-info-tooltip-date">{{ node.scan_data.end_time | datetime: DateTime.RFC2822 }}</span>
+                    <span class="run-info-tooltip-date">{{ node.scan_data.end_time | datetime: 'default' : DateTime.RFC2822 }}</span>
                   </p>
                   <a *ngIf="node.scan_data.id"
                     class="run-info-tooltip-link"
@@ -96,7 +96,7 @@
                   interactable>
                   <p class="run-info-tooltip-info">
                     <span class="run-info-tooltip-text">{{ node.run_data.status | lowercase }}</span>
-                    <span class="run-info-tooltip-date">{{ node.run_data.end_time | datetime: DateTime.RFC2822 }}</span>
+                    <span class="run-info-tooltip-date">{{ node.run_data.end_time | datetime: 'default' : DateTime.RFC2822 }}</span>
                   </p>
                   <a *ngIf="node.run_data.id"
                     class="run-info-tooltip-link"

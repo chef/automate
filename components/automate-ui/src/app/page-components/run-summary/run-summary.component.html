@@ -4,13 +4,13 @@
       <span class="metadata-title">
         <ng-container *ngIf="nodeRun.status === 'failure'">
           <chef-icon>report_problem</chef-icon>
-          Run failed {{ nodeRun.endTime | datetime: RFC2822 }}<ng-container
+          Run failed {{ nodeRun.endTime | datetime: 'default' : RFC2822 }}<ng-container
           *ngIf="nodeRun.error?.description?.title">: {{ nodeRun.error?.description?.title }}</ng-container>
           <chef-button primary caution (click)="activateModal($event)">Error Log</chef-button>
         </ng-container>
         <ng-container *ngIf="nodeRun.status === 'success'">
           <chef-icon>check_circle</chef-icon>
-          Run succeeded {{ nodeRun.endTime | datetime: RFC2822 }}
+          Run succeeded {{ nodeRun.endTime | datetime: 'default' : RFC2822 }}
         </ng-container>
       </span>
       <span class="metadata-toggle">
@@ -24,7 +24,7 @@
         <table>
           <tr>
             <th>Run Duration</th>
-            <td>{{ nodeRun.startTime | datetime: ChefHoursMins }} - {{ nodeRun.endTime | datetime: ChefHoursMins }} UTC</td>
+            <td>{{ nodeRun.startTime | datetime: 'default' : ChefHoursMins }} - {{ nodeRun.endTime | datetime: 'default' : ChefHoursMins }} UTC</td>
           </tr>
           <tr>
             <th>Run ID</th>
