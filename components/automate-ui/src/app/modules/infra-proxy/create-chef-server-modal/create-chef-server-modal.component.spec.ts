@@ -92,8 +92,9 @@ describe('CreateChefServerModalComponent', () => {
       it('when the fqdn Top Level Domain is longer than 25 characters', () => {
         component.createForm.controls['name'].setValue('test');
         component.createForm.controls['id'].setValue('test');
-        component.createForm.controls['fqdn'].setValue('chef.thistldisgoingtobetoolongwow');
         component.createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        component.createForm.controls['fqdn'].setValue('chef.thistldisgoingtobetoolongwow');
         expect(component.createForm.valid).toBeFalsy();
       });
     });
