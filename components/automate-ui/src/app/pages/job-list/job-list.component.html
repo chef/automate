@@ -39,7 +39,7 @@
         <chef-td>{{ job.name }}</chef-td>
         <chef-td>{{ job.node_count }}</chef-td>
         <chef-td>{{ job.recurrence }}</chef-td>
-        <chef-td>{{ job.end_time | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
+        <chef-td>{{ job.end_time | datetime: 'default' :'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
       </chef-tr>
     </chef-tbody>
   </chef-table>
