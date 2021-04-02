@@ -125,6 +125,8 @@ describe('CreateChefServerModalComponent', () => {
         expect(errors['pattern']).toBeTruthy();
       });
 
+      // Many testing ideas attributed to https://mathiasbynens.be/demo/url-regex
+
       using([
         ['is using something other than http or https', 'httpld://www.chef.io'],
         ['contains two periods', 'chef..internal'],
@@ -140,7 +142,8 @@ describe('CreateChefServerModalComponent', () => {
         ['has no secure domain', 'https://'],
         ['domain is dots', 'https://..'],
         ['domain is hash', 'http://#'],
-        ['domain has a space', 'http:// shouldfail.net']
+        ['domain has a space', 'http:// shouldfail.net'],
+        ['contains all numbers', 'http://10.1.1.0']
       ], function (description: string, input: string) {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
@@ -176,7 +179,11 @@ describe('CreateChefServerModalComponent', () => {
         ['has a port number', 'https://chef.io:123'],
         ['contains hyphens in the domain', 'new-company-who-dis.nice'],
         ['contains underscores in the domain', 'new_company_who_dis.chef'],
-        ['contains digits in the domain', '8675309.jenny']
+        ['contains digits in the domain', '8675309.jenny'],
+        ['contains all numbers in the domain', 'http://223.453.739.net'],
+        ['contains a query', 'http://www.chef.io/events/#&product=automate'],
+        ['contains unicode', 'http://foo.com/unicode_(✪)_in_parens'],
+        ['is a citation url', 'http://foo.com/blah_(wikipedia)_blah#cite-1']
       ], function (description: string, input: string) {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
