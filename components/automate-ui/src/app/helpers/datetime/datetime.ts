@@ -6,7 +6,7 @@ export class DateTime {
   public static readonly RFC2822: string = 'ddd, DD MMM YYYY HH:mm:ss [UTC]';
 
   // Format for testing user setting timezone
-  public static readonly DEMO_MODE: string = 'ddd, DD MMM YYYY HH:mm:ss Z z';
+  public static readonly DEMO_MODE: string = 'ddd, DD MMM YYYY HH:mm:ss z Z';
 
   // Format for date display
   // Tue, 24 Sept 2019
