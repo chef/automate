@@ -59,7 +59,7 @@
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
               </chef-td>
-              <chef-td class="created-date">{{ token.created_at | datetime: timezone : RFC2822 }}</chef-td>
+              <chef-td class="created-date">{{ token.created_at | datetime: (userPrefsService.timezone$ | async)?.value : DEMO_MODE }}</chef-td>
               <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>
                 <ng-container *ngIf="!token.active">Inactive</ng-container>

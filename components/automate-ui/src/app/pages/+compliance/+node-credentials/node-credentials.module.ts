@@ -15,6 +15,9 @@ import {
 import { NodeCredentialDetailsScreenComponent } from './node-credential-details/node-credential-details.component';
 import { CreateNodeCredentialModalComponent } from './create-node-credential-modal/create-node-credential-modal.component';
 import { SaveNodeCredential } from 'app/entities/node-credentials/node-credential.model';
+
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -23,7 +26,8 @@ import { SaveNodeCredential } from 'app/entities/node-credentials/node-credentia
     NodeCredentialsRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    ChefPipesModule // seems like this shouldn't have to be here
   ],
   declarations: [
     NodeCredentialListComponent,
