@@ -125,15 +125,17 @@ describe('CreateChefServerModalComponent', () => {
         expect(errors['pattern']).toBeTruthy();
       });
 
-            using([
-        ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
+      using([
+        ['is using something other than http or https', 'httpld://www.chef.io'],
         ['contains two periods', 'chef..internal'],
+        ['there is no TLD suffix', 'http://foo.com.'],
+        ['contains hypens in the TLD', 'chef.this-will-not'],
+        ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
         ['has a TLD that is shorter than 2 characters', 'chef.i'],
         ['has numbers in the TLD', 'chef.017'],
-        ['there is no TLD suffix', 'http://foo.com.'],
         ['has a port number that is too high', 'https://chef.io:987274892'],
         ['has a colon but no port number', 'https://chef.io:'],
-        ['is using something other than http or https', 'httpld://www.chef.io']
+        ['has a letter in the port', 'https://chef.io:123a']
       ], function (description: string, input: string) {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
@@ -160,6 +162,30 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['ip_address'].setValue('1.2.3.4');
         expect(createForm.valid).toBeTruthy();
       });
+
+      using([
+        ['has a TLD that is longer than 2 and less than 25 characters', 'chef.internal'],
+        ['uses https', 'https://chef.io'],
+        ['uses http', 'http://chef.io'],
+        ['omits http or https', 'chef.thisworks'],
+        ['has a port number', 'https://chef.io:123'],
+        ['contains hyphens in the domain', 'new-company-who-dis.nice'],
+        ['contains underscores in the domain', 'new_company_who_dis.chef'],
+        ['contains digits in the domain', '8675309.jenny']
+      ], function (description: string, input: string) {
+        it(('when the fqdn ' + description), () => {
+          createForm.controls['name'].setValue('test');
+          createForm.controls['id'].setValue('test');
+          createForm.controls['ip_address'].setValue('1.2.3.4');
+
+          createForm.controls['fqdn'].setValue(input);
+          errors = createForm.controls['fqdn'].errors || {};
+
+          expect(createForm.valid).toBeTruthy();
+          expect(errors['pattern']).toBeFalsy();
+        });
+      });
+
     });
   });
 });
