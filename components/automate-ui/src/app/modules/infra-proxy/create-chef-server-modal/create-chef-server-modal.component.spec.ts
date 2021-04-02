@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Regex } from 'app/helpers/auth/regex';
+import { using } from 'app/testing/spec-helpers';
 
 import { CreateChefServerModalComponent } from './create-chef-server-modal.component';
 
@@ -68,7 +69,48 @@ describe('CreateChefServerModalComponent', () => {
         expect(createForm.valid).toBeFalsy();
       });
 
-      it('when only 3 of the 4 inputs are complete', () => {
+      // using([
+      //   []
+      // ], function (input: string, expected: boolean) {
+      //   it(('when ' + input + ' is missing'), () => {
+
+      //   });
+      // });
+
+      it('when name is missing', () => {
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['name'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when id is missing', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['id'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when fqdn is missing', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['fqdn'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when ip_address is missing', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
         createForm.controls['fqdn'].setValue('test.net');
