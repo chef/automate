@@ -109,3 +109,13 @@ section {
     }
   }
 }
+
+// temporary styles
+.timezone-field {
+  margin-top: 25px;
+
+  chef-select {
+    width: 100%;
+    // there's a min-width issue coming from stencil that should be removed
+  }
+}

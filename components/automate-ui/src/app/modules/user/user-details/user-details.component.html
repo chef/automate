@@ -30,14 +30,12 @@
               Display Name is required.
             </chef-error>
           </chef-form-field>
-          <chef-form-field>
+          <chef-form-field class="timezone-field">
             <label for="timezone">Time Zone</label>
-            <chef-select>
-              <chef-option value="1">UTC (demo)</chef-option>
-              <chef-option value="2">some other time zone</chef-option>
-              <chef-option value="3">some other time zone</chef-option>
-              <chef-option value="4">some other time zone</chef-option>
-              <chef-option value="5">some other time zone</chef-option>
+            <chef-select #tz [value]="(userPrefsService.timezone$ | async)?.value" (change)="handleTimezoneChange(tz.value)">
+              <chef-option value="UTC">UTC</chef-option>
+              <chef-option value="Asia/Taipei">Asia/Taipei</chef-option>
+              <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
             </chef-select>
           </chef-form-field>
         </form>

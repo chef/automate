@@ -12,7 +12,9 @@ export enum UserPreferencesActionTypes {
 
   UPDATE_USER_PREFERENCES         = 'USER_PREFERENCES::UPDATE',
   UPDATE_USER_PREFERENCES_SUCCESS = 'USER_PREFERENCES::UPDATE::SUCCESS',
-  UPDATE_USER_PREFERENCES_FAILURE = 'USER_PREFERENCES::UPDATE::FAILURE'
+  UPDATE_USER_PREFERENCES_FAILURE = 'USER_PREFERENCES::UPDATE::FAILURE',
+
+  TEST_UPDATE_USER_TIMEZONE = 'TEST_UPDATE_USER_TIMEZONE'
 }
 
 export class GetUserPreferences implements Action {
@@ -49,10 +51,18 @@ export class UpdateUserPreferencesFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+// State timezone update for dev testing purposes only
+export class TestUpdateUserTimezone implements Action {
+  readonly type = UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEZONE;
+
+  constructor(public payload: string) {}
+}
+
 export type UserPreferencesActions =
   | GetUserPreferences
   | GetUserPreferencesSuccess
   | GetUserPreferencesFailure
   | UpdateUserPreferences
   | UpdateUserPreferencesSuccess
-  | UpdateUserPreferencesFailure;
+  | UpdateUserPreferencesFailure
+  | TestUpdateUserTimezone;
