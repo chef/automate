@@ -75,8 +75,8 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
-    // private userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) {
     store.pipe(
       select(apiTokenStatus),
