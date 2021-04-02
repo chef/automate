@@ -30,7 +30,7 @@
                   {{ token.projects.length }} projects
                 </ng-container>
               </td>
-              <td class="header-column">{{ token?.created_at | datetime: ( userPrefsService.timezone$ | async )?.value :'ddd, MMMM D, YYYY [at] H:mm a Z z' }}</td>
+              <td class="header-column">{{ token?.created_at | datetime: ( userPrefsService.timezone$ | async )?.value :'ddd, MMMM D, YYYY [at] H:mm a z Z' }}</td>
               <td class="header-column" data-cy="token-status">{{ status | capitalize }}</td>
             </tr>
           </tbody>
