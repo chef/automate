@@ -65,6 +65,18 @@ export function userPreferencesEntityReducer(
 
       return set('list.timeformat', timeformat, state);
 
+    // This is purely hacky way to change timezone for dev purposes only
+    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEZONE:
+      console.log(action.payload);
+      const obj = {
+          'timezone': {
+            'value': action.payload,
+            'disabled': false
+          }
+      };
+
+      return set('list', obj, state) as UserPreferencesEntityState;
+
     default:
       return state;
   }
