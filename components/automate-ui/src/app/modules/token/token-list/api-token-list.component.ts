@@ -29,8 +29,9 @@ import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policie
 import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
-import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
-// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+// import {
+  // userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-api-tokens',
@@ -48,17 +49,13 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public readonly RFC2822 = DateTime.RFC2822;
-
-  // user preferences timezone
-  public timezone: string;
-  // public timezone2: any;
+  public readonly DEMO_MODE = DateTime.DEMO_MODE;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
-    // private userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) {
     store.pipe(
       select(apiTokenStatus),
@@ -84,10 +81,10 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     });
 
     // Getting user preferences timezone from state
-    store.pipe(
-      select(userPreferencesTimezone),
-      takeUntil(this.isDestroyed)
-    ).subscribe(tz => this.timezone = tz.value);
+    // store.pipe(
+    //   select(userPreferencesTimezone),
+    //   takeUntil(this.isDestroyed)
+    // ).subscribe(tz => this.timezone = tz.value);
 
     // this.timezone2 = this.userPrefsService.getTimezone();
   }

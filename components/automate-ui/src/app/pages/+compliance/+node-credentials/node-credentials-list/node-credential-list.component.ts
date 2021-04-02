@@ -3,7 +3,7 @@ import { Store, select } from '@ngrx/store';
 import { get, toUpper, pick } from 'lodash/fp';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import * as moment from 'moment/moment';
+// import * as moment from 'moment/moment';
 import { MatOptionSelectionChange } from '@angular/material/core';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -22,6 +22,9 @@ import {
 import { NodeCredentialOrder, SortParams } from './node-credential-list.reducer';
 import { nodeCredentialListState } from './node-credential-list.selectors';
 import { SortNodeCredentialList } from './node-credential-list.actions';
+
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+
 @Component({
   selector: 'app-node-credential-list',
   templateUrl: './node-credential-list.component.html',
@@ -38,10 +41,12 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
   public nodesListLoading = true;
   public sortBy: string;
   public params: SortParams;
+  public readonly DEMO_MODE = DateTime.DEMO_MODE;
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
   }
@@ -111,9 +116,9 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  getLastModified(lastModifiedDate): string {
-    return moment.utc(lastModifiedDate).format(DateTime.RFC2822);
-  }
+  // getLastModified(lastModifiedDate): string {
+  //   return moment.utc(lastModifiedDate).format(DateTime.RFC2822);
+  // }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);

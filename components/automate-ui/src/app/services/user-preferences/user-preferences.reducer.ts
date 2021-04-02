@@ -16,8 +16,9 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   list: {
     // Subject to change, enabled for development purposes
     timezone: {
-      value: 'Asia/Taipei',
-      // value: 'default',
+      // value: 'Asia/Taipei',
+      value: 'America/Los_Angeles',
+      // value: 'UTC',
       disabled: false
     }
   },

@@ -11,16 +11,6 @@ import * as moment from 'moment-timezone';
 })
 export class DatetimePipe implements PipeTransform {
 
-  // https://momentjs.com/timezone/docs/
-  // Should we use moment-timezone?
-  // Is this a good time to move away from moment (deprecated)
-
-  // Psudocode
-  // Add argument for timezone
-  // Check if is a moment object, if not, make a moment object
-  // convert object to selected timzone
-  // format the time
-
   // REFER TO DOCS FOR USE WITH UTC https://momentjs.com/timezone/docs/#/using-timezones/
 
   public transform(value: moment.Moment | Date | string,
@@ -29,17 +19,14 @@ export class DatetimePipe implements PipeTransform {
       ///// next line for development only;
       console.log(timezone);
 
-    if (timezone !== 'default') {
-      return moment.utc(value).clone().tz(timezone).format(formatStr);
-      // return datetime.clone().tz(timezone).format(formatStr);
-    }
-    return moment.utc(value).format(formatStr);
-    // return datetime.format(formatStr);
-  }
+      // console.log( moment.tz.zonesForCountry('US'));
 
-  // public transform(value: moment.Moment | Date | string, formatStr: string): string {
-  //   const datetime = moment.isMoment(value) ? value : moment.utc(value);
-  //   return datetime.format(formatStr);
-  // }
+      // this if block will likely change
+      if (timezone === 'default') {
+        return moment.utc(value).format(formatStr);
+      }
+
+      return moment.utc(value).clone().tz(timezone).format(formatStr);
+  }
 
 }
