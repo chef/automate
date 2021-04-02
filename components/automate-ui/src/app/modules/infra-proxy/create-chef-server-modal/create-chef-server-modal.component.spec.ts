@@ -131,7 +131,7 @@ describe('CreateChefServerModalComponent', () => {
         ['is using something other than http or https', 'httpld://www.chef.io'],
         ['contains two periods', 'chef..internal'],
         ['there is no TLD suffix', 'http://foo.com.'],
-        ['contains hypens in the TLD', 'chef.this-will-not'],
+        ['contains hyphens in the TLD', 'chef.this-will-not'],
         ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
         ['has a TLD that is shorter than 2 characters', 'chef.i'],
         ['has numbers in the TLD', 'chef.017'],
