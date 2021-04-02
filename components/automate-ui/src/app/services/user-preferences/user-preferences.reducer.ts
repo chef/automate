@@ -17,8 +17,8 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
     // Subject to change, enabled for development purposes
     timezone: {
       // value: 'Asia/Taipei',
-      value: 'America/Los_Angeles',
-      // value: 'UTC',
+      // value: 'America/Los_Angeles',
+      value: 'UTC',
       disabled: false
     }
   },
@@ -57,6 +57,18 @@ export function userPreferencesEntityReducer(
       return pipe(
         set('status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as UserPreferencesEntityState;
+
+    // This is purely hacky way to change timezone for dev purposes only
+    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEZONE:
+      console.log(action.payload);
+      const obj = {
+          'timezone': {
+            'value': action.payload,
+            'disabled': false
+          }
+      };
+
+      return set('list', obj, state) as UserPreferencesEntityState;
 
     default:
       return state;
