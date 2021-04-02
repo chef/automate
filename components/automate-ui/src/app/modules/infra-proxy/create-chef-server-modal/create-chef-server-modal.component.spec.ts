@@ -135,7 +135,12 @@ describe('CreateChefServerModalComponent', () => {
         ['has numbers in the TLD', 'chef.017'],
         ['has a port number that is too high', 'https://chef.io:987274892'],
         ['has a colon but no port number', 'https://chef.io:'],
-        ['has a letter in the port', 'https://chef.io:123a']
+        ['has a letter in the port', 'https://chef.io:123a'],
+        ['has no domain', 'http://'],
+        ['has no secure domain', 'https://'],
+        ['domain is dots', 'https://..'],
+        ['domain is hash', 'http://#'],
+        ['domain has a space', 'http:// shouldfail.net']
       ], function (description: string, input: string) {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
