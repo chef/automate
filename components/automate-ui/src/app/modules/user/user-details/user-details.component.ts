@@ -33,6 +33,9 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
+// State timezone update for dev testing purposes only
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+
 export type UserTabName = 'password' | 'details';
 
 @Component({
@@ -52,7 +55,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) { }
 
   ngOnInit(): void {
@@ -114,6 +118,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public handlePasswordInput(): void {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
   }
+
+  // only for testing development - will be removed before release
+  public handleTimezoneChange(tz) {
+    this.userPrefsService.testUpdateUserTimezone(tz);
+  }
 }
 
 abstract class UserDetails {
@@ -126,7 +135,9 @@ abstract class UserDetails {
   abstract showBreadcrumbs: boolean;
   abstract showPreviousPassword: boolean;
 
-  constructor(private store: Store<NgrxStateAtom>) {}
+  constructor(
+    private store: Store<NgrxStateAtom>
+    ) { }
 
   public savePassword(): void {
     this.saveSuccessful = false;
