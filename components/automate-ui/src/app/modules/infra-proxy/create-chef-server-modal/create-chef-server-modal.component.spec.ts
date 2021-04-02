@@ -69,14 +69,6 @@ describe('CreateChefServerModalComponent', () => {
         expect(createForm.valid).toBeFalsy();
       });
 
-      // using([
-      //   []
-      // ], function (input: string, expected: boolean) {
-      //   it(('when ' + input + ' is missing'), () => {
-
-      //   });
-      // });
-
       it('when name is missing', () => {
         createForm.controls['id'].setValue('test');
         createForm.controls['fqdn'].setValue('test.net');
@@ -133,30 +125,31 @@ describe('CreateChefServerModalComponent', () => {
         expect(errors['pattern']).toBeTruthy();
       });
 
-      it('when the fqdn Top Level Domain is less than 2 characters', () => {
-        createForm.controls['name'].setValue('test');
-        createForm.controls['id'].setValue('test');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
+            using([
+        ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
+        ['contains two periods', 'chef..internal'],
+        ['has a TLD that is shorter than 2 characters', 'chef.i'],
+        ['has numbers in the TLD', 'chef.017'],
+        ['there is no TLD suffix', 'http://foo.com.'],
+        ['has a port number that is too high', 'https://chef.io:987274892'],
+        ['has a colon but no port number', 'https://chef.io:'],
+        ['is using something other than http or https', 'httpld://www.chef.io']
+      ], function (description: string, input: string) {
+        it(('when the fqdn ' + description), () => {
+          createForm.controls['name'].setValue('test');
+          createForm.controls['id'].setValue('test');
+          createForm.controls['ip_address'].setValue('1.2.3.4');
 
-        createForm.controls['fqdn'].setValue('chef.i');
-        errors = createForm.controls['fqdn'].errors || {};
+          createForm.controls['fqdn'].setValue(input);
+          errors = createForm.controls['fqdn'].errors || {};
 
-        expect(createForm.valid).toBeFalsy();
-        expect(errors['pattern']).toBeTruthy();
-      });
-
-      it('when the fqdn Top Level Domain is longer than 25 characters', () => {
-        createForm.controls['name'].setValue('test');
-        createForm.controls['id'].setValue('test');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
-
-        createForm.controls['fqdn'].setValue('chef.thistldisgoingtobetoolongwow');
-        errors = createForm.controls['fqdn'].errors || {};
-
-        expect(createForm.valid).toBeFalsy();
-        expect(errors['pattern']).toBeTruthy();
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
       });
     });
+
+
 
     describe('the form should be valid', () => {
       it('when all 4 inputs are filled and valid', () => {
