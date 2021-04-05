@@ -33,6 +33,7 @@ export class ReportingSearchbarComponent implements OnInit {
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
+  @Input() timezone = 'UTC'; // set default timezone to UTC fallback
 
   @Output() suggestValues = new EventEmitter();
   @Output() filtersCleared = new EventEmitter();
@@ -47,7 +48,7 @@ export class ReportingSearchbarComponent implements OnInit {
 
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<any>();
-  public CHEF_SHORT_DATE = DateTime.CHEF_SHORT_DATE;
+  public CHEF_SHORT_DATE_ZONE = DateTime.CHEF_SHORT_DATE_ZONE;
 
   filterTypesCategories = [];
   calendarMenuVisible = false;

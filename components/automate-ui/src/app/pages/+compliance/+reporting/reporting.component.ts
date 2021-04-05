@@ -32,6 +32,7 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 
 @Component({
@@ -191,7 +192,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
     private route: ActivatedRoute,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) { }
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
