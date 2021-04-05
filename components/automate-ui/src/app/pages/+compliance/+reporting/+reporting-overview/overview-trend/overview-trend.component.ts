@@ -11,11 +11,11 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
-import * as moment from 'moment/moment';
+import * as moment from 'moment-timezone';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
 export interface TrendData {
-  report_time: Date;
+  report_time: moment.Moment;
   failed: number;
   passed: number;
   skipped: number;
@@ -33,6 +33,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     private el: ElementRef,
     @Inject(DOCUMENT) private document: Document
   ) {}
+
+  @Input() timezone = 'UTC'; // Provide default timezone for fallback
 
   @Input() data = [];
 
@@ -55,7 +57,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   private get trendData(): TrendData[] {
     if (this.trendDataCache.length === 0) {
       this.trendDataCache = this.data.map(d => {
-        return { ...d, report_time: this.createUtcDate(d.report_time) };
+        return { ...d, report_time: this.createTimezoneDate(d.report_time) };
       });
     }
     return this.trendDataCache;
@@ -116,12 +118,12 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   private get dotsSelection() {
     return this.svgSelection.selectAll('.dot-group')
-      .data(this.trendData, (d: TrendData) => d.report_time.getTime());
+      .data(this.trendData, (d: TrendData) => d.report_time.valueOf());
   }
 
   private get tipsSelection() {
     return d3.select(this.document.body).selectAll('.dot-group-tip')
-      .data(this.trendData, (d: TrendData) => d.report_time.getTime());
+      .data(this.trendData, (d: TrendData) => d.report_time.valueOf());
   }
 
   private get linesSelection() {
@@ -171,9 +173,11 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('y', this.vbHeight - 3)
       .text(() => {
         return [
-          moment.utc(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
-          moment.utc(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
-        ].join(' - ') + ' (UTC)';
+          moment.utc(this.domainX[0])
+            .clone().tz(this.timezone).format(DateTime.CHEF_DATE_TIME),
+          moment.utc(this.domainX[1])
+            .clone().tz(this.timezone).format(DateTime.CHEF_DATE_TIME)
+        ].join(' - ') + ` (${moment.tz(this.timezone).zoneAbbr()})`;
       });
 
     this.axisXSelection.select('.domain')
@@ -235,7 +239,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('class', 'dot-group-bg');
 
     enter.on('click', (_d, i) => {
-      this.dateSelected.next(moment(i.report_time).format('YYYY-MM-DD'));
+      this.dateSelected.next(moment.utc(i.report_time).clone()
+        .tz(this.timezone).format('YYYY-MM-DD'));
     });
 
     update.select('.dot-group-tick')
@@ -311,7 +316,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     update
       .attr('for', (_d, i) => `dot-group-bg-${i}`);
     update.select('.tip-name')
-      .text(d => d3.timeFormat('%a %B %e %Y (UTC)')(d.report_time));
+      .text(d =>
+        d3.timeFormat(`%a %B %e %Y (${moment.tz(this.timezone).zoneAbbr()})`)(d.report_time));
 
     statuses.forEach(status => {
       update.select(`.tip-legend-item.${status}`)
@@ -321,13 +327,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     exit.remove();
   }
 
-  createUtcDate(time: string): Date {
-    const utcDate = moment.utc(time);
-    if (utcDate.isValid) {
-      return new Date(utcDate.year(), utcDate.month(), utcDate.date());
-    } else {
-      console.error('Not a valid date ' + time);
-      return new Date();
-    }
+  createTimezoneDate(time: string): moment.Moment {
+    return moment.utc(time).clone().tz(this.timezone);
   }
 }
