@@ -119,3 +119,38 @@ section {
     // there's a min-width issue coming from stencil that should be removed
   }
 }
+
+.test-container {
+  margin: 1em 0;
+
+  .test {
+    padding: 8px 10px;
+    outline: none;
+    border-radius: 0;
+    background: #8aefa5;
+    border: none;
+    border-bottom: 3px solid #228850;
+    cursor: pointer;
+    transition: .5s;
+
+    &:hover {
+      box-shadow: 0 4px 10px 0 rgb(0 0 0 / 20%);
+    }
+
+    &:active {
+      background: #37ab40;
+    }
+
+    &:disabled {
+      background-color: #a9b4ac;
+      border-color: grey;
+      color: grey;
+      cursor: not-allowed;
+    }
+
+    &.one {
+      margin-right: 8px;
+    }
+  }
+}
+
