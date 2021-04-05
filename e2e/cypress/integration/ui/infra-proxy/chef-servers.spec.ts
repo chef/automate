@@ -134,7 +134,7 @@ describe('chef server', () => {
       .invoke('attr', 'disabled')
       .then(disabled => {
         disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=add-button]').click();
-      })
+      });
 
       cy.get('app-chef-servers-list chef-modal').should('exist');
 
