@@ -33,6 +33,7 @@ export class ReportingSearchbarComponent implements OnInit {
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
+  @Input() timezone = 'UTC'; // set default timezone to UTC fallback
 
   @Output() suggestValues = new EventEmitter();
   @Output() filtersCleared = new EventEmitter();
