@@ -4,7 +4,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
 import { UserPreference } from './user-preferences.model';
 import { userPreferencesTimezone } from './user-preferences.selector';
-import { TestUpdateUserTimezone } from './user-preferences.actions';
+import { GetUserPreferences, TestUpdateUserTimezone, UpdateUserPreferences } from './user-preferences.actions';
 
 
 
@@ -20,6 +20,14 @@ export class UserPreferencesService {
     // only for testing development - will be removed or modified before release
   testUpdateUserTimezone(timezone) {
     this.store.dispatch(new TestUpdateUserTimezone(timezone));
+  }
+
+  getUserPreferences() {
+    this.store.dispatch(new GetUserPreferences());
+  }
+
+  updateUserPreferences(tz) {
+    this.store.dispatch(new UpdateUserPreferences(tz));
   }
 
 }

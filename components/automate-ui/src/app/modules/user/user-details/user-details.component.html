@@ -38,6 +38,10 @@
               <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
             </chef-select>
           </chef-form-field>
+          <div class="test-container">
+            <button class="test one" (click)="handleGetPrefs()">Test Get Timezone</button>
+            <button class="test two" disabled (click)="handleUpdatePrefs(tz.value)">Test Update Timezone</button>
+          </div>
         </form>
         <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline
           (click)="userDetails.saveDisplayName()" data-cy="user-details-submit-button">

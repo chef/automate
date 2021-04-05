@@ -24,6 +24,10 @@ export class DateTime {
   // 25 Oct 2019
   public static readonly CHEF_SHORT_DATE: string = 'DD MMM YYYY';
 
+  // Format for short date display with timezone
+  // 25 Oct 2019 UTC
+  public static readonly CHEF_SHORT_DATE_ZONE: string = 'DD MMM YYYY z';
+
   // Format for date labels in event feed graph
   // Tue, 24 Sept
   public static readonly EVENT_GRAPH_DATE_LABEL: string = 'ddd, DD MMM';
