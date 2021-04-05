@@ -9,6 +9,7 @@
       <div class="reporting-header">
         <app-reporting-searchbar
           [date]="endDate$ | async"
+          [timezone]="(userPrefsService.timezone$ | async)?.value"
           [filters]="filters$ | async"
           [last24h]="(reportQuery.state | async).last24h"
           [filterTypes]="availableFilterTypes"
