@@ -130,7 +130,7 @@ function chef_load_nodes() {
   local nodes=${1:-50}
   prepare_chef_load
   pushd /src >/dev/null;
-    chef-load generate --config /tmp/chef-load.toml -n $nodes
+    /src/bin/chef-load2 generate --config /tmp/chef-load.toml -n $nodes
     local EXIT_CODE=$?;
   popd >/dev/null;
   return $EXIT_CODE;
@@ -163,4 +163,23 @@ function prepare_chef_load() {
   sed -i "s/REPLACE_ME_VIA_HAB/$(get_admin_token)/g" /tmp/chef-load.toml
   install_if_missing core/busybox-static netstat;
   install_if_missing chef/chef-load chef-load;
+}
+function load_test_api() {
+  for i in {1..5}
+  do
+    output = curl --location --request POST 'https://a2-dev.test/api/v0/cfgmgmt/clientrun' \
+--header 'api-token: FYLYfSuauzhPbv255o3sTZ-HG2M=' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "offset": ${i},
+    "size": 40,
+    "feedStart": "2020-03-01T15:04:05Z",
+    "feedEnd": "2021-04-01T15:04:05Z",
+    "attribute": [
+        "id"
+    ]
+}' -k
+echo $output
+echo $i
+  done
 }
