@@ -1,17 +1,20 @@
-<div class="search-wrapper" tabindex="0">
-  <div class="search-input-wrapper">      
-    <input #search_box chefInput
-      id="search_box"
-      aria-label="Search"
-      (keyup)="handleInput($event.key, search_box.value)"
-      [value]="inputText"
-      type="text"
-      class="search-input"
-      placeholder="Search {{ placeHolder }}"
-      autocomplete="off">
-    <button chef-button class="search-button primary" primary (click)="handleFiltersClick(search_box.value)">
-      <chef-icon>search</chef-icon>
-    </button>
-  </div>
-  <ng-content></ng-content>
-</div>
+<form role='search'
+  (ngSubmit)="onSubmit(search_box.value)"
+  [class.active]="formActive">
+  <label for="search-filter" aria-hidden="true" class="hidden">
+    <span>Search</span>
+  </label>
+  <input #search_box chefInput
+    id="search-filter"
+    type="text"
+    [value]="inputText"
+    (focus)="toggleFocus()"
+    (blur)="toggleFocus()"
+    placeholder="Search {{ placeHolder }}"
+    aria-label="Search"
+    autocomplete="off">
+  <button type="submit" class="primary" primary>
+    <span aria-hidden="true" class="hidden">Submit Search</span>
+    <chef-icon>search</chef-icon>
+  </button>
+</form>

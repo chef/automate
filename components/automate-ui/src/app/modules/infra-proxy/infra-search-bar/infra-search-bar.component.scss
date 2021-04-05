@@ -1,55 +1,47 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-.search-wrapper {
+form {
+  display: flex;
   width: 100%;
+  flex-direction: row;
   font-size: 1em;
   color: $chef-primary-dark;
-  padding-bottom: 12px;
+  border-radius: $chef-border-radius;
+  overflow: hidden;
+
+  &.active {
+    box-shadow: 0px 0px 0px 1px $chef-primary-bright; // Mimic default outline
+  }
+
+  .hidden {
+    display: none;
+  }
 }
 
-.search-wrapper:focus {
-  outline: none;
+input {
+  border-radius: 4px 0px 0px 4px;
+  transition: 0s; // Remove default transition
+
+  &:focus {
+    border: 0; // Accessibility is being noted around containing form
+  }
 }
 
-.search-input-wrapper {
-  position: relative;
+button {
+  background: #E6EBEE;
+  width: 45px;
+  box-shadow: 0 1px 14px #E6EBEE;
+  border: 0px solid transparent;
+  border-radius: 0px 4px 4px 0px;
+  cursor: pointer;
 
-  .search-button {
-    box-shadow: 0 1px 14px #E6EBEE;
-    border: none;
-    border-left: none;
-    border-radius: 0px 4px 4px 0px;
-    background: #E6EBEE;
-    cursor: pointer;
-    width: 45px;
-    height: 42px;
+  &:focus {
     outline: none;
-    position: absolute;
-    right: 1.5px;
-    top: 0.5px;
-  }
-
-  .chef-input {
-    border-radius: 4px 0px 0px 4px;
-    width: 100%;
-  }
-
-  ::ng-deep .chef-input:active {
-    border-width: 0.5px;
-  }
-
-  .search-items {
-    margin-bottom: 25px;
-    width: 100%;
+    border: 1px solid $chef-primary-bright;
   }
 }
 
 chef-icon {
   margin-top: 6px;
-  margin-left: 3px;
-}
-
-.hidden-label {
-  padding: 0;
 }

@@ -18,12 +18,10 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
-    <div class="search-items">
+    <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchRoles($event)" placeHolder="Roles....">
       </app-infra-search-bar>
-      <chef-toolbar *ngIf="chefInfraViewsFeatureFlagOn">
-        <chef-button id="role-create" primary (click)="openCreateModal()">Create Role</chef-button>
-      </chef-toolbar>
+        <chef-button *ngIf="chefInfraViewsFeatureFlagOn" id="role-create" primary (click)="openCreateModal()">Create Role</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !roles.length">

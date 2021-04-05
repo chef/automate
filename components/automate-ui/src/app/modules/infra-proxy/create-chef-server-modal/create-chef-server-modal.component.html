@@ -17,7 +17,7 @@
           </label>
           <chef-error
           *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
-          Display Name is required.
+          Name is required.
         </chef-error>
         </chef-form-field>
         <span class="detail light">Don't worry, server names can be changed later.</span>

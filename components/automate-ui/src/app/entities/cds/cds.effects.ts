@@ -114,7 +114,7 @@ export class CdsEffects {
     map((action: DownloadContentItemSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Content Item "${action.payload.name}" was download`
+        message: `Content Item "${action.payload.name}" was downloaded`
       });
     })));
 
@@ -134,7 +134,7 @@ export class CdsEffects {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not check is content is enabled: ${msg || error}`
+        message: `Could not check if content is enabled: ${msg || error}`
       });
     })));
 

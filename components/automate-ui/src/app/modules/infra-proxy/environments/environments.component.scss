@@ -1,5 +1,20 @@
 @import "~styles/variables";
 
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
@@ -66,27 +81,4 @@ img {
     height: 55px;
   }
 
-  span chef-toolbar chef-button:first-child {
-    margin: 4px 0px 0px 32px;
-    float: right;
-
-    button {
-      padding: 7px 16px;
-      letter-spacing: 0.5px;
-    }
-  }
-
-  ::ng-deep {
-    .search-items app-infra-search-bar .search-wrapper {
-      float: left;
-      margin-top: 10px;
-      width: calc(100% - 187px);
-      margin-right: 32px;
-    }
-  }
-
-  chef-toolbar chef-button:first-child {
-    margin: 18px 0px 0px 0px;
-    float: right;
-  }
 }

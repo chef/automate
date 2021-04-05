@@ -2,8 +2,6 @@ import {
   Component,
   EventEmitter,
   Output,
-  ViewChild,
-  ElementRef,
   Input
 } from '@angular/core';
 
@@ -15,24 +13,17 @@ import {
 
 export class InfraSearchBarComponent {
   inputText = '';
+  formActive = false;
 
   @Input() placeHolder: string;
   @Output() searchButtonClick = new EventEmitter<string>();
-  @ViewChild('search_box', { static: true }) inputField: ElementRef;
 
-  handleFiltersClick(currentText: string): void {
+  onSubmit(currentText: string): void {
     this.searchButtonClick.emit(currentText);
   }
 
-  pressEnter(currentText: string): void {
-    this.searchButtonClick.emit(currentText);
+  toggleFocus(): void {
+    this.formActive = !this.formActive;
   }
 
-  handleInput(key, currentText): void {
-    switch (key.toLowerCase()) {
-      case 'enter':
-        this.pressEnter(currentText);
-        break;
-    }
-  }
 }

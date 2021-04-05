@@ -57,7 +57,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   public attrParseError: boolean;
   public cookbooks: Cookbook[] = [];
-  public constraintArray: Array<CookbookConstraintGrid> = [];
+  public constraints: Array<CookbookConstraintGrid> = [];
   public constraintKeys: string[] = [];
   public name_id: string;
   public nameKeys: string[] = [];
@@ -67,7 +67,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   public textareaID: string;
   public selectedCookbookNames: string[] = [];
 
-  public defaulttAttributeForm: FormGroup;
+  public defaultAttributeForm: FormGroup;
   public overrideAttributeForm: FormGroup;
   public constraintFormGroup: FormGroup;
   public close = new EventEmitter();
@@ -79,7 +79,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     private store: Store<NgrxStateAtom>
 
   ) {
-    this.defaulttAttributeForm = this.fb.group({
+    this.defaultAttributeForm = this.fb.group({
       default: ['', [Validators.required]]
     });
 
@@ -105,9 +105,9 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.cookbookConstraints.forEach((element) => {
         this.selectedCookbookNames.push(element.name);
       });
-      this.selectedCookbookNames.forEach((ele) => {
-        this.constraintKeys.forEach((element, index) => {
-          if (ele === element) {
+      this.selectedCookbookNames.forEach((cookbookName) => {
+        this.constraintKeys.forEach((key, index) => {
+          if (cookbookName === key) {
             this.constraintKeys.splice(index, 1);
           }
         });
@@ -138,7 +138,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   ngOnChanges(): void {
     if (this.label === 'Default') {
-      this.defaulttAttributeForm.controls.default.setValue(this.jsonText);
+      this.defaultAttributeForm.controls.default.setValue(this.jsonText);
     }
     if (this.label === 'Override') {
       this.overrideAttributeForm.controls.override.setValue(this.jsonText);
@@ -156,14 +156,14 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraintArray = value;
+    this.constraints = value;
   }
 
   handleNameInput(event: KeyboardEvent): void {
     if (!this.isNavigationKey(event)) {
       this.conflictError = false;
-      this.defaulttAttributeForm.controls.default.setValue(
-        IdMapper.transform(this.defaulttAttributeForm.controls.default.value.trim()));
+      this.defaultAttributeForm.controls.default.setValue(
+        IdMapper.transform(this.defaultAttributeForm.controls.default.value.trim()));
     }
   }
 
@@ -191,57 +191,48 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.updateSuccessful = false;
     this.updateInProgress = true;
 
-    if (this.label === 'Constraints') {
+    let environment: Environment = {
+      server_id: this.serverId,
+      org_id: this.orgId,
+      name: this.environment.name,
+      description: this.environment.description,
+      json_class: this.environment.json_class,
+      chef_type: this.environment.chef_type,
 
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.constraintArray.length ? this.toDisplay(this.constraintArray) : {},
-        default_attributes: JSON.parse(this.environment.default_attributes),
-        override_attributes: JSON.parse(this.environment.override_attributes),
-        json_class: this.environment.json_class,
-        chef_type: this.environment.chef_type
-      };
-      this.updatingData(environment);
+      // these are filled in by the switch below
+      cookbook_versions: {},
+      default_attributes: '',
+      override_attributes: ''
+    };
+
+    switch (this.label) {
+      case 'Constraints':
+        environment = { ...environment,
+          cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
+          default_attributes: JSON.parse(this.environment.default_attributes),
+          override_attributes: JSON.parse(this.environment.override_attributes)
+        };
+        break;
+
+      case 'Default':
+        environment = { ...environment,
+          cookbook_versions: this.environment.cookbook_versions,
+          default_attributes: JSON.parse(
+              this.defaultAttributeForm.controls['default'].value.replace(/\r?\n|\r/g, '')),
+          override_attributes: JSON.parse(this.environment.override_attributes)
+        };
+        break;
+
+      case 'Override':
+        environment = { ...environment,
+          cookbook_versions: this.environment.cookbook_versions,
+          default_attributes: JSON.parse(this.environment.default_attributes),
+          override_attributes: JSON.parse(
+            this.overrideAttributeForm.controls['override'].value.replace(/\r?\n|\r/g, ''))
+        };
+        break;
     }
-
-    if (this.label === 'Default') {
-      const json_data = this.defaulttAttributeForm.controls['default'].value;
-      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
-
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.environment.cookbook_versions,
-        default_attributes: obj,
-        override_attributes: JSON.parse(this.environment.override_attributes),
-        chef_type: this.environment.chef_type,
-        json_class: this.environment.json_class
-      };
-      this.updatingData(environment);
-    }
-
-    if (this.label === 'Override') {
-      const json_data = this.overrideAttributeForm.controls['override'].value;
-      const obj = JSON.parse(json_data.replace(/\r?\n|\r/g, ''));
-
-      const environment: Environment = {
-        server_id: this.serverId,
-        org_id: this.orgId,
-        name: this.environment.name,
-        description: this.environment.description,
-        cookbook_versions: this.environment.cookbook_versions,
-        default_attributes: JSON.parse(this.environment.default_attributes),
-        override_attributes: obj,
-        chef_type: this.environment.chef_type,
-        json_class: this.environment.json_class
-      };
-      this.updatingData(environment);
-    }
+    this.updatingData(environment);
   }
 
   private loadCookbooks() {
@@ -266,7 +257,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
         });
       }
 
-      // first cookbook constrains keys selected on drop-down when loading constrain data
+      // first cookbook constrains keys selected on drop-down when loading constraint data
       this.name_id = this.constraintKeys[0];
     });
 
@@ -275,8 +266,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   private toDisplay(cookbookVersions: Array<CookbookConstraintGrid> = []) {
     const current = {};
     cookbookVersions.forEach((element) => {
-      current[element.name] =
-        `${element.operator}` + ' ' + `${element.version}`;
+      current[element.name] = `${element.operator} ${element.version}`;
     });
     return current;
   }
