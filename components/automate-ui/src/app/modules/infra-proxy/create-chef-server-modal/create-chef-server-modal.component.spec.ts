@@ -1,14 +1,19 @@
 import { EventEmitter } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
+import { Regex } from 'app/helpers/auth/regex';
+import { using } from 'app/testing/spec-helpers';
 
 import { CreateChefServerModalComponent } from './create-chef-server-modal.component';
 
 describe('CreateChefServerModalComponent', () => {
   let component: CreateChefServerModalComponent;
   let fixture: ComponentFixture<CreateChefServerModalComponent>;
+
+  let createForm: FormGroup;
+  let errors = {};
 
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,18 +40,164 @@ describe('CreateChefServerModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateChefServerModalComponent);
     component = fixture.componentInstance;
+    // This form must mimic the createForm including Validators
     component.createForm = new FormBuilder().group({
-      id: ['', null],
-      name: ['', null],
-      description: ['', null],
-      fqdn: ['', null],
-      ip_address: ['', null]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+      fqdn: ['', [Validators.required,
+      Validators.pattern(Regex.patterns.NON_BLANK),
+      Validators.pattern(Regex.patterns.VALID_FQDN)
+      ]],
+      ip_address: ['', [Validators.required,
+      Validators.pattern(Regex.patterns.NON_BLANK),
+      Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
+      ]]
     });
     component.conflictErrorEvent = new EventEmitter();
+    createForm = component.createForm;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('form validity', () => {
+    describe('the form should be invalid', () => {
+      it('when all inputs are empty', () => {
+        expect(createForm.valid).toBeFalsy();
+      });
+
+      it('when name is missing', () => {
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['name'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when id is missing', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['id'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when fqdn is missing', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+
+        errors = createForm.controls['fqdn'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when ip_address is missing', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('test.net');
+
+        errors = createForm.controls['ip_address'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when the ip_address in invalid', () => {
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('chef.internal');
+
+        createForm.controls['ip_address'].setValue('1.2234.3.4');
+        errors = createForm.controls['ip_address'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['pattern']).toBeTruthy();
+      });
+
+      // Many testing ideas attributed to https://mathiasbynens.be/demo/url-regex
+
+      using([
+        ['is using something other than http or https', 'httpld://www.chef.io'],
+        ['contains two periods', 'chef..internal'],
+        ['there is no TLD suffix', 'http://foo.com.'],
+        ['contains hyphens in the TLD', 'chef.this-will-not'],
+        ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
+        ['has a TLD that is shorter than 2 characters', 'chef.i'],
+        ['has numbers in the TLD', 'chef.017'],
+        ['has a port number that is too high', 'https://chef.io:987274892'],
+        ['has a colon but no port number', 'https://chef.io:'],
+        ['has a letter in the port', 'https://chef.io:123a'],
+        ['has no domain', 'http://'],
+        ['has no secure domain', 'https://'],
+        ['domain is dots', 'https://..'],
+        ['domain is hash', 'http://#'],
+        ['domain has a space', 'http:// shouldfail.net'],
+        ['contains all numbers', 'http://10.1.1.0']
+      ], function (description: string, input: string) {
+        it(('when the fqdn ' + description), () => {
+          createForm.controls['name'].setValue('test');
+          createForm.controls['id'].setValue('test');
+          createForm.controls['ip_address'].setValue('1.2.3.4');
+
+          createForm.controls['fqdn'].setValue(input);
+          errors = createForm.controls['fqdn'].errors || {};
+
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+    });
+
+
+
+    describe('the form should be valid', () => {
+      it('when all 4 inputs are filled and valid', () => {
+        expect(createForm.valid).toBeFalsy();
+        createForm.controls['name'].setValue('test');
+        createForm.controls['id'].setValue('test');
+        createForm.controls['fqdn'].setValue('chef.internal');
+        createForm.controls['ip_address'].setValue('1.2.3.4');
+        expect(createForm.valid).toBeTruthy();
+      });
+
+      using([
+        ['has a TLD that is longer than 2 and less than 25 characters', 'chef.internal'],
+        ['uses https', 'https://chef.io'],
+        ['uses http', 'http://chef.io'],
+        ['omits http or https', 'chef.thisworks'],
+        ['has a port number', 'https://chef.io:123'],
+        ['contains hyphens in the domain', 'new-company-who-dis.nice'],
+        ['contains underscores in the domain', 'new_company_who_dis.chef'],
+        ['contains digits in the domain', '8675309.jenny'],
+        ['contains all numbers in the domain', 'http://223.453.739.net'],
+        ['contains a query', 'http://www.chef.io/events/#&product=automate'],
+        ['contains unicode', 'http://foo.com/unicode_(✪)_in_parens'],
+        ['is a citation url', 'http://foo.com/blah_(wikipedia)_blah#cite-1']
+      ], function (description: string, input: string) {
+        it(('when the fqdn ' + description), () => {
+          createForm.controls['name'].setValue('test');
+          createForm.controls['id'].setValue('test');
+          createForm.controls['ip_address'].setValue('1.2.3.4');
+
+          createForm.controls['fqdn'].setValue(input);
+          errors = createForm.controls['fqdn'].errors || {};
+
+          expect(createForm.valid).toBeTruthy();
+          expect(errors['pattern']).toBeFalsy();
+        });
+      });
+
+    });
   });
 });
