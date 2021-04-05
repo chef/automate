@@ -33,11 +33,10 @@ describe('OverviewTrendComponent', () => {
 
   it('create UTC date from string date with timezone', () => {
     for ( let hour = 0; hour < 10; hour++ ) {
-      console.log(component.createTimezoneDate('2019-09-14T0' + hour + ':59:59Z'));
-      expect(component.createTimezoneDate('2019-09-14T0' + hour + ':59:59Z').format('D')).toEqual('14');
+      expect(component.createTimezoneDate('2019-09-14T0' + hour + ':59:59Z').date()).toEqual(14);
     }
     for ( let hour = 10; hour < 24; hour++ ) {
-      expect(component.createTimezoneDate('2019-09-14T' + hour + ':59:59Z').format('D')).toEqual('14');
+      expect(component.createTimezoneDate('2019-09-14T' + hour + ':59:59Z').date()).toEqual(14);
     }
   });
 });
