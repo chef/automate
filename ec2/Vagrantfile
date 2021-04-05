@@ -4,6 +4,8 @@ require 'vagrant-aws'
 require 'resolv'
 require 'mkmf'
 
+#Undefined HashMap method except with Vagrant 2.2.7
+# work around was found here: https://github.com/mitchellh/vagrant-aws/issues/566#issuecomment-580812210
 class Hash
   def slice(*keep_keys)
     h = {}
