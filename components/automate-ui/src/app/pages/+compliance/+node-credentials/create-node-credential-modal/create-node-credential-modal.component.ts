@@ -10,6 +10,7 @@ import { takeUntil, filter } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { EntityStatus } from 'app/entities/entities';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   saveError,
   saveStatus
@@ -124,7 +125,7 @@ export class CreateNodeCredentialModalComponent implements OnInit, OnDestroy {
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.createNodeCredForm.controls.id.setValue(
         IdMapper.transform(this.createNodeCredForm.controls.name.value.trim()));
@@ -136,7 +137,7 @@ export class CreateNodeCredentialModalComponent implements OnInit, OnDestroy {
   }
 
   handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -145,10 +146,6 @@ export class CreateNodeCredentialModalComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
 }

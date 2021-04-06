@@ -22,6 +22,7 @@ import { DataBag } from 'app/entities/data-bags/data-bags.model';
 import {
   CreateDataBag
 } from 'app/entities/data-bags/data-bags.actions';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 @Component({
   selector: 'app-create-data-bag-modal',
@@ -93,7 +94,7 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -122,7 +123,4 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
