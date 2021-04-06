@@ -31,7 +31,7 @@
     "lodash": "^4.17.19",
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
-    "prismjs": "^1.21.0",
+    "prismjs": "^1.23.0",
     "redux": "^4.0.4",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0"
