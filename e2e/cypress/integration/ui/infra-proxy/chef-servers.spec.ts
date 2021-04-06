@@ -27,6 +27,7 @@ describe('chef server', () => {
     it('can add a server', () => {
       cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
+      cy.get('[data-cy=add-name]').should('have.focus');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=id-label]').contains(generatedServerID);
       cy.get('[data-cy=add-fqdn]').type(serverFQDN);
