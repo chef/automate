@@ -44,11 +44,10 @@
       </app-create-databag-item-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <div class="search-items">
-          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
-          <chef-toolbar>
-            <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
-          </chef-toolbar>
+        <div class="search-create-container">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items">
+          </app-infra-search-bar>
+          <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
           <chef-loading-spinner *ngIf="searching" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
@@ -64,7 +63,6 @@
                   <div class="data-bag-name">
                     {{ item.name }}
                   </div>
-                  <!-- <i class="fa fa-chevron-down"></i> -->
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
                 <div class="submenu" [ngClass]="item.active ? activeClassName : ''"> 
@@ -80,11 +78,11 @@
                           <chef-icon>remove_circle</chef-icon>
                           <span>Collapse All</span>
                         </span>
-                        <a class="float-right" (click)="startUpdateDataBagItem(item, selectedItemDetails)">
+                        <a class="right-button-box" (click)="startUpdateDataBagItem(item, selectedItemDetails)">
                           <span class="material-icons edit-item">mode_edit</span>
                           <span class="edit-text">Edit</span>
                         </a>
-                        <a class="float-right" (click)="startDataBagItemDelete(item)">
+                        <a class="right-button-box" (click)="startDataBagItemDelete(item)">
                           <span class="material-icons del-item">delete</span>
                           <span class="del-text">Delete</span>
                         </a>

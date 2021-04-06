@@ -36,7 +36,7 @@
             </div>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <chef-button [disabled]="!detailsFormGroup?.valid || conflictError"  primary id="create-button-object-modal" (click)="createEnvironment()">
+              <chef-button [disabled]="!detailsFormGroup?.valid || conflictError || nameExist"  primary id="create-button-object-modal" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating...</span>
@@ -58,7 +58,7 @@
           </div>
           <div class="button-bar-box">
             <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-            <chef-button [disabled]="!constraints.length || conflictError"  primary id="create-button-object-modal-1" (click)="createEnvironment()">
+            <chef-button [disabled]="!constraints.length || conflictError || nameExist"  primary id="create-button-object-modal-1" (click)="createEnvironment()">
               <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
               <span *ngIf="!creating">Create</span>
               <span *ngIf="creating">Creating...</span>
@@ -77,7 +77,7 @@
             </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <chef-button [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError"  primary id="create-button-object-modal-2" (click)="createEnvironment()">
+              <chef-button [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError || nameExist"  primary id="create-button-object-modal-2" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating...</span>
@@ -98,7 +98,7 @@
             </chef-form-field>
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-              <chef-button [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError"  primary id="create-button-object-modal-3" (click)="createEnvironment()">
+              <chef-button [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError || nameExist"  primary id="create-button-object-modal-3" (click)="createEnvironment()">
                 <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
                 <span *ngIf="!creating">Create</span>
                 <span *ngIf="creating">Creating...</span>
