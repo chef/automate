@@ -6,7 +6,14 @@
         <chef-form-field>
           <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput name="name" formControlName="name" type="text" (keyup)="handleNameInput($event)" data-cy="org-name" autocomplete="off">
+            <input
+              chefInput
+              name="name"
+              formControlName="name"
+              type="text"
+              (keyup)="handleNameInput($event)"
+              data-cy="org-name"
+              autocomplete="off">
           </label>
           <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
@@ -19,7 +26,14 @@
         <chef-form-field>
           <label>
             <span class="label">ID <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="id" type="text" (keyup)="handleInput($event)" id="id-input" data-cy="create-id" autocomplete="off"/>
+            <input
+              chefInput
+              formControlName="id"
+              type="text"
+              (keyup)="handleInput($event)"
+              id="id-input"
+              data-cy="add-id"
+              autocomplete="off"/>
           </label>
           <chef-error *ngIf="createForm.get('id').hasError('maxlength') && createForm.get('id').dirty">
             ID must be 64 characters or less.
@@ -56,7 +70,14 @@
         <chef-form-field>
           <label>
             <span class="label">Admin User <span aria-hidden="true">*</span></span>
-            <input chefInput name="admin_user" formControlName="admin_user" type="text" id="admin-input" data-cy="admin-user" autocomplete="off">
+            <input
+              chefInput
+              name="admin_user"
+              formControlName="admin_user"
+              type="text"
+              id="admin-input"
+              data-cy="admin-user"
+              autocomplete="off">
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_user').hasError('required') || createForm.get('admin_user').hasError('pattern')) && createForm.get('admin_user').dirty">
@@ -68,7 +89,16 @@
         <chef-form-field>
           <label>
             <span class="label">Admin Key <span aria-hidden="true">*</span></span>
-            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY -----" autofocus></textarea>
+            <textarea
+              chefInput
+              name="admin_key"
+              id="admin_key"
+              formControlName="admin_key"
+              cols="54"
+              rows="10"
+              placeholder="-----BEGIN RSA PRIVATE KEY -----"
+              data-cy="admin-key"
+              autofocus></textarea>
           </label>
           <chef-error
             *ngIf="(createForm.get('admin_key').hasError('required') || createForm.get('admin_key').hasError('pattern')) && createForm.get('admin_key').dirty">
@@ -77,8 +107,13 @@
         </chef-form-field>
       </div>
       <div id="button-org">
-        <chef-button id="cancel-org-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
-        <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
+        <chef-button id="cancel-org-popup" tertiary (click)="closeEvent()" data-cy="cancel-button">Cancel</chef-button>
+        <chef-button
+          primary
+          data-cy="add-button"
+          id="create-org-modal-btn"
+          [disabled]="!createForm?.valid || creating || conflictError"
+          (click)="createServerOrg()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
           <span *ngIf="!creating">Add Chef Organization</span>
           <span *ngIf="creating">Adding Organization...</span>

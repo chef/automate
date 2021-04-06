@@ -48,8 +48,13 @@
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                data-cy="update-chefServer-name">
+              <input
+                chefInput
+                formControlName="name"
+                type="text"
+                [resetOrigin]="saveSuccessful"
+                autocomplete="off"
+                data-cy="update-server-name">
             </label>
             <chef-error
               *ngIf="(updateServerForm.get('name').hasError('required') || updateServerForm.get('name').hasError('pattern')) && updateServerForm.get('name').dirty">
@@ -59,8 +64,13 @@
           <chef-form-field>
             <label>
               <span class="label">FQDN <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="fqdn" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                data-cy="update-chefServer-fqdn">
+              <input
+                chefInput
+                formControlName="fqdn"
+                type="text"
+                [resetOrigin]="saveSuccessful"
+                autocomplete="off"
+                data-cy="update-server-fqdn">
             </label>
             <chef-error
               *ngIf="(updateServerForm.get('fqdn').hasError('required') || updateServerForm.get('fqdn').hasError('pattern')) && updateServerForm.get('fqdn').dirty">
@@ -70,8 +80,13 @@
           <chef-form-field>
             <label>
               <span class="label">IP Address <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="ip_address" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-                data-cy="update-chefServer-ip_address">
+              <input
+                chefInput
+                formControlName="ip_address"
+                type="text"
+                [resetOrigin]="saveSuccessful"
+                autocomplete="off"
+                data-cy="update-server-ip-address">
             </label>
             <chef-error
               *ngIf="(updateServerForm.get('ip_address').hasError('required') || updateServerForm.get('ip_address').hasError('pattern')) && updateServerForm.get('ip_address').dirty">
@@ -79,8 +94,12 @@
             </chef-error>
           </chef-form-field>
           <div id="button-bar">
-            <chef-button [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty"
-            primary inline (click)="saveServer()">
+            <chef-button
+              primary
+              inline
+              data-cy="save-button"
+              [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty"
+              (click)="saveServer()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>
               <span *ngIf="!saveInProgress">Save</span></chef-button>
@@ -91,11 +110,11 @@
       <section class="page-body" *ngIf="tabValue === 'orgs'">
         <chef-toolbar>
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs', 'post', server?.id]">
-            <chef-button id="create-button" primary (click)="openCreateModal()">Add Chef Organization
+            <chef-button id="create-button" primary (click)="openCreateModal()" data-cy="add-org-button">Add Chef Organization
             </chef-button>
           </app-authorized>
         </chef-toolbar>
-        <div *ngIf="orgs.length != 0 && !orgsListLoading">
+        <div id="org-table-container" *ngIf="orgs.length != 0 && !orgsListLoading">
           <chef-table>
             <chef-thead>
               <chef-tr>
@@ -119,7 +138,7 @@
                 <chef-td class="three-dot-column">
                   <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{id}', 'delete', [server?.id, org.id]]"> -->
                     <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
-                    <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete</mat-option>
+                    <mat-option data-cy="delete-org" (onSelectionChange)="startOrgDelete($event, org)">Delete</mat-option>
                     </mat-select>
                   <!-- </app-authorized> -->
                 </chef-td>
