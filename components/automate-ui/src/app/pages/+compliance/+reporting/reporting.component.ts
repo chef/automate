@@ -174,7 +174,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadFailed = false;
   endDate$: Observable<Date>;
   filters$: Observable<FilterC[]>;
-  ChefDateTime = DateTime.CHEF_DATE_TIME;
+  ChefDateTimeZone = DateTime.CHEF_DATE_TIME_ZONE;
 
   showSummary = false;
 
