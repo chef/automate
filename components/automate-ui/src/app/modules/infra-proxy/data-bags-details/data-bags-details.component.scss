@@ -133,26 +133,20 @@ tbody > .detail-row {
   color: $royal-blue;
 }
 
-.search-button {
-  box-shadow: 0 1px 14px #E6EBEE;
-  border: 1px solid $chef-light-grey-2;
-  border-left: none;
-  border-radius: 0px 4px 4px 0px;
-  background: #E6EBEE;
-  width: 2.6%;
-  height: 45px;
-  float: right;
-}
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
 
-.chef-input {
-  border-radius: 4px 0px 0px 4px;
-  // border-right: none;
-  width: 97.4%;
-}
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
 
-.search-items {
-  margin-bottom: 8px;
-  width: 100%;
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    height: 36px;
+  }
 }
 
 // CSS for accordion
@@ -286,27 +280,5 @@ tbody > .detail-row {
 .dataBagItems {
   .page-body {
     padding: 25px 30px;
-  }
-
-  .search-items {
-    margin-bottom: 18px;
-    height: 55px;
-  }
-
-  chef-toolbar chef-button:first-child {
-    margin: 4px 0px 0px 32px;
-    float: right;
-
-    button {
-      padding: 7px 16px;
-      letter-spacing: 0.5px;
-    }
-  }
-
-  ::ng-deep {
-    .search-items app-infra-search-bar .search-wrapper {
-      float: left;
-      width: calc(100% - 135px);
-    }
   }
 }

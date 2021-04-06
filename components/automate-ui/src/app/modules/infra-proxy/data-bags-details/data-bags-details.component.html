@@ -44,11 +44,10 @@
       </app-create-databag-item-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <div class="search-items">
-          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items"></app-infra-search-bar>
-          <chef-toolbar>
-            <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
-          </chef-toolbar>
+        <div class="search-create-container">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items">
+          </app-infra-search-bar>
+          <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
           <chef-loading-spinner *ngIf="searching" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
@@ -64,7 +63,6 @@
                   <div class="data-bag-name">
                     {{ item.name }}
                   </div>
-                  <!-- <i class="fa fa-chevron-down"></i> -->
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
                 <div class="submenu" [ngClass]="item.active ? activeClassName : ''"> 
