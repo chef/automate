@@ -180,7 +180,7 @@ export class ChefModal {
   // when Angular detects the modal is open
   // it sets the focus by default on the close button for unlocked modals,
   // or the modal div for locked modals
-  // Developer can specify element to focus first by using firstFocus attribute 
+  // Developer can specify element to focus first by using firstFocus attribute
   // on an unlocked modal
   private getFocusElement(lockStatus: boolean): HTMLElement {
     const modal = this.el.getElementsByClassName('modal').item(0) as HTMLElement;
