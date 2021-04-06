@@ -102,6 +102,41 @@ main.password {
   margin-top: 10px;
 }
 
+/******* BELOW TEMPORARY STYLES ********/
+
+.theme-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.signin-login-container {
+  text-align: center;
+  padding: 3em 0;
+}
+
+.empty {
+  flex-grow: 1;
+}
+
+.spacer {
+  padding: 1em;
+}
+
+.message {
+  width: 80%;
+  margin: 0em auto;
+  background: white;
+  box-shadow: 0 0 16px 0 rgb(0 0 0 / 21%);
+  padding: 1em 2em;
+  overflow-x: scroll;
+  max-height: 250px;
+  width: 80%;
+  border: 20px solid white;
+}
+
+/******* ABOVE TEMPORARY STYLES ********/
+
 .theme-body {
   font-family: 'Source Sans Pro', Helvetica, sans-serif;
 }
