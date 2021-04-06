@@ -31,7 +31,7 @@ func (s *Server) GetNodes(ctx context.Context, req *request.Nodes) (*response.No
 	}, nil
 }
 
-// GetAffectedNodes get the nodes using chef object
+// GetAffectedNodes gets the nodes using chef object
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -229,7 +229,6 @@ func (s *Server) UpdateNodeEnvironment(ctx context.Context, req *request.UpdateN
 		Request:         *req,
 		RequiredDefault: true,
 	}).Validate()
-
 	if err != nil {
 		return nil, err
 	}
@@ -254,9 +253,57 @@ func (s *Server) UpdateNodeEnvironment(ctx context.Context, req *request.UpdateN
 		Name:        res.Name,
 		Environment: res.Environment,
 	}, nil
+
 }
 
-// fetchAffectedNodes get the nodes used by chef object
+// UpdateNodeAttributes updates the node attributes
+func (s *Server) UpdateNodeAttributes(ctx context.Context, req *request.UpdateNodeAttributes) (*response.UpdateNodeAttributes, error) {
+	err := validation.New(validation.Options{
+		Target:  "node",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
+	}).Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	attributes, err := StructToJSON(req.Attributes)
+	if err != nil {
+		return nil, err
+	}
+
+	chefNode, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	chefNode.NormalAttributes = attributes.(map[string]interface{})
+	res, err := c.client.Nodes.Put(chefNode)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	resAttributes, err := json.Marshal(res.NormalAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &response.UpdateNodeAttributes{
+		Name:       res.Name,
+		Attributes: string(resAttributes),
+	}, nil
+}
+
+// fetchAffectedNodes gets the nodes used by chef object
 // URL is being constructed based on the chefType, name, and version
 // chefType: should be one of the cookbooks, roles and chef_environment value
 // For cookbooks: it would be 'cookbooks_COOKBOOK_NAME_version:COOKBOOK_VERSION'

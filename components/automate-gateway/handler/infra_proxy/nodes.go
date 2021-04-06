@@ -9,7 +9,7 @@ import (
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// GetNodes get the nodes
+// GetNodes gets the nodes
 func (a *InfraProxyServer) GetNodes(ctx context.Context, r *gwreq.Nodes) (*gwres.Nodes, error) {
 	req := &infra_req.Nodes{
 		OrgId:    r.OrgId,
@@ -25,7 +25,7 @@ func (a *InfraProxyServer) GetNodes(ctx context.Context, r *gwreq.Nodes) (*gwres
 	}, nil
 }
 
-// GetAffectedNodes get the nodes using resource
+// GetAffectedNodes gets the nodes using resource
 func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.AffectedNodes) (*gwres.AffectedNodes, error) {
 
 	req := &infra_req.AffectedNodes{
@@ -149,6 +149,25 @@ func (a *InfraProxyServer) UpdateNodeEnvironment(ctx context.Context, r *gwreq.U
 	return &gwres.UpdateNodeEnvironment{
 		Name:        res.GetName(),
 		Environment: res.GetEnvironment(),
+	}, nil
+}
+
+// UpdateNodeAttributes updates the node attributes
+func (a *InfraProxyServer) UpdateNodeAttributes(ctx context.Context, r *gwreq.UpdateNodeAttributes) (*gwres.UpdateNodeAttributes, error) {
+	req := &infra_req.UpdateNodeAttributes{
+		OrgId:      r.OrgId,
+		ServerId:   r.ServerId,
+		Name:       r.Name,
+		Attributes: r.Attributes,
+	}
+	res, err := a.client.UpdateNodeAttributes(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.UpdateNodeAttributes{
+		Name:       res.GetName(),
+		Attributes: res.GetAttributes(),
 	}, nil
 }
 
