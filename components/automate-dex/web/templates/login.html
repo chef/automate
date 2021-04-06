@@ -11,27 +11,56 @@
     <link href="{{ url .ReqPath "theme/styles.css" }}" rel="stylesheet">
   </head>
   <body>
-    <main class="theme-panel">
-      <div class="logo">
-        <img class="theme-navbar__logo" alt="Chef Automate" src="{{url .ReqPath "static/img/automate-blue-d9789f4b.svg" }}">
+    <main>
+      <div class="theme-panel">
+      <div class="empty"></div>
+
+      <div class="signin-login-container">
+        <div class="logo">
+          <img class="theme-navbar__logo" alt="Chef Automate" src="{{url .ReqPath "static/img/automate-blue-d9789f4b.svg" }}">
+        </div>
+        <h1>User Sign In</h1>
+        <div>
+          {{ range $c := .Connectors }}
+          <div class="theme-form-row">
+            <a href="{{ $c.URL }}" target="_self">
+              <div class="dex-btn theme-btn-provider">
+                  <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
+                  {{ if eq $c.ID "local" }}
+                  <span class="dex-btn-text">Sign in as a local user</span>
+                  {{ else }}
+                  <span class="dex-btn-text">Sign in with {{ $c.Name }}</span>
+                  {{ end }}
+              </div>
+            </a>
+            {{ end }}
+          </div>
+        </div>
       </div>
-      <h1>User Sign In</h1>
-      <div>
-        {{ range $c := .Connectors }}
-        <div class="theme-form-row">
-          <a href="{{ $c.URL }}" target="_self">
-            <div class="dex-btn theme-btn-provider">
-                <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
-                {{ if eq $c.ID "local" }}
-                <span class="dex-btn-text">Sign in as a local user</span>
-                {{ else }}
-                <span class="dex-btn-text">Sign in with {{ $c.Name }}</span>
-                {{ end }}
-            </div>
-          </a>
-        {{ end }}
-      </div>
+
     </div>
+    <div class="empty">
+        <div class="message">
+          <h3>Warning</h3>
+          <p>convallis a cras semper auctor neque vitae tempus quam pellentesque nec nam aliquam sem et tortor consequat id porta
+          nibh venenatis cras sed felis eget velit aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer
+          enim neque volutpat ac tincidunt vitae semper quis lectus nulla at volutpat diam ut venenatis tellus in metus vulputate
+          eu scelerisque felis imperdiet proin fermentum leo vel orci porta non pulvinar neque laoreet suspendisse interdum
+          consectetur libero id faucibus nisl tincidunt eget nullam non nisi est sit amet facilisis magna etiam tempor orci eu
+          lobortis elementum nibh tellus molestie nunc non blandit massa enim nec dui nunc mattis enim ut tellus elementum
+          sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam vestibulum morbi blandit cursus risus at
+          ultrices mi tempus imperdiet.
+        
+          convallis a cras semper auctor neque vitae tempus quam pellentesque nec nam aliquam sem et tortor consequat id porta
+          nibh venenatis cras sed felis eget velit aliquet sagittis id consectetur purus ut faucibus pulvinar elementum integer
+          enim neque volutpat ac tincidunt vitae semper quis lectus nulla at volutpat diam ut venenatis tellus in metus vulputate
+          eu scelerisque felis imperdiet proin fermentum leo vel orci porta non pulvinar neque laoreet suspendisse interdum
+          consectetur libero id faucibus nisl tincidunt eget nullam non nisi est sit amet facilisis magna etiam tempor orci eu
+          lobortis elementum nibh tellus molestie nunc non blandit massa enim nec dui nunc mattis enim ut tellus elementum
+          sagittis vitae et leo duis ut diam quam nulla porttitor massa id neque aliquam vestibulum morbi blandit cursus risus at
+          ultrices mi tempus imperdiet</p>
+        </div>
+      </div>
     </main>
   </body>
 </html>
