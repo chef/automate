@@ -115,7 +115,7 @@ describe('chef server', () => {
       cy.get('app-chef-servers-list chef-button').contains('Delete').click();
 
       // verify success notification and then dismiss it
-      cy.get('app-notification.info').contains('Successfully Deleted Server');
+      cy.get('app-notification.info').contains('Successfully deleted server');
       cy.get('app-notification.info chef-icon').click();
 
       cy.get('app-chef-servers-list chef-tbody chef-td')
