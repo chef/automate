@@ -11,6 +11,8 @@ export class DateTime {
   // Format for date display
   // Tue, 24 Sept 2019
   public static readonly CHEF_DATE_TIME: string = 'ddd, DD MMM YYYY';
+    // Tue, 24 Sept 2019 UTC
+  public static readonly CHEF_DATE_TIME_ZONE: string = 'ddd, DD MMM YYYY z';
 
   // Format for time display
   // 09:59

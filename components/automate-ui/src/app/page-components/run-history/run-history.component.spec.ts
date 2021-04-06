@@ -1,6 +1,8 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RunHistoryComponent } from '../run-history/run-history.component';
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
+import { StoreModule } from '@ngrx/store';
 import { DateSelectorComponent } from '../date-selector/date-selector.component';
 import { StatusSelectorPipe } from '../../pipes/status-selector.pipe';
 import { ChefStatusIconPipe } from '../../pipes/chef-status-icon.pipe';
@@ -10,7 +12,6 @@ import { AbridgedNodeRun, NodeHistoryCountsFilter, NodeRunsCount } from '../../t
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { NodeHistoryFilter } from '../../types/types';
 import { MockComponent } from 'ng2-mock-component';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('RunHistoryComponent', () => {
   let fixture: ComponentFixture<RunHistoryComponent>;
@@ -27,6 +28,9 @@ describe('RunHistoryComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        StoreModule.forRoot({})
+      ],
       declarations: [
         RunHistoryComponent,
         DateSelectorComponent,

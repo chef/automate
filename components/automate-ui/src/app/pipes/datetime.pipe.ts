@@ -15,11 +15,9 @@ export class DatetimePipe implements PipeTransform {
 
   public transform(value: moment.Moment | Date | string,
     timezone: string = 'default', formatStr: string): string {
-
-      ///// next line for development only;
+      ///// next line for development > needs further inspection
+      if (timezone === null) { return; }
       console.log(timezone);
-
-      // console.log( moment.tz.zonesForCountry('US'));
 
       // this if block will likely change
       if (timezone === 'default') {

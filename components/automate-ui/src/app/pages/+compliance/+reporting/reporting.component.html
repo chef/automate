@@ -85,7 +85,7 @@
                   Report Date
                   <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
                 </th>
-                <td>{{ endDate$ | async | datetime: 'default' : ChefDateTime }}</td>
+                <td>{{ endDate$ | async | datetime: ( userPrefsService.timezone$ | async)?.value : ChefDateTimeZone }}</td>
               </tr>
               <tr>
                 <th>
