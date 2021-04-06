@@ -47,7 +47,7 @@
             <chef-icon [ngClass]="history.status">{{ history.status | chefStatusIcon }}</chef-icon>
             <div class="list-item-text">
               <p>
-                <strong>{{ history.startTime | datetime: 'default' : RFC2822 }}</strong>
+                <strong>{{ history.startTime | datetime: ( userPrefsService.timezone$ | async )?.value : DEMO_MODE }}</strong>
               </p>
               <p><span>Duration: </span>{{ getDuration(history.startTime, history.endTime) }}</p>
             </div>
