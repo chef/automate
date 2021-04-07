@@ -102,41 +102,6 @@ main.password {
   margin-top: 10px;
 }
 
-/******* BELOW TEMPORARY STYLES ********/
-
-.theme-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.signin-login-container {
-  text-align: center;
-  padding: 3em 0;
-}
-
-.empty {
-  flex-grow: 1;
-}
-
-.spacer {
-  padding: 1em;
-}
-
-.message {
-  width: 80%;
-  margin: 0em auto;
-  background: white;
-  box-shadow: 0 0 16px 0 rgb(0 0 0 / 21%);
-  padding: 1em 2em;
-  overflow-x: scroll;
-  max-height: 250px;
-  width: 80%;
-  border: 20px solid white;
-}
-
-/******* ABOVE TEMPORARY STYLES ********/
-
 .theme-body {
   font-family: 'Source Sans Pro', Helvetica, sans-serif;
 }
@@ -205,3 +170,70 @@ main.password {
   text-align: left;
   width: 250px;
 }
+
+/******* BELOW TEMPORARY STYLES ********/
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Warning Banner Styles */
+.warning-text {
+  margin: 0;
+  padding: 1em 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.theme-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 2;
+}
+
+.popup-wrapper {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: visibility 0s .25s, opacity .25s;
+}
+
+.popup-wrapper.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .25s;
+}
+
+.popup {
+  background: #fff;
+  width: 600px;
+  height: 500px;
+  position: absolute;
+  left: 50%;
+  margin-left: -300px;
+  top: 50%;
+  margin-top: -250px;
+  padding: 2em;
+  overflow-x: scroll;
+}
+
+.accept-button {
+  display: block;
+  margin: 2em 0 0 auto;
+  border: none;
+  cursor: pointer;
+}
+
+.accept-button:hover {
+  background-color: #3864de;
+}
+
+/******* ABOVE TEMPORARY STYLES ********/
