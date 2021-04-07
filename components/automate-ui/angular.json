@@ -80,7 +80,8 @@
               "browserTarget": "automate-ui:build:prod"
             },
             "no_auth": {
-              "browserTarget": "automate-ui:build:no_auth"
+              "browserTarget": "automate-ui:build:no_auth",
+              "baseHref": "/"
             },
             "production": {
               "browserTarget": "automate-ui:build:production"
