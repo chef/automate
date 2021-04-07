@@ -1,23 +1,30 @@
 package relaxting
 
 import (
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetEsIndexNoTimeLast24h(t *testing.T) {
 	sum := mappings.IndexNameSum
 	filters := make(map[string][]string)
 
+	todayTime := time.Now().UTC()
+
 	index, err := GetEsIndex(filters, true)
-
-	today := time.Now().UTC().Format("2006.01.02")
-	yesterday := time.Now().Add(-24 * time.Hour).UTC().Format("2006.01.02")
-
-	assert.Equal(t, sum+"-"+yesterday+"*,"+sum+"-"+today+"*", index)
 	assert.NoError(t, err)
+
+	today := todayTime.Format("2006.01.02")
+	if todayTime.Day() == 31 {
+		//if it's the 31st, shave off the 1 and make it 3*, which will be the 30th and 31st
+		assert.Equal(t, sum+"-3*", index)
+	} else {
+		yesterday := todayTime.Add(-24 * time.Hour).Format("2006.01.02")
+		assert.Equal(t, sum+"-"+yesterday+"*,"+sum+"-"+today+"*", index)
+	}
 }
 
 func TestGetEsIndexWithOnlyEndTimeFilter(t *testing.T) {
