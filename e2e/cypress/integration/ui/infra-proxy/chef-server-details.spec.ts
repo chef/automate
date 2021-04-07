@@ -53,7 +53,13 @@ describe('chef server details', () => {
       cy.get('chef-breadcrumbs').contains(serverName);
   
       cy.get('.page-title').contains(serverName);
-      cy.contains('Add Chef Organization');
+      cy.get('[data-cy=add-org-button]').contains('Add Chef Organization');
+    });
+
+    it('can check empty org list', () => {
+      cy.get('#org-table-container chef-th').should('not.be.visible');
+      cy.get('[data-cy=empty-list]').should('be.visible');
+      cy.get('[data-cy=no-records]').contains('No Organization available');
     });
 
     it('can add a organization', () => {

@@ -146,9 +146,9 @@
             </chef-tbody>
           </chef-table>
         </div>
-        <div class="empty-section" *ngIf="orgs.length === 0 && !orgsListLoading">
+        <div data-cy="empty-list" class="empty-section" *ngIf="orgs.length === 0 && !orgsListLoading">
           <img alt="No preview" src="/assets/img/no_preview.gif" />
-          <p>No Organization available.</p>
+          <p data-cy="no-records">No Organization available.</p>
         </div>
       </section>
     </main>
