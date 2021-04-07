@@ -12,8 +12,7 @@ describe('chef server details', () => {
   const generatedOrgID = orgName.split(' ').join('-');
   const customOrgID = `${cypressPrefix}-custom-id-${now}`;
   const adminUser = 'test_admin_user';
-  const adminKey = '-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEAxKVaH46oqVJsfV156On1Cojxl/CtDVE5HtyuUVudKqNLVy2x\nnmkuXtLwOCW5P/zwjPis3Qu/IcekPThAJf74Acc8RZR8u5teHk9SvbmZ72vdh0Pw\nV2nTXSRWLA+u5jnvQGLQg2xj5z0dHaI99xwWi6xsBdsgDquLLiWEkbLBRX4bF2r1\nnp4qf71Ka6R61Rmy/UtrTy77Y39j7NBo8WCUzk8240HoU5Wf7nnzfJ1m0AHXiptx\nUWwy7/HM8qcoMiLdSYvI507Aus0ZGZW6endzfM5Q9Xpxgq1WhhP6rzyZFbMAeb7B\nWH36jbuiZEAEvNXZE7QRjztvJgy9VSEaJ5ZOjQIDAQABAoIBAFfaQ6Q7mNBkuYFc\npJ1RAJ+fRMgLx1ReyDUohFxmoJWu9HbTPDo4ZXYJqTZ8bAHRYCqq4peyqsZNqeuL\n2OTgvy4UM7ImP3+VTvwdliqa49HaD9Nhn9t9tOc016bBrvK+SUwrmVpNr2hcnkhh\n9msSymPGOVB4cB79tqV8L3jkMoJ3pXNuTOSpU9VX3mtYH5qjCiGAjh8M5RW+DFcm\n4JBZZ/7o4eSMuj9qzmDQCKLhDvPzOPbdtV067iAaCaF1N9ek/zbSyoUfk6WGCIon\nLRy37BvVcL0mVQjXqTWamHic+53lRf9WDj5fJ5Y2ka2cRm8VzK3bp/wDkEgdSMjR\n9rguvKECgYEA/SwpYRqij+r0gEtnIRgrjXQEOwht/eWL1sCGwlFDcOxDQnm59L9Q\nOcw4PZnCKEv8JV5WrpJIZC3VJyB6RrwA/OT5x/4iw8nRxq2xWIRKZMdb3yDP4pbA\ned+oVOwvLcr7EArenccpmEUutv/v+g83DSzkIrshTq7kz62tqikpf3UCgYEAxteT\nqTYwtROnl7oKj2hSpWVfFDsUyVKpSt6ZnwIGAH7TrvoAsRnw1Xw28X/4cKsNMtmK\nb3c0bQYDIvq6lV5F1vOUFN06Nzc2SZAMgQ3nzU0QDuJthvsh/toqgg1BF0tgDz1g\n2LGScgb0oq36Dtz5Dq/tMt1E5/EWYY59kz8JB7kCgYEA8yvLwv02T0258tB6CguR\nKZjZx2ndXBVzL55U0agEQx5rrBoHRtHLWPiSvHhHSTVSxwHJ+HuBFNgA+Ef1qqNB\nv6afVD0BX1UmLNMAmKjYW9wwniyCAH4T+fudT5Rb7HwekdYe5SU7CorIx/Ukpuae\nVgVcSw+6ejz6gY+sUtieh1ECgYEAwuH2rxmVk2O4FlUYlIVCuygnj8R4EvkZQ2/4\nUIfDKikjf5M3qlwqVpJvpzItZP/A592eeLD0iQYjfN0QkeTbvljtAaXxsLxEUMUF\n/FaMogKtgmkZv/nSz90zXFNxQEt30nftu3QOfAOlMOwi8P5Se7qhWADV0B3SObtW\nCEL3rsECgYEAi//NWyRo14hS8KJubZlm3ocF58IBCVhhuwYleWeqB8Q1xu3PKV1G\neDv5RBsbwyd3u+xvm04cQ/CfUxqgtOdYOfnHfBusFb5GVLOYUpYG4iM6gwuAwFBz\nzcFOpxm6bpGL8soD6JdMmcZ6dRTtlkhhJj/vO4f86V52m3x9LIsiRmY=\n-----END RSA PRIVATE KEY-----';
-
+  const adminKey = Cypress.env('dummy_admin_key');
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -51,7 +50,6 @@ describe('chef server details', () => {
     it('displays server details', () => {
       cy.get('chef-breadcrumbs').contains('Chef Servers');
       cy.get('chef-breadcrumbs').contains(serverName);
-  
       cy.get('.page-title').contains(serverName);
       cy.get('[data-cy=add-org-button]').contains('Add Chef Organization');
     });
