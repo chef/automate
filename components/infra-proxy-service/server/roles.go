@@ -22,6 +22,8 @@ type RoleListResult struct {
 	Rows  []*chef.Role `json:"rows"`
 }
 
+type RunListCache map[string]map[string]bool
+
 // CreateRole creates the role
 func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
 	err := validation.New(validation.Options{
@@ -150,9 +152,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 	}, nil
 }
 
-// GetRole get role appended with expanded runlist
-// In order to get expanded runlist it required to have all roles if any
-// RunList contains the another Role's RunList.
+// GetRole gets the role
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
 	err := validation.New(validation.Options{
 		Target:          "role",
@@ -169,35 +169,12 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, err
 	}
 
-	result, err := c.SearchRoles(&request.SearchQuery{})
+	role, err := c.client.Roles.Get(req.Name)
 	if err != nil {
-		return nil, err
+		return nil, ParseAPIError(err)
 	}
 
-	role := findRoleFromRoleList(req.Name, &result)
-	if role == nil {
-		return nil, status.Errorf(codes.NotFound, "no %s found with name %q", "role", req.Name)
-	}
-
-	defaultAttributes, err := json.Marshal(role.DefaultAttributes)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	overrideAttributes, err := json.Marshal(role.OverrideAttributes)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &response.Role{
-		Name:               role.Name,
-		ChefType:           role.ChefType,
-		Description:        role.Description,
-		DefaultAttributes:  string(defaultAttributes),
-		OverrideAttributes: string(overrideAttributes),
-		JsonClass:          role.JsonClass,
-		RunList:            role.RunList,
-	}, nil
+	return fromAPIToRoleResponse(role)
 }
 
 // GetRoleEnvironments fetches the role environments.
@@ -249,7 +226,7 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
-	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"])
+	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], RunListCache{})
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -371,25 +348,37 @@ func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	return nil
 }
 
-func toResponseExpandedRunList(client *ChefClient, runlist []string) ([]*response.RunList, error) {
+func toResponseExpandedRunList(client *ChefClient, runlist []string, runlistCache RunListCache) ([]*response.RunList, error) {
 	resRunList := make([]*response.RunList, len(runlist))
+	var pos int32
 	for i, item := range runlist {
 		newItem, err := chef.NewRunListItem(item)
 		if err != nil {
 			return nil, err
 		}
 		newRunList := response.RunList{
-			Type:    newItem.Type,
-			Name:    newItem.Name,
-			Version: newItem.Version,
+			Type: newItem.Type,
+			Name: newItem.Name,
+		}
+
+		if runlistCache[newItem.Type][newItem.Name] {
+			newRunList.Skipped = true
+		} else {
+			if newItem.IsRecipe() {
+				newRunList.Version = newItem.Version
+				newRunList.Position = pos
+				pos++
+			}
+			runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
 		}
 
 		if newItem.IsRole() {
 			currentRole, err := client.client.Roles.Get(newItem.Name)
+			chefError, _ := chef.ChefError(err)
 			if err != nil {
-				newRunList.Error = err.Error()
+				newRunList.Error = chefError.StatusMsg()
 			} else {
-				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList)
+				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList, runlistCache)
 				if err != nil {
 					newRunList.Error = err.Error()
 				}

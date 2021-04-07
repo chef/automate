@@ -189,6 +189,9 @@ func fromUpsteamRunList(runList []*infra_res.RunList) []*gwres.RunList {
 			Type:     item.GetType(),
 			Name:     item.GetName(),
 			Version:  item.GetVersion(),
+			Skipped:  item.GetSkipped(),
+			Position: item.GetPosition(),
+			Error:    item.GetError(),
 			Children: fromUpsteamRunList(item.GetChildren()),
 		}
 		resRunList[i] = &resRunListItem
