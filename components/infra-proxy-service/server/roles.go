@@ -390,7 +390,9 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string) ([]*respons
 				newRunList.Error = err.Error()
 			} else {
 				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList)
-				newRunList.Error = err.Error()
+				if err != nil {
+					newRunList.Error = err.Error()
+				}
 			}
 		}
 		resRunList[i] = &newRunList
