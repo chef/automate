@@ -56,6 +56,7 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
   public urlContent;
   public contentData: string;
   public activeContentName: string;
+  public menuIndex: number;
   public listItem = [
     'attributes',
     'definitions',
@@ -138,6 +139,15 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.menuList = CollapsibleListMapper.transform(cookbookDetailsState, this.listItem);
         if (this.menuList.length) {
           // check submenu exists and show default item details
+          for (const menu of this.menuList) {
+            if ( menu.subMenu.length ) {
+              this.defaultContent = menu.subMenu[0];
+              this.getContent(this.defaultContent);
+              this.menuIndex = this.menuList.indexOf(menu);
+              break;
+            }
+          }
+
           if ( this.menuList[0].subMenu.length ) {
             this.defaultContent = this.menuList[0].subMenu[0];
             this.getContent(this.defaultContent);
