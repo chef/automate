@@ -73,8 +73,12 @@
                 data-cy="update-server-fqdn">
             </label>
             <chef-error
-              *ngIf="(updateServerForm.get('fqdn').hasError('required') || updateServerForm.get('fqdn').hasError('pattern')) && updateServerForm.get('fqdn').dirty">
+              *ngIf="updateServerForm.get('fqdn').hasError('required') && updateServerForm.get('fqdn').dirty">
               FQDN is required.
+            </chef-error>
+            <chef-error
+              *ngIf="updateServerForm.get('fqdn').hasError('pattern') && updateServerForm.get('fqdn').dirty">
+              FQDN is invalid.
             </chef-error>
           </chef-form-field>
           <chef-form-field>
@@ -89,8 +93,12 @@
                 data-cy="update-server-ip-address">
             </label>
             <chef-error
-              *ngIf="(updateServerForm.get('ip_address').hasError('required') || updateServerForm.get('ip_address').hasError('pattern')) && updateServerForm.get('ip_address').dirty">
+              *ngIf="updateServerForm.get('ip_address').hasError('required') && updateServerForm.get('ip_address').dirty">
               IP Address is required.
+            </chef-error>
+            <chef-error
+              *ngIf="updateServerForm.get('ip_address').hasError('pattern') && updateServerForm.get('ip_address').dirty">
+              IP Address is invalid.
             </chef-error>
           </chef-form-field>
           <div id="button-bar">
