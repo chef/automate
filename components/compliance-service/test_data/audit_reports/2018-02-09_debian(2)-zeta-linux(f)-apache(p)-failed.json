@@ -7,7 +7,7 @@
   "environment": "DevSec Prod Zeta",
   "roles": ["base_deb", "apache_deb", "debian-hardening-prod", "dot.role"],
   "recipes": [],
-  "end_time": "2018-02-09T09:18:41Z",
+  "end_time": "2018-02-09T23:59:50Z",
   "version": "2.1.10",
   "platform": {
     "name": "debian",

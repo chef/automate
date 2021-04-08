@@ -7,7 +7,7 @@
   "environment": "DevSec Prod beta",
   "roles": ["base_linux", "apache_linux", "nginx-hardening-prod", "dot.role"],
   "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],
-  "end_time": "2018-03-04T09:18:41Z",
+  "end_time": "2018-03-04T00:00:10Z",
   "version": "3.1.0",
   "platform": {
     "name": "centos",

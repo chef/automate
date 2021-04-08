@@ -312,7 +312,7 @@ describe File.basename(__FILE__) do
                    "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
                    "version" => "2.0.0"},
               "impact" => 1,
-              "endTime" => "2018-02-09T09:18:41Z",
+              "endTime" => "2018-02-09T23:59:50Z",
               "controlSummary" =>
                   {"total" => 1,
                    "passed" => {},
@@ -326,7 +326,7 @@ describe File.basename(__FILE__) do
                    "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
                    "version" => "2.0.0"},
               "impact" => 1,
-              "endTime" => "2018-02-09T09:18:41Z",
+              "endTime" => "2018-02-09T23:59:50Z",
               "controlSummary" =>
                   {"total" => 1,
                    "passed" => {},
@@ -340,7 +340,7 @@ describe File.basename(__FILE__) do
                    "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
                    "version" => "2.0.0"},
               "impact" => 0.5,
-              "endTime" => "2018-02-09T09:18:41Z",
+              "endTime" => "2018-02-09T23:59:50Z",
               "controlSummary" =>
                   {"total" => 1,
                    "passed" => {"total" => 1},
