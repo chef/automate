@@ -13,16 +13,14 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-
 	datafeed "github.com/chef/automate/api/external/data_feed"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/components/data-feed-service/service"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -62,6 +60,34 @@ func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destin
 
 	return response, nil
 }
+func (datafeedServer *DatafeedServer) GetCompliance(ctx context.Context, req *datafeed.GetPaginationRequest) (*datafeed.GetPaginationResponse, error) {
+
+	out := map[string]interface{}{}
+	// data := datafeedServer.paginationData.Data
+	out["offset"] = req.GetOffset()
+	out["size"] = req.GetSize()
+
+
+	outputJSON, _ := json.Marshal(out)
+
+	response := &datafeed.GetPaginationResponse{Data: string(outputJSON)}
+
+	return response, nil
+}
+
+func (datafeedServer *DatafeedServer) GetNodeClientId(ctx context.Context, req *datafeed.GetPaginationRequest) (*datafeed.GetPaginationResponse, error) {
+
+	out := map[string]interface{}{}
+	// data := datafeedServer.paginationData.Data
+	out["offset"] = req.GetOffset()
+	out["size"] = req.GetSize()
+	// res := pagination.GetCompliance()
+	outputJSON, _ := json.Marshal(out)
+	response := &datafeed.GetPaginationResponse{Data: string(outputJSON)}
+
+	return response, nil
+}
+
 
 func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, request *datafeed.URLValidationRequest) (*datafeed.TestDestinationResponse, error) {
 	response := &datafeed.TestDestinationResponse{Success: false}

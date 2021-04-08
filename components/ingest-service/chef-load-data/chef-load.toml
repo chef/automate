@@ -12,5 +12,5 @@ compliance_status_json_file = "./components/compliance-service/chef-load-data/co
 # interval = 30
 node_name_prefix = "chef-load"
 random_data = true
-
+replace_ip_address = "55.37.254.178"
 

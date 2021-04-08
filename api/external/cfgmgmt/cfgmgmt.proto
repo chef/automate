@@ -10,12 +10,16 @@ import "external/cfgmgmt/request/rollouts.proto";
 import "external/cfgmgmt/request/stats.proto";
 import "external/cfgmgmt/request/errors.proto";
 import "external/cfgmgmt/request/root.proto";
+import "external/cfgmgmt/request/datafeed.proto";
+
 
 import "external/cfgmgmt/response/actions.proto";
 import "external/cfgmgmt/response/nodes.proto";
 import "external/cfgmgmt/response/rollouts.proto";
 import "external/cfgmgmt/response/stats.proto";
 import "external/cfgmgmt/response/errors.proto";
+import "external/cfgmgmt/response/datafeed.proto";
+
 
 import "external/common/query/parameters.proto";
 import "external/common/version/version.proto";
@@ -28,25 +32,16 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 
 service ConfigMgmt {
-  /*
-  List Checked-in Nodes
 
-  Returns a list of infra nodes that have checked in to Automate.
-  Adding a filter makes a list of all nodes that meet the filter criteria.
-  Filters for the same field are ORd together, while filters across different fields are ANDed together.
-  Supports pagination, filtering (with wildcard support), and sorting.
-	Limited to 10k results.
+  rpc FetchClientRundata(cfgmgmt.request.GetPaginationRequest) returns (cfgmgmt.response.GetPaginationResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/cfgmgmt/clientrun"
+      body: "*"
+    };
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
 
-  Example:
-  ```
-  cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
-  ```
-
-	Authorization Action:
-	```
-	infra:nodes:list
-	```
-	*/
   rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/api/v0/cfgmgmt/nodes";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
@@ -246,7 +241,7 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "hidden";
+			tags: "hidden"
 		};
   };
 

@@ -205,6 +205,82 @@ func init() {
           "DatafeedService"
         ]
       }
+    },
+    "/api/v0/datafeed/getPaginationCompliance/{offset}/{size}": {
+      "get": {
+        "operationId": "DatafeedService_GetCompliance",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetPaginationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
+    "/api/v0/datafeed/getPaginationNodeClientId/{offset}/{size}": {
+      "get": {
+        "operationId": "DatafeedService_GetNodeClientId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetPaginationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "size",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "DatafeedService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -276,6 +352,14 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.GetPaginationResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
           "type": "string"
         }
       }

@@ -80,6 +80,26 @@ func (mr *MockCfgMgmtServiceClientMockRecorder) CreateRolloutTest(arg0, arg1 int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServiceClient)(nil).CreateRolloutTest), varargs...)
 }
 
+// FetchClientRundata mocks base method
+func (m *MockCfgMgmtServiceClient) FetchClientRundata(arg0 context.Context, arg1 *request0.GetPaginationRequest, arg2 ...grpc.CallOption) (*response0.GetPaginationResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FetchClientRundata", varargs...)
+	ret0, _ := ret[0].(*response0.GetPaginationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchClientRundata indicates an expected call of FetchClientRundata
+func (mr *MockCfgMgmtServiceClientMockRecorder) FetchClientRundata(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchClientRundata", reflect.TypeOf((*MockCfgMgmtServiceClient)(nil).FetchClientRundata), varargs...)
+}
+
 // GetAttributes mocks base method
 func (m *MockCfgMgmtServiceClient) GetAttributes(arg0 context.Context, arg1 *request0.Node, arg2 ...grpc.CallOption) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
@@ -857,6 +877,21 @@ func (m *MockCfgMgmtServiceServer) CreateRolloutTest(arg0 context.Context, arg1 
 func (mr *MockCfgMgmtServiceServerMockRecorder) CreateRolloutTest(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRolloutTest", reflect.TypeOf((*MockCfgMgmtServiceServer)(nil).CreateRolloutTest), arg0, arg1)
+}
+
+// FetchClientRundata mocks base method
+func (m *MockCfgMgmtServiceServer) FetchClientRundata(arg0 context.Context, arg1 *request0.GetPaginationRequest) (*response0.GetPaginationResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchClientRundata", arg0, arg1)
+	ret0, _ := ret[0].(*response0.GetPaginationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchClientRundata indicates an expected call of FetchClientRundata
+func (mr *MockCfgMgmtServiceServerMockRecorder) FetchClientRundata(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchClientRundata", reflect.TypeOf((*MockCfgMgmtServiceServer)(nil).FetchClientRundata), arg0, arg1)
 }
 
 // GetAttributes mocks base method

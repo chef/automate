@@ -43,6 +43,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		err = service.Start(cfg, connFactory, db)
+
 		if err != nil {
 			return errors.Wrap(err, "failed to start service")
 		}

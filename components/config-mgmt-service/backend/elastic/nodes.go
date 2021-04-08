@@ -54,7 +54,7 @@ func (es Backend) NodeExists(nodeID string, filters map[string][]string) (bool, 
 func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	end time.Time, filters map[string][]string, cursorDate time.Time,
 	cursorID string, pageSize int, _ string,
-	ascending bool) ([]backend.InventoryNode, error) {
+	ascending bool, from int) ([]backend.InventoryNode, error) {
 
 	mainQuery := newBoolQueryFromFilters(filters)
 
@@ -69,6 +69,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	searchService := es.client.Search().
 		Query(mainQuery).
 		Index(IndexNodeState).
+		From(from).
 		Size(pageSize).
 		Sort(backend.CheckIn, ascending).
 		Sort(NodeFieldID, ascending).

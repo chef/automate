@@ -230,6 +230,38 @@ func init() {
         ]
       }
     },
+    "/api/v0/cfgmgmt/clientrun": {
+      "post": {
+        "operationId": "ConfigMgmt_FetchClientRundata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.GetPaginationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.GetPaginationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/errors": {
       "get": {
         "summary": "List Errors",
@@ -380,8 +412,6 @@ func init() {
     },
     "/api/v0/cfgmgmt/nodes": {
       "get": {
-        "summary": "List Checked-in Nodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ConfigMgmt_GetNodes",
         "responses": {
           "200": {
@@ -1035,6 +1065,31 @@ func init() {
     "chef.automate.api.cfgmgmt.request.CreateRolloutTest": {
       "type": "object"
     },
+    "chef.automate.api.cfgmgmt.request.GetPaginationRequest": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "feedStart": {
+          "type": "string"
+        },
+        "feedEnd": {
+          "type": "string"
+        },
+        "attribute": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.request.SCMType": {
       "type": "string",
       "enum": [
@@ -1241,6 +1296,18 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           },
           "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.GetPaginationResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "Total": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

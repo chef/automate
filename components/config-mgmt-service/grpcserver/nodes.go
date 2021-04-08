@@ -98,6 +98,7 @@ func (s *CfgMgmtServer) GetRuns(
 func (s *CfgMgmtServer) GetInventoryNodes(ctx context.Context,
 	request *pRequest.InventoryNodes) (*interserviceResp.InventoryNodes, error) {
 	pageSize := int(request.PageSize)
+	from := int(request.From)
 
 	// default the page size to 100
 	if pageSize == 0 {
@@ -129,7 +130,7 @@ func (s *CfgMgmtServer) GetInventoryNodes(ctx context.Context,
 	sortField, sortAsc := request.GetSorting().GetParameters()
 
 	bNodes, err := s.client.GetInventoryNodes(ctx, start, end,
-		filters, cursorDate, request.CursorId, pageSize, sortField, sortAsc)
+		filters, cursorDate, request.CursorId, pageSize, sortField, sortAsc, from)
 	if err != nil {
 		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.Internal, err.Error())
 	}

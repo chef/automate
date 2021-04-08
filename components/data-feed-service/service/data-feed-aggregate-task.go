@@ -127,7 +127,7 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 		if err != nil {
 			log.Warnf("Error getting node data %v", err)
 		}
-
+		log.Debugf("d: ", d, ", resourceId: ", resourceId, ", nodeID: ", nodeID, ",, updatedNodesOnly: ", updatedNodesOnly)
 		report, err := d.getNodeComplianceData(ctx, resourceId, nodeID, updatedNodesOnly)
 		if err != nil {
 			log.Warnf("Error getting compliance data %v", err)
