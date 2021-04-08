@@ -144,6 +144,64 @@ The Chef Infra Server lets you delete environments one at a time. Select **Delet
 
 [Data bags]({{< relref "data_bags" >}}) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
 
+Chef Infra Server UI lets you:
+
+- Create a data bag.
+- List out all the data bags in one place.
+- Create a data bag item.
+- Search for a specific data bag item from a list of items.
+- Edit a data bag item.
+- Delete a data bag item.
+- Delete a data bag.
+
+#### Create a Data Bag
+
+To create a new data bag, select **Create Data Bag**, as shown below:
+
+{{< figure src="/images/automate/create-data-bag-button.png" alt="Create Data Bag Button">}}
+
+Selecting the **Create Data Bag** button opens a dialog box. Enter the name and select **Create**.
+
+{{< figure src="/images/automate/create-data-bag-popup.png" alt="Create Data Bag Dialog Box">}}
+
+#### Create a data Bag Item
+
+To create a data bag item, select the data bag created above and follow the steps given below:
+
+Select **Create Item**, as shown below:
+
+{{< figure src="/images/automate/create-data-bag-item-button.png" alt="Create Data Bag Item Button">}}
+
+Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag Item ID** and the details of the key value pairs of that particular item. Select **Create**.
+
+**{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}**
+
+#### Search for an Item
+
+Use the **Search data bag items** bar to find an item from the list of data bag items. Entering the name of an item in the search bar returns data bag items matching your search criteria.
+
+{{< figure src="/images/automate/create-data-bag-item-button.png" alt="Search Data Bag Item Bar">}}
+
+#### Edit and Delete a Data Bag Item
+
+Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **edit** or **delete** a data bag item.
+
+{{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
+
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
+
+{{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
+
+Whereas, to delete a data bag item, select **Delete**. In the dialog box displayed, select **Delete** to delete the data bag item.
+
+{{< figure src="/images/automate/delete-data-bag-item.png" alt="Delete a Data Bag Item">}}
+
+#### Delete a Data Bag
+
+Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon and then **Delete**, as illustrated below:
+
+{{< figure src="/images/automate/delete-a-data-bag.png" alt="Delete a Data Bag">}}
+
 ### Clients
 
 Chef Infra Clients provide secure API access to the Chef Infra Server. Chef Infra Server UI lets you:
