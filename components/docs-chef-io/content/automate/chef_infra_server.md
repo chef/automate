@@ -148,8 +148,8 @@ Chef Infra Server UI lets you:
 
 - Create a data bag.
 - List out all the data bags in one place.
-- Search for a specific data bag item from a list of items.
 - Create a data bag item.
+- Search for a specific data bag item from a list of items.
 - Edit a data bag item.
 - Delete a data bag item.
 - Delete a data bag.
@@ -164,18 +164,17 @@ Selecting the **Create Data Bag** button opens a dialog box. Enter the name and 
 
 {{< figure src="/images/automate/create-data-bag-popup.png" alt="Create Data Bag Dialog Box">}}
 
-#### Create a Data Bag Item
+#### Create a data Bag Item
 
-To create a data bag item, select an existing data bag from the list of data bags and follow the steps given below:
+To create a data bag item, select the data bag created above and follow the steps given below:
 
-- Select **Create Item**to open the **Create Data Bag Item** dialog box.
+Select **Create Item**, as shown below:
 
 {{< figure src="/images/automate/create-data-bag-item-button.png" alt="Create Data Bag Item Button">}}
 
-- Enter the **Data Bag Item ID**.
-- Enter the Data Bag Item properties as key value pairs. Select **Create**.
+Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag Item ID** and the details of the key value pairs of that particular item. Select **Create**.
 
-{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}
+**{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}**
 
 #### Search for an Item
 
@@ -183,23 +182,17 @@ Use the **Search data bag items** bar to find an item from the list of data bag 
 
 {{< figure src="/images/automate/create-data-bag-item-button.png" alt="Search Data Bag Item Bar">}}
 
-#### Edit a Data Bag Item
+#### Edit and Delete a Data Bag Item
 
-Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **edit** a data bag item.
+Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **edit** or **delete** a data bag item.
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
-To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the properties for the specific data bag item. Once done, Select **Save Item**.
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
 
 {{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
 
-#### Delete a Data Bag Item
-
-Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
-
-{{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
-
-To delete a data bag item, select **Delete**. In the dialog box displayed, select **Delete** to delete the data bag item.
+Whereas, to delete a data bag item, select **Delete**. In the dialog box displayed, select **Delete** to delete the data bag item.
 
 {{< figure src="/images/automate/delete-data-bag-item.png" alt="Delete a Data Bag Item">}}
 
