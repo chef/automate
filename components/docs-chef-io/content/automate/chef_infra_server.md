@@ -117,9 +117,13 @@ Select a role to view the details of that particular role.
 
 // Image
 
-**Run List:**
+**Run List:** The run list contains the *name*, *version* and *type* of that particular role.
 
-**Attributes:**
+// Image
+
+**Attributes:** The attributes tab displays the *default* and the *override* attributes of the role.
+
+// Image
 
 #### Delete a Role
 
