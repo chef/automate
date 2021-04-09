@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -226,7 +227,13 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
-	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], RunListCache{})
+	// Fetches cookbooks to evaluate recipes version.
+	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], cookbooks, RunListCache{})
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -348,7 +355,7 @@ func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	return nil
 }
 
-func toResponseExpandedRunList(client *ChefClient, runlist []string, runlistCache RunListCache) ([]*response.RunList, error) {
+func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
 	resRunList := make([]*response.RunList, len(runlist))
 	var pos int32
 	for i, item := range runlist {
@@ -365,11 +372,20 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, runlistCach
 			newRunList.Skipped = true
 		} else {
 			if newItem.IsRecipe() {
-				newRunList.Version = newItem.Version
 				newRunList.Position = pos
 				pos++
 			}
 			runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+		}
+
+		if newItem.IsRecipe() {
+			newRunList.Version = newItem.Version
+			if newRunList.Version == "" {
+				cookbookVersion := cookbooks[strings.Split(newItem.Name, "::")[0]]
+				if len(cookbookVersion.Versions) > 0 {
+					newRunList.Version = cookbookVersion.Versions[0].Version
+				}
+			}
 		}
 
 		if newItem.IsRole() {
@@ -378,7 +394,7 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, runlistCach
 			if err != nil {
 				newRunList.Error = chefError.StatusMsg()
 			} else {
-				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList, runlistCache)
+				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
 				if err != nil {
 					newRunList.Error = err.Error()
 				}
