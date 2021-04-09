@@ -139,13 +139,11 @@ export class CookbookDetailsComponent implements OnInit, OnDestroy {
         this.menuList = CollapsibleListMapper.transform(cookbookDetailsState, this.listItem);
         if (this.menuList.length) {
           // check submenu exists and show default item details
-          for (const menu of this.menuList) {
-            if ( menu.subMenu.length ) {
-              this.defaultContent = menu.subMenu[0];
-              this.getContent(this.defaultContent);
-              this.menuIndex = this.menuList.indexOf(menu);
-              break;
-            }
+          const menus = this.menuList.filter(menu => menu.subMenu.length);
+          if ( menus.length ) {
+            this.defaultContent = menus[0].subMenu[0];
+            this.getContent(this.defaultContent);
+            this.menuIndex = this.menuList.indexOf(menus[0]);
           }
 
           if ( this.menuList[0].subMenu.length ) {
