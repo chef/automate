@@ -46,4 +46,20 @@
     <app-process-progress-bar></app-process-progress-bar>
     <app-pending-edits-bar></app-pending-edits-bar>
   </div>
+
+  <!-- TEMP FOR TIME SELECTION DEMO -->
+  <div class="time-test" [class.active]="showTime">
+    <button (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
+    <h3>Current Time:</h3>
+    <p>{{ currentTime | datetime: (userPrefsService.timezone$ | async)?.value : 'ddd, DD MMM YYYY HH:mm z'}}</p>
+    <div class="hacky-line-break"></div>
+    <chef-form-field class="timezone-field">
+      <label for="timezone">Time Zone</label>
+      <chef-select #tz [value]="(userPrefsService.timezone$ | async)?.value" (change)="updateTime(tz.value)">
+        <chef-option value="UTC">UTC</chef-option>
+        <chef-option value="Asia/Taipei">Asia/Taipei</chef-option>
+        <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
+      </chef-select>
+    </chef-form-field>
+  </div>
 </div>
