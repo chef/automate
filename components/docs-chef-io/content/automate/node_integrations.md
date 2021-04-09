@@ -66,7 +66,7 @@ Scan Jobs
 The service makes calls to these APIs:
 
 * `STS-GetCallerIdentity`
-* `SEC2-DescribeRegions`
+* `EC2-DescribeRegions`
 * `IAM-ListAccountAliases`
 * `IAM-GetAccountSummary`
 * `IAM-ListUsers`

@@ -9,8 +9,16 @@ import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 
 import "google/protobuf/wrappers.proto";
 
+enum Environment {
+	UNKNOWN = 0;
+	DEV = 1;
+	TEST = 2;
+	STAGE = 3;
+	PROD = 4;
+}
+
 message ConfigRequest {
-  option (chef.automate.api.service_config) = {name: "automate-dex"};
+	option (chef.automate.api.service_config) = {name: "automate-dex"};
 
 	reserved 1 to 2;
 
@@ -30,11 +38,19 @@ message ConfigRequest {
 			Bootstrap bootstrap = 7;
 			Connectors connectors = 8;
 			chef.automate.infra.config.TLSCredentials tls = 9;
+			LoginBanner login_banner = 10;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10116, protocol: "https" } ];
 				google.protobuf.StringValue external_fqdn = 3;
+				google.protobuf.StringValue environment = 4;
+				Environment enum_environment = 5;
+			}
+
+			message LoginBanner {
+				google.protobuf.BoolValue show = 1;
+				google.protobuf.StringValue message_file_path = 2;
 			}
 		}
 

@@ -4,6 +4,19 @@ require 'vagrant-aws'
 require 'resolv'
 require 'mkmf'
 
+#Undefined HashMap method except with Vagrant 2.2.7
+# work around was found here: https://github.com/mitchellh/vagrant-aws/issues/566#issuecomment-580812210
+class Hash
+  def slice(*keep_keys)
+    h = {}
+    keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+    h
+  end unless Hash.method_defined?(:slice)
+  def except(*less_keys)
+    slice(*keys - less_keys)
+  end unless Hash.method_defined?(:except)
+end
+
 home_dir="/home/ubuntu"
 current_branch=`git rev-parse --abbrev-ref HEAD`
 latest_head_commit=`git rev-parse HEAD`
