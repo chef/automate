@@ -50,10 +50,17 @@
   transition: transform .25s;
 
   &.active {
+<<<<<<< HEAD
     transform: translateY(0);
   }
 
   .show-button {
+=======
+   transform: translateY(0); 
+  }
+
+  button {
+>>>>>>> Add temp timechanger that sits on top of ui
     position: absolute;
     top: 2.5%;
     right: 2.5%;
