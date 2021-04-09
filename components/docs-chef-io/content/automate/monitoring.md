@@ -60,7 +60,7 @@ To use `/status`, set up an authentication token for use with your monitoring sy
 3. Test that your token and policy give you access to the `/status` endpoint by running the following command:
 
     ```bash
-    curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/status?pretty
+    curl -k -H "api-token: <monitoring-token>" https://automate.example.com/api/v0/status?pretty
     ```
 
    The output appears in the following JSON format:
