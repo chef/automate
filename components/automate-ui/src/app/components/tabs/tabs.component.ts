@@ -11,7 +11,7 @@ export class TabsComponent {
     @Output() tabChange: EventEmitter<number> = new EventEmitter<number>();
 
     @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
-    betaTabs = ['Policyfiles', 'Details', 'Reset Admin Key'];
+    betaTabs = ['Policyfiles', 'Details'];
 
 
     selectTab(tab: TabComponent) {

@@ -48,7 +48,7 @@
           <app-tab *ngIf="chefInfraViewsFeatureFlagOn" tabTitle="Details" #details_tab [active]="false">
             <app-org-edit *ngIf="details_tab.active" [serverId]="serverId" [orgId]="orgId"></app-org-edit> 
           </app-tab>
-          <app-tab *ngIf="chefInfraViewsFeatureFlagOn" tabTitle="Reset Admin Key" #resetkey_tab [active]="resetKeyTab">
+          <app-tab tabTitle="Reset Admin Key" #resetkey_tab [active]="resetKeyTab">
             <app-reset-admin-key *ngIf="resetkey_tab.active" [serverId]="serverId" [orgId]="orgId"></app-reset-admin-key>
           </app-tab>
         </app-tabs>

@@ -5,8 +5,15 @@
         <chef-form-field>
           <label>
             <span class="label">New Admin Key <span aria-hidden="true">*</span></span>
-            <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
-            formControlName="admin_key" data-cy="update-org-admin-key"></textarea>
+            <textarea
+              chefInput
+              name="admin_key"
+              formControlName="admin_key"
+              cols="54"
+              rows="10"
+              placeholder="-----BEGIN RSA PRIVATE KEY -----"
+              data-cy="reset-admin-key"
+              autofocus></textarea>
           </label>
           <chef-error
             *ngIf="(resetKeyForm.get('admin_key').hasError('required') || resetKeyForm.get('admin_key').hasError('pattern')) && resetKeyForm.get('admin_key').dirty">
@@ -15,7 +22,7 @@
         </chef-form-field>
         <chef-form-field>
           <div id="button-bar">
-            <chef-button [disabled]="isLoading || !resetKeyForm.valid || !resetKeyForm.dirty" primary
+            <chef-button [disabled]="isLoading || !resetKeyForm.valid" primary
             inline (click)="saveNewKey()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>

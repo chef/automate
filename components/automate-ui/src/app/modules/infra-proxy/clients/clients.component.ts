@@ -50,18 +50,17 @@ export class ClientsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(clientList)
-    ]).pipe(
-      filter(([getClientsStatus, allClientsState]) =>
-        getClientsStatus === EntityStatus.loadingSuccess &&
-        !isNil(allClientsState)),
-      takeUntil(this.isDestroyed))
-    .subscribe(([_getClientsSt, ClientsState]) => {
-      if (!isNil(ClientsState)) {
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([getClientsSt, ClientsState]) => {
+      if (getClientsSt === EntityStatus.loadingSuccess && !isNil(ClientsState)) {
         this.clientListState = ClientsState;
         this.clients = ClientsState?.items;
         this.total = ClientsState?.total;
         this.clientsListLoading = false;
         this.searching = false;
+      } else if (getClientsSt === EntityStatus.loadingFailure) {
+        this.clientsListLoading = false;
+        this.authFailure = true;
       }
     });
 
