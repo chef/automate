@@ -33,3 +33,48 @@
 [hidden] {
   display: none !important; // sass-lint:disable-line no-important
 }
+
+.time-test {
+  position: fixed;
+  padding: 10px;
+  bottom: 0;
+  left: 0;
+  height: 340px;
+  min-width: 225px;
+  background: white;
+  box-shadow: 0 0 1em 0 rgb(0 0 0 / 21%);
+  border-top-right-radius: 10px;
+  font-size: 14px;
+  z-index: 999;
+  transform: translateY(260px);
+  transition: transform .25s;
+
+  &.active {
+   transform: translateY(0); 
+  }
+
+  button {
+    position: absolute;
+    top: 2.5%;
+    right: 2.5%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform .25s;
+
+    &.active {
+      transform: rotate(180deg);
+    }
+  }
+
+  .hacky-line-break {
+    width: 90%;
+    height: 2px;
+    margin: 4px 0;
+    background: blue;
+  }
+  
+  chef-select {
+    width: 100%;
+  }
+}
