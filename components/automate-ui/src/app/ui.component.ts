@@ -9,6 +9,8 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
+import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
+import * as moment from 'moment-timezone';
 
 @Component({
   selector: 'app-ui',
@@ -34,12 +36,15 @@ export class UIComponent implements OnInit, AfterViewChecked {
 
   legacyFeatures: Array<Feature> = [];
   hideFullPage = true;
+  currentTime = moment.utc();
+  showTime = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
     public layoutFacade: LayoutFacadeService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    public userPrefsService: UserPreferencesService
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -73,5 +78,13 @@ export class UIComponent implements OnInit, AfterViewChecked {
     // Initial call
     this.store.dispatch(new GetAllUserPerms());
     this.store.dispatch(new GetUserPreferences());
+  }
+
+  updateTime(t) {
+    this.userPrefsService.testUpdateUserTimezone(t);
+  }
+
+  toggleTime() {
+    this.showTime = !this.showTime;
   }
 }
