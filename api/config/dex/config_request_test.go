@@ -581,7 +581,7 @@ func TestMSADConfig(t *testing.T) {
 		assert.Equal(t, "ou=people,dc=org", c.GetConnectors().GetMsadLdap().GetBaseUserSearchDn().GetValue())
 		assert.Equal(t, "ou=groups,dc=org", c.GetConnectors().GetMsadLdap().GetBaseGroupSearchDn().GetValue())
 
-		// Defaults are unset so that they receive overrides in config
+		// Defaults are unset so that they receive overrides in configdefau
 		assert.Equal(t, true, c.GetConnectors().GetMsadLdap().GetInsecureNoSsl().GetValue())
 		assert.Equal(t, "(objectClass=NotPerson)", c.GetConnectors().GetMsadLdap().GetUserQueryFilter().GetValue())
 		assert.Equal(t, "NotsAMAccountName", c.GetConnectors().GetMsadLdap().GetUsernameAttr().GetValue())
@@ -663,5 +663,80 @@ func TestPrepareSystemConfig(t *testing.T) {
 		isUntouched(c.GetConnectors().GetLdap().GetFilterGroupsByUserAttr())
 		isUntouched(c.GetConnectors().GetLdap().GetFilterGroupsByUserValue())
 		isUntouched(c.GetConnectors().GetLdap().GetEmailAttr())
+	})
+}
+
+func TestBanner(t *testing.T) {
+	t.Run("Banner Show should be disabled by default", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		showBanner := cfg.V1.GetSys().GetLoginBanner().GetShow().GetValue()
+		require.False(t, showBanner)
+	})
+
+	t.Run("Banner Message needs to passed if enabled", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.LoginBanner = &dex.ConfigRequest_V1_System_LoginBanner{
+			Show: w.Bool(true),
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err, "Failed to set System Configs")
+		require.NotNil(t, sys)
+
+		require.Error(t, cfg.Validate())
+	})
+
+	t.Run("Banner Message Path should be valid", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.LoginBanner = &dex.ConfigRequest_V1_System_LoginBanner{
+			Show:            w.Bool(true),
+			MessageFilePath: w.String(""),
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err, "Failed to set System Configs")
+		require.NotNil(t, sys)
+
+		require.Error(t, cfg.Validate())
+	})
+
+	t.Run("Banner Message Path should take an existing file path", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.LoginBanner = &dex.ConfigRequest_V1_System_LoginBanner{
+			Show:            w.Bool(true),
+			MessageFilePath: w.String("./config_request.go"),
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err, "Failed to set System Configs")
+		require.NotNil(t, sys)
+
+		require.NoError(t, cfg.Validate())
+	})
+}
+
+func TestEnvironment(t *testing.T) {
+	t.Run("Default environment should be UNKNOWN", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment().String(), "UNKNOWN")
+	})
+
+	t.Run("Environment should be set from config", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Service.Environment = w.String(" dev ")
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err, "Failed to set System Configs")
+		require.NotNil(t, sys)
+
+		require.NoError(t, cfg.Validate())
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_DEV)
+	})
+
+	t.Run("Environment set from config not in the Enum environments should set it the environment as UNKNOWN", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Service.Environment = w.String("Acceptance")
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err, "Failed to set System Configs")
+		require.NotNil(t, sys)
+
+		require.NoError(t, cfg.Validate())
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_UNKNOWN)
 	})
 }
