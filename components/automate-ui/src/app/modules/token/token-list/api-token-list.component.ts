@@ -50,7 +50,8 @@ import { userPreferencesTimezone } from 'app/services/user-preferences/user-pref
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
-  styleUrls: ['./api-token-list.component.scss']
+  styleUrls: ['./api-token-list.component.scss'],
+  animations: [ myAnim ]
 })
 export class ApiTokenListComponent implements OnInit, OnDestroy {
   public sortedApiTokens$: Observable<ApiToken[]>;
