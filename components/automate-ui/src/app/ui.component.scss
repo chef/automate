@@ -53,7 +53,7 @@
    transform: translateY(0); 
   }
 
-  button {
+  .show-button {
     position: absolute;
     top: 2.5%;
     right: 2.5%;
@@ -77,4 +77,29 @@
   chef-select {
     width: 100%;
   }
+
+    .button-container {
+      margin-top: 16px;
+
+      .test-get {
+      padding: 8px 10px;
+      width: 100%;
+      outline: none;
+      border-radius: 0;
+      background: #8aefa5;
+      border: none;
+      border-bottom: 3px solid #228850;
+      cursor: pointer;
+      transition: box-shadow .5s;
+
+      &:hover {
+        box-shadow: 0 4px 10px 0 rgb(0 0 0 / 20%);
+      }
+
+      &:active {
+        background: #37ab40;
+      }
+    }
+  }
+
 }

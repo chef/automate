@@ -49,7 +49,7 @@
 
   <!-- TEMP FOR TIME SELECTION DEMO -->
   <div class="time-test" [class.active]="showTime">
-    <button (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
+    <button class="show-button" (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
     <h3>Current Time:</h3>
     <p>{{ currentTime | datetime: (userPrefsService.timezone$ | async)?.value : 'ddd, DD MMM YYYY HH:mm z'}}</p>
     <div class="hacky-line-break"></div>
@@ -61,5 +61,8 @@
         <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
       </chef-select>
     </chef-form-field>
+    <div class="button-container">
+      <button class="test-get" (click)="handleGetPrefs()">Test Get Timezone</button>
+    </div>
   </div>
 </div>
