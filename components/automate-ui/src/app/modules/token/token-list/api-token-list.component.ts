@@ -33,6 +33,14 @@ import { stringToMember } from 'app/entities/policies/policy.model';
 // import {
   // userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { trigger, transition, animate, style } from '@angular/animations';
+
+const myAnim = trigger('myAnim', [
+  transition('* => *', [
+    animate('.2s ease-out', style({ transform: 'scale(1.02)', color: 'blue' })),
+    animate('.2s ease-in', style({ transform: 'scale(1)' }))
+  ])
+]);
 
 import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 
@@ -42,7 +50,8 @@ import { userPreferencesTimezone } from 'app/services/user-preferences/user-pref
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
-  styleUrls: ['./api-token-list.component.scss']
+  styleUrls: ['./api-token-list.component.scss'],
+  animations: [ myAnim ]
 })
 export class ApiTokenListComponent implements OnInit, OnDestroy {
   public sortedApiTokens$: Observable<ApiToken[]>;
