@@ -25,6 +25,8 @@ type RoleListResult struct {
 
 type RunListCache map[string]map[string]bool
 
+var runlistCache = RunListCache{}
+
 // CreateRole creates the role
 func (s *Server) CreateRole(ctx context.Context, req *request.CreateRole) (*response.Role, error) {
 	err := validation.New(validation.Options{
@@ -233,7 +235,7 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
-	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], cookbooks, RunListCache{})
+	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], cookbooks, runlistCache)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -368,16 +370,6 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks c
 			Name: newItem.Name,
 		}
 
-		if runlistCache[newItem.Type][newItem.Name] {
-			newRunList.Skipped = true
-		} else {
-			if newItem.IsRecipe() {
-				newRunList.Position = pos
-				pos++
-			}
-			runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
-		}
-
 		if newItem.IsRecipe() {
 			newRunList.Version = newItem.Version
 			if newRunList.Version == "" {
@@ -389,17 +381,38 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks c
 		}
 
 		if newItem.IsRole() {
-			currentRole, err := client.client.Roles.Get(newItem.Name)
-			chefError, _ := chef.ChefError(err)
-			if err != nil {
+			newRunList.Position = -1 // Ignore the position for a role.
+			currentRole, err1 := client.client.Roles.Get(newItem.Name)
+			chefError, _ := chef.ChefError(err1)
+			if chefError != nil {
 				newRunList.Error = chefError.StatusMsg()
 			} else {
-				newRunList.Children, err = toResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
-				if err != nil {
-					newRunList.Error = err.Error()
+				if !runlistCache[newItem.Type][newItem.Name] {
+					children, err := toResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
+					newRunList.Children = children
+					if err != nil {
+						newRunList.Error = err.Error()
+					}
 				}
 			}
 		}
+
+		if runlistCache[newItem.Type][newItem.Name] {
+			newRunList.Skipped = true
+		} else {
+			if newItem.IsRecipe() {
+				newRunList.Position = pos
+				pos++
+			}
+
+			if runlistCache[newItem.Type] != nil {
+				runlistCache[newItem.Type][newItem.Name] = true
+			} else {
+				runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+			}
+
+		}
+
 		resRunList[i] = &newRunList
 	}
 
