@@ -1,5 +1,5 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 slot="title">Add Chef Server </h2>
+  <h2 slot="title">Add Chef Infra Server </h2>
   <div class="flex-container">
     <form [formGroup]="createForm">
       <div class="input-margin">
@@ -114,8 +114,8 @@
           id="create-button-object-modal"
           (click)="createChefServer()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-          <span *ngIf="!creating">Add Chef Server</span>
-          <span *ngIf="creating">Adding Chef Server ...</span>
+          <span *ngIf="!creating">Add Chef Infra Server</span>
+          <span *ngIf="creating">Adding Chef Infra Server ...</span>
         </chef-button>
       </div>
     </form>
