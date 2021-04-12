@@ -8,7 +8,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { By } from '@angular/platform-browser';
-import {  GetRolesSuccess } from 'app/entities/infra-roles/infra-role.action';
+import { GetRolesSuccess } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 
 describe('InfraRolesComponent', () => {
@@ -21,10 +21,10 @@ describe('InfraRolesComponent', () => {
       declarations: [
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         MockComponent({ selector: 'app-create-infra-role-modal',
-        inputs: ['openEvent', 'rolesList', 'serverId', 'orgId', 'currentPage'] }),
+          inputs: ['openEvent', 'rolesList', 'serverId', 'orgId', 'currentPage'] }),
         MockComponent({ selector: 'app-delete-infra-object-modal',
-        inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
-        outputs: ['close', 'deleteClicked'] }),
+          inputs: ['visible', 'objectNoun', 'objectAction', 'custom', 'objectName'],
+          outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -79,10 +79,8 @@ describe('InfraRolesComponent', () => {
       chef_type: 'environment',
       default_attributes: 'test',
       override_attributes:  'test',
-      run_list: [],
-      expanded_run_list: []
-    }
-    ];
+      run_list: []
+    }];
     const emptyRoles: InfraRole[] = [];
 
     beforeEach(() => {

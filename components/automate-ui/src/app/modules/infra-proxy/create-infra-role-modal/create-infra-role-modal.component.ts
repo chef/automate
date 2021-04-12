@@ -7,33 +7,28 @@ import {
 } from '@angular/core';
 import { Subject, combineLatest } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { GetRecipes } from 'app/entities/recipes/recipe.action';
-import {
-  allRecipes,
-  getAllStatus as getAllRecipesForOrgStatus
-} from 'app/entities/recipes/recipe.selectors';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { takeUntil, filter } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
-import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
-import { CreateRole, GetRoles, RolesPayload, CreateRolePayload } from 'app/entities/infra-roles/infra-role.action';
+import {
+  CreateRole,
+  GetRoles,
+  RolesPayload,
+  CreateRolePayload
+} from 'app/entities/infra-roles/infra-role.action';
 import {
   saveStatus,
   saveError
 } from 'app/entities/infra-roles/infra-role.selectors';
 import { isNil } from 'lodash/fp';
-
 import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { AvailableType } from '../infra-roles/infra-roles.component';
 
 const CREATE_TAB_NAME = 'roleTab';
-export interface AvailableType {
-  name: string;
-  type: 'role' | 'recipe';
-}
 
 @Component({
   selector: 'app-create-infra-role-modal',
@@ -43,10 +38,10 @@ export interface AvailableType {
 
 export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<void>;
-  @Input() rolesList: InfraRole[] = [];
   @Input() serverId: string;
   @Input() orgId: string;
   @Input() currentPage: number;
+  @Input() availablelist: AvailableType[];
 
   public constraintsTab = false;
   public conflictError = false;
@@ -54,21 +49,18 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   public defaultAttrParseError = false;
   public defaultTab = false;
   public detailsTab = true;
-  public nameExist = false;
   public overrideAttrParseError = false;
   public overrideTab = false;
   public showdrag = false;
   public visible = false;
-
   public attr_value = '{}';
+  public page = 1;
   public per_page = 9;
   public org: string;
   public recipes: string[] = [];
-  public selected: ListItem[] = [];
   public selectedRunList: string[] = [];
   public server: string;
-  public total: number;
-
+  public currentRunList: ListItem[] = [];
   public close = new EventEmitter();
   public conflictErrorEvent = new EventEmitter<boolean>();
   public detailsFormGroup: FormGroup;
@@ -81,16 +73,13 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private telemetryService: TelemetryService
   ) {
-
     this.detailsFormGroup = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
-
     this.defaultAttrFormGroup = this.fb.group({
       default: ['{}']
     });
-
     this.overrideAttrFormGroup = this.fb.group({
       override: ['{}', [Validators.required]]
     });
@@ -101,9 +90,9 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.conflictError = false;
         this.visible = true;
-        this.showdrag = true;
         this.server = this.serverId;
         this.org = this.orgId;
+        this.showdrag = true;
     });
 
     const payload: RolesPayload = {
@@ -113,9 +102,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       page: this.currentPage,
       per_page: this.per_page
     };
-
-    this.loadRecipes();
-
     this.store.select(saveStatus)
     .pipe(
       takeUntil(this.isDestroyed),
@@ -127,7 +113,6 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
           this.closeCreateModal();
         }
       });
-
     combineLatest([
       this.store.select(saveStatus),
       this.store.select(saveError)
@@ -138,6 +123,10 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
           this.conflictError = true;
+          this.defaultTab = false;
+          this.detailsTab = true;
+          this.constraintsTab = false;
+          this.overrideTab = false;
         } else {
           this.store.dispatch(new GetRoles(payload));
           // Close the modal on any other error because it will be displayed in the banner.
@@ -166,8 +155,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
       description: this.detailsFormGroup.controls['description'].value,
       default_attributes: JSON.parse(this.defaultAttrFormGroup.controls['default'].value),
       override_attributes: JSON.parse(this.overrideAttrFormGroup.controls['override'].value),
-      run_list: this.selectedRunList,
-      env_run_lists: []
+      run_list: this.selectedRunList
     };
     this.store.dispatch(new CreateRole({role: role}));
   }
@@ -179,32 +167,29 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleInput(event: { target: { value: string } } ): void {
-    this.nameExist = this.rolesList.some(el => el.name === event.target.value);
+  handleInput(event: KeyboardEvent): void {
+    if (this.isNavigationKey(event)) {
+      return;
+    }
+    this.conflictError = false;
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.defaultAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.defaultAttrParseError = true;
     }
   }
 
   onChangeOverrideJson(event: { target: { value: string } } ) {
-    // get value from text area
     const newValue = event.target.value;
     try {
-      // parse it to json
       JSON.parse(newValue);
       this.overrideAttrParseError = false;
     } catch (ex) {
-      // set parse error if it fails
       this.overrideAttrParseError = true;
     }
   }
@@ -236,26 +221,9 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadRecipes(): void {
-    this.store.dispatch(new GetRecipes({
-      server_id: this.serverId, org_id: this.orgId, name: '_default'
-    }));
-
-    combineLatest([
-      this.store.select(getAllRecipesForOrgStatus),
-      this.store.select(allRecipes)
-    ]).pipe(takeUntil(this.isDestroyed))
-      .subscribe(([getRecipesSt, allRecipesState]) => {
-        if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
-          this.recipes = allRecipesState;
-        }
-      });
-  }
-
-
   private resetCreateModal(): void {
     this.selectedRunList = [];
-
+    this.currentRunList = [];
     this.creating = false;
     this.defaultAttrParseError = false;
     this.defaultTab = false;
@@ -264,14 +232,11 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.overrideTab = false;
     this.overrideAttrParseError = false;
     this.showdrag = false;
-
     this.detailsFormGroup.reset();
     this.defaultAttrFormGroup.reset();
     this.overrideAttrFormGroup.reset();
-
     this.defaultAttrFormGroup.controls.default.setValue(this.attr_value);
     this.overrideAttrFormGroup.controls.override.setValue(this.attr_value);
-    this.loadRecipes();
     this.conflictErrorEvent.emit(false);
   }
 
@@ -282,4 +247,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.overrideTab = false;
   }
 
+  private isNavigationKey(event: KeyboardEvent): boolean {
+    return event.key === 'Shift' || event.key === 'Tab';
+  }
 }

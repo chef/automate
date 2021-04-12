@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="dataSource">
+<table mat-table [dataSource]="dataSource" id="runlist-table-container" >
   <div *ngFor="let column of displayedColumns; first as isFirst;">
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef [ngClass]="{'vertical-separator': options.verticalSeparator}">
@@ -6,18 +6,39 @@
           {{options.capitalizedHeader ? (column | titlecase) : column}}
         </p>
       </th>
-      <td mat-cell *matCellDef="let element" [ngClass]="{'vertical-separator': options.verticalSeparator}">
+      <td mat-cell *matCellDef="let element"
+        [ngClass]="{'vertical-separator': options.verticalSeparator,
+                    'skipped': element.value['skipped']=== true,
+                    'error': element.value['error']!== ''}">
         <div *ngIf="isFirst">
           <div class="value-cell">
             <div [class]="'child-step-'+(element.depth)"></div>
             <mat-icon [ngStyle]="{'visibility': element.children.length ? 'visible' : 'hidden'}" (click)="onNodeClick(element)">
               {{element.isExpanded ? 'remove' : 'add'}}
             </mat-icon>
-            <div [ngClass]="{'hasChildren': element.children.length}">{{element.value[column]}}</div>
+            <span *ngIf="element.value['type'] === 'role'">
+              <img alt="Available roles" src="/assets/img/briefcase.png" />
+            </span>
+            <span *ngIf="element.value['type'] === 'recipe'">
+              <img alt="Available recipes" src="/assets/img/article.png" />
+            </span>
+            <div [ngClass]="{'hasChildren': element.children.length}" id="run-list-name">{{element.value[column]}}</div>
           </div>
         </div>
         <div *ngIf="!isFirst">
-          {{element.value[column]}}
+          <div *ngIf="column === 'version'">
+            {{element.value[column]}}
+          </div>
+          <div *ngIf="column === 'position'">
+            <span *ngIf="element.value['error'] && element.value['position'] === -1" class="tooltip">
+              <mat-icon class="error-icon">error_outline</mat-icon>
+              <span class="tooltiptext">404, Object not found.</span>
+            </span>
+            <span *ngIf="!element.value['error'] && element.value['position'] !== -1">
+              {{element.value[column]}}
+            </span>
+            <span *ngIf="element.value['position'] === -1 && !element.value['error']">...</span>
+          </div>
         </div>
       </td>
     </ng-container>

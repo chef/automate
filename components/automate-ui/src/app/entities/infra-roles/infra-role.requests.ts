@@ -52,4 +52,10 @@ export class InfraRoleRequests {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/roles/${name}`,
     {headers});
   }
+
+  public updateRole(role: InfraRole): Observable<InfraRole> {
+    return this.http.put<InfraRole>(
+      `${env.infra_proxy_url}/servers/${role.server_id}/orgs/${role.org_id}/roles/${role.name}`,
+      role);
+  }
 }

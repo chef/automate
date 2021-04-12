@@ -49,17 +49,10 @@ chef-modal {
     form {
       flex-basis: 61%;
 
-      input {
-        font-size: 1em;
+      .chef-input {
+        font-size: 13px;
         height: 36px;
-        left: 398px;
-        right: 398px;
-        top: 365px;
-        border: 1px solid $chef-form-input;
-        box-sizing: border-box;
-        border-radius: 4px;
-        margin-top: 8px;
-        margin-top: 8px;
+        padding: 10px;
       }
 
       label {
@@ -72,18 +65,19 @@ chef-modal {
       }
 
       #description {
-        height: 162px;
-        left: 398px;
-        right: 398px;
-        top: 462px;
-        border: 1px solid $chef-form-input;
-        box-sizing: border-box;
-        border-radius: 4px;
+        max-width: 100%;
+        min-width: 100%;
+        min-height: 162px;
+        max-height: 162px;
         margin-top: 10px;
       }
 
       #default, #override {
         height: 286px;
+        max-height: 286px;
+        min-height: 286px;
+        max-width: 100%;
+        min-width: 100%;
       }
     }
 
@@ -96,7 +90,6 @@ chef-modal {
         top: 2px;
         margin-right: 5px;
       }
-
     }
 
     .button-bar-constraint {
@@ -110,7 +103,6 @@ chef-modal {
       }
     }
   }
-
 }
 
 .pages-body {
