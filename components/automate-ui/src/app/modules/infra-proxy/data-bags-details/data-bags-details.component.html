@@ -11,7 +11,7 @@
       </app-delete-infra-object-modal>
       <chef-loading-spinner *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
-        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Data Bags
         </chef-breadcrumb>
