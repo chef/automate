@@ -31,7 +31,6 @@
 .run-list-box {
   display: flex;
   padding: 10px 10px;
-  color: rgba(0, 0, 0, 0.87);
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -39,6 +38,13 @@
   cursor: move;
   background: $chef-white;
   font-size: 14px;
+  margin-top: 6.5px;
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-drag-preview {
+  position: relative;
+  z-index: 999999999 !important;
 }
 
 .scroll {
@@ -75,42 +81,37 @@
   text-align: center;
 }
 
-.select-box-list {
-  font-size: 14px;
-  height: 235px;
-  left: 730px;
-  right: 430px;
-  top: 389px;
-  border: 1px solid $chef-form-input;
-  box-sizing: border-box;
-  border-radius: 4px;
-}
-
-::ng-deep .scroll::-webkit-scrollbar {
-  width: 3px;
-  background-color: $chef-modal-scrollbar;
-}
-
-::ng-deep .scroll::-webkit-scrollbar-thumb {
-  border-radius: 8px;
-  background-color: $chef-modal;
-}
-
 .select-box-list-item {
   padding: 10px;
   cursor: move;
+  margin-top: 6.5px;
+  font-size: 14px;
 }
 
 .run-list-box.selected {
   margin-top: 6.5px;
-  background: rgba(56, 100, 242, 0.5);
+  background: $chef-selected-item;
+  background-blend-mode: multiply;
+  border-radius: 4px;
+}
+
+.run-list-box:hover:not(.selected) {
+  margin-top: 6.5px;
+  background: $chef-light-grey;
   background-blend-mode: multiply;
   border-radius: 4px;
 }
 
 .select-box-list-item.selected {
   margin-top: 6.5px;
-  background: rgba(56, 100, 242, 0.5);
+  background: $chef-selected-item;
+  background-blend-mode: multiply;
+  border-radius: 4px;
+}
+
+.select-box-list-item:hover:not(.selected) {
+  margin-top: 6.5px;
+  background: $chef-light-grey;
   background-blend-mode: multiply;
   border-radius: 4px;
 }
@@ -129,9 +130,10 @@
   padding: 10px;
 }
 
-.select-box-placeholder span {
-  background-color: $chef-primary-bright;
+.select-box-placeholder {
+  background-color: $chef-selected-item;
   padding: 10px;
+  font-size: 14px;
 }
 
 .selectbox-search {
@@ -156,7 +158,6 @@
 }
 
 .empty-box {
-
   float: left;
   margin-right: 10px;
   margin-left: 10px;
@@ -175,14 +176,24 @@
   padding-top: 157px;
   text-align: center;
   width: 8%;
+
+  button[disabled] {
+    img {
+      filter: opacity(0.5);
+    }
+  }
 }
 
 .up-down-arrow-box {
   float: left;
   padding-top: 157px;
-  text-align: center;
   width: 6%;
-  margin-left: 5px;
+
+  button[disabled] {
+    img {
+      filter: opacity(0.5);
+    }
+  }
 }
 
 .primary {
@@ -201,7 +212,6 @@
   text-align: center;
   white-space: nowrap;
   vertical-align: top;
-
   left: 0px;
   top: 0px;
   border: none;
@@ -211,20 +221,23 @@
   outline: none;
 }
 
+.primary:hover {
+  img {
+    filter: drop-shadow(2px 4px 6px $chef-black);
+  }
+}
+
 .input-icons {
   width: 100%;
-  width: 254px;
+  width: 260px;
   height: 32px;
-
   background: $chef-white;
   border: 1px solid $chef-light-grey;
   box-sizing: border-box;
   border-radius: 4px;
-
 }
 
 .icon {
-
   color: $chef-primary-dark;
   padding-left: 7.91px;
   padding-top: 8px;
@@ -234,21 +247,21 @@
   font-size: 16px;
 }
 
+.icon:hover {
+  color: $chef-light-grey;
+}
+
 .input-field {
   padding: 10px;
   text-align: start;
-
   width: 227px;
   height: 21px;
   left: 32px;
   top: 5px;
-
   font-size: 12px;
   line-height: 21px;
-
   letter-spacing: 0.2px;
   border: none;
-  color: #6F7878;
   margin-left: 30px;
   margin-top: 5px;
 }
@@ -256,4 +269,177 @@
 .input-icons mat-icon {
   position: absolute;
 }
- 
+
+.content {
+  height: 180px;
+  overflow: auto;
+}
+
+.spinner-item {
+  display: grid;
+  place-items: center;
+  margin-top: 50px;
+
+  chef-loading-spinner {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: auto;
+    z-index: 199;
+    background-color: $chef-white;
+    opacity: 0.7;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+::ng-deep cdk-virtual-scroll-viewport::-webkit-scrollbar {
+  width: 3px;
+  background-color: $chef-modal-scrollbar;
+}
+
+::ng-deep cdk-virtual-scroll-viewport::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: $chef-modal;
+}
+
+.run-list-container {
+  display: inline-block;
+  margin: 0 25px 0px 50;
+  max-width: 100%;
+  vertical-align: top;
+  width: 200px;
+}
+
+.run-list-box {
+  display: flex;
+  align-items: center;
+  background: $chef-white;
+  box-sizing: border-box;
+  cursor: move;
+  flex-direction: row;
+  font-size: 14px;
+  justify-content: space-between;
+  padding: 10px 10px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.run-list-box:last-child {
+  border: none;
+}
+
+.select-box {
+  width: 280px;
+}
+
+.box-margin {
+  margin-top: 8px;
+  height: 252px;
+}
+
+.heading-run-list {
+  margin-left: 337px;
+  width: 344px;
+  height: 19px;
+  left: 730px;
+  top: 362px;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: $chef-black;
+}
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 27px;
+
+  .mat-option {
+    line-height: 3em;
+    font-size: 12px;
+    height: 3em;
+    border: 1px solid $chef-key-tab;
+    height: 37px;
+  }
+}
+
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
+  flex-basis: auto;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background: $chef-white;
+  color: $chef-black;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+  line-height: 3em;
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid $chef-key-tab;
+  height: 37px;
+}
+
+::ng-deep [panelClass=chef-dropdown] {
+  height: 36px;
+  padding: 8px 12px 9px 16px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep [panelClass=chef-dropdown]:focus {
+  border-color: $chef-form-input;
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-color: $chef-white transparent transparent transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  border: 6px solid $chef-primary-bright;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: $chef-black;
+}

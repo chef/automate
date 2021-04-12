@@ -14,7 +14,10 @@ export enum RoleActionTypes {
   GET_ALL_FAILURE = 'ROLES::GET_ALL::FAILURE',
   GET = 'ROLES::GET',
   GET_SUCCESS = 'ROLES::GET::SUCCESS',
-  GET_FAILURE = 'ROLES::GET::FAILURE'
+  GET_FAILURE = 'ROLES::GET::FAILURE',
+  UPDATE            = 'ROLES::UPDATE',
+  UPDATE_SUCCESS    = 'ROLES::UPDATE::SUCCESS',
+  UPDATE_FAILURE    = 'ROLES::UPDATE::FAILURE'
 }
 
 export interface RolesSuccessPayload {
@@ -35,10 +38,9 @@ export interface CreateRolePayload {
   server_id: string;
   name: string;
   description: string;
-  default_attributes: Object ;
-  override_attributes: Object ;
+  default_attributes: string;
+  override_attributes: string;
   run_list: string[];
-  env_run_lists: Object;
 }
 
 export class CreateRole implements Action {
@@ -101,6 +103,21 @@ export class GetRoleFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class UpdateRole implements Action {
+  readonly type = RoleActionTypes.UPDATE;
+  constructor(public payload: InfraRole ) { }
+}
+
+export class UpdateRoleSuccess implements Action {
+  readonly type = RoleActionTypes.UPDATE_SUCCESS;
+  constructor(public payload: InfraRole) { }
+}
+
+export class UpdateRoleFailure implements Action {
+  readonly type = RoleActionTypes.UPDATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type RoleActions =
   | CreateRole
   | CreateRoleSuccess
@@ -113,4 +130,7 @@ export type RoleActions =
   | GetRolesFailure
   | GetRole
   | GetRoleSuccess
-  | GetRoleFailure;
+  | GetRoleFailure
+  | UpdateRole
+  | UpdateRoleSuccess
+  | UpdateRoleFailure;

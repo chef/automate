@@ -1,3 +1,5 @@
+@import "~styles/variables";
+
 table {
   width: 100%;
 }
@@ -12,17 +14,35 @@ mat-icon {
 }
 
 .highlight-on-hover:hover {
-  background-color: #F0F0F5;
+  background-color: $chef-light-grey-3;
 }
 
-td[class*=' mat-column'] {
-  width: 10vw;
-  min-width: 10vw;
-  max-width: 10vw;
+.skipped {
+  color: $chef-gray-skipped;
+
+  img {
+    filter: opacity(0.5);
+  }
 }
 
-.mat-cell, .mat-header-cell {
-  padding: 10px;
+tr.mat-row {
+  height: 19px;
+}
+
+.error {
+  background-color: $chef-pink-error;
+}
+
+td.mat-cell:first-of-type {
+  padding-left: 16px;
+}
+
+td.mat-cell:last-of-type {
+  padding-right: 0px;
+}
+
+th.mat-header-cell:last-of-type, td.mat-cell:last-of-type, td.mat-footer-cell:last-of-type {
+  padding-right: 0px;
 }
 
 td div {
@@ -51,16 +71,17 @@ th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
 th.mat-header-cell {
   font-size: 14px;
   font-weight: 600;
-  color: #222435;
+  color: $chef-primary-dark;
+}
+
+.error-icon {
+  color: #DC267F;
+  width: 16px;
+  height: 16px;
 }
 
 .mat-elevation-z5 {
   box-shadow: none;
-}
-
-table.mat-table {
-  border: 1px solid;
-  border-color: #DFE3E5;
 }
 
 .value-cell {
@@ -91,4 +112,43 @@ table.mat-table {
   .child-step-7 {
     padding-left: 105px;
   }
+}
+
+img {
+  margin-right: 9px;
+}
+
+.tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 143px;
+  background-color: black;
+  color: $chef-white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }

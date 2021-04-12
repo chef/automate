@@ -1,5 +1,6 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreeTableComponent } from './tree-table.component';
+import { MockComponent } from 'ng2-mock-component';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { mockSearchableTree } from '../mocks/mockSearchableTree';
@@ -12,6 +13,7 @@ describe('TreeTableComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
+        MockComponent({ selector: 'chef-icon' }),
         TreeTableComponent
       ],
       imports: [

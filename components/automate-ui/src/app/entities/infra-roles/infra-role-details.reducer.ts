@@ -7,9 +7,11 @@ import { InfraRole } from './infra-role.model';
 export interface InfraRoleDetailsEntityState extends EntityState<InfraRole> {
   roleStatus: EntityStatus;
   getStatus: EntityStatus;
+  updateStatus: EntityStatus;
 }
 
 const GET_STATUS = 'getStatus';
+const UPDATE_STATUS = 'updateStatus';
 
 export const infraRoleDetailsEntityAdapter: EntityAdapter<InfraRole> =
 createEntityAdapter<InfraRole>({
@@ -17,9 +19,10 @@ createEntityAdapter<InfraRole>({
 });
 
 export const InfraRoleEntityInitialState: InfraRoleDetailsEntityState =
-infraRoleDetailsEntityAdapter.getInitialState(<InfraRoleDetailsEntityState>{
-  getStatus: EntityStatus.notLoaded
-});
+  infraRoleDetailsEntityAdapter.getInitialState(<InfraRoleDetailsEntityState>{
+    getStatus: EntityStatus.notLoaded,
+    updateStatus: EntityStatus.notLoaded
+  });
 
 export function infraRoleDetailsEntityReducer(
   state: InfraRoleDetailsEntityState = InfraRoleEntityInitialState,
@@ -38,6 +41,20 @@ export function infraRoleDetailsEntityReducer(
         infraRoleDetailsEntityAdapter.addOne(action.payload, state));
     case RoleActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
+
+    case RoleActionTypes.UPDATE:
+      return set(UPDATE_STATUS, EntityStatus.loading, state) as InfraRoleDetailsEntityState;
+
+    case RoleActionTypes.UPDATE_SUCCESS:
+      return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
+        infraRoleDetailsEntityAdapter.updateOne({
+          id: action.payload.name,
+          changes: action.payload
+        }, state)) as InfraRoleDetailsEntityState;
+
+    case RoleActionTypes.UPDATE_FAILURE:
+      return set(UPDATE_STATUS,
+        EntityStatus.loadingFailure, state) as InfraRoleDetailsEntityState;
 
     default:
       return state;
