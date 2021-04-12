@@ -56,6 +56,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   private get trendData(): TrendData[] {
     if (this.trendDataCache.length === 0) {
+      console.log(this.data);
       this.trendDataCache = this.data.map(d => {
         return { ...d, report_time: this.createTimezoneDate(d.report_time) };
       });
