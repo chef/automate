@@ -37,7 +37,7 @@ export class UIComponent implements OnInit, AfterViewChecked {
   legacyFeatures: Array<Feature> = [];
   hideFullPage = true;
   currentTime = moment.utc();
-  showTime = true;
+  showTime = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -80,11 +80,15 @@ export class UIComponent implements OnInit, AfterViewChecked {
     this.store.dispatch(new GetUserPreferences());
   }
 
-  updateTime(t) {
+  public updateTime(t): void {
     this.userPrefsService.testUpdateUserTimezone(t);
   }
 
-  toggleTime() {
+  public handleGetPrefs(): void {
+    this.userPrefsService.getUserPreferences();
+  }
+
+  public toggleTime(): void {
     this.showTime = !this.showTime;
   }
 }
