@@ -24,8 +24,8 @@ describe('chef server', () => {
 
   describe('chef server list page', () => {
 
-    it('can add a server', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
+    it('can add a infra server', () => {
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=id-label]').contains(generatedServerID);
@@ -44,7 +44,7 @@ describe('chef server', () => {
     });
 
     it('lists servers', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server');
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server');
 
       cy.get('#servers-table-container chef-th').contains('Name');
       cy.get('#servers-table-container chef-th').contains('FQDN');
@@ -53,7 +53,7 @@ describe('chef server', () => {
     });
 
     it('can create a chef server with a custom ID', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=add-id]').should('not.be.visible');
@@ -75,7 +75,7 @@ describe('chef server', () => {
     });
 
     it('fails to create a chef server with a duplicate ID', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=add-id]').should('not.be.visible');
@@ -93,7 +93,7 @@ describe('chef server', () => {
     });
 
     it('can cancel creating a chef server', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
 
       // here we exit with the Cancel button
@@ -123,7 +123,7 @@ describe('chef server', () => {
     });
 
     it('can check create server button is disabled until all inputs are filled in', () => {
-      cy.get('[data-cy=add-server-button]').contains('Add Chef Server').click();
+      cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=id-label]').contains(generatedServerID);
