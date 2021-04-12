@@ -12,11 +12,14 @@ import { GetUserPreferences } from './services/user-preferences/user-preferences
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
 import * as moment from 'moment-timezone';
 
+
+
 @Component({
   selector: 'app-ui',
   templateUrl: './ui.component.html',
   styleUrls: ['./ui.component.scss']
 })
+
 export class UIComponent implements OnInit, AfterViewChecked {
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
