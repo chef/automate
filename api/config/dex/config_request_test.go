@@ -715,7 +715,7 @@ func TestBanner(t *testing.T) {
 func TestEnvironment(t *testing.T) {
 	t.Run("Default environment should be UNKNOWN", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
-		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment().String(), "UNKNOWN")
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment().String(), "ENVIRONMENT_UNKNOWN_UNSPECIFIED")
 	})
 
 	t.Run("Environment should be set from config", func(t *testing.T) {
@@ -726,7 +726,7 @@ func TestEnvironment(t *testing.T) {
 		require.NotNil(t, sys)
 
 		require.NoError(t, cfg.Validate())
-		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_DEV)
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_ENVIRONMENT_DEV)
 	})
 
 	t.Run("Environment set from config not in the Enum environments should set it the environment as UNKNOWN", func(t *testing.T) {
@@ -737,6 +737,6 @@ func TestEnvironment(t *testing.T) {
 		require.NotNil(t, sys)
 
 		require.NoError(t, cfg.Validate())
-		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_UNKNOWN)
+		require.Equal(t, cfg.GetV1().GetSys().GetService().GetEnumEnvironment(), dex.Environment_ENVIRONMENT_UNKNOWN_UNSPECIFIED)
 	})
 }
