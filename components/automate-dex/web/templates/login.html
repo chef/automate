@@ -12,11 +12,11 @@
     <script type="text/javascript" src="{{ url .ReqPath "theme/scripts.js" }}"></script>
   </head>
   <body>
-    {{/* if ...warning label should be shown */}}
+    {{ if "showBanner" | extra }} 
     <div class="warning-banner" style="background-color: #24d624;">
       <p class="warning-text" style="color: #000;">DYNAMIC CONTENT - HIGHEST POSSIBLE LEVEL OF CLASSIFICATION IS: UNCLASSIFIED</p>
     </div>
-    {{/* end ...warning label should be shown */}}
+    {{ end }}
       <div class="theme-panel" role="main">
     <main>
       <div class="theme-panel">
