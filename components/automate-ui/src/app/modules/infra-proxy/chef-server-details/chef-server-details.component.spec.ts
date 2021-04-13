@@ -12,11 +12,13 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { By } from '@angular/platform-browser';
 import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { MockComponent } from 'ng2-mock-component';
+import { using } from 'app/testing/spec-helpers';
 
 describe('ChefServerDetailsComponent', () => {
   let component: ChefServerDetailsComponent;
   let fixture: ComponentFixture<ChefServerDetailsComponent>;
   let element;
+  let errors = {};
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -178,6 +180,83 @@ describe('ChefServerDetailsComponent', () => {
       store.dispatch(new CreateOrgFailure(error));
 
       expect(component.createModalVisible).toBe(false);
+    });
+  });
+
+  describe('Updating server details', () => {
+    beforeEach(() => {
+      component.server = {
+        id: '1',
+        name: 'test server',
+        fqdn: 'chef.party',
+        ip_address: '22.24.65.65'
+      };
+    });
+
+    const VALID_NAME = 'test server';
+    const VALID_FQDN = 'chef.internal';
+    const VALID_IP = '1.2.3.4';
+
+    it('when all details are valid, it should update successfully', () => {
+      component.updateServerForm.controls['name'].setValue(VALID_NAME);
+      component.updateServerForm.controls['fqdn'].setValue(VALID_FQDN);
+      component.updateServerForm.controls['ip_address'].setValue(VALID_IP);
+
+      expect(component.updateServerForm.valid).toBeTrue();
+      component.saveServer();
+    });
+
+    describe('form should be invalid when using invalid fqdn', () => {
+      using([
+        ['is using something other than http or https', 'httpld://www.chef.io'],
+        ['contains two periods', 'chef..internal'],
+        ['there is no TLD suffix', 'http://foo.com.'],
+        ['contains hyphens in the TLD', 'chef.this-will-not'],
+        ['has a TLD that is longer than 25 characters', 'chef.thisisareallylongtldandwontwork'],
+        ['has a TLD that is shorter than 2 characters', 'chef.i'],
+        ['has numbers in the TLD', 'chef.017'],
+        ['has a port number that is too high', 'https://chef.io:987274892'],
+        ['has a colon but no port number', 'https://chef.io:'],
+        ['has a letter in the port', 'https://chef.io:123a'],
+        ['has no domain', 'http://'],
+        ['has no secure domain', 'https://'],
+        ['domain is dots', 'https://..'],
+        ['domain is hash', 'http://#'],
+        ['domain has a space', 'http:// shouldfail.net'],
+        ['contains all numbers', 'http://10.1.1.0']
+      ], function (description: string, input: string) {
+        it(('when the fqdn ' + description), () => {
+          component.updateServerForm.controls['name'].setValue('test');
+          component.updateServerForm.controls['ip_address'].setValue('1.2.3.4');
+
+          component.updateServerForm.controls['fqdn'].setValue(input);
+          errors = component.updateServerForm.controls['fqdn'].errors || {};
+
+          expect(component.updateServerForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+    });
+
+    describe('form should be invalid when using invalid ip address', () => {
+      using([
+        ['contains too many numbers', '1.2.3.454728'],
+        ['is using two periods', '1..23.4.5'],
+        ['contains spaces', '1. 23.4.5'],
+        ['contains hypens', '1-.4.5'],
+        ['is out of range', '289.23.4.5']
+      ], function (description: string, input: string) {
+        it(('when the ip address ' + description), () => {
+          component.updateServerForm.controls['name'].setValue('test');
+          component.updateServerForm.controls['fqdn'].setValue('chef.internal');
+
+          component.updateServerForm.controls['ip_address'].setValue(input);
+          errors = component.updateServerForm.controls['ip_address'].errors || {};
+
+          expect(component.updateServerForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
     });
   });
 });

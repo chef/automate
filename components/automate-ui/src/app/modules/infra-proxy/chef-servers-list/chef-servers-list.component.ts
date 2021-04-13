@@ -47,6 +47,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
 
     this.createChefServerForm = this.fb.group({
       // Must stay in sync with error checks in create-chef-server-modal.component.html
+      // and updateServerForm in chef-server-details.component.ts
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
