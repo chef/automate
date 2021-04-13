@@ -10,11 +10,11 @@ import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
 enum Environment {
-	UNKNOWN = 0;
-	DEV = 1;
-	TEST = 2;
-	STAGE = 3;
-	PROD = 4;
+	ENVIRONMENT_UNKNOWN_UNSPECIFIED = 0;
+	ENVIRONMENT_DEV = 1;
+	ENVIRONMENT_TEST = 2;
+	ENVIRONMENT_STAGE = 3;
+	ENVIRONMENT_PROD = 4;
 }
 
 message ConfigRequest {

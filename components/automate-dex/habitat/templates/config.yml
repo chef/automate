@@ -50,6 +50,12 @@ frontend:
   dir: {{cfg.frontend_dir}}
   issuer: Chef Automate
   theme: chef
+  extra:
+    environment: {{cfg.service.enum_environment}}
+    {{- if cfg.login_banner.show }}
+    showBanner: {{cfg.login_banner.show}}
+    bannerMessage: {{cfg.login_banner.message_file_path}}
+    {{- end }}
 logger:
   level: {{cfg.log.level}}
   format: text

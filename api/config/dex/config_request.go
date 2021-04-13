@@ -49,7 +49,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.Level = w.String("info")
 
 	c.V1.Sys.LoginBanner.Show = w.Bool(false)
-	c.V1.Sys.Service.EnumEnvironment = Environment_UNKNOWN
+	c.V1.Sys.Service.EnumEnvironment = Environment_ENVIRONMENT_UNKNOWN_UNSPECIFIED
 	return c
 }
 
@@ -177,6 +177,7 @@ func (c *ConfigRequest) Validate() error {
 // PrepareSystemConfig returns a system configuration that can be used
 // to start the service.
 func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (shared.PreparedSystemConfig, error) {
+	fmt.Println("+++++++++++++++++ Prepare System Config for Dex ++++++++++++++++++")
 	sys := c.V1.Sys
 	sys.Tls = creds
 
@@ -211,10 +212,11 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 		}
 	}
 
-	if enumEnv, ok := Environment_value[strings.TrimSpace(strings.ToUpper(c.V1.Sys.Service.Environment.GetValue()))]; ok {
+	envConfig := strings.TrimSpace(strings.ToUpper(c.V1.Sys.Service.Environment.GetValue()))
+	if enumEnv, ok := Environment_value[fmt.Sprintf("ENVIRONMENT_%s", envConfig)]; ok {
 		c.V1.Sys.Service.EnumEnvironment = Environment(enumEnv)
 	} else {
-		c.V1.Sys.Service.EnumEnvironment = Environment_UNKNOWN
+		c.V1.Sys.Service.EnumEnvironment = Environment_ENVIRONMENT_UNKNOWN_UNSPECIFIED
 	}
 
 	return c.V1.Sys, nil
