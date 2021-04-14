@@ -19,8 +19,8 @@ export const userPreferencesError = createSelector(
   (userPreferences) => userPreferences.error
 );
 
-/////////////////////////// Testing with timezone available
-export const userPreferencesTimezone = createSelector(
+/////////////////////////// Testing with timeformat available
+export const userPreferencesTimeformat = createSelector(
   userPreferencesState,
-  (userPreferences) => userPreferences.list.timezone
+  (userPreferences) => userPreferences.list.timeformat
 );

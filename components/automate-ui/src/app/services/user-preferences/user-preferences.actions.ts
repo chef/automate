@@ -14,7 +14,8 @@ export enum UserPreferencesActionTypes {
   UPDATE_USER_PREFERENCES_SUCCESS = 'USER_PREFERENCES::UPDATE::SUCCESS',
   UPDATE_USER_PREFERENCES_FAILURE = 'USER_PREFERENCES::UPDATE::FAILURE',
 
-  TEST_UPDATE_USER_TIMEZONE = 'TEST_UPDATE_USER_TIMEZONE'
+  TEST_UPDATE_USER_TIMEZONE = 'TEST_UPDATE_USER_TIMEZONE',
+  TEST_UPDATE_USER_TIMEFORMAT = 'TEST_UPDATE_USER_TIMEFORMAT'
 }
 
 export class GetUserPreferences implements Action {
@@ -58,6 +59,12 @@ export class TestUpdateUserTimezone implements Action {
   constructor(public payload: string) {}
 }
 
+export class TestUpdateUserTimeformat implements Action {
+  readonly type = UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT;
+
+  constructor(public payload: string) {}
+}
+
 export type UserPreferencesActions =
   | GetUserPreferences
   | GetUserPreferencesSuccess
@@ -65,4 +72,5 @@ export type UserPreferencesActions =
   | UpdateUserPreferences
   | UpdateUserPreferencesSuccess
   | UpdateUserPreferencesFailure
-  | TestUpdateUserTimezone;
+  | TestUpdateUserTimezone
+  | TestUpdateUserTimeformat;

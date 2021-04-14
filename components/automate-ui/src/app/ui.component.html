@@ -51,14 +51,15 @@
   <div class="time-test" [class.active]="showTime">
     <button class="show-button" (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
     <h3>Current Time:</h3>
-    <p>{{ currentTime | datetime: (userPrefsService.timezone$ | async)?.value : 'ddd, DD MMM YYYY HH:mm z'}}</p>
+    <p>{{ currentTime | datetime: 'ddd, DD MMM YYYY HH:mm z'}}</p>
     <div class="hacky-line-break"></div>
     <chef-form-field class="timezone-field">
-      <label for="timezone">Time Zone</label>
-      <chef-select #tz [value]="(userPrefsService.timezone$ | async)?.value" (change)="updateTime(tz.value)">
-        <chef-option value="UTC">UTC</chef-option>
-        <chef-option value="Asia/Taipei">Asia/Taipei</chef-option>
-        <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
+      <label for="timeformat">Time Format</label>
+      <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value"
+        (change)="handleTimeFormatChange(timeformat.value)">
+        <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
+        <chef-option value="MM DD YYYY">MM DD YYYY</chef-option>
+        <chef-option value="MM DD - HH:mm z">MM DD - HH:mm z</chef-option>
       </chef-select>
     </chef-form-field>
     <div class="button-container">

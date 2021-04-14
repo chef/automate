@@ -10,7 +10,7 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
-import * as moment from 'moment-timezone';
+import * as moment from 'moment/moment';
 
 
 
@@ -83,8 +83,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
     this.store.dispatch(new GetUserPreferences());
   }
 
-  public updateTime(t): void {
-    this.userPrefsService.testUpdateUserTimezone(t);
+  public handleTimeFormatChange(timeformat: string): void {
+    this.userPrefsService.testUpdateUserTimeformat(timeformat);
   }
 
   public handleGetPrefs(): void {

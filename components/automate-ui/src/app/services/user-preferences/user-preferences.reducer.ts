@@ -6,7 +6,7 @@ import { UserPreference } from './user-preferences.model';
 
 export interface UserPreferencesEntityState {
   list: {
-    timezone: UserPreference
+    timeformat: UserPreference
   };
   error: HttpErrorResponse;
   status: EntityStatus;
@@ -15,10 +15,9 @@ export interface UserPreferencesEntityState {
 export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   list: {
     // Subject to change, enabled for development purposes
-    timezone: {
-      // value: 'Asia/Taipei',
-      // value: 'America/Los_Angeles',
-      value: 'UTC',
+    timeformat: {
+      // value 'DD MM YY'
+      value: 'ddd, DD MMM YYYY',
       disabled: false
     }
   },
@@ -58,17 +57,17 @@ export function userPreferencesEntityReducer(
         set('status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as UserPreferencesEntityState;
 
-    // This is purely hacky way to change timezone for dev purposes only
-    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEZONE:
+    // This is purely hacky way to change timeformat for dev purposes only
+    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT:
+      console.log('not updating yet - user-prefs.reducer.ts');
       console.log(action.payload);
-      const obj = {
-          'timezone': {
-            'value': action.payload,
-            'disabled': false
-          }
+
+      const timeformat = {
+        'value': action.payload,
+        'disabled': false
       };
 
-      return set('list', obj, state) as UserPreferencesEntityState;
+      return set('list.timeformat', timeformat, state);
 
     default:
       return state;

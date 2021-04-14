@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment-timezone';
+import * as moment from 'moment/moment';
 
 /**
  * The datetime pipe formats datetime strings or moment objects. It's
@@ -10,21 +10,8 @@ import * as moment from 'moment-timezone';
   name: 'datetime'
 })
 export class DatetimePipe implements PipeTransform {
-
-  // REFER TO DOCS FOR USE WITH UTC https://momentjs.com/timezone/docs/#/using-timezones/
-
-  public transform(value: moment.Moment | Date | string,
-    timezone: string = 'default', formatStr: string): string {
-      ///// next line for development > needs further inspection
-      if (timezone === null) { return; }
-      console.log(timezone);
-
-      // this if block will likely change
-      if (timezone === 'default') {
-        return moment.utc(value).format(formatStr);
-      }
-
-      return moment.utc(value).clone().tz(timezone).format(formatStr);
+  public transform(value: moment.Moment | Date | string, formatStr: string): string {
+    return moment.utc(value).format(formatStr);
   }
 
 }
