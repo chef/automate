@@ -120,10 +120,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   // only for testing development - will be removed before release
-  public handleTimezoneChange(tz) {
-    this.userPrefsService.testUpdateUserTimezone(tz);
-  }
-
   public handleTimeFormatChange(format: string): void {
     this.userPrefsService.testUpdateUserTimeformat(format);
   }

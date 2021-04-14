@@ -6,7 +6,6 @@ import { UserPreference } from './user-preferences.model';
 import { userPreferencesTimeformat } from './user-preferences.selector';
 import {
   GetUserPreferences,
-  TestUpdateUserTimezone,
   UpdateUserPreferences,
   TestUpdateUserTimeformat } from './user-preferences.actions';
 
@@ -22,10 +21,6 @@ export class UserPreferencesService {
   timeformat$: Observable<UserPreference> = this.store.select(userPreferencesTimeformat);
 
     // only for testing development - will be removed or modified before release
-  testUpdateUserTimezone(timezone) {
-    this.store.dispatch(new TestUpdateUserTimezone(timezone));
-  }
-
   testUpdateUserTimeformat(format: string) {
     this.store.dispatch(new TestUpdateUserTimeformat(format));
   }
