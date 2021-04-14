@@ -28,9 +28,6 @@ import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policie
 import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
-
-// import {
-  // userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { trigger, transition, animate, style } from '@angular/animations';
 
@@ -41,10 +38,6 @@ const myAnim = trigger('myAnim', [
   ])
 ]);
 
-import { userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
-// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-
-// import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 
 @Component({
