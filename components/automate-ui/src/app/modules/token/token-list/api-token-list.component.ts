@@ -43,8 +43,7 @@ const myAnim = trigger('myAnim', [
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
-  styleUrls: ['./api-token-list.component.scss'],
-  animations: [ myAnim ]
+  styleUrls: ['./api-token-list.component.scss']
 })
 export class ApiTokenListComponent implements OnInit, OnDestroy {
   public sortedApiTokens$: Observable<ApiToken[]>;
@@ -60,21 +59,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   // user preferences timezone
   public timezone: string;
-  // public timezone2: any;
-
-  // user preferences timezone
-  public timezone: string;
-  // public timezone2: any;
-
-  // user preferences timezone
-  public timezone: string;
-  // public timezone2: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService,
-    public userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService
   ) {
     store.pipe(
       select(apiTokenStatus),
