@@ -124,6 +124,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.userPrefsService.testUpdateUserTimezone(tz);
   }
 
+  public handleTimeFormatChange(format: string): void {
+    this.userPrefsService.testUpdateUserTimeformat(format);
+  }
+
   public handleGetPrefs() {
     this.userPrefsService.getUserPreferences();
   }

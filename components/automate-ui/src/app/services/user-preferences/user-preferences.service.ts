@@ -3,8 +3,12 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
 import { UserPreference } from './user-preferences.model';
-import { userPreferencesTimezone } from './user-preferences.selector';
-import { GetUserPreferences, TestUpdateUserTimezone, UpdateUserPreferences } from './user-preferences.actions';
+import { userPreferencesTimeformat } from './user-preferences.selector';
+import {
+  GetUserPreferences,
+  TestUpdateUserTimezone,
+  UpdateUserPreferences,
+  TestUpdateUserTimeformat } from './user-preferences.actions';
 
 
 
@@ -15,11 +19,15 @@ export class UserPreferencesService {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  timezone$: Observable<UserPreference> = this.store.select(userPreferencesTimezone);
+  timeformat$: Observable<UserPreference> = this.store.select(userPreferencesTimeformat);
 
     // only for testing development - will be removed or modified before release
   testUpdateUserTimezone(timezone) {
     this.store.dispatch(new TestUpdateUserTimezone(timezone));
+  }
+
+  testUpdateUserTimeformat(format: string) {
+    this.store.dispatch(new TestUpdateUserTimeformat(format));
   }
 
   getUserPreferences() {
