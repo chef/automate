@@ -16,6 +16,7 @@ func NewConfigRequest() *ConfigRequest {
 				Tls:     &config.TLSCredentials{},
 				Service: &ConfigRequest_V1_System_Service{},
 				Log:     &ConfigRequest_V1_System_Log{},
+				S3:      &ConfigRequest_V1_System_S3{},
 			},
 		},
 	}
@@ -37,6 +38,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.ContentType = w.String("application/json")
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
+	c.V1.Sys.S3.Accept = w.Bool(false)
+	c.V1.Sys.S3.AccessKey = w.String("")
+	c.V1.Sys.S3.SecretKey = w.String("")
 	return c
 }
 

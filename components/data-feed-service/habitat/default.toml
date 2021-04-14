@@ -24,5 +24,10 @@ accept = false
 format = "text"
 level = "info"
 
+[s3]
+accept = false
+accessKey = ""
+secretKey = ""
+
 [storage]
 database = "data_feed_service"

@@ -16,6 +16,7 @@ import (
 type DataFeedConfig struct {
 	ServiceConfig    ServiceConfig    `mapstructure:"service"`
 	LogConfig        LogConfig        `mapstructure:"log"`
+	S3               S3Config         `mapstructure:"s3"`
 	TLSConfig        certs.TLSConfig  `mapstructure:"tls"`
 	SecretsConfig    SecretsConfig    `mapstructure:"secrets"`
 	CfgmgmtConfig    CfgmgmtConfig    `mapstructure:"cfgmgmt"`
@@ -43,6 +44,12 @@ type ServiceConfig struct {
 	ExternalFqdn        string        `mapstructure:"external_fqdn"`
 	AcceptedStatusCodes []int32       `mapstructure:"accepted_status_codes"`
 	ContentType         string        `mapstructure:"content_type"`
+}
+
+type S3Config struct {
+	Accept    bool   `mapstructure:"accept"`
+	AccessKey string `mapstructure:"accessKey"`
+	SecretKey string `mapstructure:"secretKey"`
 }
 
 type PostgresConfig struct {

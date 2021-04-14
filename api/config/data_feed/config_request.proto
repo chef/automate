@@ -21,6 +21,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 2;
 			Service service = 3;
 			Log log = 4;
+			S3 s3 = 5;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -40,6 +41,11 @@ message ConfigRequest {
 			message Log {
 				google.protobuf.StringValue format = 1;
 				google.protobuf.StringValue level = 2;
+			}
+			message S3 {
+				google.protobuf.BoolValue accept = 1;
+				google.protobuf.StringValue accessKey = 2;
+				google.protobuf.StringValue secretKey = 3;
 			}
 
 		}

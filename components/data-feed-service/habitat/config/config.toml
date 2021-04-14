@@ -25,6 +25,15 @@ cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"
 root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
+# accept = true
+# accessKey = ""
+# secretKey = ""
+
+[s3]
+accept = "{{cfg.s3.accept}}"
+key_path = "{{cfg.s3.accessKey}}"
+root_ca_path ="{cfg.s3.secretKey}}"
+
 [secrets]
 {{~#eachAlive bind.secrets-service.members as |secrets-service|}}
 {{~#if @last}}

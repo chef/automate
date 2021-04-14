@@ -21,6 +21,11 @@ root_ca_path = "../../dev/certs/Chef_Automate_Dev.crt"
 format = "text"
 level = "debug"
 
+[s3]
+accept = false
+accessKey = ""
+secretKey = ""
+
 [secrets]
 {{~#eachAlive bind.secrets-service.members as |secrets-service|}}
 {{~#if @last}}

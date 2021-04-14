@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,9 +24,26 @@ import (
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 
 	"github.com/chef/automate/lib/grpc/secureconn"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 const version = "1"
+
+var creds *credentials.Credentials
+
+const (
+	// add your refion eg: us-east-2
+	AWS_S3_REGION = ""
+	AWS_S3_BUCKET = ""
+	AccessKey     = ""
+	SecretKey     = ""
+)
+
+var sess = connectAWS()
 
 type datafeedNotification struct {
 	credentials Credentials
@@ -46,11 +64,16 @@ func NewDataClient(statusCodes []int32) DataClient {
 	}
 }
 
+type StructData struct {
+	Data []string `json:"data"`
+}
+
 type NotificationSender interface {
 	sendNotification(notification datafeedNotification) error
 }
 
 func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB) error {
+	fmt.Println("s3:::::", dataFeedConfig.S3.Accept)
 	log.Info("Starting data-feed-service")
 	conn, err := connFactory.Dial("cereal-service", dataFeedConfig.CerealConfig.Target)
 	if err != nil {
@@ -153,31 +176,59 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		return err
 	}
 
-	request, err := http.NewRequest("POST", notification.url, &contentBuffer)
-	if err != nil {
-		log.Error("Error creating request")
-		return err
-	}
-	request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
-	request.Header.Add("Content-Type", notification.contentType)
-	request.Header.Add("Content-Encoding", "gzip")
-	request.Header.Add("Accept", notification.contentType)
-	request.Header.Add("Chef-Data-Feed-Message-Version", version)
+	t := time.Now().UTC()
+	year := t.Year()
+	month := int(t.Month())
+	day := t.Day()
+	hr := t.Hour()
+	min := t.Minute()
+	sec := t.Second()
 
-	response, err := client.client.Do(request)
+	filename :=
+		strconv.Itoa(year) + "/" +
+			strconv.Itoa(month) + "/" +
+			strconv.Itoa(day) + "/" +
+			strconv.Itoa(hr) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec) + ".json"
+	// p := make([]byte, len(s))
+
+	uploader := s3manager.NewUploader(sess)
+
+	_, err = uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(AWS_S3_BUCKET),                  // Bucket to be used
+		Key:    aws.String(filename),                       // Name of the file to be saved
+		Body:   bytes.NewReader(notification.data.Bytes()), // File
+	})
 	if err != nil {
-		log.Errorf("Error sending message %v", err)
+		// Do your error handling here
 		return err
-	} else {
-		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
 	}
-	if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
-		return errors.New(response.Status)
-	}
-	err = response.Body.Close()
-	if err != nil {
-		log.Warnf("Error closing response body %v", err)
-	}
+
+	// request, err := http.NewRequest("POST", notification.url, &contentBuffer)
+	// if err != nil {
+	// 	log.Error("Error creating request")
+	// 	return err
+	// }
+	// request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
+	// request.Header.Add("Content-Type", notification.contentType)
+	// request.Header.Add("Content-Encoding", "gzip")
+	// request.Header.Add("Accept", notification.contentType)
+	// request.Header.Add("Chef-Data-Feed-Message-Version", version)
+
+	// response, err := client.client.Do(request)
+
+	// if err != nil {
+	// 	log.Errorf("Error sending message %v", err)
+	// 	return err
+	// } else {
+	// 	log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
+	// }
+	// if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
+	// 	return errors.New(response.Status)
+	// }
+	// err = response.Body.Close()
+	// if err != nil {
+	// 	log.Warnf("Error closing response body %v", err)
+	// }
 	return nil
 }
 
@@ -300,4 +351,17 @@ func getHostAttributes(attributesJson map[string]interface{}) (string, string, s
 	hostname, _ := attributesJson["hostname"].(string)
 
 	return ipAddress, macAddress, hostname
+}
+
+func connectAWS() *session.Session {
+	sess, err := session.NewSession(
+		&aws.Config{
+			Region:      aws.String(AWS_S3_REGION),
+			Credentials: credentials.NewStaticCredentials(string(AccessKey), string(SecretKey), ""),
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+	return sess
 }
