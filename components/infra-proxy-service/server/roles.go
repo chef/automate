@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 )
 
@@ -235,7 +236,7 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
-	runlist, err := toResponseExpandedRunList(c, envRunList["run_list"], cookbooks, runlistCache)
+	runlist, err := toResponseExpandedRunList(c, s.service, envRunList["run_list"], cookbooks, runlistCache)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -357,7 +358,7 @@ func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
 	return nil
 }
 
-func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
+func toResponseExpandedRunList(client *ChefClient, service *service.Service, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
 	resRunList := make([]*response.RunList, len(runlist))
 	var pos int32
 	for i, item := range runlist {
@@ -378,6 +379,20 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks c
 					newRunList.Version = cookbookVersion.Versions[0].Version
 				}
 			}
+
+			if runlistCache[newItem.Type] != nil {
+				if runlistCache[newItem.Type][newItem.Name] {
+					newRunList.Skipped = true
+				}
+				runlistCache[newItem.Type][newItem.Name] = true
+			} else {
+				runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+			}
+
+			if !newRunList.Skipped {
+				newRunList.Position = pos
+				pos++
+			}
 		}
 
 		if newItem.IsRole() {
@@ -387,30 +402,24 @@ func toResponseExpandedRunList(client *ChefClient, runlist []string, cookbooks c
 			if chefError != nil {
 				newRunList.Error = chefError.StatusMsg()
 			} else {
-				if !runlistCache[newItem.Type][newItem.Name] {
-					children, err := toResponseExpandedRunList(client, currentRole.RunList, cookbooks, runlistCache)
+				if runlistCache[newItem.Type] != nil {
+					if !runlistCache[newItem.Type][newItem.Name] {
+						runlistCache[newItem.Type][newItem.Name] = true
+						children, err := toResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
+						newRunList.Children = children
+						if err != nil {
+							newRunList.Error = err.Error()
+						}
+					}
+				} else {
+					runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
+					children, err := toResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
 					newRunList.Children = children
 					if err != nil {
 						newRunList.Error = err.Error()
 					}
 				}
 			}
-		}
-
-		if runlistCache[newItem.Type][newItem.Name] {
-			newRunList.Skipped = true
-		} else {
-			if newItem.IsRecipe() {
-				newRunList.Position = pos
-				pos++
-			}
-
-			if runlistCache[newItem.Type] != nil {
-				runlistCache[newItem.Type][newItem.Name] = true
-			} else {
-				runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
-			}
-
 		}
 
 		resRunList[i] = &newRunList
