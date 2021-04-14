@@ -99,13 +99,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       policies: [[]]
     });
 
-    // Getting user preferences timezone from state
-    // store.pipe(
-    //   select(userPreferencesTimezone),
-    //   takeUntil(this.isDestroyed)
-    // ).subscribe(tz => this.timezone = tz.value);
-
-    // this.timezone2 = this.userPrefsService.getTimezone();
   }
 
   ngOnInit() {

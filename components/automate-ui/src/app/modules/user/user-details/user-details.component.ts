@@ -33,7 +33,7 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
-// State timezone update for dev testing purposes only
+// State preferences update for dev testing purposes only
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 export type UserTabName = 'password' | 'details';
