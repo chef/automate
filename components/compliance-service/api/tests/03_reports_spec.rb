@@ -103,7 +103,7 @@ describe File.basename(__FILE__) do
         {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
         {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
         {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
-        {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
+        {"endTime" => "2018-03-07T00:00:10Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
         {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
         {"endTime" => "2018-03-04T09:19:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
         {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
@@ -129,8 +129,8 @@ describe File.basename(__FILE__) do
         "bb93e1b2-36d6-439e-ac70-cccccccccc09"
       ],
       "reportData" => [
-        {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
-        {"endTime" => "2018-03-04T09:18:41Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"},
+        {"endTime" => "2018-02-09T23:59:50Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
+        {"endTime" => "2018-03-04T00:00:10Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"},
         {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
         {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"}
       ]
@@ -150,7 +150,7 @@ describe File.basename(__FILE__) do
         "44024b50-2e0d-42fa-a57c-dddddddddddd"
       ],
       "reportData" => [
-        {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"}
+        {"endTime" => "2018-02-09T23:59:50Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"}
       ]
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -159,8 +159,8 @@ describe File.basename(__FILE__) do
   it "list_report_ids get those from a tiny window of time" do
     actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(
       filters: [
-        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T09:18:41Z']),
-        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T09:18:41Z'])
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:10Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T00:00:10Z'])
       ]
     )
     expected_json = {
@@ -168,7 +168,7 @@ describe File.basename(__FILE__) do
         "bb93e1b2-36d6-439e-ac70-cccccccccc04"
       ],
       "reportData" => [
-        {"endTime" => "2018-03-04T09:18:41Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"}
+        {"endTime" => "2018-03-04T00:00:10Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"}
       ]
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -196,13 +196,13 @@ describe File.basename(__FILE__) do
         "zz93e1b2-36d6-439e-ac70-cccccccccckk"
       ],
       "reportData" => [
-        {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
+        {"endTime" => "2018-02-09T23:59:50Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
         {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
         {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
         {"endTime" => "2018-03-04T09:19:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
         {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
         {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
-        {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
+        {"endTime" => "2018-03-07T00:00:10Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
         {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
         {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"},
         {"endTime" => "2018-04-02T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-ccccccczzz20"},
@@ -257,7 +257,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => "2018-02-09T09:18:41Z",
+                "endTime" => "2018-02-09T23:59:50Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -281,7 +281,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -441,7 +441,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "188.38.98.100",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e666",
                 "nodeName" => "ubuntu(1)-alpha-myprofile(s)-skipped",
-                "endTime" => "2018-03-07T03:02:02Z",
+                "endTime" => "2018-03-07T00:00:10Z",
                 "status" => "skipped",
                 "controls" => {
                     "passed" => {},
@@ -687,7 +687,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => "2018-02-09T09:18:41Z",
+                "endTime" => "2018-02-09T23:59:50Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -711,7 +711,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -858,7 +858,7 @@ describe File.basename(__FILE__) do
               "ipaddress" => "10.3.4.5",
               "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
               "nodeName" => "centos-beta",
-              "endTime" => "2018-03-04T09:18:41Z",
+              "endTime" => "2018-03-04T00:00:10Z",
               "status" => "passed",
               "controls" => {
                   "total" => 18,
@@ -949,7 +949,7 @@ describe File.basename(__FILE__) do
               "ipaddress" => "192.168.56.33",
               "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
               "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-              "endTime" => "2018-02-09T09:18:41Z",
+              "endTime" => "2018-02-09T23:59:50Z",
               "status" => "failed",
               "controls" => {
                   "total" => 59,
@@ -990,7 +990,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => "2018-02-09T09:18:41Z",
+                "endTime" => "2018-02-09T23:59:50Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -1039,7 +1039,7 @@ describe File.basename(__FILE__) do
                 "ipaddress" => "10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => "2018-03-04T09:18:41Z",
+                "endTime" => "2018-03-04T00:00:10Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -1263,7 +1263,7 @@ describe File.basename(__FILE__) do
     assert_equal(['base_linux', 'apache_linux', 'nginx-hardening-prod', 'dot.role'], res['roles'])
     assert_equal([], res['projects'])
 
-    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520155121, nanos: 0), res['end_time'])
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520121610, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
