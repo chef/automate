@@ -12,10 +12,6 @@ import { GetUserPreferences } from './services/user-preferences/user-preferences
 import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
 import * as moment from 'moment/moment';
 
-
-
-
-
 @Component({
   selector: 'app-ui',
   templateUrl: './ui.component.html',

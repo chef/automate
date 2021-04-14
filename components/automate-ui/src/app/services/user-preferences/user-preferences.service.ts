@@ -33,12 +33,4 @@ export class UserPreferencesService {
     this.store.dispatch(new UpdateUserPreferences(tz));
   }
 
-  getUserPreferences() {
-    this.store.dispatch(new GetUserPreferences());
-  }
-
-  updateUserPreferences(tz) {
-    this.store.dispatch(new UpdateUserPreferences(tz));
-  }
-
 }
