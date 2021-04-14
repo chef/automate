@@ -7,7 +7,6 @@ import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
@@ -28,22 +27,10 @@ import { ProjectConstants } from 'app/entities/projects/project.model';
 import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
 import { stringToMember } from 'app/entities/policies/policy.model';
 
-// user preferences
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { trigger, transition, animate, style } from '@angular/animations';
-
-const myAnim = trigger('myAnim', [
-  transition('* => *', [
-    animate('.2s ease-out', style({ transform: 'scale(1.02)', color: 'blue' })),
-    animate('.2s ease-in', style({ transform: 'scale(1)' }))
-  ])
-]);
-
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
-  styleUrls: ['./api-token-list.component.scss'],
-  animations: [ myAnim ]
+  styleUrls: ['./api-token-list.component.scss']
 })
 export class ApiTokenListComponent implements OnInit, OnDestroy {
   public sortedApiTokens$: Observable<ApiToken[]>;
@@ -56,7 +43,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public readonly DEMO_MODE = DateTime.DEMO_MODE;
 
   // user preferences timezone
   public timezone: string;
@@ -65,8 +51,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService,
-    public userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService
   ) {
     store.pipe(
       select(apiTokenStatus),

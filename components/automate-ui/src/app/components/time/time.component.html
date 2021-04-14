@@ -1,1 +1,3 @@
-<span>{{ time | datetime: (userPrefsService.timeformat$ | async)?.value }}</span>
+<span [@flash]='(userPrefsService.timeformat$ | async)?.value'>
+  {{ time | datetime: (userPrefsService.timeformat$ | async)?.value }}
+</span>
