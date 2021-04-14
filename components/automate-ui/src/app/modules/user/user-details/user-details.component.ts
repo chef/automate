@@ -132,17 +132,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.userPrefsService.updateUserPreferences(tz);
   }
 
-  public handleTimeFormatChange(format: string): void {
-    this.userPrefsService.testUpdateUserTimeformat(format);
-  }
-
-  public handleGetPrefs() {
-    this.userPrefsService.getUserPreferences();
-  }
-
-  public handleUpdatePrefs(tz) {
-    this.userPrefsService.updateUserPreferences(tz);
-  }
 }
 
 abstract class UserDetails {

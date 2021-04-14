@@ -57,12 +57,6 @@ export class TestUpdateUserTimeformat implements Action {
   constructor(public payload: string) {}
 }
 
-export class TestUpdateUserTimeformat implements Action {
-  readonly type = UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT;
-
-  constructor(public payload: string) {}
-}
-
 export type UserPreferencesActions =
   | GetUserPreferences
   | GetUserPreferencesSuccess
