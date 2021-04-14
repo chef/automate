@@ -32,7 +32,7 @@ import {
 import { EntityStatus } from 'app/entities/entities';
 import { Node, Options } from '../tree-table/models';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
-import { Runlist, List, ExpandedChildList } from 'app/entities/runlists/runlists.model';
+import { List, ExpandedChildList, Runlist } from 'app/entities/runlists/runlists.model';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 
 export type InfraRoleTabName = 'runList' | 'attributes';
@@ -235,6 +235,9 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
           this.idList = allRoleEnvironmentsState;
           if (this.idList.length > 0) {
             this.env_id = this.idList[0];
+            this.show = true;
+          } else {
+            this.show = false;
           }
         }
       });
@@ -251,12 +254,11 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([getRunlistSt, allRunlistState]) => {
         if (getRunlistSt === EntityStatus.loadingSuccess && !isNil(allRunlistState)) {
           if (allRunlistState && allRunlistState.length) {
-            this.show = true;
             if (this.tabValue === 'runList') {
-             this.treeNodes(allRunlistState, environmentId);
-            }  else {
-              this.show = false;
+              this.treeNodes(allRunlistState, environmentId);
             }
+          } else {
+            this.runListLoading = false;
           }
           this.conflictError = false;
         } else if (getRunlistSt === EntityStatus.loadingFailure) {
