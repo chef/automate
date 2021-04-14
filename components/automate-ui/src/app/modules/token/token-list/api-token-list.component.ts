@@ -29,8 +29,6 @@ import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policie
 import { stringToMember } from 'app/entities/policies/policy.model';
 
 // user preferences
-// import {
-  // userPreferencesTimezone } from 'app/services/user-preferences/user-preferences.selector';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { trigger, transition, animate, style } from '@angular/animations';
 
@@ -93,13 +91,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       policies: [[]]
     });
 
-    // Getting user preferences timezone from state
-    // store.pipe(
-    //   select(userPreferencesTimezone),
-    //   takeUntil(this.isDestroyed)
-    // ).subscribe(tz => this.timezone = tz.value);
-
-    // this.timezone2 = this.userPrefsService.getTimezone();
   }
 
   ngOnInit() {

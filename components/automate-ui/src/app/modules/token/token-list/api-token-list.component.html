@@ -60,11 +60,9 @@
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
               </chef-td>
               <chef-td class="created-date">
-                <span [@myAnim]='(userPrefsService.timeformat$ | async)?.value' >
-                  {{ token.created_at | datetime 
-                    : (userPrefsService.timezone$ | async)?.value 
-                    : (userPrefsService.timeformat$ | async)?.value }}
-                  </span>
+                <!-- <span [@myAnim]='(userPrefsService.timeformat$ | async)?.value' > -->
+                  <chef-time [time]='token.created_at'></chef-time>
+                  <!-- </span> -->
               </chef-td>
               <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>

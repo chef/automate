@@ -1,12 +1,3 @@
-import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-// import { UserPreference } from 'app/services/user-preferences/user-preferences.model';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { userPreferencesTimeformat } from 'app/services/user-preferences/user-preferences.selector';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-  // private isDestroyed: Subject < boolean > = new Subject<boolean>();
-
 export class DateTime {
   // Common date formats for use with moment.js -- https://momentjs.com/docs/#/displaying/format/
 
@@ -58,20 +49,5 @@ export class DateTime {
   // Format for navigating to compliance reports with an endtime set
   // 2019-09-24
   public static readonly REPORT_DATE: string = 'YYYY-MM-DD';
-
-  public userSelectedTimeFormat$;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
-
-  constructor(
-    public userPrefsService: UserPreferencesService,
-    private store: Store<NgrxStateAtom>
-    ) {
-      this.userSelectedTimeFormat$ = this.store.select(userPreferencesTimeformat).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(data => {
-      console.log(data);
-      return data.value;
-    });
-  }
 
 }
