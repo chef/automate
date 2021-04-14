@@ -1,23 +1,48 @@
 describe('infra role detail', () => {
   let adminIdToken = '';
-  const now = Cypress.moment().format('MMDDYYhhmm');
-  const serverID = 'chef-manage';
-  const serverName = 'chef manage';
-  const orgID = 'viveksingh_msys';
-  const orgName = 'viveksingh_msys';
-  const serverFQDN = 'api.chef.io';
-  const serverIP = '50.21.221.24';
-  const adminUser = 'viveksingh_msys';
-  const adminKey = `-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAln/p9MU/A5J33Q5WdLEC0tlFFo5Tth5fZHSPBJMoKBmQlzbH\naega5xsyiCkHZ0kT+jVOlENayklzyAjEGHS0pi4DYX5GNxGISi6yxAVj6OD1faof\n5ECwdfIkotxDsDTwiRNm7ja49XN/RR9iLqCC66ZdhY8ILvZ6NIXDJ5Vs43COLJsS\nC7oR6x7p4osYpJ/PhHDfGvEjVCH/y28Ozv74nVE2hgY3ym1YO2SzYh1dZztoOMWU\nWKZdgTWfq3Lo1wmQNv4XWb3kTWJHWKlL+XUmgfyLK7r/HAbeqaX9fVBWSvfJibff\npGIQK5wrw3AR37vF0B03NLvyHU6QdFBFFvHkHQIDAQABAoIBAH0buJERp2CA0cOh\nt50pyP8ePqCRkGVEumf3vSxAaJFtLxWFJCCWIkccBNXLxavGxCSrS7dUhpTCms0e\n/GSYH9RFS+ov3o7ItFN2noT1NijRWUItunU0kXx63pnEIUDJwWsyBc7hDsB8UsBT\nZnr8U9kxY20zicoAe3ZN+/1b6jjmgePQTrUHcX0kvaObsfRHwNLYuHiuD8IMftLX\nrWzPZy873S7N8GkGdrUDhh+9D7y0NCOFeSQe6RZNWE+/1wbOXPquZ3LSzyAe8pPQ\ntq2nVUx4f94h8CYfR/XzJI+SUETV+SZQkZ87r2TYQOsBD8DEY3f/pDe9yccNHuzb\nA+SrWsECgYEAx/Bj0/+drvQJ7xqGHLsrf9gbdXDGsMloXq2WvG7FstiPDKP3qQ42\n1BLQ2ZJzm9JpKcfIgRi3rTiKf2bwU9Lrsxz/CZvNCXcxi4KDTlCOG+C03sfAANKz\nvXKCpHeBG8+r/CK8jRjJpAWwA5rCbfaZ5KWW+roPdnHH0CAicMgqXQcCgYEAwLLF\nGhWhWwyhXy/0V6LPtd99IbUcpjFGN/AaVOk5Gngh0F1OPeFSQp6kkH3sckq/N/B0\naDy8oSXAyRF/UT6VicFzp0LRMYJx57sRHZ7WVj8tAB0mKCAztkegVB99bfLiQQ1R\nOE6iWmb+2bomLyRbhoMAM6XlFtN92f6mC1f0kLsCgYBYqvsaoVnEpOVi7FhdlYQN\nBkHnK0RyUl++3SzkFBwI3JFUAcNrbapTEqUcWB59FCsfJEJ/Pf73CwQgy/34rqlo\nnYtdL4MWl42ZWR/yMzdSlaygv+UeeFLNyWK2nWjcdJTJFH6Z9Ew4OW19q7xeF+bX\nx7fVKX6CAKOkYRvk+GARMQKBgQC91B5pSN+woyuhastJPcFjCGvrtdAoRChJWMWH\n2kz/r1KYQiKewQZZTJEPKo2wNcRT5hO20AZ+tYNKUGtc7MtBbopxPlh4bmmpf9Yn\nmN7LDedV0mFRbA+lRMBDvtXAZ2HN9cGKN6SmbAopEMEm9akYRJsBRi79IpE7HCoU\nyKvLmwKBgQDCojS4ANw4C8YrMOsbzWacADdN7vgSLgOyiJf1/pr2ieMUtiCpDUiY\nYwCuViYqyjGRbnkHgcHJSdybxIsn4cBUHQbUFmS4fmOSSmfW5fgmZ3i+iUPqSBP2\n5elo4PFX8XVqjCf2tiPrnJBAKLxp9yY+XWJwfvc8gz/VoyxVOEQ6+Q==\n-----END RSA PRIVATE KEY-----`;
+  const serverID = 'chef-server-dev-test';
+  const serverName = 'chef server dev';
+  const orgID = 'chef-org-dev';
+  const orgName = '4thcoffee';
+  const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
+  const serverIP = '34.219.25.251';
+  const adminUser = 'chefadmin';
+  const adminKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEA6KIxELz/HWjwT8qiQrhPbvymVG/hnF/n8owZfh04hsABneB8
+u6xklW+VjCRMBHfptovHn+5NyN5blR1wpXQc5iKXEPfDny/gncNAeu4lrezs8f8z
+dZa2jFOwFH/Cm4o1+po3uhXtAsdtN/WI7EiCHZEeXRA5jFYF86Y92G0FDoaRiA4G
+jWu7M3hL/61ELZ80d2RH+GdKgFqQh9hRlnx59ozmMW4maaMXpx2eb8RLvYgKBAUH
+5qGpWdMcODsLBkIy/+RqpLdsMFxrvFWBeTVBQvecx/UZMMWU3yQigzRismiYuLug
+nbN7DhgK71GXPkHG4JoxltgW5E+lYtjZD1wh9wIDAQABAoIBAQCJSGWyHgZjQbFH
+NSqKOyBNO/WgMKIwWPyVSw4kOXRJOPf7RiX1zqdQ9JeJK0ZdALLAUj7M56Gpn2bm
+WYhHa30+Zj1F+yDLSULBdx8PLIi52e5+ZP7mLrmtmBl6D2c1yNtP90BZpWTH1g5j
+Dpft8GAwuJn1i4Sah41dmsY2eSeZyLn1RMj8MXW/bXr4QbRtvxjXcW6Sfstj8jrV
+zjG/kbptPzoFTwqUcIR8xmmlewSqOERMhdJXYNW07uVMzmZTKB/UrJQr+lzx4otJ
+g0uHQftcku00/KW6iyGTKbQh9gm4UJ4JfVRg9rrCL2NPvLw6Y3BzlKTVOxj8UFI5
+yoZ/YBLpAoGBAPjwJQptYtgauW6MR7wboa4YK4ltB9Qa7SIbfVGPQISDhfdpyg/6
+LZW65MwHPbWM4NjwwpkaLuBrBY0eqGvxtdWAvLPCBTRfoSay5v9E7qFgWWTNWhuq
+C/SuzJeh1bnSNoNW0/fKDDAPsU+x3gUNKiu0VWFCq5tTk78NWat3wpLDAoGBAO87
+o6csdMSrLOaqoUCqUOJNpv6h8uMxLyOPJWgqAIZCVNpZaPOuWseHavkofkI5Hpzu
+T1rBEZZKVjZN8JFXc+1O4n9uqd8kXooONqsRYDDPcKxHqvibXWl42PeNDx/tcETo
+dXiwhjtHuoBjKTyp18+ND8i8wjIb0pEwjLnPBpi9AoGBAKRnZO8YAtmZ/LEHsDCJ
+RyQFDmu6OBtalRWbdg4xP3jEq+sUUMBwhz6FqakddyG5op1jlAEtC5xm0cm7X5u6
+jE4usXE+R9Wo+nLmYCxiR/8H9MHf5Qy0JyU3dCMIXHBWZm4jH+Zb5+St2Ho7i9dm
+NF2cwW50a4UvkznwBTJ662OlAoGAU4fsbXutTdpC9EuRwEV3tnzMmU4sw70xq2XY
+9tTrl/VjMVZUufkgA1k6NcM4yqCtGrhvBs4w+Nv93Do8jFMPzEVl+n7GW36Ub/nk
+hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
+4u3xbLUCgYEAm+1Dv8bvC9d3Z08mCJjUbzdRG6qA39EXpixVYjbmXmDpy71KA2zR
+LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
+8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
+-----END RSA PRIVATE KEY-----`;
   const roleName = 'chef-load-test-1';
   const roleDescription = 'role description';
-  const defaultAttribute = {default: "test"};
-  const overrideAttribute = {override: "test"};
-  const runlist = ["recipe[aix::nim_master_setup]", "recipe[aix::nim_master_setup_standalone]"];
+  const defaultAttribute = {default: 'test'};
+  const overrideAttribute = {override: 'test'};
+  const runlist = ['recipe[aix::nim_master_setup]', 'recipe[aix::nim_master_setup_standalone]'];
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
-  const nestedJson = '{"id":"0001", "type": "donut", "batters": {"batter": [{ "id": "1001", "type": "Regular" }, { "id": "1002", "type": "Chocolate" }]} }';
-  
+  const nestedJson = '{"id":"0001","batters":{"batter":[{"id":"1001"},{"id": "1002"}]} }';
+
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
@@ -100,7 +125,7 @@ describe('infra role detail', () => {
     it('displays role details', () => {
       cy.get('.page-title').contains(roleName);
     });
-    
+
     // details page specs
     it('run list details page', () => {
       cy.get('[data-cy=expand-runlist]').contains('Expand All');
@@ -112,8 +137,9 @@ describe('infra role detail', () => {
     });
 
     it('can select environment and load run list data', () => {
-      cy.get('.version-dropdown .selected-value .option-content').contains('_default').should('exist');
-      
+      cy.get('.version-dropdown .selected-value .option-content').contains('_default')
+        .should('exist');
+
       cy.get('.version-dropdown .selected-value').contains('_default').click();
       cy.get('.version-dropdown .options .option-content').contains('_default').click();
       cy.get('.version-dropdown .selected-value').contains('_default').should('exist');
@@ -123,17 +149,20 @@ describe('infra role detail', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('[data-cy=search-roles-and-recipes]').type('aix');
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('aix').should('exist');
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('aix')
+        .should('exist');
       cy.wait(1000);
       cy.get('[data-cy=search-roles-and-recipes]').clear();
       cy.wait(1000);
       cy.get('[data-cy=search-roles-and-recipes]').type('test');
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('test').should('exist');
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('test')
+        .should('exist');
       cy.wait(1000);
       cy.get('[data-cy=search-roles-and-recipes]').clear();
       cy.wait(2000);
-      cy.get('[data-cy=search-roles-and-recipes]').type('example');
-      cy.get('.cdk-virtual-scroll-content-wrapper .no-data').contains('Not Available').should('exist');
+      cy.get('[data-cy=search-roles-and-recipes]').type('exp');
+      cy.get('.cdk-virtual-scroll-content-wrapper .no-data').contains('Not Available')
+        .should('exist');
       cy.wait(1000);
       cy.get('[data-cy=search-roles-and-recipes]').clear();
       cy.wait(1000);
@@ -160,22 +189,29 @@ describe('infra role detail', () => {
     });
 
     // drag-drop specs
-    it('can select available roles and recipes, available roles, available recipes and load respective data', () => {
+    it('can select available roles and recipes, only roles, only recipes to load respective data',
+      () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.select-box .mat-select .mat-select-value-text').contains('available roles and recipes').should('exist');
-      
+      cy.get('.select-box .mat-select .mat-select-value-text')
+        .contains('available roles and recipes').should('exist');
+
       cy.get('.select-box .mat-select ').contains('available roles and recipes').click();
       cy.get('.cdk-overlay-container .mat-option .mat-option-text [alt="Available roles"]').click();
-      cy.get('.select-box .mat-select .mat-select-value-text').contains('available roles').should('exist');
+      cy.get('.select-box .mat-select .mat-select-value-text').contains('available roles')
+        .should('exist');
 
       cy.get('.select-box .mat-select ').contains('available roles').click();
-      cy.get('.cdk-overlay-container .mat-option .mat-option-text [alt="Available recipes"]').click();
-      cy.get('.select-box .mat-select .mat-select-value-text').contains('available recipes').should('exist');
+      cy.get('.cdk-overlay-container .mat-option .mat-option-text [alt="Available recipes"]')
+        .click();
+      cy.get('.select-box .mat-select .mat-select-value-text').contains('available recipes')
+        .should('exist');
 
       cy.get('.select-box .mat-select ').contains('available recipes').click();
-      cy.get('.cdk-overlay-container .mat-option .mat-option-text').contains('available roles and recipes').click();
-      cy.get('.select-box .mat-select .mat-select-value-text').contains('available roles and recipes').should('exist');
+      cy.get('.cdk-overlay-container .mat-option .mat-option-text')
+        .contains('available roles and recipes').click();
+      cy.get('.select-box .mat-select .mat-select-value-text')
+        .contains('available roles and recipes').should('exist');
 
       cy.get('app-infra-role-details chef-modal').should('exist');
 
@@ -188,55 +224,58 @@ describe('infra role detail', () => {
     it('can select a item from list, move to right then update the runlist', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('audit').click();
-    
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('chef-client')
+        .click();
+
       cy.get('[data-cy=drag-right]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-    
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
       cy.wait(2000);
-      cy.get('#runlist-table-container td #run-list-name').contains('audit').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('chef-client').should('exist');
     });
 
     it('can select multiple item from list, move to right then update the runlist', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('centos-cookbook-file').click();
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list')
+        .contains('centos-cookbook-file').click();
       cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('cron').click();
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('learn').click();
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('chef-sugar').click();
       cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('logrotate').click();
-      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('poise').click();
-      
+      cy.get('.cdk-virtual-scroll-content-wrapper #select-run-list').contains('openldap').click();
+
       cy.get('[data-cy=drag-right]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-      
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
       cy.wait(2000);
-      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file')
+        .should('exist');
       cy.get('#runlist-table-container td #run-list-name').contains('cron').should('exist');
-      cy.get('#runlist-table-container td #run-list-name').contains('learn').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('chef-sugar').should('exist');
       cy.get('#runlist-table-container td #run-list-name').contains('logrotate').should('exist');
-      cy.get('#runlist-table-container td #run-list-name').contains('poise').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('openldap').should('exist');
     });
 
     it('can select a item from selected run list, move to left then update the runlist', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('.vertical #updated-run-list').contains('aix::nim_master_setup').click();
-      
+
       cy.get('[data-cy=drag-left]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-      
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
@@ -245,16 +284,17 @@ describe('infra role detail', () => {
       cy.wait(2000);
     });
 
-    it('can select multiple item from selected run list, move to left then update the runlist', () => {
+    it('can select multiple item from selected run list, move to left then update the runlist',
+      () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical #updated-run-list').contains('learn').click();
-      cy.get('.vertical #updated-run-list').contains('poise').click();
+      cy.get('.vertical #updated-run-list').contains('chef-sugar').click();
+      cy.get('.vertical #updated-run-list').contains('openldap').click();
 
       cy.get('[data-cy=drag-left]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-        
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
@@ -267,21 +307,23 @@ describe('infra role detail', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('.vertical #updated-run-list').contains('aix::nim_master_setup_standalone').click();
-        
+
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-        
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
       cy.wait(2000);
-      cy.get('#runlist-table-container td #run-list-name').contains('aix::nim_master_setup_standalone').should('exist');
+      cy.get('#runlist-table-container td #run-list-name')
+        .contains('aix::nim_master_setup_standalone').should('exist');
     });
-  
-    it('can select multiple item from selected run list, move item up then update the runlist', () => {
+
+    it('can select multiple item from selected run list, move item up then update the runlist',
+      () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('.vertical #updated-run-list').contains('centos-cookbook-file').click();
@@ -290,15 +332,17 @@ describe('infra role detail', () => {
       cy.get('[data-cy=drag-up]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-          
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
       cy.wait(2000);
-      cy.get('#runlist-table-container td #run-list-name').contains('aix::nim_master_setup_standalone').should('exist');
-      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file').should('exist');
+      cy.get('#runlist-table-container td #run-list-name')
+        .contains('aix::nim_master_setup_standalone').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file')
+        .should('exist');
     });
 
     it('can expand a runlist', () => {
@@ -313,26 +357,28 @@ describe('infra role detail', () => {
       cy.get('#runlist-table-container th').contains('Version');
       cy.get('#runlist-table-container th').contains('Position');
     });
-    
+
     it('can select a item from selected run list, move item down then update the runlist', () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('.vertical #updated-run-list').contains('logrotate').click();
-    
+      cy.get('.vertical #updated-run-list').contains('centos-cookbook-file').click();
+
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-        
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
       cy.wait(2000);
-      cy.get('#runlist-table-container td #run-list-name').contains('logrotate').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file')
+        .should('exist');
     });
-  
-    it('can select multiple item from selected run list, move item down then update the runlist', () => {
+
+    it('can select multiple item from selected run list, move item down then update the runlist',
+      () => {
       cy.get('[data-cy=edit-runlist]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('.vertical #updated-run-list').contains('aix::nim_master_setup_standalone').click();
@@ -342,7 +388,7 @@ describe('infra role detail', () => {
       cy.get('[data-cy=drag-down]').click();
       cy.get('[data-cy=update-run-list]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-        
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
@@ -350,8 +396,10 @@ describe('infra role detail', () => {
 
       cy.wait(2000);
 
-      cy.get('#runlist-table-container td #run-list-name').contains('aix::nim_master_setup_standalone').should('exist');
-      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file').should('exist');
+      cy.get('#runlist-table-container td #run-list-name')
+        .contains('aix::nim_master_setup_standalone').should('exist');
+      cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file')
+        .should('exist');
       cy.get('#runlist-table-container td #run-list-name').contains('cron').should('exist');
     });
 
@@ -410,11 +458,12 @@ describe('infra role detail', () => {
     it('edit default attribute', () => {
       cy.get('[data-cy=edit-default-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('[data-cy=default-attribute]').clear().invoke('val', validJson).trigger('change').type(' ');
+      cy.get('[data-cy=default-attribute]').clear().invoke('val', validJson)
+        .trigger('change').type(' ');
 
       cy.get('[data-cy=update-default-attribute]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-    
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
@@ -425,15 +474,16 @@ describe('infra role detail', () => {
     it('can edit default attribute and add nested json', () => {
       cy.get('[data-cy=edit-default-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('[data-cy=default-attribute]').clear().invoke('val', nestedJson).trigger('change').type(' ');
+      cy.get('[data-cy=default-attribute]').clear().invoke('val', nestedJson)
+        .trigger('change').type(' ');
 
       cy.get('[data-cy=update-default-attribute]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-    
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true});
       cy.wait(2000);
     });
 
@@ -449,7 +499,8 @@ describe('infra role detail', () => {
       cy.get('[data-cy=default-attribute]').clear();
 
       // here we exit with the Cancel button
-      cy.get('[data-cy=cancel-default-attr-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-default-attr-button]').contains('Cancel').should('be.visible')
+        .click();
       cy.get('app-infra-role-details  chef-modal').should('not.be.visible');
     });
 
@@ -468,7 +519,8 @@ describe('infra role detail', () => {
       cy.get('app-infra-role-details chef-modal').should('exist');
 
       // here we exit with the Cancel button
-      cy.get('[data-cy=cancel-default-attr-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-default-attr-button]').contains('Cancel').should('be.visible')
+        .click();
       cy.get('app-infra-role-details  chef-modal').should('not.be.visible');
     });
 
@@ -488,30 +540,32 @@ describe('infra role detail', () => {
     it('edit override attribute', () => {
       cy.get('[data-cy=edit-override-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('[data-cy=override-attribute]').clear().invoke('val', validJson).trigger('change').type(' ');
+      cy.get('[data-cy=override-attribute]').clear().invoke('val', validJson)
+        .trigger('change').type(' ');
 
       cy.get('[data-cy=update-override-attribute]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-    
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true});
       cy.wait(2000);
     });
 
     it('can edit override attribute and add nested json', () => {
       cy.get('[data-cy=edit-override-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
-      cy.get('[data-cy=override-attribute]').clear().invoke('val', nestedJson).trigger('change').type(' ');
+      cy.get('[data-cy=override-attribute]').clear().invoke('val', nestedJson)
+        .trigger('change').type(' ');
 
       cy.get('[data-cy=update-override-attribute]').click();
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
-    
+
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({multiple: true});
       cy.wait(2000);
     });
 
@@ -527,7 +581,8 @@ describe('infra role detail', () => {
       cy.get('[data-cy=override-attribute]').clear();
 
       // here we exit with the Cancel button
-      cy.get('[data-cy=cancel-override-attr-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-override-attr-button]').contains('Cancel').should('be.visible')
+        .click();
       cy.get('app-infra-role-details  chef-modal').should('not.be.visible');
     });
 
@@ -540,13 +595,15 @@ describe('infra role detail', () => {
       cy.get('[data-cy=update-override-attribute]')
       .invoke('attr', 'disabled')
       .then(disabled => {
-        disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=update-override-attribute]').click();
+        disabled ? cy.log('buttonIsDiabled') :
+          cy.get('[data-cy=update-override-attribute]').click();
       });
 
       cy.get('app-infra-role-details chef-modal').should('exist');
 
       // here we exit with the Cancel button
-      cy.get('[data-cy=cancel-override-attr-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-override-attr-button]').contains('Cancel')
+        .should('be.visible').click();
       cy.get('app-infra-role-details  chef-modal').should('not.be.visible');
     });
 
@@ -564,6 +621,5 @@ describe('infra role detail', () => {
 
       cy.wait(2000);
     });
-
   });
 });

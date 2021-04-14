@@ -87,7 +87,7 @@ export class InfraRoleEffects {
       ofType(RoleActionTypes.CREATE_SUCCESS),
       map(({ payload: { name } }: CreateRoleSuccess) => new CreateNotification({
         type: Type.info,
-        message: `Successfully created role -${name}.`
+        message: `Successfully created role - ${name}.`
       }))));
 
   createRoleFailure$ = createEffect(() =>
@@ -143,7 +143,7 @@ export class InfraRoleEffects {
       ofType(RoleActionTypes.UPDATE_SUCCESS),
       map(({ payload: role }: UpdateRoleSuccess) => new CreateNotification({
         type: Type.info,
-        message: `Successfully updated role -${role.name} .`
+        message: `Successfully updated role - ${role.name} .`
       }))));
 
   updateRoleFailure$ = createEffect(() =>

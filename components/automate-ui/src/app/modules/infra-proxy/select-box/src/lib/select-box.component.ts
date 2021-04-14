@@ -280,6 +280,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   }
 
   private loadRoles(): void {
+    this.createrolesList = [];
     this.loading = true;
     const payload = {
       roleName: this.searchValue,
@@ -299,7 +300,6 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
       takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, RolesState]) => {
       if (!isNil(RolesState) && _getRolesSt === EntityStatus.loadingSuccess) {
-        this.createrolesList = [];
         this.createrolesList = RolesState.items;
         if (RolesState.items.length) {
           this.createrolesList.forEach((role) => {
