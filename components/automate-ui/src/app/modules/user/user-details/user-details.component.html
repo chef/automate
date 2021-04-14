@@ -31,14 +31,6 @@
             </chef-error>
           </chef-form-field>
           <chef-form-field class="timezone-field">
-            <label for="timezone">Time Zone</label>
-            <chef-select #tz [value]="(userPrefsService.timezone$ | async)?.value" (change)="handleTimezoneChange(tz.value)">
-              <chef-option value="UTC">UTC</chef-option>
-              <chef-option value="Asia/Taipei">Asia/Taipei</chef-option>
-              <chef-option value="America/Los_Angeles">America/Los Angeles</chef-option>
-            </chef-select>
-          </chef-form-field>
-          <chef-form-field class="timezone-field">
             <label for="timeformat">Time Format</label>
             <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value" (change)="handleTimeFormatChange(timeformat.value)">
               <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
@@ -47,8 +39,7 @@
             </chef-select>
           </chef-form-field>
           <div class="test-container">
-            <button class="test one" (click)="handleGetPrefs()">Test Get Timezone</button>
-            <button class="test two" disabled (click)="handleUpdatePrefs(tz.value)">Test Update Timezone</button>
+            <button class="test one" (click)="handleGetPrefs()">Test Get Preferences</button>
           </div>
         </form>
         <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline

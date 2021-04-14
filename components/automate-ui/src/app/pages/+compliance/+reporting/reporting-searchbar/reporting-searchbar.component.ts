@@ -33,10 +33,6 @@ export class ReportingSearchbarComponent implements OnInit {
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
-  @Input() timezone = 'UTC'; // set default timezone to UTC fallback
-  get tzAbbr() {
-    return moment.tz(this.timezone).zoneAbbr();
-  }
 
   @Output() suggestValues = new EventEmitter();
   @Output() filtersCleared = new EventEmitter();
@@ -104,10 +100,7 @@ export class ReportingSearchbarComponent implements OnInit {
 
   ngOnInit() {
     this.isLoadingSuggestions = false;
-    // visible date is getting converted to UTC with ...toISOString() in the view
-    // this will need to be updated in the calendar component
-    this.visibleDate = moment.utc(this.date).tz(this.timezone);
-    console.log(this.visibleDate.format('YYYY-MM-DD HH:mm z'));
+    this.visibleDate = moment.utc(this.date);
     this.filterTypesCategories = JSON.parse(JSON.stringify(this.filterTypes));
   }
 

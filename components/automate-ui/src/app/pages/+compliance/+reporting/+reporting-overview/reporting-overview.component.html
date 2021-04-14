@@ -56,7 +56,6 @@
       <app-overview-trend 
         [data]="nodeTrendData" 
         (dateSelected)="onDateChanged($event)"
-        [timezone]="( userPrefsService.timezone$ | async )?.value"
         type="nodes">
       </app-overview-trend>
       <figcaption>Node Status Over Time</figcaption>
