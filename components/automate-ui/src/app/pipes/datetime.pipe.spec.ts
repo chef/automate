@@ -1,4 +1,4 @@
-import * as moment from 'moment-timezone';
+import * as moment from 'moment/moment';
 
 import { DatetimePipe } from './datetime.pipe';
 
