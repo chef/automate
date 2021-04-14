@@ -29,10 +29,10 @@
             <ul class="list" *ngIf="menuList.length">
               <li *ngFor="let item of menuList; let i = index;">
                 <span (click)="listClickEvent($event)" 
-                [ngClass]="{'extend-list': i === 0}">
+                [ngClass]="{'extend-list': i === menuIndex}">
                   {{ item.menu | titlecase  }} ({{ item.subMenu.length }})
                 </span>
-                <ul class="sub-list" [ngClass]="{'show': i === 0}">
+                <ul class="sub-list" [ngClass]="{'show': i === menuIndex}">
                   <li *ngFor="let content of item.subMenu; let j = index;" 
                   [ngClass]="{'active-sub-list': j === 0 && i === 0}" 
                   (click)="subListClickEvent($event, content)">
