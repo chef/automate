@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "npm run serve",
     "serve": "ng serve --configuration=no_auth",
-    "serve:hab": "echo '*** Please ignore the message to go to http://localhost:4200 -- the correct URL is https://a2-dev.test/ ***' && ng serve --host 0.0.0.0 --disable-host-check --public-host=httpfake://0.0.0.0:0/ --ssl-key ../../dev/certs/automate-ui.key --ssl-cert ../../dev/certs/automate-ui.crt --base-href / --live-reload false --poll 1000",
+    "serve:hab": "echo '*** Please ignore the message to go to http://localhost:4200 -- the correct URL is https://a2-dev.test/ ***' && ng serve --host 0.0.0.0 --disable-host-check --public-host=httpfake://0.0.0.0:0/ --ssl-key ../../dev/certs/automate-ui.key --ssl-cert ../../dev/certs/automate-ui.crt --live-reload false --poll 1000",
     "preinstall": "npx npm-force-resolutions",
     "install": "echo 'use `npm run install:ui-library` for old behaviour'; npm run copy-ui-lib",
     "install:ui-library": "npm run clean-ui-lib && scripts/build_chef_ui_lib && npm run copy-ui-lib",
