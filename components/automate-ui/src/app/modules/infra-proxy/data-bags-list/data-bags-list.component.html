@@ -18,7 +18,7 @@
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
     <chef-toolbar>
       <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-        <chef-button primary (click)="openCreateModal()">Create Databag</chef-button>
+        <chef-button primary (click)="openCreateModal()">Create Data Bag</chef-button>
       </app-authorized>
     </chef-toolbar>
     <chef-table *ngIf="dataBags.length">

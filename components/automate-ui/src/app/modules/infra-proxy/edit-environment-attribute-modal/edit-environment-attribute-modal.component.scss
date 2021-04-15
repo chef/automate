@@ -167,8 +167,8 @@ chef-modal {
 .divider-constraint {
   margin-top: 9px;
   width: 643px;
-  height: 0px;
-  border: 0.5px solid $chef-key-tab;
+  height: 1px;
+  background-color: $chef-key-tab;
 }
 
 .dynamic {
