@@ -51,7 +51,7 @@
   <div class="time-test" [class.active]="showTime">
     <button class="show-button" (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
     <h3>Current Time:</h3>
-    <p>{{ currentTime | datetime: 'ddd, DD MMM YYYY HH:mm z'}}</p>
+    <chef-time [time]="currentTime"></chef-time>
     <div class="hacky-line-break"></div>
     <chef-form-field class="timezone-field">
       <label for="timeformat">Time Format</label>
