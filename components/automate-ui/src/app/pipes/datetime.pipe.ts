@@ -13,5 +13,4 @@ export class DatetimePipe implements PipeTransform {
   public transform(value: moment.Moment | Date | string, formatStr: string): string {
     return moment.utc(value).format(formatStr);
   }
-
 }
