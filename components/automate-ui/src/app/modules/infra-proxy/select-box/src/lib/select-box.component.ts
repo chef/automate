@@ -16,6 +16,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListItem } from './list-item.domain';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import {
@@ -81,6 +82,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
 
   constructor(
     private store: Store<NgrxStateAtom>,
+    private sanitizer: DomSanitizer,
     private ngZone: NgZone
   ) { }
 
@@ -117,17 +119,6 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
       }
     }
     );
-  }
-
-  public handleInput(currentText): void {
-    this.leftFilterText = currentText;
-    if (this.searchChangeObserver.observers.length === 0) {
-      this.searchChangeObserver.pipe(debounceTime(1000), distinctUntilChanged())
-        .subscribe(term => {
-          this.searchRunlist(term);
-        });
-    }
-    this.searchChangeObserver.next(currentText);
   }
 
   /* This method moves items from original list to selected on button click*/
@@ -187,6 +178,27 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
       }
     );
     return rightSelectedList;
+  }
+
+  handleInput(currentText): void {
+    this.leftFilterText = currentText;
+    if (this.searchChangeObserver.observers.length === 0) {
+      this.searchChangeObserver.pipe(debounceTime(1000), distinctUntilChanged())
+        .subscribe(term => {
+          this.searchRunlist(term);
+        });
+    }
+    this.searchChangeObserver.next(currentText);
+  }
+
+  highlightText(list: string, searchText: string): SafeHtml {
+    if (!list) { return []; }
+    if (!searchText) { return list; }
+
+    const value = list.replace(
+      searchText, `<span class='highlight-text'>${searchText}</span>` );
+
+    return this.sanitizer.bypassSecurityTrustHtml(value);
   }
 
   moveItemUp(): void {
@@ -317,14 +329,18 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     });
   }
 
-  combinedRunlist(id: string) {
+  private combinedRunlist(id: string) {
     this.originalItems = [];
     switch (id) {
       case 'available roles and recipes':
         this.currentPage = 1;
         this.getRecipes(this.searchValue);
-        this.loadRoles();
-        this.loadRecipesOnly = false;
+        if (!this.searchValue.includes(':')) {
+          this.loadRoles();
+          this.loadRecipesOnly = false;
+        } else {
+          this.loadRecipesOnly = true;
+        }
         break;
 
       case 'available roles':

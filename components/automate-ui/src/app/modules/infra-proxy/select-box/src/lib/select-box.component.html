@@ -56,7 +56,7 @@
                 class="run-list-box"
                 [ngClass]="item.selected ? 'selected' : ''"
                 id="select-run-list">
-                  {{item.value}}
+                <span [innerHTML]="highlightText(item.value, leftFilterText)"></span>
               </div>
               <div class="spinner-item" *ngIf="loading">
                 <chef-loading-spinner size="50" fixed></chef-loading-spinner>

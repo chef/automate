@@ -192,10 +192,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   updateRunlist() {
-    this.runListLoading = true;
-    this.hasRun_List = false;
-    this.arrayOfNodesTree = [];
-    this.loadRunlists(this.env_id);
+    this.selectChangeHandler(this.env_id);
   }
 
   private loadRecipes(): void {
@@ -317,7 +314,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   }
 
   private childNode(child: List[], nodes: Node<ExpandedChildList>[]) {
-    const childNodes: Node<ExpandedChildList>[] = [];
     for (let i = 0; i < child.length; i++) {
       nodes.push({
         value: {
@@ -330,7 +326,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
         },
         children:
           child[i].children && child[i].children.length ?
-            this.childNode(child[i].children, childNodes) : []
+            this.childNode(child[i].children, []) : []
       });
     }
     return nodes;
