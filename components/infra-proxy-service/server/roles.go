@@ -386,6 +386,7 @@ func toResponseExpandedRunList(client *ChefClient, service *service.Service, run
 			if runlistCache[newItem.Type] != nil {
 				if runlistCache[newItem.Type][newItem.Name] {
 					newRunList.Skipped = true
+					newRunList.Position = -1
 				}
 				runlistCache[newItem.Type][newItem.Name] = true
 			} else {
