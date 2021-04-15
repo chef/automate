@@ -19,6 +19,7 @@ import {
 import { isNil } from 'ngx-cookie';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import { Regex } from 'app/helpers/auth/regex';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 export class CookbookConstraintGrid {
   id: number;
@@ -160,7 +161,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.isNavigationKey(event)) {
+    if (!Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.defaultAttributeForm.controls.default.setValue(
         IdMapper.transform(this.defaultAttributeForm.controls.default.value.trim()));
@@ -294,10 +295,6 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.store.dispatch(
       new UpdateEnvironment(environment)
     );
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
 }

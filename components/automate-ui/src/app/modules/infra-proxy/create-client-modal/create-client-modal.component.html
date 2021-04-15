@@ -6,7 +6,7 @@
         <chef-form-field>
           <label *ngIf="!created">
             <span class="label">Client Name</span>
-            <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
+            <input chefInput firstFocus formControlName="name" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
           </label>
           <chef-error *ngIf="error">{{error}}</chef-error>
         </chef-form-field>

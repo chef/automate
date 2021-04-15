@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 import { FormGroup } from '@angular/forms';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 import { CookbookConstraintGrid } from '../create-environment-modal/create-environment-modal.component';
 
@@ -76,7 +77,7 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -138,10 +139,6 @@ export class InfraEnvironmentConstraintComponent implements OnInit {
       }
     });
     return previousName;
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
 }

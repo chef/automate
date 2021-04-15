@@ -50,6 +50,13 @@ import {
  *    <h2 id="unique-id"> TITLE OF MODAL </h2>
  * ```
  *
+ * Using custom autofocus
+ * By default, autofocus will apply to the modal itself on locked modals
+ * and to the close button on unlocked modals.  We can customize where
+ * the autofocus goes first, by adding the attribute "firstFocus" to the
+ * desired element.  Currently this works with all standard HTML input elements as
+ * well as our custom chef-button element.
+ *
  * @example
  * <chef-modal locked="false" label="unique-id">
  * <span id="unique-id" slot="title"> Hey! </span>
@@ -63,6 +70,13 @@ import {
  * </p>
  * <p> Switch to the `Console` pane and type `$0.visible = true`. </p>
  * <p> Type `$0.visible = false` to turn off the modal again.</p>
+ * </chef-modal>
+ *
+ * @example
+ * <chef-modal label="with-custom-focus" label="example-id">
+ *    <h2 slot="title" id="example-id"> Using custom autofocus </h2>
+ *    <label>this input will be focused upon opening</label>
+ *    <input type="text" firstFocus/>
  * </chef-modal>
  */
 @Component({
@@ -115,12 +129,7 @@ export class ChefModal {
     if (visible) {
       this.prevFocusedElement = document.activeElement as HTMLElement;
 
-      // when Angular detects the modal is open
-      // sets the focus on the close button for unlocked modals,
-      // or the div for locked modals
-      const focusElement =
-        (this.locked ? this.el.getElementsByClassName('modal').item(0) :
-        this.el.getElementsByClassName('close').item(0).firstElementChild) as HTMLElement;
+      const focusElement = this.getFocusElement(this.locked);
 
       const focusElementInterval = setInterval(() => {
         focusElement.focus();
@@ -166,6 +175,27 @@ export class ChefModal {
     }
 
     return '';
+  }
+
+  // when Angular detects the modal is open
+  // it sets the focus by default on the close button for unlocked modals,
+  // or the modal div for locked modals
+  // Developer can specify element to focus first by using firstFocus attribute
+  // on an unlocked modal
+  private getFocusElement(lockStatus: boolean): HTMLElement {
+    const modal = this.el.getElementsByClassName('modal').item(0) as HTMLElement;
+    const closeFocus = this.el.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
+    const firstFocus = this.el.querySelector('[firstFocus]') as HTMLElement;
+
+    if (lockStatus) {
+      return modal;
+    } else if (firstFocus) {
+      return firstFocus.tagName === 'CHEF-BUTTON'
+        ? firstFocus.firstElementChild as HTMLElement
+        : firstFocus;
+    }
+
+    return closeFocus;
   }
 
   private handleClose() {

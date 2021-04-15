@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { FormGroup } from '@angular/forms';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 @Component({
   selector: 'app-create-chef-server-modal',
@@ -28,7 +29,7 @@ export class CreateChefServerModalComponent implements OnInit {
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.createForm.controls.id.setValue(
         IdMapper.transform(this.createForm.controls.name.value.trim()));
@@ -36,7 +37,7 @@ export class CreateChefServerModalComponent implements OnInit {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -51,7 +52,4 @@ export class CreateChefServerModalComponent implements OnInit {
     this.createClicked.emit();
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
