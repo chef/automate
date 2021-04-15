@@ -443,3 +443,7 @@
 ::ng-deep .mat-select-disabled .mat-select-value {
   color: $chef-black;
 }
+
+::ng-deep .highlight-text {
+  background: $chef-highlight;
+}
