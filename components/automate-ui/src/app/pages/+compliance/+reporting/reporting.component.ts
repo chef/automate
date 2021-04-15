@@ -191,8 +191,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
     private route: ActivatedRoute,
-    private layoutFacade: LayoutFacadeService,
-    public userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
