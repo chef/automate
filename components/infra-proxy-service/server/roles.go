@@ -241,6 +241,9 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
+	// Reset the cache
+	runlistCache = RunListCache{}
+
 	return &response.ExpandedRunList{
 		Id:      req.Environment,
 		RunList: runlist,
