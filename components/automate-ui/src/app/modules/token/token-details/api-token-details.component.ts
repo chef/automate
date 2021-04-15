@@ -17,9 +17,6 @@ import {
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-
-
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -43,8 +40,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService,
-    public userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService
   ) {
     this.updateForm = fb.group({
       // Must stay in sync with error checks in api-token-details.component.html
