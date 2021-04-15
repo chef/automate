@@ -10,7 +10,6 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { Manager } from 'app/entities/managers/manager.model';
 import { automateManager, cloudManagers, managerStatus } from 'app/entities/managers/manager.selectors';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { DeleteManager } from 'app/entities/managers/manager.actions';
 import { routeParams } from 'app/route.selectors';
 
@@ -33,8 +32,7 @@ export class IntegrationsListComponent {
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
-    private layoutFacade: LayoutFacadeService,
-    public userPrefsService: UserPreferencesService
+    private layoutFacade: LayoutFacadeService
   ) {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.managers$ = store.select(cloudManagers);
