@@ -100,10 +100,14 @@
               <span>Disconnected service: Last health check received </span>
               <span class="disconnect-time" [attr.id]="'disconnect-time-' + i">{{ service.last_event_since }} ago.</span>
             </div>
-            <chef-tooltip [attr.for]="'disconnect-time-' + i">{{ service.last_event_occurred_at | datetime: RFC2822 }}</chef-tooltip>
+            <chef-tooltip [attr.for]="'disconnect-time-' + i">
+              <chef-time [time]="service.last_event_occurred_at"></chef-time>
+            </chef-tooltip>
           </div>
           <div class="health-info-panel {{service.health_check}}">
-            <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
+            <chef-tooltip [attr.for]="'health-timestamp-' + i">
+              <chef-time [time]="service.health_updated_at"></chef-time>
+            </chef-tooltip>
             <div class ="health-line">
                 <chef-icon class="health-icon {{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
               <span>

@@ -55,7 +55,6 @@
               interactable>
               <p class="checkin-tooltip-info">
                 <span class="checkin-tooltip-text">{{ history.status | titlecase }}</span>
-                <!-- <span class="checkin-tooltip-date">{{ history.end | datetime: DateTime.RFC2822 }}</span> -->
                 <chef-time class="checkin-tooltip-date" [time]="history.end"></chef-time>
               </p>
               <a *ngIf="history.run_id"
@@ -67,7 +66,7 @@
             </chef-tooltip>
           </chef-td>
           <chef-td class="date-cell">
-            <span>{{ history.end | datetime: DateTime.RFC2822 }}</span>
+            <chef-time [time]="history.end"></chef-time>
           </chef-td>
           <chef-td class="relative-date-cell">
             <span>{{ history.label }}</span>
