@@ -85,52 +85,6 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
-The Chef Infra Server UI lets you:
-
-- Create a Role
-- Search for a specific role from a list of roles.
-- List out all the roles at one place.
-- View the details of roles:
-  - Run List
-  - Attributes
-- Delete a Role.
-
-#### Create a Role
-
-To create a new role, select **Create Role**, as shown below:
-
-// Image
-
-Selecting the **Create Role** button opens a dialog box. [Incomplete Section]
-
-// Image
-
-#### Search for a Role
-
-Use the **Search Roles** bar to find the existing role from the list of roles. Entering the name of a role in the search box returns roles matching your search criteria.
-
-// Image
-
-#### Details of a Role
-
-Select a role to view the details of that particular role.
-
-// Image
-
-**Run List:** The run list contains the *name*, *version* and *type* of that particular role.
-
-// Image
-
-**Attributes:** The attributes tab displays the *default* and the *override* attributes of the role.
-
-// Image
-
-#### Delete a Role
-
-Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon and then **Delete**, as illustrated below:
-
-// Image
-
 ### Environments
 
 An [environment]({{< relref "environments" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
