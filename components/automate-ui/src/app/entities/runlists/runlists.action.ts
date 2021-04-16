@@ -3,9 +3,9 @@ import { Action } from '@ngrx/store';
 import { Runlist } from './runlists.model';
 
 export enum RunlistActionTypes {
-  GET_ALL = 'RUNLIST::GET_ALL',
-  GET_ALL_SUCCESS = 'RUNLIST::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'RUNLIST::GET_ALL::FAILURE'
+  GET_ALL          = 'RUNLIST::GET_ALL',
+  GET_ALL_SUCCESS  = 'RUNLIST::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE  = 'RUNLIST::GET_ALL::FAILURE'
 }
 
 export interface RunlistsSuccessPayload {
