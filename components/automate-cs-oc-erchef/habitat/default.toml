@@ -60,6 +60,7 @@ timeout = 5000
 pool_init_size = 25
 pool_max_size = 100
 enabled=true
+health_check_enabled=true
 
 [depsolver]
 pool_max_size=5
