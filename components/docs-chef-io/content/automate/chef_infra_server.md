@@ -174,7 +174,7 @@ Select **Create Item**, as shown below:
 
 Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag Item ID** and the details of the key value pairs of that particular item. Select **Create**.
 
-**{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}**
+{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}
 
 #### Search for an Item
 
