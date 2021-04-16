@@ -1,4 +1,6 @@
 describe('infra role', () => {
+  const now = Cypress.moment().format('MMDDYYhhmm');
+  const cypressPrefix = 'infra';
   let adminIdToken = '';
   const serverID = 'chef-server-dev-test';
   const serverName = 'chef server dev';
@@ -34,11 +36,11 @@ hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
 LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
 -----END RSA PRIVATE KEY-----`;
-  const roleName = 'chef-load-test-1';
+  const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
-  const roleRunlistName = 'chef-load-test-2';
-  const roleDefaultAttrName = 'chef-load-test-3';
-  const roleOverrideAttrName = 'chef-load-test-4';
+  const roleRunlistName = `${cypressPrefix}-role-${now}-1`;
+  const roleDefaultAttrName = `${cypressPrefix}-role-${now}-2`;
+  const roleOverrideAttrName = `${cypressPrefix}-role-${now}-3`;
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
 
@@ -49,6 +51,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 
       cy.request({
         auth: { bearer: adminIdToken },
+        failOnStatusCode: false,
         method: 'POST',
         url: '/api/v0/infra/servers',
         body: {
@@ -57,10 +60,24 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           fqdn: serverFQDN,
           ip_address: serverIP
         }
+      }).then((resp) => {
+        if (resp.status === 200 && resp.body.ok === true) {
+          return;
+        } else {
+            cy.request({
+              auth: { bearer: adminIdToken },
+              method: 'GET',
+              url: `/api/v0/infra/servers/${serverID}`,
+              body: {
+                id: serverID
+              }
+            });
+          }
       });
 
       cy.request({
         auth: { bearer: adminIdToken },
+        failOnStatusCode: false,
         method: 'POST',
         url: `/api/v0/infra/servers/${serverID}/orgs`,
         body: {
@@ -70,15 +87,20 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           admin_user: adminUser,
           admin_key: adminKey
         }
-      });
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'GET',
-        url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}`,
-        body: {
-          id: orgID,
-          server_id: serverID
-        }
+      }).then((resp) => {
+        if (resp.status === 200 && resp.body.ok === true) {
+          return;
+        } else {
+            cy.request({
+              auth: { bearer: adminIdToken },
+              method: 'GET',
+              url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}`,
+              body: {
+                id: orgID,
+                server_id: serverID
+              }
+            });
+          }
       });
       cy.visit(`/infrastructure/chef-servers/${serverID}/organizations/${orgID}`);
       cy.get('app-welcome-modal').invoke('hide');
@@ -488,25 +510,72 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
     });
 
     // delete role spec
-    it('can delete a role', () => {
+    it('can delete multiple roles', () => {
       cy.get('#search-filter').type(roleName);
       cy.get('[data-cy=search-role]').click();
-      cy.get('#roles-table-container').contains(roleName).should('exist');
 
+      cy.get('#roles-table-container').contains(roleName).should('exist');
       cy.get('app-infra-roles #roles-table-container chef-td a').contains(roleName).parent()
         .parent().find('.mat-select-trigger').as('controlMenu');
-
       // we throw in a `should` so cypress retries until introspection allows menu to be shown
       cy.get('@controlMenu').scrollIntoView().should('be.visible')
         .click();
       cy.get('[data-cy=delete-role]').should('be.visible')
         .click();
-
       // accept dialog
       cy.get('app-infra-roles chef-button').contains('Delete').click();
-
       // verify success notification and then dismiss it
       cy.get('app-notification.info').contains(`Successfully deleted role - ${roleName}.`);
+      cy.get('app-notification.info chef-icon').click();
+
+      cy.wait(5000);
+
+      cy.get('#roles-table-container').contains(roleRunlistName).should('exist');
+      cy.get('app-infra-roles #roles-table-container chef-td a').contains(roleRunlistName).parent()
+        .parent().find('.mat-select-trigger').as('controlMenu');
+      // we throw in a `should` so cypress retries until introspection allows menu to be shown
+      cy.get('@controlMenu').scrollIntoView().should('be.visible')
+        .click();
+      cy.get('[data-cy=delete-role]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-roles chef-button').contains('Delete').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains(`Successfully deleted role - ${roleRunlistName}.`);
+      cy.get('app-notification.info chef-icon').click();
+
+      cy.wait(5000);
+
+      cy.get('#roles-table-container').contains(roleDefaultAttrName).should('exist');
+      cy.get('app-infra-roles #roles-table-container chef-td a').contains(roleDefaultAttrName)
+        .parent().parent().find('.mat-select-trigger').as('controlMenu');
+      // we throw in a `should` so cypress retries until introspection allows menu to be shown
+      cy.get('@controlMenu').scrollIntoView().should('be.visible')
+        .click();
+      cy.get('[data-cy=delete-role]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-roles chef-button').contains('Delete').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info')
+        .contains(`Successfully deleted role - ${roleDefaultAttrName}.`);
+      cy.get('app-notification.info chef-icon').click();
+
+      cy.wait(5000);
+
+      cy.get('#roles-table-container').contains(roleOverrideAttrName).should('exist');
+      cy.get('app-infra-roles #roles-table-container chef-td a').contains(roleOverrideAttrName)
+        .parent().parent().find('.mat-select-trigger').as('controlMenu');
+      // we throw in a `should` so cypress retries until introspection allows menu to be shown
+      cy.get('@controlMenu').scrollIntoView().should('be.visible')
+        .click();
+      cy.get('[data-cy=delete-role]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-roles chef-button').contains('Delete').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info')
+        .contains(`Successfully deleted role - ${roleOverrideAttrName}.`);
       cy.get('app-notification.info chef-icon').click();
 
       cy.get('#roles-table-container chef-th').should('not.be.visible');

@@ -68,6 +68,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
     default_attributes: '',
     override_attributes: ''
   });
+  public availableType: AvailableType[] = [];
   public childNodes: Node<ExpandedChildList>[] = [];
   public expandedRunList: List[] = [];
   public idList: string[] = [];
@@ -78,7 +79,6 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public label: string;
   public per_page = 9;
   public selectedAttrs: any;
-  public availableType: AvailableType[] = [];
 
   // precedence levels
   public default_attributes = 'default_attributes';
@@ -143,6 +143,9 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       setTimeout(() => this.filter(this.selected_level), 10);
       this.roleDetailsLoading = false;
       this.roleAttributeLoading = false;
+      if (!this.idList.length) {
+        this.idList[0] = this.env_id;
+      }
     });
   }
 

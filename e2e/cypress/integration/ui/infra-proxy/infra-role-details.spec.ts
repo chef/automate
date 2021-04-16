@@ -1,4 +1,6 @@
 describe('infra role detail', () => {
+  const now = Cypress.moment().format('MMDDYYhhmm');
+  const cypressPrefix = 'infra';
   let adminIdToken = '';
   const serverID = 'chef-server-dev-test';
   const serverName = 'chef server dev';
@@ -34,7 +36,7 @@ hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
 LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
 -----END RSA PRIVATE KEY-----`;
-  const roleName = 'chef-load-test-1';
+  const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
   const defaultAttribute = {default: 'test'};
   const overrideAttribute = {override: 'test'};
@@ -50,6 +52,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 
       cy.request({
         auth: { bearer: adminIdToken },
+        failOnStatusCode: false,
         method: 'POST',
         url: '/api/v0/infra/servers',
         body: {
@@ -58,10 +61,24 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           fqdn: serverFQDN,
           ip_address: serverIP
         }
+      }).then((resp) => {
+        if (resp.status === 200 && resp.body.ok === true) {
+          return;
+        } else {
+            cy.request({
+              auth: { bearer: adminIdToken },
+              method: 'GET',
+              url: `/api/v0/infra/servers/${serverID}`,
+              body: {
+                id: serverID
+              }
+            });
+          }
       });
 
       cy.request({
         auth: { bearer: adminIdToken },
+        failOnStatusCode: false,
         method: 'POST',
         url: `/api/v0/infra/servers/${serverID}/orgs`,
         body: {
@@ -71,18 +88,25 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           admin_user: adminUser,
           admin_key: adminKey
         }
+      }).then((resp) => {
+        if (resp.status === 200 && resp.body.ok === true) {
+          return;
+        } else {
+            cy.request({
+              auth: { bearer: adminIdToken },
+              method: 'GET',
+              url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}`,
+              body: {
+                id: orgID,
+                server_id: serverID
+              }
+            });
+          }
       });
+
       cy.request({
         auth: { bearer: adminIdToken },
-        method: 'GET',
-        url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}`,
-        body: {
-          id: orgID,
-          server_id: serverID
-        }
-      });
-      cy.request({
-        auth: { bearer: adminIdToken },
+        failOnStatusCode: false,
         method: 'POST',
         url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/roles`,
         body: {
@@ -94,17 +118,21 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           override_attributes: overrideAttribute,
           run_list: runlist
         }
-      });
-
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'GET',
-        url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/roles/${roleName}`,
-        body: {
-          id: orgID,
-          server_id: serverID,
-          name: roleName
-        }
+      }).then((resp) => {
+        if (resp.status === 200 && resp.body.ok === true) {
+          return;
+        } else {
+            cy.request({
+              auth: { bearer: adminIdToken },
+              method: 'GET',
+              url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/roles/${roleName}`,
+              body: {
+                id: orgID,
+                server_id: serverID,
+                name: roleName
+              }
+            });
+          }
       });
 
       cy.visit(`/infrastructure/chef-servers/${serverID}/organizations/${orgID}/roles/${roleName}`);
@@ -620,6 +648,30 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
 
       cy.wait(2000);
+    });
+
+    // delete role spec
+    it('can click on breadcrumb and delete role', () => {
+      cy.get('.breadcrumbs .breadcrumb').contains('Roles').click();
+      cy.get('#search-filter').type(roleName);
+      cy.get('[data-cy=search-role]').click();
+
+      cy.get('#roles-table-container').contains(roleName).should('exist');
+      cy.get('app-infra-roles #roles-table-container chef-td a').contains(roleName).parent()
+        .parent().find('.mat-select-trigger').as('controlMenu');
+      // we throw in a `should` so cypress retries until introspection allows menu to be shown
+      cy.get('@controlMenu').scrollIntoView().should('be.visible')
+        .click();
+      cy.get('[data-cy=delete-role]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-roles chef-button').contains('Delete').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains(`Successfully deleted role - ${roleName}.`);
+      cy.get('app-notification.info chef-icon').click();
+
+      cy.get('#search-filter').clear();
+      cy.get('[data-cy=search-role]').click();
     });
   });
 });
