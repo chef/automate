@@ -24,7 +24,7 @@ describe('chef server', () => {
 
   describe('chef server list page', () => {
 
-    it('can add a infra server', () => {
+    xit('can add a infra server', () => {
       cy.get('[data-cy=add-server-button]').contains('Add Chef Infra Server').click();
       cy.get('app-chef-servers-list chef-modal').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
