@@ -131,13 +131,13 @@ Chef Automate v1 from backup if you wish to revert the upgrade after the stage
 2 migrations begin.
 `
 
-const optedInToTelemetry = `Users of this Automate deployment may elect to share anonymized usage data with
+const optedInToTelemetry = `Users of this Automate deployment may elect to share user-anonymized usage data with
 Chef Software, Inc. Chef uses this shared data to improve Automate.
 Please visit https://chef.io/privacy-policy for more information about the
 information Chef collects, and how that information is used.
 `
 
-const pleaseOptInToTelemetry = `Users of this Automate deployment cannot choose to share anonymized usage data
+const pleaseOptInToTelemetry = `Users of this Automate deployment cannot choose to share user-anonymized usage data
 with Chef Software, Inc. Chef uses this shared data to improve Automate
 Please consider allowing your users to share this data enabling telemetry.
 See the Chef Automate v2 telemetry docs for details.

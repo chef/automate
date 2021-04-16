@@ -27,14 +27,14 @@ module Telemetry
     def legal_notice
       if telemetry_disabled?
         <<-NOTICE
-Users of this Automate server cannot choose to share anonymized usage data
+Users of this Automate server cannot choose to share user-anonymized usage data
 with Chef Software, Inc. Chef uses this shared data to improve Automate.
 Please consider allowing your users to share this data by running
 `workflow-ctl telemetry enable`.
 NOTICE
       else
         <<-NOTICE
-Users of this Automate server may elect to share anonymized usage data with
+Users of this Automate server may elect to share user-anonymized usage data with
 Chef Software, Inc. Chef uses this shared data to improve Automate.
 Please visit https://chef.io/privacy-policy for more information about the
 information Chef collects, and how that information is used.
