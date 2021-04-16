@@ -4,12 +4,15 @@ package chef.automate.domain.infra_proxy.request;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
 
 import "google/protobuf/struct.proto";
+import "interservice/infra_proxy/request/common.proto";
 
 message Nodes {
     // Chef organization ID.
     string org_id = 1;
     // Chef Infra Server ID.
     string server_id = 2;
+    // Nodes search query.
+    SearchQuery search_query = 3;
 }
 
 message Node {
@@ -19,19 +22,6 @@ message Node {
     string server_id = 2;
     // Node name.
     string name = 3;
-}
-
-message AffectedNodes {
-    // Chef organization ID.
-    string org_id = 1;
-    // Chef Infra Server ID.
-    string server_id = 2;
-    // Chef object type (e.g. 'cookbooks', 'roles', 'chef_environment').
-    string chef_type = 3;
-    // Chef object name.
-    string name = 4;
-    // Chef object version.
-    string version = 5;
 }
 
 message NodeDetails {

@@ -6,11 +6,10 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/respo
 message Nodes {
     // Node list.
     repeated NodeAttribute nodes = 1;
-}
-
-message AffectedNodes {
-    // List of the nodes which are affected by the chef object.
-    repeated NodeAttribute nodes = 1;
+    // Starting page for the results.
+    int32 page = 2;
+    // Total number of records.
+    int32 total = 3;
 }
 
 message NodeAttribute {

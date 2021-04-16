@@ -13,6 +13,64 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+func TestGetNodes(t *testing.T) {
+	req := &request.Nodes{
+		ServerId: autoDeployedChefServerID,
+		OrgId:    autoDeployedChefOrganizationID,
+	}
+
+	t.Run("nodes list with a per_page search param", func(t *testing.T) {
+		req.SearchQuery = &request.SearchQuery{
+			PerPage: 1,
+		}
+		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())
+		reqNode := &request.NodeDetails{
+			ServerId: autoDeployedChefServerID,
+			OrgId:    autoDeployedChefOrganizationID,
+			Name:     name,
+		}
+
+		node, err := infraProxy.CreateNode(ctx, reqNode)
+		assert.NoError(t, err)
+		assert.NotNil(t, node)
+
+		req.SearchQuery = &request.SearchQuery{
+			PerPage: 1,
+		}
+
+		res, err := infraProxy.GetNodes(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, 0, int(res.Page))
+		assert.GreaterOrEqual(t, len(res.Nodes), 0)
+		assert.GreaterOrEqual(t, int(res.Total), 0)
+	})
+
+	t.Run("Nodes list with an invalid query search param", func(t *testing.T) {
+		req.SearchQuery = &request.SearchQuery{
+			Q:       "NO_KEY:NO_VALUE",
+			Page:    0,
+			PerPage: 5,
+		}
+		res, err := infraProxy.GetNodes(ctx, req)
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, 0, int(res.Page))
+		assert.Equal(t, 0, int(res.Total))
+		assert.Equal(t, 0, len(res.Nodes))
+	})
+
+	t.Run("Nodes list with an invalid query search param", func(t *testing.T) {
+		req.SearchQuery = &request.SearchQuery{
+			Q:       "INVALID_QUERY",
+			Page:    0,
+			PerPage: 5,
+		}
+		res, err := infraProxy.GetNodes(ctx, req)
+		assert.Error(t, err)
+		assert.Nil(t, res)
+	})
+}
 func TestGetNode(t *testing.T) {
 	t.Run("when the node exists, return the node successfully", func(t *testing.T) {
 		name := fmt.Sprintf("node-%d", time.Now().Nanosecond())

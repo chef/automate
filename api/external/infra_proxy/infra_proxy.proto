@@ -250,11 +250,6 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
-  rpc GetAffectedNodes (infra_proxy.request.AffectedNodes) returns (infra_proxy.response.AffectedNodes) {
-    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}";
-    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
-  };
   rpc DeleteNode (infra_proxy.request.Node) returns (infra_proxy.response.DeleteNode) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
