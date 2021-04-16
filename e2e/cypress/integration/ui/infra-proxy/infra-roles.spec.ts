@@ -136,6 +136,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
     it('can search a role and check empty', () => {
       cy.get('#search-filter').type(roleName);
       cy.get('[data-cy=search-role]').click();
+      cy.wait(2000);
       cy.get('#roles-table-container chef-th').should('not.be.visible');
       cy.get('[data-cy=empty-list]').should('be.visible');
       cy.get('[data-cy=no-records]').contains('No results');
@@ -150,7 +151,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('#roles-table-container chef-th').contains('Environments');
       cy.get('.roles-list-paging').contains('3').click();
       cy.get('.roles-list-paging').contains('chevron_right').click();
-      cy.get('.roles-list-paging').contains('last_page').click();
+      cy.get('.roles-list-paging').contains('last_page').click({force: true});
       cy.get('.roles-list-paging').contains('chevron_left').click();
       cy.get('.roles-list-paging').contains('first_page').click({force: true});
     });
