@@ -22,10 +22,12 @@
       <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>   
-    <div class="empty-section" *ngIf="!searching && !environments.length  && current_page === 1">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
-      <p *ngIf="searchValue === ''">No environment available.</p>
+    <div *ngIf="!authFailure">
+      <div class="empty-section" *ngIf="!searching && !environments.length && current_page === 1">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+        <p *ngIf="searchValue === ''">No environment available.</p>
+      </div>
     </div>
     <chef-table *ngIf="environments.length">
       <chef-thead>

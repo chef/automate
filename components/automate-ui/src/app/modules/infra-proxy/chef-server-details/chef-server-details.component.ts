@@ -30,14 +30,12 @@ import {
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
 export type ChefServerTabName = 'orgs' | 'details';
-
-
-
 @Component({
   selector: 'app-chef-server-details',
   templateUrl: './chef-server-details.component.html',
   styleUrls: ['./chef-server-details.component.scss']
 })
+
 export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public server: Server;
   public orgs: Org[] = [];
@@ -58,7 +56,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public isLoading = true;
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-
 
   constructor(
     private fb: FormBuilder,

@@ -51,18 +51,17 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     combineLatest([
         this.store.select(getAllStatus),
         this.store.select(environmentList)
-      ]).pipe(
-        filter(([getEnvironmentsStatus, allEnvironmentsState]) =>
-        getEnvironmentsStatus === EntityStatus.loadingSuccess &&
-        !isNil(allEnvironmentsState)),
-        takeUntil(this.isDestroyed))
-      .subscribe(([_getEnvironmentsSt, EnvironmentsState]) => {
-        if (!isNil(EnvironmentsState)) {
+      ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getEnvironmentsSt, EnvironmentsState]) => {
+        if (getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(EnvironmentsState)) {
           this.environmentListState = EnvironmentsState;
           this.environments = EnvironmentsState?.items;
           this.total = EnvironmentsState?.total;
           this.environmentsListLoading = false;
           this.searching = false;
+        } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
+          this.environmentsListLoading = false;
+          this.authFailure = true;
         }
       });
 
