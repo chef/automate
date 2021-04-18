@@ -1,5 +1,5 @@
 describe('chef server', () => {
-  const now = Cypress.moment().format('MMDDYYhhmm');
+  const now = Cypress.moment().format('MMDDYYhhmmss');
   const cypressPrefix = 'infra';
   const serverName = `${cypressPrefix} server ${now}`;
   const generatedServerID = serverName.split(' ').join('-');
