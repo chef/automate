@@ -50,7 +50,7 @@ describe('chef server details', () => {
 
   describe('chef server details page', () => {
     it('displays server details', () => {
-      cy.get('chef-breadcrumbs').contains('Chef Servers');
+      cy.get('chef-breadcrumbs').contains('Chef Infra Servers');
       cy.get('chef-breadcrumbs').contains(serverName);
       cy.get('.page-title').contains(serverName);
       cy.get('[data-cy=add-org-button]').contains('Add Chef Organization');

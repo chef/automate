@@ -9,6 +9,7 @@ import { Component,
 import { FormGroup } from '@angular/forms';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 @Component({
   selector: 'app-create-org-modal',
@@ -49,7 +50,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.createForm.controls.id.setValue(
         IdMapper.transform(this.createForm.controls.name.value.trim()));
@@ -57,7 +58,7 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -74,7 +75,4 @@ export class CreateOrgModalComponent implements OnInit, OnChanges {
     this.checkedProjectIDs = [];
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

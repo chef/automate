@@ -68,7 +68,7 @@ export class LayoutSidebarService {
               route: '/infrastructure/client-runs'
             },
             {
-              name: 'Chef Servers',
+              name: 'Chef Infra Servers',
               customIcon: 'chef-servers-icon',
               route: '/infrastructure/chef-servers',
               authorized: {

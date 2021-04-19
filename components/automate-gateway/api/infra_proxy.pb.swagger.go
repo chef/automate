@@ -395,65 +395,6 @@ func init() {
         ]
       }
     },
-    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{chef_type}/{name}": {
-      "get": {
-        "operationId": "InfraProxy_GetAffectedNodes",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AffectedNodes"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "description": "Chef Infra Server ID.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
-            "description": "Chef organization ID.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "chef_type",
-            "description": "Chef object type (e.g. 'cookbooks', 'roles', 'chef_environment').",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "description": "Chef object name.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "version",
-            "description": "Chef object version.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
         "operationId": "InfraProxy_GetClients",
@@ -1620,6 +1561,29 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "search_query.q",
+            "description": "The search query used to identify a list of items.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "search_query.page",
+            "description": "Starting page for the results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "search_query.per_page",
+            "description": "The number of results on each page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -2258,6 +2222,103 @@ func init() {
           "InfraProxy"
         ]
       }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments": {
+      "get": {
+        "operationId": "InfraProxy_GetRoleEnvironments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RoleEnvironments"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}": {
+      "get": {
+        "operationId": "InfraProxy_GetRoleExpandedRunList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Role name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "description": "Role environment.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
     }
   },
   "definitions": {
@@ -2811,18 +2872,6 @@ func init() {
         "ip_address": {
           "type": "string",
           "description": "Chef Infra Server IP address."
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.AffectedNodes": {
-      "type": "object",
-      "properties": {
-        "nodes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
-          },
-          "description": "List of the nodes which are affected by the chef object."
         }
       }
     },
@@ -3608,6 +3657,16 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
           },
           "description": "Node list."
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Starting page for the results."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of records."
         }
       }
     },
@@ -3787,13 +3846,18 @@ func init() {
             "type": "string"
           },
           "description": "Run list for the role."
-        },
-        "expanded_run_list": {
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.RoleEnvironments": {
+      "type": "object",
+      "properties": {
+        "environments": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
+            "type": "string"
           },
-          "description": "List of expanded run list for the role."
+          "description": "Role environment list."
         }
       }
     },
@@ -3844,20 +3908,29 @@ func init() {
       "properties": {
         "type": {
           "type": "string",
-          "description": "Type of run list item (e.g. 'recipe')."
+          "description": "Run list item type (e.g. 'recipe')."
         },
         "name": {
           "type": "string",
-          "description": "Name of run list item."
+          "description": "Run list item name."
         },
         "version": {
           "type": "string",
-          "description": "Version of run list item."
+          "description": "Run list item version."
         },
         "skipped": {
           "type": "boolean",
           "format": "boolean",
           "description": "Boolean denoting whether or not the run list item was skipped."
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Run list item position"
+        },
+        "error": {
+          "type": "string",
+          "title": "Run list error"
         },
         "children": {
           "type": "array",

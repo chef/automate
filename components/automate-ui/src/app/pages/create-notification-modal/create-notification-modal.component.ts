@@ -14,6 +14,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   saveStatus,
   saveError
@@ -123,7 +124,7 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
   }
 
   public handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -221,8 +222,5 @@ export class CreateNotificationModalComponent implements OnInit, OnDestroy {
     this.notificationRule.ruleType === 'ComplianceFailure';
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
 

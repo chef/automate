@@ -36,8 +36,6 @@ message Role {
     string json_class = 6;
     // Run list for the role.
     repeated string run_list  = 7;
-    // List of expanded run list for the role.
-    repeated ExpandedRunList expanded_run_list = 8;
 }
 
 message ExpandedRunList {
@@ -48,14 +46,23 @@ message ExpandedRunList {
 }
 
 message RunList {
-    // Type of run list item (e.g. 'recipe').
+    // Run list item type (e.g. 'recipe').
     string type = 1;
-    // Name of run list item.
+    // Run list item name.
     string name = 2;
-    // Version of run list item.
+    // Run list item version.
     string version = 3;
     // Boolean denoting whether or not the run list item was skipped.
     bool skipped = 4;
+    // Run list item position
+    int32 position = 5;
+    // Run list error
+    string error = 6;
     // List of the run list.
-    repeated RunList children = 5;
+    repeated RunList children = 7;
+}
+
+message RoleEnvironments {
+    // Role environment list.
+    repeated string environments = 1; 
 }

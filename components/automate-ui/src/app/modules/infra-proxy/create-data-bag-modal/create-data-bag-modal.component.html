@@ -5,8 +5,8 @@
       <div class="margin">
         <chef-form-field>
           <label>
-            <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            <span class="label">Name</span>
+            <input chefInput firstFocus formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
           </label>
           <chef-error
           *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">

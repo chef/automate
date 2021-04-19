@@ -13,6 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { AuthorizedChecker } from 'app/helpers/auth/authorized';
 import { EntityStatus } from 'app/entities/entities';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -301,7 +302,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event) && !this.editingRule) {
+    if (!this.modifyID && !Utilities.isNavigationKey(event) && !this.editingRule) {
       this.conflictError = false;
       this.ruleForm.controls.id.setValue(
         IdMapper.transform(this.ruleForm.controls.name.value.trim()));
@@ -309,14 +310,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   handleIDInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 
   get conditionControls(): { [key: string]: AbstractControl } {

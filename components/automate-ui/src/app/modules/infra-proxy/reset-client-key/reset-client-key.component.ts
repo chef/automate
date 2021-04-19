@@ -8,6 +8,7 @@ import { getStatus,
   resetKeyClient,
   saveError } from 'app/entities/clients/client-details.selectors';
 import { EntityStatus } from 'app/entities/entities';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import { isNil } from 'lodash/fp';
 import { saveAs } from 'file-saver';
 import { ResetKey } from 'app/entities/clients/client.model';
@@ -77,7 +78,7 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
   }
 
   handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
   }
@@ -115,7 +116,4 @@ export class ResetClientKeyComponent implements OnInit, OnDestroy {
     saveAs(blob, this.name + '.pem');
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }

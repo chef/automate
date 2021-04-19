@@ -14,6 +14,11 @@ func (a *InfraProxyServer) GetNodes(ctx context.Context, r *gwreq.Nodes) (*gwres
 	req := &infra_req.Nodes{
 		OrgId:    r.OrgId,
 		ServerId: r.ServerId,
+		SearchQuery: &infra_req.SearchQuery{
+			Q:       r.GetSearchQuery().GetQ(),
+			Page:    r.GetSearchQuery().GetPage(),
+			PerPage: r.GetSearchQuery().GetPerPage(),
+		},
 	}
 	res, err := a.client.GetNodes(ctx, req)
 	if err != nil {
@@ -22,26 +27,8 @@ func (a *InfraProxyServer) GetNodes(ctx context.Context, r *gwreq.Nodes) (*gwres
 
 	return &gwres.Nodes{
 		Nodes: parseNodeAttributeFromRes(res.Nodes),
-	}, nil
-}
-
-// GetAffectedNodes gets the nodes using resource
-func (a *InfraProxyServer) GetAffectedNodes(ctx context.Context, r *gwreq.AffectedNodes) (*gwres.AffectedNodes, error) {
-
-	req := &infra_req.AffectedNodes{
-		OrgId:    r.OrgId,
-		ServerId: r.ServerId,
-		ChefType: r.ChefType,
-		Name:     r.Name,
-		Version:  r.Version,
-	}
-	res, err := a.client.GetAffectedNodes(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.AffectedNodes{
-		Nodes: parseNodeAttributeFromRes(res.Nodes),
+		Page:  res.GetPage(),
+		Total: res.GetTotal(),
 	}, nil
 }
 

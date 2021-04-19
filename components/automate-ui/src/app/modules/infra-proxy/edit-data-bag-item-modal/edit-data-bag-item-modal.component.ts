@@ -15,6 +15,7 @@ import { pending, EntityStatus } from 'app/entities/entities';
 import { Subject } from 'rxjs';
 import { UpdateDataBagItem } from 'app/entities/data-bags/data-bag-details.actions';
 import { updateStatus } from 'app/entities/data-bags/data-bag-details.selector';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 @Component({
   selector: 'app-edit-data-bag-item-modal',
@@ -77,7 +78,7 @@ export class EditDataBagItemModalComponent implements OnChanges, OnInit, OnDestr
   }
 
   handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -116,7 +117,4 @@ export class EditDataBagItemModalComponent implements OnChanges, OnInit, OnDestr
     }
   }
 
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
 }
