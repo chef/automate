@@ -20,6 +20,7 @@ import { EntityStatus, pending } from 'app/entities/entities';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { UpdateRole } from 'app/entities/infra-roles/infra-role.action';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 
 @Component({
@@ -83,6 +84,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
       this.currentRunList = [];
       this.current_Page = 0;
       this.selected.forEach((element) => {
+        element.selected = false;
         this.currentRunList.push(element);
       });
       this.availablelist = [];
@@ -109,12 +111,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
   }
 
   ngOnChanges(): void {
-    if (this.label === 'Default') {
-      this.defaultAttributeForm.controls.default.setValue(this.jsonText);
-    }
-    if (this.label === 'Override') {
-      this.overrideAttributeForm.controls.override.setValue(this.jsonText);
-    }
+    this.setAttributeValue();
   }
 
   ngOnDestroy(): void {
@@ -136,7 +133,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
   }
 
   handleNameInput(event: KeyboardEvent): void {
-    if (!this.isNavigationKey(event)) {
+    if (!Utilities.isNavigationKey(event)) {
       this.conflictError = false;
       this.defaultAttributeForm.controls.default.setValue(
         IdMapper.transform(this.defaultAttributeForm.controls.default.value.trim()));
@@ -212,25 +209,25 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
   private resetEditModal(): void {
     this.creating = false;
     this.defaultAttributeForm.markAsPristine();
+    this.overrideAttributeForm.markAsPristine();
+    this.selectedRunLists = [];
+    this.defaultAttrParseError = false;
+    this.overrideAttrParseError = false;
+    this.showbutton = false;
+    this.setAttributeValue();
+    this.conflictErrorEvent.emit(false);
+  }
+
+  private setAttributeValue() {
     if (this.label === 'Default') {
       this.defaultAttributeForm.controls.default.setValue(this.jsonText);
     }
     if (this.label === 'Override') {
       this.overrideAttributeForm.controls.override.setValue(this.jsonText);
     }
-    this.overrideAttributeForm.markAsPristine();
-    this.selectedRunLists = [];
-    this.defaultAttrParseError = false;
-    this.overrideAttrParseError = false;
-    this.showbutton = false;
-    this.conflictErrorEvent.emit(false);
   }
 
   private updatingData(role: InfraRole) {
     this.store.dispatch(new UpdateRole(role));
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 }

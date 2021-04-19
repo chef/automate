@@ -1,5 +1,5 @@
 describe('infra role', () => {
-  const now = Cypress.moment().format('MMDDYYhhmm');
+  const now = Cypress.moment().format('MMDDYYhhmmss');
   const cypressPrefix = 'infra';
   let adminIdToken = '';
   const serverID = 'chef-server-dev-test';
@@ -9,7 +9,7 @@ describe('infra role', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = `-----BEGIN RSA PRIVATE KEY-----
+  const adminKey = `
 MIIEpQIBAAKCAQEA6KIxELz/HWjwT8qiQrhPbvymVG/hnF/n8owZfh04hsABneB8
 u6xklW+VjCRMBHfptovHn+5NyN5blR1wpXQc5iKXEPfDny/gncNAeu4lrezs8f8z
 dZa2jFOwFH/Cm4o1+po3uhXtAsdtN/WI7EiCHZEeXRA5jFYF86Y92G0FDoaRiA4G
@@ -35,7 +35,7 @@ hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
 4u3xbLUCgYEAm+1Dv8bvC9d3Z08mCJjUbzdRG6qA39EXpixVYjbmXmDpy71KA2zR
 LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
------END RSA PRIVATE KEY-----`;
+`;
   const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
   const roleRunlistName = `${cypressPrefix}-role-${now}-1`;
@@ -85,7 +85,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           server_id: serverID,
           name: orgName,
           admin_user: adminUser,
-          admin_key: adminKey
+          admin_key: `-----BEGIN RSA PRIVATE KEY-----${adminKey}-----END RSA PRIVATE KEY-----`
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {
@@ -149,11 +149,11 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('#roles-table-container chef-th').contains('Name');
       cy.get('#roles-table-container chef-th').contains('Description');
       cy.get('#roles-table-container chef-th').contains('Environments');
-      cy.get('.roles-list-paging').contains('3').click();
-      cy.get('.roles-list-paging').contains('chevron_right').click();
-      cy.get('.roles-list-paging').contains('last_page').click({force: true});
-      cy.get('.roles-list-paging').contains('chevron_left').click();
-      cy.get('.roles-list-paging').contains('first_page').click({force: true});
+      cy.get('.roles-list-paging .page-picker-item').contains('3').click();
+      cy.get('.roles-list-paging .page-picker-item').contains('chevron_right').click();
+      cy.get('.roles-list-paging .page-picker-item').contains('last_page').click({force: true});
+      cy.get('.roles-list-paging .page-picker-item').contains('chevron_left').click();
+      cy.get('.roles-list-paging .page-picker-item').contains('first_page').click({force: true});
     });
 
     // In create role pop-up details tab specs

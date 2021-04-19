@@ -1,5 +1,5 @@
 describe('infra role detail', () => {
-  const now = Cypress.moment().format('MMDDYYhhmm');
+  const now = Cypress.moment().format('MMDDYYhhmmss');
   const cypressPrefix = 'infra';
   let adminIdToken = '';
   const serverID = 'chef-server-dev-test';
@@ -9,7 +9,7 @@ describe('infra role detail', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = `-----BEGIN RSA PRIVATE KEY-----
+  const adminKey = `
 MIIEpQIBAAKCAQEA6KIxELz/HWjwT8qiQrhPbvymVG/hnF/n8owZfh04hsABneB8
 u6xklW+VjCRMBHfptovHn+5NyN5blR1wpXQc5iKXEPfDny/gncNAeu4lrezs8f8z
 dZa2jFOwFH/Cm4o1+po3uhXtAsdtN/WI7EiCHZEeXRA5jFYF86Y92G0FDoaRiA4G
@@ -35,7 +35,7 @@ hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
 4u3xbLUCgYEAm+1Dv8bvC9d3Z08mCJjUbzdRG6qA39EXpixVYjbmXmDpy71KA2zR
 LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
------END RSA PRIVATE KEY-----`;
+`;
   const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
   const defaultAttribute = {default: 'test'};
@@ -86,7 +86,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           server_id: serverID,
           name: orgName,
           admin_user: adminUser,
-          admin_key: adminKey
+          admin_key: `-----BEGIN RSA PRIVATE KEY-----${adminKey}-----END RSA PRIVATE KEY-----`
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {
@@ -171,6 +171,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('.version-dropdown .selected-value').contains('_default').click();
       cy.get('.version-dropdown .options .option-content').contains('_default').click();
       cy.get('.version-dropdown .selected-value').contains('_default').should('exist');
+      cy.wait(2000);
     });
 
     it('can search a item from list', () => {
@@ -495,6 +496,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       // verify success notification and then dismiss it
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
+      cy.wait(2000);
       cy.get('app-notification.info chef-icon').click();
       cy.wait(2000);
     });

@@ -72,6 +72,8 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   public leftFilterText = '';
   public loading = false;
   public loadRecipesOnly = false;
+  public leftSelected = false;
+  public rightSelected = false;
   /* working list of items on the left side */
   public originalItems: ListItem[] = [];
   public per_page = 9;
@@ -177,7 +179,13 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         if (element.selected) { rightSelectedList.push(element); }
       }
     );
+    this.rightSelected = true;
     return rightSelectedList;
+  }
+
+  getSelectedData() {
+    this.getLeftSelectedList().length > 0 ? this.leftSelected = true : this.leftSelected = false;
+    this.getRightSelectedList().length > 0 ? this.rightSelected = true : this.rightSelected = false;
   }
 
   handleInput(currentText): void {
@@ -211,6 +219,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         this.currentRunList.splice(idx - 1, 0, itemToMove[0]);
       }
     }
+    this.getSelectedData();
     this.selectedValues.emit(this.currentRunList);
   }
 
@@ -226,6 +235,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         this.currentRunList.splice(idx + 1, 0, itemToMove[0]);
       }
     }
+    this.getSelectedData();
     this.selectedValues.emit(this.currentRunList);
   }
 
@@ -247,11 +257,17 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     this.combinedRunlist(this.defaultType);
   }
 
+  selectedRunlist(item: ListItem) {
+    item.selected = (!this.disabled && !item.selected);
+    this.getSelectedData();
+  }
+
   /* helper method that changes the position of items in the list*/
   private changeItemPosition(list: ListItem[], currPos: number, newPos: number) {
     const item: ListItem = list.splice(currPos, 1)[0];
     item.selected = false;
     list.splice(newPos, 0, item);
+    this.getSelectedData();
     this.selectedValues.emit(this.currentRunList);
   }
 
@@ -356,6 +372,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
 
     }
     this.removeSelectedRunlist();
+    this.getSelectedData();
   }
 
   /*helper method that moves items between lists */
@@ -368,6 +385,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         toList.splice(insertIndex, 0, item);
       }
     }
+    this.getSelectedData();
     this.selectedValues.emit(this.currentRunList);
   }
 
@@ -414,6 +432,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
       list[i] = list[i + index];
     }
     list[toIndex] = selectedlist;
+    this.getSelectedData();
     this.selectedValues.emit(this.currentRunList);
   }
 
