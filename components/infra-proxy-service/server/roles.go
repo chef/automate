@@ -237,7 +237,7 @@ func (s *Server) GetRoleExpandedRunList(ctx context.Context, req *request.Expand
 		return nil, ParseAPIError(err)
 	}
 
-	runlist, err := toResponseExpandedRunList(c, s.service, envRunList["run_list"], cookbooks, runlistCache)
+	runlist, err := ToResponseExpandedRunList(c, s.service, envRunList["run_list"], cookbooks, runlistCache)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -350,7 +350,7 @@ func fromAPIToListRoles(result []interface{}) []*response.RoleListItem {
 	return cl
 }
 
-func toResponseExpandedRunList(client *ChefClient, service *service.Service, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
+func ToResponseExpandedRunList(client *ChefClient, service *service.Service, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
 	resRunList := make([]*response.RunList, len(runlist))
 	var pos int32
 	for i, item := range runlist {
@@ -398,7 +398,7 @@ func toResponseExpandedRunList(client *ChefClient, service *service.Service, run
 				if runlistCache[newItem.Type] != nil {
 					if !runlistCache[newItem.Type][newItem.Name] {
 						runlistCache[newItem.Type][newItem.Name] = true
-						children, err := toResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
+						children, err := ToResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
 						newRunList.Children = children
 						if err != nil {
 							newRunList.Error = err.Error()
@@ -408,7 +408,7 @@ func toResponseExpandedRunList(client *ChefClient, service *service.Service, run
 					}
 				} else {
 					runlistCache[newItem.Type] = map[string]bool{newItem.Name: true}
-					children, err := toResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
+					children, err := ToResponseExpandedRunList(client, service, currentRole.RunList, cookbooks, runlistCache)
 					newRunList.Children = children
 					if err != nil {
 						newRunList.Error = err.Error()
