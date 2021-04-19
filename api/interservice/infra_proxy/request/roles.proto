@@ -68,3 +68,14 @@ message EnvRunList {
     // Role run list.
     repeated string run_list = 2;
 }
+
+message ExpandedRunList {
+    // Chef organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Role name.
+    string name = 3;
+    // Role environment.
+    string environment = 4;
+}

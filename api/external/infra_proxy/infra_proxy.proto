@@ -122,6 +122,16 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+  rpc GetRoleExpandedRunList (infra_proxy.request.ExpandedRunList) returns (infra_proxy.response.ExpandedRunList) {
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+  rpc GetRoleEnvironments (infra_proxy.request.Role) returns (infra_proxy.response.RoleEnvironments) {
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
   rpc CreateRole (infra_proxy.request.CreateRole) returns (infra_proxy.response.Role) {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles";
     option (google.api.http).body = "*";
