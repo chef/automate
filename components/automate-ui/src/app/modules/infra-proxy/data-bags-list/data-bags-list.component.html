@@ -40,8 +40,10 @@
       </chef-tbody>
     </chef-table>
   </ng-container>
-  <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
-    <img alt="No preview" src="/assets/img/no_preview.gif"/>
-    <p>No Data Bags available.</p>
+  <div *ngIf="!authFailure">
+    <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
+      <img alt="No preview" src="/assets/img/no_preview.gif"/>
+      <p>No Data Bags available.</p>
+    </div>
   </div>
 </section>
