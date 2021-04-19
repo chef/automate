@@ -38,8 +38,6 @@ message Policyfile {
     string default_attributes = 8;
     // Policyfile override attributes JSON.
     string override_attributes = 9;
-    // Expanded run-list associated with the policy.
-    repeated ExpandedRunList expanded_run_list = 10;
 }
 
 message IncludedPolicyLock {

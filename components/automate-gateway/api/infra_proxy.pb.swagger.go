@@ -3752,13 +3752,6 @@ func init() {
         "override_attributes": {
           "type": "string",
           "description": "Policyfile override attributes JSON."
-        },
-        "expanded_run_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
-          },
-          "description": "Expanded run-list associated with the policy."
         }
       }
     },

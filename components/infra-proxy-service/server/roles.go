@@ -144,13 +144,14 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 		return nil, err
 	}
 
-	result, err := client.SearchRoles(req.SearchQuery)
+	result, err := client.SearchObjectsWithDefaults("role", req.SearchQuery, nil)
+	s.service.Logger.Info(result)
 	if err != nil {
 		return nil, err
 	}
 
 	return &response.Roles{
-		Roles: fromAPIToListRoles(result),
+		Roles: fromAPIToListRoles(result.Rows),
 		Page:  int32(result.Start),
 		Total: int32(result.Total),
 	}, nil
@@ -328,12 +329,10 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 }
 
 // fromAPIToListRoles a response.Roles from a struct of RoleList
-func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
-	cl := make([]*response.RoleListItem, len(result.Rows))
-
-	index := 0
-	for _, role := range result.Rows {
-		keys := reflect.ValueOf(role.EnvRunList).MapKeys()
+func fromAPIToListRoles(result []interface{}) []*response.RoleListItem {
+	cl := make([]*response.RoleListItem, len(result))
+	for index, role := range result {
+		keys := reflect.ValueOf(role.(map[string]interface{})["env_run_lists"]).MapKeys()
 		environments := make([]string, len(keys)+1)
 		// Add _default environment
 		environments[0] = "_default"
@@ -342,23 +341,13 @@ func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 		}
 
 		cl[index] = &response.RoleListItem{
-			Name:         role.Name,
-			Description:  role.Description,
+			Name:         SafeStringFromMap(role.(map[string]interface{}), "name"),
+			Description:  SafeStringFromMap(role.(map[string]interface{}), "description"),
 			Environments: environments,
 		}
-		index++
 	}
 
 	return cl
-}
-
-func findRoleFromRoleList(name string, result *RoleListResult) *chef.Role {
-	for _, rItem := range result.Rows {
-		if rItem.Name == name {
-			return rItem
-		}
-	}
-	return nil
 }
 
 func toResponseExpandedRunList(client *ChefClient, service *service.Service, runlist []string, cookbooks chef.EnvironmentCookbookResult, runlistCache RunListCache) ([]*response.RunList, error) {
@@ -432,31 +421,6 @@ func toResponseExpandedRunList(client *ChefClient, service *service.Service, run
 	}
 
 	return resRunList, nil
-}
-
-// GetExpandRunlistFromRole expands the run-list based on role's run-list
-func GetExpandRunlistFromRole(runlist []string, result *RoleListResult) ([]*response.RunList, error) {
-	runList := make([]*response.RunList, len(runlist))
-	for i, item := range runlist {
-		newItem, err := chef.NewRunListItem(item)
-		if err != nil {
-			return nil, err
-		}
-		newRunList := response.RunList{
-			Type:    newItem.Type,
-			Name:    newItem.Name,
-			Version: newItem.Version,
-		}
-
-		if newItem.IsRole() {
-			currentRole := findRoleFromRoleList(newItem.Name, result)
-			if currentRole != nil {
-				newRunList.Children, _ = GetExpandRunlistFromRole(currentRole.RunList, result)
-			}
-		}
-		runList[i] = &newRunList
-	}
-	return runList, nil
 }
 
 // fromAPIToRoleResponse a response.Role from a chef Role
