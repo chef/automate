@@ -166,13 +166,14 @@ Selecting the **Create Data Bag** button opens a dialog box. Enter the name and 
 
 #### Create a Data Bag Item
 
-To create a data bag item, select the data bag created above and follow the steps given below:
+To create a data bag item, select an existing data bag from the list of data bags and follow the steps given below:
 
-Select **Create Item**, as shown below:
+- Select **Create Item**to open the **Create Data Bag Item** dialog box.
 
 {{< figure src="/images/automate/create-data-bag-item-button.png" alt="Create Data Bag Item Button">}}
 
-Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag Item ID** and the details of the key value pairs of that particular item. Select **Create**.
+- Enter the **Data Bag Item ID**.
+- Enter the Data Bag Item properties as key value pairs. Select **Create**.
 
 {{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}
 
@@ -188,7 +189,7 @@ Select a specific data bag item to view the details. The details contain an *id*
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
-To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the properties for the specific data bag item. Once done, Select **Save Item**.
 
 {{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
 
