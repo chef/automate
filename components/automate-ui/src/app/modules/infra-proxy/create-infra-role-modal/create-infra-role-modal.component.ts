@@ -24,6 +24,7 @@ import {
 import { isNil } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
+import { Utilities } from 'app/helpers/utilities/utilities';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { AvailableType } from '../infra-roles/infra-roles.component';
@@ -168,7 +169,7 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
   }
 
   handleInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
+    if (Utilities.isNavigationKey(event)) {
       return;
     }
     this.conflictError = false;
@@ -245,9 +246,5 @@ export class CreateInfraRoleModalComponent implements OnInit, OnDestroy {
     this.constraintsTab = false;
     this.defaultTab = false;
     this.overrideTab = false;
-  }
-
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
   }
 }

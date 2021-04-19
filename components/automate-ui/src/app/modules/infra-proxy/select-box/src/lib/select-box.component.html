@@ -49,7 +49,7 @@
               maxBufferPx="1200">
               <div
                 *ngFor="let item of originalItems"
-                (click)="item.selected= (!disabled && !item.selected)"
+                (click)="selectedRunlist(item)"
                 cdkDrag
                 [cdkDragDisabled]="disabled || !item.selected"
                 (cdkDragStarted)="onDragleftItemStarted()"
@@ -74,7 +74,7 @@
           class="dropdown-toggle primary"
           primary
           (click)="addItems()"
-          [disabled]="!getLeftSelectedList().length"
+          [disabled]="!leftSelected"
           data-cy="drag-right">
           <img alt="Left arrow" src="/assets/img/Button-2.png" />
         </button>
@@ -84,7 +84,7 @@
             class="dropdown-toggle primary"
             primary
             (click)="removeItems()"
-            [disabled]="!getRightSelectedList().length"
+            [disabled]="!rightSelected"
             data-cy="drag-left">
             <img alt="Right arrow" src="/assets/img/Button.png" />
           </button>
@@ -99,7 +99,7 @@
           (cdkDropListDropped)="dragOntoRightItems($event)">
           <div
             *ngFor="let item of currentRunList"
-            (click)="item.selected= (!disabled && !item.selected)"
+            (click)="selectedRunlist(item)"
             cdkDrag
             [cdkDragDisabled]="disabled || !item.selected"
             (cdkDragStarted)="onDragrightItemStarted()"
@@ -127,7 +127,7 @@
             class="dropdown-toggle primary"
             primary
             (click)="moveItemUp()"
-            [disabled]="!getRightSelectedList().length"
+            [disabled]="!rightSelected"
             data-cy="drag-up">
             <img alt="Up arrow" src="/assets/img/Button-3.png" />
           </button>
@@ -137,7 +137,7 @@
               class="dropdown-toggle primary"
               primary
               (click)="moveItemDown()"
-              [disabled]="!getRightSelectedList().length"
+              [disabled]="!rightSelected"
               data-cy="drag-down">
               <img alt="Down arrow" src="/assets/img/Button-1.png" />
             </button>

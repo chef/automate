@@ -57,16 +57,39 @@ describe('EditInfraRoleModalComponent', () => {
       default_attributes: '{test:test}',
       override_attributes: '{test:test}'
     };
+    const invalidJson = '{"invalid "test"';
+
+    it('default attribute should be invalid when empty', () => {
+      component.defaultAttributeForm.controls['default'].setValue(' ');
+      expect(component.defaultAttributeForm.controls['default'].invalid).toBeFalsy();
+    });
 
     it('default attribute should be valid when json data is filled out', () => {
       component.defaultAttributeForm.controls['default'].setValue(role.default_attributes);
       expect(component.defaultAttributeForm.valid).toBeTruthy();
     });
 
+    it('default attribute show error when invalid json data is filled out', () => {
+      component.defaultAttributeForm.controls['default'].setValue(invalidJson);
+      component.onChangeDefaultJson({ target: { value: invalidJson}});
+      expect(component.defaultAttrParseError).toBe(true);
+    });
+
+    it('override attribute should be invalid when empty', () => {
+      component.overrideAttributeForm.controls['override'].setValue(' ');
+      expect(component.overrideAttributeForm.controls['override'].invalid).toBeFalsy();
+    });
+
     it('override attribute should be valid when json data is filled out', () => {
       component.overrideAttributeForm.controls['override'].setValue(
         role.override_attributes);
       expect(component.overrideAttributeForm.valid).toBeTruthy();
+    });
+
+    it('override attribute show error when invalid json data is filled out', () => {
+      component.overrideAttributeForm.controls['override'].setValue(invalidJson);
+      component.onChangeOverrideJson({ target: { value: invalidJson}});
+      expect(component.overrideAttrParseError).toBe(true);
     });
   });
 });
