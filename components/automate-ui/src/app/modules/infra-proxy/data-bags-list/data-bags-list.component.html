@@ -18,7 +18,7 @@
   <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
     <chef-toolbar>
       <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-        <chef-button primary (click)="openCreateModal()">Create Databag</chef-button>
+        <chef-button primary (click)="openCreateModal()">Create Data Bag</chef-button>
       </app-authorized>
     </chef-toolbar>
     <chef-table *ngIf="dataBags.length">
@@ -43,7 +43,7 @@
   <div *ngIf="!authFailure">
     <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
       <img alt="No preview" src="/assets/img/no_preview.gif"/>
-      <p>No databags available.</p>
+      <p>No Data Bags available.</p>
     </div>
   </div>
 </section>

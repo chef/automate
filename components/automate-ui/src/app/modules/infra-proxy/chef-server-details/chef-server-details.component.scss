@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
@@ -26,38 +27,6 @@ chef-toolbar {
     background: $chef-primary-bright;
     border-radius: 4px;
     height: 36px;
-  }
-}
-
-::ng-deep {
-
-  chef-tab-selector {
-    chef-option {
-      margin-right: 4px;
-      color: $chef-primary-dark;
-    }
-
-    ::ng-deep .selected {
-      background-color: $gray-highlight;
-    }
-
-    ::ng-deep .selected::before {
-      height: 4px;
-      background-color: $chef-dark-blue;
-    }
-
-    chef-option:focus {
-      outline: none;
-    }
-
-    ::ng-deep chef-option::before {
-      height: 4px;
-      background-color: $chef-tab-hover;
-    }
-
-    ::ng-deep chef-option:hover::before {
-      background: $chef-azureish-gray;
-    }
   }
 }
 

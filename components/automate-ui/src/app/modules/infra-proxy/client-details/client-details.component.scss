@@ -1,6 +1,7 @@
 @import "~styles/variables";
 @import 'app/page-components/json-tree/json-tree.component.scss';
 @import "~styles/mixins";
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
