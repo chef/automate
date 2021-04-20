@@ -254,9 +254,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([getRunlistSt, allRunlistState]) => {
         if (getRunlistSt === EntityStatus.loadingSuccess && !isNil(allRunlistState)) {
           if (allRunlistState && allRunlistState.length) {
-            if (this.tabValue === 'runList') {
-              this.treeNodes(allRunlistState, environmentId);
-            }
+            this.treeNodes(allRunlistState, environmentId);
           } else {
             this.runListLoading = false;
           }
