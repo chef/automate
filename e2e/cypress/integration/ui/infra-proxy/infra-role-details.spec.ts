@@ -9,33 +9,7 @@ describe('infra role detail', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = `
-MIIEpQIBAAKCAQEA6KIxELz/HWjwT8qiQrhPbvymVG/hnF/n8owZfh04hsABneB8
-u6xklW+VjCRMBHfptovHn+5NyN5blR1wpXQc5iKXEPfDny/gncNAeu4lrezs8f8z
-dZa2jFOwFH/Cm4o1+po3uhXtAsdtN/WI7EiCHZEeXRA5jFYF86Y92G0FDoaRiA4G
-jWu7M3hL/61ELZ80d2RH+GdKgFqQh9hRlnx59ozmMW4maaMXpx2eb8RLvYgKBAUH
-5qGpWdMcODsLBkIy/+RqpLdsMFxrvFWBeTVBQvecx/UZMMWU3yQigzRismiYuLug
-nbN7DhgK71GXPkHG4JoxltgW5E+lYtjZD1wh9wIDAQABAoIBAQCJSGWyHgZjQbFH
-NSqKOyBNO/WgMKIwWPyVSw4kOXRJOPf7RiX1zqdQ9JeJK0ZdALLAUj7M56Gpn2bm
-WYhHa30+Zj1F+yDLSULBdx8PLIi52e5+ZP7mLrmtmBl6D2c1yNtP90BZpWTH1g5j
-Dpft8GAwuJn1i4Sah41dmsY2eSeZyLn1RMj8MXW/bXr4QbRtvxjXcW6Sfstj8jrV
-zjG/kbptPzoFTwqUcIR8xmmlewSqOERMhdJXYNW07uVMzmZTKB/UrJQr+lzx4otJ
-g0uHQftcku00/KW6iyGTKbQh9gm4UJ4JfVRg9rrCL2NPvLw6Y3BzlKTVOxj8UFI5
-yoZ/YBLpAoGBAPjwJQptYtgauW6MR7wboa4YK4ltB9Qa7SIbfVGPQISDhfdpyg/6
-LZW65MwHPbWM4NjwwpkaLuBrBY0eqGvxtdWAvLPCBTRfoSay5v9E7qFgWWTNWhuq
-C/SuzJeh1bnSNoNW0/fKDDAPsU+x3gUNKiu0VWFCq5tTk78NWat3wpLDAoGBAO87
-o6csdMSrLOaqoUCqUOJNpv6h8uMxLyOPJWgqAIZCVNpZaPOuWseHavkofkI5Hpzu
-T1rBEZZKVjZN8JFXc+1O4n9uqd8kXooONqsRYDDPcKxHqvibXWl42PeNDx/tcETo
-dXiwhjtHuoBjKTyp18+ND8i8wjIb0pEwjLnPBpi9AoGBAKRnZO8YAtmZ/LEHsDCJ
-RyQFDmu6OBtalRWbdg4xP3jEq+sUUMBwhz6FqakddyG5op1jlAEtC5xm0cm7X5u6
-jE4usXE+R9Wo+nLmYCxiR/8H9MHf5Qy0JyU3dCMIXHBWZm4jH+Zb5+St2Ho7i9dm
-NF2cwW50a4UvkznwBTJ662OlAoGAU4fsbXutTdpC9EuRwEV3tnzMmU4sw70xq2XY
-9tTrl/VjMVZUufkgA1k6NcM4yqCtGrhvBs4w+Nv93Do8jFMPzEVl+n7GW36Ub/nk
-hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
-4u3xbLUCgYEAm+1Dv8bvC9d3Z08mCJjUbzdRG6qA39EXpixVYjbmXmDpy71KA2zR
-LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
-8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
-`;
+  const adminKey = Cypress.env('CYPRESS_AUTOMATE_INFRA_ADMIN_KEY');
   const roleName = `${cypressPrefix}-role-${now}`;
   const roleDescription = 'role description';
   const defaultAttribute = {default: 'test'};
@@ -86,7 +60,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
           server_id: serverID,
           name: orgName,
           admin_user: adminUser,
-          admin_key: `-----BEGIN RSA PRIVATE KEY-----${adminKey}-----END RSA PRIVATE KEY-----`
+          admin_key: adminKey
         }
       }).then((resp) => {
         if (resp.status === 200 && resp.body.ok === true) {

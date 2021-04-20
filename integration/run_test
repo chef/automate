@@ -100,6 +100,7 @@ docker_run_args=(
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST"
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER"
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY"
+        "--env" "CYPRESS_AUTOMATE_INFRA_ADMIN_KEY"
         "--env" "AWS_ACCESS_KEY_ID"
         "--env" "AWS_SECRET_ACCESS_KEY"
         "--env" "AWS_SESSION_TOKEN"

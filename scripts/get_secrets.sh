@@ -66,6 +66,7 @@ vault kv get -field=license secret/a2/delivery_license | base64 --decode >compon
 target_host=$(vault kv get -field=data secret/a2/testing/target_host)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
+infra_admin_key=$(vault kv get -field=data secret/a2/testing/infra_admin_key)
 
 cat >dev/secrets-env.sh <<EOF
 # Secrets
@@ -78,4 +79,5 @@ export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
+export CYPRESS_AUTOMATE_INFRA_ADMIN_KEY="$infra_admin_key"
 EOF
