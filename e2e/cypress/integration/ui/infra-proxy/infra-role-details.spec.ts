@@ -264,7 +264,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       // so it doesn't get in the way of subsequent interactions
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
-      cy.wait(2000);
+      cy.wait(3000);
       cy.get('#runlist-table-container td #run-list-name').contains('chef-client').should('exist');
     });
 
@@ -287,7 +287,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
 
-      cy.wait(2000);
+      cy.wait(3000);
       cy.get('#runlist-table-container td #run-list-name').contains('centos-cookbook-file')
         .should('exist');
       cy.get('#runlist-table-container td #run-list-name').contains('cron').should('exist');
@@ -650,6 +650,12 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
       cy.get('app-infra-role-details chef-modal').should('not.be.visible');
 
       cy.wait(2000);
+    });
+
+    // switch tab specs
+    it('can can switch to details tab', () => {
+      cy.get('[data-cy=runList-tab]').contains('Details').click();
+      cy.get('.default').contains('Run List');
     });
 
     // delete role spec

@@ -36,11 +36,11 @@ hrircH+N5OmlPebpp+ElSNJ8/HXoZHcSRVDFnb8+1INLK75V90dWwo199QcX79AW
 LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 8/A/e8ZFjAWF8m83OlP0sb1dn8CQ8Pf+hFfW/a97Y7maECqU0oyNXJg=
 `;
-  const roleName = `${cypressPrefix}-role-${now}`;
+  const roleName = `${cypressPrefix}-role-${now}-1`;
   const roleDescription = 'role description';
-  const roleRunlistName = `${cypressPrefix}-role-${now}-1`;
-  const roleDefaultAttrName = `${cypressPrefix}-role-${now}-2`;
-  const roleOverrideAttrName = `${cypressPrefix}-role-${now}-3`;
+  const roleRunlistName = `${cypressPrefix}-role-${now}-2`;
+  const roleDefaultAttrName = `${cypressPrefix}-role-${now}-3`;
+  const roleOverrideAttrName = `${cypressPrefix}-role-${now}-4`;
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
 
@@ -512,7 +512,7 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
 
     // delete role spec
     it('can delete multiple roles', () => {
-      cy.get('#search-filter').type(roleName);
+      cy.get('#search-filter').type(`${cypressPrefix}-role-${now}`);
       cy.get('[data-cy=search-role]').click();
 
       cy.get('#roles-table-container').contains(roleName).should('exist');
@@ -579,7 +579,6 @@ LvgdoNIAiVKFUcR1z8aty8HNJKzzZPL35VpFJ5Sm4Zh99OVDJkRxpWdZvqdL865h
         .contains(`Successfully deleted role - ${roleOverrideAttrName}.`);
       cy.get('app-notification.info chef-icon').click();
 
-      cy.get('#roles-table-container chef-th').should('not.be.visible');
       cy.get('[data-cy=empty-list]').should('be.visible');
       cy.get('[data-cy=no-records]').contains('No results');
 
