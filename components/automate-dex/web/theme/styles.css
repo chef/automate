@@ -215,7 +215,6 @@ body {
 .popup {
   background: #fff;
   width: 600px;
-  height: 500px;
   position: absolute;
   left: 50%;
   margin-left: -300px;
