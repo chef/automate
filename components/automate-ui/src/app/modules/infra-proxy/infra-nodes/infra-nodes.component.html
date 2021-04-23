@@ -1,0 +1,30 @@
+<section class="infra-nodes">
+  <chef-loading-spinner *ngIf="nodesListLoading" size="50"></chef-loading-spinner>
+  <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <ng-container *ngIf="!nodesListLoading && !authFailure">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th>Node Name</chef-th>
+          <chef-th>Platform</chef-th>
+          <chef-th>FQDN</chef-th>
+          <chef-th>IP Address</chef-th>
+          <chef-th>Uptime</chef-th>
+          <chef-th>Last Check-In</chef-th>
+          <chef-th>Environment</chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let node of nodes">
+          <chef-td>{{ node.name }}</chef-td>
+          <chef-td>{{ node.platform }}</chef-td>
+          <chef-td>{{ node.fqdn }}</chef-td>
+          <chef-td>{{ node.ip_address }}</chef-td>
+          <chef-td>{{ node.uptime }}</chef-td>
+          <chef-td>{{ node.check_in }}</chef-td>
+          <chef-td>{{ node.environment }}</chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
+</section>
