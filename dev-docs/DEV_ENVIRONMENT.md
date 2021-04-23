@@ -55,11 +55,17 @@ and deploying there and on your laptop looks the same.
 
 ## Prerequisites
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop). Start docker before trying to start the Habitat Studio.
+1. Install [Docker Desktop](https://www.docker.com/get-started). Start docker before trying to start the Habitat Studio.
 1. Set up your [GitHub account](https://docs.github.com/en/github/getting-started-with-github/set-up-git)
 1. Create a [Chef Habitat Builder account](https://docs.chef.io/habitat/builder_account/) and your [Builder profile](https://docs.chef.io/habitat/builder_profile/).
+<!-- This is an optional step. You can also create the personal access token from the command line. -->
 1. Create a [Builder personal access token](https://docs.chef.io/habitat/builder_profile/#create-a-personal-access-token) and copy it to an accessible location. You will use it as the value for the `HAB_AUTH_TOKEN` environment variable.
-1. [Install](https://docs.chef.io/habitat/install_habitat/) and [set up](https://docs.chef.io/habitat/hab_setup/) the hab cli. You will need to create your own origin.
+1. [Install](https://docs.chef.io/habitat/install_habitat/) Chef Habitat. The Habitat package installs with Chef Workstation so you may already have it on your computer.
+1. [Set up](https://docs.chef.io/habitat/hab_setup/) the hab cli with the command `hab cli setup`.
+    - Habitat Builder Instance: No
+    - Set up a default origin: Yes
+    - Habitat Personal Access Token: Yes UNLESS you created one in Builder, in which case you need to save it as an environment variable.
+    - Supervisor Control Gateway Secret: No
 1. Set the following environment variables:
 
 ```bash
