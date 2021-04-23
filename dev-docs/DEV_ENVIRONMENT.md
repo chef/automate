@@ -53,6 +53,26 @@ a real deploy of Automate, meaning we are developing against real infrastructure
 be deployed in the wild. It also means we can leverage it in CI, so that testing
 and deploying there and on your laptop looks the same.
 
+## Prerequisites
+
+1. Set up your [GitHub account](https://docs.github.com/en/github/getting-started-with-github/set-up-git)
+1. Create a [Chef Habitat Builder account](https://docs.chef.io/habitat/builder_account/) and your [Builder profile](https://docs.chef.io/habitat/builder_profile/).
+1. Create and copy your [Builder personal access token](https://docs.chef.io/habitat/builder_profile/#create-a-personal-access-token) to an accessible location. You will use it as the value for the `HAB_AUTH_TOKEN` environment variable.
+1. [Install](https://docs.chef.io/habitat/install_habitat/) and [set up](https://docs.chef.io/habitat/hab_setup/) the hab cli. You will need to create your own origin.
+1. Set the following environment variables:
+
+```bash
+# Angle brackets are just to indicate that the value needs replaced. Don't include them in your environment variables.
+export GITHUB_TOKEN=<your github token>
+export TOK=<your chef automate token>
+# Habitat
+export HAB_ORIGIN=<your origin>
+export HAB_AUTH_TOKEN=<your personal access token>
+export HAB_STUDIO_SECRET_GITHUB_TOKEN=GITHUB_TOKEN
+# Cert location. You may need this setting
+export SSL_CERT_FILE=/usr/local/etc/openssl/cert.pem
+```
+
 ## Quickstart
 
 I just wanna run some commands and get rolling! What should I do?
