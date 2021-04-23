@@ -1,4 +1,5 @@
 @import "~styles/variables";
+@import '../infra_shared/shared';
 
 chef-page-header {
   padding-bottom: 0;
@@ -17,39 +18,13 @@ chef-toolbar {
   }
 }
 
-form {
-  chef-form-field {
-    width: 300px;
-    margin-bottom: 15px;
-  }
+.reset-admin-key {
 
   textarea {
     height: 200px;
   }
 
-  input[type="text"]:disabled {
-    opacity: 0.5;
-    background-color: $chef-grey;
-    border: none;
-  }
-
   .chef-error {
     margin-top: -6px;
   }
-
-  #button-bar {
-    margin-top: 15px;
-
-    chef-button {
-      margin-top: 0;
-      margin-left: 0;
-    }
-  }
-}
-
-chef-loading-spinner {
-  display: block;
-  margin: 100px auto;
-  width: 100px;
-  z-index: 199;
 }

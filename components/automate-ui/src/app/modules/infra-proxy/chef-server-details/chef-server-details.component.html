@@ -43,7 +43,7 @@
         (deleteClicked)="deleteOrg()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
-      <section class="page-body" *ngIf="tabValue === 'details'">
+      <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>
             <label>
@@ -110,8 +110,8 @@
               (click)="saveServer()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>
-              <span *ngIf="!saveInProgress">Save</span></chef-button>
-            <span id="saved-note" *ngIf="saveSuccessful && !updateServerForm.dirty">All changes saved.</span>
+              <span *ngIf="!saveInProgress">Save</span>
+            </chef-button>
           </div>
         </form>
       </section>

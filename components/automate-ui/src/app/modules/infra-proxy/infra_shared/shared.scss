@@ -26,3 +26,45 @@ chef-tab-selector {
     background: $chef-azureish-gray;
   }
 }
+
+.details-tab {
+
+  chef-loading-spinner {
+    width: auto;
+    z-index: 199;
+    background-color: $chef-white;
+    opacity: 0.7;
+  }
+
+  form {
+    chef-form-field {
+      width: 310px;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"]:disabled {
+      opacity: 0.5;
+      background-color: $chef-grey;
+      border: none;
+    }
+
+    #changes-not-allowed {
+      font-size: 12px;
+    }
+
+    #button-bar {
+      margin-top: 15px;
+
+      chef-button {
+        margin-top: 0;
+        margin-left: 0;
+
+        chef-loading-spinner {
+          position: relative;
+          top: 2px;
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
