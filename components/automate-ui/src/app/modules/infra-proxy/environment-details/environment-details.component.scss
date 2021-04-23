@@ -206,21 +206,9 @@ img {
   margin-right: 33px;
   margin-top: 16px;
   background: #FFFFFF;
-  border: 1.8px solid #CFD2D2;
+  border: 1px solid #CFD2D2;
   box-sizing: border-box;
   border-radius: 2px;
-}
-
-.action {
-  float: right;
-  margin-right: 32px;
-  border: none;
-  background-color: white;
-
-  img {
-    width: 47px;
-    height: 20px;
-  }
 }
 
 .json-container {
@@ -296,4 +284,44 @@ chef-button {
     outline: none;
     border: none;
   }
+}
+
+.expand-collapse {
+  font-size: 14px;
+  color: $royal-blue;
+  padding: 0 10px;
+
+  .action {
+    cursor: pointer;
+
+    &:first-child {
+      margin-right: 45px;
+    }
+
+    chef-icon {
+      position: relative;
+      top: 0;
+    }
+  }
+
+}
+
+.right-button-box {
+  cursor: pointer;
+  position: relative;
+  float: right;
+}
+
+.edit-item {
+  margin: 0 8px 0 -4px;
+  font-size: 13px;
+}
+
+.edit-text {
+  margin-top: 0px;
+}
+
+.img-section {
+  margin-top: 27px;
+  text-align: center;
 }

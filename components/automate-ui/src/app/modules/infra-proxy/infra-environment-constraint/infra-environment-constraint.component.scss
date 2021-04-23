@@ -260,9 +260,19 @@ span.example-text {
 }
 
 // sass-lint:disable no-important
-::ng-deep .cdk-overlay-container .cdk-overlay-pane {
-  margin-left: -12px !important;
-  transform: none !important;
+.constraint-margin {
+  ::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+    margin-left: -12px !important;
+    transform: none !important;
+  }
+}
+
+// sass-lint:disable no-important
+.fixed-height {
+  ::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+    margin-left: -12px !important;
+    transform: none !important;
+  }
 }
 
 ::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {

@@ -85,21 +85,34 @@
         </label>
         <div class="attr">
           <div class="expand-collapse">
-            <chef-button class="add-circle" primary (click)="tree.expand()">
-              <img alt="Edit" src="/assets/img/expand_all.png" />
+            <chef-button tertiary class="action"
+              [disabled]= false
+              (click)="tree.expand()">
+              <chef-icon>add_circle</chef-icon>
+              <span>Expand All</span>
             </chef-button>
-
-            <chef-button class="collapse-circle" primary (click)="tree.collapse()">
-              <img alt="Collapse" src="/assets/img/collapse_tree.png" />
+            <chef-button tertiary class="action" 
+              [disabled]= false
+              (click)="tree.collapse()">
+              <chef-icon>remove_circle</chef-icon>
+              <span>Collapse All</span>
             </chef-button>
-            <chef-button class="action" primary (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
-              <img alt="Edit" src="/assets/img/content-and-icon.png" />
+            <chef-button tertiary class="right-button-box"
+              [disabled]= false
+              (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
+              <span class="material-icons edit-item">mode_edit</span>
+              <span class="edit-text">Edit</span>
             </chef-button>
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
+              <app-json-tree-table class="json-tree-container" 
+              [hidden]="default_attributes? false : true" #tree [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
+              <div *ngIf="true" class="img-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>There are no items for Display.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -108,22 +121,34 @@
         </label>
         <div class="attr">
           <div class="expand-collapse">
-            <chef-button class="add-circle" primary (click)="tree.expand()">
-              <img alt="Edit" src="/assets/img/expand_all.png" />
+            <chef-button tertiary class="action"
+              [disabled]= false
+              (click)="tree.expand()">
+              <chef-icon>add_circle</chef-icon>
+              <span>Expand All</span>
             </chef-button>
-
-            <chef-button class="collapse-circle" primary (click)="tree.collapse()">
-              <img alt="Collapse" src="/assets/img/collapse_tree.png" />
+            <chef-button tertiary class="action"
+              [disabled]= false
+              (click)="tree.collapse()">
+              <chef-icon>remove_circle</chef-icon>
+              <span>Collapse All</span>
             </chef-button>
-
-            <chef-button class="action" primary (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
-              <img alt="Edit" src="/assets/img/content-and-icon.png" />
+            <chef-button tertiary class="right-button-box" 
+              [disabled]= false
+              (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
+              <span class="material-icons edit-item">mode_edit</span>
+              <span class="edit-text">Edit</span>
             </chef-button>
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table class="json-tree-container" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
+              <app-json-tree-table class="json-tree-container"
+              [hidden]="override_attributes? false : true" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
+              <div *ngIf="true" class="img-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>There are no items for Display.</p>
+              </div>
             </div>
           </div>
         </div>
