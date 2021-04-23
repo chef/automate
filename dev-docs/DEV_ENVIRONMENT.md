@@ -58,7 +58,7 @@ and deploying there and on your laptop looks the same.
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop). Start docker before trying to start the Habitat Studio.
 1. Set up your [GitHub account](https://docs.github.com/en/github/getting-started-with-github/set-up-git)
 1. Create a [Chef Habitat Builder account](https://docs.chef.io/habitat/builder_account/) and your [Builder profile](https://docs.chef.io/habitat/builder_profile/).
-1. Create and copy your [Builder personal access token](https://docs.chef.io/habitat/builder_profile/#create-a-personal-access-token) to an accessible location. You will use it as the value for the `HAB_AUTH_TOKEN` environment variable.
+1. Create a [Builder personal access token](https://docs.chef.io/habitat/builder_profile/#create-a-personal-access-token) and copy it to an accessible location. You will use it as the value for the `HAB_AUTH_TOKEN` environment variable.
 1. [Install](https://docs.chef.io/habitat/install_habitat/) and [set up](https://docs.chef.io/habitat/hab_setup/) the hab cli. You will need to create your own origin.
 1. Set the following environment variables:
 
