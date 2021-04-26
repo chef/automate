@@ -1,4 +1,8 @@
-<table mat-table [dataSource]="dataSource" id="runlist-table-container" >
+<table
+  mat-table
+  [dataSource]="dataSource"
+  id="runlist-table-container"
+  data-cy="runlist-table-container">
   <div *ngFor="let column of displayedColumns; first as isFirst;">
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef [ngClass]="{'vertical-separator': options.verticalSeparator}">
@@ -22,7 +26,7 @@
             <span *ngIf="element.value['type'] === 'recipe'">
               <img alt="Available recipes" src="/assets/img/article.png" />
             </span>
-            <div [ngClass]="{'hasChildren': element.children.length}" id="run-list-name">{{element.value[column]}}</div>
+            <div [ngClass]="{'hasChildren': element.children.length}" id="run-list-name" data-cy="run-list-name">{{element.value[column]}}</div>
           </div>
         </div>
         <div *ngIf="!isFirst">

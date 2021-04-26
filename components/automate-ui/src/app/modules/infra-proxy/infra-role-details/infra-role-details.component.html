@@ -120,7 +120,7 @@
                 [options]="treeOptions">
               </app-tree-table>
             </div>
-            <div *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
+            <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
               <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
             </div>
@@ -176,7 +176,7 @@
               #tree
               [json]="selectedAttrs?.default_attributes">
             </app-json-tree-table>
-            <div *ngIf="!hasDefaultJson" class="img-section">
+            <div data-cy="empty-default-attribute" *ngIf="!hasDefaultJson" class="img-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
               <p>There are no items for Display.</p>
             </div>
@@ -218,7 +218,7 @@
               #override
               [json]="selectedAttrs?.override_attributes">
             </app-json-tree-table>
-            <div *ngIf="!hasOverrideJson" class="img-section">
+            <div data-cy="empty-override-attribute" *ngIf="!hasOverrideJson" class="img-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
               <p>There are no items for Display.</p>
             </div>

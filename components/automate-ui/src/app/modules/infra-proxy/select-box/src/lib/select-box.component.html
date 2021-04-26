@@ -55,7 +55,8 @@
                 (cdkDragStarted)="onDragleftItemStarted()"
                 class="run-list-box"
                 [ngClass]="item.selected ? 'selected' : ''"
-                id="select-run-list">
+                id="select-run-list"
+                data-cy="select-run-list">
                 <span [innerHTML]="highlightText(item.value, leftFilterText)"></span>
               </div>
               <div class="spinner-item" *ngIf="loading">
@@ -105,7 +106,8 @@
             (cdkDragStarted)="onDragrightItemStarted()"
             class="select-box-list-item"
             [ngClass]="item.selected ?  'selected' : ''"
-            id="updated-run-list">
+            id="updated-run-list"
+            data-cy="updated-run-list">
             <div *cdkDragPlaceholder class="select-box-placeholder vertical">
               <ng-container *ngIf="getRightSelectedList().length > 0 else single_placeholder">
                 <div *ngFor="let rightPreview of getRightSelectedList()" >

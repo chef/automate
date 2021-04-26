@@ -26,7 +26,13 @@
         (searchButtonClick)="searchRoles($event)"
         placeHolder="Roles....">
       </app-infra-search-bar>
-        <chef-button id="role-create" primary (click)="openCreateModal()" data-cy="create-role-button">Create Role</chef-button>
+      <chef-button
+        id="role-create"
+        primary
+        (click)="openCreateModal()"
+        data-cy="create-role-button">
+        Create Role
+      </chef-button>
     </div>
     <chef-loading-spinner
       class="full-screen-spinner"
@@ -39,7 +45,7 @@
       <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
       <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
     </div>
-    <div id="roles-table-container" *ngIf="roles.length">
+    <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
       <chef-table>
         <chef-thead>
           <chef-tr class="no_border_tr">

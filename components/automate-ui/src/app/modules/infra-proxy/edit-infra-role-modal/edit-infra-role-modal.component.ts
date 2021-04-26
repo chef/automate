@@ -214,6 +214,7 @@ export class EditInfraRoleModalComponent implements OnChanges, OnInit, OnDestroy
     this.defaultAttrParseError = false;
     this.overrideAttrParseError = false;
     this.showbutton = false;
+    this.isRunlist = false;
     this.setAttributeValue();
     this.conflictErrorEvent.emit(false);
   }

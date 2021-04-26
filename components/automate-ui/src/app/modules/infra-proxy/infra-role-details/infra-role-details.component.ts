@@ -235,10 +235,10 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
           this.idList = allRoleEnvironmentsState;
           if (this.idList.length > 0) {
             this.env_id = this.idList[0];
-            this.show = true;
           } else {
-            this.show = false;
+            this.idList[0] = this.env_id;
           }
+          this.show = true;
         }
       });
   }
