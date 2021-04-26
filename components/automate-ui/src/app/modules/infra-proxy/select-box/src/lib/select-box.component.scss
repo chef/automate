@@ -369,7 +369,7 @@
 }
 
 ::ng-deep .chef-dropdown {
-  margin-top: 27px;
+  margin-top: 38px;
 
   .mat-option {
     line-height: 3em;
@@ -410,9 +410,11 @@
 }
 
 // sass-lint:disable no-important
-::ng-deep .cdk-overlay-container .cdk-overlay-pane {
-  margin-left: -12px !important;
-  transform: none !important;
+.select-box {
+  ::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+    margin-left: -12px !important;
+    transform: none !important;
+  }
 }
 
 ::ng-deep .cdk-overlay-container {

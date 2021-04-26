@@ -9,7 +9,7 @@ describe('infra role', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY');
+  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const roleName = `${cypressPrefix}-role-${now}-1`;
   const roleDescription = 'role description';
   const roleRunlistName = `${cypressPrefix}-role-${now}-2`;
@@ -17,7 +17,6 @@ describe('infra role', () => {
   const roleOverrideAttrName = `${cypressPrefix}-role-${now}-4`;
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
-  let roleResponse: any;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -74,19 +73,11 @@ describe('infra role', () => {
               id: orgID,
               server_id: serverID
             }
-          }).then((orgResponse) => {
-            if (orgResponse.status === 200) {
-              expect(orgResponse.status).to.equal(200);
-            } else {
-              cy.get('[data-cy=empty-state]').should('be.visible');
-            }
           });
         }
       });
       cy.visit(`/infrastructure/chef-servers/${serverID}/organizations/${orgID}`);
       cy.get('app-welcome-modal').invoke('hide');
-      cy.get('.nav-tab').contains('Roles').click();
-      getRole('', 1);
     });
     cy.restoreStorage();
   });
@@ -117,19 +108,14 @@ describe('infra role', () => {
   }
 
   function checkResponse(response: any) {
-    if ( response && response.status === 200) {
-      expect(response.status).to.equal(200);
-      if (response.body.roles.length === 0) {
-        cy.get('[data-cy=empty-list]').should('be.visible');
-      } else {
-        cy.get('[data-cy=create-role-button]').contains('Create Role');
-        cy.get('[data-cy=roles-table-container] chef-th').contains('Name');
-        cy.get('[data-cy=roles-table-container] chef-th').contains('Description');
-        cy.get('[data-cy=roles-table-container] chef-th').contains('Environments');
-        return true;
-      }
+    if (response.body.roles.length === 0) {
+      cy.get('[data-cy=empty-list]').should('be.visible');
     } else {
-      cy.get('[data-cy=empty-state]').should('be.visible');
+      cy.get('[data-cy=create-role-button]').contains('Create Role');
+      cy.get('[data-cy=roles-table-container] chef-th').contains('Name');
+      cy.get('[data-cy=roles-table-container] chef-th').contains('Description');
+      cy.get('[data-cy=roles-table-container] chef-th').contains('Environments');
+      return true;
     }
   }
 
@@ -138,42 +124,41 @@ describe('infra role', () => {
       cy.get('.page-title').contains(orgName);
     });
 
+    // roles tabs specs
+    it('can switch to roles tab', () => {
+      cy.get('.nav-tab').contains('Roles').click();
+    });
+
     it('can check if role has list or not', () => {
       getRole('', 1).then((response) => {
-        roleResponse = response;
         checkResponse(response);
       });
     });
 
     context('can search and change page in role', () => {
       it('can search a role and check  if empty or not', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=search-filter]').type(roleName);
-          cy.get('[data-cy=search-role]').click();
-          getRole(roleName, 1).then((response) => {
-            checkResponse(response);
-          });
-          cy.get('[data-cy=search-filter]').clear();
-          cy.get('[data-cy=search-role]').click();
-          getRole('', 1).then((response) => {
-            roleResponse = response;
-            checkResponse(response);
-          });
-        }
+        cy.get('[data-cy=search-filter]').type(roleName);
+        cy.get('[data-cy=search-role]').click();
+        getRole(roleName, 1).then((response) => {
+          checkResponse(response);
+        });
+        cy.get('[data-cy=search-filter]').clear();
+        cy.get('[data-cy=search-role]').click();
+        getRole('', 1).then((response) => {
+          checkResponse(response);
+        });
       });
 
       it('can change page and load data according to page', () => {
         const page = 3;
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=roles-table-container] chef-th').contains('Name');
-          cy.get('[data-cy=roles-table-container] chef-th').contains('Description');
-          cy.get('[data-cy=roles-table-container] chef-th').contains('Environments');
-          if (cy.get('.roles-list-paging .page-picker-item').contains('3')) {
-            cy.get('.roles-list-paging .page-picker-item').contains('3').click();
-            getRole('', page).then((response) => {
-              checkResponse(response);
-            });
-          }
+        cy.get('[data-cy=roles-table-container] chef-th').contains('Name');
+        cy.get('[data-cy=roles-table-container] chef-th').contains('Description');
+        cy.get('[data-cy=roles-table-container] chef-th').contains('Environments');
+        if (cy.get('.roles-list-paging .page-picker-item').contains('3')) {
+          cy.get('.roles-list-paging .page-picker-item').contains('3').click();
+          getRole('', page).then((response) => {
+            checkResponse(response);
+          });
         }
       });
     });
@@ -181,248 +166,225 @@ describe('infra role', () => {
     // In create role pop-up details tab specs
     context('can create role with details tab', () => {
       it('can add name, description and create role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=add-button]').click();
-          cy.get('app-infra-roles chef-modal').should('not.be.visible');
+        cy.get('[data-cy=add-button]').click();
+        cy.get('app-infra-roles chef-modal').should('not.be.visible');
 
-          // verify success notification and then dismiss it
-          // so it doesn't get in the way of subsequent interactions
-          cy.get('app-notification.info').should('be.visible');
-          cy.get('app-notification.info chef-icon').click();
-        }
+        // verify success notification and then dismiss it
+        // so it doesn't get in the way of subsequent interactions
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
       });
 
       it('fails to create a role with a duplicate name', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=add-button]').click();
-          cy.get('app-infra-roles chef-modal chef-error').contains('already exists')
-            .should('be.visible');
+        cy.get('[data-cy=add-button]').click();
+        cy.get('app-infra-roles chef-modal chef-error').contains('already exists')
+          .should('be.visible');
 
-          cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('can cancel creating a role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleName);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleName);
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('can check create role button is disabled until all inputs are filled in', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').clear();
-          cy.get('[data-cy=role-description]').clear();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').clear();
+        cy.get('[data-cy=role-description]').clear();
 
-          // check for disabled
-          cy.get('[data-cy=add-button]')
-          .invoke('attr', 'disabled')
-          .then(disabled => {
-            disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=add-button]').click();
-          });
+        // check for disabled
+        cy.get('[data-cy=add-button]')
+        .invoke('attr', 'disabled')
+        .then(disabled => {
+          disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=add-button]').click();
+        });
 
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
     });
 
     // In create role pop-up run list tab specs
     context('can create role with run list tab', () => {
       it('can add a name, description, run list in role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.wait(1000);
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleRunlistName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.wait(1000);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleRunlistName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-            .click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
+          .click();
 
-          cy.get('[data-cy=drag-right]').click();
-          cy.get('[data-cy=add-run-list-button]').click();
-          cy.get('app-infra-roles chef-modal').should('not.be.visible');
+        cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=add-run-list-button]').click();
+        cy.get('app-infra-roles chef-modal').should('not.be.visible');
 
-          // verify success notification and then dismiss it
-          // so it doesn't get in the way of subsequent interactions
-          cy.get('app-notification.info').should('be.visible');
-          cy.get('app-notification.info chef-icon').click();
-        }
+        // verify success notification and then dismiss it
+        // so it doesn't get in the way of subsequent interactions
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
       });
 
       it('can cancel creating a run list role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleRunlistName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleRunlistName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
 
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
-            .click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
+          .click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('can check create run list button is disabled until all inputs are filled in', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleRunlistName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleRunlistName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
 
-          // check for disabled
-          cy.get('[data-cy=add-run-list-button]')
-          .invoke('attr', 'disabled')
-          .then(disabled => {
-            disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=add-run-list-button]').click();
-          });
+        // check for disabled
+        cy.get('[data-cy=add-run-list-button]')
+        .invoke('attr', 'disabled')
+        .then(disabled => {
+          disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=add-run-list-button]').click();
+        });
 
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
-            .click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-run-list-button]').contains('Cancel').should('be.visible')
+          .click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
-
     });
 
     // In create role pop-up default attribute tab specs
     context('can create role with default attribute tab', () => {
       it('can add a name, description, run list and default attribute in role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=add-default-attribute-button]').click();
-          cy.get('app-infra-roles chef-modal').should('not.be.visible');
+        cy.get('[data-cy=add-default-attribute-button]').click();
+        cy.get('app-infra-roles chef-modal').should('not.be.visible');
 
-          // verify success notification and then dismiss it
-          // so it doesn't get in the way of subsequent interactions
-          cy.get('app-notification.info').should('be.visible');
-          cy.get('app-notification.info chef-icon').click();
-        }
+        // verify success notification and then dismiss it
+        // so it doesn't get in the way of subsequent interactions
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
       });
 
       it('can cancel creating default attribute  role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').focus();
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').focus();
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('can check create default attribute button is disabled until textarea is filled', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear();
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear();
 
-          // check for disabled
-          cy.get('[data-cy=add-default-attribute-button]')
-          .invoke('attr', 'disabled')
-          .then(disabled => {
-            disabled ? cy.log('buttonIsDiabled') :
-              cy.get('[data-cy=add-default-attribute-button]').click();
-          });
+        // check for disabled
+        cy.get('[data-cy=add-default-attribute-button]')
+        .invoke('attr', 'disabled')
+        .then(disabled => {
+          disabled ? cy.log('buttonIsDiabled') :
+            cy.get('[data-cy=add-default-attribute-button]').click();
+        });
 
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('failed to create default attribute with invalid json', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleDefaultAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', invalidJson)
-            .trigger('change');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', invalidJson)
+          .trigger('change');
 
-          cy.get('app-infra-roles chef-modal chef-error').contains('Must be a valid JSON object')
-            .should('be.visible');
+        cy.get('app-infra-roles chef-modal chef-error').contains('Must be a valid JSON object')
+          .should('be.visible');
 
-          cy.wait(1000);
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.wait(1000);
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-default-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
     });
 
@@ -430,267 +392,254 @@ describe('infra role', () => {
     context('can create role with override attribute tab', () => {
       it('can add a name, description, run list, default attribute and override attribute in role',
         () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('audit')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=navbar]').contains('Override Attributes').click();
-          cy.get('[data-cy=role-override-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Override Attributes').click();
+        cy.get('[data-cy=role-override-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=add-override-attribute-button]').click();
-          cy.get('app-infra-roles chef-modal').should('not.be.visible');
+        cy.get('[data-cy=add-override-attribute-button]').click();
+        cy.get('app-infra-roles chef-modal').should('not.be.visible');
 
-          // verify success notification and then dismiss it
-          // so it doesn't get in the way of subsequent interactions
-          cy.get('app-notification.info').should('be.visible');
-          cy.get('app-notification.info chef-icon').click();
-        }
+        // verify success notification and then dismiss it
+        // so it doesn't get in the way of subsequent interactions
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
       });
 
       it('can cancel creating override attribute  role', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=navbar]').contains('Override Attributes').click();
-          cy.get('[data-cy=role-override-attribute]').focus();
+        cy.get('[data-cy=navbar]').contains('Override Attributes').click();
+        cy.get('[data-cy=role-override-attribute]').focus();
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('can check create override attribute button is disabled until textarea is filled', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=navbar]').contains('Override Attributes').click();
-          cy.get('[data-cy=role-override-attribute]').clear();
+        cy.get('[data-cy=navbar]').contains('Override Attributes').click();
+        cy.get('[data-cy=role-override-attribute]').clear();
 
-          // check for disabled
-          cy.get('[data-cy=add-override-attribute-button]')
-          .invoke('attr', 'disabled')
-          .then(disabled => {
-            disabled ? cy.log('buttonIsDiabled') :
-              cy.get('[data-cy=add-override-attribute-button]').click();
-          });
+        // check for disabled
+        cy.get('[data-cy=add-override-attribute-button]')
+        .invoke('attr', 'disabled')
+        .then(disabled => {
+          disabled ? cy.log('buttonIsDiabled') :
+            cy.get('[data-cy=add-override-attribute-button]').click();
+        });
 
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
 
       it('failed to create override attribute with invalid json', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
-            .click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('aix')
+          .click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=navbar]').contains('Override Attributes').click();
-          cy.get('[data-cy=role-override-attribute]').invoke('val', invalidJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Override Attributes').click();
+        cy.get('[data-cy=role-override-attribute]').invoke('val', invalidJson)
+          .trigger('change').type(' ');
 
-          cy.get('app-infra-roles chef-modal chef-error').contains('Must be a valid JSON object')
-            .should('be.visible');
+        cy.get('app-infra-roles chef-modal chef-error').contains('Must be a valid JSON object')
+          .should('be.visible');
 
-          cy.wait(1000);
-          cy.get('app-infra-roles chef-modal').should('exist');
+        cy.wait(1000);
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          // here we exit with the Cancel button
-          cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
-            .should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        // here we exit with the Cancel button
+        cy.get('[data-cy=cancel-override-attribute-button]').contains('Cancel')
+          .should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
     });
 
     context('failed to create role with dublicate name', () => {
       it('can move to details tab if fails to create a role with a duplicate name', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=create-role-button]').contains('Create Role').click();
-          cy.get('app-infra-roles chef-modal').should('exist');
-          cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
-          cy.get('[data-cy=role-description]').type(roleDescription);
+        cy.get('[data-cy=create-role-button]').contains('Create Role').click();
+        cy.get('app-infra-roles chef-modal').should('exist');
+        cy.get('[data-cy=role-name]').type(roleOverrideAttrName);
+        cy.get('[data-cy=role-description]').type(roleDescription);
 
-          cy.get('[data-cy=navbar]').contains('Run List').click();
-          cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
-            .contains('audit').click();
-          cy.get('[data-cy=drag-right]').click();
+        cy.get('[data-cy=navbar]').contains('Run List').click();
+        cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
+          .contains('audit').click();
+        cy.get('[data-cy=drag-right]').click();
 
-          cy.get('[data-cy=navbar]').contains('Default Attributes').click();
-          cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Default Attributes').click();
+        cy.get('[data-cy=role-deffault-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=navbar]').contains('Override Attributes').click();
-          cy.get('[data-cy=role-override-attribute]').clear().invoke('val', validJson)
-            .trigger('change').type(' ');
+        cy.get('[data-cy=navbar]').contains('Override Attributes').click();
+        cy.get('[data-cy=role-override-attribute]').clear().invoke('val', validJson)
+          .trigger('change').type(' ');
 
-          cy.get('[data-cy=add-override-attribute-button]').click();
+        cy.get('[data-cy=add-override-attribute-button]').click();
 
-          cy.get('app-infra-roles chef-modal chef-error').contains('already exists')
-            .should('be.visible');
+        cy.get('app-infra-roles chef-modal chef-error').contains('already exists')
+          .should('be.visible');
 
-          //  here we exit with the chef-modal exit button in the top right corner
-          cy.get('app-infra-roles chef-modal').should('exist');
+        //  here we exit with the chef-modal exit button in the top right corner
+        cy.get('app-infra-roles chef-modal').should('exist');
 
-          cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
-          cy.get('app-infra-roles  chef-modal').should('not.be.visible');
-        }
+        cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+        cy.get('app-infra-roles  chef-modal').should('not.be.visible');
       });
     });
 
     // delete role spec
     context('can delete roles', () => {
       it('can delete multiple roles', () => {
-        if (checkResponse(roleResponse)) {
-          cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-role-${now}`);
-          cy.get('[data-cy=search-role]').click();
-          getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
-            if (checkResponse(response)) {
-              cy.get('[data-cy=roles-table-container]').contains(roleName).should('exist');
-              cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
-                .contains(roleName).parent().parent().find('.mat-select-trigger').click();
-              // we throw in a `should` so cypress retries until introspection allows
-              // menu to be shown
+        cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-role-${now}`);
+        cy.get('[data-cy=search-role]').click();
+        getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+          if (checkResponse(response)) {
+            cy.get('[data-cy=roles-table-container]').contains(roleName).should('exist');
+            cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
+              .contains(roleName).parent().parent().find('.mat-select-trigger').click();
+            // we throw in a `should` so cypress retries until introspection allows
+            // menu to be shown
 
-              cy.get('[data-cy=delete-role]').should('be.visible')
-                .click();
-              // accept dialog
-              cy.get('app-infra-roles chef-button').contains('Delete').click();
-              // verify success notification and then dismiss it
-              cy.get('app-notification.info').contains(`Successfully deleted role - ${roleName}.`);
-              cy.get('app-notification.info chef-icon').click();
-            }
-          });
+            cy.get('[data-cy=delete-role]').should('be.visible')
+              .click();
+            // accept dialog
+            cy.get('app-infra-roles chef-button').contains('Delete').click();
+            // verify success notification and then dismiss it
+            cy.get('app-notification.info').contains(`Successfully deleted role - ${roleName}.`);
+            cy.get('app-notification.info chef-icon').click();
+          }
+        });
 
-          getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
-            if (checkResponse(response)) {
-              cy.wait(2000);
-              cy.get('[data-cy=roles-table-container]').contains(roleRunlistName).should('exist');
-              cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
-                .contains(roleRunlistName).parent().parent().find('.mat-select-trigger')
-                .as('controlMenu');
-              // we throw in a `should` so cypress retries until introspection allows
-              // menu to be shown
-              cy.get('@controlMenu').scrollIntoView().should('be.visible')
-                .click();
-              cy.get('[data-cy=delete-role]').should('be.visible')
-                .click();
-              // accept dialog
-              cy.get('app-infra-roles chef-button').contains('Delete').click();
-              // verify success notification and then dismiss it
-              cy.get('app-notification.info')
-                .contains(`Successfully deleted role - ${roleRunlistName}.`);
-              cy.get('app-notification.info chef-icon').click();
-            }
-          });
+        getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+          if (checkResponse(response)) {
+            cy.wait(2000);
+            cy.get('[data-cy=roles-table-container]').contains(roleRunlistName).should('exist');
+            cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
+              .contains(roleRunlistName).parent().parent().find('.mat-select-trigger')
+              .as('controlMenu');
+            // we throw in a `should` so cypress retries until introspection allows
+            // menu to be shown
+            cy.get('@controlMenu').scrollIntoView().should('be.visible')
+              .click();
+            cy.get('[data-cy=delete-role]').should('be.visible')
+              .click();
+            // accept dialog
+            cy.get('app-infra-roles chef-button').contains('Delete').click();
+            // verify success notification and then dismiss it
+            cy.get('app-notification.info')
+              .contains(`Successfully deleted role - ${roleRunlistName}.`);
+            cy.get('app-notification.info chef-icon').click();
+          }
+        });
 
-          getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
-            if (checkResponse(response)) {
-              cy.wait(2000);
-              cy.get('[data-cy=roles-table-container]').contains(roleDefaultAttrName)
-                .should('exist');
-              cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
-                .contains(roleDefaultAttrName).parent().parent().find('.mat-select-trigger')
-                .as('controlMenu');
-              // we throw in a `should` so cypress retries until introspection allows
-              // menu to be shown
-              cy.get('@controlMenu').scrollIntoView().should('be.visible')
-                .click();
-              cy.get('[data-cy=delete-role]').should('be.visible')
-                .click();
-              // accept dialog
-              cy.get('app-infra-roles chef-button').contains('Delete').click();
-              // verify success notification and then dismiss it
-              cy.get('app-notification.info')
-                .contains(`Successfully deleted role - ${roleDefaultAttrName}.`);
-              cy.get('app-notification.info chef-icon').click();
-            }
-          });
+        getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+          if (checkResponse(response)) {
+            cy.wait(2000);
+            cy.get('[data-cy=roles-table-container]').contains(roleDefaultAttrName)
+              .should('exist');
+            cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
+              .contains(roleDefaultAttrName).parent().parent().find('.mat-select-trigger')
+              .as('controlMenu');
+            // we throw in a `should` so cypress retries until introspection allows
+            // menu to be shown
+            cy.get('@controlMenu').scrollIntoView().should('be.visible')
+              .click();
+            cy.get('[data-cy=delete-role]').should('be.visible')
+              .click();
+            // accept dialog
+            cy.get('app-infra-roles chef-button').contains('Delete').click();
+            // verify success notification and then dismiss it
+            cy.get('app-notification.info')
+              .contains(`Successfully deleted role - ${roleDefaultAttrName}.`);
+            cy.get('app-notification.info chef-icon').click();
+          }
+        });
 
-          getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
-            if (checkResponse(response)) {
-              cy.wait(2000);
-              cy.get('[data-cy=roles-table-container]').contains(roleOverrideAttrName)
-                .should('exist');
-              cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
-                .contains(roleOverrideAttrName).parent().parent().find('.mat-select-trigger')
-                .as('controlMenu');
-              // we throw in a `should` so cypress retries until introspection
-              // allows menu to be shown
-              cy.get('@controlMenu').scrollIntoView().should('be.visible')
-                .click();
-              cy.get('[data-cy=delete-role]').should('be.visible')
-                .click();
-              // accept dialog
-              cy.get('app-infra-roles chef-button').contains('Delete').click();
-              // verify success notification and then dismiss it
-              cy.get('app-notification.info')
-                .contains(`Successfully deleted role - ${roleOverrideAttrName}.`);
-              cy.get('app-notification.info chef-icon').click();
-            }
-          });
+        getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+          if (checkResponse(response)) {
+            cy.wait(2000);
+            cy.get('[data-cy=roles-table-container]').contains(roleOverrideAttrName)
+              .should('exist');
+            cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a')
+              .contains(roleOverrideAttrName).parent().parent().find('.mat-select-trigger')
+              .as('controlMenu');
+            // we throw in a `should` so cypress retries until introspection
+            // allows menu to be shown
+            cy.get('@controlMenu').scrollIntoView().should('be.visible')
+              .click();
+            cy.get('[data-cy=delete-role]').should('be.visible')
+              .click();
+            // accept dialog
+            cy.get('app-infra-roles chef-button').contains('Delete').click();
+            // verify success notification and then dismiss it
+            cy.get('app-notification.info')
+              .contains(`Successfully deleted role - ${roleOverrideAttrName}.`);
+            cy.get('app-notification.info chef-icon').click();
+          }
+        });
 
-          getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
-            checkResponse(response);
-          });
+        getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+          checkResponse(response);
+        });
 
-          cy.get('[data-cy=search-filter]').clear();
-          cy.get('[data-cy=search-role]').click();
-          getRole('', 1).then((response) => {
-            roleResponse = response;
-            checkResponse(response);
-          });
-        }
+        cy.get('[data-cy=search-filter]').clear();
+        cy.get('[data-cy=search-role]').click();
+        getRole('', 1).then((response) => {
+          checkResponse(response);
+        });
       });
     });
   });
