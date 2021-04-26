@@ -27,19 +27,17 @@
           <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <div *ngIf="openEdit">
-        <app-edit-environment-attribute-modal
-          [jsonText]="jsonText"
-          [openEvent]="openEnvironmentModal"
-          [serverId]="serverId"
-          [orgId]="orgId"
-          [name]="name"
-          [environment]="environment"
-          [label]="label"
-          [cookbookConstraints]="cookbookConstraints"
-          [cookbookVersions]="cookbookVersions">
-        </app-edit-environment-attribute-modal>
-      </div>
+      <app-edit-environment-attribute-modal
+        [jsonText]="jsonText"
+        [openEvent]="openEnvironmentModal"
+        [serverId]="serverId"
+        [orgId]="orgId"
+        [name]="name"
+        [environment]="environment"
+        [label]="label"
+        [cookbookConstraints]="cookbookConstraints"
+        [cookbookVersions]="cookbookVersions">
+      </app-edit-environment-attribute-modal>
       <section class="page-body" *ngIf="tabValue === 'cookbookConstraints'">
         <div *ngIf="show">
           <div>
@@ -48,8 +46,10 @@
             </label>
             <div class="constraint-table">
               <div class="edit">
-                <chef-button class="action" primary (click)="openEditAttributeModal(environment?.default_attributes, 'Constraints')">
-                  <img alt="Edit" src="/assets/img/content-and-icon.png" />
+                <chef-button tertiary class="right-button-box" tabindex="1"
+                  (click)="openEditAttributeModal(environment?.default_attributes, 'Constraints')">
+                  <span class="material-icons edit-item">mode_edit</span>
+                  <span class="edit-text">Edit</span>
                 </chef-button>
               </div>
               <hr class="divider-constraint" />
@@ -86,19 +86,18 @@
         <div class="attr">
           <div class="expand-collapse">
             <chef-button tertiary class="action"
-              [disabled]= false
+              [disabled]= !hasDefaultJson
               (click)="tree.expand()">
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
             <chef-button tertiary class="action" 
-              [disabled]= false
+              [disabled]= !hasDefaultJson
               (click)="tree.collapse()">
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
             <chef-button tertiary class="right-button-box"
-              [disabled]= false
               (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -108,8 +107,8 @@
           <div class="json-container">
             <div class="scroll">
               <app-json-tree-table class="json-tree-container" 
-              [hidden]="default_attributes? false : true" #tree [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
-              <div *ngIf="true" class="img-section">
+              [hidden]="hasDefaultJson? false : true" #tree [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
+              <div *ngIf="!hasDefaultJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>There are no items for Display.</p>
               </div>
@@ -122,19 +121,18 @@
         <div class="attr">
           <div class="expand-collapse">
             <chef-button tertiary class="action"
-              [disabled]= false
+              [disabled]= !hasOverrideJson
               (click)="tree.expand()">
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
             <chef-button tertiary class="action"
-              [disabled]= false
+              [disabled]= !hasOverrideJson
               (click)="tree.collapse()">
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
             <chef-button tertiary class="right-button-box" 
-              [disabled]= false
               (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -144,8 +142,8 @@
           <div class="json-container">
             <div class="scroll">
               <app-json-tree-table class="json-tree-container"
-              [hidden]="override_attributes? false : true" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
-              <div *ngIf="true" class="img-section">
+              [hidden]="hasOverrideJson? false : true" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
+              <div *ngIf="!hasOverrideJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>There are no items for Display.</p>
               </div>

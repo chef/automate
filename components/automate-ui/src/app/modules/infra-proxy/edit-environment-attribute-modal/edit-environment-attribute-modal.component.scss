@@ -152,13 +152,10 @@ chef-modal {
   height: 20px;
   left: 398px;
   top: 278px;
-
-  font-family: Mulish;
   font-style: normal;
   font-weight: bold;
   font-size: 14px;
   line-height: 20px;
-
   letter-spacing: 0.5px;
   text-transform: capitalize;
   margin-top: 50px;
@@ -166,9 +163,7 @@ chef-modal {
 
 .divider-constraint {
   margin-top: 9px;
-  width: 643px;
-  height: 1px;
-  background-color: $chef-key-tab;
+  border-color: $chef-key-tab;
 }
 
 .dynamic {
@@ -248,7 +243,7 @@ chef-modal ::ng-deep .modal-overlay {
 
   ::ng-deep .nav-tab:before {
     height: 4px;
-    background: #E7E9E9;
+    background: $chef-tab-hover;
   }
 }
 
@@ -257,8 +252,10 @@ chef-modal ::ng-deep .modal-overlay {
     height: 36px;
   }
 
-  chef-button#create-button-object-modal {
-    margin: 10px 0px 0px 16px;
+  chef-button#create-default-button-object-modal,
+  chef-button#create-override-button-object-modal,
+  chef-button#create-constraints-button-object-modal {
+    margin: 8px 0px 0px 16px;
   }
 
   chef-button#cancel-server-popup {
@@ -455,15 +452,12 @@ chef-modal ::ng-deep .modal-overlay {
 }
 
 ::ng-deep .scroll::-webkit-scrollbar-thumb {
-  background: #B4C3CC;
+  background: $chef-cyan-blue;
   border-radius: 5px;
   width: 5px;
   height: 64px;
   left: 1401px;
   top: 321px;
-
-  background: #B4C3CC;
-  border-radius: 5px;
 }
 
 .add {
@@ -474,7 +468,7 @@ chef-modal ::ng-deep .modal-overlay {
     height: 36px;
     border: 1px solid rgba(56, 100, 242, 0.5);
     border-radius: 0px 4px 4px 0px;
-    background-color: white;
+    background-color: $chef-white;
     color: $chef-primary-bright;
   }
 }
@@ -485,7 +479,7 @@ chef-modal ::ng-deep .modal-overlay {
     height: 36px;
     border: 1px solid rgba(56, 100, 242, 0.5);
     border-radius: 0px 4px 4px 0px;
-    background-color: white;
+    background-color: $chef-white;
     color: $chef-primary-bright;
   }
 }
@@ -498,4 +492,13 @@ form {
       border-radius: 4px;
     }
   }
+}
+
+::ng-deep chef-button:focus {
+  outline: none;
+
+  button {
+    outline: none;
+  }
+
 }

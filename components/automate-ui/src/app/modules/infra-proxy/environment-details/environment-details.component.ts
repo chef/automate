@@ -55,6 +55,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public selectedAttrs: any;
   public selected_level = 'all';
   public jsonText: any;
+  public hasOverrideJson = true;
+  public hasDefaultJson = true;
   public openEnvironmentModal = new EventEmitter<boolean>();
 
   // precedence levels
@@ -122,6 +124,11 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       }
       this.attributes = new EnvironmentAttributes(this.environment);
 
+      this.hasDefaultJson = Object.keys(
+        JSON.parse(this.environment.default_attributes)).length > 0 ? true : false;
+      this.hasOverrideJson = Object.keys(
+        JSON.parse(this.environment.override_attributes)).length > 0 ? true : false;
+
       setTimeout(() => this.filter(this.selected_level), 10);
       this.environmentDetailsLoading = false;
     });
@@ -172,7 +179,7 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     this.label = '';
   }
 
-  public openEditAttributeModal(value, label): void {
+  public openEditAttributeModal(value, label: string): void {
     this.openEdit = true;
     const obj = JSON.parse(value);
     this.jsonText = JSON.stringify(obj, null, 4);

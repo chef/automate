@@ -55,6 +55,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   public visible = false;
   public updateSuccessful = false;
   public updateInProgress = false;
+  public isConstraints = false;
 
   public attrParseError: boolean;
   public cookbooks: Cookbook[] = [];
@@ -112,9 +113,11 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
             this.constraintKeys.splice(index, 1);
           }
         });
+        if (!this.nameKeys.includes(cookbookName)) {
+          this.nameKeys.push(cookbookName);
+        }
       });
       this.name_id = this.constraintKeys[0];
-
     });
 
     this.loadCookbooks();
@@ -138,12 +141,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   }
 
   ngOnChanges(): void {
-    if (this.label === 'Default') {
-      this.defaultAttributeForm.controls.default.setValue(this.jsonText);
-    }
-    if (this.label === 'Override') {
-      this.overrideAttributeForm.controls.override.setValue(this.jsonText);
-    }
+    this.setAttributeValue();
   }
 
   ngOnDestroy(): void {
@@ -158,6 +156,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
     this.constraints = value;
+    this.isConstraints = true;
   }
 
   handleNameInput(event: KeyboardEvent): void {
@@ -209,7 +208,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     switch (this.label) {
       case 'Constraints':
         environment = { ...environment,
-          cookbook_versions: this.constraints.length ? this.toDisplay(this.constraints) : {},
+          cookbook_versions: this.isConstraints ? this.toDisplay(this.constraints) : {},
           default_attributes: JSON.parse(this.environment.default_attributes),
           override_attributes: JSON.parse(this.environment.override_attributes)
         };
@@ -275,7 +274,12 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   private resetEditModal(): void {
     this.cookbookConstraints = [];
     this.creating = false;
+    this.defaultAttributeForm.markAsPristine();
+    this.overrideAttributeForm.markAsPristine();
+    this.defaultAttrParseError = false;
+    this.overrideAttrParseError = false;
     this.showConstraint = false;
+    this.isConstraints = false;
     this.loadCookbooks();
     this.constraintFormGroup.controls.version.setValue('');
     this.cookbookVersions.forEach((obj, index) => {
@@ -287,8 +291,17 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       });
 
     });
-
+    this.setAttributeValue();
     this.conflictErrorEvent.emit(false);
+  }
+
+  private setAttributeValue() {
+    if (this.label === 'Default') {
+      this.defaultAttributeForm.controls.default.setValue(this.jsonText);
+    }
+    if (this.label === 'Override') {
+      this.overrideAttributeForm.controls.override.setValue(this.jsonText);
+    }
   }
 
   private updatingData(environment: Environment) {
