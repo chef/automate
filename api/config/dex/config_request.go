@@ -3,7 +3,6 @@ package dex
 import (
 	"encoding/pem"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -18,16 +17,15 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Mlsa:        &shared.Mlsa{},
-				Log:         &ConfigRequest_V1_Log{},
-				Service:     &ConfigRequest_V1_System_Service{},
-				Grpc:        &ConfigRequest_V1_Grpc{},
-				Storage:     &ConfigRequest_V1_Storage{},
-				Expiry:      &ConfigRequest_V1_Expiry{},
-				Bootstrap:   &ConfigRequest_V1_Bootstrap{},
-				Connectors:  &ConfigRequest_V1_Connectors{},
-				Tls:         &shared.TLSCredentials{},
-				LoginBanner: &ConfigRequest_V1_System_LoginBanner{},
+				Mlsa:       &shared.Mlsa{},
+				Log:        &ConfigRequest_V1_Log{},
+				Service:    &ConfigRequest_V1_System_Service{},
+				Grpc:       &ConfigRequest_V1_Grpc{},
+				Storage:    &ConfigRequest_V1_Storage{},
+				Expiry:     &ConfigRequest_V1_Expiry{},
+				Bootstrap:  &ConfigRequest_V1_Bootstrap{},
+				Connectors: &ConfigRequest_V1_Connectors{},
+				Tls:        &shared.TLSCredentials{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -48,8 +46,6 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Log.Level = w.String("info")
 
-	c.V1.Sys.LoginBanner.Show = w.Bool(false)
-	c.V1.Sys.Service.EnumEnvironment = Environment_ENVIRONMENT_UNKNOWN_UNSPECIFIED
 	return c
 }
 
@@ -156,18 +152,6 @@ func (c *ConfigRequest) Validate() error {
 		}
 	}
 
-	if c.V1.Sys.LoginBanner.Show.GetValue() {
-		if c.V1.Sys.LoginBanner.MessageFilePath.GetValue() == "" {
-			cfgErr.AddInvalidValue("dex.v1.sys.log_banner.message_file_path",
-				"empty message_file_path with login_banner.show enabled is invalid")
-		} else {
-			if _, err := os.Stat(c.V1.Sys.LoginBanner.MessageFilePath.GetValue()); err != nil {
-				cfgErr.AddInvalidValue("dex.v1.sys.log_banner.message_file_path",
-					fmt.Sprintf("Message file %s does not exist", c.V1.Sys.LoginBanner.MessageFilePath.GetValue()))
-			}
-		}
-	}
-
 	if cfgErr.IsEmpty() {
 		return nil
 	}
@@ -177,7 +161,6 @@ func (c *ConfigRequest) Validate() error {
 // PrepareSystemConfig returns a system configuration that can be used
 // to start the service.
 func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (shared.PreparedSystemConfig, error) {
-	fmt.Println("+++++++++++++++++ Prepare System Config for Dex ++++++++++++++++++")
 	sys := c.V1.Sys
 	sys.Tls = creds
 
@@ -210,13 +193,6 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 			// eventual group membership changes.
 			c.V1.Sys.Expiry.IdTokens = w.String("3m")
 		}
-	}
-
-	envConfig := strings.TrimSpace(strings.ToUpper(c.V1.Sys.Service.Environment.GetValue()))
-	if enumEnv, ok := Environment_value[fmt.Sprintf("ENVIRONMENT_%s", envConfig)]; ok {
-		c.V1.Sys.Service.EnumEnvironment = Environment(enumEnv)
-	} else {
-		c.V1.Sys.Service.EnumEnvironment = Environment_ENVIRONMENT_UNKNOWN_UNSPECIFIED
 	}
 
 	return c.V1.Sys, nil
