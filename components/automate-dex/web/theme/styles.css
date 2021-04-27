@@ -178,13 +178,6 @@ body {
   flex-direction: column;
 }
 
-/* Warning Banner Styles */
-.warning-text {
-  margin: 0;
-  padding: 1em 0;
-  font-size: 14px;
-  text-align: center;
-}
 
 .theme-panel {
   display: flex;
