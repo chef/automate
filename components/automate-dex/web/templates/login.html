@@ -11,11 +11,6 @@
     <link href="{{ url .ReqPath "theme/styles.css" }}" rel="stylesheet">
   </head>
   <body>
-    {{ if eq ("showBanner" | extra) "true" }}
-    <div class="warning-banner" style="background-color: {{ "bannerBackgroundColor" | extra }}">
-    <p class="warning-text" style="color: {{ "bannerTextColor" | extra }}">DYNAMIC CONTENT - HIGHEST POSSIBLE LEVEL OF CLASSIFICATION IS: UNCLASSIFIED</p>
-    </div>
-    {{ end }}
 
       <div class="theme-panel" role="main">
     <main>
