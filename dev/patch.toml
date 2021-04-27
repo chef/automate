@@ -1,8 +1,0 @@
-[dex]
-  [dex.v1]
-    [dex.v1.sys]
-      [dex.v1.sys.service]
-      	environment = "dev"
-      [dex.v1.sys.login_banner]
-        show = false
-	message_file_path = "/src/dev/banner_message.txt"
