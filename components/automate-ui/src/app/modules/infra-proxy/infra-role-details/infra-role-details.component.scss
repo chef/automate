@@ -297,23 +297,6 @@ img {
   color: $chef-black;
 }
 
-::ng-deep .scroll {
-  max-height: 158px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-
-::ng-deep .scroll::-webkit-scrollbar {
-  width: 5px;
-  background-color: $chef-modal-scrollbar;
-}
-
-::ng-deep .scroll::-webkit-scrollbar-thumb {
-  border-radius: 8px;
-  background-color: $chef-modal;
-}
-
 .img-section {
   margin-top: 27px;
   text-align: center;

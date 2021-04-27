@@ -3,7 +3,8 @@ import * as jsonTree from 'app/page-components/json-tree/vendor/json-tree';
 
 @Component({
   selector: 'app-json-tree-table',
-  template: '<div id="tree-container" class="scroll"></div>'
+  template: '<div id="tree-container" class="scroll"></div>',
+  styleUrls: ['./json-tree-table.component.scss']
 })
 export class JsonTreeTableComponent implements OnChanges {
 
