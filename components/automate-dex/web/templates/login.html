@@ -46,7 +46,7 @@
             <h3>{{ "disclosureTitle" | extra }}</h3>
             <p>{{ "disclosureMessage" | extra }}</p>
             {{ if ("disclosureLink" | extra) }}
-              <a href='{{ "disclosureLink" | extra }}'>{{ "linkText" | extra }}</a>
+              <a href='{{ "disclosureLink" | extra }}' target="_blank" rel="noreferrer noopener">{{ "linkText" | extra }}</a>
             {{ end }}
           </div>
       {{ end }}
