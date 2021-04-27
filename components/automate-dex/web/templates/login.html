@@ -40,21 +40,18 @@
           </div>
         </div>
       </div>
+      
+      {{ if eq ("showDisclosure" | extra) "true" }}
+          <div class="disclosure">
+            <h3>{{ "disclosureTitle" | extra }}</h3>
+            <p>{{ "disclosureMessage" | extra }}</p>
+            {{ if ("disclosureLink" | extra) }}
+              <a href='{{ "disclosureLink" | extra }}'>{{ "linkText" | extra }}</a>
+            {{ end }}
+          </div>
+      {{ end }}
 
     </div>
 
-        {{ if eq ("showDisclosure" | extra) "true" }}
-          <div class="popup-wrapper open">
-            <div class="popup">
-              <div class="message">
-                <h3>Warning</h3>
-                <p>{{ "disclosureMessage" | extra }}</p>
-                <button class="accept-button">I Understand</button>
-              </div>
-            </div>
-          </div>
-        {{ end }}
-        
-    <script type="text/javascript" src="{{ url .ReqPath "theme/scripts.js" }}"></script>
   </body>
 </html>

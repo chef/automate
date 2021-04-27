@@ -178,7 +178,6 @@ body {
   flex-direction: column;
 }
 
-
 .theme-panel {
   display: flex;
   flex-direction: column;
@@ -187,45 +186,18 @@ body {
   flex-grow: 2;
 }
 
-.popup-wrapper {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  visibility: hidden;
-  transition: visibility 0s .25s, opacity .25s;
-}
-
-.popup-wrapper.open {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .25s;
-}
-
-.popup {
-  background: #fff;
-  width: 600px;
-  position: absolute;
-  left: 50%;
-  margin-left: -300px;
-  top: 50%;
-  margin-top: -250px;
+.disclosure {
+  margin-top: 30px;
   padding: 2em;
-  overflow-x: scroll;
+  width: 90%;
+  max-width: 588px;
+  min-width: 279px;
+  max-height: 350px;
+  border: 2px solid #E6EBEE;
+  border-radius: 4px;
+  overflow-y: scroll;
 }
 
-.accept-button {
-  display: block;
-  margin: 2em 0 0 auto;
-  border: none;
-  cursor: pointer;
+.disclosure h3 {
+  margin-top: 0;
 }
-
-.accept-button:hover {
-  background-color: #3864de;
-}
-
-/******* ABOVE TEMPORARY STYLES ********/
