@@ -4,7 +4,6 @@ import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { By } from '@angular/platform-browser';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-// import { ListFilterPipe } from './list-filter.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SelectBoxComponent } from './select-box.component';
 import { ListItem } from './list-item.domain';
