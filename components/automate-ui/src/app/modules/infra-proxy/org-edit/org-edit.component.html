@@ -1,5 +1,7 @@
 <section class="org-edit details-tab">
-  <chef-loading-spinner *ngIf="orgDetailsLoading" size="50" fixed></chef-loading-spinner>
+  <div class="spinner">
+    <chef-loading-spinner *ngIf="orgDetailsLoading" size="50" fixed></chef-loading-spinner>
+  </div>
   <ng-container *ngIf="!orgDetailsLoading">
     <form [formGroup]="updateOrgForm">
       <chef-form-field>
@@ -33,7 +35,7 @@
       <chef-form-field>
         <div id="button-bar">
           <chef-button
-            [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty"
+            [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty || saveInProgress"
             primary
             inline (click)="saveOrg()">
             <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>

@@ -29,13 +29,6 @@ chef-tab-selector {
 
 .details-tab {
 
-  chef-loading-spinner {
-    width: auto;
-    z-index: 199;
-    background-color: $chef-white;
-    opacity: 0.7;
-  }
-
   form {
     chef-form-field {
       width: 310px;
