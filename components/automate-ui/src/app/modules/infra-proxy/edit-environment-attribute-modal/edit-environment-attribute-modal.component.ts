@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { combineLatest, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Environment, CookbookVersionDisplay } from 'app/entities/environments/environment.model';
 import { Store } from '@ngrx/store';
@@ -11,12 +11,6 @@ import {
 } from 'app/entities/environments/environment-details.selectors';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { UpdateEnvironment } from 'app/entities/environments/environment.action';
-import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
-import {
-  allCookbooks,
-  getAllStatus as getAllCookbooksForOrgStatus
-} from 'app/entities/cookbooks/cookbook.selectors';
-import { isNil } from 'ngx-cookie';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { Utilities } from 'app/helpers/utilities/utilities';
@@ -35,7 +29,6 @@ export class CookbookConstraintGrid {
 })
 export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit, OnDestroy {
 
-
   @Input() openEvent: EventEmitter<boolean>;
   @Input() serverId: string;
   @Input() orgId: string;
@@ -45,9 +38,13 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   @Input() cookbookConstraints: Array<CookbookConstraintGrid> = [];
   @Input() cookbookVersions: CookbookVersionDisplay[];
   @Input() environment: Environment;
+  @Input() constraintKeys: string[] = [];
+  @Input() name_id: string;
+  @Input() nameKeys: string[] = [];
 
   public creating = false;
   public conflictError = false;
+  public cookbookVersionError = false;
   public defaultAttrParseError = false;
   public isLoading = true;
   public overrideAttrParseError = false;
@@ -60,9 +57,6 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
   public attrParseError: boolean;
   public cookbooks: Cookbook[] = [];
   public constraints: Array<CookbookConstraintGrid> = [];
-  public constraintKeys: string[] = [];
-  public name_id: string;
-  public nameKeys: string[] = [];
   public server: string;
   public org: string;
   public data: any;
@@ -99,6 +93,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.openEvent.pipe(takeUntil(this.isDestroyed))
     .subscribe(() => {
       this.conflictError = false;
+      this.cookbookVersionError = false;
       this.visible = true;
       this.server = this.serverId;
       this.org = this.orgId;
@@ -107,20 +102,15 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
       this.cookbookConstraints.forEach((element) => {
         this.selectedCookbookNames.push(element.name);
       });
-      this.selectedCookbookNames.forEach((cookbookName) => {
-        this.constraintKeys.forEach((key, index) => {
-          if (cookbookName === key) {
-            this.constraintKeys.splice(index, 1);
-          }
-        });
-        if (!this.nameKeys.includes(cookbookName)) {
-          this.nameKeys.push(cookbookName);
+      this.cookbookConstraints.forEach((cookbookName) => {
+        if (!this.constraintKeys.includes(cookbookName.name)) {
+          this.constraintKeys.push(cookbookName.name);
+        }
+        if (!this.nameKeys.includes(cookbookName.name)) {
+          this.nameKeys.push(cookbookName.name);
         }
       });
-      this.name_id = this.constraintKeys[0];
     });
-
-    this.loadCookbooks();
 
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed)
@@ -154,9 +144,19 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.visible = false;
   }
 
-  constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraints = value;
-    this.isConstraints = true;
+  constraintItemsHandler(values: Array<CookbookConstraintGrid> = []) {
+    for ( const value of values ) {
+      if (!Regex.patterns.VALID_VERSION.test(value.version)) {
+        this.cookbookVersionError = true;
+        break;
+      } else {
+        this.cookbookVersionError = false;
+      }
+    }
+    if (!this.cookbookVersionError) {
+      this.constraints = values;
+      this.isConstraints = true;
+    }
   }
 
   handleNameInput(event: KeyboardEvent): void {
@@ -235,34 +235,6 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.updatingData(environment);
   }
 
-  private loadCookbooks() {
-    this.name_id = '';
-    this.store.dispatch(new GetCookbooks({
-      server_id: this.serverId, org_id: this.orgId
-    }));
-
-    combineLatest([
-      this.store.select(getAllCookbooksForOrgStatus),
-      this.store.select(allCookbooks)
-    ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getCookbooksSt, allCookbooksState]) => {
-      if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
-        this.constraintKeys = [];
-        this.nameKeys = [];
-
-        this.cookbooks = allCookbooksState;
-        this.cookbooks.forEach((cookbook) => {
-          this.constraintKeys.push(cookbook.name);
-          this.nameKeys.push(cookbook.name);
-        });
-      }
-
-      // first cookbook constrains keys selected on drop-down when loading constraint data
-      this.name_id = this.constraintKeys[0];
-    });
-
-  }
-
   private toDisplay(cookbookVersions: Array<CookbookConstraintGrid> = []) {
     const current = {};
     cookbookVersions.forEach((element) => {
@@ -273,6 +245,7 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
 
   private resetEditModal(): void {
     this.cookbookConstraints = [];
+    this.cookbookVersionError = false;
     this.creating = false;
     this.defaultAttributeForm.markAsPristine();
     this.overrideAttributeForm.markAsPristine();
@@ -280,8 +253,8 @@ export class EditEnvironmentAttributeModalComponent implements OnChanges, OnInit
     this.overrideAttrParseError = false;
     this.showConstraint = false;
     this.isConstraints = false;
-    this.loadCookbooks();
     this.constraintFormGroup.controls.version.setValue('');
+    this.selectedCookbookNames = [];
     this.cookbookVersions.forEach((obj, index) => {
       this.cookbookConstraints.push({
         id: index + 1,

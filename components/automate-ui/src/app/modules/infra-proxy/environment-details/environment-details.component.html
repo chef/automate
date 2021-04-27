@@ -36,7 +36,10 @@
         [environment]="environment"
         [label]="label"
         [cookbookConstraints]="cookbookConstraints"
-        [cookbookVersions]="cookbookVersions">
+        [cookbookVersions]="cookbookVersions"
+        [constraintKeys]="constraintKeys"
+        [nameKeys]="nameKeys"
+        [name_id]="name_id">
       </app-edit-environment-attribute-modal>
       <section class="page-body" *ngIf="tabValue === 'cookbookConstraints'">
         <div *ngIf="show">
@@ -97,7 +100,9 @@
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button tertiary class="right-button-box"
+            <chef-button
+              tertiary
+              class="right-button-box"
               (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -106,8 +111,12 @@
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table class="json-tree-container" 
-              [hidden]="hasDefaultJson? false : true" #tree [json]="selectedAttrs?.default_attributes"></app-json-tree-table>
+              <app-json-tree-table
+                class="json-tree-container" 
+                [hidden]="hasDefaultJson? false : true"
+                #tree
+                [json]="selectedAttrs?.default_attributes">
+              </app-json-tree-table>
               <div *ngIf="!hasDefaultJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>There are no items for Display.</p>
@@ -132,7 +141,9 @@
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button tertiary class="right-button-box" 
+            <chef-button
+              tertiary
+              class="right-button-box" 
               (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -141,8 +152,12 @@
           <hr class="divider-constraints" />
           <div class="json-container">
             <div class="scroll">
-              <app-json-tree-table class="json-tree-container"
-              [hidden]="hasOverrideJson? false : true" #tree [json]="selectedAttrs?.override_attributes"></app-json-tree-table>
+              <app-json-tree-table
+                class="json-tree-container"
+                [hidden]="hasOverrideJson? false : true"
+                #tree
+                [json]="selectedAttrs?.override_attributes">
+              </app-json-tree-table>
               <div *ngIf="!hasOverrideJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>There are no items for Display.</p>

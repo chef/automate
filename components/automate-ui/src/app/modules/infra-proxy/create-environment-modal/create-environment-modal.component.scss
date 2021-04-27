@@ -64,11 +64,19 @@ chef-modal {
         top: 462px;
         box-sizing: border-box;
         border-radius: 4px;
+        max-width: 100%;
+        min-width: 100%;
+        min-height: 162px;
+        max-height: 162px;
         margin-top: 10px;
       }
 
       #default, #override {
         height: 286px;
+        max-height: 286px;
+        min-height: 286px;
+        max-width: 100%;
+        min-width: 100%;
       }
 
       ::ng-deep #default::-webkit-scrollbar {

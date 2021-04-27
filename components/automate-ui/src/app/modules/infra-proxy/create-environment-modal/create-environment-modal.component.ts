@@ -52,6 +52,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   @Input() currentPage: number;
 
   public conflictError = false;
+  public cookbookVersionError = false;
   public constraintsTab = false;
   public creating = false;
   public defaultAttrParseError = false;
@@ -114,6 +115,7 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
       this.conflictError = false;
+      this.cookbookVersionError = false;
       this.visible = true;
       this.items = this.environmentsList;
       this.showConstraint = true;
@@ -244,8 +246,18 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
 
   // Handles the data of cookbook version array coming from constraint tab.
-  constraintItemsHandler(value: Array<CookbookConstraintGrid> = []    ) {
-    this.constraints = value;
+  constraintItemsHandler(values: Array<CookbookConstraintGrid> = []    ) {
+    for ( const value of values ) {
+      if (!Regex.patterns.VALID_VERSION.test(value.version)) {
+        this.cookbookVersionError = true;
+        break;
+      } else {
+        this.cookbookVersionError = false;
+      }
+    }
+    if (!this.cookbookVersionError) {
+      this.constraints = values;
+    }
   }
 
   // Getting list of cookbook names
@@ -285,8 +297,8 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
 
   private resetCreateModal(): void {
     this.cookbookConstraints = [];
-
     this.constraintsTab = false;
+    this.cookbookVersionError = false;
     this.creating = false;
     this.defaultAttrParseError = false;
     this.defaultTab = false;

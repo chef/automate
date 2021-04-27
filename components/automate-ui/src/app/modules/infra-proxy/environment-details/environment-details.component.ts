@@ -7,6 +7,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
+import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import { environmentFromRoute } from 'app/entities/environments/environment-details.selectors';
 import { GetEnvironment } from 'app/entities/environments/environment.action';
 import {
@@ -14,6 +15,13 @@ import {
   EnvironmentAttributes,
   CookbookVersionDisplay
 } from 'app/entities/environments/environment.model';
+import { GetCookbooks } from 'app/entities/cookbooks/cookbook.actions';
+import {
+  allCookbooks,
+  getAllStatus as getAllCookbooksForOrgStatus
+} from 'app/entities/cookbooks/cookbook.selectors';
+import { EntityStatus } from 'app/entities/entities';
+import { isNil } from 'ngx-cookie';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -31,6 +39,9 @@ export type EnvironmentTabName = 'cookbookConstraints' | 'attributes';
 export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
   public environment: Environment;
   public cookbookVersions: CookbookVersionDisplay[];
+  public cookbooks: Cookbook[] = [];
+  public constraintKeys: string[] = [];
+  public nameKeys: string[] = [];
   public tabValue: EnvironmentTabName = 'cookbookConstraints';
   public url: string;
   public conflictErrorEvent = new EventEmitter<boolean>();
@@ -102,6 +113,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
       }));
     });
 
+    this.loadCookbooks();
+
     this.store.select(environmentFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
@@ -117,7 +130,6 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
           operator: obj.operator,
           version: obj.versionNumber
         });
-
       });
       if (Object.keys(environment.cookbook_versions).length > 0) {
         this.hasCookbookConstraints = true;
@@ -191,4 +203,28 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
     this.editAttrModalVisible = false;
   }
 
+  private loadCookbooks() {
+    this.name_id = '';
+    this.store.dispatch(new GetCookbooks({
+      server_id: this.serverId, org_id: this.orgId
+    }));
+
+    combineLatest([
+      this.store.select(getAllCookbooksForOrgStatus),
+      this.store.select(allCookbooks)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([ getCookbooksSt, allCookbooksState]) => {
+      if (getCookbooksSt === EntityStatus.loadingSuccess && !isNil(allCookbooksState)) {
+        this.constraintKeys = [];
+        this.nameKeys = [];
+
+        this.cookbooks = allCookbooksState;
+        this.cookbooks.forEach((cookbook) => {
+          this.constraintKeys.push(cookbook.name);
+          this.nameKeys.push(cookbook.name);
+        });
+      }
+    });
+
+  }
 }
