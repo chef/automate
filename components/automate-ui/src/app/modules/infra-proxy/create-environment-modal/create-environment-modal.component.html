@@ -24,7 +24,7 @@
                   *ngIf="(detailsFormGroup.get('name').hasError('required') || detailsFormGroup.get('name').hasError('pattern')) && detailsFormGroup.get('name').dirty">
                   Name is required.
                 </chef-error>
-                <chef-error *ngIf="nameExist">
+                <chef-error *ngIf="conflictError">
                   Environment "{{detailsFormGroup.get('name').value}}" already exists.
                 </chef-error>
               </chef-form-field>
@@ -50,7 +50,7 @@
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button
-                [disabled]="!detailsFormGroup?.valid || conflictError || nameExist || defaultAttrParseError || overrideAttrParseError"
+                [disabled]="!detailsFormGroup?.valid || conflictError || defaultAttrParseError || overrideAttrParseError"
                 primary
                 id="create-button-object-modal"
                 (click)="createEnvironment()">
@@ -76,7 +76,7 @@
           <div class="button-bar-box">
             <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
             <chef-button
-              [disabled]="!constraints.length || conflictError || cookbookVersionError || nameExist || defaultAttrParseError || overrideAttrParseError" 
+              [disabled]="!constraints.length || conflictError || cookbookVersionError || defaultAttrParseError || overrideAttrParseError" 
               primary
               id="create-button-object-modal-1"
               (click)="createEnvironment()">
@@ -103,7 +103,7 @@
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button
-                [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError || nameExist  || overrideAttrParseError"
+                [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError || overrideAttrParseError"
                 primary
                 id="create-button-object-modal-2"
                 (click)="createEnvironment()">
@@ -133,7 +133,7 @@
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
               <chef-button
-                [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError || nameExist || defaultAttrParseError" 
+                [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError || defaultAttrParseError" 
                 primary 
                 id="create-button-object-modal-3"
                 (click)="createEnvironment()">

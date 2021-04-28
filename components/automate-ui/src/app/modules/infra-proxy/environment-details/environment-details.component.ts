@@ -131,9 +131,8 @@ export class EnvironmentDetailsComponent implements OnInit, OnDestroy {
           version: obj.versionNumber
         });
       });
-      if (Object.keys(environment.cookbook_versions).length > 0) {
-        this.hasCookbookConstraints = true;
-      }
+      this.hasCookbookConstraints = Object.keys(
+        environment.cookbook_versions).length > 0 ? true : false;
       this.attributes = new EnvironmentAttributes(this.environment);
 
       this.hasDefaultJson = Object.keys(

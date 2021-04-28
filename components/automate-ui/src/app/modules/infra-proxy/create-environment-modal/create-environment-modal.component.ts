@@ -27,6 +27,7 @@ import {
   getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
 import { CreateEnvironment, GetEnvironments, GetEnvironmentsPayload, CreateEnvironmentPayload } from 'app/entities/environments/environment.action';
+import { Utilities } from 'app/helpers/utilities/utilities';
 
 const CREATE_TAB_NAME = 'environmentTab';
 
@@ -58,7 +59,6 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
   public defaultAttrParseError = false;
   public defaultTab = false;
   public detailsTab = true;
-  public nameExist = false;
   public overrideAttrParseError = false;
   public overrideTab = false;
   public showConstraint = false;
@@ -155,10 +155,12 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
           this.conflictError = true;
+          this.defaultTab = false;
+          this.detailsTab = true;
+          this.constraintsTab = false;
+          this.overrideTab = false;
         } else {
           this.store.dispatch(new GetEnvironments(payload));
-          this.creating = false;
-
           // Close the modal on any other error because it will be displayed in the banner.
           this.closeCreateModal();
         }
@@ -193,8 +195,11 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleInput(event: { target: { value: string } } ): void {
-    this.nameExist = this.environmentsList.some(el => el.name === event.target.value.trim());
+  handleInput(event: KeyboardEvent): void {
+    if (Utilities.isNavigationKey(event)) {
+      return;
+    }
+    this.conflictError = false;
   }
 
   onChangeDefaultJson(event: { target: { value: string } } ) {
