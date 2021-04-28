@@ -12,8 +12,13 @@
     (blur)="toggleFocus()"
     placeholder="Search {{ placeHolder }}"
     aria-label="Search"
-    autocomplete="off">
-  <button type="submit" class="primary" primary>
+    autocomplete="off"
+    data-cy="search-filter">
+  <button
+    type="submit"
+    class="primary"
+    primary
+    data-cy="search-role">
     <span aria-hidden="true" class="hidden">Submit Search</span>
     <chef-icon>search</chef-icon>
   </button>

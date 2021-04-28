@@ -6,7 +6,6 @@ import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { HttpStatus } from 'app/types/types';
 import { Type } from 'app/entities/notifications/notification.model';
-
 import {
   CreateRole,
   CreateRoleSuccess,
@@ -21,10 +20,13 @@ import {
   GetRoleFailure,
   DeleteRole,
   DeleteRoleSuccess,
-  DeleteRoleFailure
+  DeleteRoleFailure,
+  UpdateRole,
+  UpdateRoleSuccess,
+  UpdateRoleFailure
 } from './infra-role.action';
-
 import { InfraRoleRequests, RoleResponse } from './infra-role.requests';
+import { InfraRole } from './infra-role.model';
 
 @Injectable()
 export class InfraRoleEffects {
@@ -85,7 +87,7 @@ export class InfraRoleEffects {
       ofType(RoleActionTypes.CREATE_SUCCESS),
       map(({ payload: { name } }: CreateRoleSuccess) => new CreateNotification({
         type: Type.info,
-        message: `Created role ${name}.`
+        message: `Successfully created role - ${name}.`
       }))));
 
   createRoleFailure$ = createEffect(() =>
@@ -127,4 +129,29 @@ export class InfraRoleEffects {
         });
     })));
 
+  updateRole$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RoleActionTypes.UPDATE),
+      mergeMap(({ payload }: UpdateRole) =>
+        this.requests.updateRole(payload).pipe(
+          map((resp: InfraRole) => new UpdateRoleSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UpdateRoleFailure(error)))))));
+
+  updateRoleSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RoleActionTypes.UPDATE_SUCCESS),
+      map(({ payload: role }: UpdateRoleSuccess) => new CreateNotification({
+        type: Type.info,
+        message: `Successfully updated role - ${role.name} .`
+      }))));
+
+  updateRoleFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RoleActionTypes.UPDATE_FAILURE),
+      filter(({ payload }: UpdateRoleFailure) => payload.status !== HttpStatus.CONFLICT),
+      map(({ payload }: UpdateRoleFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not update role: ${payload.error.error || payload}.`
+      }))));
 }

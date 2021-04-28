@@ -1,21 +1,35 @@
-import { Component, Input, OnInit,
-  OnDestroy, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
-
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { GetRoles, DeleteRole } from 'app/entities/infra-roles/infra-role.action';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 import {
   getAllStatus,
   roleList,
   deleteStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
+import { GetRecipes } from 'app/entities/recipes/recipe.action';
+import {
+  allRecipes,
+  getAllStatus as getAllRecipesForOrgStatus
+} from 'app/entities/recipes/recipe.selectors';
 import { EntityStatus } from 'app/entities/entities';
+
+export interface AvailableType {
+  name: string;
+  type: 'role' | 'recipe';
+}
 
 @Component({
   selector: 'app-infra-roles',
@@ -28,6 +42,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
+  public availablelist: AvailableType[] = [];
   public roles: InfraRole[] = [];
   public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
@@ -37,30 +52,21 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public per_page = 9;
   public total: number;
-
   public roleToDelete: InfraRole;
-  public chefInfraViewsFeatureFlagOn: boolean;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
-
   public openRoleModal = new EventEmitter<boolean>();
   public recipes: any;
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService,
-    private featureFlagsService: FeatureFlagsService
-  ) {
-    // feature flag enable and disable the create button
-    this.chefInfraViewsFeatureFlagOn =
-    this.featureFlagsService.getFeatureStatus('chefInfraTabsViews');
-  }
+    private layoutFacade: LayoutFacadeService
+  ) {  }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-
     this.getRolesData();
-
+    this.loadRecipes();
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(roleList)
@@ -77,7 +83,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.authFailure = true;
       }
     });
-
     this.store.select(deleteStatus).pipe(
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
@@ -95,7 +100,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.searching = true;
     this.searchValue = currentText;
-
     this.getRolesData();
   }
 
@@ -113,7 +117,6 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       page: this.currentPage,
       per_page: this.per_page
     };
-
     this.store.dispatch(new GetRoles(payload));
   }
 
@@ -144,5 +147,29 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  private loadRecipes(): void {
+    this.availablelist = [];
+    this.store.dispatch(new GetRecipes({
+      server_id: this.serverId, org_id: this.orgId, name: '_default'
+    }));
+    combineLatest([
+      this.store.select(getAllRecipesForOrgStatus),
+      this.store.select(allRecipes)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getRecipesSt, allRecipesState]) => {
+        if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
+          this.recipes = allRecipesState;
+          if (this.recipes.length > 0) {
+            this.recipes.forEach((recipe) => {
+              this.availablelist.push({
+                name: recipe,
+                type: 'recipe'
+              });
+            });
+          }
+        }
+      });
   }
 }

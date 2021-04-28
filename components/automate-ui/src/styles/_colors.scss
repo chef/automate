@@ -40,6 +40,7 @@ $grape-dark-2: #47559C;
 $cornflower: #3023AE;
 $orchid: #C86DD7;
 $daylily: #FEA900;
+$highlight-yellow: #FFFF00;
 $crimson: #E71D36;
 $rose: #E61F36;
 $winter-green: #4FC293;
@@ -55,6 +56,7 @@ $blue: #174AF0;
 $malibu: #648FFF;
 // secondary
 $pink: #DC267F;
+$light-pink: #FFCAAA;
 $dark-pink: #A81B60;
 $light-grayish-pink: #F9DBEA;
 $violet: #A424B4;
@@ -83,6 +85,9 @@ $atomic-tangerine: #FF9654;
 $mahogany: #B74500;
 $blue-de-france: #3DA5FF;
 $gray: #B7BCBC;
+
+//selected item
+$violet-shade: rgba(56, 100, 242, 0.5);
 
 // ------------------------------------------------------------------------------------- //
 // gradients
@@ -124,8 +129,10 @@ $gray-less-pale: $haze;
 $gray-highlight: $haze;
 $gray-light: #B4B8BB;
 $gray-light-2: #E5E5E5;
+$gray-light-3: #F0F0F5;
 $gray: #9DA3A7;
 $gray7: #878B8E;
+$gray8: #999999;
 $gray-icon: #D8D8D8;
 // pre background
 $pre-background: #424242;
