@@ -26,6 +26,7 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public saveInProgress = false;
   public isLoading = true;
+  public resetKeyLoading = true;
   public resetKeyForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
 
@@ -41,7 +42,7 @@ export class ResetAdminKeyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-
+    this.resetKeyLoading = false;
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(([status]) => {

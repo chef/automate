@@ -1,6 +1,8 @@
 <div class="content-container">
   <div class="container">
-    <chef-loading-spinner *ngIf="orgsListLoading" size="50" fixed></chef-loading-spinner>
+    <div class="spinner">
+      <chef-loading-spinner *ngIf="orgsListLoading" size="50" fixed></chef-loading-spinner>
+    </div>
     <main>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
@@ -43,7 +45,7 @@
         (deleteClicked)="deleteOrg()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
-      <section class="page-body" *ngIf="tabValue === 'details'">
+      <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>
             <label>
@@ -106,12 +108,12 @@
               primary
               inline
               data-cy="save-button"
-              [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty"
+              [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty || saveInProgress"
               (click)="saveServer()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>
-              <span *ngIf="!saveInProgress">Save</span></chef-button>
-            <span id="saved-note" *ngIf="saveSuccessful && !updateServerForm.dirty">All changes saved.</span>
+              <span *ngIf="!saveInProgress">Save</span>
+            </chef-button>
           </div>
         </form>
       </section>

@@ -1,6 +1,9 @@
-<chef-loading-spinner *ngIf="isLoading" size="50"></chef-loading-spinner>
-<section class="reset-admin-key">
-  <ng-container>
+
+<section class="reset-admin-key details-tab">
+  <div class="spinner">
+    <chef-loading-spinner *ngIf="resetKeyLoading" size="50" fixed></chef-loading-spinner>
+  </div>
+  <ng-container  *ngIf="!resetKeyLoading">
       <form [formGroup]="resetKeyForm">
         <chef-form-field>
           <label>
@@ -22,8 +25,10 @@
         </chef-form-field>
         <chef-form-field>
           <div id="button-bar">
-            <chef-button [disabled]="isLoading || !resetKeyForm.valid" primary
-            inline (click)="saveNewKey()">
+            <chef-button
+              [disabled]="isLoading || !resetKeyForm.valid || saveInProgress"
+              primary
+              inline (click)="saveNewKey()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>
               <span *ngIf="!saveInProgress">Reset Admin Key</span>

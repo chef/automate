@@ -1,45 +1,49 @@
-<chef-loading-spinner *ngIf="isLoading" size="50"></chef-loading-spinner>
-<section class="org-edit">
-  <form [formGroup]="updateOrgForm">
-    <chef-form-field>
-      <label>
-      <span class="label">Name <span aria-hidden="true">*</span></span>
-      <input chefInput formControlName="name" type="text" autocomplete="off"
-        data-cy="update-org-name" [resetOrigin]="saveSuccessful">
-      </label>
-      <chef-error
-        *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
-        Name is required.
-      </chef-error>
-    </chef-form-field>
-    <chef-form-field id='projects-container'>
-      <app-projects-dropdown
-        [checkedProjectIDs]="org?.projects"
-        (onDropdownClosing)="onProjectDropdownClosing($event)">
-      </app-projects-dropdown>
-    </chef-form-field>
-    <chef-form-field>
-      <label>
-        <span class="label">Admin User <span aria-hidden="true">*</span></span>
-        <input chefInput formControlName="admin_user" type="text" autocomplete="off"
-          data-cy="update-Org-admin-user" [resetOrigin]="saveSuccessful">
-      </label>
-      <chef-error
-        *ngIf="(updateOrgForm.get('admin_user').hasError('required') || updateOrgForm.get('admin_user').hasError('pattern')) && updateOrgForm.get('admin_user').dirty">
-        Admin User is required.
-      </chef-error>
-    </chef-form-field>
-    <chef-form-field>
-      <div id="button-bar">
-        <chef-button [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty" primary
-        inline (click)="saveOrg()">
-          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-          <span *ngIf="saveInProgress">Saving...</span>
-          <span *ngIf="!saveInProgress">Save</span>
-        </chef-button>
-        <span id="saved-note" *ngIf="saveSuccessful && !updateOrgForm.dirty">All changes
-        saved.</span>
-      </div>
-    </chef-form-field>
-  </form>
+<section class="org-edit details-tab">
+  <div class="spinner">
+    <chef-loading-spinner *ngIf="orgDetailsLoading" size="50" fixed></chef-loading-spinner>
+  </div>
+  <ng-container *ngIf="!orgDetailsLoading">
+    <form [formGroup]="updateOrgForm">
+      <chef-form-field>
+        <label>
+        <span class="label">Name <span aria-hidden="true">*</span></span>
+        <input chefInput formControlName="name" type="text" autocomplete="off"
+          data-cy="update-org-name" [resetOrigin]="saveSuccessful">
+        </label>
+        <chef-error
+          *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
+          Name is required.
+        </chef-error>
+      </chef-form-field>
+      <chef-form-field id='projects-container'>
+        <app-projects-dropdown
+          [checkedProjectIDs]="org?.projects"
+          (onDropdownClosing)="onProjectDropdownClosing($event)">
+        </app-projects-dropdown>
+      </chef-form-field>
+      <chef-form-field>
+        <label>
+          <span class="label">Admin User <span aria-hidden="true">*</span></span>
+          <input chefInput formControlName="admin_user" type="text" autocomplete="off"
+            data-cy="update-Org-admin-user" [resetOrigin]="saveSuccessful">
+        </label>
+        <chef-error
+          *ngIf="(updateOrgForm.get('admin_user').hasError('required') || updateOrgForm.get('admin_user').hasError('pattern')) && updateOrgForm.get('admin_user').dirty">
+          Admin User is required.
+        </chef-error>
+      </chef-form-field>
+      <chef-form-field>
+        <div id="button-bar">
+          <chef-button
+            [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty || saveInProgress"
+            primary
+            inline (click)="saveOrg()">
+            <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+            <span *ngIf="saveInProgress">Saving...</span>
+            <span *ngIf="!saveInProgress">Save</span>
+          </chef-button>
+        </div>
+      </chef-form-field>
+    </form>
+  </ng-container>
 </section>
