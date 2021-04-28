@@ -281,8 +281,7 @@ chef-button:focus {
 chef-button {
   ::ng-deep button:focus {
     outline: none;
-    border: none;
-    background-color: $chef-modal-scrollbar;
+    border: 1px solid $chef-primary-bright;
     border-radius: 4px;
   }
 
