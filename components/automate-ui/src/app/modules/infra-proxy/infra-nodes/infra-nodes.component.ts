@@ -13,8 +13,7 @@ import {
   nodeList,
   getAllStatus
 } from 'app/entities/infra-nodes/infra-nodes.selectors';
-
-
+import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 @Component({
   selector: 'app-infra-nodes',
   templateUrl: './infra-nodes.component.html',
@@ -27,6 +26,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   private isDestroyed = new Subject<boolean>();
+  private timeFromNowPipe = new TimeFromNowPipe();
   public nodes: InfraNode[] = [];
   public nodeListState: { items: InfraNode[], total: number };
   public nodesListLoading = true;
@@ -98,5 +98,11 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  timeFromNow(epochFormat: string) {
+    const epchoTime = Number(epochFormat);
+    const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
+    return fromNowValue === '-' ? '--' : fromNowValue; 
   }
 }
