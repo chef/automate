@@ -1,5 +1,20 @@
 @import "~styles/variables";
 
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+  }
+}
+
 thead {
   font-size: 14px;
   letter-spacing: 0.2px;
@@ -32,4 +47,39 @@ chef-loading-spinner {
   margin: 100px auto;
   width: 100px;
   z-index: 199;
+}
+
+.empty-section {
+  text-align: center;
+}
+
+img {
+  width: 70px;
+  margin-top: 130px;
+}
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  margin-top: 239px;
+  background-color: $chef-white;
+  opacity: 0.7;
+  width: initial;
+  height: 100%;
+}
+
+.nodes-list-paging {
+  margin: 0 0 35px;
+}
+
+.three-dot-column {
+  text-align: right;
+}
+
+.infra-nodes {
+  .search-items {
+    margin-bottom: 18px;
+    height: 55px;
+  }
+
 }

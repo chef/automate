@@ -10,8 +10,8 @@ import { EntityStatus } from 'app/entities/entities';
 import { GetNodes } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import {
-  allInfraNodes,
-  getAllStatus as getAllNodesForOrgStatus
+  nodeList,
+  getAllStatus
 } from 'app/entities/infra-nodes/infra-nodes.selectors';
 
 
@@ -28,8 +28,14 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   private isDestroyed = new Subject<boolean>();
   public nodes: InfraNode[] = [];
+  public nodeListState: { items: InfraNode[], total: number };
   public nodesListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public currentPage = 1;
+  public per_page = 9;
+  public total: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -39,23 +45,50 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetNodes({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    this.getNodesData();
 
     combineLatest([
-      this.store.select(getAllNodesForOrgStatus),
-      this.store.select(allInfraNodes)
+      this.store.select(getAllStatus),
+      this.store.select(nodeList)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getNodesSt, allInfraNodesState]) => {
-      if (getNodesSt === EntityStatus.loadingSuccess && !isNil(allInfraNodesState)) {
-        this.nodes = allInfraNodesState;
+    .subscribe(([getNodesSt, NodesState]) => {
+      if (getNodesSt === EntityStatus.loadingSuccess && !isNil(NodesState)) {
+        this.nodeListState = NodesState;
+        this.nodes = NodesState?.items;
+        this.total = NodesState?.total;
         this.nodesListLoading = false;
+        this.searching = false;
       } else if (getNodesSt === EntityStatus.loadingFailure) {
         this.nodesListLoading = false;
         this.authFailure = true;
       }
     });
+  }
+
+  searchNodes(currentText: string) {
+    this.currentPage = 1;
+    this.searching = true;
+    this.searchValue = currentText;
+
+    this.getNodesData();
+  }
+
+  onPageChange(event: number): void {
+    this.currentPage = event;
+    this.searching = true;
+    this.getNodesData();
+  }
+
+  getNodesData() {
+    const payload = {
+      nodeName: this.searchValue,
+      server_id: this.serverId,
+      org_id: this.orgId,
+      page: this.currentPage,
+      per_page: this.per_page
+    };
+
+    this.store.dispatch(new GetNodes(payload));
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

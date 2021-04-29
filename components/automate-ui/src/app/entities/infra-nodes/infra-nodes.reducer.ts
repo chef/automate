@@ -8,6 +8,10 @@ import { InfraNode } from './infra-nodes.model';
 export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodesStatus: EntityStatus;
   getAllStatus: EntityStatus;
+  nodeList: {
+    items: InfraNode[],
+    total: number
+  };
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -29,8 +33,10 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.GET_ALL_SUCCESS:
       return pipe(
-        set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (nodeEntityAdapter.setAll(action.payload.nodes, state)) as InfraNodeEntityState;
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
+        set('nodeList.items', action.payload.nodes || []),
+        set('nodeList.total', action.payload.total || 0)
+        )(state) as InfraNodeEntityState;
 
     case NodeActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
@@ -40,4 +46,5 @@ export function infraNodeEntityReducer(
   }
 }
 
-export const getEntityById = (id: string) => (state: InfraNodeEntityState) => state.entities[id];
+export const getEntityById = (id: string) =>
+  (state: InfraNodeEntityState) => state.entities[id];

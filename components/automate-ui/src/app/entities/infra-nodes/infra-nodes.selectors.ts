@@ -17,3 +17,8 @@ export const infraNodeStatus = createSelector(
   infraNodeState,
   (state) => state.nodesStatus
 );
+
+export const nodeList = createSelector(
+  infraNodeState,
+  (state) => state.nodeList
+);

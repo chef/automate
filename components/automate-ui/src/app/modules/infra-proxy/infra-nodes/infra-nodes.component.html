@@ -1,17 +1,28 @@
 <section class="infra-nodes">
   <chef-loading-spinner *ngIf="nodesListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
-    <chef-table>
+    <div class="search-create-container">
+      <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name....">
+      </app-infra-search-bar>
+    </div>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
+    <div class="empty-section" *ngIf="!searching && !nodes.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p *ngIf="searchValue === ''">No nodes available.</p>
+      <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+    </div>
+    <chef-table *ngIf="nodes.length">
       <chef-thead>
-        <chef-tr>
-          <chef-th>Node Name</chef-th>
-          <chef-th>Platform</chef-th>
-          <chef-th>FQDN</chef-th>
-          <chef-th>IP Address</chef-th>
-          <chef-th>Uptime</chef-th>
-          <chef-th>Last Check-In</chef-th>
-          <chef-th>Environment</chef-th>
+        <chef-tr class="no_border_tr">
+          <chef-th class="no_border_th">Node</chef-th>
+          <chef-th class="no_border_th">Platform</chef-th>
+          <chef-th class="no_border_th">FQDN</chef-th>
+          <chef-th class="no_border_th">IP Address</chef-th>
+          <chef-th class="no_border_th">Uptime</chef-th>
+          <chef-th class="no_border_th">Last Check-In</chef-th>
+          <chef-th class="no_border_th">Environment</chef-th>
         </chef-tr>
       </chef-thead>
       <chef-tbody>
@@ -26,5 +37,14 @@
         </chef-tr>
       </chef-tbody>
     </chef-table>
+
+    <app-page-picker
+      *ngIf="!searching"
+      class="nodes-list-paging"
+      [total]="total"
+      [perPage]="per_page"
+      [page]="currentPage"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
   </ng-container>
 </section>
