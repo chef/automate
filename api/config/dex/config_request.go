@@ -3,6 +3,7 @@ package dex
 import (
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -26,6 +27,7 @@ func NewConfigRequest() *ConfigRequest {
 				Bootstrap:  &ConfigRequest_V1_Bootstrap{},
 				Connectors: &ConfigRequest_V1_Connectors{},
 				Tls:        &shared.TLSCredentials{},
+				Disclaimer: &ConfigRequest_V1_Disclaimer{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -45,6 +47,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Bootstrap.InsecureAdmin = w.Bool(false)
 
 	c.V1.Sys.Log.Level = w.String("info")
+
+	c.V1.Sys.Disclaimer.Show = w.Bool(false)
 
 	return c
 }
@@ -205,6 +209,14 @@ func (c *ConfigRequest) SetGlobalConfig(g *shared.GlobalConfig) {
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = GlobalLogLevelToDexLevel(logLevel)
+	}
+
+	c.V1.Sys.Disclaimer.Show.Value = g.GetV1().GetDisclaimer().GetShow().GetValue()
+
+	if messageFilePath := g.GetV1().GetDisclaimer().GetMessageFilePath().GetValue(); messageFilePath != "" {
+		fileContent, _ := ioutil.ReadFile(messageFilePath)
+		//os.ReadFile(messageFilePath)
+		c.V1.Sys.Disclaimer.DisclaimerMessage.Value = string(fileContent)
 	}
 }
 

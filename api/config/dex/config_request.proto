@@ -30,6 +30,7 @@ message ConfigRequest {
 			Bootstrap bootstrap = 7;
 			Connectors connectors = 8;
 			chef.automate.infra.config.TLSCredentials tls = 9;
+			Disclaimer disclaimer = 10;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -125,6 +126,11 @@ message ConfigRequest {
 			google.protobuf.StringValue entity_issuer = 6;
 			google.protobuf.StringValue name_id_policy_format = 7;
 			repeated string allowed_groups = 8;
+		}
+
+		message Disclaimer {
+			google.protobuf.BoolValue show = 1;
+			google.protobuf.StringValue disclaimer_message = 2;
 		}
 	}
 }
