@@ -1,19 +1,7 @@
 describe('chef server', () => {
-  // let adminIdToken = '';
-  // const now = Cypress.moment().format('MMDDYYhhmmss');
-  // const cypressPrefix = 'infra';
-  // const serverName = `${cypressPrefix} server ${now}`;
-  // const serverID = serverName.split(' ').join('-');
-  
-  // const serverFQDN = 'chef-server-1617089723092818000.com';
-  // const serverIP = '176.119.50.159';
-  // const orgName =  `${cypressPrefix} org ${now}`;  
-  // const orgID = orgName.split(' ').join('-');
-  // const adminUser = 'test_admin_user';
-
+  let adminIdToken = '';
   const now = Cypress.moment().format('MMDDYYhhmmss');
   const cypressPrefix = 'infra';
-  let adminIdToken = '';
   const serverID = 'chef-server-dev-test';
   const serverName = 'chef server dev';
   const orgID = 'chef-org-dev';
@@ -23,8 +11,7 @@ describe('chef server', () => {
   const adminUser = 'chefadmin';
   const adminKey = 'Dummy--admin--key';
 
- 
-  const tabNames = ['Roles','Environments','Data Bags','Clients']
+  const tabNames = ['Roles','Environments','Data Bags','Clients','Cookbooks']
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -109,6 +96,12 @@ describe('chef server', () => {
       cy.get('.nav-tab').contains('Cookbooks').should('have.class', 'active');
     });
 
+    tabNames.forEach((val) => {
+      it(`can switch to ${val} tab`, () => {      
+          cy.get('.nav-tab').contains(val).click();
+      });      
+    });
+
     it('lists of Cookbook', () => {
       cy.get('.cookbooks').then(($cookbook) => {
         if($cookbook.hasClass('empty-section')) {
@@ -122,11 +115,11 @@ describe('chef server', () => {
       })     
     });
 
-    tabNames.forEach((val) => {
-    it(`can switch to ${val} tab`, () => {      
-        cy.get('.nav-tab').contains(val).click();
-      });      
-    });   
+    it('can select cookbook and load data', () => {
+      cy.get('chef-tbody chef-tr chef-td').contains('a')
+      .should('exist');
+      cy.get('chef-tbody chef-tr chef-td').contains('a').click();
+    });
 
   });
 });
