@@ -11,7 +11,7 @@ describe('chef server', () => {
   const adminUser = 'chefadmin';
   const adminKey = 'Dummy--admin--key';
 
-  const tabNames = ['Roles','Environments','Data Bags','Clients','Cookbooks']
+  const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Cookbooks'];
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -92,19 +92,19 @@ describe('chef server', () => {
       cy.get('.page-title').contains(orgName);
     });
 
-    it('on page load Cookbook is in active state',() => {
+    it('on page load Cookbook is in active state', () => {
       cy.get('.nav-tab').contains('Cookbooks').should('have.class', 'active');
     });
 
     tabNames.forEach((val) => {
-      it(`can switch to ${val} tab`, () => {      
+      it(`can switch to ${val} tab`, () => {
           cy.get('.nav-tab').contains(val).click();
-      });      
+      });
     });
 
     it('lists of Cookbook', () => {
       cy.get('.cookbooks').then(($cookbook) => {
-        if($cookbook.hasClass('empty-section')) {
+        if ($cookbook.hasClass('empty-section')) {
           cy.get('chef-table chef-th').should('not.be.visible');
             cy.get('.empty-section').should('be.visible');
             cy.get('.empty-section p').contains('No cookbooks available');
@@ -112,7 +112,7 @@ describe('chef server', () => {
           cy.get('chef-table chef-th').contains('Name');
           cy.get('chef-table chef-th').contains('Cookbook Version');
         }
-      })     
+      });
     });
 
     it('can select cookbook and load data', () => {
