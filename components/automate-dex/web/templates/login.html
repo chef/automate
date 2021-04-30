@@ -9,17 +9,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='{{ url .ReqPath "static/main.css" }}' rel="stylesheet">
     <link href='{{ url .ReqPath "theme/styles.css" }}' rel="stylesheet">
-    <script>
-      function populateDisclaimer() {
-        let d = '{{ "disclosureMessage" | extra }}';
-        var e = document.createElement('div');
-        e.innerHTML = d;
-        var ex = document.getElementById('disclosure');
-        ex.innerHTML = e.childNodes[0].nodeValue;
-      }
-    </script>
   </head>
-  <body onload="populateDisclaimer()">
+  <body>
+        {{ if eq ("showBanner" | extra) "true" }}
+        <div class="warning-banner" style='background-color: {{ "bannerBackgroundColor" | extra }}'>
+          <p class="warning-text" style='color: {{ "bannerTextColor" | extra }}'>
+            {{ "bannerMessage" | extra }}
+          </p>
+        </div>
+        {{ end }}
 
       <div class="theme-panel" role="main">
     <main>
@@ -55,7 +53,18 @@
             <h3>{{ "disclosureTitle" | extra }}</h3>
             <div id="disclosure"></div>
           </div>
-      {{ end }}
+          {{ end }}
     </div>
+    <script>
+      const populateDisclaimer = () => {
+        const show = '{{ "showDisclosure" | extra }}';
+        if ( show !== 'true' ) return;
+
+        const d = '{{ "disclosureMessage" | extra }}';
+        document.getElementById('disclosure').innerHTML = d;
+      }
+
+      populateDisclaimer();
+    </script>
   </body>
 </html>
