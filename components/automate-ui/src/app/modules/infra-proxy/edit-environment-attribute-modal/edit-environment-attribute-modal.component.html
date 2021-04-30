@@ -14,9 +14,15 @@
           <div class="input-margin">
             <chef-form-field>
               <label>
-                <textarea chefInput name="default" formControlName="default" id="default" type="text" autocomplete="off"
-                (keyup)="onChangeDefaultJson($event)">
-                  </textarea>
+                <textarea
+                  chefInput
+                  name="default"
+                  formControlName="default"
+                  id="default"
+                  type="text"
+                  autocomplete="off"
+                  (keyup)="onChangeDefaultJson($event)">
+                </textarea>
               </label>
               <chef-error *ngIf="defaultAttrParseError">
                 Must be a valid JSON object
@@ -24,6 +30,19 @@
             </chef-form-field>
           </div>
         </form>
+        <div class="button-bar-box">
+          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-default-button-object-modal"
+            (click)="updateEnvironment()"
+            [disabled]="defaultAttrParseError || !defaultAttributeForm?.valid ||
+              !defaultAttributeForm.dirty || conflictError">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
       </div>
 
       <div *ngIf="label === 'Override'">
@@ -31,7 +50,13 @@
           <div class="input-margin">
             <chef-form-field>
               <label>
-                <textarea chefInput name="override" formControlName="override" id="override" type="text" autocomplete="off"
+                <textarea
+                  chefInput
+                  name="override"
+                  formControlName="override"
+                  id="override"
+                  type="text"
+                  autocomplete="off"
                   (keyup)="onChangeOverrideJson($event)">
                 </textarea>
               </label>
@@ -41,6 +66,19 @@
             </chef-form-field>
           </div>
         </form>
+        <div class="button-bar-box">
+          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-override-button-object-modal"
+            (click)="updateEnvironment()"
+            [disabled]="overrideAttrParseError || !overrideAttributeForm?.valid ||
+              !overrideAttributeForm.dirty || conflictError">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
       </div>
 
       <div *ngIf="label === 'Constraints'">
@@ -53,15 +91,18 @@
           [constraintFormGroup]="constraintFormGroup"
           [selectedCookbookNames]="selectedCookbookNames">
         </app-infra-environment-constraint>
-      </div>
-
-      <div class="button-bar-box">
-        <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
-        <chef-button primary id="create-button-object-modal" (click)="updateEnvironment()">
-          <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
-          <span *ngIf="updateInProgress">Saving...</span>
-          <span *ngIf="!updateInProgress">Save</span>
-        </chef-button>
+        <div class="button-bar-box">
+          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button
+            primary
+            id="create-constraints-button-object-modal"
+            (click)="updateEnvironment()"
+            [disabled]="!isConstraints || conflictError || cookbookVersionError">
+            <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
+            <span *ngIf="updateInProgress">Saving...</span>
+            <span *ngIf="!updateInProgress">Save</span>
+          </chef-button>
+        </div>
       </div>
     </div>
   </div>

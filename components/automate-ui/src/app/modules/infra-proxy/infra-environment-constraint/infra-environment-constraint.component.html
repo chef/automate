@@ -5,7 +5,7 @@
     </label>
     <div class="drop">
       <mat-select panelClass="chef-dropdown" [(value)]="name_id" [disabled]="!constraintKeys.length">
-        <mat-option *ngFor="let key of constraintKeys" [value]="key" [ngClass]="{'checkmark': key === name_id}">
+        <mat-option *ngFor="let key of cookbookKeys" [value]="key" [ngClass]="{'checkmark': key === name_id}">
           {{ key }}</mat-option>
       </mat-select>
     </div>
@@ -64,8 +64,13 @@
         </div>
       </div>
       <div class="row-version-margin">
-        <input chefInput type="text" (keyup)="handleInput($event)"
-          (ngModelChange)="handleEditVersion($event, i)" autocomplete="off" [(ngModel)]="cookbookConstraints[i].version" />
+        <input
+          chefInput
+          type="text"
+          (keyup)="handleInput($event)"
+          (ngModelChange)="handleEditVersion($event, i)"
+          autocomplete="off"
+          [(ngModel)]="cookbookConstraints[i].version"/>
       </div>
       <div class="remove">
         <chef-button (click)="deleteCookbookVersion(i, cookbook)" secondary caution>Remove
