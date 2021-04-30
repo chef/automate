@@ -25,7 +25,11 @@ require 'fileutils'
     platform: 'ubuntu',
     platform_version: '18.04',
     architecture: 'x86_64',
-  }
+   }
+  puts "*******************************"
+  puts ENV['SERVER_VERSION']
+  puts ENV['AUTOMATE_VERSION']
+  
   options['product_version'] = product['version'] if product['version']
 
   # Our target version
