@@ -23,7 +23,7 @@ require 'fileutils'
     channel: product['channel'].to_sym,
     product_name: product['product_name'],
     platform: 'ubuntu',
-    platform_version: '18.04',
+    platform_version: '16.04',
     architecture: 'x86_64',
    }
   puts "*******************************"
@@ -32,7 +32,9 @@ require 'fileutils'
   puts ENV['AUTOMATE_VERSION']
 
   options['product_version'] = product['version'] if product['version']
-
+  puts options['product_version']
+  puts ENV['SERVER_VERSION']
+  
   # Our target version
   artifact = Mixlib::Install.new(options).artifact_info
 

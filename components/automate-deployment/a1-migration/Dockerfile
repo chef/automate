@@ -1,4 +1,4 @@
-FROM solita/ubuntu-systemd:18.04
+FROM solita/ubuntu-systemd:16.04
 MAINTAINER Chef Software <ryan@chef.io>
 
 ENV DEBIAN_FRONTEND noninteractive
