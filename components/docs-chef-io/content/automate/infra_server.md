@@ -144,7 +144,7 @@ Installations require elevated privileges, so run the commands as the superuser 
     [erchef.v1.sys.data_collector]
     enabled = true
     ```
-  
+
    Then run `chef-automate config patch patch.toml` to patch your Chef Infra Server configuration.
 
 ### Install a Standalone Chef Infra Server with a Configuration File
@@ -309,4 +309,4 @@ On the workstation:
 
 1. Run `knife ssl fetch` to get the SSL certificates from Chef Infra Server and make them available to `knife`.
 
-For more information on how to set up the workstation, see [the Chef Workstation documentation]({{< relref "workstation/getting_started.md" >}}).
+For more information on how to set up the workstation, see [the Chef Workstation documentation]({{< relref "workstation/setup.md" >}}).
