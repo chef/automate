@@ -20,6 +20,11 @@ html, body {
   font-weight: 400;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 button, div.dex-btn {
     background-color: #3864f2;
     color: #fff;
@@ -171,11 +176,11 @@ main.password {
   width: 250px;
 }
 
-/******* BELOW TEMPORARY STYLES ********/
-
-body {
-  display: flex;
-  flex-direction: column;
+.warning-text {
+  margin: 0;
+  padding: 1em 0;
+  font-size: 14px;
+  text-align: center;
 }
 
 .theme-panel {
