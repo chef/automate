@@ -166,7 +166,7 @@ Selecting the **Create Data Bag** button opens a dialog box. Enter the name and 
 
 #### Create a Data Bag Item
 
-To create a data bag item, select the data bag created above and follow the steps given below:
+To create a data bag item, select the data bag from the list of created data bags and follow the steps given below:
 
 Select **Create Item**, as shown below:
 
@@ -178,7 +178,7 @@ Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag It
 
 #### Search for an Item
 
-Use the **Search data bag items** bar to find an item from the list of data bag items. Entering the name of an item in the search bar returns data bag items matching your search criteria.
+Use the **Search data bag items** bar to find an item from the list of data bag items. Entering the name of an item in the search bar returns data bag items that match your search criteria.
 
 {{< figure src="/images/automate/create-data-bag-item-button.png" alt="Search Data Bag Item Bar">}}
 
@@ -204,7 +204,7 @@ To delete a data bag item, select **Delete**. In the dialog box displayed, selec
 
 #### Delete a Data Bag
 
-Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-data-bag.png" alt="Delete a Data Bag">}}
 
