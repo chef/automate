@@ -138,12 +138,12 @@ describe('infra role', () => {
     context('can search and change page in role', () => {
       it('can search a role and check  if empty or not', () => {
         cy.get('[data-cy=search-filter]').type(roleName);
-        cy.get('[data-cy=search-role]').click();
+        cy.get('[data-cy=search-entity]').click();
         getRole(roleName, 1).then((response) => {
           checkResponse(response);
         });
         cy.get('[data-cy=search-filter]').clear();
-        cy.get('[data-cy=search-role]').click();
+        cy.get('[data-cy=search-entity]').click();
         getRole('', 1).then((response) => {
           checkResponse(response);
         });
@@ -544,7 +544,7 @@ describe('infra role', () => {
     context('can delete roles', () => {
       it('can delete multiple roles', () => {
         cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-role-${now}`);
-        cy.get('[data-cy=search-role]').click();
+        cy.get('[data-cy=search-entity]').click();
         getRole(`${cypressPrefix}-role-${now}`, 1).then((response) => {
           if (checkResponse(response)) {
             cy.get('[data-cy=roles-table-container]').contains(roleName).should('exist');
@@ -636,7 +636,7 @@ describe('infra role', () => {
         });
 
         cy.get('[data-cy=search-filter]').clear();
-        cy.get('[data-cy=search-role]').click();
+        cy.get('[data-cy=search-entity]').click();
         getRole('', 1).then((response) => {
           checkResponse(response);
         });

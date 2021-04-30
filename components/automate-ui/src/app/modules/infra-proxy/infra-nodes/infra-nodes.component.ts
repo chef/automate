@@ -103,6 +103,6 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   timeFromNow(epochFormat: string) {
     const epchoTime = Number(epochFormat);
     const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
-    return fromNowValue === '-' ? '--' : fromNowValue; 
+    return fromNowValue === '-' ? '--' : fromNowValue;
   }
 }

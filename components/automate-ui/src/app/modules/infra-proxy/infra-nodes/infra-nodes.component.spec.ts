@@ -68,10 +68,10 @@ describe('InfraNodesComponent', () => {
       name: 'test',
       fqdn: 'xyz.com',
       ip_address: '1.1.1.1',
-      id: "c93e4823-c1e7-4bcd-83a9-d6fe65c87a10",
-      platform: "ubuntu",
-      policy_group: "",
-      uptime: "37 minutes 00 seconds",
+      id: 'c93e4823-c1e7-4bcd-83a9-d6fe65c87a10',
+      platform: 'ubuntu',
+      policy_group: '',
+      uptime: '37 minutes 00 seconds',
       check_in: '37 minutes 00 seconds',
       environment: 'test'
     }];
