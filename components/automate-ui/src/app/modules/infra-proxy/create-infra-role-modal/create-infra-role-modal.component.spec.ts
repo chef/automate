@@ -1,4 +1,4 @@
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -10,6 +10,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpStatus } from 'app/types/types';
 import { EventEmitter } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
+import { Regex } from 'app/helpers/auth/regex';
+import { using } from 'app/testing/spec-helpers';
 
 class MockTelemetryService {
   track() { }
@@ -18,6 +20,9 @@ class MockTelemetryService {
 describe('CreateInfraRoleModalComponent', () => {
   let component: CreateInfraRoleModalComponent;
   let fixture: ComponentFixture<CreateInfraRoleModalComponent>;
+
+  let createForm: FormGroup;
+  let errors = {};
 
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -50,8 +55,9 @@ describe('CreateInfraRoleModalComponent', () => {
     fixture = TestBed.createComponent(CreateInfraRoleModalComponent);
     component = fixture.componentInstance;
     component.detailsFormGroup = new FormBuilder().group({
-      name: ['', null],
-      description: ['', null]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
+      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     component.defaultAttrFormGroup = new FormBuilder().group({
       default: ['', null]
@@ -60,11 +66,150 @@ describe('CreateInfraRoleModalComponent', () => {
       override: ['', null]
     });
     component.openEvent = new EventEmitter();
+    createForm = component.detailsFormGroup;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('form validity', () => {
+    describe('the form should be invalid', () => {
+      it('when all inputs are empty', () => {
+        expect(createForm.valid).toBeFalsy();
+      });
+
+      it('when name is missing', () => {
+        createForm.controls['description'].setValue('test');
+
+        errors = createForm.controls['name'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when description is missing', () => {
+        createForm.controls['name'].setValue('test');
+
+        errors = createForm.controls['description'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      using([
+        ['contains tilde.', 'role~'],
+        ['contains acute, back quote,', 'role`'],
+        ['contains exclamation mark', 'role!'],
+        ['contains ampersat, at', 'role@'],
+        ['contains dollar sign', 'role$'],
+        ['contains percent.', 'role%'],
+        ['contains caret or circumflex.,', 'role^'],
+        ['contains ampersand', 'role&'],
+        ['contains asterisk', 'role*'],
+        ['contains open or left parenthesis.', 'role('],
+        ['contains close or right parenthesis,', 'role)'],
+        ['contains plus', 'role+'],
+        ['contains equal', 'role='],
+        ['contains open brace', 'role{'],
+        ['contains close brace', 'role}'],
+        ['contains open bracket', 'role['],
+        ['contains closed bracket', 'role]'],
+        ['contains pipe', 'role|'],
+        ['contains backslash', 'role\\'],
+        ['contains forward slash', 'role/'],
+        ['contains colon', 'role:'],
+        ['contains semicolon.', 'role;'],
+        ['contains quote', 'role"'],
+        ['contains apostrophe', 'role\'test'],
+        ['contains less than', 'role<'],
+        ['contains greater than', 'role>'],
+        ['contains comma', 'role,'],
+        ['contains period, dot', 'role.'],
+        ['contains question mark', 'role?'],
+        ['contains space', 'role test1'],
+        ['has mixed alphabet, number, special character', 'role-test!+ test1']
+      ], function (description: string, input: string) {
+        it(('when the name' + description), () => {
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+
+      using([
+        ['contains tilde.', '~'],
+        ['contains acute, back quote,', '`'],
+        ['contains exclamation mark', '!'],
+        ['contains ampersat, at', '@'],
+        ['contains dollar sign', '$'],
+        ['contains percent.', '%'],
+        ['contains caret or circumflex.,', '^'],
+        ['contains ampersand', '&'],
+        ['contains asterisk', '*'],
+        ['contains open or left parenthesis.', '('],
+        ['contains close or right parenthesis,', ')'],
+        ['contains plus', '+'],
+        ['contains equal', '='],
+        ['contains open brace', '{'],
+        ['contains close brace', '}'],
+        ['contains open bracket', '['],
+        ['contains closed bracket', ']'],
+        ['contains pipe', '|'],
+        ['contains backslash', '\\'],
+        ['contains forward slash', '/'],
+        ['contains colon', ':'],
+        ['contains semicolon.', ';'],
+        ['contains quote', '"'],
+        ['contains apostrophe', '\'test'],
+        ['contains less than', '<'],
+        ['contains greater than', '>'],
+        ['contains comma', ','],
+        ['contains period, dot', '.'],
+        ['contains question mark', '?'],
+        ['contains space', '    test1']
+      ], function (description: string, input: string) {
+        it(('when the name only' + description), () => {
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+    });
+
+    describe('the form should be valid', () => {
+      it('when all inputs are filled and valid', () => {
+        expect(createForm.valid).toBeFalsy();
+        createForm.controls['name'].setValue('role');
+        createForm.controls['description'].setValue('test role description');
+        expect(createForm.valid).toBeTruthy();
+      });
+
+      using([
+        ['contains numbers range 0-9.', 'role123'],
+        ['contains alphabets a-z', 'role-test'],
+        ['contains underscore.', 'role_test'],
+        ['contains hyphen, minus, or dash.', 'role_test-1'],
+        ['has mixed characters', 'role-Test_10']
+      ], function (description: string, input: string) {
+        it(('when the name ' + description), () => {
+          createForm.controls['description'].setValue('test role description');
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeTruthy();
+          expect(errors['pattern']).toBeFalsy();
+        });
+      });
+    });
   });
 
   describe('create role', () => {

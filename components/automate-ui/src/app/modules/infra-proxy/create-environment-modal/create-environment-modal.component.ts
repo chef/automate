@@ -97,7 +97,8 @@ export class CreateEnvironmentModalComponent implements OnInit, OnDestroy {
     });
 
     this.detailsFormGroup = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
+           Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 

@@ -6,9 +6,13 @@
         <chef-form-field>
           <label *ngIf="!created">
             <span class="label">Client Name</span>
-            <input chefInput firstFocus formControlName="name" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
+            <input chefInput firstFocus formControlName="name" type="text" (keyup)="handleInput($event)" autocomplete="off" />
           </label>
           <chef-error *ngIf="error">{{error}}</chef-error>
+          <chef-error
+            *ngIf="createForm.get('name').hasError('pattern') && createForm.get('name').dirty">
+            name can only contain 'a-z', 'A-Z', '0-9', '_', '-'.
+          </chef-error>
         </chef-form-field>
         <chef-form-field>
           <chef-checkbox *ngIf="!created" (change)="updateValidatorCheckbox($event.detail)"

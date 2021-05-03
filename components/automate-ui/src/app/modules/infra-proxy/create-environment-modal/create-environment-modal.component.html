@@ -21,11 +21,15 @@
                     autocomplete="off"/>
                 </label>
                 <chef-error
-                  *ngIf="(detailsFormGroup.get('name').hasError('required') || detailsFormGroup.get('name').hasError('pattern')) && detailsFormGroup.get('name').dirty">
+                  *ngIf="detailsFormGroup.get('name').hasError('required') && detailsFormGroup.get('name').dirty">
                   Name is required.
                 </chef-error>
                 <chef-error *ngIf="conflictError">
                   Environment "{{detailsFormGroup.get('name').value}}" already exists.
+                </chef-error>
+                <chef-error
+                  *ngIf="detailsFormGroup.get('name').hasError('pattern') && detailsFormGroup.get('name').dirty">
+                  name can only contain 'a-z', '0-9', 'A-Z', '_', '-'.
                 </chef-error>
               </chef-form-field>
             </div>

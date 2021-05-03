@@ -46,7 +46,8 @@ export class CreateClientModalComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>
   ) {
     this.createForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
       validator: ['']
     });
   }

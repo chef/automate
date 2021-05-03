@@ -22,11 +22,15 @@
                     autocomplete="off"/>
                 </label>
                 <chef-error
-                  *ngIf="(detailsFormGroup.get('name').hasError('required') || detailsFormGroup.get('name').hasError('pattern')) && detailsFormGroup.get('name').dirty">
+                  *ngIf="detailsFormGroup.get('name').hasError('required') && detailsFormGroup.get('name').dirty">
                   Name is required.
                 </chef-error>
                 <chef-error *ngIf="conflictError">
                   Role "{{detailsFormGroup.get('name').value}}" already exists.
+                </chef-error>
+                <chef-error
+                  *ngIf="detailsFormGroup.get('name').hasError('pattern') && detailsFormGroup.get('name').dirty">
+                  name can only contain 'a-z', 'A-Z', '0-9', '_', '-'.
                 </chef-error>
               </chef-form-field>
             </div>

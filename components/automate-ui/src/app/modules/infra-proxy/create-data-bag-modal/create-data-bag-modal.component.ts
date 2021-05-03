@@ -49,7 +49,8 @@ export class CreateDataBagModalComponent implements OnInit, OnDestroy {
   ) {
     this.createForm = this.fb.group({
       // Must stay in sync with error checks in create-notification-modal.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
+              Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]]
     });
   }
 

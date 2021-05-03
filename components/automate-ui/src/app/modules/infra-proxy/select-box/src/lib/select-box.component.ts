@@ -37,6 +37,7 @@ import {
 } from 'app/entities/infra-roles/infra-role.selectors';
 import { GetRoles } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 export const SELECT_BOX_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -67,6 +68,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
 
   public createrolesList: InfraRole[] = [];
   public defaultType = 'available roles and recipes';
+  public error = false;
   public isLeftItemDragging = false;
   public isRightItemDragging = false;
   public leftFilterText = '';
@@ -296,7 +298,12 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   }
 
   private filterRunlist(searchvalue) {
-    this.originalItems = this.originalItems.filter(item => item.value.search(new RegExp(searchvalue, 'i')) > -1);
+    if (!this.error) {
+      this.originalItems = this.originalItems.filter(
+        item => item.value.search(new RegExp(searchvalue, 'i')) > -1);
+    } else {
+      this.originalItems = [];
+    }
   }
 
   private getRecipes(searchvalue) {
@@ -321,11 +328,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(roleList)
-    ]).pipe(
-      filter(([getRolesStatus, allRolesState]) =>
-        getRolesStatus === EntityStatus.loadingSuccess &&
-        !isNil(allRolesState)),
-      takeUntil(this.isDestroyed))
+    ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([_getRolesSt, RolesState]) => {
       if (!isNil(RolesState) && _getRolesSt === EntityStatus.loadingSuccess) {
         this.createrolesList = RolesState.items;
@@ -341,6 +344,8 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         } else {
           this.loading = false;
         }
+      } else if (_getRolesSt === EntityStatus.loadingFailure) {
+        this.loading = false;
       }
     });
   }
@@ -350,24 +355,40 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     switch (id) {
       case 'available roles and recipes':
         this.currentPage = 1;
-        this.getRecipes(this.searchValue);
-        if (!this.searchValue.includes(':')) {
+        this.error = false;
+        if (this.searchValue !== '' && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(
+          this.searchValue)) {
+          this.error = true;
+        } else {
+          this.error = false;
+          this.getRecipes(this.searchValue);
           this.loadRoles();
           this.loadRecipesOnly = false;
-        } else {
-          this.loadRecipesOnly = true;
         }
         break;
 
       case 'available roles':
         this.currentPage = 1;
-        this.loadRoles();
-        this.loadRecipesOnly = false;
+        this.error = false;
+        if (this.searchValue !== '' && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(
+          this.searchValue)) {
+          this.error = true;
+        } else {
+          this.error = false;
+          this.loadRoles();
+          this.loadRecipesOnly = false;
+        }
         break;
 
       case 'available recipes':
         this.loadRecipesOnly = true;
-        this.getRecipes(this.searchValue);
+        if (this.searchValue !== '' && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(
+          this.searchValue)) {
+          this.error = true;
+        } else {
+          this.error = false;
+          this.getRecipes(this.searchValue);
+        }
         break;
 
     }

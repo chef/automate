@@ -1,4 +1,4 @@
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ComponentFixture, TestBed, waitForAsync
@@ -12,6 +12,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpStatus } from 'app/types/types';
 import { EventEmitter } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
+import { Regex } from 'app/helpers/auth/regex';
+import { using } from 'app/testing/spec-helpers';
 
 export interface CreateEnvironment {
   server_id: string;
@@ -30,6 +32,9 @@ class MockTelemetryService {
 describe('CreateEnvironmentModalComponent', () => {
   let component: CreateEnvironmentModalComponent;
   let fixture: ComponentFixture<CreateEnvironmentModalComponent>;
+
+  let createForm: FormGroup;
+  let errors = {};
 
   beforeEach( waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -63,8 +68,9 @@ describe('CreateEnvironmentModalComponent', () => {
     fixture = TestBed.createComponent(CreateEnvironmentModalComponent);
     component = fixture.componentInstance;
     component.detailsFormGroup = new FormBuilder().group({
-      name: ['', null],
-      description: ['', null]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN)]],
+      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     component.defaultAttrFormGroup = new FormBuilder().group({
       default: ['', null]
@@ -73,11 +79,150 @@ describe('CreateEnvironmentModalComponent', () => {
       override: ['', null]
     });
     component.openEvent = new EventEmitter();
+    createForm = component.detailsFormGroup;
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('form validity', () => {
+    describe('the form should be invalid', () => {
+      it('when all inputs are empty', () => {
+        expect(createForm.valid).toBeFalsy();
+      });
+
+      it('when name is missing', () => {
+        createForm.controls['description'].setValue('test');
+
+        errors = createForm.controls['name'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      it('when description is missing', () => {
+        createForm.controls['name'].setValue('test');
+
+        errors = createForm.controls['description'].errors || {};
+
+        expect(createForm.valid).toBeFalsy();
+        expect(errors['required']).toBeTruthy();
+      });
+
+      using([
+        ['contains tilde.', 'environment~'],
+        ['contains acute, back quote,', 'environment`'],
+        ['contains exclamation mark', 'environment!'],
+        ['contains ampersat, at', 'environment@'],
+        ['contains dollar sign', 'environment$'],
+        ['contains percent.', 'environment%'],
+        ['contains caret or circumflex.,', 'environment^'],
+        ['contains ampersand', 'environment&'],
+        ['contains asterisk', 'environment*'],
+        ['contains open or left parenthesis.', 'environment('],
+        ['contains close or right parenthesis,', 'environment)'],
+        ['contains plus', 'environment+'],
+        ['contains equal', 'environment='],
+        ['contains open brace', 'environment{'],
+        ['contains close brace', 'environment}'],
+        ['contains open bracket', 'environment['],
+        ['contains closed bracket', 'environment]'],
+        ['contains pipe', 'environment|'],
+        ['contains backslash', 'environment\\'],
+        ['contains forward slash', 'environment/'],
+        ['contains colon', 'environment:'],
+        ['contains semicolon.', 'environment;'],
+        ['contains quote', 'environment"'],
+        ['contains apostrophe', 'environment\'test'],
+        ['contains less than', 'environment<'],
+        ['contains greater than', 'environment>'],
+        ['contains comma', 'environment,'],
+        ['contains period, dot', 'environment.'],
+        ['contains question mark', 'environment?'],
+        ['contains space', 'environment test1'],
+        ['has mixed alphabet, number, special character', 'environment-test!+ test1']
+      ], function (description: string, input: string) {
+        it(('when the name ' + description), () => {
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+
+      using([
+        ['contains tilde.', '~'],
+        ['contains acute, back quote,', '`'],
+        ['contains exclamation mark', '!'],
+        ['contains ampersat, at', '@'],
+        ['contains dollar sign', '$'],
+        ['contains percent.', '%'],
+        ['contains caret or circumflex.,', '^'],
+        ['contains ampersand', '&'],
+        ['contains asterisk', '*'],
+        ['contains open or left parenthesis.', '('],
+        ['contains close or right parenthesis,', ')'],
+        ['contains plus', '+'],
+        ['contains equal', '='],
+        ['contains open brace', '{'],
+        ['contains close brace', '}'],
+        ['contains open bracket', '['],
+        ['contains closed bracket', ']'],
+        ['contains pipe', '|'],
+        ['contains backslash', '\\'],
+        ['contains forward slash', '/'],
+        ['contains colon', ':'],
+        ['contains semicolon.', ';'],
+        ['contains quote', '"'],
+        ['contains apostrophe', '\'test'],
+        ['contains less than', '<'],
+        ['contains greater than', '>'],
+        ['contains comma', ','],
+        ['contains period, dot', '.'],
+        ['contains question mark', '?'],
+        ['contains space', '    test1']
+      ], function (description: string, input: string) {
+        it(('when the name only' + description), () => {
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeFalsy();
+          expect(errors['pattern']).toBeTruthy();
+        });
+      });
+    });
+
+    describe('the form should be valid', () => {
+      it('when all inputs are filled and valid', () => {
+        expect(createForm.valid).toBeFalsy();
+        createForm.controls['name'].setValue('environment');
+        createForm.controls['description'].setValue('test environment description');
+        expect(createForm.valid).toBeTruthy();
+      });
+
+      using([
+        ['contains numbers range 0-9.', 'environment123'],
+        ['contains alphabets a-z', 'environment-test'],
+        ['contains underscore.', 'environment_test'],
+        ['contains hyphen, minus, or dash.', 'environment_test-1'],
+        ['has mixed characters', 'environment-Test_10']
+      ], function (description: string, input: string) {
+        it(('when the name ' + description), () => {
+          createForm.controls['description'].setValue('test environment description');
+
+          createForm.controls['name'].setValue(input);
+          errors = createForm.controls['name'].errors || {};
+
+          expect(createForm.valid).toBeTruthy();
+          expect(errors['pattern']).toBeFalsy();
+        });
+      });
+    });
   });
 
   describe('check cookbook version', () => {

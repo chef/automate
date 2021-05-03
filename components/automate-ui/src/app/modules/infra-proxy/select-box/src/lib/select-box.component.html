@@ -40,6 +40,9 @@
                 placeholder="Search.."
                 (keyup)="handleInput(keyInput.value)"
                 data-cy="search-roles-and-recipes"/>
+              <chef-error *ngIf="error">
+                Only contain 'a-z', 'A-Z', '0-9', '_', '-'.
+              </chef-error>
             </div>
             <cdk-virtual-scroll-viewport
               #scroller
