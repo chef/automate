@@ -1,6 +1,6 @@
 <section class="infra-nodes">
   <chef-loading-spinner *ngIf="nodesListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="roles" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
     <div class="search-create-container">

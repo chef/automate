@@ -12,11 +12,6 @@ export interface RoleResponse {
   role: InfraRole;
 }
 
-export interface RoleSearchResponse {
-  roles: InfraRole[];
-  total: number;
-}
-
 @Injectable()
 export class InfraRoleRequests {
 

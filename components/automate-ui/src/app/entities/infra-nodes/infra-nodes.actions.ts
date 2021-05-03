@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { InfraNode } from './infra-nodes.model';
 
 export enum NodeActionTypes {
-  GET_ALL = 'NODES::GET_ALL',
+  GET_ALL         = 'NODES::GET_ALL',
   GET_ALL_SUCCESS = 'NODES::GET_ALL::SUCCESS',
   GET_ALL_FAILURE = 'NODES::GET_ALL::FAILURE'
 }

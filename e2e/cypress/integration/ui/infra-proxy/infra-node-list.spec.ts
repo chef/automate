@@ -127,7 +127,7 @@ describe('infra node list', () => {
       cy.get('.page-title').contains(orgName);
     });
 
-    // roles tabs specs
+    // nodes tabs specs
     it('can switch to nodes tab', () => {
       cy.get('.nav-tab').contains('Nodes').click();
     });

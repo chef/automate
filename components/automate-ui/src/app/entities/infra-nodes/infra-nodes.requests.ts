@@ -3,14 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { NodesPayload, NodesSuccessPayload } from './infra-nodes.actions';
-import { InfraNode } from './infra-nodes.model';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
-export interface RoleSearchResponse {
-  nodes: InfraNode[];
-  total: number;
-}
+
 @Injectable()
 export class InfraNodeRequests {
 
