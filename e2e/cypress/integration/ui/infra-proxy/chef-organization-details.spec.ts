@@ -9,7 +9,7 @@ describe('chef server', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = 'Dummy--admin--key';
+  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
 
   const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Cookbooks'];
 
@@ -105,21 +105,15 @@ describe('chef server', () => {
     it('lists of Cookbook', () => {
       cy.get('.cookbooks').then(($cookbook) => {
         if ($cookbook.hasClass('empty-section')) {
-          cy.get('chef-table chef-th').should('not.be.visible');
+          cy.get('[data-cy=cookbooks-table-container]').should('not.be.visible');
             cy.get('.empty-section').should('be.visible');
             cy.get('.empty-section p').contains('No cookbooks available');
         } else {
-          cy.get('chef-table chef-th').contains('Name');
-          cy.get('chef-table chef-th').contains('Cookbook Version');
+          cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Name');
+          cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Cookbook Version');
         }
       });
     });
-
-    it('can select cookbook and load data', () => {
-      cy.get('chef-tbody chef-tr chef-td').contains('a')
-      .should('exist');
-      cy.get('chef-tbody chef-tr chef-td').contains('a').click();
-    });
-
+   
   });
 });
