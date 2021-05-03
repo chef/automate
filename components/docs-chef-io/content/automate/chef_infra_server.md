@@ -85,6 +85,50 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
+The Chef Infra Server UI lets you:
+
+- Create a role
+- List out all the roles at one place.
+- Search for a specific role from a list of roles.
+- View the details of roles:
+  - Run List
+  - Attributes
+- Delete a role
+
+#### Create a Role
+
+To create a new role, select **Create Role**:
+
+{{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
+
+Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
+
+{{< figure src="/images/automate/create-role-popup.png" alt="Create Roles Dialog Box">}}
+
+#### Search for a Role
+
+Use the **Search Roles** bar to find the existing role from the list of roles. Entering the name of a role in the search box returns roles matching your search criteria.
+
+{{< figure src="/images/automate/create-role-button.png" alt="Select Create Roles Button">}}
+
+#### View Role Details
+
+Select a specific role to view the details of that particular role. Its contains two tabs, _Details_ and _Attributes_.
+
+{{< figure src="/images/automate/view-role-details.png" alt="View Role Details">}}
+
+The _Details_ contains the Run List, whereas the attributes tab displays the *default* and the *override* attributes of the role.
+
+{{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
+
+You can edit the *default* and *override* attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
+
+#### Delete a Role
+
+Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon and then **Delete**, as illustrated below:
+
+{{< figure src="/images/automate/delete-a-role.png" alt="Delete A Role">}}
+
 ### Environments
 
 An [environment]({{< relref "environments" >}}) can be used to map an organization's real-life workflow to what can be configured and managed when using Chef Infra. This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
@@ -143,6 +187,70 @@ The Chef Infra Server lets you delete environments one at a time. Select **Delet
 ### Data Bags
 
 [Data bags]({{< relref "data_bags" >}}) store global variables as JSON data. Data bags are indexed for searching and can be loaded by a cookbook or accessed during a search.
+
+Chef Infra Server UI lets you:
+
+- Create a data bag.
+- List out all the data bags in one place.
+- Search for a specific data bag item from a list of items.
+- Create a data bag item.
+- Edit a data bag item.
+- Delete a data bag item.
+- Delete a data bag.
+
+#### Create a Data Bag
+
+To create a new data bag, select **Create Data Bag**, as shown below:
+
+{{< figure src="/images/automate/create-data-bag-button.png" alt="Create Data Bag Button">}}
+
+Selecting the **Create Data Bag** button opens a dialog box. Enter the name and select **Create**.
+
+{{< figure src="/images/automate/create-data-bag-popup.png" alt="Create Data Bag Dialog Box">}}
+
+#### Create a Data Bag Item
+
+To create a data bag item, select the data bag from the list of created data bags and follow the steps given below:
+
+Select **Create Item**, as shown below:
+
+{{< figure src="/images/automate/create-data-bag-item-button.png" alt="Create Data Bag Item Button">}}
+
+Selecting the **Create Item** button opens a dialog box. Enter the **Data Bag Item ID** and the details of the key value pairs of that particular item. Select **Create**.
+
+{{< figure src="/images/automate/create-data-bag-item-popup.png" alt="Create Data Bag Item Dialog Box">}}
+
+#### Search for an Item
+
+Use the **Search data bag items** bar to find an item from the list of data bag items. Entering the name of an item in the search bar returns data bag items that match your search criteria.
+
+{{< figure src="/images/automate/create-data-bag-item-button.png" alt="Search Data Bag Item Bar">}}
+
+#### Edit a Data Bag Item
+
+Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **edit** a data bag item.
+
+{{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
+
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
+
+{{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
+
+#### Delete a Data Bag Item
+
+Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
+
+{{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
+
+To delete a data bag item, select **Delete**. In the dialog box displayed, select **Delete** to delete the data bag item.
+
+{{< figure src="/images/automate/delete-data-bag-item.png" alt="Delete a Data Bag Item">}}
+
+#### Delete a Data Bag
+
+Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
+
+{{< figure src="/images/automate/delete-a-data-bag.png" alt="Delete a Data Bag">}}
 
 ### Clients
 
