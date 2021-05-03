@@ -725,7 +725,7 @@ describe('infra role detail', () => {
     });
 
     it('edit override attribute and show empty data', () => {
-      cy.get('[data-cy=edit-override-attribute]').scrollIntoView().should('be.visible')
+      cy.get('[data-cy=edit-override-attribute]').scrollIntoView().should('be.visible');
       cy.get('[data-cy=edit-override-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('[data-cy=override-attribute]').clear().invoke('val', nullJson)
