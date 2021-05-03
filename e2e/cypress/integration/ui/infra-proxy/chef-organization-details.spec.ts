@@ -9,8 +9,8 @@ describe('chef server', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-
+  // const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const adminKey = 'Dummy--admin--key';
   const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Cookbooks'];
 
   before(() => {
@@ -114,6 +114,6 @@ describe('chef server', () => {
         }
       });
     });
-   
+
   });
 });
