@@ -103,7 +103,7 @@ To create a new role, select **Create Role**:
 
 Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
 
-{{< figure src="/images/automate/create-role-popup.png" alt="Create Role Dialog Box">}}
+{{< figure src="/images/automate/create-role-popup.png" alt="Create Roles Dialog Box">}}
 
 #### Search for a Role
 
