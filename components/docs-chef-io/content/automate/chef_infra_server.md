@@ -87,17 +87,17 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 The Chef Infra Server UI lets you:
 
-- Create a Role
+- Create a role
 - List out all the roles at one place.
 - Search for a specific role from a list of roles.
 - View the details of roles:
   - Run List
   - Attributes
-- Delete a Role.
+- Delete a role
 
 #### Create a Role
 
-To create a new role, select **Create Role**, as shown below:
+To create a new role, select **Create Role**:
 
 {{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
 
@@ -109,7 +109,7 @@ Selecting the **Create Role** button opens a dialog box. The dialog box contains
 
 Use the **Search Roles** bar to find the existing role from the list of roles. Entering the name of a role in the search box returns roles matching your search criteria.
 
-{{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
+{{< figure src="/images/automate/create-role-button.png" alt="Select Create Roles Button">}}
 
 #### View Role Details
 
