@@ -54,8 +54,8 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Banner.Show = w.Bool(false)
 	c.V1.Sys.Banner.Message = w.String("")
-	c.V1.Sys.Banner.BackgroundColor = w.String("#3864f2") // Chef Success blue
-	c.V1.Sys.Banner.TextColor = w.String("#FFFFFF")       // White
+	c.V1.Sys.Banner.BackgroundColor = w.String("3864f2") // Chef Success blue
+	c.V1.Sys.Banner.TextColor = w.String("FFFFFF")       // White
 
 	return c
 }

@@ -12,8 +12,8 @@
   </head>
   <body>
         {{ if eq ("showBanner" | extra) "true" }}
-        <div class="warning-banner" style='background-color: {{ "bannerBackgroundColor" | extra }}'>
-          <p class="warning-text" style='color: {{ "bannerTextColor" | extra }}'>
+        <div class="warning-banner" style='background-color: #{{ "bannerBackgroundColor" | extra }}'>
+          <p class="warning-text" style='color: #{{ "bannerTextColor" | extra }}'>
             {{ "bannerMessage" | extra }}
           </p>
         </div>
