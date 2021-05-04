@@ -725,6 +725,7 @@ describe('infra role detail', () => {
     });
 
     it('edit override attribute and show empty data', () => {
+      cy.get('[data-cy=edit-override-attribute]').scrollIntoView().should('be.visible');
       cy.get('[data-cy=edit-override-attribute]').contains('Edit').click();
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('[data-cy=override-attribute]').clear().invoke('val', nullJson)
@@ -857,7 +858,7 @@ describe('infra role detail', () => {
     it('can click on breadcrumb and delete role', () => {
       cy.get('.breadcrumbs .breadcrumb').contains('Roles').click();
       cy.get('[data-cy=search-filter]').type(roleName);
-      cy.get('[data-cy=search-role]').click();
+      cy.get('[data-cy=search-entity]').click();
 
       cy.get('[data-cy=roles-table-container]').contains(roleName).should('exist');
       cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a').contains(roleName)
@@ -874,7 +875,7 @@ describe('infra role detail', () => {
       cy.get('app-notification.info chef-icon').click();
 
       cy.get('[data-cy=search-filter]').clear();
-      cy.get('[data-cy=search-role]').click();
+      cy.get('[data-cy=search-entity]').click();
     });
   });
 });

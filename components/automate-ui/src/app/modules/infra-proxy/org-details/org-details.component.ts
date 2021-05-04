@@ -34,6 +34,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public environmentsTab = false;
   public resetKeyTab = false;
   public rolesTab = false;
+  public nodesTab = false;
   public dataBagsTab = false;
   public clientsTab = false;
   public policyFilesTab = false;
@@ -71,6 +72,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('data-bags')) {
           this.resetTabs();
           this.dataBagsTab = true;
+        } else if (path.includes('nodes')) {
+          this.resetTabs();
+          this.nodesTab = true;
         } else if (path.includes('cookbooks')) {
           this.resetTabs();
           this.cookbooksTab = true;
@@ -145,9 +149,12 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.policyFilesTab = true;
         break;
       case 6:
-        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'nodes');
         break;
       case 7:
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
+        break;
+      case 8:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'resetkey');
         break;
     }
@@ -168,6 +175,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.policyFilesTab = false;
     this.resetKeyTab = false;
     this.clientsTab = false;
+    this.nodesTab = false;
   }
 
   ngOnDestroy(): void {
