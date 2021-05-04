@@ -4,6 +4,4 @@
     message_file_path = "/src/dev/banner_message.txt"
   [global.v1.banner]
     show = true
-    message = "Here is my banner message"
-    background_color = "3864f2"
-    text_color = "FFF"
+    message = "This is my banner message"
