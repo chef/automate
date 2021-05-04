@@ -163,8 +163,6 @@ func (c *ConfigRequest) Validate() error {
 		}
 	}
 
-	//shared.ValidateDisclaimerFilePath(shared.)
-
 	if cfgErr.IsEmpty() {
 		return nil
 	}
@@ -223,11 +221,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *shared.GlobalConfig) {
 	c.V1.Sys.Disclosure.Show.Value = g.GetV1().GetDisclosure().GetShow().GetValue()
 
 	if messageFilePath := g.GetV1().GetDisclosure().GetMessageFilePath().GetValue(); messageFilePath != "" {
-		fileContent, err := ioutil.ReadFile(messageFilePath)
-		if err != nil {
-			fmt.Printf("Err:: %s", err.Error())
-			return
-		}
+		fileContent, _ := ioutil.ReadFile(messageFilePath)
 		message := strings.TrimSuffix(string(fileContent), "\n")
 		message = strings.Replace(message, `"`, `\"`, -1)
 		c.V1.Sys.Disclosure.DisclosureMessage.Value = message
