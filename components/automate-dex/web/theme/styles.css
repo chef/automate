@@ -191,6 +191,11 @@ main.password {
   flex-grow: 2;
 }
 
+.signin-login-container {
+  padding-top: 1em;
+  text-align: center;
+}
+
 .disclosure {
   margin-top: 30px;
   padding: 2em;
