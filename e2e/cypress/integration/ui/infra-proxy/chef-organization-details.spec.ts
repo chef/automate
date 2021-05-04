@@ -103,18 +103,13 @@ describe('chef server', () => {
 
     it('lists of Cookbook', () => {
       cy.get('.cookbooks').then(($cookbook) => {
-        if (cy.get('[data-cy=empty-state-wrapper]')) {
-          cy.get('[data-cy=empty-state] p')
-          .contains('Unable to show cookbooks because admin key is invalid.');
+        if ($cookbook.hasClass('empty-section')) {
+          cy.get('[data-cy=cookbooks-table-container]').should('not.be.visible');
+            cy.get('.empty-section').should('be.visible');
+            cy.get('.empty-section p').contains('No cookbooks available');
         } else {
-          if ($cookbook.hasClass('empty-section')) {
-            cy.get('[data-cy=cookbooks-table-container]').should('not.be.visible');
-              cy.get('.empty-section').should('be.visible');
-              cy.get('.empty-section p').contains('No cookbooks available');
-          } else {
-            cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Name');
-            cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Cookbook Version');
-          }
+          cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Name');
+          cy.get('[data-cy=cookbooks-table-container] chef-th').contains('Cookbook Version');
         }
       });
     });
