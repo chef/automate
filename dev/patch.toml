@@ -1,4 +1,4 @@
 [global.v1]
-  [global.v1.disclaimer]
+  [global.v1.disclosure]
     show = true
     message_file_path = "/src/dev/banner_message.txt"

@@ -16,7 +16,8 @@ message V1 {
   Log log = 5;
   External external = 6;
   repeated chef.automate.infra.config.FrontendTLSCredential frontend_tls = 7;
-  Disclaimer disclaimer = 8;
+  Disclosure disclosure = 8;
+  Banner banner = 9;
 }
 
 message External {
@@ -238,7 +239,14 @@ message Log {
   google.protobuf.StringValue format = 2;
 }
 
-message Disclaimer {
+message Disclosure {
   google.protobuf.BoolValue show = 1;
   google.protobuf.StringValue message_file_path = 2;
+}
+
+message Banner {
+  google.protobuf.BoolValue show = 1;
+  google.protobuf.StringValue message = 2;
+  google.protobuf.StringValue background_color = 3;
+  google.protobuf.StringValue text_color = 4;
 }
