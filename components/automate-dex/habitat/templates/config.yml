@@ -242,15 +242,9 @@ frontend:
   issuer: Chef Automate
   theme: chef
   extra:
-    showBanner: true
-    bannerBackgroundColor: "green"  # Accepts any valid CSS color
-    bannerTextColor: "white" # Accepts any valid CSS color
-    bannerMessage: "DYNAMIC CONTENT - HIGHEST POSSIBLE LEVEL OF CLASSIFICATION IS: UNCLASSIFIED"
-    showDisclosure: {{cfg.login_disclaimer.show}}
-    disclosureTitle: Warning
-    # disclosureMessage: {{cfg.login_disclaimer.disclaimer_message}}
-    disclosureMessage: "<h1 style='color: blue;''>Warning</h1>
-<p>You are on a government computer.  Things are gettting really wild around here.</p>
-<p>blah blah blah some other important legal stuff to say.</p>
-<p>oooooooh yeahhhhhhhh</p>
-<a href='https://www.chef.io'>This is a link to Chef</a>"
+    showDisclosure: {{cfg.login_disclosure.show}} 
+    disclosureMessage: "{{cfg.login_disclosure.disclosure_message}}"
+    showBanner: {{cfg.banner.show}}
+    bannerMessage: "{{cfg.banner.message}}"
+    bannerBackgroundColor: {{cfg.banner.background_color}}
+    bannerTextColor: {{cfg.banner.text_color}}
