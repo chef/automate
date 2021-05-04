@@ -1,6 +1,6 @@
 <section class="cookbooks">
   <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
-  <app-empty-state *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
+  <app-empty-state data-cy="empty-state-wrapper" *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
     <div class="empty-section" *ngIf="!cookbooks.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />

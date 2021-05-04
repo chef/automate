@@ -103,7 +103,7 @@ describe('chef server', () => {
 
     it('lists of Cookbook', () => {
       cy.get('.cookbooks').then(($cookbook) => {
-        if (cy.get('[data-cy=empty-state]')) {
+        if (cy.get('[data-cy=empty-state-wrapper]')) {
           cy.get('[data-cy=empty-state] p')
           .contains('Unable to show cookbooks because admin key is invalid.');
         } else {
