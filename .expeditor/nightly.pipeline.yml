@@ -42,7 +42,6 @@ steps:
   - label: A1 -> A2 migration test (dev channel)
     command:
       - scripts/nightly_migration.sh
-        soft_fail: true
     env:
       HAB_ORIGIN: chef
     timeout_in_minutes: 30
