@@ -26,7 +26,6 @@ steps:
   - label: basic A1 -> A2 migration test (dev channel)
     command:
       - scripts/nightly_basic_a1.sh
-    soft_fail: true
     env:
       HAB_ORIGIN: chef
     timeout_in_minutes: 30
@@ -43,6 +42,7 @@ steps:
   - label: A1 -> A2 migration test (dev channel)
     command:
       - scripts/nightly_migration.sh
+        soft_fail: true
     env:
       HAB_ORIGIN: chef
     timeout_in_minutes: 30
