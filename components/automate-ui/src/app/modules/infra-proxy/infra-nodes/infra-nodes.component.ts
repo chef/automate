@@ -1,17 +1,18 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
-import { GetNodes } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { GetNodes, DeleteNode } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import {
   nodeList,
-  getAllStatus
+  getAllStatus,
+  deleteStatus
 } from 'app/entities/infra-nodes/infra-nodes.selectors';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 @Component({
@@ -36,7 +37,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public per_page = 9;
   public total: number;
-  public nodesToDelete: InfraNode;
+  public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
 
   constructor(
@@ -65,6 +66,18 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
         this.authFailure = true;
       }
     });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.searching = true;
+        if (this.nodes.length === 0 &&
+          this.currentPage !== 1) {
+          this.currentPage = this.currentPage - 1;
+        }
+        this.getNodesData();
+      });
   }
 
   searchNodes(currentText: string) {
@@ -109,13 +122,16 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   }
 
   public startNodeDelete(node: InfraNode): void {
-    this.nodesToDelete = node;
+    this.nodeToDelete = node;
     this.deleteModalVisible = true;
   }
 
   public deleteNode(): void {
     this.searching = true;
     this.closeDeleteModal();
+    this.store.dispatch(new DeleteNode({
+      server_id: this.serverId, org_id: this.orgId, name: this.nodeToDelete.name
+    }));
   }
 
   public closeDeleteModal(): void {

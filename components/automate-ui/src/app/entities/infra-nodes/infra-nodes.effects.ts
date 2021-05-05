@@ -12,7 +12,10 @@ import {
   GetNodesSuccess,
   NodesSuccessPayload,
   GetNodesFailure,
-  NodeActionTypes
+  NodeActionTypes,
+  DeleteNode,
+  DeleteNodeSuccess,
+  DeleteNodeFailure
 } from './infra-nodes.actions';
 
 import {
@@ -44,6 +47,36 @@ export class InfraNodeEffects {
         type: Type.error,
         message: `Could not get nodes: ${msg || payload.error}`
       });
+    })));
+
+  deleteNode$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.DELETE),
+      mergeMap(({ payload: { server_id, org_id, name } }: DeleteNode) =>
+        this.requests.deleteNode(server_id, org_id, name).pipe(
+          map(() => new DeleteNodeSuccess({ name })),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new DeleteNodeFailure(error)))))));
+
+  deleteNodeSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.DELETE_SUCCESS),
+      map(({ payload: { name } }: DeleteNodeSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Successfully deleted node - ${name}.`
+        });
+    })));
+
+  deleteNodeFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.DELETE_FAILURE),
+      map(({ payload: { error } }: DeleteNodeFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not delete node: ${msg || error}`
+        });
     })));
 
 }

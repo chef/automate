@@ -6,7 +6,10 @@ import { InfraNode } from './infra-nodes.model';
 export enum NodeActionTypes {
   GET_ALL         = 'NODES::GET_ALL',
   GET_ALL_SUCCESS = 'NODES::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'NODES::GET_ALL::FAILURE'
+  GET_ALL_FAILURE = 'NODES::GET_ALL::FAILURE',
+  DELETE          = 'NODES::DELETE',
+  DELETE_SUCCESS  = 'NODES::DELETE::SUCCESS',
+  DELETE_FAILURE  = 'NODES::DELETE::FAILURE'
 }
 
 export interface NodesSuccessPayload {
@@ -34,7 +37,25 @@ export class GetNodesFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class DeleteNode implements Action {
+  readonly type = NodeActionTypes.DELETE;
+  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
+}
+
+export class DeleteNodeSuccess implements Action {
+  readonly type = NodeActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { name: string }) { }
+}
+
+export class DeleteNodeFailure implements Action {
+  readonly type = NodeActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type NodeActions =
   | GetNodes
   | GetNodesSuccess
-  | GetNodesFailure;
+  | GetNodesFailure
+  | DeleteNode
+  | DeleteNodeSuccess
+  | DeleteNodeFailure;

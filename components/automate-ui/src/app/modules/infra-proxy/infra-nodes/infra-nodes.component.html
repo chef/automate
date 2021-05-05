@@ -3,7 +3,7 @@
   <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
     objectNoun="node"
-    [objectName]="nodesToDelete?.name"
+    [objectName]="nodeToDelete?.name"
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteNode()"
     objectAction="Delete">

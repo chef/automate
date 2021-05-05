@@ -26,4 +26,9 @@ export class InfraNodeRequests {
     return this.http.get<NodesSuccessPayload>(url, {headers});
   }
 
+  public deleteNode(server_id: string, org_id: string, name: string): Observable<{}> {
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/nodes/${name}`,
+    {headers});
+  }
+
 }
