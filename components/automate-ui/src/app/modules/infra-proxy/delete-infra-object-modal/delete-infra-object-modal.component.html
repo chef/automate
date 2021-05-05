@@ -14,6 +14,9 @@
           <span>Without a validate client, you may have</span><br> 
           <span>difficulties creating new nodes.</span>
         </div>
+        <div *ngIf="objectNoun === 'node'" class="node-message">
+          <span>Any associated clients will also be deleted.</span>
+        </div>
       </ng-container>
     </div>
 

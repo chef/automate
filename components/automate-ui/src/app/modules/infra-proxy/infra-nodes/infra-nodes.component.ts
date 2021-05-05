@@ -36,6 +36,8 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public per_page = 9;
   public total: number;
+  public nodesToDelete: InfraNode;
+  public deleteModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -104,5 +106,19 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     const epchoTime = Number(epochFormat);
     const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
     return fromNowValue === '-' ? '--' : fromNowValue;
+  }
+
+  public startNodeDelete(node: InfraNode): void {
+    this.nodesToDelete = node;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteNode(): void {
+    this.searching = true;
+    this.closeDeleteModal();
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 }

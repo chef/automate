@@ -1,5 +1,13 @@
 <section class="infra-nodes">
   <chef-loading-spinner *ngIf="nodesListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="node"
+    [objectName]="nodesToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deleteNode()"
+    objectAction="Delete">
+    </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
@@ -24,6 +32,7 @@
             <chef-th class="no_border_th">Uptime</chef-th>
             <chef-th class="no_border_th">Last Check-In</chef-th>
             <chef-th class="no_border_th">Environment</chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
           </chef-tr>
         </chef-thead>
         <chef-tbody>
@@ -35,6 +44,11 @@
             <chef-td>{{ node.uptime === '' ? '--' : node.uptime.split(' ').slice(0,2).join(' ') }}</chef-td>
             <chef-td>{{ timeFromNow(node.check_in) }}</chef-td>
             <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu">
+                <mat-option data-cy="delete" class="secondary" (onSelectionChange)="startNodeDelete(node)">Delete</mat-option>
+              </mat-select>
+            </chef-td>
           </chef-tr>
         </chef-tbody>
       </chef-table>

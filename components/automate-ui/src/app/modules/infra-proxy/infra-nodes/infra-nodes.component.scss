@@ -82,3 +82,19 @@ img {
     height: 55px;
   }
 }
+
+::ng-deep
+.mat-select-panel .mat-option {
+  // height: 2.3em;
+
+  &.secondary {
+    width: 115px;
+    background: $chef-white;
+    color: $chef-critical;
+  }
+
+  &:hover {
+    background: $chef-primary-bright;
+    color: $chef-white;
+  }
+}
