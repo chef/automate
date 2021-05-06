@@ -4,7 +4,7 @@ import {
   Output,
   Input
 } from '@angular/core';
-import { Regex } from 'app/helpers/auth/regex';
+// import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-infra-search-bar',
@@ -16,7 +16,6 @@ export class InfraSearchBarComponent {
   inputText = '';
   formActive = false;
   error = false;
-  disabled = false;
 
   @Input() placeHolder: string;
   @Output() searchButtonClick = new EventEmitter<string>();
@@ -29,14 +28,12 @@ export class InfraSearchBarComponent {
     this.formActive = !this.formActive;
   }
 
-  handleEditVersion(event: { target: { value: string}}) {
-    const search = event.target.value;
-    if ( search !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(search)) {
-      this.error = true;
-      this.disabled = true;
-    } else {
-      this.error = false;
-      this.disabled = false;
-    }
-  }
+  // handleEditVersion(event: { target: { value: string}}) {
+  //   const search = event.target.value;
+  //   if ( search !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(search)) {
+  //     this.error = true;
+  //   } else {
+  //     this.error = false;
+  //   }
+  // }
 }

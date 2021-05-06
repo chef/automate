@@ -359,6 +359,7 @@ export class SelectBoxComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         if (this.searchValue !== '' && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(
           this.searchValue)) {
           this.error = true;
+          this.originalItems = [];
         } else {
           this.error = false;
           this.getRecipes(this.searchValue);

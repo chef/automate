@@ -16,6 +16,7 @@ import { DataBagItems, DataBagsItemDetails } from 'app/entities/data-bags/data-b
 import { getAllStatus, dataBagItemList, deleteStatus } from 'app/entities/data-bags/data-bag-details.selector';
 import { GetDataBagItemDetails } from 'app/entities/data-bags/data-bag-item-details.actions';
 import { dataBagItemDetailsFromRoute, getStatus  } from 'app/entities/data-bags/data-bag-item-details.selector';
+import { Regex } from 'app/helpers/auth/regex';
 
 export type DataBagsDetailsTab = 'details';
 
@@ -159,7 +160,13 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
     this.searching = true;
     this.current_page = 1;
     this.searchValue = currentText;
-    this.getDataBagItemsData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.searching = false;
+      this.dataBagItems.length = 0;
+      this.total = 0;
+    } else {
+      this.getDataBagItemsData();
+    }
   }
 
   onPageChange(event: number): void {

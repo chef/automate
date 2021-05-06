@@ -25,6 +25,7 @@ import {
   getAllStatus as getAllRecipesForOrgStatus
 } from 'app/entities/recipes/recipe.selectors';
 import { EntityStatus } from 'app/entities/entities';
+import { Regex } from 'app/helpers/auth/regex';
 
 export interface AvailableType {
   name: string;
@@ -100,7 +101,13 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.searching = true;
     this.searchValue = currentText;
-    this.getRolesData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.searching = false;
+      this.roles.length = 0;
+      this.total = 0;
+    } else {
+      this.getRolesData();
+    }
   }
 
   onPageChange(event: number): void {

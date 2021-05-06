@@ -13,18 +13,14 @@
     placeholder="Search {{ placeHolder }}"
     aria-label="Search"
     autocomplete="off"
-    data-cy="search-filter"
-    (keyup)="handleEditVersion($event)">
+    data-cy="search-filter">
   <button
     type="submit"
     class="primary"
     primary
-    [disabled]="disabled"
     data-cy="search-entity">
     <span aria-hidden="true" class="hidden">Submit Search</span>
     <chef-icon>search</chef-icon>
   </button>
 </form>
-<chef-error *ngIf="error">
-  Only contain 'a-z', 'A-Z', '0-9', '_', '-'.
-</chef-error>
+

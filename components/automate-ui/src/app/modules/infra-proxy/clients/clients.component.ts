@@ -10,6 +10,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { GetClients, DeleteClient } from 'app/entities/clients/client.action';
 import { Client } from 'app/entities/clients/client.model';
 import { getAllStatus, clientList, deleteStatus } from 'app/entities/clients/client.selectors';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-clients',
@@ -81,7 +82,13 @@ export class ClientsComponent implements OnInit, OnDestroy {
     this.current_page = 1;
     this.searching = true;
     this.searchValue = currentText;
-    this.getClientsData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.searching = false;
+      this.clients.length = 0;
+      this.total = 0;
+    } else {
+      this.getClientsData();
+    }
   }
 
   onPageChange(event: number): void {
