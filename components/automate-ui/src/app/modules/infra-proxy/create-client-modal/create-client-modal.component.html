@@ -11,7 +11,7 @@
           <chef-error *ngIf="error">{{error}}</chef-error>
           <chef-error
             *ngIf="createForm.get('name').hasError('pattern') && createForm.get('name').dirty">
-            name can only contain 'a-z', 'A-Z', '0-9', '_', '-'.
+            Name can only contain 'a-z', 'A-Z', '0-9', '_', '-'.
           </chef-error>
         </chef-form-field>
         <chef-form-field>
