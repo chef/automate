@@ -34,6 +34,11 @@ describe('InfraNodesComponent', () => {
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
+        MockComponent({
+          selector: 'app-delete-infra-object-modal',
+          inputs: ['default', 'visible', 'objectNoun', 'objectName'],
+          outputs: ['close', 'deleteNode']
+        }),
         InfraNodesComponent
       ],
       providers: [

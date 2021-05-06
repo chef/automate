@@ -170,5 +170,36 @@ describe('infra node list', () => {
         }
       });
     });
+
+    it('can delete node', () => {
+      cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-node-${now}`);
+      cy.get('[data-cy=search-entity]').click();
+      getNodes(`${cypressPrefix}-node-${now}`, 1).then((response) => {
+        if (checkResponse(response)) {
+          cy.get('[data-cy=nodes-table-container]').contains(nodeName).should('exist');
+          cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
+            .contains(nodeName).parent().parent().find('.mat-select-trigger').click();
+
+          cy.get('[data-cy=delete]').should('be.visible')
+            .click();
+          // accept dialog
+          cy.get('app-infra-nodes chef-button').contains('Delete').click();
+          // verify success notification and then dismiss it
+          cy.get('app-notification.info').contains(`Successfully deleted role - ${nodeName}.`);
+          cy.get('app-notification.info chef-icon').click();
+        }
+      });
+
+      getNodes(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+        checkResponse(response);
+      });
+
+      cy.get('[data-cy=search-filter]').clear();
+      cy.get('[data-cy=search-entity]').click();
+      getNodes('', 1).then((response) => {
+        checkResponse(response);
+      });
+    });
+
   });
 });
