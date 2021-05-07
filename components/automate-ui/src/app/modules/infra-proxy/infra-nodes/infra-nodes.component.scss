@@ -99,10 +99,12 @@ img {
     position: absolute;
     right: 0;
   }
+
   &:hover {
     &:before {
       color: $chef-white;
     }
+
   }
 }
 
