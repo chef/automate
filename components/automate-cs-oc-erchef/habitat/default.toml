@@ -20,6 +20,7 @@ max_request_size=4000000
 bulk_fetch_batch_size=5
 base_resource_url="host_header"
 strict_search_result_acls=false
+actions_fqdn="localhost"
 
 [keygen]
 cache_workers = 2
