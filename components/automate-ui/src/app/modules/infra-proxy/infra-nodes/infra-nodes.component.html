@@ -46,7 +46,7 @@
             <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="delete" class="secondary" (onSelectionChange)="startNodeDelete(node)">Delete</mat-option>
+                <mat-option data-cy="delete" class="secondary minus-icon" (onSelectionChange)="startNodeDelete(node)">Delete</mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>

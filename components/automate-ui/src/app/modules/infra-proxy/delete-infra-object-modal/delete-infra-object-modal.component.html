@@ -5,8 +5,8 @@
 
   <div class="right-box">
     <div class="left-align">
-      <chef-icon class="url-failed-icon">warning</chef-icon><span class="object-name"> {{objectName}}</span>
       <div class="title-text">Deleting {{objectNoun | titlecase}}?</div>
+      <p class="object-name"> {{objectName}}</p>
       <ng-container *ngIf="custom === false">
         <div class="action-text">This action is irreversible.</div>
         <div *ngIf="validator" class="client-message">
