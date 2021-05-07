@@ -303,6 +303,21 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 {{< figure src="/images/automate/delete-a-client.png" alt="Delete a Client">}}
 
+### Nodes
+
+A [Node]({{< relref "nodes" >}}) is a communication between the Infra Chef Server and the Infra Clients. Nodes are used when an Infra Client asks for a policy from the Infra Chef Server.
+
+The Chef Infra Server UI lets you:
+
+- Search for a specific Node from a list of nodes.
+- List out all the nodes at one place.
+
+#### Search for a Node
+
+Use the **Search nodes by name** bar to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
+
+{{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
+
 ## Troubleshoot
 
 While fetching any objects like cookbooks, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server.
