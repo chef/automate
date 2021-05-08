@@ -75,13 +75,33 @@
             <form [formGroup]="updateNodeForm">
               <chef-form-field>
                 <span class="label">Environment</span>
-                <mat-select #li panelClass="chef-dropdown" [value]="node.environment">
-                  <!-- (selectionChange)="selectChangeHandler(li.value)"> -->
+                <mat-select #li panelClass="chef-dropdown" formControlName="environment" [value]="node.environment"
+                  (selectionChange)="selectChangeHandler(li.value)">
                   <mat-option *ngFor="let key of environmentsAvailable" [value]="key">
                     {{ key }}
                   </mat-option>
                 </mat-select>
               </chef-form-field>
+              <div *ngIf="confirming" class="changes-confirmation">
+                <p class="change-node-text">Change Node Environment?</p>
+                <div id="button-env">
+                  <chef-button
+                    tertiary
+                    id="cancel"
+                    data-cy="cancel-button"
+                    (click)="closeConfirmationBox()">Cancel</chef-button>
+                  <chef-button
+                    primary
+                    data-cy="save-button"
+                    id="save-btn"
+                    [disabled]="saving"
+                    (click)="saveEnvironment()">
+                    <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                    <span *ngIf="!saving">Save</span>
+                    <span *ngIf="saving">Saving</span>
+                  </chef-button>
+                </div>
+              </div>
             </form>
           </ng-container>
         </div>

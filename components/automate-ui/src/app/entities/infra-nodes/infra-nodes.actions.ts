@@ -12,7 +12,10 @@ export enum NodeActionTypes {
   GET_FAILURE     = 'NODES::GET::FAILURE',
   DELETE          = 'NODES::DELETE',
   DELETE_SUCCESS  = 'NODES::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'NODES::DELETE::FAILURE'
+  DELETE_FAILURE  = 'NODES::DELETE::FAILURE',
+  UPDATE          = 'NODES::UPDATE',
+  UPDATE_SUCCESS  = 'NODES::UPDATE::SUCCESS',
+  UPDATE_FAILURE  = 'NODES::UPDATE::FAILURE'
 }
 
 export interface NodesSuccessPayload {
@@ -27,6 +30,14 @@ export interface NodesPayload {
   page: number;
   per_page: number;
 }
+
+export interface UpdateNodeEnvPayload {
+  name: string;
+  server_id: string;
+  org_id: string;
+  environment: string;
+}
+
 export class GetNodes implements Action {
   readonly type = NodeActionTypes.GET_ALL;
   constructor(public payload: NodesPayload) { }
@@ -70,6 +81,21 @@ export class DeleteNodeFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class UpdateNodeEnvironment implements Action {
+  readonly type = NodeActionTypes.UPDATE;
+  constructor(public payload: { node:  UpdateNodeEnvPayload}) { }
+}
+
+export class UpdateNodeEnvironmentSuccess implements Action {
+  readonly type = NodeActionTypes.UPDATE_SUCCESS;
+  constructor(public payload: {name: string, environment: string}) { }
+}
+
+export class UpdateNodeEnvironmentFailure implements Action {
+  readonly type = NodeActionTypes.UPDATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type NodeActions =
   | GetNodes
   | GetNodesSuccess
@@ -79,4 +105,7 @@ export type NodeActions =
   | GetNodeFailure
   | DeleteNode
   | DeleteNodeSuccess
-  | DeleteNodeFailure;
+  | DeleteNodeFailure
+  | UpdateNodeEnvironment
+  | UpdateNodeEnvironmentSuccess
+  | UpdateNodeEnvironmentFailure;

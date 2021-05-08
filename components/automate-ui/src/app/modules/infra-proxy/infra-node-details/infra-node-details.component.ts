@@ -8,8 +8,8 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { infraNodeFromRoute } from 'app/entities/infra-nodes/infra-nodes.selectors';
-import { GetNode } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { infraNodeFromRoute, updateStatus } from 'app/entities/infra-nodes/infra-nodes.selectors';
+import { GetNode, UpdateNodeEnvironment } from 'app/entities/infra-nodes/infra-nodes.actions';
 import {
   InfraNode
 } from 'app/entities/infra-nodes/infra-nodes.model';
@@ -17,7 +17,7 @@ import {
 import { GetEnvironments } from 'app/entities/environments/environment.action';
 import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
 import { Environment } from 'app/entities/environments/environment.model';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, pending } from 'app/entities/entities';
 
 export type InfraNodeTabName = 'details';
 
@@ -49,18 +49,24 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public environmentListState: { items: Environment[], total: number };
   public total: number;
 
+
+  public saving: boolean = false;
+  public confirming: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) { 
     this.updateNodeForm = this.fb.group({
-      environment: ['', [Validators.required]],
+      environment: [this.node?.environment, [Validators.required]],
     });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
+
+    // load node details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('org-id'), filter(identity)),
@@ -76,7 +82,15 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       }));
     });
 
+    this.store.select(infraNodeFromRoute).pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+    ).subscribe(node => {
+      this.node = node;
+      this.nodeDetailsLoading = false;
+    });
 
+    // load environments list
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(environmentList)
@@ -93,14 +107,20 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-
-    this.store.select(infraNodeFromRoute).pipe(
-      filter(identity),
-      takeUntil(this.isDestroyed)
-    ).subscribe(node => {
-      this.node = node;
-      this.nodeDetailsLoading = false;
+    // update node environment
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.saving && !pending(state)))
+    .subscribe((state) => {
+      this.saving = false;
+      this.saving = (state === EntityStatus.loadingSuccess);
+      if (this.saving) {
+        this.updateNodeForm.markAsPristine();
+      }
+      this.closeConfirmationBox();
     });
+
+    
   }
 
   getEnvironmentData() {
@@ -113,6 +133,30 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new GetEnvironments(payload));
+  }
+
+
+  selectChangeHandler(env: string) {
+    console.log(env);
+    if (this.node.environment !== env) {
+      this.confirming = true;
+    }
+  }
+
+  closeConfirmationBox() {
+    this.confirming = false;
+  }
+
+  saveEnvironment() {
+    debugger
+    this.saving = true;
+    const updatedNode = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.node.name,
+      environment: this.updateNodeForm.controls.environment.value.trim()
+    };
+    this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
   }
 
   ngOnDestroy(): void {

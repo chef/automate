@@ -25,6 +25,11 @@ export const getStatus = createSelector(
   (state) => state.getStatus
 );
 
+export const updateStatus = createSelector(
+  infraNodeState,
+  (state) => state.updateStatus
+);
+
 export const nodeList = createSelector(
   infraNodeState,
   (state) => state.nodeList

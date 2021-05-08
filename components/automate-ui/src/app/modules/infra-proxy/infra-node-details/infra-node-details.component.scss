@@ -169,3 +169,34 @@ chef-loading-spinner {
     }
   }
 }
+
+p.change-node-text {
+  font-size: 18px;
+  font-weight: 700;
+  padding-top: 5px;
+  padding-left: 8px;
+}
+
+.changes-confirmation {
+  background: $chef-white;
+  width: 600px;
+  padding: 6px;
+  border-radius: 4px;
+  position: absolute;
+  box-shadow: 0px 0px 10px 0px $chef-modal;
+  margin-top: -20px;
+
+  chef-button {
+    height: 36px;
+  }
+
+  chef-loading-spinner {
+    top: 2px;
+    width: auto;
+    margin-right: 10px;
+  }
+}
+
+div#button-env {
+  float: right;
+}

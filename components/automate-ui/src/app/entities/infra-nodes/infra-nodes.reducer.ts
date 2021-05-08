@@ -8,7 +8,8 @@ import { InfraNode } from './infra-nodes.model';
 export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodesStatus: EntityStatus;
   getAllStatus: EntityStatus;
-  getStatus: EntityStatus.notLoaded
+  getStatus: EntityStatus.notLoaded;
+  updateStatus: EntityStatus;
   nodeList: {
     items: InfraNode[],
     total: number
@@ -19,6 +20,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
 const GET_ALL_STATUS = 'getAllStatus';
 const DELETE_STATUS = 'deleteStatus';
 const GET_STATUS = 'getStatus';
+const UPDATE_STATUS = 'updateStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
   selectId: (infraNode: InfraNode) => infraNode.name
@@ -75,6 +77,19 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
+
+    case NodeActionTypes.UPDATE:
+      return set(UPDATE_STATUS, EntityStatus.loading, state);
+
+    case NodeActionTypes.UPDATE_SUCCESS:
+      return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
+        nodeEntityAdapter.updateOne({
+          id: action.payload.name,
+          changes: action.payload
+        }, state));
+
+    case NodeActionTypes.UPDATE_FAILURE:
+      return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

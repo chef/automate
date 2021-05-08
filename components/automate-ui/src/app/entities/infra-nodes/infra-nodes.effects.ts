@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map } from 'rxjs/operators';
-
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 
@@ -14,6 +14,9 @@ import {
   GetNode,
   GetNodeSuccess,
   GetNodeFailure,
+  UpdateNodeEnvironment,
+  UpdateNodeEnvironmentSuccess,
+  UpdateNodeEnvironmentFailure,
   DeleteNode,
   DeleteNodeSuccess,
   DeleteNodeFailure,
@@ -100,4 +103,30 @@ export class InfraNodeEffects {
           message: `Could not get node: ${msg || payload.error}`
         });
     })));
+  
+  updateNodeEnvironment$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE),
+      mergeMap(({ payload }: UpdateNodeEnvironment) =>
+        this.requests.updateNodeEnvironment(payload.node).pipe(
+          map((resp) => new UpdateNodeEnvironmentSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UpdateNodeEnvironmentFailure(error)))))));
+
+  updateNodeEnvironmentSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_SUCCESS),
+      map(({ }: UpdateNodeEnvironmentSuccess) => new CreateNotification({
+        type: Type.info,
+        message: `Successfully updated node environment.`
+      }))));
+
+  updateNodeEnvironmentFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_FAILURE),
+      filter(({ payload }: UpdateNodeEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
+      map(({ payload }: UpdateNodeEnvironmentFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not update node environment: ${payload.error.error || payload}.`
+      }))));
 }
