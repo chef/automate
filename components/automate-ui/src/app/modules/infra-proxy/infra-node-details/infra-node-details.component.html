@@ -1,0 +1,91 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
+         {{node?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{node?.name}}</chef-heading>
+        <div class="meta-box" *ngIf="!nodeDetailsLoading">
+          <div class="summary-body">
+            <table>
+              <tr>
+                <th>
+                  <p class="meta-head">NODE INFROMATION</p>
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  Environment
+                </th>
+                <td>{{node?.environment}}</td>
+              </tr>
+              <tr>
+                <th>
+                  Policy Group
+                </th>
+                <td>{{node?.policy_group === '' ? '--' : node?.policy_group}}</td>
+              </tr>
+              <tr>
+                <th>
+                  Policy Name
+                </th>
+                <td>{{node?.policy_name === '' ? '--' : node?.policy_name}}</td>
+              </tr>
+            </table>
+            <table>
+              <tr>
+                <th>
+                  <p class="meta-head">METADATA</p>
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  Chef Server
+                </th>
+                <td>
+                  {{serverId}}
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  Chef Organization
+                </th>
+                <td>
+                  {{orgId}}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='runList' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="details-tab" *ngIf="!nodeDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <ng-container *ngIf="!nodeDetailsLoading">
+            <form [formGroup]="updateNodeForm">
+              <chef-form-field>
+                <span class="label">Environment</span>
+                <mat-select #li panelClass="chef-dropdown" [value]="node.environment">
+                  <!-- (selectionChange)="selectChangeHandler(li.value)"> -->
+                  <mat-option *ngFor="let key of environmentsAvailable" [value]="key">
+                    {{ key }}
+                  </mat-option>
+                </mat-select>
+              </chef-form-field>
+            </form>
+          </ng-container>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

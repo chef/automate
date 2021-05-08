@@ -8,6 +8,7 @@ import { InfraNode } from './infra-nodes.model';
 export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodesStatus: EntityStatus;
   getAllStatus: EntityStatus;
+  getStatus: EntityStatus.notLoaded
   nodeList: {
     items: InfraNode[],
     total: number
@@ -17,8 +18,11 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
 
 const GET_ALL_STATUS = 'getAllStatus';
 const DELETE_STATUS = 'deleteStatus';
+const GET_STATUS = 'getStatus';
 
-export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>();
+export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
+  selectId: (infraNode: InfraNode) => infraNode.name
+});
 
 export const InfraNodeEntityInitialState: InfraNodeEntityState =
   nodeEntityAdapter.getInitialState(<InfraNodeEntityState>{
@@ -58,6 +62,19 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.DELETE_FAILURE:
       return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
+    case NodeActionTypes.GET:
+      return set(
+        GET_STATUS,
+        EntityStatus.loading,
+        nodeEntityAdapter.removeAll(state)
+      ) as InfraNodeEntityState;
+
+    case NodeActionTypes.GET_SUCCESS:
+      return set(GET_STATUS, EntityStatus.loadingSuccess,
+        nodeEntityAdapter.addOne(action.payload, state));
+
+    case NodeActionTypes.GET_FAILURE:
+      return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

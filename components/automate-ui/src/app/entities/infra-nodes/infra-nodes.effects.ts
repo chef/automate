@@ -10,12 +10,15 @@ import { Type } from 'app/entities/notifications/notification.model';
 import {
   GetNodes,
   GetNodesSuccess,
-  NodesSuccessPayload,
   GetNodesFailure,
-  NodeActionTypes,
+  GetNode,
+  GetNodeSuccess,
+  GetNodeFailure,
   DeleteNode,
   DeleteNodeSuccess,
-  DeleteNodeFailure
+  DeleteNodeFailure,
+  NodesSuccessPayload,
+  NodeActionTypes
 } from './infra-nodes.actions';
 
 import {
@@ -79,4 +82,22 @@ export class InfraNodeEffects {
         });
     })));
 
+  getNode$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.GET),
+      mergeMap(({ payload: { server_id, org_id, name } }: GetNode) =>
+        this.requests.getNode(server_id, org_id, name).pipe(
+          map((resp) => new GetNodeSuccess(resp)),
+          catchError((error: HttpErrorResponse) => observableOf(new GetNodeFailure(error)))))));
+
+  getNodeFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.GET_FAILURE),
+      map(({ payload }: GetNodeFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get node: ${msg || payload.error}`
+        });
+    })));
 }

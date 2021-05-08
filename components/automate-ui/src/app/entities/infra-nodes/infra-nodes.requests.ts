@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { NodesPayload, NodesSuccessPayload } from './infra-nodes.actions';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
+import {
+  InfraNode
+} from 'app/entities/infra-nodes/infra-nodes.model';
 
 const headers = new HttpHeaders().set(InterceptorSkipHeader, '');
 
@@ -26,9 +29,13 @@ export class InfraNodeRequests {
     return this.http.get<NodesSuccessPayload>(url, {headers});
   }
 
+  public getNode(server_id: string, org_id: string, name: string): Observable<InfraNode> {
+    return this.http.get<InfraNode>(
+        `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/nodes/${name}`, {headers});
+  }
+
   public deleteNode(server_id: string, org_id: string, name: string): Observable<{}> {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/nodes/${name}`,
     {headers});
   }
-
 }

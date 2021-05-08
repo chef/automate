@@ -1,0 +1,171 @@
+@import "~styles/variables";
+@import '../infra_shared/shared';
+@import '../../../../app/page-components/json-tree/json-tree.component.scss';
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-loading-spinner {
+  z-index: 199;
+}
+
+.page-body {
+  margin-right: 33px;
+
+  chef-loading-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+}
+
+.summary-body {
+  display: flex;
+  padding: 1em;
+  background: $chef-white;
+
+  table {
+    width: 25%;
+    font-size: 14px;
+
+    &:first-child {
+      border-right: 1px solid $chef-grey;
+
+      tr {
+        td {
+          padding-right: 2.25em;
+        }
+      }
+    }
+
+    &:last-child {
+      tr {
+        th {
+          padding-left: 2.25em;
+        }
+      }
+    }
+
+    tr {
+      margin: 0;
+
+      th,
+      td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+        word-break: break-all;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      td {
+        flex-grow: 2;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-light-grey;
+      }
+    }
+  }
+}
+
+.meta-box {
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  color: $chef-black;
+  margin-bottom: 36px;
+}
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 27px;
+
+  .mat-option {
+    line-height: 3em;
+    font-size: 12px;
+    height: 3em;
+    border: 1px solid $chef-key-tab;
+    height: 37px;
+  }
+}
+
+::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
+  flex-basis: auto;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
+  background: $chef-white;
+  color: $chef-black;
+}
+
+::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
+  line-height: 3em;
+  font-size: 12px;
+  height: 3em;
+  border: 1px solid $chef-key-tab;
+  height: 37px;
+}
+
+::ng-deep [panelClass=chef-dropdown] {
+  height: 36px;
+  padding: 8px 12px 9px 16px;
+  border: 1px solid $chef-form-input;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+::ng-deep [panelClass=chef-dropdown]:focus {
+  border-color: $chef-form-input;
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -16px !important;
+  transform: none !important;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 999999999;
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-color: $chef-white transparent transparent transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  border: 6px solid $chef-primary-bright;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+::ng-deep .mat-select-disabled .mat-select-value {
+  color: $chef-black;
+}
+
+.details-tab {
+  form {
+    chef-form-field {
+      width: 600px;
+      margin-bottom: 30px;
+    }
+  }
+}
