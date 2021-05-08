@@ -177,3 +177,22 @@ func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAt
 
 	return nl
 }
+
+func (a *InfraProxyServer) GetNodeExpandedRunList(ctx context.Context, r *gwreq.NodeExpandedRunList) (*gwres.NodeExpandedRunList, error) {
+	req := &infra_req.NodeExpandedRunList{
+		OrgId:       r.OrgId,
+		ServerId:    r.ServerId,
+		Name:        r.Name,
+		Environment: r.Environment,
+	}
+
+	res, err := a.client.GetNodeExpandedRunList(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.NodeExpandedRunList{
+		Id:      res.GetId(),
+		RunList: fromUpsteamRunList(res.GetRunList()),
+	}, nil
+}

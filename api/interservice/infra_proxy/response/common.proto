@@ -1,0 +1,22 @@
+
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message RunList {
+    // Run list item type (e.g. 'recipe').
+    string type = 1;
+    // Run list item name.
+    string name = 2;
+    // Run list item version.
+    string version = 3;
+    // Boolean denoting whether or not the run list item was skipped.
+    bool skipped = 4;
+    // Run list item position
+    int32 position = 5;
+    // Run list error
+    string error = 6;
+    // List of the run list.
+    repeated RunList children = 7;
+}
