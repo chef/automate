@@ -1,0 +1,5 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+exec user-settings-service

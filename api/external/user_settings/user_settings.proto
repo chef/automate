@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package chef.automate.api.user_settings;
+option go_package = "github.com/chef/automate/api/external/user_settings";
+
+import "google/api/annotations.proto";
+import "external/annotations/iam/annotations.proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+// UserSettings allows accessing of user settings
+service UserSettingsService {
+	//
+	// Global
+	//
+
+	// GetUserSettings returns all of the preferences for a given user
+	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {
+		option (google.api.http).get = "/api/v0/user/{id}/settings";
+		option (chef.automate.api.iam.policy) = {
+			resource: "global:userSettings"
+			action: "global:userSettings:get"
+		};
+	};
+
+	// UpdateUserSettings upserts all of the preferences for a given user
+	rpc UpdateUserSettings(UpdateUserSettingsRequest) returns (UpdateUserSettingsResponse) {
+		option (google.api.http) = {
+			put: "/api/v0/user/{id}/settings";
+			body: "*";
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "global:userSettings"
+			action: "global:userSettings:update"
+		};
+	};
+
+	// DeleteUserSettings deletes all settings for a given user
+	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
+		option (google.api.http) = {
+			delete: "/api/v0/user/{id}/settings"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "global:userSettings"
+			action: "global:userSettings:delete"
+		};
+	};
+}
+
+message GetUserSettingsRequest{
+	// ID of the user.
+	string id = 1;
+}
+
+message UpdateUserSettingsRequest{
+	// ID of the user. Cannot be changed. Used to sign in.
+	string id = 1;
+
+	// The user settings to persist.
+	map<string, UserSettingValue> settings = 2;
+}
+
+message DeleteUserSettingsRequest{
+	// ID of the user.
+	string id = 1;
+}
+
+message GetUserSettingsResponse {
+	string id = 1;
+	map<string, UserSettingValue> settings = 2;
+}
+
+message UpdateUserSettingsResponse {
+	string id = 1;
+}
+
+message DeleteUserSettingsResponse {
+	string id = 1;
+}
+
+message UserSettingValue {
+	// Default value for this setting.
+	string default_value = 1;
+	// Value for this setting.
+	string value = 2;
+	// Enabled
+	bool enabled = 3;
+}
+
+
+
+
+
+
+
+
