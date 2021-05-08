@@ -1571,7 +1571,7 @@ func init() {
           },
           {
             "name": "environment",
-            "description": "Role environment.",
+            "description": "Node environment.",
             "in": "path",
             "required": true,
             "type": "string"
