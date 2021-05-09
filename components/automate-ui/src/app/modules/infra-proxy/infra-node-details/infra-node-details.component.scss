@@ -13,10 +13,21 @@ chef-loading-spinner {
 .page-body {
   margin-right: 33px;
 
-  chef-loading-spinner {
+  .top-spinner {
     display: block;
     margin: 100px auto;
     width: 100px;
+  }
+
+  .details-tab {
+    .spinner {
+      chef-loading-spinner {
+        width: auto;
+        z-index: 199;
+        background-color: $chef-white;
+        opacity: 0.7;
+      }
+    }
   }
 }
 
@@ -199,4 +210,94 @@ p.change-node-text {
 
 div#button-env {
   float: right;
+}
+
+.node-tags-box {
+  display: flex;
+  width: 600px;
+  flex-direction: row;
+  font-size: 1em;
+  color: #222435;
+  border-radius: var(--chef-border-radius);
+  overflow: hidden;
+
+  input {
+    border-radius: 4px 0px 0px 4px;
+    height: 36px;
+    transition: 0s; // Remove default transition
+    
+    &:focus {
+      border: 0; // Accessibility is being noted around containing form
+    }
+  }
+  
+  button {
+    background: #E6EBEE;
+    box-shadow: 0 1px 14px #E6EBEE;
+    border: 0.5px solid #3864F2;
+    border-radius: 0px 4px 4px 0px;
+    color: #3864F2;
+    font-size: 14px;
+    height: 36px;
+    width: 75px;
+    cursor: pointer;
+  
+    &:focus {
+      outline: none;
+      border: 1px solid $chef-primary-bright;
+    }
+  }
+}
+
+.tag-note {
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 7px;
+}
+
+.label {
+  font-size: 12px;
+}
+
+.display-node-tags {
+  background: $chef-white;
+  border: 0.5px solid #CFD2D2;
+  box-sizing: border-box;
+  border-radius: 2px;
+  overflow: auto;
+  padding: 0px 0px 18px 8px;
+  width: 600px;
+}
+
+.tag {
+  background-color: #785EF0;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px 8px;
+  height: 28px;
+  margin: 7px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+a.removeTag{
+  cursor: pointer;
+  color: #fff;
+  border: 1px solid white;
+  border-radius: 30px;
+  font-size: 18px;
+  display: inline-block;
+  line-height: 0px;
+  padding: 8px 3px;  
+}
+
+.removeTag:before {
+  content: "×";
+}
+
+.tag a {
+  margin: 18px 0px 0px 6px;
+  font-weight: 700;
 }

@@ -66,16 +66,17 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
         <div class="details-tab" *ngIf="!nodeDetailsLoading">
           <div class="spinner">
             <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!nodeDetailsLoading">
             <form [formGroup]="updateNodeForm">
               <chef-form-field>
                 <span class="label">Environment</span>
-                <mat-select #li panelClass="chef-dropdown" formControlName="environment" [value]="node.environment"
+                <mat-select #li panelClass="chef-dropdown" formControlName="environment" [value]="node?.environment"
                   (selectionChange)="selectChangeHandler(li.value)">
                   <mat-option *ngFor="let key of environmentsAvailable" [value]="key">
                     {{ key }}
@@ -103,6 +104,29 @@
                 </div>
               </div>
             </form>
+
+            <span class="label">Tags</span>
+            <div class="node-tags-box">
+              <input 
+                chefInput
+                type="text"
+                id="tag-input"
+                [(ngModel)]="inputTxt"/>
+              <button
+                primary
+                type="submit"
+                class="primary"
+                [disabled]= "inputTxt === ''"
+                data-cy="add-tag"
+                (click)="addTags()"> Add </button>
+            </div>
+            <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
+            <div *ngIf="nodeTags?.length" class="display-node-tags">
+              <span *ngFor="let tag of nodeTags" class="tag">
+                {{tag}}
+                <a class="removeTag" (click)="removeTag(tag)"></a>
+              </span>
+            </div>
           </ng-container>
         </div>
       </section>

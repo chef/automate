@@ -2,7 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { NodesPayload, NodesSuccessPayload, UpdateNodeEnvPayload } from './infra-nodes.actions';
+import {
+  NodesPayload,
+  NodesSuccessPayload,
+  UpdateNodeEnvPayload,
+  UpdateNodeTagPayload
+} from './infra-nodes.actions';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 import {
   InfraNode
@@ -36,6 +41,12 @@ export class InfraNodeRequests {
   public updateNodeEnvironment(node: UpdateNodeEnvPayload): Observable<UpdateNodeEnvPayload> {
     return this.http.put<UpdateNodeEnvPayload>(
       `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/environment`,
+      node);
+  }
+
+  public updateNodeTags(node: UpdateNodeTagPayload): Observable<UpdateNodeTagPayload> {
+    return this.http.put<UpdateNodeTagPayload>(
+      `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/tags`,
       node);
   }
 

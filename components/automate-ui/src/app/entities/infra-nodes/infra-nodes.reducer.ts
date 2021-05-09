@@ -8,19 +8,22 @@ import { InfraNode } from './infra-nodes.model';
 export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodesStatus: EntityStatus;
   getAllStatus: EntityStatus;
-  getStatus: EntityStatus.notLoaded;
-  updateStatus: EntityStatus;
+  getStatus: EntityStatus;
+  updateEnvStatus: EntityStatus;
+  updateTagsStatus:EntityStatus;
   nodeList: {
     items: InfraNode[],
     total: number
   };
   deleteStatus: EntityStatus;
+  nodeTags: string[];
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
 const DELETE_STATUS = 'deleteStatus';
 const GET_STATUS = 'getStatus';
-const UPDATE_STATUS = 'updateStatus';
+const UPDATE_ENVIRONMENT_STATUS = 'updateEnvStatus';
+const UPDATE_TAGS_STATUS = 'updateTagsStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
   selectId: (infraNode: InfraNode) => infraNode.name
@@ -78,18 +81,26 @@ export function infraNodeEntityReducer(
     case NodeActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
-    case NodeActionTypes.UPDATE:
-      return set(UPDATE_STATUS, EntityStatus.loading, state);
+    case NodeActionTypes.UPDATE_ENVIRONMENT:
+      return set(UPDATE_ENVIRONMENT_STATUS, EntityStatus.loading, state);
 
-    case NodeActionTypes.UPDATE_SUCCESS:
-      return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
-        nodeEntityAdapter.updateOne({
-          id: action.payload.name,
-          changes: action.payload
-        }, state));
+    case NodeActionTypes.UPDATE_ENVIRONMENT_SUCCESS:
+      return set(UPDATE_ENVIRONMENT_STATUS, EntityStatus.loadingSuccess, state);
 
-    case NodeActionTypes.UPDATE_FAILURE:
-      return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
+    case NodeActionTypes.UPDATE_ENVIRONMENT_FAILURE:
+      return set(UPDATE_ENVIRONMENT_STATUS, EntityStatus.loadingFailure, state);
+    
+    case NodeActionTypes.UPDATE_TAGS:
+      return set(UPDATE_TAGS_STATUS, EntityStatus.loading, state);
+
+    case NodeActionTypes.UPDATE_TAGS_SUCCESS:
+      return pipe(
+        set(UPDATE_TAGS_STATUS, EntityStatus.loadingSuccess),
+        set('nodeTags', action.payload.tags || [])
+        )(state) as InfraNodeEntityState;
+
+    case NodeActionTypes.UPDATE_TAGS_FAILURE:
+      return set(UPDATE_TAGS_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

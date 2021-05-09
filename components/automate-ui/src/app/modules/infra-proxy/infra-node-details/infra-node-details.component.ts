@@ -8,8 +8,13 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { infraNodeFromRoute, updateStatus } from 'app/entities/infra-nodes/infra-nodes.selectors';
-import { GetNode, UpdateNodeEnvironment } from 'app/entities/infra-nodes/infra-nodes.actions';
+import {
+  infraNodeFromRoute,
+  updateEnvStatus,
+  updateTagsStatus,
+  nodeTags
+} from 'app/entities/infra-nodes/infra-nodes.selectors';
+import { GetNode, UpdateNodeEnvironment, UpdateNodeTags } from 'app/entities/infra-nodes/infra-nodes.actions';
 import {
   InfraNode
 } from 'app/entities/infra-nodes/infra-nodes.model';
@@ -49,9 +54,14 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public environmentListState: { items: Environment[], total: number };
   public total: number;
 
-
   public saving: boolean = false;
   public confirming: boolean = false;
+
+
+  public tags: string[];
+  public nodeTags: string[];
+  public inputTxt = '';
+  public updatingTags = false;
 
   constructor(
     private fb: FormBuilder,
@@ -87,6 +97,8 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(node => {
       this.node = node;
+      this.nodeTags = node.tags;
+      this.tags = this.nodeTags;
       this.nodeDetailsLoading = false;
     });
 
@@ -108,7 +120,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     });
 
     // update node environment
-    this.store.select(updateStatus).pipe(
+    this.store.select(updateEnvStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.saving && !pending(state)))
     .subscribe((state) => {
@@ -120,7 +132,20 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       this.closeConfirmationBox();
     });
 
-    
+    // update node tags
+    combineLatest([
+      this.store.select(updateTagsStatus),
+      this.store.select(nodeTags)
+    ]).pipe(takeUntil(this.isDestroyed)).subscribe(([getTagsSt, TagsState]) => {
+      if (getTagsSt === EntityStatus.loadingSuccess && !isNil(TagsState)) {
+        this.nodeTags = TagsState;
+        this.tags = this.nodeTags;
+        this.updatingTags = false;
+      } else if (getTagsSt === EntityStatus.loadingFailure){
+        this.nodeTags = this.tags;
+        this.updatingTags = false;
+      }
+    });
   }
 
   getEnvironmentData() {
@@ -148,7 +173,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   }
 
   saveEnvironment() {
-    debugger
     this.saving = true;
     const updatedNode = {
       org_id: this.orgId,
@@ -157,6 +181,30 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       environment: this.updateNodeForm.controls.environment.value.trim()
     };
     this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
+  }
+
+
+  // add tags
+  addTags() {    
+    if(this.inputTxt != ''){
+      this.updatingTags = true
+      this.tags.push(this.inputTxt);
+      this.inputTxt = '';
+      const updatedNode = {
+        org_id: this.orgId,
+        server_id: this.serverId,
+        name: this.node.name,
+        action: 'add',
+        tags: this.tags
+      };
+      this.store.dispatch(new UpdateNodeTags({node: updatedNode}));
+    }
+  }
+
+  removeTag(tag: string){
+    this.tags.forEach((element,index)=>{
+      if (element == tag) this.tags.splice(index,1);
+   });
   }
 
   ngOnDestroy(): void {

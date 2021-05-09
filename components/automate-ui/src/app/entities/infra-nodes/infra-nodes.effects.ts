@@ -17,6 +17,9 @@ import {
   UpdateNodeEnvironment,
   UpdateNodeEnvironmentSuccess,
   UpdateNodeEnvironmentFailure,
+  UpdateNodeTags,
+  UpdateNodeTagsSuccess,
+  UpdateNodeTagsFailure,
   DeleteNode,
   DeleteNodeSuccess,
   DeleteNodeFailure,
@@ -106,7 +109,7 @@ export class InfraNodeEffects {
   
   updateNodeEnvironment$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NodeActionTypes.UPDATE),
+      ofType(NodeActionTypes.UPDATE_ENVIRONMENT),
       mergeMap(({ payload }: UpdateNodeEnvironment) =>
         this.requests.updateNodeEnvironment(payload.node).pipe(
           map((resp) => new UpdateNodeEnvironmentSuccess(resp)),
@@ -115,7 +118,7 @@ export class InfraNodeEffects {
 
   updateNodeEnvironmentSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NodeActionTypes.UPDATE_SUCCESS),
+      ofType(NodeActionTypes.UPDATE_ENVIRONMENT_SUCCESS),
       map(({ }: UpdateNodeEnvironmentSuccess) => new CreateNotification({
         type: Type.info,
         message: `Successfully updated node environment.`
@@ -123,10 +126,36 @@ export class InfraNodeEffects {
 
   updateNodeEnvironmentFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NodeActionTypes.UPDATE_FAILURE),
+      ofType(NodeActionTypes.UPDATE_ENVIRONMENT_FAILURE),
       filter(({ payload }: UpdateNodeEnvironmentFailure) => payload.status !== HttpStatus.CONFLICT),
       map(({ payload }: UpdateNodeEnvironmentFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not update node environment: ${payload.error.error || payload}.`
+      }))));
+  
+  updateNodeTags$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_TAGS),
+      mergeMap(({ payload }: UpdateNodeTags) =>
+        this.requests.updateNodeTags(payload.node).pipe(
+          map((resp) => new UpdateNodeTagsSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UpdateNodeTagsFailure(error)))))));
+
+  updateNodeTagsSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_TAGS_SUCCESS),
+      map(({ }: UpdateNodeTagsSuccess) => new CreateNotification({
+        type: Type.info,
+        message: `Successfully updated node tags.`
+      }))));
+
+  updateNodeTagsFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_TAGS_FAILURE),
+      filter(({ payload }: UpdateNodeTagsFailure) => payload.status !== HttpStatus.CONFLICT),
+      map(({ payload }: UpdateNodeTagsFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not update node tags: ${payload.error.error || payload}.`
       }))));
 }

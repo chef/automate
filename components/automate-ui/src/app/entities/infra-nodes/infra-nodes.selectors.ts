@@ -25,14 +25,24 @@ export const getStatus = createSelector(
   (state) => state.getStatus
 );
 
-export const updateStatus = createSelector(
+export const updateEnvStatus = createSelector(
   infraNodeState,
-  (state) => state.updateStatus
+  (state) => state.updateEnvStatus
+);
+
+export const updateTagsStatus = createSelector(
+  infraNodeState,
+  (state) => state.updateTagsStatus
 );
 
 export const nodeList = createSelector(
   infraNodeState,
   (state) => state.nodeList
+);
+
+export const nodeTags = createSelector(
+  infraNodeState,
+  (state) => state.nodeTags
 );
 
 export const deleteStatus = createSelector(
