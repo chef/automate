@@ -73,7 +73,7 @@
             <chef-loading-spinner *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!nodeDetailsLoading">
-            <form [formGroup]="updateNodeForm">
+            <form [ngClass]="confirming === true ? 'auto-height' : ''" [formGroup]="updateNodeForm">
               <chef-form-field>
                 <span class="label">Environment</span>
                 <mat-select #li panelClass="chef-dropdown" formControlName="environment" [value]="node?.environment"

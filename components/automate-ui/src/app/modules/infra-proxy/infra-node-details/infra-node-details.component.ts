@@ -60,6 +60,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   public tags: string[];
   public nodeTags: string[];
+  public removeTags: string[] = [];
   public inputTxt = '';
   public updatingTags = false;
 
@@ -184,27 +185,34 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   }
 
 
-  // add tags
+  // update tags
+
+  updateTags(action: string, tags: string[]) {
+    this.updatingTags = true
+    const updatedNode = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.node.name,
+      action: action,
+      tags: tags
+    };
+    this.store.dispatch(new UpdateNodeTags({node: updatedNode}));
+  }
+
   addTags() {    
     if(this.inputTxt != ''){
-      this.updatingTags = true
       this.tags.push(this.inputTxt);
       this.inputTxt = '';
-      const updatedNode = {
-        org_id: this.orgId,
-        server_id: this.serverId,
-        name: this.node.name,
-        action: 'add',
-        tags: this.tags
-      };
-      this.store.dispatch(new UpdateNodeTags({node: updatedNode}));
+      this.updateTags('add', this.tags)
     }
   }
 
   removeTag(tag: string){
     this.tags.forEach((element,index)=>{
       if (element == tag) this.tags.splice(index,1);
-   });
+    });
+    this.removeTags.push(tag)
+    this.updateTags('delete', this.removeTags)
   }
 
   ngOnDestroy(): void {
