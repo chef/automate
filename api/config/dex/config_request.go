@@ -218,19 +218,31 @@ func (c *ConfigRequest) SetGlobalConfig(g *shared.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = GlobalLogLevelToDexLevel(logLevel)
 	}
 
-	c.V1.Sys.Disclosure.Show.Value = g.GetV1().GetDisclosure().GetShow().GetValue()
+	if g.GetV1().GetDisclosure().GetShow() != nil {
+		c.V1.Sys.Disclosure.Show.Value = g.GetV1().GetDisclosure().GetShow().GetValue()
 
-	if messageFilePath := g.GetV1().GetDisclosure().GetMessageFilePath().GetValue(); messageFilePath != "" {
-		fileContent, _ := ioutil.ReadFile(messageFilePath)
-		message := strings.TrimSuffix(string(fileContent), "\n")
-		message = strings.Replace(message, `"`, `\"`, -1)
-		c.V1.Sys.Disclosure.DisclosureMessage.Value = message
+		if messageFilePath := g.GetV1().GetDisclosure().GetMessageFilePath().GetValue(); messageFilePath != "" {
+			fileContent, _ := ioutil.ReadFile(messageFilePath)
+			message := strings.TrimSuffix(string(fileContent), "\n")
+			message = strings.Replace(message, `"`, `\"`, -1)
+			c.V1.Sys.Disclosure.DisclosureMessage.Value = message
+		}
 	}
 
-	c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
-	c.V1.Sys.Banner.Message.Value = g.GetV1().GetBanner().GetMessage().GetValue()
-	c.V1.Sys.Banner.TextColor.Value = g.GetV1().GetBanner().GetTextColor().GetValue()
-	c.V1.Sys.Banner.BackgroundColor.Value = g.GetV1().GetBanner().GetBackgroundColor().GetValue()
+	if g.GetV1().GetDisclosure().GetShow() != nil {
+		c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
+		if bannerMessage := g.GetV1().GetBanner().GetMessage().GetValue(); bannerMessage != "" {
+			c.V1.Sys.Banner.Message.Value = bannerMessage
+		}
+
+		if textColor := g.GetV1().GetBanner().GetTextColor().GetValue(); textColor != "" {
+			c.V1.Sys.Banner.TextColor.Value = textColor
+		}
+
+		if backgroundColor := g.GetV1().GetBanner().GetBackgroundColor().GetValue(); backgroundColor != "" {
+			c.V1.Sys.Banner.BackgroundColor.Value = backgroundColor
+		}
+	}
 }
 
 // Convert the accepted GlobalLogLevels to a log level accepted by
