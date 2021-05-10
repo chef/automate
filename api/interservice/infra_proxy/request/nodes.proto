@@ -92,6 +92,6 @@ message NodeExpandedRunList {
     string server_id = 2;
     // Node name.
     string name = 3;
-    // Node environment.
+    // Node environment
     string environment = 4;
 }
