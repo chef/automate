@@ -201,6 +201,7 @@ import {
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
 
+import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component'
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
 @NgModule({
@@ -260,7 +261,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TelemetryCheckboxComponent,
     TopNavLandingComponent,
     UIComponent,
-    WelcomeModalComponent
+    WelcomeModalComponent,
+    WarningBannerComponent
   ],
   imports: [
     ApiTokenModule,
