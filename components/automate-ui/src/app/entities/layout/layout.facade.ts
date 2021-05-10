@@ -18,6 +18,7 @@ import { ShowPageLoading } from './layout.actions';
 enum Height {
   Navigation = 70,
   License = 39,
+  WarningBanner = 39,
   ProcessProgressBar = 54,
   PendingEditsBar = 52
 }
@@ -42,6 +43,7 @@ export class LayoutFacadeService {
     header: {
       display: true,
       license: false,
+      warningBanner: true, // This will be set to false by default when real
       navigation: true
     },
     sidebar: {
@@ -88,6 +90,9 @@ export class LayoutFacadeService {
     }
     if (this.layout.header.license) {
       combinedHeights += Height.License;
+    }
+    if (this.layout.header.warningBanner) {
+      combinedHeights += Height.WarningBanner;
     }
     // order matters for these two: pending is suppressed if processing
     if (this.layout.userNotifications.updatesProcessing) {
