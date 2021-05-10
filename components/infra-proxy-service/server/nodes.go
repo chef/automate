@@ -292,7 +292,7 @@ func (s *Server) UpdateNodeAttributes(ctx context.Context, req *request.UpdateNo
 	}, nil
 }
 
-// GetNodeExpandedRunList fetchs the expanded runlist of a node
+// GetNodeExpandedRunList fetches the expanded runlist of a node
 func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeExpandedRunList) (*response.NodeExpandedRunList, error) {
 	err := validation.New(validation.Options{
 		Target:  "role",
