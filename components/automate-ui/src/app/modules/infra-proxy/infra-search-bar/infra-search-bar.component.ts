@@ -27,13 +27,4 @@ export class InfraSearchBarComponent {
   toggleFocus(): void {
     this.formActive = !this.formActive;
   }
-
-  // handleEditVersion(event: { target: { value: string}}) {
-  //   const search = event.target.value;
-  //   if ( search !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(search)) {
-  //     this.error = true;
-  //   } else {
-  //     this.error = false;
-  //   }
-  // }
 }
