@@ -10,6 +10,7 @@ layout = "data-api"
 style_sheet = "/automate-api-styles.css"
 api_file_path = "/automate-api-docs/all-apis.swagger.json"
 return_page = "/automate/"
+description = "Chef Automate API documentation."
 
 [menu]
   [menu.automate]
