@@ -12,9 +12,11 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
     items: InfraNode[],
     total: number
   };
+  deleteStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const DELETE_STATUS = 'deleteStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>();
 
@@ -40,6 +42,22 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case NodeActionTypes.DELETE:
+      return set(DELETE_STATUS, EntityStatus.loading, state);
+
+    case NodeActionTypes.DELETE_SUCCESS:
+    const nodes =
+        state.nodeList.items.filter(node => node.name !== action.payload.name);
+      const total = state.nodeList.total - 1;
+      return pipe(
+        set(DELETE_STATUS, EntityStatus.loadingSuccess),
+        set('nodeList.items', nodes || []),
+        set('nodeList.total', total || 0)
+      )(state) as InfraNodeEntityState;
+
+    case NodeActionTypes.DELETE_FAILURE:
+      return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

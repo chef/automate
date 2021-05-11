@@ -31,11 +31,14 @@ chef-modal {
     margin-top: 6px;
     margin-bottom: 11px;
     line-height: 40px;
+    letter-spacing: 0.15px;
   }
 
   .action-text {
     font-size: 24px;
     font-weight: 900;
+    line-height: 28px;
+    letter-spacing: 0.25px;
   }
 
   .left-align {
@@ -65,12 +68,10 @@ chef-modal {
     margin: 0px;
   }
 
-  span.object-name {
-    font-weight: 400;
-    margin-top: -2px;
-    margin-left: 7px;
-    position: absolute;
-    text-transform: capitalize;
+  p.object-name {
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 18px;
   }
 }
 
@@ -137,13 +138,17 @@ chef-modal {
     opacity: 0.5;
   }
 
-  .url-failed-icon {
-    color: $chef-critical;
-  }
 }
 
 .client-message {
   font-size: 14px;
   line-height: 20px;
+  margin-top: 10px;
+}
+
+.node-message {
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.25px;
   margin-top: 10px;
 }

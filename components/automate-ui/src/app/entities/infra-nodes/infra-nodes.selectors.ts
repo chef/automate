@@ -22,3 +22,8 @@ export const nodeList = createSelector(
   infraNodeState,
   (state) => state.nodeList
 );
+
+export const deleteStatus = createSelector(
+  infraNodeState,
+  (state) => state.deleteStatus
+);
