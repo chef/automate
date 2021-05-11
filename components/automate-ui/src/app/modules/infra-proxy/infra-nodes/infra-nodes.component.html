@@ -7,7 +7,7 @@
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteNode()"
     objectAction="Delete">
-    </app-delete-infra-object-modal>
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
