@@ -40,8 +40,18 @@ button {
     outline: none;
     border: 1px solid $chef-primary-bright;
   }
+
+  &[disabled] {
+    cursor: auto;
+  }
 }
 
 chef-icon {
   margin-top: 6px;
+}
+
+chef-error {
+  background-color: $chef-critical;
+  color: $chef-white;
+  border-radius: 0 0 4px 4px;
 }

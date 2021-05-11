@@ -11,6 +11,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { By } from '@angular/platform-browser';
 import { GetEnvironmentsSuccess } from 'app/entities/environments/environment.action';
 import { Environment } from 'app/entities/environments/environment.model';
+import { using } from 'app/testing/spec-helpers';
 
 describe('EnvironmentsComponent', () => {
   let component: EnvironmentsComponent;
@@ -70,6 +71,105 @@ describe('EnvironmentsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('#search', () => {
+    describe('search shows no data', () => {
+      using([
+        ['contains tilde.', 'environment~'],
+        ['contains acute, back quote,', 'environment`'],
+        ['contains exclamation mark', 'environment!'],
+        ['contains ampersat, at', 'environment@'],
+        ['contains dollar sign', 'environment$'],
+        ['contains percent.', 'environment%'],
+        ['contains caret or circumflex.,', 'environment^'],
+        ['contains ampersand', 'environment&'],
+        ['contains asterisk', 'environment*'],
+        ['contains open or left parenthesis.', 'environment('],
+        ['contains close or right parenthesis,', 'environment)'],
+        ['contains plus', 'environment+'],
+        ['contains equal', 'environment='],
+        ['contains open brace', 'environment{'],
+        ['contains close brace', 'environment}'],
+        ['contains open bracket', 'environment['],
+        ['contains closed bracket', 'environment]'],
+        ['contains pipe', 'environment|'],
+        ['contains backslash', 'environment\\'],
+        ['contains forward slash', 'environment/'],
+        ['contains colon', 'environment:'],
+        ['contains semicolon.', 'environment;'],
+        ['contains quote', 'environment"'],
+        ['contains apostrophe', 'environment\'test'],
+        ['contains less than', 'environment<'],
+        ['contains greater than', 'environment>'],
+        ['contains comma', 'environment,'],
+        ['contains period, dot', 'environment.'],
+        ['contains question mark', 'environment?'],
+        ['contains space', 'environment test1'],
+        ['has mixed alphabet, number, special character', 'environment-test!+ test1']
+      ], function (description: string, input: string) {
+        it(('when the name ' + description), () => {
+          component.searchEnvironment(input);
+          expect(component.environments.length).toBe(0);
+          expect(component.total).toBe(0);
+        });
+      });
+
+      using([
+        ['contains tilde.', '~'],
+        ['contains acute, back quote,', '`'],
+        ['contains exclamation mark', '!'],
+        ['contains ampersat, at', '@'],
+        ['contains dollar sign', '$'],
+        ['contains percent.', '%'],
+        ['contains caret or circumflex.,', '^'],
+        ['contains ampersand', '&'],
+        ['contains asterisk', '*'],
+        ['contains open or left parenthesis.', '('],
+        ['contains close or right parenthesis,', ')'],
+        ['contains plus', '+'],
+        ['contains equal', '='],
+        ['contains open brace', '{'],
+        ['contains close brace', '}'],
+        ['contains open bracket', '['],
+        ['contains closed bracket', ']'],
+        ['contains pipe', '|'],
+        ['contains backslash', '\\'],
+        ['contains forward slash', '/'],
+        ['contains colon', ':'],
+        ['contains semicolon.', ';'],
+        ['contains quote', '"'],
+        ['contains apostrophe', '\'test'],
+        ['contains less than', '<'],
+        ['contains greater than', '>'],
+        ['contains comma', ','],
+        ['contains period, dot', '.'],
+        ['contains question mark', '?'],
+        ['contains space', '    test1']
+      ], function (description: string, input: string) {
+        it(('when the name only' + description), () => {
+          component.searchEnvironment(input);
+          expect(component.environments.length).toBe(0);
+          expect(component.total).toBe(0);
+        });
+      });
+    });
+
+    describe('the form should be valid', () => {
+      using([
+        ['contains numbers range 0-9.', 'environment123'],
+        ['contains alphabets a-z', 'environment-test'],
+        ['contains underscore.', 'environment_test'],
+        ['contains hyphen, minus, or dash.', 'environment_test-1'],
+        ['has mixed characters', 'environment-Test_10']
+      ], function (description: string, input: string) {
+        it(('when the name ' + description), () => {
+          component.searchEnvironment(input);
+          expect(component.environments.length).not.toBeNull();
+          expect(element.query(By.css('.empty-section'))).toBeNull();
+        });
+      });
+    });
   });
 
   describe('environment list', () => {

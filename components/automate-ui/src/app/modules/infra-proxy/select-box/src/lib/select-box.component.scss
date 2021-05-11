@@ -364,6 +364,13 @@
   color: $chef-black;
 }
 
+chef-error {
+  background-color: $chef-critical;
+  color: $chef-white;
+  border-radius: 0 0 4px 4px;
+  margin-top: -15px;
+}
+
 ::ng-deep mat-select {
   width: 277px;
 }

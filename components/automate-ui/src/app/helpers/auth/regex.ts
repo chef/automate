@@ -12,6 +12,13 @@ export class Regex {
     // NB: neither \S nor ^\s work inside the brackets in this regex language.
     NON_BLANK: '.*[^ ].*',
 
+    // Only allows words or numbers or hyphen or underscore also combined
+    // Will Not allow wildcard alone also not combination also not space
+    // Legal Values: _, -, chef, _state, -chef, 19test, tes-1-9-A_test etc.
+    // Illegal Values: abc*, *chef, c*h*e*f, **, * chef
+    // Allows no special characters except hyphen and underscore.
+    NO_WILDCARD_ALLOW_HYPHEN: /^[0-9a-zA-Z-_]+$/,
+
     // Only allows wildcard alone or words and numbers, but not combined
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **

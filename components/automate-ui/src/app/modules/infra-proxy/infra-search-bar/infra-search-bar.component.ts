@@ -4,6 +4,7 @@ import {
   Output,
   Input
 } from '@angular/core';
+// import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-infra-search-bar',
@@ -14,6 +15,7 @@ import {
 export class InfraSearchBarComponent {
   inputText = '';
   formActive = false;
+  error = false;
 
   @Input() placeHolder: string;
   @Output() searchButtonClick = new EventEmitter<string>();
@@ -25,5 +27,4 @@ export class InfraSearchBarComponent {
   toggleFocus(): void {
     this.formActive = !this.formActive;
   }
-
 }

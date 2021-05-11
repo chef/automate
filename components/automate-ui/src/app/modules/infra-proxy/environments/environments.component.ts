@@ -9,6 +9,7 @@ import { GetEnvironments, DeleteEnvironment } from 'app/entities/environments/en
 import { Environment } from 'app/entities/environments/environment.model';
 import { getAllStatus, deleteStatus, environmentList } from 'app/entities/environments/environment.selectors';
 import { EntityStatus } from 'app/entities/entities';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-environments',
@@ -86,7 +87,13 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
     this.current_page = 1;
     this.searching = true;
     this.searchValue = currentText;
-    this.getEnvironmentData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.searching = false;
+      this.environments.length = 0;
+      this.total = 0;
+    } else {
+      this.getEnvironmentData();
+    }
   }
 
   onPageChange(event: number): void {

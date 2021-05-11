@@ -9,12 +9,16 @@
               <input chefInput formControlName="itemId" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="(createForm.get('itemId').hasError('required') || createForm.get('itemId').hasError('pattern')) && createForm.get('itemId').dirty">
-            Data Bag Item ID is required.
-          </chef-error>
-          <chef-error *ngIf="conflictError">
-            ID "{{createForm.get('itemId').value}}" already exists.
-          </chef-error>
+              *ngIf="createForm.get('itemId').hasError('required') && createForm.get('itemId').dirty">
+              Data Bag Item ID is required.
+            </chef-error>
+            <chef-error *ngIf="conflictError">
+              ID "{{createForm.get('itemId').value}}" already exists.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('itemId').hasError('pattern') && createForm.get('itemId').dirty">
+              ID can only contain 'a-z', '0-9', '_', '-'.
+            </chef-error>
           </chef-form-field>
         </div>
 
