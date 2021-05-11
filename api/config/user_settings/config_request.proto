@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package chef.automate.infra.user_settings;
+package chef.automate.infra.cereal;
 option go_package = "github.com/chef/automate/api/config/user_settings";
 
 import "config/shared/global.proto";
