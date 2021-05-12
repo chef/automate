@@ -119,19 +119,9 @@ Select a specific role to view the details of that particular role. Its contains
 
 The _Details_ contains the Run List, whereas the attributes tab displays the *default* and the *override* attributes of the role.
 
-<<<<<<< HEAD
 {{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
 
 You can edit the *default* and *override* attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
-=======
-**Run List:** The run list contains the *name*, *version* and *type* of that particular role.
-
-// Image
-
-**Attributes:** The attributes tab displays the *default* and the *override* attributes of the role.
-
-// Image
->>>>>>> 23223f13c... some more functionalities added to the role object(an incomplete section though)
 
 #### Delete a Role
 
