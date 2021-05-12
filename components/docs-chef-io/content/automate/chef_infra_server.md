@@ -311,12 +311,19 @@ The Chef Infra Server UI lets you:
 
 - Search for a specific Node from a list of nodes.
 - List out all the nodes at one place.
+- Delete a node
 
 #### Search for a Node
 
 Use the **Search nodes by name** bar to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
 
 {{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
+
+#### Delete a Node
+
+Chef Infra Server lets you delete the existing nodes one at a time. To delete a node, select the ellipses icon and then **Delete**, as illustrated below:
+
+{{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
 ## Troubleshoot
 
