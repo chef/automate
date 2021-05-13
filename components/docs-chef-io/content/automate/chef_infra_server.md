@@ -305,23 +305,23 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 ### Nodes
 
-A [Node]({{< relref "nodes" >}}) is a communication between the Infra Chef Server and the Infra Clients. Nodes are used when an Infra Client asks for a policy from the Infra Chef Server.
+A [Node]({{< relref "nodes" >}}) is a communication between the Chef Infra Server and the Infra Clients. Nodes are used when an Infra Client asks for a policy from the Infra Chef Server.
 
-The Chef Infra Server UI lets you:
+The Chef Infra Server integration lets you:
 
 - Search for a specific Node from a list of nodes.
-- List out all the nodes at one place.
+- View a list of all the connected nodes.
 - Delete a node
 
 #### Search for a Node
 
-Use the **Search nodes by name** bar to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
+Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
 
 {{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
 
 #### Delete a Node
 
-Chef Infra Server lets you delete the existing nodes one at a time. To delete a node, select the ellipses icon and then **Delete**, as illustrated below:
+Delete individual existing nodes by selecting the ellipses icon and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
