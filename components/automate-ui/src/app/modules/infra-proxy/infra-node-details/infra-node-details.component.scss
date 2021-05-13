@@ -28,6 +28,17 @@ chef-loading-spinner {
         opacity: 0.7;
       }
     }
+
+    .node-details-section {
+      width: 600px;
+    }
+
+    form {
+      chef-form-field {
+        width: 600px;
+        margin-bottom: 30px;
+      }
+    }
   }
 }
 
@@ -100,87 +111,104 @@ chef-loading-spinner {
   margin-top: 27px;
 
   .mat-option {
-    line-height: 3em;
-    font-size: 12px;
-    height: 3em;
     border: 1px solid $chef-key-tab;
-    height: 37px;
   }
 }
 
-::ng-deep  .cdk-overlay-pane .mat-select-panel-wrap  {
-  flex-basis: auto;
-}
+// tags css
+.node-tags-box {
+  display: flex;
+  width: 600px;
+  flex-direction: row;
+  font-size: 1em;
+  color: $chef-primary-dark;
+  border-radius: var(--chef-border-radius);
+  overflow: hidden;
 
-::ng-deep .cdk-overlay-pane .mat-select-panel .mat-option.mat-selected:not(.mat-option-multiple) {
-  background: $chef-white;
-  color: $chef-black;
-}
+  input {
+    border-radius: 4px 0px 0px 4px;
+    height: 36px;
+    transition: 0s; // Remove default transition
 
-::ng-deep .cdk-overlay-pane .mat-select-panel ng-container .mat-option {
-  line-height: 3em;
-  font-size: 12px;
-  height: 3em;
-  border: 1px solid $chef-key-tab;
-  height: 37px;
-}
+    &:focus {
+      border: 0;
+    }
+  }
 
-::ng-deep [panelClass=chef-dropdown] {
-  height: 36px;
-  padding: 8px 12px 9px 16px;
-  border: 1px solid $chef-form-input;
-  box-sizing: border-box;
-  border-radius: 4px;
-}
+  button {
+    background: $chef-light-grey;
+    box-shadow: 0 1px 14px $chef-light-grey;
+    border: 0.5px solid $chef-primary-bright;
+    border-radius: 0px 4px 4px 0px;
+    color: $chef-primary-bright;
+    font-size: 14px;
+    height: 36px;
+    width: 75px;
+    cursor: pointer;
 
-::ng-deep [panelClass=chef-dropdown]:focus {
-  border-color: $chef-form-input;
-}
-
-// sass-lint:disable no-important
-::ng-deep .cdk-overlay-container .cdk-overlay-pane {
-  margin-left: -16px !important;
-  transform: none !important;
-}
-
-::ng-deep .cdk-overlay-container {
-  position: fixed;
-  z-index: 999999999;
-}
-
-::ng-deep .mat-select-arrow-wrapper .mat-select-arrow {
-  right: 10px;
-  width: 0;
-  height: 0;
-  border-color: $chef-white transparent transparent transparent;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid;
-  border: 6px solid $chef-primary-bright;
-  border-width: 0 2px 2px 0;
-  padding: 3px;
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-::ng-deep .mat-select-arrow-wrapper .mat-select-arrow:visited {
-  transform: rotate(-135deg);
-  -webkit-transform: rotate(-135deg);
-}
-
-::ng-deep .mat-select-disabled .mat-select-value {
-  color: $chef-black;
-}
-
-.details-tab {
-  form {
-    chef-form-field {
-      width: 600px;
-      margin-bottom: 30px;
+    &:focus {
+      outline: none;
+      border: 1px solid $chef-primary-bright;
     }
   }
 }
 
+.tag-note {
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 7px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 12px;
+  padding-left: 12px;
+}
+
+.display-node-tags {
+  background: $chef-white;
+  border: 0.5px solid $chef-key-tab;
+  box-sizing: border-box;
+  border-radius: 2px;
+  overflow: auto;
+  padding: 0px 0px 18px 8px;
+  width: 600px;
+}
+
+.tag {
+  margin: 7px;
+  background-color: $chef-minor;
+  border-radius: 4px;
+  color: $chef-white;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px 8px;
+  height: 28px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+a.removeTag {
+  display: inline-block;
+  border: 1px solid $chef-white;
+  border-radius: 30px;
+  color: $chef-white;
+  font-size: 18px;
+  line-height: 0px;
+  padding: 8px 3px;
+  cursor: pointer;
+}
+
+.removeTag:before {
+  content: "×";
+}
+
+.tag a {
+  margin: 18px 0px 0px 6px;
+  font-weight: 700;
+}
+
+// update node env
 p.change-node-text {
   font-size: 18px;
   font-weight: 700;
@@ -212,98 +240,56 @@ div#button-env {
   float: right;
 }
 
-.node-tags-box {
-  display: flex;
-  width: 600px;
-  flex-direction: row;
-  font-size: 1em;
-  color: #222435;
-  border-radius: var(--chef-border-radius);
-  overflow: hidden;
-
-  input {
-    border-radius: 4px 0px 0px 4px;
-    height: 36px;
-    transition: 0s; // Remove default transition
-    
-    &:focus {
-      border: 0; // Accessibility is being noted around containing form
-    }
-  }
-  
-  button {
-    background: #E6EBEE;
-    box-shadow: 0 1px 14px #E6EBEE;
-    border: 0.5px solid #3864F2;
-    border-radius: 0px 4px 4px 0px;
-    color: #3864F2;
-    font-size: 14px;
-    height: 36px;
-    width: 75px;
-    cursor: pointer;
-  
-    &:focus {
-      outline: none;
-      border: 1px solid $chef-primary-bright;
-    }
-  }
-}
-
-.tag-note {
-  font-size: 11px;
-  font-weight: 400;
-  margin-top: 7px;
-  margin-bottom: 20px;
-}
-
 .label {
   font-size: 12px;
   padding-left: 12px;
 }
 
-.display-node-tags {
-  background: $chef-white;
-  border: 0.5px solid #CFD2D2;
-  box-sizing: border-box;
-  border-radius: 2px;
-  overflow: auto;
-  padding: 0px 0px 18px 8px;
-  width: 600px;
-}
-
-.tag {
-  background-color: #785EF0;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 5px 8px;
-  height: 28px;
-  margin: 7px;
-  text-transform: capitalize;
-  cursor: pointer;
-}
-
-a.removeTag{
-  cursor: pointer;
-  color: #fff;
-  border: 1px solid white;
-  border-radius: 30px;
-  font-size: 18px;
-  display: inline-block;
-  line-height: 0px;
-  padding: 8px 3px;  
-}
-
-.removeTag:before {
-  content: "×";
-}
-
-.tag a {
-  margin: 18px 0px 0px 6px;
-  font-weight: 700;
-}
-
 .auto-height {
   height: 220px;
+}
+
+// ng-select 
+::ng-deep {
+  .ng-select .ng-select-container {
+    font-size: 14px;
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    border-bottom: 1px solid $chef-white;
+    font-size: 14px;
+    height: 32px;
+    padding: 5px 10px;
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: $chef-primary-bright;
+    color: $chef-white;
+  }
+
+  .ng-select .ng-arrow-wrapper .ng-arrow {
+    border-color: $chef-white transparent transparent transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    border: 6px solid $chef-primary-bright;
+    border-width: 0 2px 2px 0;
+    padding: 3px;
+    right: 5px;
+    top: -2px;
+    transform: rotate(45deg);
+  }
+
+  .ng-select.ng-select-opened > .ng-select-container .ng-arrow {
+    border-color: $chef-white transparent transparent transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    border: 6px solid $chef-primary-bright;
+    border-width: 0 2px 2px 0;
+    padding: 3px;
+    right: 5px;
+    top: 0px;
+    transform: rotate(225deg);
+  }
 }

@@ -45,7 +45,7 @@ export interface UpdateNodeTagPayload {
   server_id: string;
   org_id: string;
   name: string;
-  action: string
+  action: string;
   tags: string[];
 }
 

@@ -38,6 +38,7 @@
     "@angular/platform-server": "^11.2.6",
     "@angular/router": "^11.2.6",
     "@carbon/grid": "^10.22.0",
+    "@ng-select/ng-select": "^6.1.0",
     "@ngrx/effects": "11.0.1",
     "@ngrx/entity": "11.0.1",
     "@ngrx/router-store": "11.0.1",

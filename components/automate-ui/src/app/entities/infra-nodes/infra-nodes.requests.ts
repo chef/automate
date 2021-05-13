@@ -46,7 +46,7 @@ export class InfraNodeRequests {
 
   public updateNodeTags(node: UpdateNodeTagPayload): Observable<UpdateNodeTagPayload> {
     return this.http.put<UpdateNodeTagPayload>(
-      `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/tags`,
+    `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/tags`,
       node);
   }
 

@@ -1,28 +1,34 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { combineLatest, Subject } from 'rxjs';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus, pending } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   infraNodeFromRoute,
-  updateEnvStatus,
   updateTagsStatus,
-  nodeTags
+  updateEnvStatus,
+  nodeTags,
+  nodeEnvironment
 } from 'app/entities/infra-nodes/infra-nodes.selectors';
-import { GetNode, UpdateNodeEnvironment, UpdateNodeTags } from 'app/entities/infra-nodes/infra-nodes.actions';
 import {
-  InfraNode
-} from 'app/entities/infra-nodes/infra-nodes.model';
-
+  getAllStatus,
+  environmentList
+} from 'app/entities/environments/environment.selectors';
+import {
+  GetNode,
+  UpdateNodeTags,
+  UpdateNodeEnvironment
+} from 'app/entities/infra-nodes/infra-nodes.actions';
 import { GetEnvironments } from 'app/entities/environments/environment.action';
-import { getAllStatus, environmentList } from 'app/entities/environments/environment.selectors';
+import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import { Environment } from 'app/entities/environments/environment.model';
-import { EntityStatus, pending } from 'app/entities/entities';
+
 
 export type InfraNodeTabName = 'details';
 
@@ -40,37 +46,38 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public serverId: string;
   public orgId: string;
   public name: string;
+  public environmentName: string;
   public nodeDetailsLoading = true;
   public updateNodeForm: FormGroup;
-  public environmentsAvailable: string[] = ['_default', 'production environemnt', 'default environemnt']
   private isDestroyed = new Subject<boolean>();
 
-
-  public environments: Environment[] = [];
-  public environmentsBuffer: Environment[] = [];
-  public per_page = 20;
-  public current_page = 0;
-  public loading: boolean = false;
-  public environmentListState: { items: Environment[], total: number };
-  public total: number;
-
-  public saving: boolean = false;
-  public confirming: boolean = false;
-
-
+  // for tags
   public tags: string[];
   public nodeTags: string[];
   public removeTags: string[] = [];
   public inputTxt = '';
   public updatingTags = false;
 
+
+  // for environemnts
+  public environmentListState: { items: Environment[], total: number };
+  public environments: Environment[] = [];
+  public environmentsBuffer: Environment[] = [];
+  public PageBufferSize = 20;
+  public numberOfItemsFromEndBeforeFetchingMore = 10;
+  public loading = false;
+  public currentPage = 1;
+  public total: number;
+  public saving = false;
+  public confirming = false;
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
-  ) { 
+  ) {
     this.updateNodeForm = this.fb.group({
-      environment: [this.node?.environment, [Validators.required]],
+      environment: [null, [Validators.required]]
     });
   }
 
@@ -99,9 +106,117 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     ).subscribe(node => {
       this.node = node;
       this.nodeTags = node.tags;
+      this.environmentName = node.environment;
       this.tags = this.nodeTags;
       this.nodeDetailsLoading = false;
+      // set default value of node environment
+      this.updateNodeForm.controls.environment.setValue(this.environmentName);
     });
+
+    // show default list of environments
+    this.loadEnvironmentsList();
+
+    combineLatest([
+      this.store.select(updateEnvStatus),
+      this.store.select(nodeEnvironment)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state]) => this.saving && !pending(state))
+    ).subscribe(([getEnvSt, envStatus]) => {
+      if (getEnvSt === EntityStatus.loadingSuccess && !isNil(envStatus)) {
+        this.environmentName = envStatus;
+        this.updateNodeForm.markAsPristine();
+        this.saving = false;
+        this.closeConfirmationBox();
+      }
+    });
+
+    combineLatest([
+      this.store.select(updateTagsStatus),
+      this.store.select(nodeTags)
+    ]).pipe(
+        takeUntil(this.isDestroyed)
+      ).subscribe(([getTagsSt, TagsState]) => {
+      if (getTagsSt === EntityStatus.loadingSuccess && !isNil(TagsState)) {
+        this.nodeTags = TagsState;
+        this.tags = this.nodeTags;
+        this.updatingTags = false;
+      } else if (getTagsSt === EntityStatus.loadingFailure) {
+        this.nodeTags = this.tags;
+        this.updatingTags = false;
+      }
+    });
+  }
+
+  // update tags
+  updateTags(action: string, tags: string[]) {
+    this.updatingTags = true;
+    const updatedNode = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.node.name,
+      action: action,
+      tags: tags
+    };
+    this.store.dispatch(new UpdateNodeTags({node: updatedNode}));
+  }
+
+  addTags() {
+    if (this.inputTxt !== '') {
+      this.tags = this.tags.concat(this.inputTxt.split(', '));
+      this.inputTxt = '';
+      this.updateTags('add', this.tags);
+    }
+  }
+
+  removeTag(tag: string) {
+    this.tags.forEach((element, index) => {
+      if (element === tag) {
+        this.tags.splice(index, 1);
+      }
+    });
+
+    this.removeTags.push(tag);
+    this.updateTags('delete', this.removeTags);
+  }
+
+  // load list of environments
+  onScrollToEnd() {
+    this.fetchMore();
+  }
+
+  onScroll({ end }) {
+    if (this.loading || this.total <= this.environmentsBuffer.length) {
+      return;
+    }
+
+    if (end + this.numberOfItemsFromEndBeforeFetchingMore >= this.environmentsBuffer.length) {
+      this.fetchMore();
+    }
+  }
+
+  private fetchMore() {
+    this.loading = true;
+    this.currentPage += 1;
+    this.loadEnvironmentsList();
+
+    // using timeout here to simulate backend API delay
+    setTimeout(() => {
+        this.loading = false;
+    }, 200);
+  }
+
+  private loadEnvironmentsList(): void {
+    this.loading = true;
+    const payload = {
+      environmentName: '',
+      page: this.currentPage,
+      per_page: this.PageBufferSize,
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+
+    this.store.dispatch(new GetEnvironments(payload));
 
     // load environments list
     combineLatest([
@@ -112,64 +227,38 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       if (getEnvironmentsSt === EntityStatus.loadingSuccess && !isNil(EnvironmentsState)) {
         this.environmentListState = EnvironmentsState;
         this.environments = EnvironmentsState?.items;
-        this.environmentsBuffer = this.environments;
+        this.environmentsBuffer.push(...this.environments);
+        const result = this.removeDuplicateEnv();
+        this.environmentsBuffer = result;
         this.total = this.environmentListState?.total;
-        this.nodeDetailsLoading = false;
+        this.loading = false;
       } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
-        this.nodeDetailsLoading = false;
+        this.loading = false;
       }
     });
-
-    // update node environment
-    this.store.select(updateEnvStatus).pipe(
-      takeUntil(this.isDestroyed),
-      filter(state => this.saving && !pending(state)))
-    .subscribe((state) => {
-      this.saving = false;
-      this.saving = (state === EntityStatus.loadingSuccess);
-      if (this.saving) {
-        this.updateNodeForm.markAsPristine();
-      }
-      this.closeConfirmationBox();
-    });
-
-    // update node tags
-    combineLatest([
-      this.store.select(updateTagsStatus),
-      this.store.select(nodeTags)
-    ]).pipe(takeUntil(this.isDestroyed)).subscribe(([getTagsSt, TagsState]) => {
-      if (getTagsSt === EntityStatus.loadingSuccess && !isNil(TagsState)) {
-        this.nodeTags = TagsState;
-        this.tags = this.nodeTags;
-        this.updatingTags = false;
-      } else if (getTagsSt === EntityStatus.loadingFailure){
-        this.nodeTags = this.tags;
-        this.updatingTags = false;
-      }
-    });
+    console.log(this.environmentsBuffer.length);
   }
 
-  getEnvironmentData() {
-    const payload = {
-      environmentName: '',
-      page: this.current_page,
-      per_page: this.per_page,
-      server_id: this.serverId,
-      org_id: this.orgId
-    };
-
-    this.store.dispatch(new GetEnvironments(payload));
+  private removeDuplicateEnv(): Environment[] {
+    const setObj = new Set(); // create key value pair from array of array
+    const result = this.environmentsBuffer.reduce((acc, item) => {
+      if (!setObj.has(item.name)) {
+        setObj.add(item.name);
+        acc.push(item);
+      }
+      return acc;
+    }, []); // converting back to array from map-object
+    return result;
   }
 
-
-  selectChangeHandler(env: string) {
-    console.log(env);
-    if (this.node.environment !== env) {
+  selectChangeHandler(env: { name: string }) {
+    if (this.environmentName !== env.name) {
       this.confirming = true;
     }
   }
 
   closeConfirmationBox() {
+    this.updateNodeForm.controls.environment.setValue(this.environmentName);
     this.confirming = false;
   }
 
@@ -182,37 +271,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       environment: this.updateNodeForm.controls.environment.value.trim()
     };
     this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
-  }
-
-
-  // update tags
-
-  updateTags(action: string, tags: string[]) {
-    this.updatingTags = true
-    const updatedNode = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.node.name,
-      action: action,
-      tags: tags
-    };
-    this.store.dispatch(new UpdateNodeTags({node: updatedNode}));
-  }
-
-  addTags() {    
-    if(this.inputTxt != ''){
-      this.tags.push(this.inputTxt);
-      this.inputTxt = '';
-      this.updateTags('add', this.tags)
-    }
-  }
-
-  removeTag(tag: string){
-    this.tags.forEach((element,index)=>{
-      if (element == tag) this.tags.splice(index,1);
-    });
-    this.removeTags.push(tag)
-    this.updateTags('delete', this.removeTags)
   }
 
   ngOnDestroy(): void {

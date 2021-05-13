@@ -73,59 +73,76 @@
             <chef-loading-spinner *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!nodeDetailsLoading">
-            <form [ngClass]="confirming === true ? 'auto-height' : ''" [formGroup]="updateNodeForm">
-              <chef-form-field>
-                <span class="label">Environment</span>
-                <mat-select #li panelClass="chef-dropdown" formControlName="environment" [value]="node?.environment"
-                  (selectionChange)="selectChangeHandler(li.value)">
-                  <mat-option *ngFor="let key of environmentsAvailable" [value]="key">
-                    {{ key }}
-                  </mat-option>
-                </mat-select>
-              </chef-form-field>
-              <div *ngIf="confirming" class="changes-confirmation">
-                <p class="change-node-text">Change Node Environment?</p>
-                <div id="button-env">
-                  <chef-button
-                    tertiary
-                    id="cancel"
-                    data-cy="cancel-button"
-                    (click)="closeConfirmationBox()">Cancel</chef-button>
-                  <chef-button
-                    primary
-                    data-cy="save-button"
-                    id="save-btn"
-                    [disabled]="saving"
-                    (click)="saveEnvironment()">
-                    <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-                    <span *ngIf="!saving">Save</span>
-                    <span *ngIf="saving">Saving</span>
-                  </chef-button>
+            <div class="node-details-section">
+              <form [ngClass]="confirming === true ? 'auto-height' : ''" [formGroup]="updateNodeForm">
+                <chef-form-field>
+                  <span class="label">Environment</span>
+                  <ng-select
+                    formControlName="environment"
+                    [items]="environmentsBuffer"
+                    [virtualScroll]="true"
+                    [loading]="loading"
+                    bindLabel="name"
+                    bindValue="name"
+                    appendTo="body"
+                    [searchable]="false"
+                    [clearable]="false"
+                    (scroll)="onScroll($event)"
+                    (change)="selectChangeHandler($event)"
+                    (scrollToEnd)="onScrollToEnd()">
+                    <ng-template ng-header-tmp>
+                      <small class="form-text text-muted">Loaded {{environmentsBuffer.length}} of {{total}}</small>
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                      {{item.name}}
+                    </ng-template>
+                  </ng-select>
+                </chef-form-field>
+                <div *ngIf="confirming" class="changes-confirmation">
+                  <p class="change-node-text">Change Node Environment?</p>
+                  <div id="button-env">
+                    <chef-button
+                      tertiary
+                      id="cancel"
+                      data-cy="cancel-button"
+                      (click)="closeConfirmationBox()">Cancel</chef-button>
+                    <chef-button
+                      primary
+                      data-cy="save-button"
+                      id="save-btn"
+                      [disabled]="saving"
+                      (click)="saveEnvironment()">
+                      <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                      <span *ngIf="!saving">Save</span>
+                      <span *ngIf="saving">Saving</span>
+                    </chef-button>
+                  </div>
                 </div>
+              </form>
+              <span class="label">Tags</span>
+              <div class="node-tags-box">
+                <input 
+                  chefInput
+                  type="text"
+                  id="tag-input"
+                  autocomplete="off"
+                  data-cy="add-tag"
+                  [(ngModel)]="inputTxt"/>
+                <button
+                  primary
+                  type="submit"
+                  class="primary"
+                  [disabled]= "inputTxt === ''"
+                  data-cy="add-tag-button"
+                  (click)="addTags()"> Add </button>
               </div>
-            </form>
-
-            <span class="label">Tags</span>
-            <div class="node-tags-box">
-              <input 
-                chefInput
-                type="text"
-                id="tag-input"
-                [(ngModel)]="inputTxt"/>
-              <button
-                primary
-                type="submit"
-                class="primary"
-                [disabled]= "inputTxt === ''"
-                data-cy="add-tag"
-                (click)="addTags()"> Add </button>
-            </div>
-            <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
-            <div *ngIf="nodeTags?.length" class="display-node-tags">
-              <span *ngFor="let tag of nodeTags" class="tag">
-                {{tag}}
-                <a class="removeTag" (click)="removeTag(tag)"></a>
-              </span>
+              <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
+              <div *ngIf="nodeTags?.length" class="display-node-tags">
+                <span *ngFor="let tag of nodeTags" class="tag">
+                  {{tag}}
+                  <a class="removeTag" (click)="removeTag(tag)"></a>
+                </span>
+              </div>
             </div>
           </ng-container>
         </div>
