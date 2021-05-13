@@ -15,21 +15,32 @@
     [org_Id]="orgId">
   </app-create-data-bag-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
-  <ng-container  *ngIf="!dataBagsListLoading && !authFailure">
-    <chef-toolbar>
-      <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-        <chef-button primary (click)="openCreateModal()">Create Data Bag</chef-button>
-      </app-authorized>
-    </chef-toolbar>
-    <chef-table *ngIf="dataBags.length">
-      <chef-thead>
+  <ng-container *ngIf="!dataBagsListLoading && !authFailure">
+    <div class="search-create-container">
+      <app-infra-search-bar (searchButtonClick)="searchDataBags($event)" placeHolder="data bags">
+      </app-infra-search-bar>
+      <chef-button data-cy="create-databag-button" primary (click)="openCreateModal()">Create Data Bag</chef-button>
+    </div>   
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner> 
+    <chef-table *ngIf="dataBags.length" id="databags-table-container" data-cy="databags-table-container">
+      <chef-thead *ngIf="!searchFlag || serachArr.length">
         <chef-tr class="no_border_tr">
-          <chef-th class="no_border_th">Name</chef-th>
+          <chef-th class="no_border_th" data-cy="name">Name</chef-th>
           <chef-th class="no_border_th three-dot-column"></chef-th>
         </chef-tr>
       </chef-thead>
-      <chef-tbody>
+      <chef-tbody *ngIf="!searchFlag">
         <chef-tr *ngFor="let dataBag of dataBags">
+          <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
+          <chef-td class="three-dot-column">
+            <mat-select panelClass="chef-control-menu">
+              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
+            </mat-select>
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+      <chef-tbody *ngIf="searchFlag">
+        <chef-tr *ngFor="let dataBag of serachArr">
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
           <chef-td class="three-dot-column">
             <mat-select panelClass="chef-control-menu">
@@ -41,9 +52,10 @@
     </chef-table>
   </ng-container>
   <div *ngIf="!authFailure">
-    <div class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0)">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!dataBagsListLoading && (dataBags.length === 0) || searchFlag && (serachArr.length === 0) ">
       <img alt="No preview" src="/assets/img/no_preview.gif"/>
-      <p>No Data Bags available.</p>
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue === ''">No Data Bags available.</p>
     </div>
   </div>
 </section>
