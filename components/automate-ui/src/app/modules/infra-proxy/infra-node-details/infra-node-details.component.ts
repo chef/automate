@@ -40,9 +40,8 @@ export type InfraNodeTabName = 'details';
 
 export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public conflictError = false;
-  public node: InfraNode;
+  public InfraNode: InfraNode;
   public tabValue: InfraNodeTabName = 'details';
-  public url: string;
   public serverId: string;
   public orgId: string;
   public name: string;
@@ -104,7 +103,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(node => {
-      this.node = node;
+      this.InfraNode = node;
       this.nodeTags = node.tags;
       this.environmentName = node.environment;
       this.tags = this.nodeTags;
@@ -154,7 +153,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     const updatedNode = {
       org_id: this.orgId,
       server_id: this.serverId,
-      name: this.node.name,
+      name: this.name,
       action: action,
       tags: tags
     };
@@ -202,7 +201,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
     // using timeout here to simulate backend API delay
     setTimeout(() => {
-        this.loading = false;
+      this.loading = false;
     }, 200);
   }
 
@@ -267,7 +266,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     const updatedNode = {
       org_id: this.orgId,
       server_id: this.serverId,
-      name: this.node.name,
+      name: this.name,
       environment: this.updateNodeForm.controls.environment.value.trim()
     };
     this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));

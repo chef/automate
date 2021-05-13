@@ -5,10 +5,10 @@
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
-         {{node?.name}}
+         {{InfraNode?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
-        <chef-heading>{{node?.name}}</chef-heading>
+        <chef-heading>{{InfraNode?.name}}</chef-heading>
         <div class="meta-box" *ngIf="!nodeDetailsLoading">
           <div class="summary-body">
             <table>
@@ -21,19 +21,19 @@
                 <th>
                   Environment
                 </th>
-                <td>{{node?.environment}}</td>
+                <td>{{InfraNode?.environment}}</td>
               </tr>
               <tr>
                 <th>
                   Policy Group
                 </th>
-                <td>{{node?.policy_group === '' ? '--' : node?.policy_group}}</td>
+                <td>{{InfraNode?.policy_group === '' ? '--' : InfraNode?.policy_group}}</td>
               </tr>
               <tr>
                 <th>
                   Policy Name
                 </th>
-                <td>{{node?.policy_name === '' ? '--' : node?.policy_name}}</td>
+                <td>{{InfraNode?.policy_name === '' ? '--' : InfraNode?.policy_name}}</td>
               </tr>
             </table>
             <table>
