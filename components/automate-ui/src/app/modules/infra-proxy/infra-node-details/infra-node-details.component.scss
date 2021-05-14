@@ -150,6 +150,11 @@ chef-loading-spinner {
       outline: none;
       border: 1px solid $chef-primary-bright;
     }
+
+    &[disabled] {
+      background-color: $chef-light-grey;
+      opacity: 0.5;
+    }
   }
 }
 
@@ -208,6 +213,11 @@ a.removeTag {
   font-weight: 700;
 }
 
+.disable {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 // update node env
 p.change-node-text {
   font-size: 18px;
@@ -256,7 +266,7 @@ div#button-env {
   }
 
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
-    border-bottom: 1px solid $chef-white;
+    border-bottom: 1px solid $chef-modal;
     font-size: 14px;
     height: 32px;
     padding: 5px 10px;
