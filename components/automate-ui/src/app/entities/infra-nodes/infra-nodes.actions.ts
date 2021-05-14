@@ -18,7 +18,7 @@ export enum NodeActionTypes {
   UPDATE_TAGS_FAILURE         = 'NODES::TAGS::UPDATE::FAILURE',
   DELETE                      = 'NODES::DELETE',
   DELETE_SUCCESS              = 'NODES::DELETE::SUCCESS',
-  DELETE_FAILURE              = 'NODES::DELETE::FAILURE',
+  DELETE_FAILURE              = 'NODES::DELETE::FAILURE'
 }
 
 export interface NodesSuccessPayload {
