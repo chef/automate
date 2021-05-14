@@ -63,13 +63,13 @@ To see the data lifecycle job statuses, configure jobs, or run jobs requires an 
 To see the combined status and configuration for all data lifecycle jobs, you can use the global status endpoint:
 
 ```bash
-curl -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
 
 To see individual statuses by data type, you can access the data type sub-status endpoints:
 
 ```bash
-curl -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
+curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
 ```
 
 Swap `event-feed` for `infra` or `compliance` or `services` to see their corresponding jobs.
@@ -188,7 +188,7 @@ You cannot read the data on the `status` endpoint, change some values, and feed 
 Save the JSON file as `config.json` in the current working directory:
 
 ```bash
-curl -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
 If you wish to configure a specific endpoint, you can specify the `job_settings` for that data type and configure it using data types sub-resource.
@@ -222,7 +222,7 @@ For example, if you want to configure compliance settings, create a smaller JSON
 And update the specific endpoint using the `compliance` sub-resource:
 
 ```bash
-curl -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
+curl -s -S -k -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
 ```
 
 #### Job Settings
@@ -389,13 +389,13 @@ As with `status` and `configure`, you can run data lifecycle jobs globally acros
 To run all data lifecycle jobs, run the following command:
 
 ```bash
-curl -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
 To run jobs for a specific data type, you can make the request to the sub-resource:
 
 ```bash
-curl -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
+curl -s -S -k -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
 ```
 
 Swap `infra` for `event-feed` or `compliance` to run their corresponding jobs.
