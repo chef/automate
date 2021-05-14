@@ -97,7 +97,17 @@ func (a *InfraProxyServer) UpdateNode(ctx context.Context, r *gwreq.NodeDetails)
 	}
 
 	return &gwres.Node{
+		NodeId: res.GetNodeId(),
 		Name: res.GetName(),
+		Environment: res.GetEnvironment(),
+		PolicyName: res.GetPolicyName(),
+		PolicyGroup: res.GetPolicyGroup(),
+		RunList: res.GetRunList(),
+		Tags: res.GetTags(),
+		AutomaticAttributes: res.GetAutomaticAttributes(),
+		DefaultAttributes: res.GetDefaultAttributes(),
+		NormalAttributes: res.GetNormalAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
 	}, nil
 }
 
