@@ -6,9 +6,6 @@ option go_package = "github.com/chef/automate/api/external/user_settings";
 import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/duration.proto";
-
 // UserSettings allows accessing of user settings
 service UserSettingsService {
 	//
@@ -17,29 +14,29 @@ service UserSettingsService {
 
 	// GetUserSettings returns all of the preferences for a given user
 	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {
-		option (google.api.http).get = "/api/v0/user/{id}/settings";
+		option (google.api.http).get = "/api/v0/user-settings/{id}";
 		option (chef.automate.api.iam.policy) = {
 			resource: "global:userSettings"
 			action: "global:userSettings:get"
 		};
 	};
 
-	// UpdateUserSettings upserts all of the preferences for a given user
-	rpc UpdateUserSettings(UpdateUserSettingsRequest) returns (UpdateUserSettingsResponse) {
+	// PutUserSettings upserts all of the preferences for a given user
+	rpc PutUserSettings(PutUserSettingsRequest) returns (PutUserSettingsResponse) {
 		option (google.api.http) = {
-			put: "/api/v0/user/{id}/settings";
+			put: "/api/v0/user-settings/{id}";
 			body: "*";
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "global:userSettings"
-			action: "global:userSettings:update"
+			action: "global:userSettings:put"
 		};
 	};
 
 	// DeleteUserSettings deletes all settings for a given user
 	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
 		option (google.api.http) = {
-			delete: "/api/v0/user/{id}/settings"
+			delete: "/api/v0/user-settings/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "global:userSettings"
@@ -53,7 +50,7 @@ message GetUserSettingsRequest{
 	string id = 1;
 }
 
-message UpdateUserSettingsRequest{
+message PutUserSettingsRequest{
 	// ID of the user. Cannot be changed. Used to sign in.
 	string id = 1;
 
@@ -71,7 +68,7 @@ message GetUserSettingsResponse {
 	map<string, UserSettingValue> settings = 2;
 }
 
-message UpdateUserSettingsResponse {
+message PutUserSettingsResponse {
 	string id = 1;
 }
 

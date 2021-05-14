@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/v0/user/{id}/settings": {
+    "/api/v0/user-settings/{id}": {
       "get": {
         "summary": "GetUserSettings returns all of the preferences for a given user",
         "operationId": "UserSettingsService_GetUserSettings",
@@ -76,13 +76,13 @@ func init() {
         ]
       },
       "put": {
-        "summary": "UpdateUserSettings upserts all of the preferences for a given user",
-        "operationId": "UserSettingsService_UpdateUserSettings",
+        "summary": "PutUserSettings upserts all of the preferences for a given user",
+        "operationId": "UserSettingsService_PutUserSettings",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.user_settings.UpdateUserSettingsResponse"
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsResponse"
             }
           },
           "default": {
@@ -105,7 +105,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.user_settings.UpdateUserSettingsRequest"
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsRequest"
             }
           }
         ],
@@ -138,7 +138,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.user_settings.UpdateUserSettingsRequest": {
+    "chef.automate.api.user_settings.PutUserSettingsRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -154,7 +154,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.user_settings.UpdateUserSettingsResponse": {
+    "chef.automate.api.user_settings.PutUserSettingsResponse": {
       "type": "object",
       "properties": {
         "id": {

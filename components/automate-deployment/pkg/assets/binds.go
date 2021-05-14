@@ -88,6 +88,7 @@ session-service BINDING_MODE strict
 teams-service REQUIRED authz-service automate-pg-gateway cereal-service pg-sidecar-service
 teams-service BINDING_MODE strict
 trial-license-service BINDING_MODE strict
+user-settings-service REQUIRED automate-pg-gateway pg-sidecar-service
 user-settings-service BINDING_MODE strict
 user-settings-service-2 REQUIRED automate-pg-gateway pg-sidecar-service secrets-service
 user-settings-service-2 BINDING_MODE strict

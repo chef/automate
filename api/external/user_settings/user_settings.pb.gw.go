@@ -85,8 +85,8 @@ func local_request_UserSettingsService_GetUserSettings_0(ctx context.Context, ma
 
 }
 
-func request_UserSettingsService_UpdateUserSettings_0(ctx context.Context, marshaler runtime.Marshaler, client UserSettingsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateUserSettingsRequest
+func request_UserSettingsService_PutUserSettings_0(ctx context.Context, marshaler runtime.Marshaler, client UserSettingsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq PutUserSettingsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -115,13 +115,13 @@ func request_UserSettingsService_UpdateUserSettings_0(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	msg, err := client.UpdateUserSettings(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.PutUserSettings(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_UserSettingsService_UpdateUserSettings_0(ctx context.Context, marshaler runtime.Marshaler, server UserSettingsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateUserSettingsRequest
+func local_request_UserSettingsService_PutUserSettings_0(ctx context.Context, marshaler runtime.Marshaler, server UserSettingsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq PutUserSettingsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -150,7 +150,7 @@ func local_request_UserSettingsService_UpdateUserSettings_0(ctx context.Context,
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-	msg, err := server.UpdateUserSettings(ctx, &protoReq)
+	msg, err := server.PutUserSettings(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -234,7 +234,7 @@ func RegisterUserSettingsServiceHandlerServer(ctx context.Context, mux *runtime.
 
 	})
 
-	mux.Handle("PUT", pattern_UserSettingsService_UpdateUserSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserSettingsService_PutUserSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -243,14 +243,14 @@ func RegisterUserSettingsServiceHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_UserSettingsService_UpdateUserSettings_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_UserSettingsService_PutUserSettings_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserSettingsService_UpdateUserSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserSettingsService_PutUserSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -335,7 +335,7 @@ func RegisterUserSettingsServiceHandlerClient(ctx context.Context, mux *runtime.
 
 	})
 
-	mux.Handle("PUT", pattern_UserSettingsService_UpdateUserSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("PUT", pattern_UserSettingsService_PutUserSettings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -344,14 +344,14 @@ func RegisterUserSettingsServiceHandlerClient(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserSettingsService_UpdateUserSettings_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserSettingsService_PutUserSettings_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserSettingsService_UpdateUserSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserSettingsService_PutUserSettings_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -379,17 +379,17 @@ func RegisterUserSettingsServiceHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_UserSettingsService_GetUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v0", "user", "id", "settings"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserSettingsService_GetUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v0", "user-settings", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserSettingsService_UpdateUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v0", "user", "id", "settings"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserSettingsService_PutUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v0", "user-settings", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UserSettingsService_DeleteUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v0", "user", "id", "settings"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_UserSettingsService_DeleteUserSettings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v0", "user-settings", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
 	forward_UserSettingsService_GetUserSettings_0 = runtime.ForwardResponseMessage
 
-	forward_UserSettingsService_UpdateUserSettings_0 = runtime.ForwardResponseMessage
+	forward_UserSettingsService_PutUserSettings_0 = runtime.ForwardResponseMessage
 
 	forward_UserSettingsService_DeleteUserSettings_0 = runtime.ForwardResponseMessage
 )

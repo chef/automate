@@ -1,6 +1,8 @@
 package user_settings
 
 import (
+	"strings"
+
 	shared "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
@@ -36,7 +38,12 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	msg := c.GetV1().GetSys().GetService()
+	msg := c.GetV1().GetSys().GetService().GetMessage().GetValue()
+	if strings.Contains(msg, "$") {
+		cfgErr := shared.NewInvalidConfigError()
+		cfgErr.AddInvalidValue("user_settings.v1.sys.service.message", "cant have $")
+		return cfgErr
+	}
 	return nil
 }
 

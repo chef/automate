@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package chef.automate.infra.cereal;
+package chef.automate.domain.user_settings;
 option go_package = "github.com/chef/automate/api/config/user_settings";
 
 import "config/shared/global.proto";
@@ -28,7 +28,7 @@ message ConfigRequest {
         google.protobuf.Int32Value port = 1 
             [ (chef.automate.api.port) =
                   {name : "service", default : 10107, protocol : "grpc"} ];
-        google.protobuf.Int32Value max_recv_size_bytes = 2;
+        google.protobuf.StringValue message = 2;   
       }
     }
     message Service {}
