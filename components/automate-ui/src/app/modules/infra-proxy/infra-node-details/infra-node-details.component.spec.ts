@@ -145,7 +145,7 @@ describe('InfraNodeDetailsComponent', () => {
     }];
 
   const add_tags =  ['tag1'];
-  const remove_tags = ['tag1']
+  const remove_tags = ['tag1'];
 
   it('should be created', () => {
     expect(component).toBeTruthy();
