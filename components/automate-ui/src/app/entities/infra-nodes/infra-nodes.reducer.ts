@@ -20,11 +20,11 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodeEnvironment: string;
 }
 
-const GET_ALL_STATUS = 'getAllStatus';
-const DELETE_STATUS = 'deleteStatus';
-const GET_STATUS = 'getStatus';
+const GET_ALL_STATUS            = 'getAllStatus';
+const DELETE_STATUS             = 'deleteStatus';
+const GET_STATUS                = 'getStatus';
 const UPDATE_ENVIRONMENT_STATUS = 'updateEnvStatus';
-const UPDATE_TAGS_STATUS = 'updateTagsStatus';
+const UPDATE_TAGS_STATUS        = 'updateTagsStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
   selectId: (infraNode: InfraNode) => infraNode.name

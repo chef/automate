@@ -144,7 +144,8 @@ describe('InfraNodeDetailsComponent', () => {
       override_attributes: '{}'
     }];
 
-  const tags =  ['tag1'];
+  const add_tags =  ['tag1'];
+  const remove_tags = ['tag1']
 
   it('should be created', () => {
     expect(component).toBeTruthy();
@@ -157,15 +158,15 @@ describe('InfraNodeDetailsComponent', () => {
 
   it('add the node tags', () => {
     store.dispatch(new GetNodeSuccess(node));
+    store.dispatch(new UpdateNodeTagsSuccess({tags: add_tags}));
     const tagsLength = component.InfraNode.tags.length;
-    store.dispatch(new UpdateNodeTagsSuccess({tags: tags}));
     expect(component.nodeTags.length).toEqual(tagsLength);
   });
 
   it('remove the node tags', () => {
     store.dispatch(new GetNodeSuccess(node));
+    store.dispatch(new UpdateNodeTagsSuccess({tags: remove_tags}));
     const tagsLength = component.InfraNode.tags.length;
-    store.dispatch(new UpdateNodeTagsSuccess({tags: tags}));
     expect(component.nodeTags.length).toEqual(tagsLength);
   });
 

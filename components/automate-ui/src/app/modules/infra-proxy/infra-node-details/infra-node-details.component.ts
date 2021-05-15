@@ -58,7 +58,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public updatingTags = false;
 
 
-  // for environemnts
+  // for environments
   public environmentListState: { items: Environment[], total: number };
   public environments: Environment[] = [];
   public environmentsBuffer: Environment[] = [];
