@@ -305,11 +305,11 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 ### Nodes
 
-A [node]({{< relref "nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client, the client retrieved a policy from the server and converges it onto a node.
+A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node will be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific Node from a list of nodes.
+- Search for a specific node from a list of nodes.
 - View a list of all the connected nodes.
 - Delete a node
 
