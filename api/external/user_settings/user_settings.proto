@@ -5,6 +5,7 @@ option go_package = "github.com/chef/automate/api/external/user_settings";
 
 import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 // UserSettings allows accessing of user settings
 service UserSettingsService {

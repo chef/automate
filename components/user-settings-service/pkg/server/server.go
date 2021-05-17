@@ -3,21 +3,26 @@ package server
 import (
 	"context"
 	"errors"
-	"sync"
-
 	"github.com/chef/automate/api/interservice/user_settings"
+	"github.com/chef/automate/components/user-settings-service/pkg/storage"
+	"github.com/chef/automate/lib/grpc/health"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
 
 //UserSettingsServer is a map of user Id to map of
 type UserSettingsServer struct {
-	mutex sync.Mutex
-	vals  map[string]map[string]*user_settings.UserSettingValue
+	storageClient storage.Client
+	health        *health.Service
+	mutex         sync.Mutex
+	vals          map[string]map[string]*user_settings.UserSettingValue
 }
 
-func New() *UserSettingsServer {
+func New(storage storage.Client) *UserSettingsServer {
 	return &UserSettingsServer{
-		vals: make(map[string]map[string]*user_settings.UserSettingValue),
+		storageClient: storage,
+		health:        health.NewService(),
+		vals:          make(map[string]map[string]*user_settings.UserSettingValue),
 	}
 }
 
@@ -31,7 +36,12 @@ func (s *UserSettingsServer) GetUserSettings(ctx context.Context, req *user_sett
 	}
 
 	logrus.Infof("Get settings for user %q", id)
+	//err, resp := s.storageClient.GetUserSettings(req)
+	//if err != nil {
+	//	logrus.Error(err)
+	//}
 
+	//fmt.Printf("%+v", resp)
 	return &user_settings.GetUserSettingsResponse{Id: id, Settings: s.vals[id]}, nil
 }
 

@@ -2,7 +2,7 @@
 #shellcheck disable=SC2154
 
 pkg_name=user-settings-service
-pkg_description="Chef BUser Settings Service"
+pkg_description="Chef User Settings Service"
 pkg_origin=chef
 pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
@@ -28,6 +28,14 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
+
+do_install() {
+  do_default_install
+
+  build_line "Copying schema sql files"
+  mkdir "${pkg_prefix}/schema"
+  cp -r pkg/storage/postgres/schema/sql/* "${pkg_prefix}/schema"
+}
 
 do_strip() {
   return 0

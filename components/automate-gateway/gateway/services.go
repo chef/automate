@@ -40,6 +40,7 @@ import (
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
+	pb_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/authn"
 	cfgmgmt_request "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/compliance/profiles"
@@ -318,6 +319,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
+	userSettingsClient, err := clients.UserSettingsClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for user-settings service")
+	}
+	pb_user_settings.RegisterUserSettingsServiceServer(grpcServer, handler.NewUserSettingsHandler(userSettingsClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -365,6 +372,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"data-lifecycle":           pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
+		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
 	})
 }
 
