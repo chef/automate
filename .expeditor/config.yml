@@ -151,7 +151,7 @@ subscriptions:
     actions:
       - bash:.expeditor/update-compliance-profiles.sh:
           post_commit: false
-  # Update our InSpec pinnings when a new version of Inspec is released
+  # Update our InSpec pinnings when a new version of InSpec is released
   - workload: hab_package_published:stable:chef/inspec/4.*
     actions:
       - bash:.expeditor/update-inspec-version.sh:
@@ -174,4 +174,3 @@ subscriptions:
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
- 
