@@ -131,7 +131,13 @@ chef-loading-spinner {
     transition: 0s; // Remove default transition
 
     &:focus {
-      border: 0;
+      // border-color: #3864F2;
+      border: solid 1px rgba(56,100,242,0.4);
+      border-right: none;
+    }
+    &:hover {
+      border: solid 1px rgba(56,100,242,0.4);
+      border-right: none;
     }
   }
 
