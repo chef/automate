@@ -305,7 +305,7 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 ### Nodes
 
-A [Node]({{< relref "nodes" >}}) is a communication between the Chef Infra Server and the Infra Clients. Nodes are used when an Infra Client asks for a policy from the Infra Chef Server.
+A [node]({{< relref "nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client, the client retrieved a policy from the server and converges it onto a node.
 
 The Chef Infra Server integration lets you:
 
