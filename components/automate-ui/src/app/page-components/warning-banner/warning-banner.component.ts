@@ -1,5 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
-import { OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding } from '@angular/core';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 @Component({
