@@ -1,0 +1,22 @@
+@import "~styles/variables";
+
+:host {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  color: $chef-white;
+  background-color: #45805F; // this is a temporary color
+  padding: 0.5em;
+  overflow: hidden;
+  z-index: 10;
+
+  p {
+    margin: 0 auto;
+    color: $chef-white;
+  }
+
+  a {
+    color: $chef-white;
+  }
+}
