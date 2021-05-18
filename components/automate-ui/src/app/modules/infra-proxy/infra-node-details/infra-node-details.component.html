@@ -1,0 +1,155 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
+         {{InfraNode?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading data-cy="infra-node-head">{{InfraNode?.name}}</chef-heading>
+        <div class="meta-box" *ngIf="!nodeDetailsLoading">
+          <div class="summary-body">
+            <table>
+              <tr>
+                <th>
+                  <p class="meta-head">NODE INFROMATION</p>
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  Environment
+                </th>
+                <td data-cy="node-env">{{InfraNode?.environment}}</td>
+              </tr>
+              <tr>
+                <th>
+                  Policy Group
+                </th>
+                <td>{{InfraNode?.policy_group === '' ? '--' : InfraNode?.policy_group}}</td>
+              </tr>
+              <tr>
+                <th>
+                  Policy Name
+                </th>
+                <td>{{InfraNode?.policy_name === '' ? '--' : InfraNode?.policy_name}}</td>
+              </tr>
+            </table>
+            <table>
+              <tr>
+                <th>
+                  <p class="meta-head">METADATA</p>
+                </th>
+              </tr>
+              <tr>
+                <th>
+                  Chef Server
+                </th>
+                <td data-cy="node-server">
+                  {{serverId}}
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  Chef Organization
+                </th>
+                <td data-cy="node-org">
+                  {{orgId}}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='runList' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="details-tab" *ngIf="!nodeDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
+          </div>
+          <ng-container *ngIf="!nodeDetailsLoading">
+            <div class="node-details-section">
+              <form [ngClass]="confirming === true ? 'auto-height' : ''" [formGroup]="updateNodeForm">
+                <chef-form-field>
+                  <span class="label">Environment</span>
+                  <ng-select
+                    formControlName="environment"
+                    [items]="environmentsBuffer"
+                    [virtualScroll]="true"
+                    [loading]="loading"
+                    bindLabel="name"
+                    bindValue="name"
+                    appendTo="body"
+                    [searchable]="false"
+                    [clearable]="false"
+                    (scroll)="onScroll($event)"
+                    (change)="selectChangeHandler($event)"
+                    (scrollToEnd)="onScrollToEnd()">
+                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                      {{item.name}}
+                    </ng-template>
+                  </ng-select>
+                </chef-form-field>
+                <div *ngIf="confirming" class="changes-confirmation" data-cy="change-confirm">
+                  <p class="change-node-text">Change Node Environment?</p>
+                  <div id="button-env">
+                    <chef-button
+                      tertiary
+                      id="cancel"
+                      data-cy="cancel-button"
+                      [disabled]="saving"
+                      (click)="closeConfirmationBox()">Cancel</chef-button>
+                    <chef-button
+                      primary
+                      data-cy="save-button"
+                      id="save-btn"
+                      [disabled]="saving"
+                      (click)="saveEnvironment()">
+                      <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                      <span *ngIf="!saving">Save</span>
+                      <span *ngIf="saving">Saving</span>
+                    </chef-button>
+                  </div>
+                </div>
+              </form>
+              <span class="label">Tags</span>
+              <div class="node-tags-box">
+                <input 
+                  chefInput
+                  type="text"
+                  id="tag-input"
+                  autocomplete="off"
+                  data-cy="add-tag"
+                  [ngClass]="saving ? 'disable' : ''"
+                  [(ngModel)]="inputTxt"/>
+                <button
+                  primary
+                  type="submit"
+                  class="primary"
+                  [disabled]= "(inputTxt === '') || saving"
+                  data-cy="add-tag-button"
+                  (click)="addTags()"> Add </button>
+              </div>
+              <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
+              <div
+                *ngIf="nodeTags?.length"
+                class="display-node-tags"
+                [ngClass]="saving ? 'disable' : ''"
+                data-cy="tag-box">
+                <span *ngFor="let tag of nodeTags" class="tag">
+                  {{tag}}
+                  <a class="removeTag" (click)="removeTag(tag)" data-cy="remove-tag"></a>
+                </span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

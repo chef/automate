@@ -29,6 +29,7 @@ import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
 import { InfraEnvironmentConstraintComponent } from './infra-environment-constraint/infra-environment-constraint.component';
 import { InfraNodesComponent } from './infra-nodes/infra-nodes.component';
+import { InfraNodeDetailsComponent } from './infra-node-details/infra-node-details.component';
 import { InfraRolesComponent } from './infra-roles/infra-roles.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { InfraSearchBarComponent } from './infra-search-bar/infra-search-bar.component';
@@ -46,6 +47,7 @@ import { MatInputModule } from '@angular/material/input';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SelectBoxModule } from './select-box/src/public_api';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -74,6 +76,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     JsonTreeTableComponent,
     InfraEnvironmentConstraintComponent,
     InfraNodesComponent,
+    InfraNodeDetailsComponent,
     InfraRolesComponent,
     InfraRoleDetailsComponent,
     InfraSearchBarComponent,
@@ -98,7 +101,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatInputModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    NgSelectModule
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

@@ -4,7 +4,7 @@
 @import "assets/chef-ui-library/collection/assets/fonts/material-icons/material-icons.css";
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
 @import "styles/chef-theme";
-
+@import "~@ng-select/ng-select/themes/default.theme.css";
 
 #app-content-wrapper {
   chef-side-panel {
