@@ -26,6 +26,7 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 3;
 			Nginx ngx = 4;
 			Log log = 5;
+			Banner banner = 6;
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true]; // The listen host is no longer setable(localhost only)
@@ -66,6 +67,13 @@ message ConfigRequest {
 		}
 
 		message Service {
+		}
+
+		message Banner {
+			google.protobuf.BoolValue show = 1;
+			google.protobuf.StringValue message = 2;
+			google.protobuf.StringValue background_color = 3;
+			google.protobuf.StringValue text_color = 4;
 		}
 	}
 }
