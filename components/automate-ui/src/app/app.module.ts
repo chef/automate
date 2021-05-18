@@ -204,6 +204,10 @@ import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
+// Initialize configuration file
+import { APP_INITIALIZER } from '@angular/core';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
+
 @NgModule({
   declarations: [
     // Page Components
@@ -356,7 +360,17 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
-    UserRequests
+    UserRequests,
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => {
+        return () => {
+          return appConfigService.loadAppConfig();
+        };
+      }
+    }
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

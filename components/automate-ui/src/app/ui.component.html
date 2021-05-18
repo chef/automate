@@ -23,6 +23,8 @@
     <app-navbar></app-navbar>
   </div>
 
+  <div>{{showBanner}}</div>
+
   <!-- App Content -->
   <div id="app-content-wrapper"
     [attr.hasNotifications]="layoutFacade.hasGlobalNotifications() ? true : null"

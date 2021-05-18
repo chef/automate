@@ -8,6 +8,7 @@ import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
+import { AppConfigService } from './services/app-config/app-config.service';
 
 @Component({
   selector: 'app-ui',
@@ -15,6 +16,7 @@ import { GetAllUserPerms } from './entities/userperms/userperms.actions';
   styleUrls: ['./ui.component.scss']
 })
 export class UIComponent implements OnInit, AfterViewChecked {
+  showBanner = false;
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
   experimentalFeatures: Array<Feature> = [
@@ -38,7 +40,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     public layoutFacade: LayoutFacadeService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private appConfigService: AppConfigService
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -61,6 +64,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
+    this.showBanner = this.appConfigService.showBanner;
+
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
     ).subscribe((event: ActivationStart) => this.hideFullPage = !event.snapshot.data.hideNavBar);
