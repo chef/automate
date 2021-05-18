@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
+
+// Angular APP_INITIALIZER documentation https://angular.io/api/core/APP_INITIALIZER
+// Excellent detailed instructions https://stackoverflow.com/a/54793384
 export class AppConfigService {
 
   private appConfig: any;
@@ -13,9 +16,7 @@ export class AppConfigService {
   loadAppConfig() {
     return this.http.get('/assets/app-config.json')
       .toPromise()
-      .then(data => {
-        this.appConfig = data;
-      });
+      .then(data => this.appConfig = data);
   }
 
   get showBanner() {
