@@ -292,6 +292,55 @@ func (s *Server) UpdateNodeAttributes(ctx context.Context, req *request.UpdateNo
 	}, nil
 }
 
+// GetNodeExpandedRunList fetches the expanded runlist of a node
+func (s *Server) GetNodeExpandedRunList(ctx context.Context, req *request.NodeExpandedRunList) (*response.NodeExpandedRunList, error) {
+	err := validation.New(validation.Options{
+		Target:  "role",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":       []string{"required"},
+			"ServerId":    []string{"required"},
+			"Name":        []string{"required"},
+			"Environment": []string{"required"},
+		},
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Nodes.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	runList := res.RunList
+
+	// Fetches cookbooks to evaluate recipes version.
+	cookbooks, err := c.client.Environments.ListCookbooks(req.Environment, "1")
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	var runlistCache = RunListCache{}
+
+	var expandedRunList []*response.RunList
+	expandedRunList, err = ToResponseExpandedRunList(c, runList, cookbooks, runlistCache)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.NodeExpandedRunList{
+		Id:      req.Environment,
+		RunList: expandedRunList,
+	}, nil
+}
+
 // fetchAffectedNodes gets the nodes used by chef object
 // URL is being constructed based on the chefType, name, and version
 // chefType: should be one of the cookbooks, roles and chef_environment value
