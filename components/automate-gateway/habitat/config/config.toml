@@ -150,6 +150,15 @@ limiter_max_requests = {{ cfg.data_collector.limiter.max_inflight_requests  }}
 {{~#if @last}}
   [grpc_clients.endpoints.automate-cds]
     target = "127.0.0.1:{{cds.cfg.port}}"
+    secure = true 
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.user-settings-service.members as |uss|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.user-settings-service]
+    target = "127.0.0.1:{{uss.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+
+

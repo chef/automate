@@ -42,7 +42,7 @@ document "user_settings_grpcurl_list_services" <<DOC
 
   Example: Inspect the UserSettings service
   -----------------------------
-  user_settings_grpcurl_list_services chef.automate.domain.user_settings.service.UserSettings
+  user_settings_grpcurl_list_services chef.automate.domain.user_settings.service.UserSettingsService
 DOC
 user_settings_grpcurl_list_services() {
     user_settings_grpcurl_get list "$1"
@@ -55,7 +55,7 @@ document "user_settings_grpcurl_get" <<DOC
 
   Example: Get user settings for a given user  (GetUserSettings)
   -----------------------------
-  user_settings_grpcurl_get chef.automate.domain.user_settings.service.UserSettings.GetUserSettings
+  user_settings_grpcurl_get chef.automate.domain.user_settings.service.UserSettingsService.GetUserSettings
 
   NOTE: Run 'user_settings_grpcurl_list_services' to inspect the RPC services.
 DOC

@@ -269,6 +269,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/user-settings-service",
+      "metadata": {
+        "name": "chef/user-settings-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-gateway",
       "metadata": null
     },
@@ -431,16 +441,6 @@ var ProductMetadataJSON = `
           "chef-automate"
         ],
         "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/user-settings-service",
-      "metadata": {
-        "name": "chef/user-settings-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
         "bootstrap": null
       }
     },
