@@ -26,4 +26,16 @@ export class AppConfigService {
 
     return this.appConfig.showBanner;
   }
+
+  get bannerMessage() {
+    return this.appConfig.bannerMessage;
+  }
+
+  get bannerBackgroundColor() {
+    return this.appConfig.bannerBackgroundColor;
+  }
+
+  get bannerTextColor() {
+    return this.appConfig.bannerTextColor;
+  }
 }
