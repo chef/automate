@@ -26,8 +26,8 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
 };
 
 export function userPreferencesEntityReducer(
-  state: UserPreferencesEntityState = UserPreferencesEntityInitialState,
-  action: UserPreferencesActions): UserPreferencesEntityState {
+  action: UserPreferencesActions, 
+  state: UserPreferencesEntityState = UserPreferencesEntityInitialState): UserPreferencesEntityState {
 
   switch (action.type) {
 
@@ -52,18 +52,6 @@ export function userPreferencesEntityReducer(
       return pipe(
         set('status', EntityStatus.loadingSuccess),
         set('list', action.payload))(state) as UserPreferencesEntityState;
-
-    // This is purely hacky way to change timeformat for dev purposes only
-    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT:
-      console.log('not updating yet - user-prefs.reducer.ts');
-      console.log(action.payload);
-
-      const timeformat = {
-        'value': action.payload,
-        'disabled': false
-      };
-
-      return set('list.timeformat', timeformat, state);
 
     // This is purely hacky way to change timeformat for dev purposes only
     case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT:
