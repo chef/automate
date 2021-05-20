@@ -127,7 +127,7 @@ section {
     padding: 8px 10px;
     outline: none;
     border-radius: 0;
-    background: #8aefa5;
+    background: #8AEFA5;
     border: none;
     border-bottom: 3px solid #228850;
     cursor: pointer;
@@ -138,11 +138,11 @@ section {
     }
 
     &:active {
-      background: #37ab40;
+      background: #37AB40;
     }
 
     &:disabled {
-      background-color: #a9b4ac;
+      background-color: #A9B4AC;
       border-color: grey;
       color: grey;
       cursor: not-allowed;

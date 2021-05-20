@@ -50,7 +50,7 @@
   transition: transform .25s;
 
   &.active {
-   transform: translateY(0); 
+    transform: translateY(0);
   }
 
   .show-button {
@@ -68,20 +68,20 @@
   }
 
   .hacky-line-break {
+    margin: 4px 0;
     width: 90%;
     height: 2px;
-    margin: 4px 0;
     background: blue;
   }
-  
+
   chef-select {
     width: 100%;
   }
 
-    .button-container {
-      margin-top: 16px;
+  .button-container {
+    margin-top: 16px;
 
-      .test-get {
+    .test-get {
       padding: 8px 10px;
       width: 100%;
       outline: none;
