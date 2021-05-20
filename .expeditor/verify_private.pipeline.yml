@@ -455,6 +455,9 @@ steps:
     command:
       - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 35
+    retry:
+      automatic:
+        limit: 2
     expeditor:
       secrets: &cypress_secrets
         A2_LICENSE:
