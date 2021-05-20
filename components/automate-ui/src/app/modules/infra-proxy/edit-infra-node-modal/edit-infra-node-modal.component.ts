@@ -3,7 +3,6 @@ import {
   EventEmitter,
   Input,
   OnInit,
-  OnChanges,
   OnDestroy,
   Output
 } from '@angular/core';
@@ -26,7 +25,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
   templateUrl: './edit-infra-node-modal.component.html',
   styleUrls: ['./edit-infra-node-modal.component.scss']
 })
-export class EditInfraNodeModalComponent implements OnChanges, OnInit, OnDestroy {
+export class EditInfraNodeModalComponent implements OnInit, OnDestroy {
   @Input() label: string;
   @Input() openEvent: EventEmitter<boolean>;
   @Input() orgId: string;
@@ -95,9 +94,6 @@ export class EditInfraNodeModalComponent implements OnChanges, OnInit, OnDestroy
           this.closeEditModal();
         }
       });
-  }
-
-  ngOnChanges(): void {
   }
 
   ngOnDestroy(): void {

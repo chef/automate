@@ -304,6 +304,41 @@ describe('infra node detail', () => {
       });
     });
 
+    it('can check save button is disabled until run list value is not changed', () => {
+      cy.get('[data-cy=node-edit-runlist]').contains('Edit').click();
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=drag-right]').should('be.disabled');
+      cy.get('[data-cy=drag-left]').should('be.disabled');
+      cy.get('[data-cy=drag-up]').should('be.disabled');
+      cy.get('[data-cy=drag-down]').should('be.disabled');
+
+      // check for disabled save button
+      cy.get('[data-cy=update-run-list]')
+      .invoke('attr', 'disabled')
+      .then(disabled => {
+        disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=update-run-list]').click();
+      });
+
+      cy.get('app-infra-node-details chef-modal').should('exist');
+
+      // here we exit with the Cancel button
+      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
+    });
+
+    it('can cancel edit run list', () => {
+      cy.get('[data-cy=node-edit-runlist]').contains('Edit').click();
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=drag-right]').should('be.disabled');
+      cy.get('[data-cy=drag-left]').should('be.disabled');
+      cy.get('[data-cy=drag-up]').should('be.disabled');
+      cy.get('[data-cy=drag-down]').should('be.disabled');
+
+      // here we exit with the Cancel button
+      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
+    });
+
     // switch to Run list tab specs
     it('can switch to details tab', () => {
       cy.get('[data-cy=details-tab]').contains('Details').click();
