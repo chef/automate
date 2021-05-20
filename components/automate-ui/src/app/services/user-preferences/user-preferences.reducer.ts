@@ -26,8 +26,9 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
 };
 
 export function userPreferencesEntityReducer(
-  action: UserPreferencesActions, 
-  state: UserPreferencesEntityState = UserPreferencesEntityInitialState): UserPreferencesEntityState {
+  action: UserPreferencesActions,
+  state: UserPreferencesEntityState
+    = UserPreferencesEntityInitialState): UserPreferencesEntityState {
 
   switch (action.type) {
 
