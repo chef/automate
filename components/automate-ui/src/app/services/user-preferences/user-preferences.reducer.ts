@@ -26,8 +26,8 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
 };
 
 export function userPreferencesEntityReducer(
-  state: UserPreferencesEntityState = UserPreferencesEntityInitialState,
-  action: UserPreferencesActions): UserPreferencesEntityState {
+  action: UserPreferencesActions, 
+  state: UserPreferencesEntityState = UserPreferencesEntityInitialState): UserPreferencesEntityState {
 
   switch (action.type) {
 
@@ -40,6 +40,7 @@ export function userPreferencesEntityReducer(
         set('list', action.payload.user_preferences))(state) as UserPreferencesEntityState;
 
     case UserPreferencesActionTypes.GET_USER_PREFERENCES_FAILURE:
+    case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_FAILURE: // fallthrough
       return pipe(
         set('status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as UserPreferencesEntityState;
@@ -51,11 +52,6 @@ export function userPreferencesEntityReducer(
       return pipe(
         set('status', EntityStatus.loadingSuccess),
         set('list', action.payload))(state) as UserPreferencesEntityState;
-
-    case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_FAILURE:
-      return pipe(
-        set('status', EntityStatus.loadingFailure),
-        set('error', action.payload))(state) as UserPreferencesEntityState;
 
     // This is purely hacky way to change timeformat for dev purposes only
     case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT:

@@ -3,7 +3,6 @@ import { Store, select } from '@ngrx/store';
 import { get, toUpper, pick } from 'lodash/fp';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-// import * as moment from 'moment/moment';
 import { MatOptionSelectionChange } from '@angular/material/core';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';

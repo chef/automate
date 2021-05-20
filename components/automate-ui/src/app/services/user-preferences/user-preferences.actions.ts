@@ -19,7 +19,6 @@ export enum UserPreferencesActionTypes {
 
 export class GetUserPreferences implements Action {
   readonly type = UserPreferencesActionTypes.GET_USER_PREFERENCES;
-  constructor() {}
 }
 
 export class GetUserPreferencesSuccess implements Action {
