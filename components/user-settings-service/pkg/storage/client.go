@@ -3,5 +3,7 @@ package storage
 import "github.com/chef/automate/api/interservice/user_settings"
 
 type Client interface {
-	GetUserSettings(*user_settings.GetUserSettingsRequest) (error, *user_settings.GetUserSettingsResponse)
+	GetUserSettings(string) (*user_settings.GetUserSettingsResponse, error)
+	PutUserSettings(*user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error)
+	DeleteUserSettings(string) error
 }

@@ -17,14 +17,14 @@ import (
 // specifically for storage.
 //
 // Additionally this struct implements our storage.Client interface
-type Postgres struct {
+type DB struct {
 	*gorp.DbMap
 	*config.Postgres
 }
 
 // New creates a new Postgres client, connects to the database server and runs
 // the migrations
-func ConnectAndMigrate(dbConf *config.Postgres) (*Postgres, error) {
+func ConnectAndMigrate(dbConf *config.Postgres) (*DB, error) {
 	pg, err := Connect(dbConf)
 	if err != nil {
 		return nil, err
@@ -37,8 +37,8 @@ func ConnectAndMigrate(dbConf *config.Postgres) (*Postgres, error) {
 	return pg, err
 }
 
-func Connect(dbConf *config.Postgres) (*Postgres, error) {
-	pg := &Postgres{Postgres: dbConf}
+func Connect(dbConf *config.Postgres) (*DB, error) {
+	pg := &DB{Postgres: dbConf}
 
 	log.WithFields(log.Fields{
 		"uri": pg.URI,
@@ -47,7 +47,7 @@ func Connect(dbConf *config.Postgres) (*Postgres, error) {
 	return pg, err
 }
 
-func (db *Postgres) DestructiveMigrateForTests() error {
+func (db *DB) DestructiveMigrateForTests() error {
 	if err := migrator.DestructiveMigrateForTests(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
 	}
@@ -55,12 +55,12 @@ func (db *Postgres) DestructiveMigrateForTests() error {
 }
 
 // ping will verify if the database mapped with gorp is available
-func (db *Postgres) ping() error {
+func (db *DB) ping() error {
 	return db.Db.Ping()
 }
 
 // connect opens a connection to the database
-func (db *Postgres) connect() error {
+func (db *DB) connect() error {
 	dbMap, err := libdb.PGOpen(db.URI)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
@@ -85,7 +85,7 @@ func (db *Postgres) connect() error {
 }
 
 // initDB initializes the database
-func (db *Postgres) initDB() error {
+func (db *DB) initDB() error {
 	// Create the schema
 	// @afiune Can we rename this library?
 	// @sr Just do it ;)

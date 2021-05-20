@@ -5,7 +5,6 @@ option go_package = "github.com/chef/automate/api/external/user_settings";
 
 import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
 
 // UserSettings allows accessing of user settings
 service UserSettingsService {
@@ -17,7 +16,7 @@ service UserSettingsService {
 	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {
 		option (google.api.http).get = "/api/v0/user-settings/{id}";
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings"
+			resource: "global:userSettings:{id}"
 			action: "global:userSettings:get"
 		};
 	};
@@ -25,12 +24,12 @@ service UserSettingsService {
 	// PutUserSettings upserts all of the preferences for a given user
 	rpc PutUserSettings(PutUserSettingsRequest) returns (PutUserSettingsResponse) {
 		option (google.api.http) = {
-			put: "/api/v0/user-settings/{id}";
-			body: "*";
+			put: "/api/v0/user-settings/{id}"
+			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings"
-			action: "global:userSettings:put"
+			resource: "global:userSettings:{id}"
+			action: "global:userSettings:update"
 		};
 	};
 
@@ -40,7 +39,7 @@ service UserSettingsService {
 			delete: "/api/v0/user-settings/{id}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings"
+			resource: "global:userSettings:{id}"
 			action: "global:userSettings:delete"
 		};
 	};
@@ -85,11 +84,3 @@ message UserSettingValue {
 	// Enabled
 	bool enabled = 3;
 }
-
-
-
-
-
-
-
-

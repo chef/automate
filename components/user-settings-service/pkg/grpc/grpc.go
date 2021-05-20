@@ -5,18 +5,26 @@ import (
 	"github.com/chef/automate/lib/grpc/health"
 
 	"fmt"
+	"net"
+
 	"github.com/chef/automate/components/user-settings-service/pkg/config"
 	uss "github.com/chef/automate/components/user-settings-service/pkg/server"
+	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/reflection"
-	"net"
 )
 
 func Spawn(c *config.UserSettings, connFactory *secureconn.Factory) error {
+	db, err := postgres.ConnectAndMigrate(&c.Postgres)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Fatal("Creating postgres connection")
+		return err
+	}
+
 	grpcServer := connFactory.NewServer()
-	userSettingsServer := uss.New(c.GetStorage())
+	userSettingsServer := uss.New(db, c.GetStorage())
 
 	user_settings.RegisterUserSettingsServiceServer(grpcServer, userSettingsServer)
 	health.RegisterHealthServer(grpcServer, health.NewService())
