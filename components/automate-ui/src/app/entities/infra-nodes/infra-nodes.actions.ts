@@ -10,6 +10,9 @@ export enum NodeActionTypes {
   GET                         = 'NODES::GET',
   GET_SUCCESS                 = 'NODES::GET::SUCCESS',
   GET_FAILURE                 = 'NODES::GET::FAILURE',
+  UPDATE                      = 'NODES::UPDATE',
+  UPDATE_SUCCESS              = 'NODES::UPDATE::SUCCESS',
+  UPDATE_FAILURE              = 'NODES::UPDATE::FAILURE',
   UPDATE_ENVIRONMENT          = 'NODES::ENVIRONMENT::UPDATE',
   UPDATE_ENVIRONMENT_SUCCESS  = 'NODES::ENVIRONMENT::UPDATE::SUCCESS',
   UPDATE_ENVIRONMENT_FAILURE  = 'NODES::ENVIRONMENT::UPDATE::FAILURE',
@@ -92,6 +95,21 @@ export class DeleteNodeFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class UpdateNode implements Action {
+  readonly type = NodeActionTypes.UPDATE;
+  constructor(public payload: InfraNode ) { }
+}
+
+export class UpdateNodeSuccess implements Action {
+  readonly type = NodeActionTypes.UPDATE_SUCCESS;
+  constructor(public payload: InfraNode) { }
+}
+
+export class UpdateNodeFailure implements Action {
+  readonly type = NodeActionTypes.UPDATE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export class UpdateNodeEnvironment implements Action {
   readonly type = NodeActionTypes.UPDATE_ENVIRONMENT;
   constructor(public payload: { node:  UpdateNodeEnvPayload}) { }
@@ -132,6 +150,9 @@ export type NodeActions =
   | DeleteNode
   | DeleteNodeSuccess
   | DeleteNodeFailure
+  | UpdateNode
+  | UpdateNodeSuccess
+  | UpdateNodeFailure
   | UpdateNodeEnvironment
   | UpdateNodeEnvironmentSuccess
   | UpdateNodeEnvironmentFailure

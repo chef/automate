@@ -37,6 +37,7 @@ import * as jobEdit from './pages/job-edit/job-edit.reducer';
 import * as jobEntity from './entities/jobs/job.reducer';
 import * as jobList from './pages/job-list/job-list.reducer';
 import * as manager from './entities/managers/manager.reducer';
+import * as nodeRunlistEntity from './entities/nodeRunlists/nodeRunlists.reducer';
 import * as notificationEntity from './entities/notifications/notification.reducer';
 import * as NotificationRuleEntity from './entities/notification_rules/notification_rule.reducer';
 import * as orgEntity from './entities/orgs/org.reducer';
@@ -107,6 +108,7 @@ export interface NgrxStateAtom {
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
   nodes: nodesEntity.NodesEntityState;
+  nodeRunlist: nodeRunlistEntity.NodeRunlistEntityState;
   notifications: notificationEntity.NotificationEntityState;
   notificationRules: NotificationRuleEntity.NotificationRuleEntityState;
   orgs: orgEntity.OrgEntityState;
@@ -236,6 +238,7 @@ export const defaultInitialState = {
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
   nodes: nodesEntity.NodesEntityInitialState,
+  nodeRunlist: nodeRunlistEntity.NodeRunlistEntityInitialState,
   notifications: notificationEntity.InitialState,
   notificationRules: NotificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
@@ -301,6 +304,7 @@ export const ngrxReducers = {
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
   nodes: nodesEntity.nodesEntityReducer,
+  nodeRunlist: nodeRunlistEntity.nodeRunlistEntityReducer,
   licenseStatus: license.licenseStatusEntityReducer,
   notifications: notificationEntity.notificationEntityReducer,
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,

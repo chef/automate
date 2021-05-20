@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams } from 'app/route.selectors';
+import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -21,16 +22,29 @@ import {
   environmentList
 } from 'app/entities/environments/environment.selectors';
 import {
+  allRecipes,
+  getAllStatus as getAllRecipesForOrgStatus
+} from 'app/entities/recipes/recipe.selectors';
+import {
+  allNodeRunlist,
+  getAllStatus as getAllNodeRunlistForOrgStatus
+} from 'app/entities/nodeRunlists/nodeRunlists.selectors';
+import {
   GetNode,
   UpdateNodeTags,
   UpdateNodeEnvironment
 } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { GetEnvironments } from 'app/entities/environments/environment.action';
+import { GetNodeRunlists } from 'app/entities/nodeRunlists/nodeRunlists.action';
+import { GetRecipes } from 'app/entities/recipes/recipe.action';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import { Environment } from 'app/entities/environments/environment.model';
+import { List, ExpandedChildList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
+import { Node, Options } from '../tree-table/models';
+import { AvailableType } from '../infra-roles/infra-roles.component';
+import { ListItem } from '../select-box/src/lib/list-item.domain';
 
-
-export type InfraNodeTabName = 'details';
+export type InfraNodeTabName = 'details' | 'runList';
 
 @Component({
   selector: 'app-infra-node-details',
@@ -44,11 +58,17 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public tabValue: InfraNodeTabName = 'details';
   public serverId: string;
   public orgId: string;
+  public openEdit = false;
+  public label: string;
   public name: string;
   public environmentName: string;
   public nodeDetailsLoading = true;
+  public nodeRunlistLoading = true;
+  public url: string;
+
   public updateNodeForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
+  public openEnvironmentModal = new EventEmitter<boolean>();
 
   // for tags
   public tags: string[];
@@ -56,7 +76,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public removeTags: string[] = [];
   public inputTxt = '';
   public updatingTags = false;
-
 
   // for environments
   public environmentListState: { items: Environment[], total: number };
@@ -70,8 +89,23 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public saving = false;
   public confirming = false;
 
+  // for runlist
+  public arrayOfNodesTree: Node<ExpandedChildList>[];
+  public availableType: AvailableType[] = [];
+  public childNodes: Node<ExpandedChildList>[] = [];
+  public expandedRunList: List[] = [];
+  public hasRun_List = false;
+  public recipes: string[] = [];
+  public runListLoading = true;
+  public runlist: NodeRunlist[] = [];
+  public selected: ListItem[] = [];
+  public treeOptions: Options<ExpandedChildList> = {
+    capitalizedHeader: true
+  };
+
   constructor(
     private fb: FormBuilder,
+    private router: Router,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
@@ -82,7 +116,12 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+    .subscribe((url: string) => {
+      this.url = url;
+      const [, fragment] = url.split('#');
+      this.tabValue = (fragment === 'runList') ? 'runList' : 'details';
+    });
     // load node details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -98,7 +137,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
         server_id: server_id, org_id: org_id, name: name
       }));
     });
-
+    this.loadRecipes();
     this.store.select(infraNodeFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
@@ -108,8 +147,11 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       this.environmentName = node.environment;
       this.tags = this.nodeTags;
       this.nodeDetailsLoading = false;
+      this.nodeRunlistLoading = false;
       // set default value of node environment
       this.updateNodeForm.controls.environment.setValue(this.environmentName);
+      // load runlist according to the environment
+      this.loadNodeRunlists(this.InfraNode.environment);
     });
 
     // show default list of environments
@@ -122,11 +164,13 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed),
       filter(([state]) => this.saving && !pending(state))
     ).subscribe(([getEnvSt, envStatus]) => {
-      if (getEnvSt === EntityStatus.loadingSuccess && !isNil(envStatus)) {
+      if (getEnvSt === EntityStatus.loadingSuccess && !isNil(envStatus)
+        && envStatus !== this.environmentName) {
         this.environmentName = envStatus;
         this.updateNodeForm.markAsPristine();
         this.saving = false;
         this.closeConfirmationBox();
+        this.updateRunlist();
       }
     });
 
@@ -145,6 +189,11 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
         this.updatingTags = false;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   // update tags
@@ -195,6 +244,43 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  openEditModal(label: string): void {
+    this.openEdit = true;
+    this.label = label;
+    this.openEnvironmentModal.emit(true);
+  }
+
+  onSelectedTab(event: { target: { value: InfraNodeTabName } }) {
+    this.tabValue = event.target.value;
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  selectChangeHandler(env: { name: string }) {
+    if (this.environmentName !== env.name) {
+      this.confirming = true;
+    }
+  }
+
+  closeConfirmationBox() {
+    this.updateNodeForm.controls.environment.setValue(this.environmentName);
+    this.confirming = false;
+  }
+
+  saveEnvironment() {
+    this.saving = true;
+    const updatedNode = {
+      org_id: this.orgId,
+      server_id: this.serverId,
+      name: this.name,
+      environment: this.updateNodeForm.controls.environment.value.trim()
+    };
+    this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
+  }
+
+  updateRunlist() {
+    this.loadNodeRunlists(this.environmentName);
+  }
+
   private fetchMore() {
     this.loading = true;
     this.currentPage += 1;
@@ -236,7 +322,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
-    console.log(this.environmentsBuffer.length);
   }
 
   private removeDuplicateEnv(): Environment[] {
@@ -251,30 +336,112 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  selectChangeHandler(env: { name: string }) {
-    if (this.environmentName !== env.name) {
-      this.confirming = true;
+  private loadNodeRunlists(environmentId: string): void {
+    this.store.dispatch(new GetNodeRunlists({
+      server_id: this.serverId, org_id: this.orgId, name: this.name, id: environmentId
+    }));
+    combineLatest([
+      this.store.select(getAllNodeRunlistForOrgStatus),
+      this.store.select(allNodeRunlist)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getNodeRunlistSt, allNodeRunlistState]) => {
+        if (getNodeRunlistSt === EntityStatus.loadingSuccess && !isNil(allNodeRunlistState)) {
+          if (allNodeRunlistState && allNodeRunlistState.length) {
+            this.runListLoading = true;
+            this.hasRun_List = false;
+            this.runlist = allNodeRunlistState;
+            this.treeNodes(allNodeRunlistState, environmentId);
+
+          } else {
+            this.runListLoading = false;
+          }
+          this.conflictError = false;
+        } else if (getNodeRunlistSt === EntityStatus.loadingFailure) {
+          this.conflictError = true;
+          this.hasRun_List = false;
+          this.runListLoading = false;
+        }
+      });
+  }
+
+  private loadRecipes(): void {
+    this.store.dispatch(new GetRecipes({
+      server_id: this.serverId, org_id: this.orgId, name: '_default'
+    }));
+    combineLatest([
+      this.store.select(getAllRecipesForOrgStatus),
+      this.store.select(allRecipes)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getRecipesSt, allRecipesState]) => {
+        if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
+          this.recipes = allRecipesState;
+          if (this.recipes.length > 0) {
+            this.recipes.forEach((recipe) => {
+              this.availableType.push({
+                name: recipe,
+                type: 'recipe'
+              });
+            });
+          }
+        }
+      });
+  }
+
+  // 1. According to the environment ID getting the array.
+  // 2. Then Convert our Particular Array data with parent, child nodes as tree structure.
+  private treeNodes(expandedList: NodeRunlist[], li: string) {
+    this.arrayOfNodesTree = [];
+    this.selected = [];
+    for (let i = 0; i < expandedList.length; i++) {
+      if (expandedList[i].id === li) {
+        this.expandedRunList = expandedList[i].run_list;
+        if (this.expandedRunList && this.expandedRunList.length) {
+          for (let j = 0; j < this.expandedRunList.length; j++) {
+            this.selected.push({
+              selected: false,
+              type: this.expandedRunList[j].type,
+              value: this.expandedRunList[j].name
+            });
+            this.arrayOfNodesTree.push({
+              value: {
+                name: this.expandedRunList[j].name,
+                version: this.expandedRunList[j].version ? this.expandedRunList[j].version :  '...',
+                type: this.expandedRunList[j].type,
+                error: this.expandedRunList[j].error,
+                position: this.expandedRunList[j].position,
+                skipped: this.expandedRunList[j].skipped
+              },
+              children:
+                this.expandedRunList[j].children && this.expandedRunList[j].children.length ?
+                  this.childNode(this.expandedRunList[j].children, []) : []
+            });
+          }
+          this.hasRun_List = true;
+          this.runListLoading = false;
+        } else {
+          this.hasRun_List = false;
+          this.runListLoading = false;
+        }
+      }
     }
   }
 
-  closeConfirmationBox() {
-    this.updateNodeForm.controls.environment.setValue(this.environmentName);
-    this.confirming = false;
-  }
-
-  saveEnvironment() {
-    this.saving = true;
-    const updatedNode = {
-      org_id: this.orgId,
-      server_id: this.serverId,
-      name: this.name,
-      environment: this.updateNodeForm.controls.environment.value.trim()
-    };
-    this.store.dispatch(new UpdateNodeEnvironment({node: updatedNode}));
-  }
-
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+  private childNode(child: List[], nodes: Node<ExpandedChildList>[]) {
+    for (let i = 0; i < child.length; i++) {
+      nodes.push({
+        value: {
+          name: child[i].name,
+          version: child[i].version ? child[i].version : '...',
+          type: child[i].type,
+          error: child[i].error,
+          position: child[i].position,
+          skipped: child[i].skipped
+        },
+        children:
+          child[i].children && child[i].children.length ?
+            this.childNode(child[i].children, []) : []
+      });
+    }
+    return nodes;
   }
 }
