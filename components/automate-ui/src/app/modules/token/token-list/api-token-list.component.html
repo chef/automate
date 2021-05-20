@@ -69,7 +69,7 @@
               <chef-td class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{token.id}}" data-cy="token-control">
                   <mat-option (onSelectionChange)="notifyCopy($event)" data-cy="copy-token">
-                    <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
+                    <chef-clipboard plain value="{{token.value}}" label="Copy Token" icon=""></chef-clipboard>
                   </mat-option>
                   <!-- <app-authorized [allOf]="[`/apis/iam/v2/tokens/{id}`, 'put', token.id]"> -->
                   <mat-option (onSelectionChange)="toggleActive($event, token)">Toggle Status</mat-option>
