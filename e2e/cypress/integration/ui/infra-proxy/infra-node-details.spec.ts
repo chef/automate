@@ -349,10 +349,10 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option').contains('developmen1t').click();
+      cy.get('.ng-option').contains('chef-environment-').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
-      cy.get('.ng-value').contains('developmen1t');
+      cy.get('.ng-value').contains('chef-environment-');
 
       cy.get('app-notification.info').contains('Successfully updated node environment.');
       cy.get('app-notification.info chef-icon').click();

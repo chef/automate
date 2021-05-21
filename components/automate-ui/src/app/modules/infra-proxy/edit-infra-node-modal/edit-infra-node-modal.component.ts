@@ -139,13 +139,12 @@ export class EditInfraNodeModalComponent implements OnInit, OnDestroy {
       override_attributes: JSON.parse(this.node.override_attributes)
     };
 
-    switch (this.label) {
-      case 'Run List':
-        node = { ...node,
-          run_list: this.isRunlist ? this.selectedRunLists : this.node.run_list
-        };
-        break;
+    if (this.label === 'Run List') {
+      node = { ...node,
+        run_list: this.isRunlist ? this.selectedRunLists : this.node.run_list
+      };
     }
+
     this.updatingData(node);
   }
 

@@ -1,9 +1,9 @@
 export interface NodeRunlist {
   id: string;
-  run_list: List[];
+  run_list: NodeList[];
 }
 
-export interface List {
+export interface NodeList {
   type: string;
   name: string;
   version?: string;
@@ -12,10 +12,10 @@ export interface List {
   error?: string;
   no_version?: boolean;
   skipped: boolean;
-  children?: List[];
+  children?: NodeList[];
 }
 
-export interface ExpandedChildList {
+export interface NodeExpandedChildList {
   type: string;
   name: string;
   version?: string;

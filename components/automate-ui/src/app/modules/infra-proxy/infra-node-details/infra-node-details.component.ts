@@ -39,7 +39,7 @@ import { GetNodeRunlists } from 'app/entities/nodeRunlists/nodeRunlists.action';
 import { GetRecipes } from 'app/entities/recipes/recipe.action';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import { Environment } from 'app/entities/environments/environment.model';
-import { List, ExpandedChildList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
+import { NodeList, NodeExpandedChildList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { Node, Options } from '../tree-table/models';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
@@ -90,16 +90,16 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public confirming = false;
 
   // for runlist
-  public arrayOfNodesTree: Node<ExpandedChildList>[];
+  public arrayOfNodesTree: Node<NodeExpandedChildList>[];
   public availableType: AvailableType[] = [];
-  public childNodes: Node<ExpandedChildList>[] = [];
-  public expandedRunList: List[] = [];
+  public childNodes: Node<NodeExpandedChildList>[] = [];
+  public expandedRunList: NodeList[] = [];
   public hasRun_List = false;
   public recipes: string[] = [];
   public runListLoading = true;
   public runlist: NodeRunlist[] = [];
   public selected: ListItem[] = [];
-  public treeOptions: Options<ExpandedChildList> = {
+  public treeOptions: Options<NodeExpandedChildList> = {
     capitalizedHeader: true
   };
 
@@ -392,30 +392,11 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   private treeNodes(expandedList: NodeRunlist[], li: string) {
     this.arrayOfNodesTree = [];
     this.selected = [];
-    for (let i = 0; i < expandedList.length; i++) {
-      if (expandedList[i].id === li) {
-        this.expandedRunList = expandedList[i].run_list;
+    for (const expandValue of expandedList) {
+      if (expandValue.id === li) {
+        this.expandedRunList = expandValue.run_list;
         if (this.expandedRunList && this.expandedRunList.length) {
-          for (let j = 0; j < this.expandedRunList.length; j++) {
-            this.selected.push({
-              selected: false,
-              type: this.expandedRunList[j].type,
-              value: this.expandedRunList[j].name
-            });
-            this.arrayOfNodesTree.push({
-              value: {
-                name: this.expandedRunList[j].name,
-                version: this.expandedRunList[j].version ? this.expandedRunList[j].version :  '...',
-                type: this.expandedRunList[j].type,
-                error: this.expandedRunList[j].error,
-                position: this.expandedRunList[j].position,
-                skipped: this.expandedRunList[j].skipped
-              },
-              children:
-                this.expandedRunList[j].children && this.expandedRunList[j].children.length ?
-                  this.childNode(this.expandedRunList[j].children, []) : []
-            });
-          }
+          this.expandedTreeNode(this.expandedRunList);
           this.hasRun_List = true;
           this.runListLoading = false;
         } else {
@@ -426,20 +407,43 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private childNode(child: List[], nodes: Node<ExpandedChildList>[]) {
-    for (let i = 0; i < child.length; i++) {
-      nodes.push({
+  private expandedTreeNode(expandedRunList: NodeList[]) {
+    for (const value of expandedRunList) {
+      this.selected.push({
+        selected: false,
+        type: value.type,
+        value: value.name
+      });
+      this.arrayOfNodesTree.push({
         value: {
-          name: child[i].name,
-          version: child[i].version ? child[i].version : '...',
-          type: child[i].type,
-          error: child[i].error,
-          position: child[i].position,
-          skipped: child[i].skipped
+          name: value.name,
+          version: value.version ? value.version :  '...',
+          type: value.type,
+          error: value.error,
+          position: value.position,
+          skipped: value.skipped
         },
         children:
-          child[i].children && child[i].children.length ?
-            this.childNode(child[i].children, []) : []
+          value.children && value.children.length ?
+            this.childNode(value.children, []) : []
+      });
+    }
+  }
+
+  private childNode(child: NodeList[], nodes: Node<NodeExpandedChildList>[]) {
+    for (const value of child) {
+      nodes.push({
+        value: {
+          name: value.name,
+          version: value.version ? value.version : '...',
+          type: value.type,
+          error: value.error,
+          position: value.position,
+          skipped: value.skipped
+        },
+        children:
+          value.children && value.children.length ?
+            this.childNode(value.children, []) : []
       });
     }
     return nodes;
