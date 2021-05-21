@@ -83,35 +83,9 @@ img {
   }
 }
 
-.minus-icon {
-  &:before {
-    display: inline-block;
-    content: '|';
-    font-family: arial;
-    transform: scaleX(-1) rotate(-90deg);
-    vertical-align: top;
-    line-height: 1em;
-    width: 8px;
-    color: $chef-critical;
-    height: 10px;
-    margin-right: 1.3em;
-    text-align: center;
-    position: absolute;
-    right: 0;
-  }
-
-  &:hover {
-    &:before {
-      color: $chef-white;
-    }
-
-  }
-}
-
-::ng-deep
-.mat-select-panel .mat-option {
+::ng-deep .mat-select-panel .mat-option {
   &.secondary {
-    width: 115px;
+    width: 150px;
     height: 2.3em;
     background: $chef-white;
     color: $chef-critical;
@@ -120,5 +94,28 @@ img {
   &:hover {
     background: $chef-primary-bright;
     color: $chef-white;
+
+    chef-icon.primary {
+      color: $chef-white;
+    }
+  }
+}
+
+// reest key
+
+chef-icon.primary {
+  color: $chef-primary-bright;
+  float: right;
+  margin-top: 15px;
+
+  &:hover {
+    color: $chef-white;
+  }
+}
+
+::ng-deep {
+  .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
+    background: #3864F2;
+    color: #FFFFFF;
   }
 }

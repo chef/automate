@@ -9,8 +9,9 @@ describe('infra node list', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const adminKey = 'test';
   const nodeName = `${cypressPrefix}-node-${now}-1`;
+  const nodeName1 = 'ec2-node-viv'
   const nodePlatform = 'ubuntu';
   const nodeFQDN = 'ip-172-31-20-111.us-east-2.compute.internal';
   const nodeIpAddress = '1.1.1.1';
@@ -201,5 +202,61 @@ describe('infra node list', () => {
       });
     });
 
+    it('can successfully reset the node key', () => {
+      cy.get('[data-cy=search-filter]').type(`${nodeName1}`);
+      cy.get('[data-cy=search-entity]').click();
+      cy.get('[data-cy=nodes-table-container]').contains(nodeName1).should('exist');
+      cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
+        .contains(nodeName1).parent().parent().find('.mat-select-trigger').click();
+
+      cy.get('[data-cy=reset-key]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-nodes chef-button').contains('Reset Key').click();
+      cy.get('[data-cy=close]').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains(`Successfully reset the key - ${nodeName1}.`);
+      cy.get('app-notification.info chef-icon').click();
+    });
+
+    it('can successfully reset the node key and copy the key', () => {
+      cy.get('[data-cy=search-filter]').clear();
+      cy.get('[data-cy=search-entity]').click();
+      cy.get('[data-cy=search-filter]').type(`${nodeName1}`);
+      cy.get('[data-cy=search-entity]').click();
+      cy.get('[data-cy=nodes-table-container]').contains(nodeName1).should('exist');
+      cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
+        .contains(nodeName1).parent().parent().find('.mat-select-trigger').click();
+
+      cy.get('[data-cy=reset-key]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-nodes chef-button').contains('Reset Key').click();
+      cy.get('[data-cy=copy]').click();
+      cy.get('[data-cy=close]').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains(`Successfully reset the key - ${nodeName1}.`);
+      cy.get('app-notification.info chef-icon').click();
+    });
+
+    it('can successfully reset the node key and download the the key', () => {
+      cy.get('[data-cy=search-filter]').clear();
+      cy.get('[data-cy=search-entity]').click();
+      cy.get('[data-cy=search-filter]').type(`${nodeName1}`);
+      cy.get('[data-cy=search-entity]').click();
+      cy.get('[data-cy=nodes-table-container]').contains(nodeName1).should('exist');
+      cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
+        .contains(nodeName1).parent().parent().find('.mat-select-trigger').click();
+
+      cy.get('[data-cy=reset-key]').should('be.visible')
+        .click();
+      // accept dialog
+      cy.get('app-infra-nodes chef-button').contains('Reset Key').click();
+      cy.get('[data-cy=download]').click();
+      cy.get('[data-cy=close]').click();
+      // verify success notification and then dismiss it
+      cy.get('app-notification.info').contains(`Successfully reset the key - ${nodeName1}.`);
+      cy.get('app-notification.info chef-icon').click();
+    });
   });
 });

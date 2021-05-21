@@ -8,6 +8,12 @@
     (deleteClicked)="deleteNode()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
+  <app-reset-node-key
+    [openEvent]="openNotificationModal"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [name]="nodeName">
+  </app-reset-node-key>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
@@ -49,7 +55,20 @@
             <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="delete" class="secondary minus-icon" (onSelectionChange)="startNodeDelete(node)">Delete</mat-option>
+                <mat-option
+                  data-cy="reset-key"
+                  class="secondary"
+                  (onSelectionChange)="openResetKeyModal(node.name)">
+                  Reset Key
+                  <chef-icon aria-hidden="true" class="primary">add</chef-icon>
+                </mat-option>
+                <mat-option 
+                  data-cy="delete"
+                  class="secondary"
+                  (onSelectionChange)="startNodeDelete(node)">
+                  Delete
+                  <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
+                </mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>

@@ -41,6 +41,7 @@ import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
+import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatInputModule } from '@angular/material/input';
@@ -86,7 +87,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     OrgEditComponent,
     PolicyFilesComponent,
     ResetAdminKeyComponent,
-    ResetClientKeyComponent
+    ResetClientKeyComponent,
+    ResetNodeKeyComponent
   ],
   imports: [
     CommonModule,
