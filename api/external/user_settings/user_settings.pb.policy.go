@@ -6,43 +6,13 @@ package user_settings
 import policy "github.com/chef/automate/api/external/iam/v2/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/GetUserSettings", "global:userSettings:{id}", "global:userSettings:get", "GET", "/api/v0/user-settings/{id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*GetUserSettingsRequest); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "id":
-					return m.Id
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
+	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/GetUserSettings", "global:userSettings:{user.name}:{user.connector}", "global:userSettings:get", "GET", "/api/v0/user-settings/{user.name}/{user.connector}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/PutUserSettings", "global:userSettings:{id}", "global:userSettings:update", "PUT", "/api/v0/user-settings/{id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*PutUserSettingsRequest); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "id":
-					return m.Id
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
+	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/PutUserSettings", "global:userSettings:{user.name}:{user.connector}", "global:userSettings:update", "PUT", "/api/v0/user-settings/{user.name}/{user.connector}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/DeleteUserSettings", "global:userSettings:{id}", "global:userSettings:delete", "DELETE", "/api/v0/user-settings/{id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*DeleteUserSettingsRequest); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "id":
-					return m.Id
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
+	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/DeleteUserSettings", "global:userSettings:{user.name}:{user.connector}", "global:userSettings:delete", "DELETE", "/api/v0/user-settings/{user.name}/{user.connector}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
 	})
 }

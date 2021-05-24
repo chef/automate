@@ -2,6 +2,9 @@ package postgres
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/chef/automate/api/external/lib/errorutils"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -11,38 +14,41 @@ import (
 
 const selectUserSettings = `
 SELECT 
+id,
 user_name,
 connector,
 settings
-from user_settings
-where user_name = $1
+from user_settings 
+WHERE user_name = $1 and connector = $2;
 `
 
 const deleteUserSettings = `
-DELETE FROM user_settings
-WHERE id = $1;
+DELETE FROM user_settings 
+WHERE user_name = $1 and connector = $2;
 `
 
 const upsertUserSettings = `
 INSERT INTO user_settings(user_name, connector, settings)
 VALUES ($1, $2, $3)
-ON CONFLICT ON CONSTRAINT user_name_unique
-DO UPDATE SET (EXCLUDED.user_name, EXCLUDED.connector, settings) = ($1,$2,$3);
+ON CONFLICT ON CONSTRAINT user_settings_user_name_and_connector
+DO UPDATE SET (user_name, connector, settings) = ($1,$2,$3);
 `
 
 type UserSettings struct {
+	Id        int32           `db:"id, primarykey, autoincrement"`
 	UserName  string          `db:"user_name"`
 	Connector string          `db:"connector"`
 	Settings  json.RawMessage `db:"settings"`
 }
 
-func (db *DB) GetUserSettings(id string) (*user_settings.GetUserSettingsResponse, error) {
+func (db *DB) GetUserSettings(name string, connector string) (*user_settings.GetUserSettingsResponse, error) {
 	userSettingsData := UserSettings{}
-	res, err := db.Select(&userSettingsData, selectUserSettings, id)
+	err := db.SelectOne(&userSettingsData, selectUserSettings, name, connector)
 	if err != nil {
-		return nil, err
+		return nil, errorutils.ProcessSQLNotFound(err,
+			fmt.Sprintf("connector: $s, user_name: %s", connector, name), "GetJob error")
 	}
-	logrus.Infof("res %v", res)
+	logrus.Infof("userSettingsData.Settings %v", userSettingsData.Settings)
 
 	var data map[string]*user_settings.UserSettingValue
 	err = json.Unmarshal(userSettingsData.Settings, &data)
@@ -50,32 +56,43 @@ func (db *DB) GetUserSettings(id string) (*user_settings.GetUserSettingsResponse
 		return nil, err
 	}
 	settingsResponse := &user_settings.GetUserSettingsResponse{
-		Id:       userSettingsData.UserName,
+		User: &user_settings.User{
+			Id:        userSettingsData.Id,
+			Name:      name,
+			Connector: connector,
+		},
 		Settings: data,
 	}
 
 	return settingsResponse, err
 }
 
-func (db *DB) PutUserSettings(inUserSettings *user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error) {
+func (db *DB) PutUserSettings(name string, connector string,
+	settings map[string]*user_settings.UserSettingValue) (*user_settings.PutUserSettingsResponse, error) {
 	logrus.Infof("MAKING IT SO")
-	var userSettings map[string]*user_settings.UserSettingValue
-	id := inUserSettings.GetId()
-	userSettings = inUserSettings.GetSettings()
-
-	jsonString, err := json.Marshal(userSettings)
+	jsonString, err := json.Marshal(settings)
 	if err != nil {
 		return nil, err
 	}
-	logrus.Infof("for id: %s, user settings: %s", id, jsonString)
 
-	return &user_settings.PutUserSettingsResponse{Id: id}, nil
+	_, err = db.Exec(upsertUserSettings, name, connector, jsonString)
+	if err != nil {
+		return nil, errors.Wrap(err, "PutUserSettings unable to update user settings")
+	}
+
+	return &user_settings.PutUserSettingsResponse{
+		User: &user_settings.User{
+			Name:      name,
+			Connector: connector,
+		},
+	}, nil
 }
 
-func (db *DB) DeleteUserSettings(id string) error {
-	_, err := db.Exec(deleteUserSettings, id)
+func (db *DB) DeleteUserSettings(name string, connector string) error {
+	_, err := db.Exec(deleteUserSettings, name, connector)
 	if err != nil {
-		return errors.Wrapf(err, "DeleteUserSettings unable to delete user settings for id: %s", id)
+		return errors.Wrapf(err, "DeleteUserSettings unable to delete user settings for user: %s connector: %s",
+			name, connector)
 	}
 	return nil
 }

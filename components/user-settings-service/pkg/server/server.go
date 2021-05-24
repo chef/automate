@@ -3,11 +3,13 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
+
+	"github.com/chef/automate/api/external/lib/errorutils"
 
 	pb "github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/chef/automate/api/external/lib/errorutils"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/user_settings"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
@@ -46,111 +48,68 @@ func New(db *postgres.DB, storage storage.Client) *UserSettingsServer {
 }
 
 func (s *UserSettingsServer) GetUserSettings(ctx context.Context, req *user_settings.GetUserSettingsRequest) (*user_settings.GetUserSettingsResponse, error) {
-	id := req.GetId()
-	if id == "" {
+	logrus.Infof("GetUserSettings from server.go - RIGHT HERE!!!!!!")
+
+	name := req.GetUser().GetName()
+	if name == "" {
 		return nil, errors.New("invalid user Id")
 	}
-
-	logrus.Infof("Get settings for user %q", id)
-	userSettings, err := s.db.GetUserSettings(id)
-	if err != nil {
-		logrus.Error(err)
+	connector := req.GetUser().GetConnector()
+	if connector == "" {
+		return nil, errors.New("invalid connector")
 	}
 
-	//fmt.Printf("%+v", resp)
-	return &user_settings.GetUserSettingsResponse{Id: id, Settings: userSettings.GetSettings()}, nil
+	logrus.Infof("Get settings for connector: %s user: %s", connector, name)
+	getUserSettingsResp, err := s.db.GetUserSettings(name, connector)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err,
+			fmt.Sprintf("for connector: %s and user: %s", connector, name))
+	}
+	logrus.Infof("GetUserSettings response: %v", getUserSettingsResp)
+	return getUserSettingsResp, nil
 }
 
 //	rpc UpdateUserSettings(PutUserSettings) returns (UpdateUserSettingsResponse) {
 func (s *UserSettingsServer) PutUserSettings(ctx context.Context, req *user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error) {
-	logrus.Infof("RIGHT HERE!!!!!!")
-	id := req.GetId()
-	logrus.Infof("PutUserSettings for id: %s", id)
-	if id == "" {
+	logrus.Infof("PutUserSettings from server.go")
+	name := req.GetUser().GetName()
+	if name == "" {
 		return nil, errors.New("invalid user Id")
 	}
-	logrus.Infof("PutUserSettings set %q to %q", id, req.GetSettings())
-	putUserSettingsResp, err := s.db.PutUserSettings(req)
+	connector := req.GetUser().GetConnector()
+	if connector == "" {
+		return nil, errors.New("invalid connector")
+	}
+	logrus.Infof("Put settings for connector: %s user: %s", connector, name)
+	var userSettings map[string]*user_settings.UserSettingValue
+	userSettings = req.GetSettings()
+	logrus.Infof("userSettings: %v", userSettings)
+
+	putUserSettingsResp, err := s.db.PutUserSettings(name, connector, userSettings)
 	if err != nil {
 		return nil, err
 	}
 	logrus.Infof("PutUserSettings response: %v", putUserSettingsResp)
-	return nil, nil
+	return putUserSettingsResp, nil
 }
 
 //rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
-func (s *UserSettingsServer) DeleteUserSettings(ctx context.Context, req *user_settings.DeleteUserSettingsRequest) (*user_settings.DeleteUserSettingsResponse, error) {
-	logrus.Debugf("Deleting job id: %+v", req.Id)
-	id := req.GetId()
-	if id == "" {
+func (s *UserSettingsServer) DeleteUserSettings(ctx context.Context, req *user_settings.DeleteUserSettingsRequest) (*pb.Empty, error) {
+	logrus.Infof("DeleteUserSettings from server.go")
+	name := req.GetUser().GetName()
+	if name == "" {
 		return nil, errors.New("invalid user Id")
 	}
+	connector := req.GetUser().GetConnector()
+	if connector == "" {
+		return nil, errors.New("invalid connector")
+	}
+	logrus.Infof("Put settings for connector: %s user: %s", connector, name)
 	// delete the user settings for this id
-	err := s.db.DeleteUserSettings(id)
+	err := s.db.DeleteUserSettings(name, connector)
 	if err != nil {
-		return nil, errorutils.FormatErrorMsg(err, id)
+		return nil, err
 	}
 
-	return &user_settings.DeleteUserSettingsResponse{Id: id}, nil
-}
-
-//from maps.. this is throw away code
-func (s *UserSettingsServer) GetUserSettingsFromMap(ctx context.Context, req *user_settings.GetUserSettingsRequest) (*user_settings.GetUserSettingsResponse, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	id := req.GetId()
-	if id == "" {
-		return nil, errors.New("invalid user Id")
-	}
-
-	logrus.Infof("Get settings for user %q", id)
-	//err, resp := s.storageClient.GetUserSettings(req)
-	//if err != nil {
-	//	logrus.Error(err)
-	//}
-
-	//fmt.Printf("%+v", resp)
-	return &user_settings.GetUserSettingsResponse{Id: id, Settings: s.vals[id]}, nil
-}
-
-//	rpc UpdateUserSettings(PutUserSettings) returns (UpdateUserSettingsResponse) {
-func (s *UserSettingsServer) PutUserSettingsFromMap(ctx context.Context, req *user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	id := req.GetId()
-	if id == "" {
-		return nil, errors.New("invalid user Id")
-	}
-
-	if req.GetSettings() == nil {
-		return nil, errors.New("invalid settings")
-	}
-
-	//impl here
-	s.vals[id] = req.GetSettings()
-
-	logrus.Infof("Set %q to %q", id, req.GetSettings())
-
-	return &user_settings.PutUserSettingsResponse{Id: id}, nil
-}
-
-//rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
-func (s *UserSettingsServer) DeleteUserSettingsFromMap(ctx context.Context, req *user_settings.DeleteUserSettingsRequest) (*user_settings.DeleteUserSettingsResponse, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	id := req.GetId()
-	if id == "" {
-		return nil, errors.New("invalid user Id")
-	}
-
-	_, ok := s.vals[id]
-	if ok {
-		delete(s.vals, id)
-	}
-	logrus.Infof("Deleted user settings for %q", id)
-
-	return &user_settings.DeleteUserSettingsResponse{Id: id}, nil
+	return &empty, nil
 }

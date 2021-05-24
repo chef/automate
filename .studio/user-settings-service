@@ -48,52 +48,18 @@ user_settings_grpcurl_list_services() {
     user_settings_grpcurl_get list "$1"
 }
 
-document "user_settings_grpcurl_get" <<DOC
-  Make a grpcurl GET request to the provided GRPC function.
-
-  @(arg:1) Required: A GRPC function
-
-  Example: Get user settings for a given user  (GetUserSettings)
-  -----------------------------
-  user_settings_grpcurl_get chef.automate.domain.user_settings.service.UserSettingsService.GetUserSettings
-
-  NOTE: Run 'user_settings_grpcurl_list_services' to inspect the RPC services.
-DOC
-function user_settings_grpcurl_get() {
-    log_line "calling grpc get"
-
-  chef-automate dev grpcurl user-settings-service -- "$@"
-}
-
-
-## this doesn't exist.. get rid of this
-document "user_settings_grpcurl_get_suggestions" <<DOC
-  Hits the suggestions endpoint inside the user-settings-service. (GetSuggestions)
-
-  @(arg:1) Type of suggestion to lookup
-  @(arg:2) Text for the provided suggestion type
-
-  Example: Get the suggestions for the chef version 14
-  -----------------------------
-  user_settings_grpcurl_get_suggestions chef_version 14*
-DOC
-function user_settings_grpcurl_get_suggestions() {
-  chef-automate dev grpcurl user-settings-service -- -d '{"type": "'"$1"'", "text": "'"$2"'"}' \
-	  chef.automate.domain.cfgmgmt.service.GetSuggestions
-}
-
-
 document "user_settings_grpcurl_get_user_settings" <<DOC
   Hits the get user settings endpoint inside the user-settings-service. (GetUserSettings)
 
-  @(arg:1) id of user to get settings for
+  @(arg:1) name of user to get settings for
+  @(arg:2) connector of user to get settings for
 
   Example: Get the user settings for the user id uid1
   -----------------------------
   user_settings_grpcurl_get_user_settings uid1
 DOC
 function user_settings_grpcurl_get_user_settings() {
-  chef-automate dev grpcurl user-settings-service -- -d '{"id": "'"$1"'"}' \
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}}' \
 	  chef.automate.domain.user_settings.service.UserSettingsService.GetUserSettings
 }
 
@@ -101,16 +67,33 @@ document "user_settings_grpcurl_put_user_settings" <<DOC
   Hits the put user settings endpoint inside the user-settings-service. (PutUserSettings)
 
   @(arg:1) id of user to put settings for
-  @(arg:2) UserSettings to be set for the given user id
+  @(arg:2) connector of user to put settings for
+  @(arg:3) UserSettings to be set for the given user id
 
   Example: Put the user settings for the user id uid1
   -----------------------------
   user_settings_grpcurl_put_user_settings uid1
 DOC
 function user_settings_grpcurl_put_user_settings() {
-  chef-automate dev grpcurl user-settings-service -- -d '{"id": "'"$1"'", "settings": { "setting1" : {"default_value": "defval1", "value": "val1", "enabled": true}, "setting2" : {"default_value": "defval2", "value": "val2", "enabled": false}}}' \
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}, "settings": { "setting1" : {"default_value": "defval1", "value": "val1", "enabled": true}, "setting2" : {"default_value": "defval2", "value": "val2", "enabled": false}}}' \
 	  chef.automate.domain.user_settings.service.UserSettingsService.PutUserSettings
 }
+
+document "user_settings_grpcurl_delete_user_settings" <<DOC
+  Hits the get user settings endpoint inside the user-settings-service. (GetUserSettings)
+
+  @(arg:1) name of user to get settings for
+  @(arg:2) connector of user to get settings for
+
+  Example: Get the user settings for the user id uid1
+  -----------------------------
+  user_settings_grpcurl_get_user_settings uid1
+DOC
+function user_settings_grpcurl_delete_user_settings() {
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}}' \
+	  chef.automate.domain.user_settings.service.UserSettingsService.DeleteUserSettings
+}
+
 
 
 

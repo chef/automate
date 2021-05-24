@@ -5,6 +5,7 @@ option go_package = "github.com/chef/automate/api/external/user_settings";
 
 import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
+import "google/protobuf/empty.proto";
 
 // UserSettings allows accessing of user settings
 service UserSettingsService {
@@ -14,9 +15,9 @@ service UserSettingsService {
 
 	// GetUserSettings returns all of the preferences for a given user
 	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {
-		option (google.api.http).get = "/api/v0/user-settings/{id}";
+		option (google.api.http).get = "/api/v0/user-settings/{user.name}/{user.connector}";
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings:{id}"
+			resource: "global:userSettings:{user.name}:{user.connector}"
 			action: "global:userSettings:get"
 		};
 	};
@@ -24,56 +25,57 @@ service UserSettingsService {
 	// PutUserSettings upserts all of the preferences for a given user
 	rpc PutUserSettings(PutUserSettingsRequest) returns (PutUserSettingsResponse) {
 		option (google.api.http) = {
-			put: "/api/v0/user-settings/{id}"
+			put: "/api/v0/user-settings/{user.name}/{user.connector}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings:{id}"
+			resource: "global:userSettings:{user.name}:{user.connector}"
 			action: "global:userSettings:update"
 		};
 	};
 
 	// DeleteUserSettings deletes all settings for a given user
-	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
+	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (google.protobuf.Empty){
 		option (google.api.http) = {
-			delete: "/api/v0/user-settings/{id}"
+			delete: "/api/v0/user-settings/{user.name}/{user.connector}"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings:{id}"
+			resource: "global:userSettings:{user.name}:{user.connector}"
 			action: "global:userSettings:delete"
 		};
 	};
 }
 
+message User {
+	int32 id = 1;
+	string name = 2;
+	string connector = 3;
+}
+
 message GetUserSettingsRequest{
-	// ID of the user.
-	string id = 1;
+	// The user to get settings for
+	User user = 1;
 }
 
 message PutUserSettingsRequest{
 	// ID of the user. Cannot be changed. Used to sign in.
-	string id = 1;
-
+	User user = 1;
 	// The user settings to persist.
 	map<string, UserSettingValue> settings = 2;
 }
 
 message DeleteUserSettingsRequest{
 	// ID of the user.
-	string id = 1;
+	User user = 1;
 }
 
 message GetUserSettingsResponse {
-	string id = 1;
+	User user = 1;
 	map<string, UserSettingValue> settings = 2;
 }
 
 message PutUserSettingsResponse {
-	string id = 1;
-}
-
-message DeleteUserSettingsResponse {
-	string id = 1;
+	User user = 1;
 }
 
 message UserSettingValue {

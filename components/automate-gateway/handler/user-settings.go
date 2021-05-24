@@ -2,10 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
+
+	gp "github.com/golang/protobuf/ptypes/empty"
+
 	external_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/user_settings"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/chef/automate/components/automate-gateway/protobuf"
+	"github.com/golang/protobuf/proto"
 )
 
 type UserSettingsServiceServer struct {
@@ -18,42 +22,43 @@ func NewUserSettingsHandler(client user_settings.UserSettingsServiceClient) *Use
 	}
 }
 
-func (s *UserSettingsServiceServer) GetUserSettings(ctx context.Context, request *external_user_settings.GetUserSettingsRequest) (*external_user_settings.GetUserSettingsResponse, error) {
-	clientReq := &user_settings.GetUserSettingsRequest{
-		Id: request.GetId(),
+func (s *UserSettingsServiceServer) GetUserSettings(ctx context.Context, in *external_user_settings.GetUserSettingsRequest) (*external_user_settings.GetUserSettingsResponse, error) {
+	fmt.Println("IN GATEWAY GetUserSettings.. ")
+	inDomain := &user_settings.GetUserSettingsRequest{}
+	out := &external_user_settings.GetUserSettingsResponse{}
+	f := func() (proto.Message, error) {
+		return s.client.GetUserSettings(ctx, inDomain)
 	}
-	log.WithFields(log.Fields{
-		"request": request.String(),
-		"func":    nameOfFunc(),
-	}).Debug("rpc call")
-
-	clientResponse, err := s.client.GetUserSettings(ctx, clientReq)
+	err := protobuf.CallDomainService(in, inDomain, f, out)
 	if err != nil {
 		return nil, err
 	}
+	return out, nil
+}
 
-	var settings map[string]*external_user_settings.UserSettingValue
-	for k, v := range clientResponse.GetSettings() {
-		settings[k] = &external_user_settings.UserSettingValue{
-			DefaultValue: v.GetDefaultValue(),
-			Value:        v.GetValue(),
-			Enabled:      v.GetEnabled(),
-		}
+func (s *UserSettingsServiceServer) PutUserSettings(ctx context.Context, in *external_user_settings.PutUserSettingsRequest) (*external_user_settings.PutUserSettingsResponse, error) {
+	inDomain := &user_settings.PutUserSettingsRequest{}
+	out := &external_user_settings.PutUserSettingsResponse{}
+	f := func() (proto.Message, error) {
+		return s.client.PutUserSettings(ctx, inDomain)
 	}
-	return &external_user_settings.GetUserSettingsResponse{
-		Id:       clientResponse.GetId(),
-		Settings: settings,
-	}, nil
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+
 }
 
-func (s *UserSettingsServiceServer) PutUserSettings(ctx context.Context, request *external_user_settings.PutUserSettingsRequest) (*external_user_settings.PutUserSettingsResponse, error) {
-	return &external_user_settings.PutUserSettingsResponse{
-		Id: request.GetId(),
-	}, nil
-}
-
-func (s *UserSettingsServiceServer) DeleteUserSettings(ctx context.Context, request *external_user_settings.DeleteUserSettingsRequest) (*external_user_settings.DeleteUserSettingsResponse, error) {
-	return &external_user_settings.DeleteUserSettingsResponse{
-		Id: request.GetId(),
-	}, nil
+func (s *UserSettingsServiceServer) DeleteUserSettings(ctx context.Context, in *external_user_settings.DeleteUserSettingsRequest) (*gp.Empty, error) {
+	inDomain := &user_settings.DeleteUserSettingsRequest{}
+	out := &gp.Empty{}
+	f := func() (proto.Message, error) {
+		return s.client.DeleteUserSettings(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }

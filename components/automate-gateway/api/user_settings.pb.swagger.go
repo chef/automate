@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/api/v0/user-settings/{id}": {
+    "/api/v0/user-settings/{user.name}/{user.connector}": {
       "get": {
         "summary": "GetUserSettings returns all of the preferences for a given user",
         "operationId": "UserSettingsService_GetUserSettings",
@@ -34,11 +34,23 @@ func init() {
         },
         "parameters": [
           {
-            "name": "id",
-            "description": "ID of the user.",
+            "name": "user.name",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "user.connector",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.id",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -52,7 +64,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.user_settings.DeleteUserSettingsResponse"
+              "properties": {}
             }
           },
           "default": {
@@ -64,11 +76,23 @@ func init() {
         },
         "parameters": [
           {
-            "name": "id",
-            "description": "ID of the user.",
+            "name": "user.name",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "user.connector",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.id",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -94,8 +118,13 @@ func init() {
         },
         "parameters": [
           {
-            "name": "id",
-            "description": "ID of the user. Cannot be changed. Used to sign in.",
+            "name": "user.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.connector",
             "in": "path",
             "required": true,
             "type": "string"
@@ -116,19 +145,11 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.user_settings.DeleteUserSettingsResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.user_settings.GetUserSettingsResponse": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
         },
         "settings": {
           "type": "object",
@@ -141,8 +162,8 @@ func init() {
     "chef.automate.api.user_settings.PutUserSettingsRequest": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User",
           "description": "ID of the user. Cannot be changed. Used to sign in."
         },
         "settings": {
@@ -157,7 +178,22 @@ func init() {
     "chef.automate.api.user_settings.PutUserSettingsResponse": {
       "type": "object",
       "properties": {
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.User": {
+      "type": "object",
+      "properties": {
         "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "connector": {
           "type": "string"
         }
       }

@@ -80,7 +80,7 @@ func (db *DB) connect() error {
 	if err != nil {
 		return errors.Wrapf(err, "Failed to ping database with uri: %s", db.URI)
 	}
-
+	db.TraceOn("gorp", log.New())
 	return nil
 }
 
