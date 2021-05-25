@@ -7,6 +7,8 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -54,6 +56,12 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 
 	deploymentUUID := ToUUID(deploymentID)
 
+	resp, e := http.Get("https://telemetry-acceptance.chef.io/segment/api_keys")
+	if e != nil {
+		fmt.Println("Err::", e.Error())
+	} else {
+		fmt.Println("RESP::", resp)
+	}
 	//if deployment id is empty or a UUID don't turn it into a UUID
 
 	if r.License != nil {
