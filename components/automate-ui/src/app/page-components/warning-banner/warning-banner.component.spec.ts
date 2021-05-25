@@ -18,19 +18,19 @@ class MockAppConfigService {
       message: Configs.Message,
       background_color: Configs.BackgroundColor,
       text_color: Configs.TextColor
-    }
+    };
   }
 
   get bannerMessage() {
-    return Configs.Message
+    return Configs.Message;
   }
 
   get bannerBackgroundColor() {
-    return `#${Configs.BackgroundColor}`
+    return `#${Configs.BackgroundColor}`;
   }
 
   get bannerTextColor() {
-    return `#${Configs.TextColor}`
+    return `#${Configs.TextColor}`;
   }
 }
 
@@ -54,14 +54,14 @@ describe('WarningBannerComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create',() => {
+  it('should create', () => {
     expect(component).toBeDefined();
   });
 
   it('should load variables on initialization', () => {
-    expect(component.bannerMessage).toBe(Configs.Message)
-    expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`)
-    expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`)
-  })
+    expect(component.bannerMessage).toBe(Configs.Message);
+    expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`);
+    expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`);
+  });
 
 });

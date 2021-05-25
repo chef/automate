@@ -34,7 +34,7 @@ export class AppConfigService {
   }
 
   get bannerBackgroundColor(): string {
-    const backgroundColor = this.convertToHex(this.appConfig.background_color)
+    const backgroundColor = this.convertToHex(this.appConfig.background_color);
     return backgroundColor;
   }
 
@@ -44,6 +44,6 @@ export class AppConfigService {
   }
 
   private convertToHex(color: string): string {
-    return `#${color}`
+    return `#${color}`;
   }
 }
