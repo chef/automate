@@ -34,13 +34,11 @@ export class AppConfigService {
   }
 
   get bannerBackgroundColor(): string {
-    const backgroundColor = this.convertToHex(this.appConfig.background_color);
-    return backgroundColor;
+    return this.convertToHex(this.appConfig.background_color);
   }
 
   get bannerTextColor(): string {
-    const textColor = this.convertToHex(this.appConfig.text_color);
-    return textColor;
+    return this.convertToHex(this.appConfig.text_color);
   }
 
   private convertToHex(color: string): string {
