@@ -4,6 +4,36 @@ import { WarningBannerComponent } from './warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 
+enum Configs {
+  Show = 'true',
+  Message = 'this is a test message',
+  BackgroundColor = '3864f2',
+  TextColor = 'FFF'
+}
+
+class MockAppConfigService {
+  loadAppConfig() {
+    return {
+      show: Configs.Show,
+      message: Configs.Message,
+      background_color: Configs.BackgroundColor,
+      text_color: Configs.TextColor
+    }
+  }
+
+  get bannerMessage() {
+    return Configs.Message
+  }
+
+  get bannerBackgroundColor() {
+    return `#${Configs.BackgroundColor}`
+  }
+
+  get bannerTextColor() {
+    return `#${Configs.TextColor}`
+  }
+}
+
 describe('WarningBannerComponent', () => {
   let component: WarningBannerComponent;
   let fixture: ComponentFixture<WarningBannerComponent>;
@@ -12,7 +42,9 @@ describe('WarningBannerComponent', () => {
     TestBed.configureTestingModule({
       declarations: [WarningBannerComponent],
       imports: [HttpClientTestingModule],
-      providers: [AppConfigService]
+      providers: [
+        {provide: AppConfigService, useClass: MockAppConfigService}
+      ]
     }).compileComponents();
   });
 
@@ -22,7 +54,14 @@ describe('WarningBannerComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create',() => {
     expect(component).toBeDefined();
   });
+
+  it('should load variables on initialization', () => {
+    expect(component.bannerMessage).toBe(Configs.Message)
+    expect(component.bannerBackgroundColor).toBe(`#${Configs.BackgroundColor}`)
+    expect(component.bannerTextColor).toBe(`#${Configs.TextColor}`)
+  })
+
 });
