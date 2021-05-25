@@ -43,7 +43,7 @@ export class LayoutFacadeService {
     header: {
       display: true,
       license: false,
-      warningBanner: true, // This will be set to false by default when real
+      warningBanner: false,
       navigation: true
     },
     sidebar: {
