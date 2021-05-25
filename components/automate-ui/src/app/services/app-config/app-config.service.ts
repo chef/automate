@@ -1,16 +1,17 @@
 import { HttpClient, HttpBackend } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
-
 interface ConfigTypes {
   show?: boolean;
   message?: string;
   background_color?: string;
   text_color?: string;
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+
 
 export class AppConfigService {
 
@@ -42,7 +43,7 @@ export class AppConfigService {
     return textColor;
   }
 
-  public convertToHex(color: string): string {
+  private convertToHex(color: string): string {
     return `#${color}`
   }
 }
