@@ -25,6 +25,7 @@ import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
 import * as infraNodeEntity from './entities/infra-nodes/infra-nodes.reducer';
+import * as infraNodeDetailsEntity from './entities/infra-nodes/infra-node-details.reducer';
 import * as infraRoleEntity from './entities/infra-roles/infra-role.reducer';
 import * as infraRoleDetailsEntity from './entities/infra-roles/infra-role-details.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
@@ -102,6 +103,7 @@ export interface NgrxStateAtom {
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
   infraNodes: infraNodeEntity.InfraNodeEntityState;
+  infraNodeDetails: infraNodeDetailsEntity.InfraNodeDetailsEntityState;
   infraRoles: infraRoleEntity.InfraRoleEntityState;
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleDetailsEntityState;
   jobs: jobEntity.JobEntityState;
@@ -232,6 +234,7 @@ export const defaultInitialState = {
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
   infraNodes: infraNodeEntity.InfraNodeEntityInitialState,
+  infraNodeDetails: infraNodeDetailsEntity.InfraNodeEntityInitialState,
   infraRoles: infraRoleEntity.InfraRoleEntityInitialState,
   infraRoleDetails: infraRoleDetailsEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
@@ -299,6 +302,7 @@ export const ngrxReducers = {
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
   infraNodes: infraNodeEntity.infraNodeEntityReducer,
+  infraNodeDetails: infraNodeDetailsEntity.infraNodeDetailsEntityReducer,
   infraRoles: infraRoleEntity.infraRoleEntityReducer,
   infraRoleDetails: infraRoleDetailsEntity.infraRoleDetailsEntityReducer,
   jobs: jobEntity.jobEntityReducer,

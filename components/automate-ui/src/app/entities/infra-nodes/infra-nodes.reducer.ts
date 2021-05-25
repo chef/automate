@@ -19,6 +19,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   deleteStatus: EntityStatus;
   nodeTags: string[];
   nodeEnvironment: string;
+  node: InfraNode;
 }
 
 const GET_ALL_STATUS            = 'getAllStatus';
@@ -79,8 +80,10 @@ export function infraNodeEntityReducer(
       ) as InfraNodeEntityState;
 
     case NodeActionTypes.GET_SUCCESS:
-      return set(GET_STATUS, EntityStatus.loadingSuccess,
-        nodeEntityAdapter.addOne(action.payload, state));
+      return pipe(
+        set(GET_STATUS, EntityStatus.loadingSuccess),
+        set('node', action.payload || [])
+      )(state) as InfraNodeEntityState;
 
     case NodeActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);

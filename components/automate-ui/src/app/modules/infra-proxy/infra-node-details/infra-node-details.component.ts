@@ -11,7 +11,9 @@ import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  infraNodeFromRoute,
+  infraNodeFromRoute
+} from 'app/entities/infra-nodes/infra-node-details.selectors';
+import {
   updateTagsStatus,
   updateEnvStatus,
   nodeTags,
@@ -351,7 +353,6 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
             this.hasRun_List = false;
             this.runlist = allNodeRunlistState;
             this.treeNodes(allNodeRunlistState, environmentId);
-
           } else {
             this.runListLoading = false;
           }

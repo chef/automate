@@ -1,7 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { InfraNodeEntityState, nodeEntityAdapter } from './infra-nodes.reducer';
-import { routeParams } from 'app/route.selectors';
-import { find } from 'lodash/fp';
 
 export const infraNodeState = createFeatureSelector<InfraNodeEntityState>('infraNodes');
 
@@ -61,7 +59,6 @@ export const deleteStatus = createSelector(
 );
 
 export const infraNodeFromRoute = createSelector(
-  nodeEntities,
-  routeParams,
-  (state, { name }) => find({ name }, state)
+  infraNodeState,
+  (state) => state.node
 );

@@ -35,7 +35,7 @@ export function nodeRunlistEntityReducer(
 
     case NodeRunlistActionTypes.GET_ALL_SUCCESS:
        return set(GET_ALL_STATUS, EntityStatus.loadingSuccess,
-        nodeRunlistEntityAdapter.addOne(action.payload, state));
+        nodeRunlistEntityAdapter.addOne(action.payload, state)) as NodeRunlistEntityState;
 
     case NodeRunlistActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
@@ -44,3 +44,6 @@ export function nodeRunlistEntityReducer(
       return state;
   }
 }
+
+export const getEntityById = (id: string) =>
+  (state: NodeRunlistEntityState) => state.entities[id];

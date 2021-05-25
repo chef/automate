@@ -8,7 +8,9 @@ import { MockComponent } from 'ng2-mock-component';
 import { By } from '@angular/platform-browser';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
-import { GetNodesSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { GetNodesSuccess, GetNodeSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { GetNodeRunlistsSuccess } from 'app/entities/nodeRunlists/nodeRunlists.action';
+import { NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 
 describe('InfraNodesComponent', () => {
   let component: InfraNodesComponent;
@@ -42,6 +44,12 @@ describe('InfraNodesComponent', () => {
         MockComponent({
           selector: 'app-update-node-tag-modal',
           inputs: ['openEvent', 'serverId', 'orgId', 'name']
+        }),
+        MockComponent({
+          selector: 'app-edit-infra-node-modal',
+          inputs: ['label', 'openEvent', 'orgId', 'availableType',
+            'node', 'serverId', 'selected'],
+          outputs: ['closeRunlist']
         }),
         InfraNodesComponent
       ],
@@ -107,6 +115,56 @@ describe('InfraNodesComponent', () => {
     it('show no preview image', () => {
       store.dispatch(new GetNodesSuccess({nodes: emptyNodes,  total: emptyNodes.length}));
       expect(component.nodes.length).toBe(0);
+    });
+  });
+
+  describe('edit run list', () => {
+    let store: Store<NgrxStateAtom>;
+    const node: InfraNode = {
+      server_id: 'chef-server-dev-test',
+      org_id: 'chef-org-dev',
+      id: 'node-692057300',
+      tags: ['tag2'],
+      check_in: '',
+      uptime: '',
+      platform: '',
+      automatic_attributes: '{}',
+      default_attributes: '{}',
+      environment: '_default',
+      name: 'node-692057300',
+      normal_attributes: '{}',
+      override_attributes: '{}',
+      policy_group: '',
+      policy_name: '',
+      run_list: ['recipe[centos-cookbook-file]', 'recipe[chef-client]'],
+      ip_address: '',
+      fqdn: ''
+    };
+
+    const runlist: NodeRunlist = {
+      id: 'environment',
+      run_list: []
+    };
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+    });
+
+    it('open edit modal ', () => {
+      component.editRunlist(node);
+      expect(component.editRunlistLoading).toEqual(true);
+    });
+
+    it('get infra node ', () => {
+      component.getNode(node);
+      store.dispatch(new GetNodeSuccess(node));
+      expect(component.nodeToEditRunlist).not.toBeNull();
+    });
+
+    it('load run list ', () => {
+      component.loadNodeRunlist(node);
+      store.dispatch(new GetNodeRunlistsSuccess(runlist));
+      expect(component.runlist.length).not.toBeNull();
     });
   });
 });

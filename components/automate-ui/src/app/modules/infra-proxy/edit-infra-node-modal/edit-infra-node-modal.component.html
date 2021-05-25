@@ -8,15 +8,21 @@
         <span class="constraint">{{node?.name}}</span>
       </label>
       <div *ngIf="label === 'Run List' && showbutton">
-        <app-select-box id="myListBox"
-          [serverId]="server"
-          [orgId]="org"
-          [list]="availablelist"
-          search="true"
-          [currentRunList]="currentRunList"
-          [currentPage]="current_Page"
-          (selectedValues)="dragDropHandler($event)">
-        </app-select-box>
+        <div *ngIf="runlistError" class="empty-section">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p>Cannot load environment - <b>{{node?.environment}}</b></p>
+        </div>
+        <div *ngIf="!runlistError">
+          <app-select-box id="myListBox"
+            [serverId]="server"
+            [orgId]="org"
+            [list]="availablelist"
+            search="true"
+            [currentRunList]="currentRunList"
+            [currentPage]="current_Page"
+            (selectedValues)="dragDropHandler($event)">
+          </app-select-box>
+        </div>
         <div class="button-bar-box">
           <chef-button tertiary (click)="closeEditModal()" data-cy="cancel-button">Cancel</chef-button>
           <chef-button

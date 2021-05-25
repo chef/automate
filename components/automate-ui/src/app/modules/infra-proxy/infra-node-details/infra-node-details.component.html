@@ -74,6 +74,7 @@
         [node]="InfraNode"
         [serverId]="serverId"
         [selected]="selected"
+        [runlistError]="conflictError"
         (runlistUpdated)="updateRunlist()">
       </app-edit-infra-node-modal>
       <section class="page-body" *ngIf="tabValue === 'details'">
@@ -198,6 +199,7 @@
                   tertiary
                   class="float-right action"
                   (click)="openEditModal('Run List')"
+                  [disabled]="runListLoading || conflictError"
                   data-cy="node-edit-runlist">
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
@@ -240,6 +242,10 @@
               <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>Run list details are not available for the environment.</p>
+              </div>
+              <div *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
+                <img alt="No preview" src="/assets/img/no_preview.gif" />
+                <p>Cannot load environment - <b> {{InfraNode?.environment}}</b></p>
               </div>
             </div>
           </div>

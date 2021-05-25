@@ -4,7 +4,8 @@ import {
   Input,
   OnInit,
   OnDestroy,
-  Output
+  Output,
+  OnChanges
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -25,7 +26,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
   templateUrl: './edit-infra-node-modal.component.html',
   styleUrls: ['./edit-infra-node-modal.component.scss']
 })
-export class EditInfraNodeModalComponent implements OnInit, OnDestroy {
+export class EditInfraNodeModalComponent implements OnInit, OnDestroy, OnChanges {
   @Input() label: string;
   @Input() openEvent: EventEmitter<boolean>;
   @Input() orgId: string;
@@ -33,7 +34,9 @@ export class EditInfraNodeModalComponent implements OnInit, OnDestroy {
   @Input() node: InfraNode;
   @Input() serverId: string;
   @Input() selected: ListItem[] = [];
+  @Input() runlistError: boolean;
   @Output() runlistUpdated: EventEmitter<void> =   new EventEmitter();
+  @Output() closeRunlist = new EventEmitter();
 
   public creating = false;
   public conflictError = false;
@@ -96,12 +99,25 @@ export class EditInfraNodeModalComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngOnChanges() {
+    this.currentRunList = [];
+    this.selected.forEach((element) => {
+      element.selected = false;
+      this.currentRunList.push(element);
+    });
+    this.availablelist = [];
+    this.availableType.forEach((element) => {
+      this.availablelist.push(element);
+    });
+  }
+
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
   closeEditModal(): void {
+    this.closeRunlist.emit();
     this.resetEditModal();
     this.visible = false;
   }
