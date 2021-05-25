@@ -63,6 +63,12 @@
         },
         "deployment_id": {
           "type": "string"
+        },
+        "telemetry_source_id": {
+          "type": "string"
+        },
+        "telemetry_write_key": {
+          "type": "string"
         }
       }
     },

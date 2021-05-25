@@ -7,6 +7,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -21,11 +22,17 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/telemetry"
 
 	"github.com/gofrs/uuid"
+	"io/ioutil"
 )
 
 type TelemetryServer struct {
 	client        license_control.LicenseControlServiceClient
 	deploy_client deployment_service.DeploymentClient
+}
+
+type TelemetryAPIKey struct {
+	SourceID string `json:"source_id"`
+	WriteKey string `json:"write_key"`
 }
 
 func NewTelemetryServer(client license_control.LicenseControlServiceClient, dclient deployment_service.DeploymentClient) *TelemetryServer {
@@ -55,12 +62,14 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 	}
 
 	deploymentUUID := ToUUID(deploymentID)
+	segmentKey := TelemetryAPIKey{}
 
 	resp, e := http.Get("https://telemetry-acceptance.chef.io/segment/api_keys")
 	if e != nil {
 		fmt.Println("Err::", e.Error())
 	} else {
-		fmt.Println("RESP::", resp)
+		body, _ := ioutil.ReadAll(resp.Body)
+		_ = json.Unmarshal(body, &segmentKey)
 	}
 	//if deployment id is empty or a UUID don't turn it into a UUID
 
@@ -78,21 +87,26 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 		}
 
 		return &telemetry.TelemetryResponse{
-			LicenseId:        r.License.Id,
-			CustomerName:     r.License.Customer,
-			CustomerId:       r.License.CustomerId,
-			LicenseType:      r.License.Type,
-			TelemetryEnabled: tel.TelemetryEnabled,
-			TelemetryUrl:     tel.TelemetryUrl,
-			MaxNodes:         maxNodes,
-			DeploymentId:     deploymentUUID,
+			LicenseId:         r.License.Id,
+			CustomerName:      r.License.Customer,
+			CustomerId:        r.License.CustomerId,
+			LicenseType:       r.License.Type,
+			TelemetryEnabled:  tel.TelemetryEnabled,
+			TelemetryUrl:      tel.TelemetryUrl,
+			MaxNodes:          maxNodes,
+			DeploymentId:      deploymentUUID,
+			TelemetrySourceId: segmentKey.SourceID,
+			TelemetryWriteKey: segmentKey.WriteKey,
 		}, nil
 	}
 
 	return &telemetry.TelemetryResponse{
-		TelemetryEnabled: tel.TelemetryEnabled,
-		TelemetryUrl:     tel.TelemetryUrl,
-		DeploymentId:     deploymentUUID}, nil
+		TelemetryEnabled:  tel.TelemetryEnabled,
+		TelemetryUrl:      tel.TelemetryUrl,
+		DeploymentId:      deploymentUUID,
+		TelemetrySourceId: segmentKey.SourceID,
+		TelemetryWriteKey: segmentKey.WriteKey,
+	}, nil
 }
 
 func (t *TelemetryServer) getDeploymentID(ctx context.Context) (string, error) {
