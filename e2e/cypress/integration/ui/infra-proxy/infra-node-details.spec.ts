@@ -1,7 +1,7 @@
 describe('infra node detail', () => {
-  const now = Cypress.moment().format('MMDDYYhhmmss');
-  const cypressPrefix = 'infra';
   let adminIdToken = '';
+  let tags: string[];
+
   const serverID = 'chef-server-dev-test';
   const serverName = 'chef server dev';
   const orgID = 'chef-org-dev';
@@ -11,7 +11,6 @@ describe('infra node detail', () => {
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const nodeName = 'node-learn_chef_apache2';
-  let tags: string[];
 
   before(() => {
     cy.adminLogin('/').then(() => {
