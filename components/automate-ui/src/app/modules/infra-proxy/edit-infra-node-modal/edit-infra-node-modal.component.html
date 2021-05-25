@@ -10,7 +10,7 @@
       <div *ngIf="label === 'Run List' && showbutton">
         <div *ngIf="runlistError" class="empty-section">
           <img alt="No preview" src="/assets/img/no_preview.gif" />
-          <p>Cannot load environment - <b>{{node?.environment}}</b></p>
+          <p>Cannot load environment - <strong>{{node?.environment}}</strong></p>
         </div>
         <div *ngIf="!runlistError">
           <app-select-box id="myListBox"
