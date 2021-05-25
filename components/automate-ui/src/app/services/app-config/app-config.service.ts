@@ -1,41 +1,48 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpBackend } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 
-// Angular APP_INITIALIZER documentation https://angular.io/api/core/APP_INITIALIZER
-// Excellent detailed instructions https://stackoverflow.com/a/54793384
+interface ConfigTypes {
+  show?: boolean;
+  message?: string;
+  background_color?: string;
+  text_color?: string;
+}
+
 export class AppConfigService {
 
-  private appConfig: any;
+  public appConfig: ConfigTypes;
 
-  constructor(private http: HttpClient) { }
+  constructor(private handler: HttpBackend) { }
 
-  loadAppConfig() {
-    return this.http.get('/assets/app-config.json')
+  public loadAppConfig() {
+    return new HttpClient(this.handler).get('/banner.js')
       .toPromise()
       .then(data => this.appConfig = data);
   }
 
-  get showBanner() {
-    if (!this.appConfig) {
-      throw Error('Config file not loaded');
-    }
-
-    return this.appConfig.showBanner;
+  get showBanner(): boolean {
+    return this.appConfig.show;
   }
 
-  get bannerMessage() {
-    return this.appConfig.bannerMessage;
+  get bannerMessage(): string {
+    return this.appConfig.message;
   }
 
-  get bannerBackgroundColor() {
-    return this.appConfig.bannerBackgroundColor;
+  get bannerBackgroundColor(): string {
+    const backgroundColor = this.convertToHex(this.appConfig.background_color)
+    return backgroundColor;
   }
 
-  get bannerTextColor() {
-    return this.appConfig.bannerTextColor;
+  get bannerTextColor(): string {
+    const textColor = this.convertToHex(this.appConfig.text_color);
+    return textColor;
+  }
+
+  public convertToHex(color: string): string {
+    return `#${color}`
   }
 }

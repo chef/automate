@@ -2,11 +2,9 @@ import { Component, OnInit, ChangeDetectorRef, AfterViewChecked } from '@angular
 import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
-
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 import { AppConfigService } from './services/app-config/app-config.service';
 

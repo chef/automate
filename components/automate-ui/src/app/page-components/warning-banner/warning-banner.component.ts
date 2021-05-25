@@ -11,11 +11,15 @@ export class WarningBannerComponent implements OnInit {
   bannerTextColor: string;
   @HostBinding('style.backgroundColor') bannerBackgroundColor: string;
 
-  constructor(private appConfigService: AppConfigService) { }
+  constructor(private appConfigService: AppConfigService) { 
+
+  }
 
   ngOnInit() {
     this.bannerMessage = this.appConfigService.bannerMessage;
     this.bannerBackgroundColor = this.appConfigService.bannerBackgroundColor;
     this.bannerTextColor = this.appConfigService.bannerTextColor;
   }
+
 }
+

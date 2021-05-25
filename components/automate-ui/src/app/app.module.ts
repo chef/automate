@@ -201,10 +201,10 @@ import {
 } from './page-components/telemetry-checkbox/telemetry-checkbox.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
-import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
-// Initialize configuration file
+// Warning Banner
+import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 @NgModule({
@@ -361,6 +361,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     TelemetryService,
     UserPermsRequests,
     UserRequests,
+    // Initilization for warning banner component
     {
       provide: APP_INITIALIZER,
       multi: true,
