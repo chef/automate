@@ -13,12 +13,11 @@ const initialConfig = {
     message: null,
     background_color: null,
     text_color: null
-}
+};
 
 @Injectable({
   providedIn: 'root'
 })
-
 
 export class AppConfigService {
 
@@ -31,7 +30,7 @@ export class AppConfigService {
       .toPromise()
       .then(data => this.appConfig = data)
       // when there is no config, we can just rest the config to its initial values
-      .catch(_error => this.appConfig = initialConfig)
+      .catch(_error => this.appConfig = initialConfig);
   }
 
   get showBanner(): boolean {
