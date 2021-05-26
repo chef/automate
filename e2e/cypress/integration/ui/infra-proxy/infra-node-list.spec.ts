@@ -167,13 +167,15 @@ describe('infra node list', () => {
     });
 
     it('can update node tag', () => {
-      cy.get('[data-cy=search-filter]').type(`node-learn_chef_apache2`);
+      cy.get('[data-cy=search-filter]').type('node-learn_chef_apache2');
       cy.get('[data-cy=search-entity]').click();
-      getNodes(`node-learn_chef_apache2`, 1).then((response) => {
+      getNodes('node-learn_chef_apache2', 1).then((response) => {
         if (checkResponse(response)) {
-          cy.get('[data-cy=nodes-table-container]').contains('node-learn_chef_apache2').should('exist');
+          cy.get('[data-cy=nodes-table-container]').contains('node-learn_chef_apache2')
+            .should('exist');
           cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
-            .contains('node-learn_chef_apache2').parent().parent().find('.mat-select-trigger').click();
+            .contains('node-learn_chef_apache2').parent().parent().find('.mat-select-trigger')
+            .click();
 
           cy.get('[data-cy=reset-key]').should('be.visible')
             .click();
@@ -185,7 +187,7 @@ describe('infra node list', () => {
           cy.get('app-update-node-tag-modal chef-modal').should('not.be.visible');
 
           // verify success notification and then dismiss it
-          cy.get('app-notification.info').contains(`Successfully updated node tags.`);
+          cy.get('app-notification.info').contains('Successfully updated node tags.');
           cy.get('app-notification.info chef-icon').click();
         }
       });
@@ -195,7 +197,6 @@ describe('infra node list', () => {
       cy.get('.display-node-tags').find('span').should('have.length.greaterThan', 1);
       cy.get('.breadcrumbs .breadcrumb').contains('Nodes').click();
     });
-    
 
     it('can delete node', () => {
       cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-node-${now}`);
