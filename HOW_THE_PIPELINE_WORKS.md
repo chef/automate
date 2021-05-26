@@ -217,7 +217,7 @@ are likely to encounter:
   services are written in this style.  The output of these kind of
   tests typically looks something like:
 
-- Inspec tests: Some tests are written using inspec and can be found
+- InSpec tests: Some tests are written using InSpec and can be found
   in the `inspec` folder. Some of the "Integration Test
   Framework"-style tests run these tests as do our post-build
   deploy/dev pipeline jobs.

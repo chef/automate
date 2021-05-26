@@ -31,6 +31,10 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   public dataBagsListLoading = true;
   public dataBagToDelete: DataBag;
   public deleteModalVisible = false;
+  public searchValue = '';
+  public searchFlag = false;
+  public searching = false;
+  public serachArr: DataBag[];
   public openDataBagModal = new EventEmitter<void>();
   private isDestroyed = new Subject<boolean>();
 
@@ -98,5 +102,21 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
 
   public openCreateModal(): void {
     this.openDataBagModal.emit();
+  }
+
+  public searchDataBags(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.dataBags || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.serachArr = this.dataBags.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.name.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
   }
 }

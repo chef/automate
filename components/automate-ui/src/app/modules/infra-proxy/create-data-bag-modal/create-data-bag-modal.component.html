@@ -6,7 +6,8 @@
         <chef-form-field>
           <label>
             <span class="label">Name</span>
-            <input chefInput firstFocus formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
+            <input chefInput firstFocus formControlName="name" type="text" id="name-input" 
+            data-cy="databag-name" (keyup)="handleInput($event)" autocomplete="off"/>
           </label>
           <chef-error
           *ngIf="createForm.get('name').hasError('required') && createForm.get('name').dirty">
@@ -23,8 +24,10 @@
       </div>
 
       <div id="button-bar">
-        <chef-button tertiary id="cancel-data-bag-popup" (click)="closeCreateModal()">Cancel</chef-button>
-        <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createDataBag()">
+        <chef-button tertiary id="cancel-data-bag-popup" data-cy="cancel-button" 
+        (click)="closeCreateModal()">Cancel</chef-button>
+        <chef-button [disabled]="!createForm?.valid || creating || conflictError" primary 
+        id="create-button-object-modal" data-cy="add-button" (click)="createDataBag()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
           <span *ngIf="!creating">Create</span>
           <span *ngIf="creating">Creating Data Bag...</span>

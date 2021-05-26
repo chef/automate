@@ -3,6 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
 
+import "interservice/infra_proxy/response/common.proto";
 message Nodes {
     // Node list.
     repeated NodeAttribute nodes = 1;
@@ -80,4 +81,11 @@ message UpdateNodeAttributes {
     string name = 1;
     // Node attributes JSON.
     string attributes = 2;
+}
+
+message NodeExpandedRunList {
+    // ID of the run list collection.
+    string id = 1;
+    // List of the run list.
+    repeated RunList run_list = 2;
 }

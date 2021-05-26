@@ -303,6 +303,28 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 {{< figure src="/images/automate/delete-a-client.png" alt="Delete a Client">}}
 
+### Nodes
+
+A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node will be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
+
+The Chef Infra Server integration lets you:
+
+- Search for a specific node from a list of nodes.
+- View a list of all the connected nodes.
+- Delete a node
+
+#### Search for a Node
+
+Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
+
+{{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
+
+#### Delete a Node
+
+Delete individual existing nodes by selecting the ellipses icon and then **Delete**:
+
+{{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
+
 ## Troubleshoot
 
 While fetching any objects like cookbooks, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server.

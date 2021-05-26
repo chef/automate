@@ -181,21 +181,3 @@ func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 
 	return ts
 }
-
-func fromUpsteamRunList(runList []*infra_res.RunList) []*gwres.RunList {
-	resRunList := make([]*gwres.RunList, len(runList))
-	for i, item := range runList {
-		resRunListItem := gwres.RunList{
-			Type:     item.GetType(),
-			Name:     item.GetName(),
-			Version:  item.GetVersion(),
-			Skipped:  item.GetSkipped(),
-			Position: item.GetPosition(),
-			Error:    item.GetError(),
-			Children: fromUpsteamRunList(item.GetChildren()),
-		}
-		resRunList[i] = &resRunListItem
-	}
-
-	return resRunList
-}

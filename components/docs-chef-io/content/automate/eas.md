@@ -19,7 +19,7 @@ Chef EAS includes the following Chef solutions:
 
 * **Chef Habitat** builds and deploys your applications because delivering applications is where you derive your business value
 * **Chef Infra** configures your infrastructure, because your applications also needs to run on a stable and scalable system
-* **Chef Inspec** validates and secures both your applications and your infrastructure
+* **Chef InSpec** validates and secures both your applications and your infrastructure
 * **Chef Automate** visualizes your applications, their infrastructure, and the compliance status for both.
 * **Chef Workstation** provides a unified experience for all of Chef EAS
 

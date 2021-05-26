@@ -16,6 +16,7 @@ import {
 import { IntegrationsEditComponent } from './pages/integrations/edit/integrations-edit.component';
 import { IntegrationsListComponent } from './pages/integrations/list/integrations-list.component';
 import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
+import { InfraNodeDetailsComponent } from './modules/infra-proxy/infra-node-details/infra-node-details.component';
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
@@ -263,6 +264,10 @@ const routes: Routes = [
             {
               path: ':id/organizations/:org-id/cookbooks/:cookbook-name',
               component: CookbookDetailsComponent
+            },
+            {
+              path: ':id/organizations/:org-id/nodes/:name',
+              component: InfraNodeDetailsComponent
             },
             {
               path: ':id/organizations/:org-id/roles/:name',

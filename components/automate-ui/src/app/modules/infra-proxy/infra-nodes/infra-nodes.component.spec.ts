@@ -76,9 +76,16 @@ describe('InfraNodesComponent', () => {
       id: 'c93e4823-c1e7-4bcd-83a9-d6fe65c87a10',
       platform: 'ubuntu',
       policy_group: '',
+      policy_name: '',
+      run_list: [],
       uptime: '37 minutes 00 seconds',
       check_in: '37 minutes 00 seconds',
-      environment: 'test'
+      environment: 'test',
+      default_attributes: 'test',
+      override_attributes: 'test',
+      normal_attributes: 'test',
+      automatic_attributes: 'test',
+      tags: []
     }];
 
     const emptyNodes: InfraNode[] = [];

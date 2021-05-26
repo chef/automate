@@ -13,7 +13,6 @@ chef-loading-spinner {
 
 img {
   margin-top: 130px;
-  margin-left: 130PX;
   width: 70px;
 }
 
@@ -24,4 +23,30 @@ img {
 chef-toolbar chef-button:first-child {
   margin: 10px 0px 0px 0px;
   float: right;
+}
+
+.search-create-container {
+  display: flex;
+  margin: 24px 0 18px;
+  flex-direction: row;
+
+  app-infra-search-bar {
+    flex-grow: 2;
+  }
+
+  chef-button {
+    margin: 0;
+    margin-left: 16px;
+    height: 36px;
+  }
+}
+
+.full-screen-spinner {
+  display: flex;
+  margin: auto;
+  margin-top: 238px;
+  background-color: $chef-white;
+  opacity: 0.7;
+  width: initial;
+  height: 100%;
 }

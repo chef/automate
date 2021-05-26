@@ -1,0 +1,312 @@
+@import "~styles/variables";
+@import '../infra_shared/shared';
+@import '../../../../app/page-components/json-tree/json-tree.component.scss';
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-loading-spinner {
+  z-index: 199;
+}
+
+.page-body {
+  margin-right: 33px;
+
+  .top-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+
+  .details-tab {
+    .spinner {
+      chef-loading-spinner {
+        width: auto;
+        z-index: 199;
+        background-color: $chef-white;
+        opacity: 0.7;
+      }
+    }
+
+    .node-details-section {
+      width: 600px;
+    }
+
+    form {
+      chef-form-field {
+        width: 600px;
+        margin-bottom: 30px;
+      }
+    }
+  }
+}
+
+.summary-body {
+  display: flex;
+  padding: 1em;
+  background: $chef-white;
+
+  table {
+    width: 25%;
+    font-size: 14px;
+
+    &:first-child {
+      border-right: 1px solid $chef-grey;
+
+      tr {
+        td {
+          padding-right: 2.25em;
+        }
+      }
+    }
+
+    &:last-child {
+      tr {
+        th {
+          padding-left: 2.25em;
+        }
+      }
+    }
+
+    tr {
+      margin: 0;
+
+      th,
+      td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+        word-break: break-all;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      td {
+        flex-grow: 2;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-light-grey;
+      }
+    }
+  }
+}
+
+.meta-box {
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  color: $chef-black;
+  margin-bottom: 36px;
+}
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 27px;
+
+  .mat-option {
+    border: 1px solid $chef-key-tab;
+  }
+}
+
+// tags css
+.node-tags-box {
+  display: flex;
+  width: 600px;
+  flex-direction: row;
+  font-size: 1em;
+  color: $chef-primary-dark;
+  border-radius: var(--chef-border-radius);
+  overflow: hidden;
+
+  input {
+    border-radius: 4px 0px 0px 4px;
+    height: 36px;
+    transition: 0s; // Remove default transition
+
+    &:focus {
+      // border-color: #3864F2;
+      border: solid 1px rgba(56, 100, 242, 0.4);
+      border-right: none;
+    }
+
+    &:hover {
+      border: solid 1px rgba(56, 100, 242, 0.4);
+      border-right: none;
+    }
+  }
+
+  button {
+    background: $chef-light-grey;
+    box-shadow: 0 1px 14px $chef-light-grey;
+    border: 0.5px solid $chef-primary-bright;
+    border-radius: 0px 4px 4px 0px;
+    color: $chef-primary-bright;
+    font-size: 14px;
+    height: 36px;
+    width: 75px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $chef-primary-bright;
+    }
+
+    &[disabled] {
+      background-color: $chef-light-grey;
+      opacity: 0.5;
+    }
+  }
+}
+
+.tag-note {
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 7px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 12px;
+  padding-left: 12px;
+}
+
+.display-node-tags {
+  background: $chef-white;
+  border: 0.5px solid $chef-key-tab;
+  box-sizing: border-box;
+  border-radius: 2px;
+  overflow: auto;
+  padding: 0px 0px 18px 8px;
+  width: 600px;
+}
+
+.tag {
+  margin: 7px;
+  background-color: $chef-minor;
+  border-radius: 4px;
+  color: $chef-white;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px 8px;
+  height: 28px;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+a.removeTag {
+  display: inline-block;
+  border: 1px solid $chef-white;
+  border-radius: 30px;
+  color: $chef-white;
+  font-size: 18px;
+  line-height: 0px;
+  padding: 8px 3px;
+  cursor: pointer;
+}
+
+.removeTag:before {
+  content: "×";
+}
+
+.tag a {
+  margin: 18px 0px 0px 6px;
+  font-weight: 700;
+}
+
+.disable {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+// update node env
+p.change-node-text {
+  font-size: 18px;
+  font-weight: 700;
+  padding-top: 5px;
+  padding-left: 8px;
+}
+
+.changes-confirmation {
+  background: $chef-white;
+  width: 600px;
+  padding: 6px;
+  border-radius: 4px;
+  position: absolute;
+  box-shadow: 0px 0px 10px 0px $chef-modal;
+  margin-top: -20px;
+
+  chef-button {
+    height: 36px;
+  }
+
+  chef-loading-spinner {
+    top: 2px;
+    width: auto;
+    margin-right: 10px;
+  }
+}
+
+div#button-env {
+  float: right;
+}
+
+.label {
+  font-size: 12px;
+  padding-left: 12px;
+}
+
+.auto-height {
+  height: 220px;
+}
+
+// ng-select 
+::ng-deep {
+  .ng-select .ng-select-container {
+    font-size: 14px;
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    border-bottom: 1px solid $chef-modal;
+    font-size: 14px;
+    height: 32px;
+    padding: 5px 10px;
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: $chef-primary-bright;
+    color: $chef-white;
+  }
+
+  .ng-select .ng-arrow-wrapper .ng-arrow {
+    border-color: $chef-white transparent transparent transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    border: 6px solid $chef-primary-bright;
+    border-width: 0 2px 2px 0;
+    padding: 3px;
+    right: 5px;
+    top: -2px;
+    transform: rotate(45deg);
+  }
+
+  .ng-select.ng-select-opened > .ng-select-container .ng-arrow {
+    border-color: $chef-white transparent transparent transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    border: 6px solid $chef-primary-bright;
+    border-width: 0 2px 2px 0;
+    padding: 3px;
+    right: 5px;
+    top: 0px;
+    transform: rotate(225deg);
+  }
+}

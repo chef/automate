@@ -536,35 +536,6 @@ steps:
       executor:
         docker:
 
-  # TODO(ssd) 2019-03-19: I've added a couple of basic tests here but
-  # there are a number of A1 tests we might want to integrate.
-  #
-  # I'm holding off on most as other cleanups we want to do might
-  # impact them.
-  #
-  # Tests to port:
-  # - schema tests
-  # - erlang dialyzer tests
-  # - web unit tests
-  # - web e2e test
-  # - workflow-web-jshint
-  - label: "[unit] automate-workflow-server"
-    command:
-      - export PATH=/opt/asdf/shims:/opt/asdf/bin:\$PATH
-      - asdf global erlang 18.3
-      - cd components/automate-workflow-server
-      - ./rebar get-deps
-      - make compile
-      - make syntax_elvis
-      # - make dialyzer
-      - cd apps/enterprise_ctl
-      - make .concrete/DEV_MODE compile eunit
-    expeditor:
-      executor:
-        docker:
-          # a1-buildkite has erlang 18 pre-installed
-          image: chefes/a1-buildkite
-
   - label: "[unit] automate-cds"
     command:
       - hab studio run "source .studiorc && go_component_unit automate-cds && go_component_static_tests automate-cds"
