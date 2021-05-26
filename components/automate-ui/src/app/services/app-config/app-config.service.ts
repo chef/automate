@@ -8,6 +8,13 @@ interface ConfigTypes {
   text_color?: string;
 }
 
+const initialConfig = {
+    show: null,
+    message: null,
+    background_color: null,
+    text_color: null
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,14 +22,16 @@ interface ConfigTypes {
 
 export class AppConfigService {
 
-  public appConfig: ConfigTypes;
+  public appConfig: ConfigTypes = initialConfig;
 
   constructor(private handler: HttpBackend) { }
 
   public loadAppConfig() {
     return new HttpClient(this.handler).get('/banner.js')
       .toPromise()
-      .then(data => this.appConfig = data);
+      .then(data => this.appConfig = data)
+      // when there is no config, we can just rest the config to its initial values
+      .catch(_error => this.appConfig = initialConfig)
   }
 
   get showBanner(): boolean {
