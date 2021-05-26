@@ -29,7 +29,7 @@ export class AppConfigService {
     return new HttpClient(this.handler).get('/banner.js')
       .toPromise()
       .then(data => this.appConfig = data)
-      // when there is no config, we can just rest the config to its initial values
+      // when there is no config, we can just reset the config to its initial empty values
       .catch(_error => this.appConfig = initialConfig);
   }
 
