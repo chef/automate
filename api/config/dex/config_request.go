@@ -229,7 +229,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *shared.GlobalConfig) {
 		}
 	}
 
-	if g.GetV1().GetDisclosure().GetShow() != nil {
+	if g.GetV1().GetBanner().GetShow() != nil {
 		c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
 		if bannerMessage := g.GetV1().GetBanner().GetMessage().GetValue(); bannerMessage != "" {
 			c.V1.Sys.Banner.Message.Value = bannerMessage

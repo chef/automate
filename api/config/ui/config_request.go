@@ -79,16 +79,18 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToNginxLevel(logLevel)
 	}
 
-	c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
-	if bannerMessage := g.GetV1().GetBanner().GetMessage().GetValue(); bannerMessage != "" {
-		c.V1.Sys.Banner.Message.Value = bannerMessage
-	}
+	if g.GetV1().GetBanner().GetShow() != nil {
+		c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
+		if bannerMessage := g.GetV1().GetBanner().GetMessage().GetValue(); bannerMessage != "" {
+			c.V1.Sys.Banner.Message.Value = bannerMessage
+		}
 
-	if textColor := g.GetV1().GetBanner().GetTextColor().GetValue(); textColor != "" {
-		c.V1.Sys.Banner.TextColor.Value = textColor
-	}
+		if textColor := g.GetV1().GetBanner().GetTextColor().GetValue(); textColor != "" {
+			c.V1.Sys.Banner.TextColor.Value = textColor
+		}
 
-	if backgroundColor := g.GetV1().GetBanner().GetBackgroundColor().GetValue(); backgroundColor != "" {
-		c.V1.Sys.Banner.BackgroundColor.Value = backgroundColor
+		if backgroundColor := g.GetV1().GetBanner().GetBackgroundColor().GetValue(); backgroundColor != "" {
+			c.V1.Sys.Banner.BackgroundColor.Value = backgroundColor
+		}
 	}
 }
