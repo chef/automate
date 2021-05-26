@@ -162,7 +162,8 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
 
   addTags() {
     if (this.inputTxt !== '') {
-      this.tags = this.tags.concat(this.inputTxt.split(', '));
+      this.tags = this.tags.concat(this.inputTxt.replace(/^[,\s]+|[,\s]+$/g, '')
+        .replace(/,[,\s]*,/g, ',').split(',').map(item => item.trim()));
       this.inputTxt = '';
       this.updateTags('add', this.tags);
     }

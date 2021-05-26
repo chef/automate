@@ -14,6 +14,12 @@
     [orgId]="orgId"
     [name]="nodeName">
   </app-reset-node-key>
+  <app-update-node-tag-modal
+    [openEvent]="openTagModal"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [name]="updateNodeName">
+  </app-update-node-tag-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
@@ -55,6 +61,13 @@
             <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
+                <mat-option
+                  data-cy="reset-key"
+                  class="primary"
+                  (onSelectionChange)="openManageTagModal(node.name)">
+                  Manage Tags
+                  <chef-icon class="add-icon">add</chef-icon>
+                </mat-option>
                 <mat-option
                   data-cy="reset-key"
                   class="secondary"

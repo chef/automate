@@ -39,6 +39,10 @@ describe('InfraNodesComponent', () => {
           inputs: ['default', 'visible', 'objectNoun', 'objectName'],
           outputs: ['close', 'deleteNode']
         }),
+        MockComponent({
+          selector: 'app-update-node-tag-modal',
+          inputs: ['openEvent', 'serverId', 'orgId', 'name']
+        }),
         InfraNodesComponent
       ],
       providers: [
