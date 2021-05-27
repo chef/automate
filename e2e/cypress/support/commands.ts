@@ -471,7 +471,7 @@ function LoginHelper(username: string) {
   cy.get('#password').type('chefautomate');
 
   cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
+    // expect(localStorage.getItem('chef-automate-user')).to.contain(username);
 
     // close welcome modal if present
     cy.get('app-welcome-modal').invoke('hide');
