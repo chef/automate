@@ -11,27 +11,15 @@ INSERT INTO user_settings (user_name, connector, settings)
 VALUES ('_default', 'local',
         '{
           "date_format": {
-            "default_value": "EEEE, MMMM d, y, h:mm:ss a zzzz",
             "value": "EEEE, MMMM d, y, h:mm:ss a zzzz",
             "enabled": true
-          },
-          "setting2": {
-            "default_value": "defval2",
-            "value": "val2",
-            "enabled": false
           }
         }')
 ON CONFLICT ON CONSTRAINT user_settings_user_name_and_connector
     DO UPDATE
     SET settings='{
       "date_format": {
-        "default_value": "EEEE, MMMM d, y, h:mm:ss a zzzz",
         "value": "EEEE, MMMM d, y, h:mm:ss a zzzz",
         "enabled": true
-      },
-      "setting2": {
-        "default_value": "defval2",
-        "value": "val2",
-        "enabled": false
       }
     }';
