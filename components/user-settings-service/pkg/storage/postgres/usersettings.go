@@ -43,9 +43,15 @@ type UserSettings struct {
 
 func (db *DB) GetUserSettings(name string, connector string) (*user_settings.GetUserSettingsResponse, error) {
 	userSettingsData := UserSettings{}
+	settingsResponse := &user_settings.GetUserSettingsResponse{
+		User: &user_settings.User{
+			Name:      name,
+			Connector: connector,
+		},
+	}
 	err := db.SelectOne(&userSettingsData, selectUserSettings, name, connector)
 	if err != nil {
-		return nil, errorutils.ProcessSQLNotFound(err,
+		return settingsResponse, errorutils.ProcessSQLNotFound(err,
 			fmt.Sprintf("connector: $s, user_name: %s", connector, name), "GetJob error")
 	}
 	logrus.Infof("userSettingsData.Settings %v", userSettingsData.Settings)
@@ -55,14 +61,7 @@ func (db *DB) GetUserSettings(name string, connector string) (*user_settings.Get
 	if err != nil {
 		return nil, err
 	}
-	settingsResponse := &user_settings.GetUserSettingsResponse{
-		User: &user_settings.User{
-			Id:        userSettingsData.Id,
-			Name:      name,
-			Connector: connector,
-		},
-		Settings: data,
-	}
+	settingsResponse.Settings = data
 
 	return settingsResponse, err
 }

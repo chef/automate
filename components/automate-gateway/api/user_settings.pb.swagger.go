@@ -44,13 +44,6 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "user.id",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
@@ -86,13 +79,6 @@ func init() {
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "user.id",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
@@ -186,10 +172,6 @@ func init() {
     "chef.automate.api.user_settings.User": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int32"
-        },
         "name": {
           "type": "string"
         },

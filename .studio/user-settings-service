@@ -75,7 +75,7 @@ document "user_settings_grpcurl_put_user_settings" <<DOC
   user_settings_grpcurl_put_user_settings uid1
 DOC
 function user_settings_grpcurl_put_user_settings() {
-  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}, "settings": { "setting1" : {"default_value": "defval1", "value": "val1", "enabled": true}, "setting2" : {"default_value": "defval2", "value": "val2", "enabled": false}}}' \
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}, "settings": { "setting3" : {"default_value": "defval1", "value": "val1", "enabled": true}, "setting2" : {"default_value": "defval2", "value": "val2", "enabled": false}}}' \
 	  chef.automate.domain.user_settings.service.UserSettingsService.PutUserSettings
 }
 
