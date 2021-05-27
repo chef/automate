@@ -40,6 +40,10 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
 
+  // node reset
+  public nodeName: string;
+  public openNotificationModal = new EventEmitter<void>();
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -136,5 +140,10 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  openResetKeyModal(name: string) {
+    this.nodeName = name;
+    this.openNotificationModal.emit();
   }
 }

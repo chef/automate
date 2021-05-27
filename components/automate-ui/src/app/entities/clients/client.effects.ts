@@ -147,7 +147,7 @@ export class ClientEffects {
     map(({ payload: { name } }: ResetKeyClientSuccess) => {
       return new CreateNotification({
         type: Type.info,
-        message: `Successfully reset client key - ${name}.`
+        message: `Successfully reset the key - ${name}.`
       });
     })));
 
@@ -157,7 +157,7 @@ export class ClientEffects {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,
-        message: `Could not reset client key: ${msg || error}`
+        message: `Could not reset the key: ${msg || error}`
       });
     })));
 }

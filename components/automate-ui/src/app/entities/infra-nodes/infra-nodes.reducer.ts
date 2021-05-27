@@ -88,7 +88,7 @@ export function infraNodeEntityReducer(
     case NodeActionTypes.UPDATE_ENVIRONMENT_SUCCESS:
       return pipe(
         set(UPDATE_ENVIRONMENT_STATUS, EntityStatus.loadingSuccess),
-        set('nodeEnvironment', action.payload.environment || [])
+        set('nodeEnvironment', action.payload.environment || '')
         )(state) as InfraNodeEntityState;
 
     case NodeActionTypes.UPDATE_ENVIRONMENT_FAILURE:

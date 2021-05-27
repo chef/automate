@@ -1,0 +1,49 @@
+<chef-modal [visible]="visible" (closeModal)="closeCreateModal()" class="reset-client-modal">
+  <div class="flex-container">
+    <div *ngIf="!isReset" class="reset-div">
+      <div class="left-box">
+        <img class="big-icon" src="assets/img/infra-client-reset-key.svg"
+          alt="client-reset-key-icon" />
+      </div>
+
+      <div class="right-box">
+        <div class="left-align">
+          <div class="title-text">Resetting its Key?</div>
+          <div class="action-text">The current key will no longer be accepted.</div>
+        </div>
+
+        <div class="button-bar options">
+          <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
+          <chef-button primary id="reset-button-object-modal" (click)="resetKeyNode()">
+            <chef-loading-spinner *ngIf="resetting"></chef-loading-spinner>
+            <span *ngIf="!resetting">Reset Key</span>
+            <span *ngIf="resetting">Resetting...</span>
+          </chef-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="id-margin" *ngIf="isReset">
+      <h2 slot="title">Reset Key</h2>
+      <div class="detail">
+        <div class="icon-wrap"><em></em></div>
+        <p>The key has been reset. This key is not stored by the Chef Infra server, so please<br/>
+          make sure to copy or download it somewhere safe.</p>
+      </div>
+      <div class="key-tab-body">
+        <chef-snippet [code]="privateKey" lang="json" #newKey></chef-snippet>
+      </div>
+
+      <div class="button-bar">
+        <chef-button tertiary data-cy="copy" class="copy-button" (click)="copyKey(newKey)">
+          <img class="key-icon" src="assets/img/key.svg" alt="key-icon" />
+            Copy Key
+        </chef-button>
+        <chef-button data-cy="close" tertiary (click)="closeCreateModal()">Close</chef-button>
+        <chef-button data-cy="download" primary id="download-button-object-modal" (click)="downloadKey()">
+          Download
+        </chef-button>
+      </div>
+    </div>
+  </div>
+</chef-modal>
