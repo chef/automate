@@ -316,7 +316,7 @@ The Chef Infra Server integration lets you:
 
 #### Search for a Node
 
-Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
+Use the search bar on the Nodes tab (**Chef Infra Servers > Organizations> Nodes**)  to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
 
 {{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
 
