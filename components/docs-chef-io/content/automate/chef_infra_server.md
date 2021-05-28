@@ -311,7 +311,7 @@ The Chef Infra Server integration lets you:
 
 - Search for a specific node from a list of nodes.
 - View a list of all the connected nodes.
-- Details of a node.
+- Node details.
 - Delete a node.
 
 #### Search for a Node
