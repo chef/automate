@@ -335,7 +335,7 @@ To select the environment:
 - Click on the dropdown menu and select the name of the environment.
 
 - Add tags to the environment from the text bar below the dropdown menu.
-**Note:** To add multiple tags at a time, use comma separator. Example: Tag1, Tag2, Tag3.
+**Note:** Use a comma separator to add multiple tags. Example: `Tag1`, `Tag2`, `Tag3`.
 
 - Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
 
