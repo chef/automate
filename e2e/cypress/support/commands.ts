@@ -14,12 +14,18 @@ Cypress.Commands.add('sendToDataCollector', (report: any) => {
 });
 
 Cypress.Commands.add('login', (url: string, username: string) => {
+  console.log('----login')
+  console.log(url)
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
 
   // only environments using SAML or LDAP present this login method selection
   return cy.location('pathname')
-    .then((path: any) => path.startsWith('/dex/auth/local'))
+    .then((path: any) => {
+      console.log('-----path');
+      console.log(path);
+      return path.startsWith('/dex/auth/local')
+    })
     .then((local: any) => {
       if (local) {
         LoginHelper(username);
@@ -30,6 +36,8 @@ Cypress.Commands.add('login', (url: string, username: string) => {
 });
 
 Cypress.Commands.add('adminLogin', (url: string) => {
+  console.log('----adminLogin')
+  console.log(url)
   // CYPRESS_BASE_URL environment variable must be set
   return cy.login(url, 'admin');
 });
@@ -471,7 +479,7 @@ function LoginHelper(username: string) {
   cy.get('#password').type('chefautomate');
 
   cy.get('[type=submit]').click().then(() => {
-    // expect(localStorage.getItem('chef-automate-user')).to.contain(username);
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
 
     // close welcome modal if present
     cy.get('app-welcome-modal').invoke('hide');
