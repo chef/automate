@@ -341,7 +341,6 @@ To select the environment:
 
 - Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
 
-{{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
 #### Delete a Node
 
