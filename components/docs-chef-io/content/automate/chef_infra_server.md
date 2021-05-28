@@ -333,7 +333,9 @@ The next section of the page is the details section to view or update the node e
 To select the environment:
 
 - Click on the dropdown menu and select the name of the environment.
+- Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
 
+{{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 - Add tags to the environment from the text bar below the dropdown menu.
 **Note:** Use a comma separator to add multiple tags. Example: `Tag1`, `Tag2`, `Tag3`.
 
