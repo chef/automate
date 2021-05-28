@@ -322,7 +322,7 @@ Use the search bar on the Nodes tab (**Chef Infra Servers > Organizations> Nodes
 
 #### Node Details
 
-Select a specific node to view the node information, metadata and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group` and `Policy Name`. You can also view the **Metadata** for the node which contains the name of the `Chef Server`, and name of the `Chef Organization`.
+Selecting a node from the nodes list on the **Nodes** tab opens the Single Node page, which contains  **Node Information**, **Metadata**, and **Details**.  **Node Information** contains the node's `Environment`, `Policy Group` and `Policy Name`. **Metadata** contains the `Chef Server`, `Chef Organization` for that node. 
 
 The above information looks like as shown below:
 
