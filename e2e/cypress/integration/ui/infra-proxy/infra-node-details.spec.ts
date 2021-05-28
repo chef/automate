@@ -217,6 +217,7 @@ describe('infra node detail', () => {
 
       cy.get('app-notification.info').contains('Successfully updated node tags.');
       cy.get('app-notification.info chef-icon').click();
+      cy.get('[data-cy=tag-box]').scrollIntoView();
       cy.get('[data-cy=tag-box]').should(('be.visible'));
       cy.get('.display-node-tags').find('span').should('have.length', 2);
     });
