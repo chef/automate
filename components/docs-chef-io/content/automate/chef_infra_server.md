@@ -320,7 +320,7 @@ Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a 
 
 {{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
 
-#### Details of a Node
+#### Node Details
 
 Select a specific node to view the node information, metadata and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group` and `Policy Name`. You can also view the **Metadata** for the node which contains the name of the `Chef Server`, and name of the `Chef Organization`.
 
