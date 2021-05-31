@@ -142,7 +142,6 @@ chef-modal {
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  text-transform: capitalize;
   margin-top: 50px;
 }
 
@@ -182,14 +181,6 @@ chef-modal ::ng-deep .modal-overlay {
 .button-bar-box {
   chef-button {
     height: 36px;
-  }
-
-  chef-button#create-default-button-object-modal {
-    margin: 10px 0px 0px 16px;
-  }
-
-  chef-button#create-override-button-object-modal {
-    margin: 10px 0px 0px 16px;
   }
 
   chef-button#create-runlist-button-object-modal {

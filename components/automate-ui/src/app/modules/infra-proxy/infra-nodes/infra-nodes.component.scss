@@ -106,10 +106,6 @@ img {
       color: $chef-white;
     }
 
-    .add-icon {
-      background: $chef-primary-bright;
-      color: $chef-white;
-    }
   }
 }
 
@@ -135,12 +131,6 @@ chef-icon.primary {
     background: #3864F2;
     color: #FFFFFF;
   }
-}
-
-.add-icon {
-  margin-left: 27px;
-  margin-top: 13px;
-  color: $chef-primary-bright;
 }
 
 // sass-lint:disable no-important

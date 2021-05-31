@@ -38,8 +38,7 @@
       <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name....">
       </app-infra-search-bar>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="editRunlistLoading" size="50" fixed></chef-loading-spinner>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading" size="50" fixed></chef-loading-spinner>
     <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !nodes.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>
@@ -85,7 +84,7 @@
                   class="primary"
                   (onSelectionChange)="editRunlist(node)">
                   Edit Run list
-                  <chef-icon class="add-icon">add</chef-icon>
+                  <chef-icon class="primary">add</chef-icon>
                 </mat-option>
                 <mat-option
                   data-cy="reset-key"
