@@ -177,11 +177,11 @@ describe('infra node list', () => {
             .contains('node-learn_chef_apache2').parent().parent().find('.mat-select-trigger')
             .click();
 
-          cy.get('[data-cy=reset-key]').should('be.visible')
+          cy.get('[data-cy=update-tag]').contains('Manage Tags')
             .click();
           cy.get('app-update-node-tag-modal chef-modal').should('exist');
 
-          cy.get('[data-cy=update-tag]').type('tag1, tag2');
+          cy.get('[data-cy=update-tag]').type('tag1');
           // accept dialog
           cy.get('[data-cy=update-node-tag-button]').contains('Update Tags').click();
           cy.get('app-update-node-tag-modal chef-modal').should('not.be.visible');
