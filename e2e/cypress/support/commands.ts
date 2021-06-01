@@ -14,16 +14,20 @@ Cypress.Commands.add('sendToDataCollector', (report: any) => {
 });
 
 Cypress.Commands.add('login', (url: string, username: string) => {
-  console.log('----login')
-  console.log(url)
+  Cypress.log({
+    displayName: 'login',
+    message: [url],
+  })
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
 
   // only environments using SAML or LDAP present this login method selection
   return cy.location('pathname')
     .then((path: any) => {
-      console.log('-----path');
-      console.log(path);
+      Cypress.log({
+        displayName: 'pathname',
+        message: [path],
+      })
       return path.startsWith('/dex/auth/local')
     })
     .then((local: any) => {
@@ -36,8 +40,10 @@ Cypress.Commands.add('login', (url: string, username: string) => {
 });
 
 Cypress.Commands.add('adminLogin', (url: string) => {
-  console.log('----adminLogin')
-  console.log(url)
+  Cypress.log({
+    displayName: 'adminLogin',
+    message: [url],
+  })
   // CYPRESS_BASE_URL environment variable must be set
   return cy.login(url, 'admin');
 });
