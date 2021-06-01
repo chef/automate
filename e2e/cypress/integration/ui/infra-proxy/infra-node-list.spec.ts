@@ -181,7 +181,7 @@ describe('infra node list', () => {
             .click();
           cy.get('app-update-node-tag-modal chef-modal').should('exist');
 
-          cy.get('[data-cy=update-tag]').type('tag1');
+          cy.get('[data-cy=update-node-tag]').type('tag1');
           // accept dialog
           cy.get('[data-cy=update-node-tag-button]').contains('Update Tags').click();
           cy.get('app-update-node-tag-modal chef-modal').should('not.be.visible');
