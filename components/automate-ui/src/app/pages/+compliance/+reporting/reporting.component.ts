@@ -32,7 +32,6 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   templateUrl: './reporting.component.html',

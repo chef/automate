@@ -27,19 +27,6 @@ import { ProjectConstants } from 'app/entities/projects/project.model';
 import { AddPolicyMembers, PolicyMembersMgmtPayload } from 'app/entities/policies/policy.actions';
 import { stringToMember } from 'app/entities/policies/policy.model';
 
-// user preferences
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { trigger, transition, animate, style } from '@angular/animations';
-
-const myAnim = trigger('myAnim', [
-  transition('* => *', [
-    animate('.2s ease-out', style({ transform: 'scale(1.02)', color: 'blue' })),
-    animate('.2s ease-in', style({ transform: 'scale(1)' }))
-  ])
-]);
-
-
-
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
