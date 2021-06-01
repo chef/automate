@@ -311,13 +311,35 @@ The Chef Infra Server integration lets you:
 
 - Search for a specific node from a list of nodes.
 - View a list of all the connected nodes.
-- Delete a node
+- Details of a node.
+- Delete a node.
 
 #### Search for a Node
 
 Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a node from the list of nodes. Entering the name of a node in the search bar returns nodes matching your search criteria.
 
 {{< figure src="/images/automate/search-a-node.png" alt="Search a Node">}}
+
+#### Details of a Node
+
+Select a specific node to view the node information, metadata and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group` and `Policy Name`. You can also view the **Metadata** for the node which contains the name of the `Chef Server`, and name of the `Chef Organization`.
+
+The above information looks like as shown below:
+
+{{< figure src="/images/automate/node-information-metadata.png" alt="Node Information & Metadata">}}
+
+The next section of the page is the details section to view or update the node environment. The drop down menu consists of the list of environment created in the chef server. You can select any one environment for the selected node.
+
+To select the environment:
+
+- Click on the dropdown menu and select the name of the environment.
+
+- You can add tags to the environment from the text bar below the dropdown menu.
+**Note:** To add multiple tags at a time, use comma separator. Example: Tag1, Tag2, Tag3.
+
+- Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
+
+{{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
 #### Delete a Node
 
