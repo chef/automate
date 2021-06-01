@@ -13,7 +13,6 @@ const flash = trigger('flash', [
 @Component({
   selector: 'chef-time',
   templateUrl: './time.component.html',
-  styleUrls: ['./time.component.scss'],
   animations: [ flash ]
 })
 export class TimeComponent {
