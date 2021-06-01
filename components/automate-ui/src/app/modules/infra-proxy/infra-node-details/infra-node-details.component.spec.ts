@@ -21,13 +21,17 @@ import {
   GetNodeSuccess
 } from 'app/entities/infra-nodes/infra-nodes.actions';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
+import { NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { GetEnvironmentsSuccess } from 'app/entities/environments/environment.action';
+import { GetNodeRunlistsSuccess } from 'app/entities/nodeRunlists/nodeRunlists.action';
+import { By } from '@angular/platform-browser';
 
 describe('InfraNodeDetailsComponent', () => {
   let component: InfraNodeDetailsComponent;
   let fixture: ComponentFixture<InfraNodeDetailsComponent>;
   let router: Router;
   let store: Store<NgrxStateAtom>;
+  let element;
 
   const server_id = 'chef-server-dev-test';
   const org_id = 'chef-org-dev';
@@ -96,6 +100,7 @@ describe('InfraNodeDetailsComponent', () => {
 
     fixture = TestBed.createComponent(InfraNodeDetailsComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement;
     fixture.detectChanges();
   });
 
@@ -146,6 +151,15 @@ describe('InfraNodeDetailsComponent', () => {
 
   const add_tags =  ['tag1'];
   const remove_tags = ['tag1'];
+  const runlist: NodeRunlist = {
+    id: 'environment',
+    run_list: []
+  };
+
+  const emptyRunlist: NodeRunlist = {
+    id: 'environment',
+    run_list: []
+  };
 
   it('should be created', () => {
     expect(component).toBeTruthy();
@@ -183,4 +197,15 @@ describe('InfraNodeDetailsComponent', () => {
     component.saveEnvironment();
   });
 
+  it('render the run list', () => {
+    runlist.run_list.push({type: 'recipe', name: 'test', skipped: false});
+    store.dispatch(new GetNodeRunlistsSuccess(runlist));
+    expect(component.runlist.length).not.toBeNull();
+    expect(element.query(By.css('.empty-section'))).toBeNull();
+  });
+
+  it('show no preview image', () => {
+    store.dispatch(new GetNodeRunlistsSuccess(emptyRunlist));
+    expect(component.runlist.length).toBe(0);
+  });
 });

@@ -7,14 +7,30 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
-import { GetNodes, DeleteNode } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { GetNodeRunlists } from 'app/entities/nodeRunlists/nodeRunlists.action';
+import { GetNodes, DeleteNode, GetNode } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { GetRecipes } from 'app/entities/recipes/recipe.action';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import {
   nodeList,
   getAllStatus,
-  deleteStatus
+  deleteStatus,
+  infraNodeFromRoute,
+  getStatus
 } from 'app/entities/infra-nodes/infra-nodes.selectors';
+import {
+  allRecipes,
+  getAllStatus as getAllRecipesForOrgStatus
+} from 'app/entities/recipes/recipe.selectors';
+import {
+  allNodeRunlist,
+  getAllStatus as getAllNodeRunlistForOrgStatus
+} from 'app/entities/nodeRunlists/nodeRunlists.selectors';
+import { AvailableType } from '../infra-roles/infra-roles.component';
+import { ListItem } from '../select-box/src/lib/list-item.domain';
+import { NodeList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+
 @Component({
   selector: 'app-infra-nodes',
   templateUrl: './infra-nodes.component.html',
@@ -39,6 +55,19 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public total: number;
   public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
+  public editRunlistModalVisible = new EventEmitter<boolean>();
+
+  // edit run list
+  public availableType: AvailableType[] = [];
+  public editRunlistLoading = false;
+  public label = 'Run List';
+  public nodeStatus;
+  public nodeToEditRunlist: InfraNode;
+  public recipes: string[] = [];
+  public runlist: NodeRunlist[] = [];
+  public runlistError = false;
+  public runlistStatus;
+  public selected: ListItem[] = [];
 
   // node reset
   public nodeName: string;
@@ -57,7 +86,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
     this.getNodesData();
-
+    this.loadRecipes();
     combineLatest([
       this.store.select(getAllStatus),
       this.store.select(nodeList)
@@ -134,6 +163,18 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.openTagModal.emit();
   }
 
+  public editRunlist(node: InfraNode): void {
+    this.editRunlistLoading = true;
+    this.selected = [];
+    if ( this.nodeStatus !== EntityStatus.loading) {
+      this.getNode(node);
+    }
+
+    if (this.runlistStatus !== EntityStatus.loading) {
+      this.loadNodeRunlist(node);
+    }
+  }
+
   public startNodeDelete(node: InfraNode): void {
     this.nodeToDelete = node;
     this.deleteModalVisible = true;
@@ -154,5 +195,105 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   openResetKeyModal(name: string) {
     this.nodeName = name;
     this.openNotificationModal.emit();
+  }
+
+  public closeRunlistModal(): void {
+    this.selected = [];
+    this.runlistStatus = '';
+    this.nodeStatus = '';
+    this.editRunlistModalVisible.emit(false);
+  }
+
+  getNode(node: InfraNode) {
+    this.store.dispatch(new GetNode({
+      server_id: this.serverId, org_id: this.orgId, name: node.name
+    }));
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(infraNodeFromRoute)
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([getstat, allInfra]) => {
+      this.nodeStatus = getstat;
+      if (getstat === EntityStatus.loadingSuccess && !isNil(allInfra)) {
+        this.nodeToEditRunlist = allInfra;
+      }
+    });
+  }
+
+  loadNodeRunlist(node: InfraNode): void {
+    this.store.dispatch(new GetNodeRunlists({
+      server_id: this.serverId, org_id: this.orgId, name: node.name, id: node.environment
+    }));
+    combineLatest([
+      this.store.select(getAllNodeRunlistForOrgStatus),
+      this.store.select(allNodeRunlist)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getNodeRunlistSt, allNodeRunlistState]) => {
+        this.runlistStatus = getNodeRunlistSt;
+        if (getNodeRunlistSt === EntityStatus.loadingSuccess && !isNil(allNodeRunlistState)) {
+          if (allNodeRunlistState && allNodeRunlistState.length) {
+            this.runlist = allNodeRunlistState;
+            this.getRunlist(allNodeRunlistState);
+          }
+        } else if (getNodeRunlistSt === EntityStatus.loadingFailure) {
+          console.log('dd');
+
+          this.runlistError = true;
+          this.editRunlistLoading = false;
+          this.editRunlistModalVisible.emit(true);
+        }
+      });
+  }
+
+  private loadRecipes(): void {
+    this.store.dispatch(new GetRecipes({
+      server_id: this.serverId, org_id: this.orgId, name: '_default'
+    }));
+    combineLatest([
+      this.store.select(getAllRecipesForOrgStatus),
+      this.store.select(allRecipes)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([getRecipesSt, allRecipesState]) => {
+        if (getRecipesSt === EntityStatus.loadingSuccess && !isNil(allRecipesState)) {
+          this.recipes = allRecipesState;
+          if (this.recipes.length > 0) {
+            this.recipes.forEach((recipe) => {
+              this.availableType.push({
+                name: recipe,
+                type: 'recipe'
+              });
+            });
+          }
+        }
+      });
+  }
+
+  // 1. According to the environment ID getting the array.
+  private getRunlist(nodeRunlist: NodeRunlist[]) {
+    this.selected = [];
+    nodeRunlist.forEach(nodeValue => {
+      if (nodeValue.run_list && nodeValue.run_list.length) {
+        this.getSelectedRunlist(nodeValue.run_list);
+        this.editRunlistLoading = false;
+        this.runlistError = false;
+        this.editRunlistModalVisible.emit(true);
+      } else {
+        this.selected = [];
+        this.editRunlistLoading = false;
+        this.runlistError = false;
+        this.editRunlistModalVisible.emit(true);
+      }
+    });
+  }
+
+  private getSelectedRunlist(runlist: NodeList[]) {
+    for (const value of runlist) {
+      this.selected.push({
+        selected: false,
+        type: value.type,
+        value: value.name
+      });
+    }
   }
 }

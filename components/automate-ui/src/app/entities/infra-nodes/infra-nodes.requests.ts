@@ -38,6 +38,12 @@ export class InfraNodeRequests {
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/nodes/${name}`, {headers});
   }
 
+  public updateNode(node: InfraNode): Observable<InfraNode> {
+    return this.http.put<InfraNode>(
+      `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}`,
+      node);
+  }
+
   public updateNodeEnvironment(node: UpdateNodeEnvPayload): Observable<UpdateNodeEnvPayload> {
     return this.http.put<UpdateNodeEnvPayload>(
       `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/environment`,

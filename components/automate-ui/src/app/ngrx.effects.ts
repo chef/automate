@@ -27,6 +27,7 @@ import { LicenseStatusEffects } from './entities/license/license.effects';
 import { ManagerEffects } from './entities/managers/manager.effects';
 import { NodesEffects } from './entities/nodes/nodes.effects';
 import { NodeCredentialEffects } from './entities/node-credentials/node-credential.effects';
+import { NodeRunlistEffects } from './entities/nodeRunlists/nodeRunlists.effects';
 import { NotificationRuleEffects } from './entities/notification_rules/notification_rule.effects';
 import { OrgEffects } from './entities/orgs/org.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
@@ -74,6 +75,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ManagerEffects,
       NodesEffects,
       NodeCredentialEffects,
+      NodeRunlistEffects,
       NotificationRuleEffects,
       OrgEffects,
       PolicyEffects,

@@ -1,13 +1,13 @@
 export interface InfraNode {
-  id: string;
+  id?: string;
   server_id: string;
   org_id: string;
   name: string;
-  fqdn: string;
-  ip_address: string;
-  check_in: string;
-  uptime: string;
-  platform: string;
+  fqdn?: string;
+  ip_address?: string;
+  check_in?: string;
+  uptime?: string;
+  platform?: string;
   environment: string;
   policy_group: string;
   policy_name: string;
@@ -16,5 +16,5 @@ export interface InfraNode {
   normal_attributes: string;
   automatic_attributes: string;
   run_list: string[];
-  tags: string[];
+  tags?: string[];
 }

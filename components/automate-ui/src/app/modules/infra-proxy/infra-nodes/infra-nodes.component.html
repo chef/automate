@@ -20,6 +20,17 @@
     [orgId]="orgId"
     [name]="updateNodeName">
   </app-update-node-tag-modal>
+  <app-edit-infra-node-modal
+    [label]="label"
+    [openEvent]="editRunlistModalVisible"
+    [orgId]="orgId"
+    [availableType]="availableType"
+    [node]="nodeToEditRunlist"
+    [serverId]="serverId"
+    [selected]="selected"
+    [runlistError]="runlistError"
+    (closeRunlist)="closeRunlistModal()">
+  </app-edit-infra-node-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
@@ -27,7 +38,7 @@
       <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name....">
       </app-infra-search-bar>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading" size="50" fixed></chef-loading-spinner>
     <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !nodes.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>
@@ -66,6 +77,13 @@
                   class="primary"
                   (onSelectionChange)="openManageTagModal(node.name)">
                   Manage Tags
+                  <chef-icon class="primary">add</chef-icon>
+                </mat-option>
+                <mat-option
+                  data-cy="runlist"
+                  class="primary"
+                  (onSelectionChange)="editRunlist(node)">
+                  Edit Run list
                   <chef-icon class="primary">add</chef-icon>
                 </mat-option>
                 <mat-option

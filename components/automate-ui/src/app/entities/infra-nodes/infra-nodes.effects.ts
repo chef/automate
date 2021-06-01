@@ -14,6 +14,9 @@ import {
   GetNode,
   GetNodeSuccess,
   GetNodeFailure,
+  UpdateNode,
+  UpdateNodeSuccess,
+  UpdateNodeFailure,
   UpdateNodeEnvironment,
   UpdateNodeEnvironmentSuccess,
   UpdateNodeEnvironmentFailure,
@@ -30,6 +33,8 @@ import {
 import {
   InfraNodeRequests
 } from './infra-nodes.requests';
+
+import { InfraNode } from './infra-nodes.model';
 
 @Injectable()
 export class InfraNodeEffects {
@@ -106,6 +111,32 @@ export class InfraNodeEffects {
           message: `Could not get node: ${msg || payload.error}`
         });
     })));
+
+  updateNode$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE),
+      mergeMap(({ payload }: UpdateNode) =>
+        this.requests.updateNode(payload).pipe(
+          map((resp: InfraNode) => new UpdateNodeSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UpdateNodeFailure(error)))))));
+
+  updateNodeSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_SUCCESS),
+      map(({ payload: node }: UpdateNodeSuccess) => new CreateNotification({
+        type: Type.info,
+        message: `Successfully updated node - ${node.name} .`
+      }))));
+
+  updateNodeFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_FAILURE),
+      filter(({ payload }: UpdateNodeFailure) => payload.status !== HttpStatus.CONFLICT),
+      map(({ payload }: UpdateNodeFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not update node: ${payload.error.error || payload}.`
+      }))));
 
   updateNodeEnvironment$ = createEffect(() =>
     this.actions$.pipe(

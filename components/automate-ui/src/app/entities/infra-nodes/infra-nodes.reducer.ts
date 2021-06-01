@@ -9,6 +9,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodesStatus: EntityStatus;
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
+  updateStatus: EntityStatus;
   updateEnvStatus: EntityStatus;
   updateTagsStatus: EntityStatus;
   nodeList: {
@@ -18,11 +19,13 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   deleteStatus: EntityStatus;
   nodeTags: string[];
   nodeEnvironment: string;
+  node: InfraNode;
 }
 
 const GET_ALL_STATUS            = 'getAllStatus';
 const DELETE_STATUS             = 'deleteStatus';
 const GET_STATUS                = 'getStatus';
+const UPDATE_STATUS             = 'updateStatus';
 const UPDATE_ENVIRONMENT_STATUS = 'updateEnvStatus';
 const UPDATE_TAGS_STATUS        = 'updateTagsStatus';
 
@@ -32,7 +35,8 @@ export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<I
 
 export const InfraNodeEntityInitialState: InfraNodeEntityState =
   nodeEntityAdapter.getInitialState(<InfraNodeEntityState>{
-    getAllStatus: EntityStatus.notLoaded
+    getAllStatus: EntityStatus.notLoaded,
+    updateStatus: EntityStatus.notLoaded
   });
 
 export function infraNodeEntityReducer(
@@ -76,11 +80,27 @@ export function infraNodeEntityReducer(
       ) as InfraNodeEntityState;
 
     case NodeActionTypes.GET_SUCCESS:
-      return set(GET_STATUS, EntityStatus.loadingSuccess,
-        nodeEntityAdapter.addOne(action.payload, state));
+      return pipe(
+        set(GET_STATUS, EntityStatus.loadingSuccess),
+        set('node', action.payload || [])
+      )(state) as InfraNodeEntityState;
 
     case NodeActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
+
+    case NodeActionTypes.UPDATE:
+      return set(UPDATE_STATUS, EntityStatus.loading, state) as InfraNodeEntityState;
+
+    case NodeActionTypes.UPDATE_SUCCESS:
+      return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
+        nodeEntityAdapter.updateOne({
+          id: action.payload.name,
+          changes: action.payload
+        }, state)) as InfraNodeEntityState;
+
+    case NodeActionTypes.UPDATE_FAILURE:
+      return set(UPDATE_STATUS,
+        EntityStatus.loadingFailure, state) as InfraNodeEntityState;
 
     case NodeActionTypes.UPDATE_ENVIRONMENT:
       return set(UPDATE_ENVIRONMENT_STATUS, EntityStatus.loading, state);

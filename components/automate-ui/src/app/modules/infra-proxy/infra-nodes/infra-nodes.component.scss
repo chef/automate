@@ -105,6 +105,7 @@ img {
     chef-icon.primary {
       color: $chef-white;
     }
+
   }
 }
 
@@ -130,4 +131,15 @@ chef-icon.primary {
     background: #3864F2;
     color: #FFFFFF;
   }
+}
+
+// sass-lint:disable no-important
+::ng-deep .cdk-overlay-container .cdk-overlay-pane {
+  margin-left: -12px !important;
+  transform: none !important;
+}
+
+::ng-deep .chef-control-menu {
+  margin-top: 29px;
+  right: -43px;
 }

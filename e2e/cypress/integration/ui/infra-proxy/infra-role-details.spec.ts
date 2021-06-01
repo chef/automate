@@ -741,9 +741,9 @@ describe('infra role detail', () => {
 
       updateRole('override', nullJson).then((response) => {
         if (Object.keys(response.body.override_attributes).length > 0) {
-          cy.get('[data-cy=empty-override-attribute]').should('be.visible');
+          cy.get('[data-cy=empty-override-attribute]').scrollIntoView().should('be.visible');
         } else {
-          cy.get('[data-cy=empty-override-attribute]').should('not.be.visible');
+          cy.get('[data-cy=empty-override-attribute]').scrollIntoView().should('not.be.visible');
         }
       });
     });

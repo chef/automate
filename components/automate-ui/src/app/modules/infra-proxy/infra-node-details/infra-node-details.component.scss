@@ -309,3 +309,98 @@ div#button-env {
     transform: rotate(225deg);
   }
 }
+
+// run list
+.runlist {
+
+  .empty-section {
+    margin-top: 130px;
+    text-align: center;
+  }
+
+  img {
+    width: 70px;
+  }
+
+  .json-tree-container {
+    font-size: 14px;
+  }
+
+  .attr {
+    width: 98%;
+    margin-left: 28px;
+    margin-right: 33px;
+    margin-top: 16px;
+    background: $chef-white;
+    border: 1px solid $chef-key-tab;
+    box-sizing: border-box;
+    border-radius: 2px;
+    padding-bottom: 16px;
+  }
+
+  .expand-collapse {
+    margin: 0 10px;
+    width: 98%;
+    border-bottom: 0.5px solid $chef-key-tab;
+    font-size: 14px;
+    color: $royal-blue;
+
+    .action {
+      cursor: pointer;
+    }
+  }
+
+  .float-right {
+    position: relative;
+    float: right;
+
+    &:hover {
+      background: $chef-light-grey;
+      border-radius: 4px;
+    }
+
+    &:focus {
+      border: solid 1px $chef-primary-bright;
+    }
+  }
+
+  .label {
+    margin-left: 39px;
+    height: 20px;
+    left: 200px;
+    top: 238px;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    color: $chef-black;
+  }
+
+  .default {
+    margin-top: 29px;
+    max-width: 25%;
+  }
+
+  .label-items {
+    margin-bottom: 16px;
+    height: 55px;
+  }
+
+  .version-dropdown {
+    float: right;
+    width: 279px;
+  }
+
+  ::ng-deep {
+    .label-items .label {
+      float: left;
+    }
+  }
+
+  .edit-item {
+    margin: 0 8px 0 -4px;
+    font-size: 13px;
+  }
+}
+
+
