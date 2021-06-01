@@ -50,15 +50,8 @@
   transition: transform .25s;
 
   &.active {
-    transform: translateY(0);
-  }
-
-  .show-button {
    transform: translateY(0); 
   }
-
-
-  button {
 
   .show-button {
     position: absolute;
@@ -108,5 +101,4 @@
       }
     }
   }
-}
 }
