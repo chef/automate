@@ -80,16 +80,4 @@ export class UIComponent implements OnInit, AfterViewChecked {
     this.store.dispatch(new GetAllUserPerms());
     this.store.dispatch(new GetUserPreferences());
   }
-
-  public handleTimeFormatChange(timeformat: string): void {
-    this.userPrefsService.testUpdateUserTimeformat(timeformat);
-  }
-
-  public handleGetPrefs(): void {
-    this.userPrefsService.getUserPreferences();
-  }
-
-  public toggleTime(): void {
-    this.showTime = !this.showTime;
-  }
 }

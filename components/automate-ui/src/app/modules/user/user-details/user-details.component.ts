@@ -32,8 +32,6 @@ import {
 } from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
-
-// State preferences update for dev testing purposes only
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 export type UserTabName = 'password' | 'details';

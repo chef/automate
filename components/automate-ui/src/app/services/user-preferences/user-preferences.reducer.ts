@@ -16,7 +16,6 @@ export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   list: {
     // Subject to change, enabled for development purposes
     timeformat: {
-      // value 'DD MM YY'
       value: 'ddd, DD MMM YYYY',
       disabled: false
     }

@@ -46,24 +46,4 @@
     <app-process-progress-bar></app-process-progress-bar>
     <app-pending-edits-bar></app-pending-edits-bar>
   </div>
-
-  <!-- TEMP FOR TIME SELECTION DEMO -->
-  <div class="time-test" [class.active]="showTime">
-    <button class="show-button" (click)="toggleTime()" [class.active]="showTime">&#9650;</button>
-    <h3>Current Time:</h3>
-    <chef-time [time]="currentTime"></chef-time>
-    <div class="hacky-line-break"></div>
-    <chef-form-field class="timezone-field">
-      <label for="timeformat">Time Format</label>
-      <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value"
-        (change)="handleTimeFormatChange(timeformat.value)">
-        <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
-        <chef-option value="MM DD YYYY">MM DD YYYY</chef-option>
-        <chef-option value="MM DD - HH:mm z">MM DD - HH:mm z</chef-option>
-      </chef-select>
-    </chef-form-field>
-    <div class="button-container">
-      <button class="test-get" (click)="handleGetPrefs()">Test Get Preferences</button>
-    </div>
-  </div>
 </div>

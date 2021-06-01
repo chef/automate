@@ -1,7 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule, Store } from '@ngrx/store';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { TimeComponent } from './time.component';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
@@ -16,7 +15,7 @@ describe('TimeComponent', () => {
     TestBed.configureTestingModule({
       declarations: [TimeComponent, DatetimePipe],
       providers: [UserPreferencesService],
-      imports: [StoreModule.forRoot(ngrxReducers, { runtimeChecks }), BrowserAnimationsModule],
+      imports: [StoreModule.forRoot(ngrxReducers, { runtimeChecks })],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
