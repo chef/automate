@@ -117,25 +117,46 @@ Remember to replace `X` in `ecX-X-XX-XX-XXX` with you EC2 instance IP where ever
 
 Add below data and save the file:
 
-```dn: ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+```
+dn: ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
 objectClass: organizationalUnit
 ou: People
 
-dn: cn=test,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+dn: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+sn: doe
+cn: jane
+
+dn: cn=john,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+sn: doe
+cn: john
+
+dn: ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=admins,ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: groupOfNames
+cn: admins
+member: cn=john,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+member: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+
+dn: cn=developers,ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: groupOfNames
+cn: developers
+member: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+
+dn: cn=abdul,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
 objectClass: person
 objectClass: inetOrgPerson
 objectClass: simpleSecurityObject
 userPassword: 123
-sn: testuser
+sn: test
 cn: test
 
-dn: cn=test2,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
-objectClass: person
-objectClass: inetOrgPerson
-objectClass: simpleSecurityObject
-userPassword: 1234
-sn: testuser2
-cn: test2
 ```
 
 {{< note >}}
@@ -191,10 +212,6 @@ In Automate Sign in using LDAP:
 Usermane: test
 Password: 123
 
-or
-
-Usermane: test2
-Password: 1234
 
 As we have only above two user in LDAP, we can add more users into LDAP and login, if needed.
 
