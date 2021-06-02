@@ -31,6 +31,13 @@
     [runlistError]="runlistError"
     (closeRunlist)="closeRunlistModal()">
   </app-edit-infra-node-modal>
+  <app-edit-infra-node-attribute-modal 
+    [jsonText]="jsonText"
+    [openEvent]="openAttributeModal"
+    [orgId]="orgId"
+    [node]="node"
+    [serverId]="serverId">
+  </app-edit-infra-node-attribute-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
@@ -84,6 +91,13 @@
                   class="primary"
                   (onSelectionChange)="editRunlist(node)">
                   Edit Run list
+                  <chef-icon class="primary">add</chef-icon>
+                </mat-option>
+                <mat-option
+                  data-cy="attribute"
+                  class="primary"
+                  (onSelectionChange)="editAttributes(node)">
+                  Edit Attributes
                   <chef-icon class="primary">add</chef-icon>
                 </mat-option>
                 <mat-option

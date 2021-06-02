@@ -77,6 +77,14 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public updateNodeName: string;
   public openTagModal = new EventEmitter<void>();
 
+  // edit attributes
+  public editAttributesLoading = false;
+  public editNodeAttributes: string;
+  public node: InfraNode;
+  public jsonText;
+  public attributes;
+  public openAttributeModal = new EventEmitter<void>();
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -163,6 +171,19 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.openTagModal.emit();
   }
 
+  public editAttributes(node: InfraNode): void {
+    this.editAttributesLoading = true;
+    if ( this.nodeStatus !== EntityStatus.loading) {
+      this.getNode(node);
+    }
+  }
+
+  public loadAttributes(node: InfraNode) {
+    this.node = node;
+    this.jsonText = JSON.stringify(this.attributes, null, 4);
+    this.openAttributeModal.emit();
+  }
+
   public editRunlist(node: InfraNode): void {
     this.editRunlistLoading = true;
     this.selected = [];
@@ -217,6 +238,11 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
       this.nodeStatus = getstat;
       if (getstat === EntityStatus.loadingSuccess && !isNil(allInfra)) {
         this.nodeToEditRunlist = allInfra;
+        this.attributes =
+        (allInfra.normal_attributes && JSON.parse(allInfra.normal_attributes)) || {};
+        if (this.editAttributesLoading === true) {
+          this.loadAttributes(node);
+        }
       }
     });
   }
@@ -237,8 +263,6 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
             this.getRunlist(allNodeRunlistState);
           }
         } else if (getNodeRunlistSt === EntityStatus.loadingFailure) {
-          console.log('dd');
-
           this.runlistError = true;
           this.editRunlistLoading = false;
           this.editRunlistModalVisible.emit(true);
