@@ -27,7 +27,10 @@ import {
   DeleteNodeSuccess,
   DeleteNodeFailure,
   NodesSuccessPayload,
-  NodeActionTypes
+  NodeActionTypes,
+  UpdateNodeAttributes,
+  UpdateNodeAttributesSuccess,
+  UpdateNodeAttributesFailure
 } from './infra-nodes.actions';
 
 import {
@@ -188,5 +191,31 @@ export class InfraNodeEffects {
       map(({ payload }: UpdateNodeTagsFailure) => new CreateNotification({
         type: Type.error,
         message: `Could not update node tags: ${payload.error.error || payload}.`
+      }))));
+
+  updateNodeAttributes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_ATTRIBUTES),
+      mergeMap(({ payload }: UpdateNodeAttributes) =>
+        this.requests.updateNodeAttributes(payload).pipe(
+          map((resp) => new UpdateNodeAttributesSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new UpdateNodeAttributesFailure(error)))))));
+
+  updateNodeAttributesSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_ATTRIBUTES_SUCCESS),
+      map(({ }: UpdateNodeAttributesSuccess) => new CreateNotification({
+        type: Type.info,
+        message: 'Successfully updated node attibutes.'
+      }))));
+
+  updateNodeAttributesFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.UPDATE_ATTRIBUTES_FAILURE),
+      filter(({ payload }: UpdateNodeAttributesFailure) => payload.status !== HttpStatus.CONFLICT),
+      map(({ payload }: UpdateNodeAttributesFailure) => new CreateNotification({
+        type: Type.error,
+        message: `Could not update node attibutes: ${payload.error.error || payload}.`
       }))));
 }

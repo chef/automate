@@ -62,3 +62,8 @@ export const infraNodeFromRoute = createSelector(
   infraNodeState,
   (state) => state.node
 );
+
+export const updateAttributesStatus = createSelector(
+  infraNodeState,
+  (state) => state.updateAttributesStatus
+);
