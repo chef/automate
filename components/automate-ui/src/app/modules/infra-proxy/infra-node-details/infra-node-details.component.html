@@ -5,7 +5,7 @@
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
-         {{InfraNode?.name}}
+        {{InfraNode?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
         <chef-heading data-cy="infra-node-head">{{InfraNode?.name}}</chef-heading>
@@ -64,8 +64,10 @@
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='details' data-cy="details-tab">Details</chef-option>
           <chef-option value='runList' data-cy="run-list-tab">Run list</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
+
       <app-edit-infra-node-modal
         [label]="label"
         [openEvent]="openEnvironmentModal"
@@ -77,6 +79,15 @@
         [runlistError]="conflictError"
         (runlistUpdated)="updateRunlist()">
       </app-edit-infra-node-modal>
+
+      <app-edit-infra-node-attribute-modal 
+      [jsonText]="jsonText"
+      [openEvent]="openAttributeModal"
+      [orgId]="orgId" [node]="InfraNode"
+      [serverId]="serverId"
+      [attrParseError]="conflictError">
+      </app-edit-infra-node-attribute-modal>
+
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
         <div class="details-tab" *ngIf="!nodeDetailsLoading">
@@ -111,52 +122,52 @@
                   <p class="change-node-text">Change Node Environment?</p>
                   <div id="button-env">
                     <chef-button
-                      tertiary
-                      id="cancel"
-                      data-cy="cancel-button"
-                      [disabled]="saving"
-                      (click)="closeConfirmationBox()">Cancel</chef-button>
+                    tertiary
+                    id="cancel"
+                    data-cy="cancel-button"
+                    [disabled]="saving"
+                    (click)="closeConfirmationBox()">Cancel</chef-button>
                     <chef-button
-                      primary
-                      data-cy="save-button"
-                      id="save-btn"
-                      [disabled]="saving"
-                      (click)="saveEnvironment()">
-                      <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-                      <span *ngIf="!saving">Save</span>
-                      <span *ngIf="saving">Saving</span>
+                    primary
+                    data-cy="save-button"
+                    id="save-btn"
+                    [disabled]="saving"
+                    (click)="saveEnvironment()">
+                    <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                    <span *ngIf="!saving">Save</span>
+                    <span *ngIf="saving">Saving</span>
                     </chef-button>
                   </div>
                 </div>
               </form>
               <span class="label">Tags</span>
               <div class="node-tags-box">
-                <input 
-                  chefInput
-                  type="text"
-                  id="tag-input"
-                  autocomplete="off"
-                  data-cy="add-tag"
-                  [ngClass]="saving ? 'disable' : ''"
-                  [(ngModel)]="inputTxt"/>
+                <input
+                chefInput
+                type="text"
+                id="tag-input"
+                autocomplete="off"
+                data-cy="add-tag"
+                [ngClass]="saving ? 'disable' : ''"
+                [(ngModel)]="inputTxt"/>
                 <button
-                  primary
-                  type="submit"
-                  class="primary"
-                  [disabled]= "(inputTxt === '') || saving"
-                  data-cy="add-tag-button"
-                  (click)="addTags()"> Add </button>
+                primary
+                type="submit"
+                class="primary"
+                [disabled]= "(inputTxt === '') || saving"
+                data-cy="add-tag-button"
+                (click)="addTags()"> Add </button>
               </div>
               <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
               <div
-                *ngIf="nodeTags?.length"
-                class="display-node-tags"
-                [ngClass]="saving ? 'disable' : ''"
-                data-cy="tag-box">
-                <span *ngFor="let tag of nodeTags" class="tag">
-                  {{tag}}
-                  <a class="removeTag" (click)="removeTag(tag)" data-cy="remove-tag"></a>
-                </span>
+              *ngIf="nodeTags?.length"
+              class="display-node-tags"
+              [ngClass]="saving ? 'disable' : ''"
+              data-cy="tag-box">
+              <span *ngFor="let tag of nodeTags" class="tag">
+                {{tag}}
+                <a class="removeTag" (click)="removeTag(tag)" data-cy="remove-tag"></a>
+              </span>
               </div>
             </div>
           </ng-container>
@@ -249,6 +260,58 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+      <section class="page-body attributes" *ngIf="tabValue === 'attributes'">
+        <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="attributes-tab" *ngIf="!nodeAttributesLoading">
+          <div class="spinner">
+             <chef-loading-spinner *ngIf="nodeAttributesLoading" size="50" fixed></chef-loading-spinner>
+           <!-- <chef-loading-spinner *ngIf="attributesLoading" size="50" fixed></chef-loading-spinner> -->
+          </div>
+          <ng-container *ngIf="!nodeAttributesLoading">
+            <div class="node-attributes-section">
+              <label>
+                <span class="label default">Attributes</span>
+              </label>
+              <div class="attr">
+                <div class="expand-collapse">
+                  <chef-button tertiary class="action"
+                   (click)="tree.expand()" [disabled]=!hasattributes
+                    data-cy="empty-expand-attributes">
+                    <chef-icon>add_circle</chef-icon>
+                    <span>Expand All</span>
+                  </chef-button>
+                  <chef-button tertiary class="action"
+                   (click)="tree.collapse()" [disabled]=!hasattributes
+                    data-cy="empty-collapse-attributes">
+                    <chef-icon>remove_circle</chef-icon>
+                    <span>Collapse All</span>
+                  </chef-button>
+                  <chef-button tertiary class="right-button-box" 
+                    [disabled]="conflictError" (click)="openEditAttrModal(InfraNode.normal_attributes)"
+                    data-cy="node-edit-attributes">
+                    <span class="material-icons edit-item">mode_edit</span>
+                    <span class="edit-text">Edit</span>
+                  </chef-button>
+                </div>
+                <hr class="divider-constraints" />
+                <div class="json-container">
+                  <div class="scroll">
+                    <app-json-tree-table class="json-tree-container" 
+                    [hidden]="hasattributes? false : true" 
+                    #tree
+                    [json]="attributes">
+                    </app-json-tree-table>
+                    <div *ngIf="!hasattributes" class="img-section">
+                      <img alt="No preview" src="/assets/img/no_preview.gif" />
+                      <p>There are no items for Display.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </section>
     </main>

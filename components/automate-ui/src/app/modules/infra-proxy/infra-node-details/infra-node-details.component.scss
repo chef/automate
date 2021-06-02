@@ -265,6 +265,10 @@ div#button-env {
   height: 220px;
 }
 
+.json-tree-container {
+  font-size: 14px;
+}
+
 // ng-select 
 ::ng-deep {
   .ng-select .ng-select-container {
@@ -320,10 +324,6 @@ div#button-env {
 
   img {
     width: 70px;
-  }
-
-  .json-tree-container {
-    font-size: 14px;
   }
 
   .attr {
@@ -404,3 +404,59 @@ div#button-env {
 }
 
 
+//Attributes tab
+.attributes {
+
+  .attr {
+    width: 100%;
+    height: 242px;
+    background: $chef-white;
+    border: 1px solid $chef-key-tab;
+    border-radius: 2px;
+  }
+
+  .divider-constraints {
+    margin-left: 16px;
+    margin-top: 2px;
+    margin-right: 18px;
+  }
+
+  .json-container {
+    height: 169px;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    color: $chef-black;
+  }
+
+  .scroll {
+    max-height: 158px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  ::ng-deep .scroll::-webkit-scrollbar {
+    width: 5px;
+    background-color: $chef-modal-scrollbar;
+  }
+
+  ::ng-deep .scroll::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: $chef-modal;
+  }
+
+  .img-section {
+    text-align: center;
+  }
+
+  img {
+    margin-top: 30px;
+    width: 70px;
+  }
+
+  .right-button-box {
+    cursor: pointer;
+    position: relative;
+    float: right;
+  }
+}
