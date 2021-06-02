@@ -25,6 +25,7 @@ import { EditDataBagItemModalComponent } from './edit-data-bag-item-modal/edit-d
 import { EditEnvironmentAttributeModalComponent } from './edit-environment-attribute-modal/edit-environment-attribute-modal.component';
 import { EditInfraNodeModalComponent } from './edit-infra-node-modal/edit-infra-node-modal.component';
 import { EditInfraRoleModalComponent } from './edit-infra-role-modal/edit-infra-role-modal.component';
+import { EditInfraNodeAttributeModalComponent } from './edit-infra-node-attribute-modal/edit-infra-node-attribute-modal.component';
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
@@ -74,6 +75,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     EditEnvironmentAttributeModalComponent,
     EditInfraNodeModalComponent,
     EditInfraRoleModalComponent,
+    EditInfraNodeAttributeModalComponent,
     EmptyStateComponent,
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
