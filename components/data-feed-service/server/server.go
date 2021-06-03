@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	//"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -70,7 +71,6 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	// otherwise use passwd
 	username := ""
 	password := ""
-	token := ""
 	headers := ""
 	var err error
 	var credentials service.Credentials
@@ -80,11 +80,8 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
-	case *datafeed.URLValidationRequest_TokenAuth:
-		token = request.GetTokenAuth().GetToken()
-		credentials = service.NewTokenAuthCredentials(token)
-	case *datafeed.URLValidationRequest_CustomHeader:
-		headers = request.GetCustomHeader().GetHeaders()
+	case *datafeed.URLValidationRequest_Header:
+		headers = request.GetHeader().GetValue()
 		credentials = service.NewCustomHeaderCredentials(headers)
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
@@ -124,7 +121,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
 
-	if credentials.GetAuthType() == service.CUSTOM_HEADER_AUTH {
+	if credentials.GetAuthType() == service.HEADER_AUTH {
 		headerString := credentials.GetValues().HeaderJSONString
 		var headerMap map[string]string
 		err := json.Unmarshal([]byte(headerString), &headerMap)
@@ -135,7 +132,11 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 			httpRequest.Header.Set(key, value)
 		}
 	} else {
-		httpRequest.Header.Add("Authorization", credentials.GetValues().AuthorizationHeader)
+		authHeader := credentials.GetValues().AuthorizationHeader
+		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
+		if tokenValue != "" {
+			httpRequest.Header.Add("Authorization", authHeader)
+		}
 	}
 
 	client := http.Client{}

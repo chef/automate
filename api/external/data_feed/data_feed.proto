@@ -133,12 +133,8 @@ message SecretId {
   string id = 1;
 }
 
-message TokenAuth {
-  string token = 1;
-}
-
-message CustomHeader {
-	string headers = 1;
+message Header {
+	string value = 1;
 }
 
 message URLValidationRequest {
@@ -146,8 +142,7 @@ message URLValidationRequest {
   oneof credentials {
     UsernamePassword username_password = 2;
     SecretId secret_id = 3;
-	TokenAuth token_auth = 4;
-	CustomHeader custom_header = 5;
+	Header header = 4;
   }
 }
 

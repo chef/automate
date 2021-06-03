@@ -139,9 +139,23 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
 
-func formCustomHeaders(headerReq http.Header, data map[string]string) {
-	for key, value := range data {
-		headerReq.Add(key, value)
+func (n datafeedNotification) addCustomHeader(header http.Header) {
+	if n.credentials.GetAuthType() == HEADER_AUTH {
+		headerString := n.credentials.GetValues().HeaderJSONString
+		var headerMap map[string]string
+		err := json.Unmarshal([]byte(headerString), &headerMap)
+		if err != nil {
+			log.Warnf("Error parsing headers %v", err)
+		}
+		for key, value := range headerMap {
+			header.Set(key, value)
+		}
+	} else {
+		authHeader := n.credentials.GetValues().AuthorizationHeader
+		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
+		if tokenValue != "" {
+			header.Add("Authorization", authHeader)
+		}
 	}
 }
 
@@ -164,26 +178,13 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		log.Error("Error creating request")
 		return err
 	}
-	//set only if present : TODO
-	request.Header.Add("Authorization", notification.credentials.GetValues().AuthorizationHeader)
+
 	request.Header.Add("Content-Type", notification.contentType)
 	request.Header.Add("Content-Encoding", "gzip")
 	request.Header.Add("Accept", notification.contentType)
 	request.Header.Add("Chef-Data-Feed-Message-Version", version)
 
-	if notification.credentials.GetAuthType() == CUSTOM_HEADER_AUTH {
-		headerString := notification.credentials.GetValues().HeaderJSONString
-		var headerMap map[string]string
-		err := json.Unmarshal([]byte(headerString), &headerMap)
-		if err != nil {
-			log.Warnf("Error parsing headers %v", err)
-		}
-		for key, value := range headerMap {
-			request.Header.Set(key, value)
-		}
-	}
-
-	// request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
+	notification.addCustomHeader(request.Header)
 
 	response, err := client.client.Do(request)
 	if err != nil {
