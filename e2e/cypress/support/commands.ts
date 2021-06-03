@@ -31,15 +31,63 @@ Cypress.Commands.add('login', (url: string, username: string) => {
       return path.startsWith('/dex/auth/local');
     })
     .then((local: any) => {
-      console.log('---local---:' + local);
-      console.log('---url---:' + url);
-      console.log('---username---:' + username);
+      Cypress.log({
+        displayName: 'pathnamess',
+        message: [cy.location('pathname')]
+      });
+      Cypress.log({
+        displayName: 'local',
+        message: [local]
+      });
+      Cypress.log({
+        displayName: 'geta',
+        message: [cy.get('a')]
+      });
+      Cypress.log({
+        displayName: 'url',
+        message: [url]
+      });
       if (!local && cy.get('a')) {
-        console.log('---cy.get(a)---:' + cy.get('a'));
+        Cypress.log({
+          displayName: 'ifpathname',
+          message: [cy.location('pathname')]
+        });
+        Cypress.log({
+          displayName: 'iflocal',
+          message: [local]
+        });
+        Cypress.log({
+          displayName: 'ifgeta',
+          message: [cy.get('a')]
+        });
+        Cypress.log({
+          displayName: 'ifurl',
+          message: [url]
+        });
         cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
       } else {
+        Cypress.log({
+          displayName: 'elsepathname',
+          message: [cy.location('pathname')]
+        });
+        Cypress.log({
+          displayName: 'elselocal',
+          message: [local]
+        });
+        Cypress.log({
+          displayName: 'elsegeta',
+          message: [cy.get('a')]
+        });
+        Cypress.log({
+          displayName: 'elseurl',
+          message: [url]
+        });
         LoginHelper(username);
       }
+      Cypress.log({
+        displayName: 'outsideurl',
+        message: [url]
+      });
     });
 });
 
