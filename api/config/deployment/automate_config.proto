@@ -103,5 +103,5 @@ message AutomateConfig {
 	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
 	chef.automate.domain.cds.ConfigRequest cds = 46;
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
-  chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
+	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 }
