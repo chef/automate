@@ -15,11 +15,11 @@ import (
 	"github.com/pkg/errors"
 
 	datafeed "github.com/chef/automate/api/external/data_feed"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/components/data-feed-service/service"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 
@@ -70,6 +70,8 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	// otherwise use passwd
 	username := ""
 	password := ""
+	token := ""
+	headers := ""
 	var err error
 	var credentials service.Credentials
 	url := request.Url
@@ -78,6 +80,12 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
+	case *datafeed.URLValidationRequest_TokenAuth:
+		token = request.GetTokenAuth().GetToken()
+		credentials = service.NewTokenAuthCredentials(token)
+	case *datafeed.URLValidationRequest_CustomHeader:
+		headers = request.GetCustomHeader().GetHeaders()
+		credentials = service.NewCustomHeaderCredentials(headers)
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
@@ -111,10 +119,25 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		log.Error("Error creating request")
 		return response, err
 	}
-	httpRequest.Header.Add("Authorization", credentials.GetAuthorizationHeaderValue())
+	// httpRequest.Header.Add("Authorization", credentials.GetAuthorizationHeaderValue())
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
+
+	if credentials.GetAuthType() == service.CUSTOM_HEADER_AUTH {
+		headerString := credentials.GetValues().HeaderJSONString
+		var headerMap map[string]string
+		err := json.Unmarshal([]byte(headerString), &headerMap)
+		if err != nil {
+			log.Warnf("Error parsing headers %v", err)
+		}
+		for key, value := range headerMap {
+			httpRequest.Header.Set(key, value)
+		}
+	} else {
+		httpRequest.Header.Add("Authorization", credentials.GetValues().AuthorizationHeader)
+	}
+
 	client := http.Client{}
 	httpResponse, err := client.Do(httpRequest)
 	if err != nil {
