@@ -244,14 +244,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.datafeed.CustomHeader": {
-      "type": "object",
-      "properties": {
-        "headers": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
@@ -288,6 +280,14 @@ func init() {
         }
       }
     },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.ListDestinationRequest": {
       "type": "object"
     },
@@ -319,14 +319,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.datafeed.TokenAuth": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.datafeed.URLValidationRequest": {
       "type": "object",
       "properties": {
@@ -339,11 +331,8 @@ func init() {
         "secret_id": {
           "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
         },
-        "token_auth": {
-          "$ref": "#/definitions/chef.automate.api.datafeed.TokenAuth"
-        },
-        "custom_header": {
-          "$ref": "#/definitions/chef.automate.api.datafeed.CustomHeader"
+        "header": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.Header"
         }
       }
     },

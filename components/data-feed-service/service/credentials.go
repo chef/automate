@@ -26,10 +26,9 @@ type Credentials interface {
 }
 
 const (
-	BASIC_AUTH         = "basic_auth"
-	SPLUNK_AUTH        = "splunk_auth"
-	TOKEN_AUTH         = "token_auth"
-	CUSTOM_HEADER_AUTH = "custom_header"
+	BASIC_AUTH  = "basic_auth"
+	SPLUNK_AUTH = "splunk_auth"
+	HEADER_AUTH = "header_auth"
 )
 
 type CredentialsFactory struct {
@@ -48,14 +47,10 @@ func (c *CredentialsFactory) NewCredentials() (Credentials, error) {
 	if splunk, ok := c.data["Splunk"]; ok {
 		return NewSplunkAuthCredentials(splunk), nil
 	}
-	if c.data["auth_type"] == BASIC_AUTH {
-		return NewBasicAuthCredentials(c.data["username"], c.data["password"]), nil
-	}
-	if c.data["auth_type"] == TOKEN_AUTH {
-		return NewTokenAuthCredentials(c.data["token"]), nil
-	}
-	if c.data["auth_type"] == CUSTOM_HEADER_AUTH {
-		return NewCustomHeaderCredentials(c.data["headers"]), nil
+	if auth_type, ok := c.data["auth_type"]; ok {
+		if auth_type == HEADER_AUTH {
+			return NewCustomHeaderCredentials(c.data["headers"]), nil
+		}
 	}
 	return nil, errors.New(CredentialsError)
 }
@@ -102,24 +97,6 @@ func (c SplunkAuthCredentials) GetAuthType() string {
 	return SPLUNK_AUTH
 }
 
-type TokenAuthCredentials struct {
-	token string
-}
-
-func NewTokenAuthCredentials(token string) TokenAuthCredentials {
-	return TokenAuthCredentials{token: token}
-}
-
-func (c TokenAuthCredentials) GetValues() AuthTypes {
-	return AuthTypes{
-		AuthorizationHeader: c.token,
-	}
-}
-
-func (c TokenAuthCredentials) GetAuthType() string {
-	return TOKEN_AUTH
-}
-
 type CustomHeaderCredentials struct {
 	headers string
 }
@@ -135,7 +112,7 @@ func (c CustomHeaderCredentials) GetValues() AuthTypes {
 }
 
 func (c CustomHeaderCredentials) GetAuthType() string {
-	return CUSTOM_HEADER_AUTH
+	return HEADER_AUTH
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (Credentials, error) {
