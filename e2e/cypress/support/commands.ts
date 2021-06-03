@@ -31,10 +31,14 @@ Cypress.Commands.add('login', (url: string, username: string) => {
       return path.startsWith('/dex/auth/local');
     })
     .then((local: any) => {
-      if (local) {
-        LoginHelper(username);
-      } else {
+      console.log('---local---:' + local);
+      console.log('---url---:' + url);
+      console.log('---username---:' + username);
+      if (!local && cy.get('a')) {
+        console.log('---cy.get(a)---:' + cy.get('a'));
         cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
+      } else {
+        LoginHelper(username);
       }
     });
 });
