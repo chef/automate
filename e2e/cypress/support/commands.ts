@@ -16,8 +16,8 @@ Cypress.Commands.add('sendToDataCollector', (report: any) => {
 Cypress.Commands.add('login', (url: string, username: string) => {
   Cypress.log({
     displayName: 'login',
-    message: [url],
-  })
+    message: [url]
+  });
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
 
@@ -26,11 +26,14 @@ Cypress.Commands.add('login', (url: string, username: string) => {
     .then((path: any) => {
       Cypress.log({
         displayName: 'pathname',
-        message: [path],
-      })
-      return path.startsWith('/dex/auth/local')
+        message: [path]
+      });
+      return path.startsWith('/dex/auth/local');
     })
     .then((local: any) => {
+      console.log('---url---:' + url);
+      console.log('---username---:' + username);
+
       LoginHelper(username);
     });
 });
@@ -38,8 +41,8 @@ Cypress.Commands.add('login', (url: string, username: string) => {
 Cypress.Commands.add('adminLogin', (url: string) => {
   Cypress.log({
     displayName: 'adminLogin',
-    message: [url],
-  })
+    message: [url]
+  });
   // CYPRESS_BASE_URL environment variable must be set
   return cy.login(url, 'admin');
 });
