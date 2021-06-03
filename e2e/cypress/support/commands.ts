@@ -31,11 +31,7 @@ Cypress.Commands.add('login', (url: string, username: string) => {
       return path.startsWith('/dex/auth/local')
     })
     .then((local: any) => {
-      if (local) {
-        LoginHelper(username);
-      } else {
-        cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
-      }
+      LoginHelper(username);
     });
 });
 
@@ -485,7 +481,6 @@ function LoginHelper(username: string) {
   cy.get('#password').type('chefautomate');
 
   cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
 
     // close welcome modal if present
     cy.get('app-welcome-modal').invoke('hide');
