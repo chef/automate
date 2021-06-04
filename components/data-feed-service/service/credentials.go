@@ -11,7 +11,10 @@ import (
 const CredentialsError = "Could not create credentials"
 
 type AwsCredentials struct {
-	region string
+	accesskey       string
+	secretAccessKey string
+	region          string
+	bucket          string
 }
 
 type AuthTypes struct {
@@ -29,6 +32,7 @@ const (
 	BASIC_AUTH  = "basic_auth"
 	SPLUNK_AUTH = "splunk_auth"
 	HEADER_AUTH = "header_auth"
+	AWS_AUTH    = "aws_auth"
 )
 
 type CredentialsFactory struct {
@@ -52,7 +56,29 @@ func (c *CredentialsFactory) NewCredentials() (Credentials, error) {
 			return NewCustomHeaderCredentials(c.data["headers"]), nil
 		}
 	}
+	if c.data["auth_type"] == AWS_AUTH {
+		return NewS3Credentials(c.data["access_key"], c.data["secret_access_key"], c.data["region"], c.data["bucket"]), nil
+	}
 	return nil, errors.New(CredentialsError)
+}
+
+func NewS3Credentials(AccessKey string, secretAccessKey string, region string, bucket string) AwsCredentials {
+	return AwsCredentials{accesskey: AccessKey, secretAccessKey: secretAccessKey, region: region, bucket: bucket}
+}
+
+func (c AwsCredentials) GetValues() AuthTypes {
+	return AuthTypes{
+		AwsCreds: AwsCredentials{
+			accesskey:       c.accesskey,
+			secretAccessKey: c.secretAccessKey,
+			region:          c.region,
+			bucket:          c.bucket,
+		},
+	}
+}
+
+func (c AwsCredentials) GetAuthType() string {
+	return AWS_AUTH
 }
 
 type BasicAuthCredentials struct {
