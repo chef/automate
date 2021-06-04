@@ -21,73 +21,22 @@ Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
 
+  cy.url()
+  .should('include', '/dex/auth?')
+  .should('include', 'client_id=automate-session')
+  .should('include', 'redirect_uri');
+  cy.contains('Sign in as a local user');
   // only environments using SAML or LDAP present this login method selection
   return cy.location('pathname')
     .then((path: any) => {
-      Cypress.log({
-        displayName: 'pathname',
-        message: [path]
-      });
       return path.startsWith('/dex/auth/local');
     })
     .then((local: any) => {
-      Cypress.log({
-        displayName: 'pathnamess',
-        message: [cy.location('pathname')]
-      });
-      Cypress.log({
-        displayName: 'local',
-        message: [local]
-      });
-      Cypress.log({
-        displayName: 'geta',
-        message: [cy.get('a')]
-      });
-      Cypress.log({
-        displayName: 'url',
-        message: [url]
-      });
       if (!local && cy.get('a')) {
-        Cypress.log({
-          displayName: 'ifpathname',
-          message: [cy.location('pathname')]
-        });
-        Cypress.log({
-          displayName: 'iflocal',
-          message: [local]
-        });
-        Cypress.log({
-          displayName: 'ifgeta',
-          message: [cy.get('a')]
-        });
-        Cypress.log({
-          displayName: 'ifurl',
-          message: [url]
-        });
         cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
       } else {
-        Cypress.log({
-          displayName: 'elsepathname',
-          message: [cy.location('pathname')]
-        });
-        Cypress.log({
-          displayName: 'elselocal',
-          message: [local]
-        });
-        Cypress.log({
-          displayName: 'elsegeta',
-          message: [cy.get('a')]
-        });
-        Cypress.log({
-          displayName: 'elseurl',
-          message: [url]
-        });
         LoginHelper(username);
       }
-      Cypress.log({
-        displayName: 'outsideurl',
-        message: [url]
-      });
     });
 });
 
