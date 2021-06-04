@@ -9,9 +9,13 @@ describe('infra node detail', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  // const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const adminKey = 'Dummy--admin--key';
   const nodeName = 'node-learn_chef_apache2';
   let environment = '';
+  const nullJson = '{}';
+  const validJson = '{"test":"test"}';
+  const invalidJson = '{"invalid "test"';
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -364,6 +368,129 @@ describe('infra node detail', () => {
       getRunlist(environment).then((response) => {
         checkResponse(response);
       });
+    });
+  });
+
+  describe('inside attributes tab ', () => {
+
+    function updateAttributes(attribute: string) {
+      const nodeAttribute = {
+        org_id: orgID,
+        server_id: serverID,
+        name: nodeName,
+        attributes: JSON.parse(attribute.replace(/\r?\n|\r/g, ''))
+      };
+
+      return cy.request({
+        auth: { bearer: adminIdToken },
+        method: 'PUT',
+        url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/nodes/${nodeName}/attributes`,
+        body: nodeAttribute
+      });
+    }
+
+    // switch to attributes tab specs
+    it('can switch to attributes tab', () => {
+      cy.get('[data-cy=attributes-tab]').contains('Attributes').click();
+      cy.get('.default').contains('Attributes');
+    });
+
+    it('attribute tab contains buttons', () => {
+      cy.get('.default').contains('Attributes');
+      cy.get('[data-cy=expand-attributes]').contains('Expand All');
+      cy.get('[data-cy=collapse-attributes]').contains('Collapse All');
+      cy.get('[data-cy=node-edit-attributes]').contains('Edit');
+    });
+
+    it('can check save button is disabled until attributes value is not changed', () => {
+      cy.get('[data-cy=node-edit-attributes]').contains('Edit').click();
+      cy.get('app-infra-node-details chef-modal').should('exist');
+
+      // check for disabled save button
+      cy.get('[data-cy=save-attribute]')
+      .invoke('attr', 'disabled')
+      .then(disabled => {
+        disabled ? cy.log('buttonIsDiabled') : cy.get('[data-cy=save-attribute]').click();
+      });
+
+      cy.get('app-infra-node-details chef-modal').should('exist');
+
+      // here we exit with the Cancel button
+      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
+    });
+
+    it('edit attribute and show empty data', () => {
+      cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=attributes]').clear().invoke('val', nullJson)
+        .trigger('change').type(' ');
+
+      cy.get('[data-cy=save-attribute]').click();
+      cy.get('app-infra-node-details chef-modal').should('not.be.visible');
+
+      // verify success notification and then dismiss it
+      // so it doesn't get in the way of subsequent interactions
+      cy.get('app-notification.info').should('be.visible');
+      cy.get('app-notification.info chef-icon').click();
+
+      updateAttributes(nullJson).then((response) => {
+        if (Object.keys(response.body.attributes).length > 0) {
+          cy.get('[data-cy=expand-attributes]').should('not.be.disabled');
+          cy.get('[data-cy=collapse-attributes]').should('not.be.disabled');
+        } else {
+          cy.get('[data-cy=expand-attributes]').should('be.disabled');
+          cy.get('[data-cy=collapse-attributes]').should('be.visible');
+        }
+      });
+    });
+
+    it('edit attribute and show updated data', () => {
+      cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=attributes]').clear().invoke('val', validJson)
+        .trigger('change').type(' ');
+
+      cy.get('[data-cy=save-attribute]').click();
+      cy.get('app-infra-node-details chef-modal').should('not.be.visible');
+
+      // verify success notification and then dismiss it
+      // so it doesn't get in the way of subsequent interactions
+      cy.get('app-notification.info').should('be.visible');
+      cy.get('app-notification.info chef-icon').click();
+
+      updateAttributes(validJson).then((response) => {
+        if (Object.keys(response.body.attributes).length > 0) {
+          cy.get('[data-cy=expand-attributes]').should('not.be.disabled');
+          cy.get('[data-cy=collapse-attributes]').should('not.be.disabled');
+        } else {
+          cy.get('[data-cy=expand-attributes]').should('be.disabled');
+          cy.get('[data-cy=collapse-attributes]').should('be.visible');
+        }
+      });
+    });
+
+    it('fails to edit attribute with a invalid json', () => {
+      cy.get('[data-cy=node-edit-attributes').contains('Edit').click();
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=attributes]').clear().invoke('val', invalidJson).trigger('change');
+
+      cy.get('app-infra-node-details chef-modal chef-error')
+        .contains('Must be a valid JSON object').should('be.visible');
+      cy.get('[data-cy=cancel-button]').click();
+      cy.get('app-infra-node-details chef-modal').should('not.be.visible');
+    });
+
+    it('can cancel edit attributes', () => {
+      cy.get('[data-cy=node-edit-attributes]').contains('Edit').click();
+      cy.get('app-infra-node-details chef-modal').should('exist');
+      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('app-infra-node-details chef-modal').should('not.be.visible');
+    });
+
+    // switch to Run details tab
+    it('can switch to details tab', () => {
+      cy.get('[data-cy=details-tab]').contains('Details').click();
     });
   });
 });

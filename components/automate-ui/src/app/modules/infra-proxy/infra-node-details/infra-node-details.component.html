@@ -278,18 +278,19 @@
                 <div class="expand-collapse">
                   <chef-button tertiary class="action"
                    (click)="tree.expand()" [disabled]=!hasattributes
-                    data-cy="empty-expand-attributes">
+                    data-cy="expand-attributes">
                     <chef-icon>add_circle</chef-icon>
                     <span>Expand All</span>
                   </chef-button>
                   <chef-button tertiary class="action"
                    (click)="tree.collapse()" [disabled]=!hasattributes
-                    data-cy="empty-collapse-attributes">
+                    data-cy="collapse-attributes">
                     <chef-icon>remove_circle</chef-icon>
                     <span>Collapse All</span>
                   </chef-button>
                   <chef-button tertiary class="right-button-box" 
-                    [disabled]="conflictError" (click)="openEditAttrModal(InfraNode.normal_attributes)"
+                    [disabled]="conflictError"
+                    (click)="openEditAttrModal(InfraNode.normal_attributes)"
                     data-cy="node-edit-attributes">
                     <span class="material-icons edit-item">mode_edit</span>
                     <span class="edit-text">Edit</span>

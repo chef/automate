@@ -19,6 +19,7 @@
               id="default"
               type="text" 
               autocomplete="off"
+              data-cy="attributes"
               (keyup)="onChangeDefaultJson($event)">
               </textarea>
             </label>
@@ -29,8 +30,9 @@
         </div>
       </form>
       <div class="button-bar-box">
-        <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
-        <chef-button primary id="create-default-button-object-modal"
+        <chef-button data-cy="cancel-button" tertiary (click)="closeEditModal()">Cancel</chef-button>
+        <chef-button data-cy="save-attribute"
+          primary id="create-default-button-object-modal"
           (click)="updateNodeAttribute()"
           [disabled]="attrParseError || !attributeForm?.valid ||
            !attributeForm.dirty || conflictError">
