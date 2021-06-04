@@ -21,23 +21,29 @@ Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
 
-  cy.url()
-  .should('include', '/dex/auth?')
-  .should('include', 'client_id=automate-session')
-  .should('include', 'redirect_uri');
-  cy.contains('Sign in as a local user');
+  // cy.url()
+  // .should('include', '/dex/auth?')
+  // .should('include', 'client_id=automate-session')
+  // .should('include', 'redirect_uri');
+  // cy.contains('Sign in as a local user');
+
+  if(cy.url().should('include', '/dex/auth?')) {
+    cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
+  } else {
+    LoginHelper(username);
+  }
   // only environments using SAML or LDAP present this login method selection
-  return cy.location('pathname')
-    .then((path: any) => {
-      return path.startsWith('/dex/auth/local');
-    })
-    .then((local: any) => {
-      if (!local && cy.get('a')) {
-        cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
-      } else {
-        LoginHelper(username);
-      }
-    });
+  // return cy.location('pathname')
+  //   .then((path: any) => {
+  //     return path.startsWith('/dex/auth/local');
+  //   })
+  //   .then((local: any) => {
+  //     if (!local && cy.get('a')) {
+  //       cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
+  //     } else {
+  //       LoginHelper(username);
+  //     }
+  //   });
 });
 
 Cypress.Commands.add('adminLogin', (url: string) => {
