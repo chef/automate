@@ -20,7 +20,6 @@ Cypress.Commands.add('login', (url: string, username: string) => {
   });
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
-  cy.wait(1000);
   cy.reload();
   // only environments using SAML or LDAP present this login method selection
   cy.url().then(($url) => {
