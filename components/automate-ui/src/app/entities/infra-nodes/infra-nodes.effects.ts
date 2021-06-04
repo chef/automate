@@ -205,7 +205,7 @@ export class InfraNodeEffects {
   updateNodeAttributesSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NodeActionTypes.UPDATE_ATTRIBUTES_SUCCESS),
-      map(({ }: UpdateNodeAttributesSuccess) => new CreateNotification({
+      map(( ) => new CreateNotification({
         type: Type.info,
         message: 'Successfully updated node attibutes.'
       }))));
