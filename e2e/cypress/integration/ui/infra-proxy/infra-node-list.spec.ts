@@ -9,8 +9,7 @@ describe('infra node list', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  // const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const adminKey = 'Dummy--admin--key';
+  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const nodeName = `${cypressPrefix}-node-${now}-1`;
   const seachableNode = 'ec2-node-viv';
 
