@@ -46,17 +46,6 @@ chef-modal {
         background: $chef-modal;
         border-radius: 5px;
       }
-
-      ::ng-deep #override::-webkit-scrollbar {
-        width: 5px;
-        background: $chef-form-input;
-        border-radius: 5px;
-      }
-
-      ::ng-deep #override::-webkit-scrollbar-thumb {
-        background: $chef-modal;
-        border-radius: 5px;
-      }
     }
 
     .button-bar-box {
@@ -166,12 +155,9 @@ chef-modal ::ng-deep .modal-overlay {
   width: 5px;
   background: $chef-form-input;
   border-radius: 5px;
-  width: 5px;
   height: 195px;
   left: 1401px;
   top: 321px;
-  background: $chef-form-input;
-  border-radius: 5px;
 }
 
 ::ng-deep .scroll::-webkit-scrollbar-thumb {

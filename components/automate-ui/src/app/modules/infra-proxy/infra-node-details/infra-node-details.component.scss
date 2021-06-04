@@ -269,6 +269,11 @@ div#button-env {
   font-size: 14px;
 }
 
+.edit-item {
+  margin: 0 8px 0 -4px;
+  font-size: 13px;
+}
+
 // ng-select 
 ::ng-deep {
   .ng-select .ng-select-container {
@@ -395,12 +400,7 @@ div#button-env {
     .label-items .label {
       float: left;
     }
-  }
-
-  .edit-item {
-    margin: 0 8px 0 -4px;
-    font-size: 13px;
-  }
+  }  
 }
 
 
