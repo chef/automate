@@ -9,9 +9,29 @@ import (
 )
 
 const CredentialsError = "Could not create credentials"
+const (
+	BASIC_AUTH  = "basic_auth"
+	SPLUNK_AUTH = "splunk_auth"
+	HEADER_AUTH = "header_auth"
+	AWS_AUTH    = "aws_auth"
+)
+
+type AwsCredentials struct {
+	accesskey       string
+	secretAccessKey string
+	region          string
+	bucket          string
+}
+
+type AuthTypes struct {
+	AuthorizationHeader string
+	HeaderJSONString    string
+	AwsCreds            AwsCredentials
+}
 
 type Credentials interface {
-	GetAuthorizationHeaderValue() string
+	GetValues() AuthTypes
+	GetAuthType() string
 }
 
 type CredentialsFactory struct {
@@ -42,13 +62,19 @@ func NewBasicAuthCredentials(username string, password string) BasicAuthCredenti
 	return BasicAuthCredentials{username: username, password: password}
 }
 
-func (c BasicAuthCredentials) GetAuthorizationHeaderValue() string {
-	return "Basic " + c.basicAuth()
+func (c BasicAuthCredentials) GetValues() AuthTypes {
+	return AuthTypes{
+		AuthorizationHeader: "Basic " + c.basicAuth(),
+	}
 }
 
 func (c BasicAuthCredentials) basicAuth() string {
 	auth := c.username + ":" + c.password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+func (c BasicAuthCredentials) GetAuthType() string {
+	return BASIC_AUTH
 }
 
 type SplunkAuthCredentials struct {
@@ -59,8 +85,14 @@ func NewSplunkAuthCredentials(splunkToken string) SplunkAuthCredentials {
 	return SplunkAuthCredentials{splunkToken: splunkToken}
 }
 
-func (c SplunkAuthCredentials) GetAuthorizationHeaderValue() string {
-	return "Splunk " + c.splunkToken
+func (c SplunkAuthCredentials) GetValues() AuthTypes {
+	return AuthTypes{
+		AuthorizationHeader: "Splunk " + c.splunkToken,
+	}
+}
+
+func (c SplunkAuthCredentials) GetAuthType() string {
+	return SPLUNK_AUTH
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (Credentials, error) {

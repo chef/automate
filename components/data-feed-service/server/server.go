@@ -15,11 +15,11 @@ import (
 	"github.com/pkg/errors"
 
 	datafeed "github.com/chef/automate/api/external/data_feed"
+	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/components/data-feed-service/service"
-	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 
@@ -111,7 +111,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		log.Error("Error creating request")
 		return response, err
 	}
-	httpRequest.Header.Add("Authorization", credentials.GetAuthorizationHeaderValue())
+	httpRequest.Header.Add("Authorization", credentials.GetValues().AuthorizationHeader)
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
