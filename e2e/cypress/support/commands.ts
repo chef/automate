@@ -20,18 +20,19 @@ Cypress.Commands.add('login', (url: string, username: string) => {
   });
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url);
-
+  cy.wait(5000);
+  cy.reload();
   cy.url().then(($url) => {
-    if($url.includes('/dex/auth/local')) {
-      cy.log("Yes")
-      LoginHelper(username);
+    cy.log($url);
+
+    if ($url.includes('/dex/auth?client_id=automate-session')) {
+      cy.log('Yes');
+      cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
     } else  {
-        cy.log("No")
-        cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
+        cy.log('No');
+        LoginHelper(username);
       }
   });
-
-
   // only environments using SAML or LDAP present this login method selection
 
 });
