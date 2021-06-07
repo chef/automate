@@ -72,6 +72,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	username := ""
 	password := ""
 	headers := ""
+	aws := ""
 	var err error
 	var credentials service.Credentials
 	url := request.Url

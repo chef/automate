@@ -208,6 +208,26 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.datafeed.AWS": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
@@ -333,6 +353,9 @@ func init() {
         },
         "header": {
           "$ref": "#/definitions/chef.automate.api.datafeed.Header"
+        },
+        "aws": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
         }
       }
     },
