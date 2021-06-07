@@ -222,9 +222,6 @@ func init() {
         },
         "region": {
           "type": "string"
-        },
-        "url": {
-          "type": "string"
         }
       }
     },
