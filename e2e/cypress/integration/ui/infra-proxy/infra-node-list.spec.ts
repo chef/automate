@@ -194,7 +194,7 @@ describe('infra node list', () => {
       cy.get('[data-cy=nodes-table-container]').contains('node-learn_chef_apache2').click();
       cy.get('[data-cy=tag-box]').scrollIntoView();
       cy.get('[data-cy=tag-box]').should(('be.visible'));
-      cy.get('.display-node-tags').find('span').should('have.length.greaterThan', 1);
+      cy.get('.display-node-tags').find('span').should('have.length.greaterThan', 0);
       cy.get('.breadcrumbs .breadcrumb').contains('Nodes').click();
     });
 
