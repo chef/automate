@@ -60,6 +60,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
   public roleAttributeLoading = true;
   public runListLoading = true;
   public openEdit = false;
+  public editDisabled = false;
   public treeOptions: Options<ExpandedChildList> = {
     capitalizedHeader: true
   };
@@ -174,6 +175,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
 
   selectChangeHandler(id: string): void {
     this.env_id = id;
+    this.editDisabled = (this.env_id === '_default') ? false : true;
     this.runListLoading = true;
     this.hasRun_List = false;
     this.arrayOfNodesTree = [];
