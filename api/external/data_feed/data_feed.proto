@@ -142,7 +142,6 @@ message AWS {
 	string secret_access_key = 2;
 	string bucket = 3;
 	string region = 4;
-	string url = 5;
 }
 
 message URLValidationRequest {
