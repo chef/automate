@@ -185,7 +185,7 @@ describe('infra node detail', () => {
     it('can select environment and display the confirmation box', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-      cy.get('.ng-option').contains('chef-environment-971654600').click();
+      cy.get('.ng-option.ng-option-marked').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
     });
 
@@ -194,7 +194,7 @@ describe('infra node detail', () => {
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
       cy.get('.ng-option').contains('chef-environment-885598100').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
-      cy.get('[data-cy=cancel-button]').click();
+      cy.get('#button-env [data-cy=cancel-button]').click();
       cy.get('[data-cy=change-confirm]').should(('not.be.visible'));
     });
 
@@ -202,10 +202,9 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option').contains('chef-environment-275303900').click();
+      cy.get('.ng-option.ng-option-marked').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
-      cy.get('.ng-value').contains('chef-environment-275303900');
 
       cy.get('app-notification.info').contains('Successfully updated node environment.');
       cy.get('app-notification.info chef-icon').click();
@@ -415,7 +414,7 @@ describe('infra node detail', () => {
       cy.get('app-infra-node-details chef-modal').should('exist');
 
       // here we exit with the Cancel button
-      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-attribute-button]').contains('Cancel').should('be.visible').click();
       cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
     });
 
@@ -476,14 +475,14 @@ describe('infra node detail', () => {
 
       cy.get('app-infra-node-details chef-modal chef-error')
         .contains('Must be a valid JSON object').should('be.visible');
-      cy.get('[data-cy=cancel-button]').click();
+      cy.get('[data-cy=cancel-attribute-button]').click();
       cy.get('app-infra-node-details chef-modal').should('not.be.visible');
     });
 
     it('can cancel edit attributes', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click();
       cy.get('app-infra-node-details chef-modal').should('exist');
-      cy.get('[data-cy=cancel-button]').contains('Cancel').should('be.visible').click();
+      cy.get('[data-cy=cancel-attribute-button]').contains('Cancel').should('be.visible').click();
       cy.get('app-infra-node-details chef-modal').should('not.be.visible');
     });
 
