@@ -5,7 +5,7 @@
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Nodes</chef-breadcrumb>
-        {{InfraNode?.name}}
+          {{InfraNode?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
         <chef-heading data-cy="infra-node-head">{{InfraNode?.name}}</chef-heading>
@@ -81,11 +81,11 @@
       </app-edit-infra-node-modal>
 
       <app-edit-infra-node-attribute-modal 
-      [jsonText]="jsonText"
-      [openEvent]="openAttributeModal"
-      [orgId]="orgId" [node]="InfraNode"
-      [serverId]="serverId"
-      [attrParseError]="conflictError">
+        [jsonText]="jsonText"
+        [openEvent]="openAttributeModal"
+        [orgId]="orgId" [node]="InfraNode"
+        [serverId]="serverId"
+        [attrParseError]="conflictError">
       </app-edit-infra-node-attribute-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
@@ -122,20 +122,20 @@
                   <p class="change-node-text">Change Node Environment?</p>
                   <div id="button-env">
                     <chef-button
-                    tertiary
-                    id="cancel"
-                    data-cy="cancel-button"
-                    [disabled]="saving"
-                    (click)="closeConfirmationBox()">Cancel</chef-button>
+                      tertiary
+                      id="cancel"
+                      data-cy="cancel-button"
+                      [disabled]="saving"
+                      (click)="closeConfirmationBox()">Cancel</chef-button>
                     <chef-button
-                    primary
-                    data-cy="save-button"
-                    id="save-btn"
-                    [disabled]="saving"
-                    (click)="saveEnvironment()">
-                    <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-                    <span *ngIf="!saving">Save</span>
-                    <span *ngIf="saving">Saving</span>
+                      primary
+                      data-cy="save-button"
+                      id="save-btn"
+                      [disabled]="saving"
+                      (click)="saveEnvironment()">
+                      <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                      <span *ngIf="!saving">Save</span>
+                      <span *ngIf="saving">Saving</span>
                     </chef-button>
                   </div>
                 </div>
@@ -143,27 +143,27 @@
               <span class="label">Tags</span>
               <div class="node-tags-box">
                 <input
-                chefInput
-                type="text"
-                id="tag-input"
-                autocomplete="off"
-                data-cy="add-tag"
-                [ngClass]="saving ? 'disable' : ''"
-                [(ngModel)]="inputTxt"/>
+                  chefInput
+                  type="text"
+                  id="tag-input"
+                  autocomplete="off"
+                  data-cy="add-tag"
+                  [ngClass]="saving ? 'disable' : ''"
+                  [(ngModel)]="inputTxt"/>
                 <button
-                primary
-                type="submit"
-                class="primary"
-                [disabled]= "(inputTxt === '') || saving"
-                data-cy="add-tag-button"
-                (click)="addTags()"> Add </button>
+                  primary
+                  type="submit"
+                  class="primary"
+                  [disabled]= "(inputTxt === '') || saving"
+                  data-cy="add-tag-button"
+                  (click)="addTags()"> Add </button>
               </div>
               <p class="tag-note">Note: Multiple Tags Should Be Comma-Separated. (Example: "Tag1, Tag2, Tag3")</p>
               <div
-              *ngIf="nodeTags?.length"
-              class="display-node-tags"
-              [ngClass]="saving ? 'disable' : ''"
-              data-cy="tag-box">
+                *ngIf="nodeTags?.length"
+                class="display-node-tags"
+                [ngClass]="saving ? 'disable' : ''"
+                data-cy="tag-box">
               <span *ngFor="let tag of nodeTags" class="tag">
                 {{tag}}
                 <a class="removeTag" (click)="removeTag(tag)" data-cy="remove-tag"></a>
@@ -266,8 +266,7 @@
         <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
         <div class="attributes-tab" *ngIf="!nodeAttributesLoading">
           <div class="spinner">
-             <chef-loading-spinner *ngIf="nodeAttributesLoading" size="50" fixed></chef-loading-spinner>
-           <!-- <chef-loading-spinner *ngIf="attributesLoading" size="50" fixed></chef-loading-spinner> -->
+            <chef-loading-spinner *ngIf="nodeAttributesLoading" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!nodeAttributesLoading">
             <div class="node-attributes-section">

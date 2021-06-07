@@ -65,12 +65,6 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
       this.org = this.orgId;
      });
 
-    // this.store.select(updateAttributesStatus).pipe(
-    //   takeUntil(this.isDestroyed)
-    // ).subscribe(([status]) => {
-    //   this.isLoading = status === EntityStatus.loading;
-    // });
-
     this.store.select(updateAttributesStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(state => this.updateInProgress && !pending(state)))
