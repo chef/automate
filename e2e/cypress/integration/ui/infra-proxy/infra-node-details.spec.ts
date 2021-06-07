@@ -222,6 +222,7 @@ describe('infra node detail', () => {
     });
 
     it('can show the node tags box', () => {
+      cy.get('[data-cy=tag-box]').scrollIntoView();
       cy.get('[data-cy=tag-box]').should(('be.visible'));
       cy.get('.display-node-tags').find('span').should('have.length', 1);
     });
