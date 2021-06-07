@@ -1,3 +1,170 @@
+### Set Up LDAP Server and Configure
+
+Below server setup is tested on Ubuntu 18.04.5 LTS (Bionic Beaver) EC2 instance even Chef Automate running on the same machine
+
+Server Prep
+ - SSH into your server and issue this command: `sudo apt-get update`
+ 
+Server Security
+ - Enable Port 80 and 389 for LDAP via the AWS console, or you can go to EC2 instances select your instance select Security tab -> Security groups -> edit inbound rules -> type -> All traffic and save rules
+
+Install LDAP Server & Utilities
+ - Execute this command via SSH: `sudo apt-get install slapd ldap-utils` You will be prompted to enter a password, so do so. (Password can be anything lets keep `123` for example)
+
+LDAP Configuration
+ - Execute this command via SSH: `sudo dpkg-reconfigure slapd` 
+
+You will be faced with anther set of prompts you must answer in order to configure OpenLDAP.
+
+Omit OpenLDAP server configuration?
+ - No
+
+DNS domain name?
+ - example.com (Important, this must be DNS address of the LDAP server, in this case Public IPv4 DNS of EC2 instance with DNS value as `ecX-X-XX-XX-XXX.us-east-2.compute.amazonaws.com`)
+
+Organization name?
+ - EXAMPLE (Can be anything you wish)
+
+Administration Password?
+ - Same as previous (`123` in this case)
+
+Database backend to use?
+ - HDB
+
+Remove the database when slapd is purged?
+ - No
+
+Move old database?
+ - Yes
+
+Allow LDAPv2 Protocol?
+ - No
+
+Use `ldapsearch -x -LLL -s base -b "" namingContexts` to check your base DN and verify OpenLDAP is configured correctly, it should return 
+```dn:
+namingContexts: dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+```
+Above DN corresponds to DNS we set at the time of configuration which is `ecX-X-XX-XX-XXX.us-east-2.compute.amazonaws.com`
+
+If our DNS was `example.com` then DN would look like `dc=example,dc=com`
+
+### Add Data/Users to LDAP
+
+Inorder to insert data into LDAP we shall use ldif files, just type `sudo vi add_entries.ldif` from root directory.
+
+{{< note >}}
+Remember to replace `X` in `ecX-X-XX-XX-XXX` with you EC2 instance IP where ever required
+{{< /note >}}
+
+Add below data and save the file:
+
+```
+dn: ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+sn: doe
+cn: jane
+
+dn: cn=john,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+sn: doe
+cn: john
+
+dn: ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=admins,ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: groupOfNames
+cn: admins
+member: cn=john,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+member: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+
+dn: cn=developers,ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: groupOfNames
+cn: developers
+member: cn=jane,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+
+dn: cn=abdul,ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: simpleSecurityObject
+userPassword: 123
+sn: test
+cn: test
+
+```
+
+{{< note >}}
+userPassword attribute is part of objectClass: simpleSecurityObject so we must have corresponding objectClass defined in oreder to use its attributes
+{{< /note >}}
+
+Use ldapadd command to save add_entries.ldif file contents into LDAP as shown below:
+
+`ldapadd -x -D cn=admin,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com -W -f add_entries.ldif`
+
+it will ask for password: 
+enter same password which we used at the time of LDAP installation which is `123` in this case.
+
+
+Explaination of above command:
+
+`-x`: Use simple authentication instead of SASL.
+`-D` : binddn, Use the Distinguished Name binddn to bind to the LDAP directory. For SASL binds, the server is expected to ignore this value.
+`cn=admin,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com` : LDAP administrator DN(distinguished name)
+`-W`: Prompt for simple authentication. This is used instead of specifying the password on the command line.
+`-f`: file, Read the entry modification information from file instead of from standard input.
+
+Use this command to view all entries in LDAP: 
+`ldapsearch -x -LLL -b dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com`
+
+In automate folder search for `config.toml`
+
+## Changing Chef Automate Configuration
+
+If you need to change your configured external identity provider settings, replace your existing configuration by following these steps:
+
+1. Run `chef-automate config show config.toml`.
+2. Edit `config.toml` to replace the `dex.sys.connectors` section with the configuration values for your new identity provider.
+3. Run `chef-automate config set config.toml` to set your updated configuration.
+
+### Patch LDAP configuration into config.toml
+```
+[dex.v1.sys.connectors.ldap]
+  host = "ecX-X-XX-XX-XXX.us-east-2.compute.amazonaws.com"
+  bind_dn = "cn=admin,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com"
+  bind_password = "123"
+  insecure_no_ssl = true
+  user_id_attr = "cn"
+  username_attr = "cn"
+  base_user_search_dn = "ou=People,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com"
+  base_group_search_dn = "ou=Groups,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com"
+  user_display_name_attr = "cn"
+
+```
+
+In Automate Sign in using LDAP:
+
+Usermane: test
+Password: 123
+
+
+As we have only above two user in LDAP, we can add more users into LDAP and login, if needed.
+
+
+{{< note >}}
+Useful links
+https://openldap.org/doc/
+https://wiki.debian.org/LDAP/OpenLDAPSetup/
+https://ldapwiki.com/
+{{< /note >}}
+
+
 # LDAP Development via MSAD in AWS
 
 You can spin up an ad-hoc MSAD (Microsoft Active Directory) environment for your LDAP
