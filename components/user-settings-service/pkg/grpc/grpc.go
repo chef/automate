@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+//Spawn starts up the grpc server and listen on the tcp port
 func Spawn(c *config.UserSettings, connFactory *secureconn.Factory) error {
 	db, err := postgres.ConnectAndMigrate(&c.Postgres)
 	if err != nil {

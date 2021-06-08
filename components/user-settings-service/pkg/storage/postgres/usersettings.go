@@ -40,6 +40,7 @@ type UserSettings struct {
 	Settings  json.RawMessage `db:"settings"`
 }
 
+//GetUserSettings retrieves user settings from the database
 func (db *DB) GetUserSettings(name string, connector string) (*user_settings.GetUserSettingsResponse, error) {
 	userSettingsData := UserSettings{}
 	settingsResponse := &user_settings.GetUserSettingsResponse{

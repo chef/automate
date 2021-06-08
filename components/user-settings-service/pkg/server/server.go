@@ -38,6 +38,7 @@ type Server struct {
 	schedulerServer *scheduler.Scheduler
 }
 
+//New constructs a UserSettingsServer object
 func New(db *postgres.DB, storage storage.Client) *UserSettingsServer {
 	return &UserSettingsServer{
 		db:            db,
@@ -47,6 +48,7 @@ func New(db *postgres.DB, storage storage.Client) *UserSettingsServer {
 	}
 }
 
+//GetUserSettings is the implementation of api /user-settings/{user.name}/{user.connector}
 func (s *UserSettingsServer) GetUserSettings(ctx context.Context, req *user_settings.GetUserSettingsRequest) (*user_settings.GetUserSettingsResponse, error) {
 	//first try to get the default settings from the database.
 	//all user settings that we support will have an entry in the db held in user: _default connector: local

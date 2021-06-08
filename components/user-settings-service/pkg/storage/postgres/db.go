@@ -22,7 +22,7 @@ type DB struct {
 	*config.Postgres
 }
 
-// New creates a new Postgres client, connects to the database server and runs
+// ConnectAndMigrate creates a new Postgres client, connects to the database server and runs
 // the migrations
 func ConnectAndMigrate(dbConf *config.Postgres) (*DB, error) {
 	pg, err := Connect(dbConf)
@@ -37,6 +37,7 @@ func ConnectAndMigrate(dbConf *config.Postgres) (*DB, error) {
 	return pg, err
 }
 
+// Connect creates a new Postgres client, connects to the database server
 func Connect(dbConf *config.Postgres) (*DB, error) {
 	pg := &DB{Postgres: dbConf}
 
@@ -47,6 +48,13 @@ func Connect(dbConf *config.Postgres) (*DB, error) {
 	return pg, err
 }
 
+// DestructiveMigrateForTests will:
+// * Drop the database to give you a clean slate
+// * Run all your migrations
+// * Forcibly run all the migrations again to verify that they are idempotent.
+//
+// Obviously you don't want this for production, but you should use it instead
+// of the plain Migrate function in your tests if you can.
 func (db *DB) DestructiveMigrateForTests() error {
 	if err := migrator.DestructiveMigrateForTests(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
