@@ -151,7 +151,7 @@ message URLValidationRequest {
     SecretId secret_id = 3;
 	Header header = 4;
 	AWS aws = 5;
-  }
+   }
 }
 
 message TestDestinationResponse {
