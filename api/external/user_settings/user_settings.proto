@@ -45,4 +45,6 @@ message UserSettingValue {
 	string value = 2;
 	// Enabled
 	bool enabled = 3;
+	// Valid values for this setting.
+	repeated string valid_values = 4;
 }

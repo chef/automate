@@ -93,6 +93,13 @@ func init() {
           "type": "boolean",
           "format": "boolean",
           "title": "Enabled"
+        },
+        "valid_values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Valid values for this setting."
         }
       }
     },
