@@ -72,7 +72,11 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	username := ""
 	password := ""
 	headers := ""
-	aws := ""
+	accesskey := ""
+	secretAccessKey := ""
+	region := ""
+	bucket := ""
+
 	var err error
 	var credentials service.Credentials
 	url := request.Url
@@ -84,6 +88,13 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	case *datafeed.URLValidationRequest_Header:
 		headers = request.GetHeader().GetValue()
 		credentials = service.NewCustomHeaderCredentials(headers)
+	case *datafeed.URLValidationRequest_Aws:
+		accesskey = request.GetAws().GetAccessKey()
+		secretAccessKey = request.GetAws().GetSecretAccessKey()
+		region = request.GetAws().GetRegion()
+		bucket = request.GetAws().GetBucket()
+		credentials = service.NewS3Credentials(accesskey, secretAccessKey, region, bucket)
+
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
