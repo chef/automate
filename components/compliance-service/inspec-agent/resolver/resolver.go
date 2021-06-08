@@ -168,7 +168,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch credential id:%s %s", m.CredentialId, err.Error())
 	}
-	clientID, clientSecret, tenantID := managers.GetAzureCreds(secret)
+	clientID, clientSecret, tenantID, subscriptionID := managers.GetAzureCreds(secret)
 
 	jobArray := []*types.InspecJob{}
 	for _, group := range nodeCollections {
@@ -192,9 +192,10 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				SubscriptionId: node.ID,
 			}
 			secrets := inspec.Secrets{
-				AzureClientID:     clientID,
-				AzureClientSecret: clientSecret,
-				AzureTenantID:     tenantID,
+				AzureClientID:       clientID,
+				AzureClientSecret:   clientSecret,
+				AzureTenantID:       tenantID,
+				AzureSubscriptionID: subscriptionID,
 			}
 			inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
 			if err != nil {
@@ -554,7 +555,7 @@ func (r *Resolver) handleInstanceCredentials(ctx context.Context, instanceCreds 
 
 func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManager, nodeCollections map[string]managerNodes, job *jobs.Job) ([]*types.InspecJob, error) {
 	jobArray := []*types.InspecJob{}
-	var clientID, clientSecret, tenantID string
+	var clientID, clientSecret, tenantID, subscriptionID string
 	if m.Type == "azure-vm" {
 		if len(m.CredentialId) == 0 {
 			logrus.Infof("GetAzureCreds attempting to use environment credentials")
@@ -564,7 +565,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				logrus.Errorf("Failed to get manager credentials for node manager %s: %s", m.Id, err.Error())
 			}
 			if m.Type == "azure-vm" {
-				clientID, clientSecret, tenantID = managers.GetAzureCreds(mgrCreds)
+				clientID, clientSecret, tenantID, subscriptionID = managers.GetAzureCreds(mgrCreds)
 			}
 		}
 	}
@@ -616,9 +617,10 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				}
 				if m.Type == "azure-vm" {
 					credsArr = append(credsArr, &inspec.Secrets{
-						AzureClientID:     clientID,
-						AzureClientSecret: clientSecret,
-						AzureTenantID:     tenantID,
+						AzureClientID:       clientID,
+						AzureClientSecret:   clientSecret,
+						AzureTenantID:       tenantID,
+						AzureSubscriptionID: subscriptionID,
 					})
 				}
 				inspecJob, err := assembleJob(job, nodeDetails, credsArr, tc)
