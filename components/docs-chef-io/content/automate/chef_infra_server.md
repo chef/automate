@@ -312,8 +312,8 @@ The Chef Infra Server integration lets you:
 - Search for a specific node from a list of nodes
 - View a list of all the connected nodes
 - Details of a node
+- Edit Run list
 - Manage tags
-- Edit Run list of a node
 - Reset a node key
 - Delete a node
 
@@ -331,7 +331,14 @@ The above information looks like as shown below:
 
 {{< figure src="/images/automate/node-information-metadata.png" alt="Node Information & Metadata">}}
 
-The next section of the page is the details section to view or update the node environment. The drop down menu consists of the list of environment created in the chef server. You can select any one environment for the selected node.
+The next section of the page contains two options:
+
+- Details
+- Run List
+
+##### Details
+
+Details section is to view or update the node environment. The drop down menu consists of the list of environment created in the chef server. You can select any one environment for the selected node.
 
 To select the environment:
 
@@ -344,6 +351,32 @@ To select the environment:
 
 {{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
+##### Run List
+
+You can edit, expand or collapse the run list of a node.
+
+{{< figure src="/images/automate/run-list-of-a-node.png" alt="Run List of a Node">}}
+
+Chef Infra allows you to edit the run list of a node by following the steps below:
+
+1. Select **edit** option. A popup window opens.
+
+2. The left section the window contains the list of environment of the nodes. Select any one environment from the list.
+
+3. The right section of the window will show the current run list of the selected environment.
+
+4. Select the run list you want for the specific environment and select **Create**.
+
+The popup window looks like as shown below:
+
+{{< figure src="/images/automate/edit-run-list.png" alt="Edit Run List">}}
+
+Chef Infra allows you to edit the run list of a node using a shortcut. Select the option **Edit Run List** from the ellipses icon of the specific node in the node list. Selecting the option will open the same popup window which can be used to edit the run list of a node.
+
+The ellipses icon list looks like:
+
+{{< figure src="/images/automate/edit-run-list-ellipses-icon.png" alt="Edit Run List Ellipses Icon">}}
+
 #### Manage Tags
 
 Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags by:
@@ -353,8 +386,6 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 - OR, by simply selecting the **Manage Tags** option in the ellipses icon of a specific node. Selecting the Manage Tags option from the ellipses icon opens a popup window, where you can add multiple tags and click **Update Tags**. The popup window looks like as shown below:
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
-
-#### Edit Run list of a Node
 
 #### Reset a Node Key
 
