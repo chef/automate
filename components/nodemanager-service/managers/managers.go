@@ -55,8 +55,8 @@ func GetAWSCreds(secret *secrets.Secret) awsec2.AwsCreds {
 }
 
 // GetAzureCreds returns clientID, clientSecret, tenantID
-func GetAzureCreds(secret *secrets.Secret) (string, string, string) {
-	clientID, clientSecret, tenantID := "", "", ""
+func GetAzureCreds(secret *secrets.Secret) (string, string, string, string) {
+	clientID, clientSecret, tenantID, subscriptionID := "", "", "", ""
 	if secret != nil {
 		for _, item := range secret.Data {
 			if item.Key == "AZURE_CLIENT_ID" {
@@ -68,12 +68,15 @@ func GetAzureCreds(secret *secrets.Secret) (string, string, string) {
 			if item.Key == "AZURE_TENANT_ID" {
 				tenantID = item.Value
 			}
+			if item.Key == "AZURE_SUBSCRIPTION_ID" {
+				subscriptionID = item.Value
+			}
 		}
 	}
 	if len(clientID) == 0 || len(clientSecret) == 0 || len(tenantID) == 0 {
 		logrus.Infof("GetAzureCreds attempting to use environment credentials")
 	}
-	return clientID, clientSecret, tenantID
+	return clientID, clientSecret, tenantID, subscriptionID
 }
 
 func GetAWSManagerFromCredential(ctx context.Context, credential string, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (myaws *awsec2.AwsCreds, err error) {
@@ -91,16 +94,16 @@ func GetAWSManagerFromCredential(ctx context.Context, credential string, db *pgd
 }
 
 func GetAzureManagerFromCredential(ctx context.Context, credential string, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (myaws *azure.Creds, err error) {
-	var clientID, clientSecret, tenantID string
+	var clientID, clientSecret, tenantID, subscriptionID string
 	if len(credential) > 0 {
 		secret, err := secretsClient.Read(ctx, &secrets.Id{Id: credential})
 		if err != nil {
 			return nil, errors.Wrapf(err, "Could not find secret with id %s", credential)
 		}
 
-		clientID, clientSecret, tenantID = GetAzureCreds(secret)
+		clientID, clientSecret, tenantID, subscriptionID = GetAzureCreds(secret)
 	}
-	creds, err := azure.New(clientID, clientSecret, tenantID)
+	creds, err := azure.New(clientID, clientSecret, tenantID, subscriptionID)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetAzureManagerFromCredential unable to initialize connection to azure api")
 	}
@@ -144,8 +147,8 @@ func GetAzureManagerFromID(ctx context.Context, id string, db *pgdb.DB, secretsC
 		return nil, errors.Wrapf(err, "Could not find secret with manager id %s", id)
 	}
 
-	clientID, clientSecret, tenantID := GetAzureCreds(azureSecret)
-	creds, err := azure.New(clientID, clientSecret, tenantID)
+	clientID, clientSecret, tenantID, subscriptionID := GetAzureCreds(azureSecret)
+	creds, err := azure.New(clientID, clientSecret, tenantID, subscriptionID)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetAzureManagerFromID unable to initialize connection to azure api")
 	}
@@ -263,7 +266,7 @@ func SendRemoteExecutionJob(ctx context.Context, job *types.InspecJob, script st
 		s := awsec2.NewSSM()
 		return s.SendSSMJob(ctx, job, script, scriptType)
 	case inspec.BackendAZ, inspec.BackendAZWindows:
-		creds, err := azure.New(job.TargetConfig.AzureClientID, job.TargetConfig.AzureClientSecret, job.TargetConfig.AzureTenantID)
+		creds, err := azure.New(job.TargetConfig.AzureClientID, job.TargetConfig.AzureClientSecret, job.TargetConfig.AzureTenantID, job.TargetConfig.AzureSubscriptionID)
 		if err != nil {
 			return errors.Wrap(err, "SendRemoteExecutionJob unable to initialize connection to azure api")
 		}
