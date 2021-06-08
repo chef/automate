@@ -78,6 +78,8 @@ func RunSSMJob(ctx context.Context, ssmJob *types.InspecJob) *inspec.Error {
 		logrus.Errorf("unable to delete token for reporting to automate: %s", err.Error())
 		return translateToInspecErr(err)
 	}
+	logrus.Debugf("::::: jobErrRunssmJob ::::::", jobErr)
+	fmt.Println("::::: jobErrRunssmJob ::::::", jobErr)
 	return translateToInspecErr(jobErr)
 }
 
