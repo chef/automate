@@ -87,7 +87,8 @@ export class IntegrationsEditComponent implements OnDestroy {
         credentials: fb.group({
           azure_client_id: '',
           azure_client_secret: '',
-          azure_tenant_id: ''
+          azure_tenant_id: '',
+          azure_subscription_id:''
         })
       }),
       gcp: fb.group({
