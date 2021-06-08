@@ -26,7 +26,8 @@ export class IntegrationsFormComponent {
   }
 
   get instance_credentials(): FormArray {
-    return this.integrationsForm.get('instance_credentials') as FormArray;
+    return 
+    this.integrationsForm.get('instance_credentials') as FormArray;
   }
 
   showInstanceCreds() {

@@ -243,18 +243,19 @@ type Error struct {
 }
 
 type Secrets struct {
-	User              string   `json:"user,omitempty"`
-	Password          string   `json:"password,omitempty"`
-	KeyFiles          []string `json:"key_files,omitempty"`
-	SudoPassword      string   `json:"sudo_password,omitempty"`
-	SudoOptions       string   `json:"sudo_options,omitempty"`
-	AwsUser           string   `json:"aws_user,omitempty"`
-	AwsPassword       string   `json:"aws_password,omitempty"`
-	AzureClientID     string   `json:"azure_client_id,omitempty"`
-	AzureClientSecret string   `json:"azure_client_secret,omitempty"`
-	AzureTenantID     string   `json:"azure_tenant_id,omitempty"`
-	GcpCredsJson      string   `json:"gcp_creds_json,omitempty"`
-	AwsSessionToken   string   `json:"aws_session_token,omitempty"`
+	User                string   `json:"user,omitempty"`
+	Password            string   `json:"password,omitempty"`
+	KeyFiles            []string `json:"key_files,omitempty"`
+	SudoPassword        string   `json:"sudo_password,omitempty"`
+	SudoOptions         string   `json:"sudo_options,omitempty"`
+	AwsUser             string   `json:"aws_user,omitempty"`
+	AwsPassword         string   `json:"aws_password,omitempty"`
+	AzureClientID       string   `json:"azure_client_id,omitempty"`
+	AzureClientSecret   string   `json:"azure_client_secret,omitempty"`
+	AzureTenantID       string   `json:"azure_tenant_id,omitempty"`
+	AzureSubscriptionID string   `json:"azure_subscription_id,omitempty"`
+	GcpCredsJson        string   `json:"gcp_creds_json,omitempty"`
+	AwsSessionToken     string   `json:"aws_session_token,omitempty"`
 }
 
 type TargetBaseConfig struct {

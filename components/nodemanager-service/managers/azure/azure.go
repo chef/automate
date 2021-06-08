@@ -28,12 +28,13 @@ import (
 )
 
 type Creds struct {
-	Token    *adal.ServicePrincipalToken
-	TenantID string
+	Token          *adal.ServicePrincipalToken
+	TenantID       string
+	SubscriptionID string
 }
 
 // New returns a Creds struct of ServicePrincipalToken and TenantID given azure creds
-func New(clientID string, clientSecret string, tenantID string) (Creds, error) {
+func New(clientID string, clientSecret string, tenantID string, subscriptionID string) (Creds, error) {
 	if len(clientID) == 0 && len(clientSecret) == 0 && len(tenantID) == 0 {
 		return Creds{}, nil
 	}
@@ -50,7 +51,7 @@ func New(clientID string, clientSecret string, tenantID string) (Creds, error) {
 		return Creds{}, errors.Wrap(err, "azure - New unable to get token")
 	}
 	token.SetAutoRefresh(true)
-	return Creds{Token: token, TenantID: tenantID}, nil
+	return Creds{Token: token, TenantID: tenantID, SubscriptionID: subscriptionID}, nil
 }
 
 func getAuthorizer(token *adal.ServicePrincipalToken) autorest.Authorizer {
