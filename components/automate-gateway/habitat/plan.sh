@@ -38,6 +38,7 @@ pkg_binds_optional=(
   [teams-service]="port"
   [secrets-service]="port"
   [automate-cds]="port"
+  [user-settings-service]="port"
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)

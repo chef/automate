@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Helper methods specific for the user-settings-service
+
+document "start_user_settings_service" <<DOC
+  Build and start the local user-settings-service
+DOC
+function start_user_settings_service {
+  build components/user-settings-service/
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/user-settings-service --with-deps
+}
+
+document "start_user_settings_service_deps" <<DOC
+  Start the applications service's deps so integration tests can run
+DOC
+function start_user_settings_service_deps() {
+  start_deployment_service
+  chef-automate dev deploy-some --with-deps "$(app_service_origin)/user_settings_service"
+  chef-automate dev remove-some "$(app_service_origin)/user_settings_service"
+}
+
+document "debug_user_settings" <<DOC
+  Attaches a remote debugger to user-settings-service
+DOC
+function debug_user_settings() {
+  check_if_deployinate_started || return 1
+  debug_go_service user-settings-service
+}
+
+document "user_settings_grpcurl_get_user_settings" <<DOC
+  Hits the get user settings endpoint inside the user-settings-service. (GetUserSettings)
+
+  @(arg:1) name of user to get settings for
+  @(arg:2) connector of user to get settings for
+
+  Example: Get the user settings for the user id uid1
+  -----------------------------
+  user_settings_grpcurl_get_user_settings uid1
+DOC
+function user_settings_grpcurl_get_user_settings() {
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}}' \
+	  chef.automate.domain.user_settings.service.UserSettingsService.GetUserSettings
+}

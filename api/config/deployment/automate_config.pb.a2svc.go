@@ -46,6 +46,7 @@ import (
 	shared "github.com/chef/automate/api/config/shared"
 	teams "github.com/chef/automate/api/config/teams"
 	ui "github.com/chef/automate/api/config/ui"
+	usersettings "github.com/chef/automate/api/config/user_settings"
 	workflownginx "github.com/chef/automate/api/config/workflow_nginx"
 	workflowserver "github.com/chef/automate/api/config/workflow_server"
 )
@@ -96,6 +97,7 @@ func NewAutomateConfig() *AutomateConfig {
 		Session:          session.NewConfigRequest(),
 		Teams:            teams.NewConfigRequest(),
 		UI:               ui.NewConfigRequest(),
+		UserSettings:     usersettings.NewConfigRequest(),
 		Workflow:         workflowserver.NewConfigRequest(),
 		WorkflowNginx:    workflownginx.NewConfigRequest(),
 	}
@@ -147,6 +149,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		Session:          session.DefaultConfigRequest(),
 		Teams:            teams.DefaultConfigRequest(),
 		UI:               ui.DefaultConfigRequest(),
+		UserSettings:     usersettings.DefaultConfigRequest(),
 		Workflow:         workflowserver.DefaultConfigRequest(),
 		WorkflowNginx:    workflownginx.DefaultConfigRequest(),
 	}
@@ -159,7 +162,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate())
 	if err == nil {
 		return nil
 	}
@@ -218,6 +221,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.InfraProxy.SetGlobalConfig(c.Global)
 	c.Cds.SetGlobalConfig(c.Global)
 	c.SampleData.SetGlobalConfig(c.Global)
+	c.UserSettings.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -311,6 +315,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Cds, true
 	case "sample-data-service":
 		return c.SampleData, true
+	case "user-settings-service":
+		return c.UserSettings, true
 	default:
 		return nil, false
 	}

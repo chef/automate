@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package chef.automate.domain.user_settings;
+option go_package = "github.com/chef/automate/api/config/user_settings";
+
+import "config/shared/global.proto";
+import "config/shared/tls.proto";
+import "automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+  option (chef.automate.api.service_config) = {
+    name : "user-settings-service"
+  };
+  V1 v1 = 1;
+
+  message V1 {
+    System sys = 1;
+    Service svc = 2;
+
+    message System {
+      chef.automate.infra.config.Mlsa mlsa = 1;
+      chef.automate.infra.config.TLSCredentials tls = 2;
+      Service service = 3;
+      chef.automate.infra.config.Log log = 4;
+
+      message Service {
+        google.protobuf.Int32Value port = 1 
+            [ (chef.automate.api.port) =
+                  {name : "service", default : 10107, protocol : "grpc"} ];
+        google.protobuf.StringValue message = 2;   
+      }
+    }
+    message Service {}
+  }
+}

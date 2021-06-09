@@ -45,6 +45,7 @@
     "chef/automate-prometheus",
     "chef/sample-data-service",
     "chef/automate-cli",
+    "chef/user-settings-service",
     "core/rsync"
   ],
 
@@ -148,7 +149,8 @@
       "hidden": true,
       "dependencies": ["automate"],
       "services": [
-        "chef/automate-cds"
+        "chef/automate-cds",
+        "chef/user-settings-service"
       ]
     },
     {
