@@ -86,3 +86,41 @@ func (s *UserSettingsServer) GetUserSettings(ctx context.Context, req *user_sett
 
 	return getUserSettingsResp, nil
 }
+
+//	rpc UpdateUserSettings(PutUserSettings) returns (UpdateUserSettingsResponse) {
+func (s *UserSettingsServer) PutUserSettings(ctx context.Context, req *user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error) {
+	logrus.Debugf("PutUserSettings from server.go")
+	name := req.GetUser().GetName()
+	if name == "" {
+		return nil, errors.New("invalid user Id")
+	}
+	connector := req.GetUser().GetConnector()
+	if connector == "" {
+		return nil, errors.New("invalid connector")
+	}
+	logrus.Debugf("Put settings for connector: %s user: %s", connector, name)
+	var userSettings map[string]*user_settings.UserSettingValue
+	userSettings = req.GetSettings()
+
+	getDefaultUserSettingsResp, err := s.db.GetUserSettings("_default", "local")
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err,
+			fmt.Sprintf("for connector: %s and user: %s", connector, name))
+	}
+
+	logrus.Debugf("----->Checking default settings to make sure we're putting in supported settings")
+	for keyFromUser, _ := range userSettings {
+		if _, ok := getDefaultUserSettingsResp.Settings[keyFromUser]; !ok {
+			//it's not in the default map so delete it from user settings before we save to db
+			logrus.Debugf("----->Removing %s from map because it's not a supported setting", keyFromUser)
+			delete(userSettings, keyFromUser)
+		}
+	}
+
+	putUserSettingsResp, err := s.db.PutUserSettings(name, connector, userSettings)
+	if err != nil {
+		return nil, err
+	}
+	logrus.Debugf("PutUserSettings response: %v", putUserSettingsResp)
+	return putUserSettingsResp, nil
+}

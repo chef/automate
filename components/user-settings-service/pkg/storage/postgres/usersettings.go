@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/user_settings"
@@ -64,4 +65,25 @@ func (db *DB) GetUserSettings(name string, connector string) (*user_settings.Get
 	settingsResponse.Settings = data
 
 	return settingsResponse, err
+}
+
+func (db *DB) PutUserSettings(name string, connector string,
+	settings map[string]*user_settings.UserSettingValue) (*user_settings.PutUserSettingsResponse, error) {
+	logrus.Infof("MAKING IT SO")
+	jsonString, err := json.Marshal(settings)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(upsertUserSettings, name, connector, jsonString)
+	if err != nil {
+		return nil, errors.Wrap(err, "PutUserSettings unable to update user settings")
+	}
+
+	return &user_settings.PutUserSettingsResponse{
+		User: &user_settings.User{
+			Name:      name,
+			Connector: connector,
+		},
+	}, nil
 }

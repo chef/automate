@@ -20,12 +20,32 @@ function start_user_settings_service_deps() {
   chef-automate dev remove-some "$(app_service_origin)/user_settings_service"
 }
 
+# Run Integration tests for the user-settings-service
+document "user_settings_integration" <<DOC
+  Runs the integration tests for the user-settings-service
+DOC
+function user_settings_integration() {
+  go_test "github.com/chef/automate/components/user-settings-service/integration_test"
+}
 document "debug_user_settings" <<DOC
   Attaches a remote debugger to user-settings-service
 DOC
 function debug_user_settings() {
   check_if_deployinate_started || return 1
   debug_go_service user-settings-service
+}
+
+document "user_settings_grpcurl_list_services" <<DOC
+  Display the list of RPC services inside the user-settings-service.
+
+  @(arg:1) Optional: An RPC service to inspect
+
+  Example: Inspect the UserSettings service
+  -----------------------------
+  user_settings_grpcurl_list_services chef.automate.domain.user_settings.service.UserSettingsService
+DOC
+user_settings_grpcurl_list_services() {
+    user_settings_grpcurl_get list "$1"
 }
 
 document "user_settings_grpcurl_get_user_settings" <<DOC
@@ -42,3 +62,26 @@ function user_settings_grpcurl_get_user_settings() {
   chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}}' \
 	  chef.automate.domain.user_settings.service.UserSettingsService.GetUserSettings
 }
+
+document "user_settings_grpcurl_put_user_settings" <<DOC
+  Hits the put user settings endpoint inside the user-settings-service. (PutUserSettings)
+
+  @(arg:1) id of user to put settings for
+  @(arg:2) connector of user to put settings for
+  @(arg:3) UserSettings to be set for the given user id
+
+  Example: Put the user settings for the user id uid1
+  -----------------------------
+  user_settings_grpcurl_put_user_settings uid1
+DOC
+function user_settings_grpcurl_put_user_settings() {
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}, "settings": { "setting3" : {"default_value": "defval1", "value": "val1", "enabled": true}, "setting2" : {"default_value": "defval2", "value": "val2", "enabled": false}}}' \
+	  chef.automate.domain.user_settings.service.UserSettingsService.PutUserSettings
+}
+
+
+
+
+
+
+
