@@ -57,7 +57,7 @@ func (c *CredentialsFactory) NewCredentials() (Credentials, error) {
 		}
 	}
 	if c.data["auth_type"] == AWS_AUTH {
-		return NewS3Credentials(c.data["access_key"], c.data["secret_access_key"], c.data["region"], c.data["bucket"]), nil
+		return NewS3Credentials(c.data["access_key"], c.data["secret_access_key"], c.data["region"], c.data["bucket"]), nil 
 	}
 	return nil, errors.New(CredentialsError)
 }
