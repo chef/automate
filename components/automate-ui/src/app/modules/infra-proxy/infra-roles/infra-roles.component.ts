@@ -58,6 +58,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public openRoleModal = new EventEmitter<boolean>();
   public recipes: any;
+  public deleting = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -79,6 +80,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.total = RolesState?.total;
         this.rolesListLoading = false;
         this.searching = false;
+        this.deleting = false;
       } else if (getRolesSt === EntityStatus.loadingFailure) {
         this.rolesListLoading = false;
         this.authFailure = true;
@@ -154,6 +156,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 
   private loadRecipes(): void {

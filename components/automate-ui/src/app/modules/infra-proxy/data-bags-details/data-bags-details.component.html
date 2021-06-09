@@ -50,7 +50,7 @@
           <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
-          <chef-loading-spinner *ngIf="searching" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
+          <chef-loading-spinner *ngIf="searching || deleting" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
           <div class="empty-section" *ngIf="!searching && !dataBagItems.length">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p *ngIf="searchValue === ''">No data bag items available</p>

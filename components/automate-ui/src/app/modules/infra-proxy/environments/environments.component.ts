@@ -26,6 +26,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public environmentsListLoading = true;
   public searching = false;
+  public deleting = true;
 
   public current_page = 1;
   public environments: Environment[] = [];
@@ -60,6 +61,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
           this.total = EnvironmentsState?.total;
           this.environmentsListLoading = false;
           this.searching = false;
+          this.deleting = false;
         } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
           this.environmentsListLoading = false;
           this.authFailure = true;
@@ -137,6 +139,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 }
 

@@ -35,6 +35,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public total: number;
   public clientToDelete: Client;
   public deleteModalVisible = false;
+  public deleting = true;
   private isDestroyed = new Subject<boolean>();
   public openClientModal = new EventEmitter<void>();
 
@@ -59,6 +60,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.total = ClientsState?.total;
         this.clientsListLoading = false;
         this.searching = false;
+        this.deleting = false;
       } else if (getClientsSt === EntityStatus.loadingFailure) {
         this.clientsListLoading = false;
         this.authFailure = true;
@@ -137,5 +139,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 }
