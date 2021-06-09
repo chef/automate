@@ -1,0 +1,189 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: 44px;
+    margin-top: 0px;
+  }
+
+  .flex-container {
+    justify-content: center;
+
+    .input-margin {
+      margin-bottom: 20px;
+    }
+
+    form {
+      flex-basis: 61%;
+
+      label {
+        padding-bottom: 0;
+        font-size: 16px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: $chef-black;
+        margin-top: 32px;
+      }
+
+      #default {
+        height: 286px;
+        max-height: 286px;
+        min-height: 286px;
+        max-width: 100%;
+        min-width: 100%;
+      }
+
+      ::ng-deep #default::-webkit-scrollbar {
+        width: 5px;
+        background: $chef-form-input;
+        border-radius: 5px;
+      }
+
+      ::ng-deep #default::-webkit-scrollbar-thumb {
+        background: $chef-modal;
+        border-radius: 5px;
+      }
+    }
+
+    .button-bar-box {
+      text-align: right;
+      margin-top: 20px;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+
+    }
+
+  }
+
+  ::ng-deep {
+    .modal {
+      overflow-x: hidden;
+      padding: 32px;
+      outline: none;
+      box-shadow: 0px 0px 30px 0px $chef-modal;
+      width: 708px;
+    }
+
+    .modal::-webkit-scrollbar {
+      width: 8px;
+      background-color: $chef-modal-scrollbar;
+    }
+
+    .modal::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: $chef-modal;
+    }
+
+    .label {
+      font-size: 16px;
+      font-weight: 400;
+      padding-bottom: 0px;
+    }
+  }
+}
+
+.pageLabel {
+  width: 61px;
+  height: 20px;
+  left: 398px;
+  top: 278px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin-top: 50px;
+}
+
+.divider-pageLabel {
+  margin-top: 9px;
+  border-color: $chef-key-tab;
+}
+
+img {
+  width: 15px;
+  margin-right: 5px;
+  margin-bottom: -3px;
+}
+
+chef-modal ::ng-deep .modal-overlay {
+  background-color: $chef-white;
+  mix-blend-mode: normal;
+  opacity: 0.7;
+}
+
+.pages-body {
+  padding-top: 0;
+}
+
+.button-bar-box {
+  chef-button {
+    height: 36px;
+  }
+
+  chef-button#create-default-button-object-modal {
+    margin: 8px 0px 0px 16px;
+  }
+
+  chef-button.close {
+    border: none;
+    color: var(--chef-primary-dark);
+    outline: none;
+    margin-top: 18px;
+    margin-right: 18px;
+  }
+
+  chef-button.close:active {
+    background: none;
+    color: var(--chef-primary-dark);
+  }
+}
+
+.scroll {
+  overflow: scroll;
+  height: 256px;
+}
+
+::ng-deep .scroll::-webkit-scrollbar {
+  width: 5px;
+  background: $chef-form-input;
+  border-radius: 5px;
+  height: 195px;
+  left: 1401px;
+  top: 321px;
+}
+
+::ng-deep .scroll::-webkit-scrollbar-thumb {
+  background: $chef-cyan-blue;
+  border-radius: 5px;
+  width: 5px;
+  height: 64px;
+  left: 1401px;
+  top: 321px;
+}
+
+form {
+  chef-form-field {
+    textarea {
+      height: 286px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      margin-bottom: -5px;
+    }
+  }
+}
+
+chef-button {
+  ::ng-deep button:focus {
+    outline: none;
+    border: 1px solid $chef-primary-bright;
+    border-radius: 4px;
+  }
+}

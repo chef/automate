@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -45,8 +45,9 @@ import { NodeList, NodeExpandedChildList, NodeRunlist } from 'app/entities/nodeR
 import { Node, Options } from '../tree-table/models';
 import { AvailableType } from '../infra-roles/infra-roles.component';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
+import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
-export type InfraNodeTabName = 'details' | 'runList';
+export type InfraNodeTabName = 'details' | 'runList' | 'attributes';
 
 @Component({
   selector: 'app-infra-node-details',
@@ -105,6 +106,18 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     capitalizedHeader: true
   };
 
+  // for attributes
+  public attributes = [];
+  public jsonText: any;
+  public attributesLoading = true;
+  public nodeAttributesLoading = true;
+  public hasattributes = true;
+  public openEditAttr = false;
+  public openAttributeModal = new EventEmitter<boolean>();
+
+  @ViewChild(JsonTreeTable, { static: true })
+  tree: JsonTreeTable;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -122,7 +135,17 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'runList') ? 'runList' : 'details';
+      switch (fragment) {
+        case 'details':
+          this.tabValue = 'details';
+          break;
+        case 'runList':
+          this.tabValue = 'runList';
+          break;
+        case 'attributes':
+          this.tabValue = 'attributes';
+          break;
+      }
     });
     // load node details
     combineLatest([
@@ -150,10 +173,15 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       this.tags = this.nodeTags;
       this.nodeDetailsLoading = false;
       this.nodeRunlistLoading = false;
+      this.nodeAttributesLoading = false;
       // set default value of node environment
       this.updateNodeForm.controls.environment.setValue(this.environmentName);
       // load runlist according to the environment
       this.loadNodeRunlists(this.InfraNode.environment);
+      // load attributes
+      this.attributes = (node.normal_attributes && JSON.parse(node.normal_attributes)) || {};
+      this.hasattributes = Object.keys(
+        JSON.parse(node.normal_attributes)).length > 0 ? true : false;
     });
 
     // show default list of environments
@@ -448,5 +476,16 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       });
     }
     return nodes;
+  }
+
+  openEditAttrModal(value): void {
+    this.openEditAttr = true;
+    const obj = JSON.parse(value);
+    this.jsonText = JSON.stringify(obj, null, 4);
+    this.openAttributeModal.emit(true);
+  }
+
+  public closeEditAttributeModal(): void {
+    this.openEditAttr = false;
   }
 }

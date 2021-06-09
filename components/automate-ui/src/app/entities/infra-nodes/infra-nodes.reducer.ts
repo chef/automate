@@ -12,6 +12,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   updateStatus: EntityStatus;
   updateEnvStatus: EntityStatus;
   updateTagsStatus: EntityStatus;
+  updateAttributesStatus: EntityStatus;
   nodeList: {
     items: InfraNode[],
     total: number
@@ -20,6 +21,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodeTags: string[];
   nodeEnvironment: string;
   node: InfraNode;
+  nodeAttributes: string[];
 }
 
 const GET_ALL_STATUS            = 'getAllStatus';
@@ -28,6 +30,7 @@ const GET_STATUS                = 'getStatus';
 const UPDATE_STATUS             = 'updateStatus';
 const UPDATE_ENVIRONMENT_STATUS = 'updateEnvStatus';
 const UPDATE_TAGS_STATUS        = 'updateTagsStatus';
+const UPDATE_ATTRIBUTES_STATUS  = 'updateAttributesStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
   selectId: (infraNode: InfraNode) => infraNode.name
@@ -125,6 +128,18 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.UPDATE_TAGS_FAILURE:
       return set(UPDATE_TAGS_STATUS, EntityStatus.loadingFailure, state);
+
+    case NodeActionTypes.UPDATE_ATTRIBUTES:
+      return set(UPDATE_ATTRIBUTES_STATUS, EntityStatus.loading, state);
+
+    case NodeActionTypes.UPDATE_ATTRIBUTES_SUCCESS:
+      return pipe(
+        set(UPDATE_ATTRIBUTES_STATUS, EntityStatus.loadingSuccess),
+        set('nodeAttributes', action.payload.attributes || [])
+        )(state) as InfraNodeEntityState;
+
+    case NodeActionTypes.UPDATE_ATTRIBUTES_FAILURE:
+      return set(UPDATE_ATTRIBUTES_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

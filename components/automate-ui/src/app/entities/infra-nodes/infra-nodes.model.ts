@@ -18,3 +18,10 @@ export interface InfraNode {
   run_list: string[];
   tags?: string[];
 }
+
+export interface InfraNodeAttribute {
+  server_id: string;
+  org_id: string;
+  name: string;
+  attributes: string[];
+}

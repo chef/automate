@@ -194,7 +194,7 @@ describe('infra node list', () => {
       cy.get('[data-cy=nodes-table-container]').contains('node-learn_chef_apache2').click();
       cy.get('[data-cy=tag-box]').scrollIntoView();
       cy.get('[data-cy=tag-box]').should(('be.visible'));
-      cy.get('.display-node-tags').find('span').should('have.length.greaterThan', 1);
+      cy.get('.display-node-tags').find('span').should('have.length.greaterThan', 0);
       cy.get('.breadcrumbs .breadcrumb').contains('Nodes').click();
     });
 
@@ -212,12 +212,12 @@ describe('infra node list', () => {
           // accept dialog
           cy.get('app-infra-nodes chef-button').contains('Delete').click();
           // verify success notification and then dismiss it
-          cy.get('app-notification.info').contains(`Successfully deleted role - ${nodeName}.`);
+          cy.get('app-notification.info').contains(`Successfully deleted node - ${nodeName}.`);
           cy.get('app-notification.info chef-icon').click();
         }
       });
 
-      getNodes(`${cypressPrefix}-role-${now}`, 1).then((response) => {
+      getNodes(`${cypressPrefix}-node-${now}`, 1).then((response) => {
         checkResponse(response);
       });
 
@@ -283,6 +283,36 @@ describe('infra node list', () => {
       // verify success notification and then dismiss it
       cy.get('app-notification.info').contains(`Successfully reset the key - ${seachableNode}.`);
       cy.get('app-notification.info chef-icon').click();
+    });
+
+    it('can edit attributes', () => {
+      cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-node-${now}`);
+      cy.get('[data-cy=search-entity]').click();
+      getNodes(`${cypressPrefix}-node-${now}`, 1).then((response) => {
+        if (checkResponse(response)) {
+          cy.get('[data-cy=nodes-table-container]').contains(nodeName).should('exist');
+          cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
+            .contains(nodeName).parent().parent().find('.mat-select-trigger').click();
+
+          cy.get('[data-cy=attribute]').should('be.visible')
+            .click();
+          // accept dialog
+          cy.get('app-infra-nodes chef-button').contains('Save').click();
+          // verify success notification and then dismiss it
+          cy.get('app-notification.info').contains('Successfully updated node attibutes.');
+          cy.get('app-notification.info chef-icon').click();
+        }
+      });
+
+      getNodes(`${cypressPrefix}-node-${now}`, 1).then((response) => {
+        checkResponse(response);
+      });
+
+      cy.get('[data-cy=search-filter]').clear();
+      cy.get('[data-cy=search-entity]').click();
+      getNodes('', 1).then((response) => {
+        checkResponse(response);
+      });
     });
   });
 });

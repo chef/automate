@@ -6,7 +6,8 @@ import {
   NodesPayload,
   NodesSuccessPayload,
   UpdateNodeEnvPayload,
-  UpdateNodeTagPayload
+  UpdateNodeTagPayload,
+  UpdateNodeAttrPayload
 } from './infra-nodes.actions';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 import {
@@ -59,5 +60,11 @@ export class InfraNodeRequests {
   public deleteNode(server_id: string, org_id: string, name: string): Observable<{}> {
     return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/nodes/${name}`,
     {headers});
+  }
+
+  public updateNodeAttributes(node: UpdateNodeAttrPayload): Observable<UpdateNodeAttrPayload> {
+    return this.http.put<UpdateNodeAttrPayload>(
+    `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/attributes`,
+      node);
   }
 }
