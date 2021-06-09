@@ -94,8 +94,6 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	}
 
 	stdOut, stdErr, err := run(args, target, timeout, env)
-	fmt.Println("::::::::  stdOut ::::", stdOut)
-	fmt.Println("::::::::  stdErr ::::", stdErr)
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
