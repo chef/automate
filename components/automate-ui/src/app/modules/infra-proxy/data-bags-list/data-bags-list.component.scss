@@ -41,12 +41,20 @@ chef-toolbar chef-button:first-child {
   }
 }
 
+.databags {
+  position: relative;
+}
+
 .full-screen-spinner {
   display: flex;
   margin: auto;
-  margin-top: 238px;
   background-color: $chef-white;
   opacity: 0.7;
-  width: initial;
-  height: 100%;
+  width: calc(100% + 70px);
+  margin-top: -20px;
+  position: absolute;
+  top: 0;
+  left: -35px;
+  bottom: 0%;
+  right: 0%;
 }

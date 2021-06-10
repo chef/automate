@@ -23,7 +23,7 @@
       </app-infra-search-bar>
       <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="true" size="50" fixed></chef-loading-spinner>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
     <div class="empty-section" *ngIf="!searching && !clients.length && current_page === 1">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>

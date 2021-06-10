@@ -45,7 +45,7 @@
       <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name....">
       </app-infra-search-bar>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading" size="50" fixed></chef-loading-spinner>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading || deleting" size="50" fixed></chef-loading-spinner>
     <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !nodes.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>

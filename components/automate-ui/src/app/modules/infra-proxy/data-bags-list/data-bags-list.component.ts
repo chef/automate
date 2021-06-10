@@ -34,6 +34,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
   public searchValue = '';
   public searchFlag = false;
   public searching = false;
+  public deleting = false;
   public serachArr: DataBag[];
   public openDataBagModal = new EventEmitter<void>();
   private isDestroyed = new Subject<boolean>();
@@ -58,6 +59,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
       if (getDataBagsSt === EntityStatus.loadingSuccess && !isNil(allDataBagsState)) {
         this.dataBags = allDataBagsState;
         this.dataBagsListLoading = false;
+        this.deleting = false;
       } else if (getDataBagsSt === EntityStatus.loadingFailure) {
         this.dataBagsListLoading = false;
         this.authFailure = true;
@@ -98,6 +100,7 @@ export class DataBagsListComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 
   public openCreateModal(): void {
