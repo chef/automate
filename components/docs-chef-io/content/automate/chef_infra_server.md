@@ -359,7 +359,7 @@ You can edit, expand or collapse the run list of a node.
 
 Edit a run list by:
 
-1. Select **edit** option. A popup window opens.
+1. Select **edit**. A popup window opens.
 
 2. The left section the window contains the list of environment of the nodes. Select any one environment from the list.
 
