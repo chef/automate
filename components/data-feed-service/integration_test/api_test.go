@@ -15,16 +15,18 @@ import (
 )
 
 var (
-	automateApiToken = os.Getenv("AUTOMATE_API_TOKEN")
-	addData          = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret"}`)
-	addDataValues    = []string{"test", "https://test.com", "secret"}
-	emptyAddData     = []byte(`{}`)
-	updateData       = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
-	updateDataValues = []string{"test update", "https://update.test.com", "updated secret"}
-	testSuccessData  = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
-	testFailsData    = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
-	secretData       = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
-	client           = NewClient()
+	automateApiToken      = os.Getenv("AUTOMATE_API_TOKEN")
+	addData               = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"custom", "integration_types": "webhook"}`)
+	addDataValues         = []string{"test", "https://test.com", "secret", "custom", "webhook"}
+	emptyAddData          = []byte(`{}`)
+	updateData            = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
+	updateDataValues      = []string{"test update", "https://update.test.com", "updated secret"}
+	testSuccessData       = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
+	testFailsData         = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
+	testSuccessHeaderData = []byte(`{"url":"http://localhost:38080/success", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
+	testFailsHeaderData   = []byte(`{"url":"http://localhost:38080/fails", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
+	secretData            = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	client                = NewClient()
 )
 
 func NewClient() *http.Client {
@@ -108,10 +110,12 @@ func TestDeleteNonExistent(t *testing.T) {
 
 func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
+	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
 }
 
 func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
+	testDestinationHeaderRequestFail(t, testFailsHeaderData)
 }
 
 func TestDestinationWithSecret(t *testing.T) {
@@ -279,7 +283,31 @@ func testDestinationRequestSuccess(t *testing.T, data []byte) {
 	}
 }
 
+func testDestinationHeaderRequestSuccess(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 200, response.StatusCode, "Expected 200, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.True(t, responseBody["success"].(bool), "Expected success=true, got %v", responseBody["success"])
+		}
+	}
+}
+
 func testDestinationRequestFail(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 500, response.StatusCode, "Expected 500, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.Equal(t, "404 Not Found posting test message to: http://localhost:38080/fails", responseBody["error"], "Expected 404 Not Found posting test message to: http://localhost:38080/fails, got %v", responseBody["error"])
+		}
+	}
+}
+
+func testDestinationHeaderRequestFail(t *testing.T, data []byte) {
 	response, err := testDestinationRequest(t, data)
 	assert.Nil(t, err, "Error: %v", err)
 	if assert.NotNil(t, response, "expected a response got nil") {

@@ -220,6 +220,12 @@
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -237,6 +243,12 @@
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -256,6 +268,12 @@
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -273,6 +291,12 @@
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -364,6 +388,12 @@
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }

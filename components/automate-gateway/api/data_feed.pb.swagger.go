@@ -223,6 +223,12 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -240,6 +246,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -259,6 +271,12 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -276,6 +294,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -367,6 +391,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
