@@ -338,7 +338,7 @@ The next section of the page contains two options:
 
 ##### Details
 
-Details section is to view or update the node environment. The drop down menu consists of the list of environment created in the chef server. You can select any one environment for the selected node.
+The **Details** section lets you view and update the node environment. The drop-down menu consists of the list of environments created in the chef server. You can select any one environment for the selected node.
 
 To select the environment:
 
