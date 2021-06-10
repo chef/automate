@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
@@ -61,12 +63,15 @@ func (s *UserSettingsServer) GetUserSettings(ctx context.Context,
 
 	//The call to get _default user settings has succeeded so we may now get the user settings for this user
 	name := req.GetUser().GetName()
-	if name == "" {
-		return nil, errors.New("cannot get user settings.. no user name was provided")
+
+	//check for whitespace in the name if we find it, return err
+	if containsWhitespace(name) {
+		logrus.Infof("%s contains some whitespace", name)
+		return nil, errors.New("invalid user Id - name must not contain any whitespace")
 	}
 	connector := req.GetUser().GetConnector()
-	if connector == "" {
-		return nil, errors.New(fmt.Sprintf("cannot get user settings for user: %s.  no connector was provided", name))
+	if !validConnector(strings.ToLower(connector)) {
+		return nil, errors.New("invalid connector")
 	}
 
 	logrus.Debugf("Get settings for connector: %s user: %s", connector, name)
@@ -92,13 +97,15 @@ func (s *UserSettingsServer) GetUserSettings(ctx context.Context,
 //	rpc UpdateUserSettings(PutUserSettings) returns (UpdateUserSettingsResponse) {
 func (s *UserSettingsServer) PutUserSettings(ctx context.Context,
 	req *user_settings.PutUserSettingsRequest) (*user_settings.PutUserSettingsResponse, error) {
-	logrus.Debugf("PutUserSettings from server.go")
 	name := req.GetUser().GetName()
-	if name == "" {
-		return nil, errors.New("invalid user Id")
+
+	//check for whitespace in the name if we find it, return err
+	if containsWhitespace(name) {
+		logrus.Infof("%s contains some whitespace", name)
+		return nil, errors.New("invalid user Id - name must not contain any whitespace")
 	}
 	connector := req.GetUser().GetConnector()
-	if connector == "" {
+	if !validConnector(strings.ToLower(connector)) {
 		return nil, errors.New("invalid connector")
 	}
 	logrus.Debugf("Put settings for connector: %s user: %s", connector, name)
@@ -111,13 +118,15 @@ func (s *UserSettingsServer) PutUserSettings(ctx context.Context,
 			fmt.Sprintf("for connector: %s and user: %s", connector, name))
 	}
 
-	logrus.Debugf("----->Checking default settings to make sure we're putting in supported settings")
 	for keyFromUser, _ := range userSettings {
 		setting, found := getDefaultUserSettingsResp.Settings[keyFromUser]
 		if !found || !allowed(userSettings[keyFromUser].Value, setting.ValidValues) {
 			//it's not in the default map so delete it from user settings before we save to db
 			logrus.Debugf("----->Removing %s from map because it's not a supported setting", keyFromUser)
 			delete(userSettings, keyFromUser)
+		} else {
+			//save it but only save the value part of it as the other properties should come from the default user
+			userSettings[keyFromUser] = &user_settings.UserSettingValue{Value: userSettings[keyFromUser].Value}
 		}
 	}
 	var putUserSettingsResp *user_settings.PutUserSettingsResponse
@@ -149,4 +158,12 @@ func allowed(value string, validValues []string) bool {
 		}
 	}
 	return false
+}
+
+func validConnector(connector string) bool {
+	return connector == "local" || connector == "saml" || connector == "ldap"
+}
+func containsWhitespace(value string) bool {
+	ws := regexp.MustCompile(`\s`)
+	return ws.MatchString(value)
 }
