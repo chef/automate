@@ -383,7 +383,7 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 - Selecting the node and add the tags from the text bar below the dropdown menu of environment.
 
-- OR, by simply selecting the **Manage Tags** option in the ellipses icon of a specific node. Selecting the Manage Tags option from the ellipses icon opens a popup window, where you can add multiple tags and click **Update Tags**. The popup window looks like as shown below:
+2.  Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
