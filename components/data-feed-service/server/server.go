@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"strconv"
-	"strings"
 
 	//"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -54,7 +53,7 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -121,23 +120,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
 
-	if credentials.GetAuthType() == service.HEADER_AUTH {
-		headerString := credentials.GetValues().HeaderJSONString
-		var headerMap map[string]string
-		err := json.Unmarshal([]byte(headerString), &headerMap)
-		if err != nil {
-			log.Warnf("Error parsing headers %v", err)
-		}
-		for key, value := range headerMap {
-			httpRequest.Header.Set(key, value)
-		}
-	} else {
-		authHeader := credentials.GetValues().AuthorizationHeader
-		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
-		if tokenValue != "" {
-			httpRequest.Header.Add("Authorization", authHeader)
-		}
-	}
+	service.AddCustomHeader(credentials, httpRequest.Header)
 
 	client := http.Client{}
 	httpResponse, err := client.Do(httpRequest)
@@ -169,7 +152,7 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	if err != nil {
 		log.Warnf("Could not get destination details for delete response id: %d,  err: %s", destination.Id, err)
 	} else {
-		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret}
+		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret, Services: fullDestination.Services, IntegrationTypes: fullDestination.IntegrationTypes}
 	}
 
 	err = datafeedServer.db.DeleteDestination(destination)
