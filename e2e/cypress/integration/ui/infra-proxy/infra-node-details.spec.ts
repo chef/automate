@@ -202,7 +202,7 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option.ng-option-marked').click();
+      cy.get('.ng-option').contains('chef-environment-').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
 
@@ -222,6 +222,7 @@ describe('infra node detail', () => {
     });
 
     it('can show the node tags box', () => {
+      cy.get('[data-cy=tag-box]').scrollIntoView();
       cy.get('[data-cy=tag-box]').should(('be.visible'));
       cy.get('.display-node-tags').find('span').should('have.length', 1);
     });
@@ -351,10 +352,10 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option').contains('chef-environment-').click();
+      cy.get('.ng-option').contains('chef-environment-5').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
-      cy.get('.ng-value').contains('chef-environment-');
+      cy.get('.ng-value').contains('chef-environment-5');
 
       cy.get('app-notification.info').contains('Successfully updated node environment.');
       cy.get('app-notification.info chef-icon').click();
