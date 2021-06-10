@@ -383,11 +383,11 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
-#### Reset a Node Key
+#### Reset a Client Key
 
-Reset a node key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
+Reset a client key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
 
-{{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Node Key">}}
+{{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Client Key">}}
 
 #### Delete a Node
 
