@@ -353,7 +353,7 @@ To select the environment:
 
 ##### Run List
 
-You can edit, expand or collapse the run list of a node.
+You can edit, expand or collapse a node's run list.
 
 {{< figure src="/images/automate/run-list-of-a-node.png" alt="Run List of a Node">}}
 
