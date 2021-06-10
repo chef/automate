@@ -373,23 +373,19 @@ The popup window looks like as shown below:
 
 Chef Infra allows you to edit the run list of a node using a shortcut. Select the option **Edit Run List** from the ellipses icon of the specific node in the node list. Selecting the option will open the same popup window which can be used to edit the run list of a node.
 
-The ellipses icon list looks like:
-
-{{< figure src="/images/automate/edit-run-list-ellipses-icon.png" alt="Edit Run List Ellipses Icon">}}
-
 #### Manage Tags
 
 Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags by:
 
 - Selecting the node and add the tags from the text bar below the dropdown menu of environment.
 
-2.  Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
+- Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
 #### Reset a Node Key
 
-Reset a node key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm. 
+Reset a node key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Node Key">}}
 
