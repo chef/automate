@@ -357,7 +357,7 @@ You can edit, expand or collapse the run list of a node.
 
 {{< figure src="/images/automate/run-list-of-a-node.png" alt="Run List of a Node">}}
 
-Chef Infra allows you to edit the run list of a node by following the steps below:
+Edit a run list by:
 
 1. Select **edit** option. A popup window opens.
 
