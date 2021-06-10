@@ -69,7 +69,6 @@ func (db *DB) GetUserSettings(name string, connector string) (*user_settings.Get
 
 func (db *DB) PutUserSettings(name string, connector string,
 	settings map[string]*user_settings.UserSettingValue) (*user_settings.PutUserSettingsResponse, error) {
-	logrus.Infof("MAKING IT SO")
 	jsonString, err := json.Marshal(settings)
 	if err != nil {
 		return nil, err
