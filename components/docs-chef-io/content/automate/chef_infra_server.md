@@ -389,7 +389,7 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 #### Reset a Node Key
 
-You can reset the key of a node by selecting the **Reset Key** option from the ellipses icon of a specific node in the node list. Selecting the option opens a warning popup specifying that the current key will no longer be accepted. Select **Reset Key** once again to confirm. The popup looks like:
+Reset a node key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm. 
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Node Key">}}
 
