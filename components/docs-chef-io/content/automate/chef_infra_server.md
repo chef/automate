@@ -361,7 +361,7 @@ Edit a run list by:
 
 1. Select **edit**. A popup window opens.
 
-2. The left section the window contains the list of environment of the nodes. Select any one environment from the list.
+2. The left side of the window contains the list of environments. Select an environment from the list.
 
 3. The right section of the window will show the current run list of the selected environment.
 
