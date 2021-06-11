@@ -265,8 +265,11 @@ export class TelemetryService {
   }
 
   private retrieveSegmentWriteKey() {
+    const headers = new HttpHeaders()
+      .set('content-type', 'application/json')
+      .set('Access-Control-Allow-Origin', '*');
     return this.httpClient.get(this.telemetryUrl + '/segment/api_keys',
-     { params: { unfiltered: 'true' }}); // don't pass 'projects' header
+     { headers, params: { unfiltered: 'true' }}); // don't pass 'projects' header
   }
 
   // ISO 8601 formatted date time
