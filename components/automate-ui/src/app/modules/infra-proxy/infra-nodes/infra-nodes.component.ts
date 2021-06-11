@@ -55,6 +55,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public total: number;
   public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
+  public deleting = false;
   public editRunlistModalVisible = new EventEmitter<boolean>();
 
   // edit run list
@@ -106,6 +107,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
         this.total = NodesState?.total;
         this.nodesListLoading = false;
         this.searching = false;
+        this.deleting = false;
       } else if (getNodesSt === EntityStatus.loadingFailure) {
         this.nodesListLoading = false;
         this.authFailure = true;
@@ -211,6 +213,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+    this.deleting = true;
   }
 
   openResetKeyModal(name: string) {

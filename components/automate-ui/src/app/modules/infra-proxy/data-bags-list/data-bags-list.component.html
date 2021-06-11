@@ -21,7 +21,7 @@
       </app-infra-search-bar>
       <chef-button data-cy="create-databag-button" primary (click)="openCreateModal()">Create Data Bag</chef-button>
     </div>   
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner> 
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner> 
     <chef-table *ngIf="dataBags.length" id="databags-table-container" data-cy="databags-table-container">
       <chef-thead *ngIf="!searchFlag || serachArr.length">
         <chef-tr class="no_border_tr">
