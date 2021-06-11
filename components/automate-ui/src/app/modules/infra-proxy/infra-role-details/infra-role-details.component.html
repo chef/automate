@@ -81,7 +81,8 @@
               <chef-button
                 tertiary
                 class="float-right action"
-                (click)="openEditModal(role?.default_attributes, 'Run List')">
+                (click)="openEditModal(role?.default_attributes, 'Run List')"
+                [disabled]="editDisabled">
                 <span class="material-icons edit-item">mode_edit</span>
                 <span class="edit-text">Edit</span>
               </chef-button>
@@ -108,7 +109,8 @@
                   tertiary
                   class="float-right action"
                   (click)="openEditModal(role?.default_attributes, 'Run List')"
-                  data-cy="edit-runlist">
+                  data-cy="edit-runlist"
+                  [disabled]="editDisabled">
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
                 </chef-button>
