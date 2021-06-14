@@ -10,7 +10,7 @@ describe('infra node detail', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const nodeName = 'node-learn_chef_apache2';
+  const nodeName = 'node-692057300';
   let environment = '';
   const nullJson = '{}';
   const validJson = '{"test":"test"}';
@@ -202,7 +202,7 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option').contains('chef-environment-').click();
+      cy.get('.scrollable-content .ng-option').contains('chef-environment-47').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
 

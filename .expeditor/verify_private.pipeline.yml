@@ -454,7 +454,7 @@ steps:
   - label: "cypress :cypress:"
     command:
       - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 45
     retry:
       automatic:
         limit: 2

@@ -214,7 +214,7 @@ steps:
   - label: "cypress (flaky included) :cypress:"
     command:
       - FLAKY=yes integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 35
+    timeout_in_minutes: 45
     soft_fail: true
     expeditor:
       secrets: &cypress_secrets
