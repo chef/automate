@@ -20,11 +20,11 @@ var (
 	// The postgresql URL is coming from the environment variable POSTGRESQL_URL
 	postgresqlUrl = os.Getenv("POSTGRESQL_URL")
 
-	secretsDb = createDatabaseObject()
+	db = createDatabaseObject()
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
-	suite = NewSuite(secretsDb)
+	suite = NewSuite(db)
 
 	// A global CfgMgmt Server instance to call any rpc function
 	//
@@ -32,7 +32,7 @@ var (
 	// ```
 	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
 	// ```
-	secretsServer = server.New(secretsDb)
+	userSettingsServer = server.New(db)
 )
 
 func createDatabaseObject() *dao.DB {
