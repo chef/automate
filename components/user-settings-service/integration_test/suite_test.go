@@ -20,7 +20,7 @@ type Suite struct {
 func NewSuite(db *postgres.DB) *Suite {
 	s := new(Suite)
 
-	err := db.Ping()
+	err := db.Db.Ping()
 	if err != nil {
 		fmt.Printf("Could not connect to postgresql'%s'\n", err)
 		os.Exit(1)

@@ -2,10 +2,11 @@ package integration_test
 
 import (
 	"context"
+	"github.com/chef/automate/api/external/secrets"
 	"testing"
 
 	"github.com/chef/automate/api/external/common/query"
-	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/user_settings"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +14,7 @@ func TestCreateSecretEmpty(t *testing.T) {
 	ctx := context.Background()
 	req := new(secrets.Secret)
 
-	_, err := secretsServer.Create(ctx, req)
+	_, err := userSettings.Create(ctx, req)
 
 	assert.Error(t, err)
 }

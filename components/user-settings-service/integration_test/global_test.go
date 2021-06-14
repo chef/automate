@@ -1,8 +1,3 @@
-//
-//  Author:: Salim Afiune <afiune@chef.io>
-//  Copyright:: Copyright 2017, Chef Software Inc.
-//
-
 package integration_test
 
 import (
@@ -10,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/components/secrets-service/config"
-	"github.com/chef/automate/components/secrets-service/dao"
-	"github.com/chef/automate/components/secrets-service/server"
+	"github.com/chef/automate/components/user-settings-service/pkg/config"
+	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
+	"github.com/chef/automate/components/user-settings-service/pkg/server"
 )
 
 // Global variables
@@ -32,14 +27,15 @@ var (
 	// ```
 	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
 	// ```
-	userSettingsServer = server.New(db)
+	secretsServer = server.New(db)
 )
 
-func createDatabaseObject() *dao.DB {
+func createDatabaseObject() *postgres.DB {
 	connectionString := "postgresql://secrets@" + postgresqlUrl +
 		"/secrets_service?sslmode=verify-ca&sslcert=/hab/svc/secrets-service/config/service.crt&sslkey=/hab/svc/secrets-service/config/service.key&sslrootcert=/hab/svc/secrets-service/config/root_ca.crt"
-	postgresConfig := config.Postgres{ConnectionString: connectionString, MigrationsPath: "/src/components/secrets-service/dao/migration/sql"}
-	db, err := dao.New(&postgresConfig, "75e79c17ae62445e9771cd13fc4216f4")
+	postgresConfig := config.Postgres{URI: connectionString, SchemaPath: "/src/components/user-settings-service/pkg/storage/postres/schema/sql"}
+	//db, err := postgres.Connect(&postgresConfig, "75e79c17ae62445e9771cd13fc4216f4")
+	db, err := postgres.Connect(&postgresConfig)
 	if err != nil {
 		fmt.Printf("Could not create postgresql client from '%s': %s\n", connectionString, err)
 		os.Exit(1)
