@@ -274,6 +274,10 @@ Once the user has provided a username and password at the sign in screen, Chef A
 
 Chef Automate supports defining permissions for LDAP users and their groups. See [IAM members and policies]({{< ref "iam_v2_overview.md#members-and-policies" >}}).
 
+#### Default Session Timout {#ldap-default-session-timeout}
+
+The default session timeout for LDAP connection is 3minutes
+
 #### Connect
 
 Chef Automate first needs to establish a TCP connection to your LDAP service, secured by TLS.

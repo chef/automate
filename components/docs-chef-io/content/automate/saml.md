@@ -189,3 +189,7 @@ These values are accepted for `name_id_policy_format`:
  - `urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos`
  - `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
  - `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`
+
+#### Default Session Timeout {#saml-default-session-timeout}
+
+The default session timeout for LDAP connection is 24hours.

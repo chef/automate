@@ -46,6 +46,8 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Log.Level = w.String("info")
 
+	c.V1.Sys.Expiry.IdTokens = w.String("1h")
+
 	return c
 }
 

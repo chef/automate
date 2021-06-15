@@ -452,6 +452,20 @@ Configuration to sign out users from Chef Automate when they close the browser.
   persistent = false
 ```
 
+
+#### Setting up Web UI Session Timeout
+
+Default timeout for Local Users is 24 hour.
+Check [SAML]({{< relref "saml.md#saml-default-session-timeout" >}}) and [LDAP]({{< relref "ldap.md#ldap-default-session-timeout" >}}) Configuration for other connectors.
+Web UI Session timeout can be set by patching the following configuration:
+
+```toml
+[dex.v1.sys.expiry]
+  # This can set the expiry time of id_token
+  # Valid time units are "s"(second), "m"(minute), "h"(hour)
+  id_tokens = "1h"
+```
+
 ### Troubleshooting
 
 Common syntax errors may cause issues in configuration files:
