@@ -363,23 +363,25 @@ Edit a run list by:
 
 2. The left side of the window contains the list of environments. Select an environment from the list.
 
-3. The right section of the window will show the current run list of the selected environment.
+3. The right side of the window will show the run list for the selected environment.
 
-4. Select the run list you want for the specific environment and select **Create**.
+4. Select the run list for a specific environment.
 
-The popup window looks like as shown below:
+5. Select **Create**.
+
+This opens a pop-up window similar to:
 
 {{< figure src="/images/automate/edit-run-list.png" alt="Edit Run List">}}
 
-Chef Infra allows you to edit the run list of a node using a shortcut. Select the option **Edit Run List** from the ellipses icon of the specific node in the node list. Selecting the option will open the same popup window which can be used to edit the run list of a node.
+You can find the editing window directly by selecting **Edit Run List** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting the option opens a pop-up for editing the run list.
 
 #### Manage Tags
 
-Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags by:
+Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags in two ways:
 
-- Selecting the node and add the tags from the text bar below the dropdown menu of environment.
+1. Selecting the node and add the tags from the text bar below the dropdown menu of environments.
 
-- Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
+2. Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
