@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/external/common/query"
-	//"github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 )
 
