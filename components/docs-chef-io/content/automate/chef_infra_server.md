@@ -248,7 +248,7 @@ To delete a data bag item, select **Delete**. In the dialog box displayed, selec
 
 #### Delete a Data Bag
 
-Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h">}} and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-data-bag.png" alt="Delete a Data Bag">}}
 
@@ -373,7 +373,7 @@ This opens a pop-up window similar to:
 
 {{< figure src="/images/automate/edit-run-list.png" alt="Edit Run List">}}
 
-You can find the editing window directly by selecting **Edit Run List** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting the option opens a pop-up for editing the run list.
+You can find the editing window directly by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Edit Run List**  of a specific node in the node list. Selecting the option opens a pop-up for editing the run list.
 
 #### Manage Tags
 
@@ -381,19 +381,19 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 1. Selecting the node and add the tags from the text bar below the dropdown menu of environments.
 
-2. Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
+2. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Manage Tags** for a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
 #### Reset a Client Key
 
-Reset a client key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
+Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Client Key">}}
 
 #### Delete a Node
 
-Delete individual existing nodes by selecting the ellipses {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
+Delete individual existing nodes by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
