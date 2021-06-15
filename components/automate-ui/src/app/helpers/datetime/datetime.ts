@@ -5,9 +5,14 @@ export class DateTime {
   // Wed, 03 Jul 2019 17:08:53 UTC
   public static readonly RFC2822: string = 'ddd, DD MMM YYYY HH:mm:ss [UTC]';
 
+  // Format for testing user setting timezone
+  public static readonly DEMO_MODE: string = 'ddd, DD MMM YYYY HH:mm:ss z Z';
+
   // Format for date display
   // Tue, 24 Sept 2019
   public static readonly CHEF_DATE_TIME: string = 'ddd, DD MMM YYYY';
+  // Tue, 24 Sept 2019 UTC
+  public static readonly CHEF_DATE_TIME_ZONE: string = 'ddd, DD MMM YYYY z';
 
   // Format for time display
   // 09:59
@@ -20,6 +25,10 @@ export class DateTime {
   // Format for short date display
   // 25 Oct 2019
   public static readonly CHEF_SHORT_DATE: string = 'DD MMM YYYY';
+
+  // Format for short date display with timezone
+  // 25 Oct 2019 UTC
+  public static readonly CHEF_SHORT_DATE_ZONE: string = 'DD MMM YYYY z';
 
   // Format for date labels in event feed graph
   // Tue, 24 Sept

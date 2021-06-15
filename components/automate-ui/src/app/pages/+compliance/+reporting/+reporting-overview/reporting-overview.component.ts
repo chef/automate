@@ -7,6 +7,7 @@ import {
   ReportDataService,
   ReportQuery
 } from '../../shared/reporting';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { union } from 'lodash/fp';
 import * as moment from 'moment/moment';
@@ -73,6 +74,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
+    public userPrefsService: UserPreferencesService,
     private route: ActivatedRoute,
     private router: Router
   ) {}

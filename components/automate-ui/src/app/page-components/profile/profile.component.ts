@@ -31,6 +31,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
 
+  aboutModalVisible = false;
+
   versionSub: Subscription;
 
   public licenseModalVisible = false;
@@ -87,9 +89,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.chefSessionService.logout('/', true /* don't skip signin method selection */);
   }
 
-  showWelcomeModal() {
+  showWelcomeModal(): void {
+    this.toggleAboutModal();
     this.welcomeModalComponent.showModal();
-    this.closeDropdown();
+  }
+
+  toggleAboutModal(): void {
+    this.aboutModalVisible = !this.aboutModalVisible;
   }
 
   toggleDropdown() {

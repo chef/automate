@@ -7,7 +7,6 @@ import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
@@ -43,9 +42,10 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public creatingToken = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
-
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public readonly RFC2822 = DateTime.RFC2822;
+
+  // user preferences timezone
+  public timezone: string;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -74,6 +74,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       projects: [[]],
       policies: [[]]
     });
+
   }
 
   ngOnInit() {

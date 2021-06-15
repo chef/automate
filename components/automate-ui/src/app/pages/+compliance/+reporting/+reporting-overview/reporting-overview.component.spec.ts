@@ -6,6 +6,7 @@ import { CookieModule } from 'ngx-cookie';
 import { of as observableOf } from 'rxjs';
 import * as moment from 'moment/moment';
 import { Router } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
@@ -27,7 +28,8 @@ describe('ReportingOverviewComponent', () => {
       imports: [
         RouterTestingModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({})
       ],
       declarations: [
         ReportingOverviewComponent

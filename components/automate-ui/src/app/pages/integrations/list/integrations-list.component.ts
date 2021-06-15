@@ -27,7 +27,7 @@ export class IntegrationsListComponent {
   private sort: string;
   private order: string;
 
-  public readonly RFC2822 = DateTime.RFC2822;
+  public readonly RFC2822 = DateTime.DEMO_MODE;
 
   constructor(
     private store: Store<NgrxStateAtom>,

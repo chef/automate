@@ -65,6 +65,7 @@ import { ProjectsFilterService } from './services/projects-filter/projects-filte
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
 import { TelemetryService } from './services/telemetry/telemetry.service';
+import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 
 // Requests
 import { AdminKeyRequests } from './entities/reset-admin-key/reset-admin-key.requests';
@@ -352,6 +353,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,
+    UserPreferencesRequests,
     SessionStorageService,
     TeamRequests,
     TelemetryService,

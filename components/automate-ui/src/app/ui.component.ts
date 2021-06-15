@@ -8,12 +8,16 @@ import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
+import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
+import { UserPreferencesService } from './services/user-preferences/user-preferences.service';
+import * as moment from 'moment/moment';
 
 @Component({
   selector: 'app-ui',
   templateUrl: './ui.component.html',
   styleUrls: ['./ui.component.scss']
 })
+
 export class UIComponent implements OnInit, AfterViewChecked {
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
@@ -33,12 +37,15 @@ export class UIComponent implements OnInit, AfterViewChecked {
 
   legacyFeatures: Array<Feature> = [];
   hideFullPage = true;
+  currentTime = moment.utc();
+  showTime = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
     public layoutFacade: LayoutFacadeService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    public userPrefsService: UserPreferencesService
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -71,5 +78,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
 
     // Initial call
     this.store.dispatch(new GetAllUserPerms());
+    this.store.dispatch(new GetUserPreferences());
   }
 }

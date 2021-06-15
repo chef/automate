@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import * as moment from 'moment/moment';
 
 import { EntityStatus } from '../../entities/entities';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -28,11 +27,6 @@ import {
   providedIn: 'root'
 })
 export class ServiceGroupsFacadeService {
-  // RFC2822 format like: Wed, 03 Jul 2019 17:08:53 UTC
-  // TODO @afiune we should move this to a common place where other
-  // components can use this time format
-  readonly RFC2822 = 'ddd, DD MMM YYYY, HH:mm:ss [UTC]';
-
   public serviceGroups$: Observable<ServiceGroup>;
   public serviceGroupsList$: Observable<ServiceGroup>;
 
@@ -111,11 +105,5 @@ export class ServiceGroupsFacadeService {
       default:
         return health;
     }
-  }
-
-  // format a timestamp to standardized RFC2822
-  public formatTimestamp(time: Date): string {
-    // Forcing UTC with custom RFC format
-    return moment.utc(time).format(this.RFC2822);
   }
 }

@@ -60,6 +60,7 @@ import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-c
 import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
+import * as userPreferencesEntity from './services/user-preferences/user-preferences.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
 
 import { LayoutActionTypes, UpdateSidebars } from './entities/layout/layout.actions';
@@ -130,6 +131,7 @@ export interface NgrxStateAtom {
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
+  userPreferences: userPreferencesEntity.UserPreferencesEntityState;
   userSelf: userSelfEntity.UserSelfEntityState;
 }
 
@@ -262,6 +264,7 @@ export const defaultInitialState = {
   desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
+  userPreferences: userPreferencesEntity.UserPreferencesEntityInitialState,
   userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
@@ -330,6 +333,7 @@ export const ngrxReducers = {
   desktops: desktopEntity.desktopEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
+  userPreferences: userPreferencesEntity.userPreferencesEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
 

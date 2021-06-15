@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { StoreModule } from '@ngrx/store';
 import {
   NodeDetailsService
 } from '../../services/node-details/node-details.service';
@@ -13,6 +14,9 @@ describe('RunSummaryComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        StoreModule.forRoot({})
+      ],
       declarations: [
         RunSummaryComponent,
         DatetimePipe,

@@ -33,7 +33,6 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
 
-
 @Component({
   templateUrl: './reporting.component.html',
   styleUrls: ['./reporting.component.scss'],
@@ -173,7 +172,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadFailed = false;
   endDate$: Observable<Date>;
   filters$: Observable<FilterC[]>;
-  ChefDateTime = DateTime.CHEF_DATE_TIME;
+  ChefDateTimeZone = DateTime.CHEF_DATE_TIME_ZONE;
 
   showSummary = false;
 

@@ -6,6 +6,7 @@ import {
 import * as moment from 'moment/moment';
 import { NodeRun } from '../../types/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-run-summary',
@@ -21,11 +22,12 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   public chartSucceeded;
   public chartFailed;
   public chartOther;
-  public RFC2822 = DateTime.RFC2822;
+  public DEMO_MODE = DateTime.DEMO_MODE;
   public ChefHoursMins = DateTime.CHEF_HOURS_MINS;
 
   constructor(
-    private eventService: NodeDetailsService
+    private eventService: NodeDetailsService,
+    public userPrefsService: UserPreferencesService
   ) { }
 
   ngAfterContentInit() {

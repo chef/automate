@@ -32,6 +32,7 @@ import {
 } from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 export type UserTabName = 'password' | 'details';
 
@@ -52,7 +53,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService
   ) { }
 
   ngOnInit(): void {
@@ -114,6 +116,20 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public handlePasswordInput(): void {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
   }
+
+  // only for testing development - will be removed before release
+  public handleTimeFormatChange(format: string): void {
+    this.userPrefsService.testUpdateUserTimeformat(format);
+  }
+
+  public handleGetPrefs() {
+    this.userPrefsService.getUserPreferences();
+  }
+
+  public handleUpdatePrefs(tz) {
+    this.userPrefsService.updateUserPreferences(tz);
+  }
+
 }
 
 abstract class UserDetails {
@@ -126,7 +142,9 @@ abstract class UserDetails {
   abstract showBreadcrumbs: boolean;
   abstract showPreviousPassword: boolean;
 
-  constructor(private store: Store<NgrxStateAtom>) {}
+  constructor(
+    private store: Store<NgrxStateAtom>
+    ) { }
 
   public savePassword(): void {
     this.saveSuccessful = false;

@@ -75,7 +75,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   public tooltipMessageFor = this.serviceGroupsFacade.tooltipMessageFor;
   public healthCheckStatus = this.serviceGroupsFacade.healthCheckStatus;
-  public formatTimestamp = this.serviceGroupsFacade.formatTimestamp;
   public timewizardMessage = this.serviceGroupsFacade.timewizardMessage;
 
   ngOnInit() {

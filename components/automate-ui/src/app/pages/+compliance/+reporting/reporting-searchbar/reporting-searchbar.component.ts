@@ -47,7 +47,7 @@ export class ReportingSearchbarComponent implements OnInit {
 
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<any>();
-  public CHEF_SHORT_DATE = DateTime.CHEF_SHORT_DATE;
+  public CHEF_SHORT_DATE_ZONE = DateTime.CHEF_SHORT_DATE_ZONE;
 
   filterTypesCategories = [];
   calendarMenuVisible = false;
@@ -521,5 +521,4 @@ export class ReportingSearchbarComponent implements OnInit {
     });
     this.suggestionsVisibleStream.next(true);
   }
-
 }

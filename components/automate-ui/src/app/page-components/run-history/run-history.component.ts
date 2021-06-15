@@ -9,6 +9,7 @@ import {
   RunInfo } from '../../types/types';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { HistorySelection } from '../../helpers/history-selection/history-selection';
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
 import { Subscription } from 'rxjs';
@@ -38,7 +39,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   nodeHistory: AbridgedNodeRun[];
   currentPage = 1;
   pageSize = 10;
-  RFC2822 = DateTime.RFC2822;
+  DEMO_MODE = DateTime.DEMO_MODE;
   // store enum as member to be able to access it via html templates
   selectedStatus = SelectedStatus;
   // store selection
@@ -52,7 +53,8 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private nodeHistoryStore: RunHistoryStore,
-    private nodeRunsService: NodeRunsService
+    private nodeRunsService: NodeRunsService,
+    public userPrefsService: UserPreferencesService
   ) { }
 
   ngOnInit() {
