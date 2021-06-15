@@ -125,7 +125,7 @@ You can edit the *default* and *override* attributes by selecting the **Edit** o
 
 #### Delete a Role
 
-Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-role.png" alt="Delete A Role">}}
 
@@ -248,7 +248,7 @@ To delete a data bag item, select **Delete**. In the dialog box displayed, selec
 
 #### Delete a Data Bag
 
-Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing data bag one at a time. To delete a data bag, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h">}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-data-bag.png" alt="Delete a Data Bag">}}
 
@@ -299,7 +299,7 @@ Selecting the _Reset Key_ shown in the above image opens a new dialog box which 
 
 #### Delete a Client
 
-Chef Infra Server lets you delete the existing clients one at a time. To delete a client, select the ellipses icon and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing clients one at a time. To delete a client, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-client.png" alt="Delete a Client">}}
 
@@ -393,7 +393,7 @@ Reset a client key by selecting **Reset Key** from the options list ( {{< fontaw
 
 #### Delete a Node
 
-Delete individual existing nodes by selecting the ellipses icon and then **Delete**:
+Delete individual existing nodes by selecting the ellipses {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
