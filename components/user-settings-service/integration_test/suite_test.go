@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/external/common/query"
-	"github.com/chef/automate/api/external/secrets"
+	//"github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 )
 
@@ -31,26 +31,26 @@ func NewSuite(db *postgres.DB) *Suite {
 
 // GlobalSetup is the place where you prepare anything that we need before
 func (s *Suite) GlobalSetup() {
-	deleteAllSecrets()
+	deleteAllUserSettings()
 }
 
 // GlobalTeardown is the place where you tear everything down after we have finished
 func (s *Suite) GlobalTeardown() {
-	deleteAllSecrets()
+	deleteAllUserSettings()
 }
 
-func deleteAllSecrets() {
-	secrets, _, err := secretsDb.GetSecrets("", secrets.Query_ASC, 0, 0, nil)
+func deleteAllUserSettings() {
+	err := db.TruncateTables()
 	if err != nil {
 		fmt.Printf("error clearing tables %v\n", err)
 	}
 
-	for _, secret := range secrets {
-		_, err := secretsDb.DeleteSecret(secret.Id)
-		if err != nil {
-			fmt.Printf("error deleting secret with ID %v error: %v\n", secret.Id, err)
-		}
-	}
+	//for _, secret := range secrets {
+	//	_, err := db.(secret.Id)
+	//	if err != nil {
+	//		fmt.Printf("error deleting secret with ID %v error: %v\n", secret.Id, err)
+	//	}
+	//}
 }
 
 func appendKvs(kvs ...*query.Kv) []*query.Kv {

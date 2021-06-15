@@ -1,13 +1,13 @@
 package integration_test
-
 import (
 	"fmt"
+	//"github.com/chef/automate/lib/tls/certs"
 	"os"
 	"testing"
 
 	"github.com/chef/automate/components/user-settings-service/pkg/config"
-	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 	"github.com/chef/automate/components/user-settings-service/pkg/server"
+	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 )
 
 // Global variables
@@ -27,12 +27,12 @@ var (
 	// ```
 	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
 	// ```
-	secretsServer = server.New(db)
+	userSettingsServer = server.New(db, db)
 )
 
 func createDatabaseObject() *postgres.DB {
-	connectionString := "postgresql://secrets@" + postgresqlUrl +
-		"/secrets_service?sslmode=verify-ca&sslcert=/hab/svc/secrets-service/config/service.crt&sslkey=/hab/svc/secrets-service/config/service.key&sslrootcert=/hab/svc/secrets-service/config/root_ca.crt"
+	connectionString := "postgresql://user_settings@" + postgresqlUrl +
+		"/user-settings_service?sslmode=verify-ca&sslcert=/hab/svc/user-settings-service/config/service.crt&sslkey=/hab/svc/user-settings-service/config/service.key&sslrootcert=/hab/svc/user-settings-service/config/root_ca.crt"
 	postgresConfig := config.Postgres{URI: connectionString, SchemaPath: "/src/components/user-settings-service/pkg/storage/postres/schema/sql"}
 	//db, err := postgres.Connect(&postgresConfig, "75e79c17ae62445e9771cd13fc4216f4")
 	db, err := postgres.Connect(&postgresConfig)
