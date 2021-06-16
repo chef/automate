@@ -100,38 +100,20 @@ var exampleValidationFailures = []struct {
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(
-			&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-			&query.Kv{Key: "AZURE_SUBSCRIPTION_ID", Value: "AZURE_SUBSCRIPTION_ID"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"})},
 		"Invalid data content for secret type 'azure'. AZURE_TENANT_ID not provided",
 	},
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(
-			&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"},
-			&query.Kv{Key: "AZURE_SUBSCRIPTION_ID", Value: "AZURE_SUBSCRIPTION_ID"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
 		"Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided",
 	},
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(
-			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"},
-			&query.Kv{Key: "AZURE_SUBSCRIPTION_ID", Value: "AZURE_SUBSCRIPTION_ID"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}, &query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
 		"Invalid data content for secret type 'azure'. AZURE_CLIENT_ID not provided",
-	},
-	{Secret{
-		Name: "name",
-		Type: "azure",
-		Data: appendKvs(
-			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-			&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
-		"Invalid data content for secret type 'azure'. AZURE_SUBSCRIPTION_ID not provided",
 	},
 	//chef-server
 	{Secret{
@@ -185,8 +167,7 @@ var exampleValidationSuccesses = []struct {
 		Type: "azure",
 		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
 			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"},
-			&query.Kv{Key: "AZURE_SUBSCRIPTION_ID", Value: "AZURE_SUBSCRIPTION_ID"})}},
+			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})}},
 	//chef-server
 	{Secret{
 		Name: "name",
