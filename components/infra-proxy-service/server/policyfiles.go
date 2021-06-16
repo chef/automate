@@ -178,7 +178,7 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 		return nil, err
 	}
 
-	err = c.client.Policies.Delete(req.Name)
+	_, err = c.client.Policies.Delete(req.Name)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
