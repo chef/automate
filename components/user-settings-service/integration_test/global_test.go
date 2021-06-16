@@ -1,4 +1,5 @@
 package integration_test
+
 import (
 	"fmt"
 	//"github.com/chef/automate/lib/tls/certs"
@@ -31,10 +32,11 @@ var (
 )
 
 func createDatabaseObject() *postgres.DB {
+	postgresqlUrl = "127.0.0.1:5432"
 	connectionString := "postgresql://user_settings@" + postgresqlUrl +
-		"/user-settings_service?sslmode=verify-ca&sslcert=/hab/svc/user-settings-service/config/service.crt&sslkey=/hab/svc/user-settings-service/config/service.key&sslrootcert=/hab/svc/user-settings-service/config/root_ca.crt"
+		"/chef_user_settings_service?sslmode=verify-ca&sslcert=/hab/svc/user-settings-service/config/service.crt&sslkey=/hab/svc/user-settings-service/config/service.key&sslrootcert=/hab/svc/user-settings-service/config/root_ca.crt"
 	postgresConfig := config.Postgres{URI: connectionString, SchemaPath: "/src/components/user-settings-service/pkg/storage/postres/schema/sql"}
-	//db, err := postgres.Connect(&postgresConfig, "75e79c17ae62445e9771cd13fc4216f4")
+	//db, err := postgres.Connect(&postgresConfig, "75e79cv7ae62445e9771cd13fc4216f4")
 	db, err := postgres.Connect(&postgresConfig)
 	if err != nil {
 		fmt.Printf("Could not create postgresql client from '%s': %s\n", connectionString, err)
