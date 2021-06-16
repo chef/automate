@@ -125,7 +125,7 @@ You can edit the *default* and *override* attributes by selecting the **Edit** o
 
 #### Delete a Role
 
-Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing roles one at a time. To delete a role, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-role.png" alt="Delete A Role">}}
 
@@ -299,7 +299,7 @@ Selecting the _Reset Key_ shown in the above image opens a new dialog box which 
 
 #### Delete a Client
 
-Chef Infra Server lets you delete the existing clients one at a time. To delete a client, select the ellipses icon and then **Delete**, as illustrated below:
+Chef Infra Server lets you delete the existing clients one at a time. To delete a client, select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**, as illustrated below:
 
 {{< figure src="/images/automate/delete-a-client.png" alt="Delete a Client">}}
 
@@ -363,35 +363,37 @@ Edit a run list by:
 
 2. The left side of the window contains the list of environments. Select an environment from the list.
 
-3. The right section of the window will show the current run list of the selected environment.
+3. The right side of the window will show the run list for the selected environment.
 
-4. Select the run list you want for the specific environment and select **Create**.
+4. Select the run list for a specific environment.
 
-The popup window looks like as shown below:
+5. Select **Create**.
+
+This opens a pop-up window similar to:
 
 {{< figure src="/images/automate/edit-run-list.png" alt="Edit Run List">}}
 
-Chef Infra allows you to edit the run list of a node using a shortcut. Select the option **Edit Run List** from the ellipses icon of the specific node in the node list. Selecting the option will open the same popup window which can be used to edit the run list of a node.
+You can find the editing window directly by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Edit Run List**  of a specific node in the node list. Selecting the option opens a pop-up for editing the run list.
 
 #### Manage Tags
 
-Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags by:
+Chef Infra allows you to manage tags of the environment. You can add or remove multiple tags in two ways:
 
-- Selecting the node and add the tags from the text bar below the dropdown menu of environment.
+1. Selecting the node and add the tags from the text bar below the dropdown menu of environments.
 
-- Selecting **Manage Tags** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
+2. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Manage Tags** for a specific node. Add and remove tags in tag editor and select **Update Tags** to save your changes.
 
 {{< figure src="/images/automate/manage-tags-from-ellipses-icon.png" alt="Manage Tags">}}
 
 #### Reset a Client Key
 
-Reset a client key by selecting **Reset Key** from the options list ( {{< fontawesome class="fas fa-ellipsis-h" >}}) of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
+Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Client Key">}}
 
 #### Delete a Node
 
-Delete individual existing nodes by selecting the ellipses icon and then **Delete**:
+Delete individual existing nodes by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
