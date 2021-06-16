@@ -23,7 +23,6 @@ const (
 	requiredAzureClientIDError             = "Invalid data content for secret type 'azure'. AZURE_CLIENT_ID not provided"
 	requiredAzureClientSecretError         = "Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided"
 	requiredAzureTenantIDError             = "Invalid data content for secret type 'azure'. AZURE_TENANT_ID not provided"
-	requiredAzureSubscriptionIDError       = "Invalid data content for secret type 'azure'. AZURE_SUBSCRIPTION_ID not provided" //
 	requiredGcpCredentialsJsonError        = "Invalid data content for secret type 'gcp'. GOOGLE_CREDENTIALS_JSON not provided"
 	requiredChefServerOrganizationKeyError = "Invalid data content for secret type 'chef-server'. A 'key' field is required"
 )
@@ -70,7 +69,6 @@ func (s *Secret) Validate() error {
 		errors = requiredField(kvMap["AZURE_CLIENT_ID"], requiredAzureClientIDError, errors)
 		errors = requiredField(kvMap["AZURE_CLIENT_SECRET"], requiredAzureClientSecretError, errors)
 		errors = requiredField(kvMap["AZURE_TENANT_ID"], requiredAzureTenantIDError, errors)
-		errors = requiredField(kvMap["AZURE_SUBSCRIPTION_ID"], requiredAzureSubscriptionIDError, errors)
 	case "gcp":
 		errors = requiredField(kvMap["GOOGLE_CREDENTIALS_JSON"], requiredGcpCredentialsJsonError, errors)
 		_, err := UnmarshalGcpServiceAcc(kvMap["GOOGLE_CREDENTIALS_JSON"])
