@@ -54,7 +54,7 @@ func GetAWSCreds(secret *secrets.Secret) awsec2.AwsCreds {
 	}
 }
 
-// GetAzureCreds returns clientID, clientSecret, tenantID
+// GetAzureCreds returns clientID, clientSecret, tenantID, subscriptionID
 func GetAzureCreds(secret *secrets.Secret) (string, string, string, string) {
 	clientID, clientSecret, tenantID, subscriptionID := "", "", "", ""
 	if secret != nil {
