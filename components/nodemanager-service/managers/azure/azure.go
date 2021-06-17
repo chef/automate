@@ -3,7 +3,6 @@ package azure
 import (
 	"context"
 	"fmt"
-	
 	"strings"
 	"time"
 
@@ -771,7 +770,6 @@ func (creds *Creds) SendRunCommandJob(ctx context.Context, job *types.InspecJob,
 		job.NodeStatus = types.StatusFailed
 		return errors.Wrap(err, "unable to get command status")
 	}
-
 	logrus.Infof("azure run command job for node %s status %s", job.NodeName, future.Status())
 	job.NodeStatus = types.StatusCompleted
 	return nil
