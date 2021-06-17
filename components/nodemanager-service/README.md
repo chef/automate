@@ -105,11 +105,11 @@ For azure managers,
 
 VM:
 
-   - The credential added must have key/values of AZURE_CLIENT_ID, AZURE_CLIENT_SECRET and AZURE_TENANT_ID.
+   - The credential added must have key/values of `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` and `AZURE_TENANT_ID`.
 
 API:
 
-  - The credential added must have key/values of AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID and AZURE_SUBSCRIPTION_ID.<br>
+  - The credential added must have key/values of `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` and `AZURE_SUBSCRIPTION_ID`.<br>
   **Note** : AZURE_SUBSCRIPTION_ID is optional
 
 `instance_credentials` is an ssh or winrm cred used to access the nodes.
