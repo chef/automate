@@ -102,7 +102,8 @@ To create a node manager instance, the user can call NodeManagerService.Create w
 For aws managers, the credential added must have key/values of `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.  Users running the binary in aws can use the environmental creds to connect to the sdk instead of the access creds, by simply leaving out credential data when creating the manager.
 
 For azure managers, the credential added must have key/values of `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`,`AZURE_SUBSCRIPTION_ID`.
-**Note :** `AZURE_SUBSCRIPTION_ID` is optional to add
+
+**Note :** If we are using azure-api we can add `AZURE_SUBSCRIPTION_ID`,its optional
 
 `instance_credentials` is an ssh or winrm cred used to access the nodes.
 
