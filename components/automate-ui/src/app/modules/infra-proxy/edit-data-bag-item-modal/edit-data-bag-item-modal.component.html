@@ -18,7 +18,7 @@
       </div>
       <div id="button-bar">
         <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-        <chef-button primary [disabled]="!updateForm?.valid || conflictError || itemAttrParseError || !updateForm.dirty"
+        <chef-button primary [disabled]="!updateForm?.valid || conflictError || itemAttrParseError || !updateForm.dirty || updating"
           id="edit-button" (click)="updateDataBagItem()">
           <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
           <span *ngIf="!updating">Save Item</span>

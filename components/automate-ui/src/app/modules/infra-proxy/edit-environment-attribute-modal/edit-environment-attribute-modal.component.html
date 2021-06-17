@@ -37,7 +37,7 @@
             id="create-default-button-object-modal"
             (click)="updateEnvironment()"
             [disabled]="defaultAttrParseError || !defaultAttributeForm?.valid ||
-              !defaultAttributeForm.dirty || conflictError">
+              !defaultAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -73,7 +73,7 @@
             id="create-override-button-object-modal"
             (click)="updateEnvironment()"
             [disabled]="overrideAttrParseError || !overrideAttributeForm?.valid ||
-              !overrideAttributeForm.dirty || conflictError">
+              !overrideAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -97,7 +97,7 @@
             primary
             id="create-constraints-button-object-modal"
             (click)="updateEnvironment()"
-            [disabled]="!isConstraints || conflictError || cookbookVersionError">
+            [disabled]="!isConstraints || conflictError || cookbookVersionError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>

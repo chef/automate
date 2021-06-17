@@ -30,7 +30,7 @@
       <div id="button-bar">
         <chef-button tertiary *ngIf="!created" (click)="closeCreateModal()">Cancel</chef-button>
         <chef-button tertiary *ngIf="created" (click)="closeCreateModal()">Close</chef-button>
-        <chef-button primary *ngIf="!created" [disabled]="!createForm?.valid || error || conflictError"
+        <chef-button primary *ngIf="!created" [disabled]="!createForm?.valid || error || conflictError || creating"
           id="create-button-object-modal" (click)="createClient()">
           <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
           <span *ngIf="!creating">Create</span>

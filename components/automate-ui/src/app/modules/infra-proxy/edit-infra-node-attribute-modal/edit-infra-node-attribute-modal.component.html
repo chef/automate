@@ -40,7 +40,7 @@
           primary id="create-default-button-object-modal"
           (click)="updateNodeAttribute()"
           [disabled]="attrParseError || !attributeForm?.valid ||
-           !attributeForm.dirty || conflictError">
+           !attributeForm.dirty || conflictError || updateInProgress">
           <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
           <span *ngIf="updateInProgress">Saving...</span>
           <span *ngIf="!updateInProgress">Save</span>

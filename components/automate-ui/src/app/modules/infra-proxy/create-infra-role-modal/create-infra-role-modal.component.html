@@ -83,7 +83,7 @@
           <div class="button-bar-box">
             <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-run-list-button">Cancel</chef-button>
             <chef-button
-              [disabled]="!selectedRunList?.length || conflictError"
+              [disabled]="!selectedRunList?.length || conflictError || creating"
               primary
               id="create-button-object-modal-1"
               (click)="createRole()"
@@ -112,7 +112,7 @@
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-default-attribute-button">Cancel</chef-button>
               <chef-button
-                [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError"
+                [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError || creating"
                 primary
                 id="create-button-object-modal-2"
                 (click)="createRole()"
@@ -143,7 +143,7 @@
             <div class="button-bar-box">
               <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-override-attribute-button">Cancel</chef-button>
               <chef-button
-                [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError"
+                [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError || creating"
                 primary
                 id="create-button-object-modal-3"
                 (click)="createRole()"

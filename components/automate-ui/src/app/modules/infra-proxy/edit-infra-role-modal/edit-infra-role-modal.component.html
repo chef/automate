@@ -37,7 +37,7 @@
             (click)="updateInfrarole()"
             data-cy="update-default-attribute"
             [disabled]="defaultAttrParseError || !defaultAttributeForm?.valid ||
-              !defaultAttributeForm.dirty || conflictError">
+              !defaultAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -75,7 +75,7 @@
             data-cy="update-override-attribute"
             [disabled]="
               overrideAttrParseError || !overrideAttributeForm?.valid ||
-              !overrideAttributeForm.dirty || conflictError">
+              !overrideAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -99,7 +99,7 @@
             id="create-runlist-button-object-modal"
             (click)="updateInfrarole()"
             data-cy="update-run-list"
-            [disabled]="!isRunlist || conflictError">
+            [disabled]="!isRunlist || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
