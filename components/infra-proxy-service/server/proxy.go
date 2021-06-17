@@ -72,7 +72,6 @@ func (c *ChefClient) SearchObjectsWithDefaults(searchIndex string, searchQuery *
 	if result.Start != 0 {
 		result.Start = result.Start / perPage
 	}
-
 	return &result, nil
 }
 

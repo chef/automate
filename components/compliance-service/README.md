@@ -114,6 +114,8 @@ To run the azure-related tests, you'll need the following env vars:
  - AZURE_CLIENT_ID
  - AZURE_CLIENT_SECRET
  - AZURE_TENANT_ID
+ - AZURE_SUBSCRIPTION_ID is optional to mention.
+
 These credentials can be found in LastPass under "inspec azure test creds".  The azure tests will automatically get skipped if you do not have these env vars set.
 
 When the test command is run, the ruby grpc code is generated and the GRPC function is called against that with the request (see https://github.com/chef/automate/components/compliance-service/blob/master/api/tests/run.rb#L316.

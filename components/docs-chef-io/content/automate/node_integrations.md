@@ -156,11 +156,12 @@ We do not support Azure Government Cloud.
 When creating an Azure VM Node Manager, you will be required to provide:
 
 1. A name for your manager
-1. Your Azure credentials (client ID, client secret, and tenant ID)
+2. Your Azure credentials (client ID, client secret, subscriptionID and tenant ID)
+3. SubscriptionID is optional
 
 This information is required to detect the nodes in your Azure account. Chef Automate creates a nodes reference for each VM in your account, reading in all tags associated with each instance. Chef Automate detects your nodes immediately after any update to the Node Manager in order to maintain a current list of your node status. The following example uses a tag with the key 'Name' and the value 'vj-' to associate those nodes with the 'ssh ec2' credential.
 
-![Chef Automate Create Azure-VM Manager](/images/automate/create-azure-vm-mgr.png)
+![Chef Automate Create Azure-VM Manager](/images/automate/Node-Integrations-Azure.png)
 
 Chef Automate uses Azure's RunCommand functionality to run scan jobs on instances without needing `ssh` and `WinRM` credentials. In order for this functionality to work, the Automate instance must be reachable (open to incoming traffic) from the instances being scanned.
 
