@@ -9,7 +9,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CookieModule } from 'ngx-cookie';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, APP_INITIALIZER } from '@angular/core';
 import { environment } from '../environments/environment';
 
 // ngrx/store
@@ -201,8 +201,11 @@ import {
 } from './page-components/telemetry-checkbox/telemetry-checkbox.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
-
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
+
+// Warning Banner
+import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 @NgModule({
   declarations: [
@@ -261,7 +264,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TelemetryCheckboxComponent,
     TopNavLandingComponent,
     UIComponent,
-    WelcomeModalComponent
+    WelcomeModalComponent,
+    WarningBannerComponent
   ],
   imports: [
     ApiTokenModule,
@@ -356,7 +360,18 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
-    UserRequests
+    UserRequests,
+    // Initilization for warning banner component
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => {
+        return () => {
+          return appConfigService.loadAppConfig();
+        };
+      }
+    }
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

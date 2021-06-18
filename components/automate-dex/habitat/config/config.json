@@ -15,5 +15,11 @@
 {{~#if cfg.expiry}}
 "expiry": {{ toJson cfg.expiry}},
 {{ ~/if }}
+{{~#if cfg.disclosure}}
+"login_disclosure": {{ toJson cfg.disclosure}},
+{{ ~/if }}
+{{~#if cfg.banner}}
+"banner": {{ toJson cfg.banner}},
+{{ ~/if }}
 "__placeholder": {}
 }

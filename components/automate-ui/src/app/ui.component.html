@@ -19,6 +19,7 @@
   
   <!-- App Header -->
   <div id="app-header-wrapper" [hidden]="!layoutFacade.layout.header.display">
+    <app-warning-banner *ngIf="showBanner"></app-warning-banner>
     <app-license-notifications (triggerApplyLicense)="licenseApplyModal.openModal();"></app-license-notifications>
     <app-navbar></app-navbar>
   </div>

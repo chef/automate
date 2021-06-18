@@ -20,6 +20,11 @@ html, body {
   font-weight: 400;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 button, div.dex-btn {
     background-color: #3864f2;
     color: #fff;
@@ -102,13 +107,6 @@ main.password {
   margin-top: 10px;
 }
 
-.theme-panel {
-  text-align: center;
-  position: relative;
-  top: 40%;
-  transform: translateY(-50%);
-}
-
 .theme-body {
   font-family: 'Source Sans Pro', Helvetica, sans-serif;
 }
@@ -176,4 +174,51 @@ main.password {
   position: relative;
   text-align: left;
   width: 250px;
+}
+
+.warning-text {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.theme-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 2;
+}
+
+.signin-login-container {
+  padding-top: 1em;
+  text-align: center;
+}
+
+.disclosure {
+  margin-top: 30px;
+  padding: 2em;
+  width: 90%;
+  max-width: 588px;
+  min-width: 279px;
+  max-height: 350px;
+  border: 2px solid #E6EBEE;
+  border-radius: 4px;
+  overflow-y: scroll;
+}
+
+.disclosure h3 {
+  margin-top: 0;
+}
+
+/* Force the scrollbars to show for UX */
+.disclosure::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+.disclosure::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }

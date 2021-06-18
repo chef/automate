@@ -2,18 +2,29 @@
 <!-- rendered using https://golang.org/pkg/html/template/-->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{{ issuer }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ url .ReqPath "static/main.css" }}" rel="stylesheet">
-    <link href="{{ url .ReqPath "theme/styles.css" }}" rel="stylesheet">
-  </head>
-  <body>
-    <main class="theme-panel">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>{{ issuer }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href='{{ url .ReqPath "static/main.css" }}' rel="stylesheet">
+  <link href='{{ url .ReqPath "theme/styles.css" }}' rel="stylesheet">
+</head>
+
+<body>
+  {{ if eq ("showBanner" | extra) "true" }}
+  <div class="warning-banner" style='background-color: #{{ "bannerBackgroundColor" | extra }}'>
+    <p class="warning-text" style='color: #{{ "bannerTextColor" | extra }}'>
+      {{ "bannerMessage" | extra }}
+    </p>
+  </div>
+  {{ end }}
+  <div class="theme-panel" role="main">
+    <div class="signin-login-container">
       <div class="logo">
-        <img class="theme-navbar__logo" alt="Chef Automate" src="{{url .ReqPath "static/img/automate-blue-d9789f4b.svg" }}">
+        <img class="theme-navbar__logo" alt="Chef Automate"
+          src='{{url .ReqPath "static/img/automate-blue-d9789f4b.svg" }}'>
       </div>
       <h1>User Sign In</h1>
       <div>
@@ -21,17 +32,37 @@
         <div class="theme-form-row">
           <a href="{{ $c.URL }}" target="_self">
             <div class="dex-btn theme-btn-provider">
-                <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
-                {{ if eq $c.ID "local" }}
-                <span class="dex-btn-text">Sign in as a local user</span>
-                {{ else }}
-                <span class="dex-btn-text">Sign in with {{ $c.Name }}</span>
-                {{ end }}
+              <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
+              {{ if eq $c.ID "local" }}
+              <span class="dex-btn-text">Sign in as a local user</span>
+              {{ else }}
+              <span class="dex-btn-text">Sign in with {{ $c.Name }}</span>
+              {{ end }}
             </div>
           </a>
-        {{ end }}
+          {{ end }}
+        </div>
       </div>
     </div>
-    </main>
-  </body>
+  </div>
+  {{ if eq ("showDisclosure" | extra) "true" }}
+  <div class="disclosure">
+    <h3>{{ "disclosureTitle" | extra }}</h3>
+    <div id="disclosure"></div>
+  </div>
+  {{ end }}
+
+  <script>
+    const populateDisclaimer = () => {
+      const show = '{{ "showDisclosure" | extra }}';
+      if (show !== 'true') return;
+
+      const d = '{{ "disclosureMessage" | extra }}';
+      document.getElementById('disclosure').innerHTML = d;
+    }
+
+    populateDisclaimer();
+  </script>
+</body>
+
 </html>
