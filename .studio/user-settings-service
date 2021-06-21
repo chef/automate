@@ -79,7 +79,20 @@ function user_settings_grpcurl_put_user_settings() {
 	  chef.automate.domain.user_settings.service.UserSettingsService.PutUserSettings
 }
 
+document "user_settings_grpcurl_delete_user_settings" <<DOC
+  Hits the get user settings endpoint inside the user-settings-service. (GetUserSettings)
 
+  @(arg:1) name of user to get settings for
+  @(arg:2) connector of user to get settings for
+
+  Example: Get the user settings for the user id uid1
+  -----------------------------
+  user_settings_grpcurl_get_user_settings uid1
+DOC
+function user_settings_grpcurl_delete_user_settings() {
+  chef-automate dev grpcurl user-settings-service -- -d '{"user": {"name": "'"$1"'", "connector": "'"$2"'"}}' \
+	  chef.automate.domain.user_settings.service.UserSettingsService.DeleteUserSettings
+}
 
 
 

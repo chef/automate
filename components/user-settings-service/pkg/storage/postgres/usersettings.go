@@ -86,3 +86,12 @@ func (db *DB) PutUserSettings(name string, connector string,
 		},
 	}, nil
 }
+
+func (db *DB) DeleteUserSettings(name string, connector string) error {
+	_, err := db.Exec(deleteUserSettings, name, connector)
+	if err != nil {
+		return errors.Wrapf(err, "DeleteUserSettings unable to delete user settings for user: %s connector: %s",
+			name, connector)
+	}
+	return nil
+}
