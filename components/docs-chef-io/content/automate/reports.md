@@ -94,6 +94,28 @@ Deep filtering supports filtering for:
 - one profile
 - one profile and one of its associated controls
 
+In order to narrow the data to only one profile, we must use profile_id. The reason that profile_name doesn't suffice here is that we may have different versions of profile_name. Filtering by profile_id guarantees that we are querying with exactly one profile. We require this singularity of profile because we don't do the various stats aggregations at a granular level when computing stats, as doing so would be very slow, due to the number of reports in the system.
+
+Similarly, for control level narrowing of stats, we require that exactly one control be included in the filter and that control must be a child of one single profile (again, included as profile_id and not profile_name)
+
+in summary deep filtering works as follows:
+
+Rules for profile depth:
+
+    exactly one profile in the filter, specified as profile_id
+    no controls allowed in the filter
+    any of the other supported reporting filters may also be included without any constraints on their respective quantities
+
+Rules for control depth:
+
+    exactly one profile in the filter, specified as profile_id
+    exactly one control in the filter that must be a child of the specified profile in rule 1
+    any of the other supported reporting filters may also be included without any constraints on their respective quantities
+
+*N.B. profile and control depth rules differ only by the second rule
+
+Anything not conforming to the rules above will yield report depth
+
 ### Waivers
 
 A node's waived status appears if applicable in displays where a node's status appears in Chef Automate.
