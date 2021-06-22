@@ -56,9 +56,11 @@ The application provides several roles appropriate for integration, which can be
 
 These roles are part of the package. Users can create their requisite roles and controls if any further restrictions are required.
 
-#### Role x\_chef\_automate.
+#### Role x\_chef\_automate.admin
 
-This role can be assigned to a user other than a Systems administrator to allow administration of the application properties and logs. Thus, administration can be carried out by a user who is not the system administrator. Note that a systems administrator can perform all tasks that an `x\_chef\_autoamte.admin` role can.
+This role can be assigned to a user other than a Systems administrator to allow administration of the application properties and logs. Thus, administration can be carried out by a user who is not the system administrator. 
+
+Note that a systems administrator can perform all tasks that an `x\_chef\_autoamte.admin` role can. In addition, the Admin role is added by default in ServiceNow and is not part of the app.
 
 The `admin` role grants a user access to the:
 
