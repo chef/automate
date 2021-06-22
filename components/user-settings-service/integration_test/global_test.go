@@ -13,16 +13,13 @@ import (
 
 // Global variables
 var (
-	// The postgresql URL is coming from the environment variable POSTGRESQL_URL
-	postgresqlUrl = os.Getenv("POSTGRESQL_URL")
-
 	db = createDatabaseObject()
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
 	suite = NewSuite(db)
 
-	// A global CfgMgmt Server instance to call any rpc function
+	// A global User Settings Server instance to call any rpc function
 	//
 	// From any test you can directly call:
 	// ```
@@ -32,9 +29,12 @@ var (
 )
 
 func createDatabaseObject() *postgres.DB {
-	postgresqlUrl = "127.0.0.1:5432"
-	connectionString := "postgresql://user_settings@" + postgresqlUrl +
-		"/chef_user_settings_service?sslmode=verify-ca&sslcert=/hab/svc/user-settings-service/config/service.crt&sslkey=/hab/svc/user-settings-service/config/service.key&sslrootcert=/hab/svc/user-settings-service/config/root_ca.crt"
+	connectionString := "postgresql://user-settings@localhost:5432/chef_user_settings_service" +
+		"?sslmode=verify-ca" +
+		"&sslcert=/hab/svc/user-settings-service/config/service.crt" +
+		"&sslkey=/hab/svc/user-settings-service/config/service.key" +
+		"&sslrootcert=/hab/svc/user-settings-service/config/root_ca.crt"
+
 	postgresConfig := config.Postgres{URI: connectionString, SchemaPath: "/src/components/user-settings-service/pkg/storage/postres/schema/sql"}
 	//db, err := postgres.Connect(&postgresConfig, "75e79cv7ae62445e9771cd13fc4216f4")
 	db, err := postgres.Connect(&postgresConfig)
