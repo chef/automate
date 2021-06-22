@@ -262,7 +262,7 @@ Follow these steps to configure the `Chef Automate integration from ServiceNow`:
 
 1. Navigate to the **Chef Automate** menu.
 2. Select the **Automate instances** module.
-1. Click the button to create a new Automate instance.
+1. Click the **Submit** button to create a new Automate instance.
 1. Enter the following details:
 - Name - a unique name for the integration.
 - URL - URL of the Chef Automate instance.
@@ -278,7 +278,7 @@ Follow these steps to configure the Chef Automate integration from the `Chef Aut
 
 1. Navigate to the **Settings** menu.
 1. Click the **Data Feeds** link from the **General** settings.
-1. Click the button to create a Data Feed.
+1. Click the **Create Data Feed** button to create a Data Feed.
 1. Enter the following details:
 - Name - a unique name for the integration.
 - Data Feed URL – URL of the ServiceNow application Datafeed API ending `api/x\_chef\_automate/asset`.
