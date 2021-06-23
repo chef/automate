@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service ReportingService {
-	rpc ListReports(Query) returns (Reports) {};
+	rpc ListReports(Query) returns (ReportsSummaryLevelOne) {};
 	rpc ListReportIds(Query) returns (ReportIds) {};
 	rpc ReadReport(Query) returns (Report) {};
 	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {};
