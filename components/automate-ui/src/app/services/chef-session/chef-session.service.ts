@@ -47,7 +47,7 @@ export class ChefSessionService implements CanActivate {
   constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
-    window.onload = function() {
+    window.onload = () => {
       this.idleLogout();
     }
     this.tokenProvider = new ReplaySubject(1);
@@ -204,7 +204,7 @@ export class ChefSessionService implements CanActivate {
 
 
 
-  public idleLogout(): void {
+  idleLogout(): void {
     var idleTime = 0;
     // Increment the idle time counter 3 sec.
     setInterval(timerIncrement, 3000); // 3 sec
