@@ -24,7 +24,7 @@ Chef Automate platform let's you manage application which helps in speed up your
 
 The Disclosure Panel looks like:
 
-IMAGE
+{{< figure src="/images/automate/disclosure-panel-in-chef-automate.png" width="500" alt="Disclosure Panel in Chef Automate">}}
 
 To add a Disclosure Panel to the login page, follow the instructions given below:
 
@@ -41,10 +41,12 @@ To add a Disclosure Panel to the login page, follow the instructions given below
   [global.v1.disclosure]
     show = true # Set the value of `show` to `true` to enable the disclosure panel in the login page
     message_file_path = "/src/dev/disclosure-panel-message.txt" # The `.txt` file containing the message of the panel
+
+    # check your HTML validation at https://validator.w3.org/
 ```
 
 {{< note >}}
-To disable (default value) the disclosure panel, set the value of `show` to **true**.
+To disable (default value) the disclosure panel, set the value of `show` to **false**.
 {{< /note >}}
 
 ## Banner
@@ -53,7 +55,7 @@ To disable (default value) the disclosure panel, set the value of `show` to **tr
 
 The Banner looks like:
 
-IMAGE
+{{< figure src="/images/automate/banner-in-chef-automate.png" width="500" alt="Banner in Chef Automate Interface">}}
 
 To add a Banner to Chef Automate, follow the instructions given below:
 
@@ -70,8 +72,11 @@ To add a Banner to Chef Automate, follow the instructions given below:
     text_color = "FFF" # Set the color of the text using the Hex Color Code (Do not add # to the code)
 
     # Find valid HEX codes at https://htmlcolorcodes.com/
-    # check your HTML validation at https://validator.w3.org/
 ```
+
+{{< note >}}
+To disable (default value) the banner, set the value of `show` to **false**.
+{{< /note >}}
 
 {{< note >}}
 The Banner can display only one message, warning or an instruction throughout the interface.
