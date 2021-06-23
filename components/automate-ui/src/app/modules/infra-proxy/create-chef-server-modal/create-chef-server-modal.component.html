@@ -108,7 +108,7 @@
         </chef-form-field>
       </div>
       <div id="button-bar">
-        <chef-button id="cancel-server-popup" tertiary (click)="closeEvent()">Cancel</chef-button>
+        <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeEvent()">Cancel</chef-button>
         <chef-button [disabled]="!createForm?.valid || creating || conflictError"
           primary
           data-cy="add-button"

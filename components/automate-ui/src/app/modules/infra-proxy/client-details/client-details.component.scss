@@ -116,12 +116,6 @@ img {
     background: $chef-white;
     border-bottom: 0.5px solid $chef-key-tab;
     text-align: right;
-
-    ::ng-deep {
-      chef-button button:focus {
-        outline: 0.5px solid $chef-primary-bright;
-      }
-    }
   }
 
   .key-tab-head {

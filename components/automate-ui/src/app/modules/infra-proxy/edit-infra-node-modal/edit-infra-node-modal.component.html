@@ -24,7 +24,7 @@
           </app-select-box>
         </div>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()" data-cy="cancel-button">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()" data-cy="cancel-button">Cancel</chef-button>
           <chef-button
             primary
             id="create-runlist-button-object-modal"
