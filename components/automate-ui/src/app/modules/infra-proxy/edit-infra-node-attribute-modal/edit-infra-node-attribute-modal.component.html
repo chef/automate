@@ -33,6 +33,7 @@
         <chef-button 
           data-cy="cancel-attribute-button"
           tertiary
+          [disabled]="updateInProgress"
           (click)="closeEditModal()">
           Cancel
         </chef-button>

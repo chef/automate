@@ -34,7 +34,7 @@
 
         <div id="button-bar">
           <chef-button tertiary id="cancel-data-bag-item-popup"
-          (click)="closeCreateModal()">Cancel</chef-button>
+          [disabled]="creating" (click)="closeCreateModal()">Cancel</chef-button>
           <chef-button [disabled]="!createForm?.valid || creating || conflictError || creating"
           primary id="create-button-object-modal" (click)="createDataBagItem()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>

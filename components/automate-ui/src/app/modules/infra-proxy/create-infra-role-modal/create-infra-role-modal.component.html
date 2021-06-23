@@ -54,7 +54,7 @@
               </chef-form-field>
             </div>
             <div class="button-bar-box">
-              <chef-button tertiary (click)="closeCreateModal()"  data-cy="cancel-button">Cancel</chef-button>
+              <chef-button tertiary [disabled]="creating" (click)="closeCreateModal()"  data-cy="cancel-button">Cancel</chef-button>
               <chef-button
                 [disabled]="!detailsFormGroup?.valid || conflictError || creating"
                 primary
@@ -81,7 +81,7 @@
             </app-select-box>
           </div>
           <div class="button-bar-box">
-            <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-run-list-button">Cancel</chef-button>
+            <chef-button tertiary [disabled]="creating" (click)="closeCreateModal()" data-cy="cancel-run-list-button">Cancel</chef-button>
             <chef-button
               [disabled]="!selectedRunList?.length || conflictError || creating"
               primary
@@ -110,7 +110,8 @@
               </chef-error>
             </chef-form-field>
             <div class="button-bar-box">
-              <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-default-attribute-button">Cancel</chef-button>
+              <chef-button tertiary [disabled]="creating"
+               (click)="closeCreateModal()" data-cy="cancel-default-attribute-button">Cancel</chef-button>
               <chef-button
                 [disabled]="!defaultAttrFormGroup?.valid || conflictError || defaultAttrParseError || creating"
                 primary
@@ -141,7 +142,8 @@
               </chef-error>
             </chef-form-field>
             <div class="button-bar-box">
-              <chef-button tertiary (click)="closeCreateModal()" data-cy="cancel-override-attribute-button">Cancel</chef-button>
+              <chef-button tertiary [disabled]="creating" (click)="closeCreateModal()"
+                data-cy="cancel-override-attribute-button">Cancel</chef-button>
               <chef-button
                 [disabled]="!overrideAttrFormGroup?.valid || conflictError || overrideAttrParseError || creating"
                 primary

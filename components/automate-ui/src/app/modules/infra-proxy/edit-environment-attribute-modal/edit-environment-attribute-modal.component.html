@@ -31,7 +31,7 @@
           </div>
         </form>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-default-button-object-modal"
@@ -67,7 +67,7 @@
           </div>
         </form>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-override-button-object-modal"
@@ -92,7 +92,7 @@
           [selectedCookbookNames]="selectedCookbookNames">
         </app-infra-environment-constraint>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-constraints-button-object-modal"
