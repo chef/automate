@@ -2,29 +2,41 @@
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
-    <div class="empty-section" *ngIf="!policyFiles.length">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p>No policy files available</p>
     </div>
-    <chef-table *ngIf="policyFiles.length">
-      <chef-thead>
-        <chef-tr class="no_border_tr">
-          <chef-th class="no_border_th">Name</chef-th>
-          <chef-th class="no_border_th">Group of Policies </chef-th>
-          <chef-th class="no_border_th"></chef-th>
-          <chef-th class="no_border_th"></chef-th>
-          <chef-th class="no_border_th"></chef-th>
-        </chef-tr>
-      </chef-thead>
-      <chef-tbody>
-        <chef-tr *ngFor="let policyFile of policyFiles">
-          <chef-td>{{ policyFile.name }}</chef-td>
-          <chef-td>{{ policyFile.policy_group }}</chef-td>
-          <chef-td></chef-td>
-          <chef-td></chef-td>
-          <chef-td></chef-td>
-        </chef-tr>
-      </chef-tbody>
-    </chef-table>
+    <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
+      <chef-table>
+        <chef-thead>
+          <chef-tr class="no_border_tr">
+            <chef-th class="no_border_th">
+              <chef-checkbox></chef-checkbox>
+            </chef-th>
+            <chef-th class="no_border_th">Name</chef-th>
+            <chef-th class="no_border_th">Revision ID</chef-th>
+            <chef-th class="no_border_th"></chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr *ngFor="let policyFile of pageOfItems">
+            <chef-td>
+              <chef-checkbox></chef-checkbox>
+            </chef-td>
+            <chef-td>{{ policyFile.name }}</chef-td>
+            <chef-td>{{ policyFile.revision_id }}</chef-td>
+            <chef-td></chef-td>
+            <chef-td class="three-dot-column"></chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+    </div>
+    <app-pagination
+      [items]="policyFiles"
+      class="policy-file-list-paging"
+      label="name"
+      (changePage)="onChangePage($event)">
+    </app-pagination>
   </ng-container>
 </section>

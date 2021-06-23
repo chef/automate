@@ -40,6 +40,7 @@ import { InfraTabChangeComponent } from './infra-tab-change/infra-tab-change.com
 import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.component';
 import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
+import { PaginationComponent } from './pagination/components/pagination.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
@@ -90,6 +91,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     InfraTabChangeComponent,
     OrgDetailsComponent,
     OrgEditComponent,
+    PaginationComponent,
     PolicyFilesComponent,
     ResetAdminKeyComponent,
     ResetClientKeyComponent,

@@ -30,6 +30,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyFilesListLoading = true;
   public authFailure = false;
+  pageOfItems: Array<any>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -60,6 +61,11 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
 
   resetKeyTabRedirection(resetLink: boolean) {
     this.resetKeyRedirection.emit(resetLink);
+  }
+
+  onChangePage(pageOfItems: Array<any>) {
+    // update current page of items
+    this.pageOfItems = pageOfItems;
   }
 
   ngOnDestroy(): void {
