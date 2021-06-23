@@ -13,6 +13,10 @@ import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
+window.onload = function() {
+  idleLogout();
+  }
+
 const USE_DEFAULT_SESSION = environment.use_default_session;
 
 export interface ChefSessionUser {
@@ -196,6 +200,33 @@ export class ChefSessionService implements CanActivate {
     localStorage.setItem(this.userTelemetryStorageKey(), this.booleanToString(isOptedIn));
     if (this.user) {
       this.user.telemetry_enabled = isOptedIn;
+    }
+  }
+
+
+
+  public idleLogout(): void {
+    var idleTime = 0;
+    // Increment the idle time counter 3 sec.
+    setInterval(timerIncrement, 3000); // 3 sec
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer;  // catches touchscreen presses as well
+    window.ontouchstart = resetTimer; // catches touchscreen swipes as well
+    window.onclick = resetTimer;      // catches touchpad clicks as well
+    window.onkeydown = resetTimer;
+    window.addEventListener('scroll', resetTimer, true);
+
+    function resetTimer() {
+      idleTime = 0;
+    }
+
+    function timerIncrement() {
+      idleTime = idleTime + 1;
+      if (idleTime > 2) { // 6 sec
+          console.log('logout')
+          // window.location.reload();
+      }
     }
   }
 
