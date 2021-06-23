@@ -74,7 +74,7 @@ To add a Banner to Chef Automate, follow the instructions given below:
   [global.v1.banner]
     show = true # Set the value of `show` to `true` to enable the banner
     # The default value of show is `false`.
-    
+
     message = "Lorem ipsum dolor sit amet" # Add the Message for the banner
     background_color = "3864f2" # Set the background color using the Hex Color Code (Do not add # to the code)
     text_color = "FFF" # Set the color of the text using the Hex Color Code (Do not add # to the code)
