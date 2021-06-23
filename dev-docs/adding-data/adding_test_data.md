@@ -110,6 +110,11 @@ there are four options...
 1. Ensure Chef Infra Server is running. If it is not start it with `start_chef_server`
 1. Then run `converge_policyfile_chef_client`
 
+## Adding multiple policyfiles sample data 
+1. Ensure Chef Infra Server is running. If it is not start it with `start_chef_server`
+1. First you need to run `infra_service_load_sample_data`
+1. Then run `load_policy_files_sample_data`
+
 # DELETING DATA
 
 to delete the postgres scanjobs data:
