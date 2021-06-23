@@ -11,6 +11,7 @@ INSERT INTO user_settings (user_name, connector, settings)
 VALUES ('_default', 'local',
         '{
           "date_format": {
+            "default_value": "ddd, DD MMM YYYY",
             "value": "ddd, DD MMM YYYY",
             "enabled": true,
             "valid_values": [
@@ -27,6 +28,7 @@ ON CONFLICT ON CONSTRAINT user_settings_user_name_and_connector
     DO UPDATE
     SET settings='{
       "date_format": {
+        "default_value": "ddd, DD MMM YYYY",
         "value": "ddd, DD MMM YYYY",
         "enabled": true,
         "valid_values": [

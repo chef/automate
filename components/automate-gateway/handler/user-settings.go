@@ -33,3 +33,17 @@ func (s *UserSettingsServiceServer) GetUserSettings(ctx context.Context, in *ext
 	}
 	return out, nil
 }
+
+func (s *UserSettingsServiceServer) PutUserSettings(ctx context.Context, in *external_user_settings.PutUserSettingsRequest) (*external_user_settings.PutUserSettingsResponse, error) {
+	inDomain := &user_settings.PutUserSettingsRequest{}
+	out := &external_user_settings.PutUserSettingsResponse{}
+	f := func() (proto.Message, error) {
+		return s.client.PutUserSettings(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+
+}

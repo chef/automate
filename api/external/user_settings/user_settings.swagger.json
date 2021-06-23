@@ -46,6 +46,49 @@
         "tags": [
           "UserSettingsService"
         ]
+      },
+      "put": {
+        "summary": "PutUserSettings upserts all of the preferences for a given user",
+        "operationId": "UserSettingsService_PutUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.connector",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserSettingsService"
+        ]
       }
     }
   },
@@ -61,6 +104,30 @@
           "additionalProperties": {
             "$ref": "#/definitions/chef.automate.api.user_settings.UserSettingValue"
           }
+        }
+      }
+    },
+    "chef.automate.api.user_settings.PutUserSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User",
+          "description": "ID of the user. Cannot be changed. Used to sign in."
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/chef.automate.api.user_settings.UserSettingValue"
+          },
+          "description": "The user settings to persist."
+        }
+      }
+    },
+    "chef.automate.api.user_settings.PutUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
         }
       }
     },
