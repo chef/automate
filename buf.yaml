@@ -5,7 +5,7 @@
 # This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
 # use `lint_all_protobuf_components` in the habitat studio.
 #
-# ## References:
+# ## References: 
 # 
 # - Style Guide: https://buf.build/docs/style-guide/
 # - Docs for individual checkers: https://buf.build/docs/lint-checkers
