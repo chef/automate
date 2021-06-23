@@ -30,6 +30,10 @@ To add a Disclosure Panel to the login page, follow the instructions given below
 
 - Create a `.txt` file and save to a location where the Chef Automate can track it.
 
+{{< note >}}
+You can create the file in any format which will be readable by Chef Automate. For example, `.html`, `.txt`.
+{{< /note >}}
+
 - In the `.txt` file, you can write the message or the information you want to add to the disclosure panel.
 
 - Create a patch file and save it in the `.toml` file format.
@@ -39,7 +43,9 @@ To add a Disclosure Panel to the login page, follow the instructions given below
 ```toml
 [global.v1]
   [global.v1.disclosure]
-    show = true # Set the value of `show` to `true` to enable the disclosure panel in the login page
+    show = true # Set the value of `show` to `true` to enable the disclosure panel in the login page.
+    # The default value of show is `false`.
+
     message_file_path = "/src/dev/disclosure-panel-message.txt" # The `.txt` file containing the message of the panel
 
     # check your HTML validation at https://validator.w3.org/
@@ -67,6 +73,8 @@ To add a Banner to Chef Automate, follow the instructions given below:
 [global.v1]
   [global.v1.banner]
     show = true # Set the value of `show` to `true` to enable the banner
+    # The default value of show is `false`.
+    
     message = "Lorem ipsum dolor sit amet" # Add the Message for the banner
     background_color = "3864f2" # Set the background color using the Hex Color Code (Do not add # to the code)
     text_color = "FFF" # Set the color of the text using the Hex Color Code (Do not add # to the code)
