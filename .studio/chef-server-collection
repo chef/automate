@@ -412,10 +412,9 @@ document "generate the sample policyfiles data" <<DOC
   Create the multiple sample policyfiles.
 DOC
 function load_policy_files_sample_data() {
-  chef_server_policyfile_rb_path="/tmp/.policyfile.rb"
   for i in {1..50}; do
-    name="examplecb_${i}"
-    echo ${name}
+    name="examplecb-${i}"
+
     cat << EOH > ${chef_server_policyfile_rb_path}
 log_location           STDOUT
 chef_server_url        'https://${chef_server_hostname}/organizations/${chef_server_test_org_name}'
