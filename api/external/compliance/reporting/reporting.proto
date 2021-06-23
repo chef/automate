@@ -40,7 +40,7 @@ service ReportingService {
 	compliance:reports:list
 	```
 	*/
-	rpc ListReports(Query) returns (Reports) {
+	rpc ListReports(Query) returns (ReportsSummaryLevelOne) {
 		option (google.api.http) = {
 			post: "/api/v0/compliance/reporting/reports"
 			body: "*"
@@ -285,7 +285,7 @@ service ReportingService {
 		};
 	};
 
-	rpc LicenseUsageNodes(TimeQuery) returns (Reports) {
+	rpc LicenseUsageNodes(TimeQuery) returns (LicenseUsageNodesReports) {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:licenseusage"
 			action: "compliance:reportingLicenseUsage:list"
@@ -418,25 +418,63 @@ message ControlSummary {
 	Total  waived = 5;
 }
 
+//LicenseUsageNodesReports used for LicenseUsageNodes call
+message LicenseUsageNodesReports {
+	// Paginated results of summary level reports matching the filters.
+	repeated LicenseUsageNodesReport reports = 1;
+	// Total number of reports matching the filters.
+	int32 total = 2;
+}
+
+message LicenseUsageNodesReport {
+	// A unique report identifier.
+	string id = 1;
+	// The compliance scan job ID associated with the report.
+	string job_id = 2;
+	// The reporting node's unique ID.
+	string node_id = 3;
+	// The reporting node name.
+	string node_name = 4;
+	// The environment of the node making the report.
+	string environment = 5;
+	// The platform of the nodes making the report.
+	Platform platform = 6;
+	// The time that the report was completed.
+	google.protobuf.Timestamp end_time = 7;
+	// The status of the run the report was made from.
+	string status = 8;
+}
+
+//ReportsSummaryLevelOne used for ListReports call
+message ReportsSummaryLevelOne {
+	// Paginated results of summary level reports matching the filters.
+	repeated ReportSummaryLevelOne reports = 1;
+	// Total number of reports matching the filters.
+	int32 total = 2;
+}
+
+message ReportSummaryLevelOne {
+	// A unique report identifier.
+	string id = 1;
+	// The reporting node's unique ID.
+	string node_id = 2;
+	// The reporting node name.
+	string node_name = 3;
+	// The time that the report was completed.
+	google.protobuf.Timestamp end_time = 4;
+	// The status of the run the report was made from.
+	string status = 5;
+	// Intentionally blank.
+	ControlSummary controls = 6;
+	// The reporting node IP address.
+	string ipaddress = 7;
+}
+
 message Reports {
 	// Paginated results of reports matching the filters.
 	repeated Report reports = 1;
 	// Total number of reports matching the filters.
 	int32 total = 2;
-}
-
-message ReportIds {
-	// The list of unique report identifiers found matching the query.
-	repeated string ids = 1;
-	// The list of unique report identifiers with their respective end_time, found matching the query.
-	repeated ReportData report_data = 2;
-}
-
-message ReportData{
-	// The report run_uuid
-	string id = 1;
-	// The time in UTC that the scan was completed
-	google.protobuf.Timestamp end_time = 2;
 }
 
 message Report {
@@ -481,6 +519,22 @@ message Report {
 	// The status message of the report.
 	string status_message = 21;
 }
+
+message ReportIds {
+	// The list of unique report identifiers found matching the query.
+	repeated string ids = 1;
+	// The list of unique report identifiers with their respective end_time, found matching the query.
+	repeated ReportData report_data = 2;
+}
+
+message ReportData{
+	// The report run_uuid
+	string id = 1;
+	// The time in UTC that the scan was completed
+	google.protobuf.Timestamp end_time = 2;
+}
+
+
 
 message Profile {
 	// The name of the profile. Must be unique.

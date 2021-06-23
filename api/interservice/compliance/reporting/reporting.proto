@@ -86,18 +86,40 @@ message ControlItems {
 	ControlSummary control_summary_totals = 2;
 }
 
+message LicenseUsageNodesReports {
+	repeated LicenseUsageNodesReport reports = 1;
+	int32 total = 2;
+}
+
+message LicenseUsageNodesReport {
+	string id = 1;
+	string job_id = 2;
+	string node_id = 3;
+	string node_name = 4;
+	string environment = 5;
+	Platform platform = 6;
+	google.protobuf.Timestamp end_time = 7;
+	string status = 8;
+}
+
+message ReportsSummaryLevelOne {
+	repeated ReportSummaryLevelOne reports = 1;
+	int32 total = 2;
+}
+
+message ReportSummaryLevelOne{
+	string id = 1;
+	string node_id = 2;
+	string node_name = 3;
+	google.protobuf.Timestamp end_time = 4;
+	string status = 5;
+	ControlSummary controls = 6;
+	string ipaddress = 7;
+}
+
 message Reports {
 	repeated Report reports = 1;
 	int32 total = 2;
-}
-message ReportIds {
-	repeated string ids = 1;
-	repeated ReportData report_data = 2;
-}
-
-message ReportData{
-	string id = 1;
-	google.protobuf.Timestamp end_time = 2;
 }
 
 message Report {
@@ -122,6 +144,17 @@ message Report {
 	repeated string projects = 20;
 	string status_message = 21;
 }
+
+message ReportIds {
+	repeated string ids = 1;
+	repeated ReportData report_data = 2;
+}
+
+message ReportData{
+	string id = 1;
+	google.protobuf.Timestamp end_time = 2;
+}
+
 message Profile {
 	string name = 1;
 	string title = 2;

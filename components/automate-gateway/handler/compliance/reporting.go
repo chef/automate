@@ -49,9 +49,9 @@ func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.ControlI
 }
 
 // should cover /reports
-func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
+func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*reporting.ReportsSummaryLevelOne, error) {
 	inDomain := &reportingService.Query{}
-	out := &reporting.Reports{}
+	out := &reporting.ReportsSummaryLevelOne{}
 	f := func() (proto.Message, error) {
 		return a.client.ListReports(ctx, inDomain)
 	}
@@ -170,7 +170,7 @@ func (a *Reporting) GetVersion(ctx context.Context, in *gp.Empty) (*version.Vers
 
 // LicenseUsageNodes gathers information about scanned nodes (as initiated by scan jobs)
 // for owca billing purposes
-func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQuery) (*reporting.Reports, error) {
+func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQuery) (*reporting.LicenseUsageNodesReports, error) {
 	logrus.Infof("making request with start time %s", in.GetStartTime())
 	// convert start time to time.Time for later use
 	startTime, err := ptypes.Timestamp(in.GetStartTime())
@@ -189,7 +189,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 	}
 	logrus.Debugf("found jobs %+v", jobsList)
 
-	reports := make([]*reporting.Report, 0)
+	reports := make([]*reporting.LicenseUsageNodesReport, 0)
 	// for each job, query compliance reporting with job_id filter, get nodes
 	for _, job := range jobsList.GetIdsWithTime() {
 		translatedTime, err := ptypes.Timestamp(job.EndTime)
@@ -202,7 +202,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 		}
 		logrus.Debugf("LicenseUsageNodes found %d nodes ", len(nodesList))
 
-		nodesListNoAPIScans := make([]*reporting.Report, 0)
+		nodesListNoAPIScans := make([]*reporting.LicenseUsageNodesReport, 0)
 		// go through the list of nodes found, add to return object if
 		// 1) node (environment) != aws-api or azure-api
 		// 2) end time is after start time
@@ -212,7 +212,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 				return nil, errors.Wrap(err, "unable to parse timestamp")
 			}
 			if node.Environment != "aws-api" && node.Environment != "azure-api" && endTime.After(startTime) {
-				nodesListNoAPIScans = append(nodesListNoAPIScans, &reporting.Report{
+				nodesListNoAPIScans = append(nodesListNoAPIScans, &reporting.LicenseUsageNodesReport{
 					Id:          node.GetLatestReport().GetId(),
 					JobId:       job.Id,
 					NodeId:      node.GetId(),
@@ -228,7 +228,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 		reports = append(reports, nodesListNoAPIScans...)
 	}
 	logrus.Debugf("found license usage nodes %+v", reports)
-	return &reporting.Reports{Reports: reports, Total: int32(len(reports))}, nil
+	return &reporting.LicenseUsageNodesReports{Reports: reports, Total: int32(len(reports))}, nil
 }
 
 func (a *Reporting) getAllNodes(ctx context.Context, jobId string, end_time string) ([]*reporting.Node, error) {
