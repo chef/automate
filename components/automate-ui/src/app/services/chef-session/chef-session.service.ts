@@ -13,10 +13,6 @@ import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
-window.onload = function() {
-  idleLogout();
-  }
-
 const USE_DEFAULT_SESSION = environment.use_default_session;
 
 export interface ChefSessionUser {
@@ -51,6 +47,9 @@ export class ChefSessionService implements CanActivate {
   constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    window.onload = function() {
+      idleLogout();
+    }
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
       this.setDefaultSession();
