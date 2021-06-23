@@ -34,6 +34,16 @@ func DefaultGlobalConfig() *GlobalConfig {
 			Mlsa: &Mlsa{
 				Accept: w.Bool(true),
 			},
+			Disclosure: &Disclosure{
+				Show:            w.Bool(false),
+				MessageFilePath: w.String(""),
+			},
+			Banner: &Banner{
+				Show:            w.Bool(false),
+				Message:         w.String(""),
+				BackgroundColor: w.String("#3864f2"), // Chef Success blue
+				TextColor:       w.String("#FFFFFF"), // White
+			},
 		},
 	}
 }

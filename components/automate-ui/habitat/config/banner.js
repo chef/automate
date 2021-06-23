@@ -1,0 +1,1 @@
+{{ toJson cfg.banner }}

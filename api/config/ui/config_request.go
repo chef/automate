@@ -16,6 +16,7 @@ func NewConfigRequest() *ConfigRequest {
 				Ngx: &ConfigRequest_V1_System_Nginx{
 					Http: &ConfigRequest_V1_System_Nginx_Http{},
 				},
+				Banner: &ConfigRequest_V1_Banner{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -34,6 +35,11 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
+
+	c.V1.Sys.Banner.Show = w.Bool(false)
+	c.V1.Sys.Banner.Message = w.String("")
+	c.V1.Sys.Banner.BackgroundColor = w.String("3864f2") // Chef Success blue
+	c.V1.Sys.Banner.TextColor = w.String("FFFFFF")
 	return c
 }
 
@@ -71,5 +77,20 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToNginxLevel(logLevel)
+	}
+
+	if g.GetV1().GetBanner().GetShow() != nil {
+		c.V1.Sys.Banner.Show.Value = g.GetV1().GetBanner().GetShow().GetValue()
+		if bannerMessage := g.GetV1().GetBanner().GetMessage().GetValue(); bannerMessage != "" {
+			c.V1.Sys.Banner.Message.Value = bannerMessage
+		}
+
+		if textColor := g.GetV1().GetBanner().GetTextColor().GetValue(); textColor != "" {
+			c.V1.Sys.Banner.TextColor.Value = textColor
+		}
+
+		if backgroundColor := g.GetV1().GetBanner().GetBackgroundColor().GetValue(); backgroundColor != "" {
+			c.V1.Sys.Banner.BackgroundColor.Value = backgroundColor
+		}
 	}
 }

@@ -58,12 +58,11 @@ pipelines:
       env:
         - CHANNEL: dev
 
-promote:
-  channels:
-    - dev
-    - acceptance
-    - current
-    - stable
+artifact_channels:
+  - dev
+  - acceptance
+  - current
+  - stable
 
 staging_areas:
   - post_merge:

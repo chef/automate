@@ -189,16 +189,16 @@ describe('infra node detail', () => {
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
     });
 
-    it('can cancel the environemnt update', () => {
+    xit('can cancel the environemnt update', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-      cy.get('.ng-option').contains('chef-environment-885598100').click();
+      cy.get('.scrollable-content .ng-option').contains('chef-environment-88').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('#button-env [data-cy=cancel-button]').click();
       cy.get('[data-cy=change-confirm]').should(('not.be.visible'));
     });
 
-    it('can update the environemnt', () => {
+    xit('can update the environemnt', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
@@ -352,7 +352,7 @@ describe('infra node detail', () => {
       cy.get('.ng-arrow-wrapper').click();
       cy.get('.ng-dropdown-panel-items').should(('be.visible'));
 
-      cy.get('.ng-option').contains('chef-environment-5').click();
+      cy.get('.scrollable-content .ng-option').contains('chef-environment-5').click();
       cy.get('[data-cy=change-confirm]').should(('be.visible'));
       cy.get('[data-cy=save-button]').click();
       cy.get('.ng-value').contains('chef-environment-5');
