@@ -48,7 +48,7 @@ export class ChefSessionService implements CanActivate {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     window.onload = function() {
-      idleLogout();
+      this.idleLogout();
     }
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
