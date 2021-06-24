@@ -162,6 +162,7 @@ export class ChefSessionService implements CanActivate {
       id_token,
       isLocalUser
     };
+    this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
