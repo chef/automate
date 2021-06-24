@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 40
 +++
 ## Chef Automate Scoped Certified Application
-This guide aids you to set up a customer’s instance for enabling the population of CMDB data from each node being managed by Chef Automate in the customer’s estate. It also includes configuration management status and compliance management status.
+This guide aids you to set up a customer’s instance for enabling the population of CMDB [Configuration Management Database] data from each node being managed by Chef Automate in the customer’s estate. It also includes configuration management status and compliance management status.
 ## ServiceNow Integration
 The integration between a Chef Automate server and a ServiceNow instance requires the following:
 - Chef Automate Scoped Application
@@ -71,7 +71,7 @@ The role is suitable for users that require application access without administr
 - Logs module
 - Properties module
 - Support module
-Note that for integration with CMDB data you need to assign the `OOB ITIL` role.
+Note that for integration with CMDB data in ServiceNow, you need to assign the `OOB ITIL` role.
 #### Role x\_chef\_automate.api
 This role should be assigned to a user who is responsible for integrating the Chef automate data into the application. It is recommended that a new user is created specifically for this. This user’s credentials are required to configure the Chef automate server for communication with the application. Note that for integration with CMDB data you need to assign the `OOB ITIL` role. You need to select Web service access only for this user.
 #### References
