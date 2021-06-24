@@ -108,7 +108,7 @@ These 2 properties are used to set a maximum number of clients runs and complian
 The `x_chef_automate.chef.user` property is used to set up user’s ID or sys ID for inserting the data.
 #### Property x_chef_automate. logging.enabled
 The `x_chef_automate. logging.enabled` property is used for flagging the enable or disable logging. The default value is **No**.
-#### Property x_chef_automate.chef.default. status
+#### Property x_chef_automate.chef.default.status
 The `x_chef_automate.chef.default. status` property is used to set up the status of the service record as **inserted** or **updated**.
 #### Property x_chef_automate.logging.verbosity
 The `x_chef_automate.logging.verbosity` property debugs the data in ServiceNow. The possible values are:
@@ -190,7 +190,7 @@ The **Transformation** events occur during the process of transforming an impo
 - **PropertiesUtil:** Updates the role in the property.
 - **ImportUtil:** Updates the compliance import data.
 - **Util:** Updates manufacturer data in the core company table and updates the category and manufacturer data in the _CMDB model_ table.
-- 
+
 {{< figure src="/images/automate/snow_integration_transform_map_scripts1.png" alt="Script Includes">}}
 ## Chef Automate Configuration
 Chef Automate can be configured in two ways:
@@ -222,8 +222,8 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
    - Data Feed URL – URL of the ServiceNow application Datafeed API ending `api/x_chef_automate/asset`.
    - Chef Automate API token - an API token generated for Chef Automate with data-feed-service authorization.
    - ServiceNow user - a ServiceNow user with **ITIL** and `x_chef_automate.api` roles.
-   - ServiceNow password - Password for the ServiceNow user being set.
-   Note that the Data Feed URL is the ServiceNow application FQDN/api/x_chef_automate/asset e.g. <https://venxxx.service-now.com/api/x_chef_automate/asset>.
+   - ServiceNow password - Password for the ServiceNow user being set.<br  />
+   Note that the Data Feed URL is the ServiceNow application, `FQDN/api/x_chef_automate/asset`. For example,  <https://venxxx.service-now.com/api/x_chef_automate/asset>.
 1. Click the **Test Data Feed** button. This will check that the values are correct and that there is connectivity between Chef Automate and the ServiceNow application. A successful test shows the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues. 
 1. Click **Create Data Feed**. The configuration is saved.
    
@@ -232,7 +232,7 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
 In ServiceNow, the navigation of the application is through the **Chef Automate** menu.
 {{< figure src="/images/automate/snow_integration_navigation.png" alt="Navigation">}}
 
-The **Automate Instances** module allows the user to configure the integration with Chef Automate. The main module for navigation is the **Servers** module. The **Server** module displays a list of servers in the _CMDB_ module. The Chef Automate integration augments the existing CMDB servers and inserts new servers into CMDB. The application uses the ServiceNow discovery IRE (Identification and Reconciliation Engine) when inserting or updating servers.
+The **Automate Instances** module allows the user to configure the integration with Chef Automate. The main module for navigation is the **Servers** module. The **Server** module displays a list of servers in the _CMDB_ module. The Chef Automate integration augments the existing CMDB servers and inserts new servers into CMDB. The application uses the ServiceNow discovery IRE (Identification and Reconciliation Engine) when inserting or updating servers.<br  />
 In addition, the application updates the CMDB file systems and software installed tables, and adds related information on the servers form with related data from Chef Automate:
 - Client Runs
 - Attributes
@@ -241,7 +241,7 @@ In addition, the application updates the CMDB file systems and software installe
 From a server record, the user can drill down into **Client Run** detail by clicking the name on an individual Client Run. Client run record displays related information for:
 - Client run cookbooks - cookbooks executed during the client run.
 - Client run lists - run lists executed during the client run.
-- Client run recipes - recipes executed during the client run.
+- Client run recipes - recipes executed during the client run.<br  />
 Full Chef client run details are available for each server. Client runs are also available from the **Client Runs** module.
 ### Attributes
 From a server record, the user can drill down into the current server attributes detail by clicking on the attributes record. Full OHAI attributes are available for each server.
@@ -249,7 +249,7 @@ From a server record, the user can drill down into the current server attributes
 From a server record, the user can drill down into **Compliance** report detail by clicking the name on an individual **Compliance** report. Compliance report record displays related information for:
 - Compliance report profiles - all profiles executed during the compliance scan.
 - Compliance report results - all results from the compliance scan.
-In addition, the user can drill down into each **Compliance** report profile to view the individual results for each profile. Full Chef compliance report details are available for each server. Compliance reports are also available from the **Compliance** report module.
+In addition, the user can drill down into each **Compliance** report profile to view the individual results for each profile.<br  /> Full Chef compliance report details are available for each server. Compliance reports are also available from the **Compliance** report module.
 ## Uninstalling
 To uninstall the application:
 - In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
