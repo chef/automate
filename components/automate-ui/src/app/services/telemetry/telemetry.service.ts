@@ -79,7 +79,7 @@ export class TelemetryService {
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        if (this.chefSessionService.telemetry_enabled) {// || (this.telemetryEnabled && this.getTelemetryPrefFromLocalStorage())) {
+        if (this.chefSessionService.telemetry_enabled) {
           this.engageTelemetry(trackingOperations);
         }
       });
@@ -273,13 +273,5 @@ export class TelemetryService {
   private getCurrentDateTime() {
     return (new Date).toISOString();
   }
-
-  /*public getTelemetryPrefFromLocalStorage() {
-    const telemetryLocalStorageKey = this.chefSessionService.uuid + '-telemetry-enabled';
-    if(localStorage.getItem(telemetryLocalStorageKey) !== 'false') {
-      return true;
-    }
-    return false;
-  }*/
 
 }
