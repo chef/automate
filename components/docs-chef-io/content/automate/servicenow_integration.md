@@ -79,7 +79,7 @@ This role should be assigned to a user who is responsible for integrating the Ch
 - [Assigning roles in ServiceNow](https://docs.servicenow.com/bundle/madrid-platform-administration/page/administer/users-and-groups/task/t_AssignARoleToAUser.html)
 ### Application properties
 The application properties can be configured by users with `admin` or `x\_chef\_automate.admin` roles. Select the **Chef Automate** > **Properties** menu item to navigate to the **Properties** configuration UI.
-{{< figure src="/images/automate/snow_integration_appproperties.png)" alt="Chef Automate Properties">}}
+{{< figure src="/images/automate/snow_integration_appproperties.png" alt="Chef Automate Properties">}}
 The application system properties are:
 - x\_chef\_automate.Rest.api
 - x\_chef\_automate. insert\_manufacturer
@@ -157,6 +157,7 @@ Field maps establish a relationship between a field in an import set table and a
 | system\_class\_name | sys\_class\_name |
 | virtual | virtual |
 | [Script] | install\_status |
+
 {{< figure src="/images/automate/snow_integration_field_map.png" alt="Table Transaction Map">}}
 #### Transform Map Scripts
 The `Transformation` events occur during the process of transforming an import set table onto a target table. You can navigate to this script by selecting **Importing Data** >**Transform Event Scripts**.
@@ -211,10 +212,12 @@ Follow these steps to configure the Chef Automate integration from the `Chef Aut
    Note that the Data Feed URL is the ServiceNow application FQDN/api/x\_chef\_automate/asset e.g. <https://venxxx.service-now.com/api/x_chef_automate/asset>.
 1. Click the **Test Data Feed** button. This will check that the values are correct and that there is connectivity between Chef Automate and the ServiceNow application. A successful test shows the `service-now automate connectivity passed` message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues. 
 1. Click **Create Data Feed**. The configuration is saved.
+   
 {{< figure src="/images/automate/snow_integration_create_data_feed.png" alt="Create Data Feed">}}
 ## Navigation
 In ServiceNow, the navigation of the application is from the **Chef Automate** menu.
 {{< figure src="/images/automate/snow_integration_navigation.png" alt="Navigation">}}
+
 The **Automate Instances** module allows the user to configure the integration with Chef Automate. The main module for navigation is the **Servers** module. The **Server** module displays a list of servers in the `CMDB` module. The Chef Automate integration augments the existing CMDB servers and inserts new servers into CMDB. The application uses the ServiceNow discovery IRE (Identification and Reconciliation Engine) when inserting or updating servers.
 In addition, the application updates the CMDB file systems and software installed tables, and adds related information on the servers form with related data from Chef Automate:
 - Client Runs
