@@ -273,5 +273,4 @@ export class TelemetryService {
   private getCurrentDateTime() {
     return (new Date).toISOString();
   }
-
 }
