@@ -1,0 +1,35 @@
+<ng-container *ngIf="pager.pages && pager.pages.length > 1">
+  <chef-button secondary
+    class="page-picker-item page-picker-first"
+    (click)="setPage(1)"
+    [disabled]="pager.currentPage === 1">
+    <chef-icon>first_page</chef-icon>
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-prev"
+    (click)="setPage(pager.currentPage - 1)"
+    [disabled]="pager.currentPage === 1">
+    <chef-icon>chevron_left</chef-icon>
+  </chef-button>
+  <chef-button
+    *ngFor="let item of pager.pages;"
+    class="page-picker-item"
+    [attr.disabled]="pager.pages.length <=1"
+    [attr.primary]="item === pager.currentPage"
+    [attr.secondary]="item !== pager.currentPage"
+    (click)="setPage(item)">
+    {{ item }}
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-next"
+    (click)="setPage(pager.currentPage + 1)"
+    [disabled]="pager.currentPage === pager.totalPages">
+    <chef-icon>chevron_right</chef-icon>
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-last"
+    (click)="setPage(pager.totalPages)"
+    [disabled]="pager.currentPage === pager.totalPages">
+    <chef-icon>last_page</chef-icon>
+  </chef-button>
+</ng-container>
