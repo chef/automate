@@ -10,9 +10,6 @@
       <chef-table>
         <chef-thead>
           <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">
-              <chef-checkbox></chef-checkbox>
-            </chef-th>
             <chef-th class="no_border_th">Name</chef-th>
             <chef-th class="no_border_th">Revision ID</chef-th>
             <chef-th class="no_border_th"></chef-th>
@@ -21,9 +18,6 @@
         </chef-thead>
         <chef-tbody>
           <chef-tr *ngFor="let policyFile of pageOfItems">
-            <chef-td>
-              <chef-checkbox></chef-checkbox>
-            </chef-td>
             <chef-td>{{ policyFile.name }}</chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>
