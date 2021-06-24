@@ -98,6 +98,6 @@ message NamedRunList {
 }
 
 message DeletePolicyfile {
-    // Policyfile revision ID.
-    string revision_id = 1;
+    // Policyfile name.
+    string name = 1;
 }

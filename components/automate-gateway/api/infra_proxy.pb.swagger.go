@@ -3467,9 +3467,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.DeletePolicyfile": {
       "type": "object",
       "properties": {
-        "revision_id": {
+        "name": {
           "type": "string",
-          "description": "Policyfile revision ID."
+          "description": "Policyfile name."
         }
       }
     },

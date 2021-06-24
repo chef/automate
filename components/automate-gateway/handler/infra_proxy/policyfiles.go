@@ -130,6 +130,6 @@ func (a *InfraProxyServer) DeletePolicyfile(ctx context.Context, r *gwreq.Delete
 	}
 
 	return &gwres.DeletePolicyfile{
-		RevisionId: res.RevisionId,
+		Name: res.GetName(),
 	}, nil
 }

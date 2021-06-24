@@ -184,6 +184,6 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 	}
 
 	return &response.DeletePolicyfile{
-		RevisionId: req.GetName(),
+		Name: req.GetName(),
 	}, nil
 }
