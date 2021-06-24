@@ -107,25 +107,17 @@ tbody > .detail-row {
   font-size: 14px;
 }
 
-.expand-collapse {
-  border-bottom: 0.5px solid #CFD2D2;
+.expand-collapse.edited {
+  border-bottom: 0.5px solid $chef-key-tab;
   font-size: 14px;
   color: $royal-blue;
   margin-bottom: 10px;
-  padding-bottom: 10px;
+  padding: 4px 0;
   padding-left: 17px;
 
-  .action {
-    cursor: pointer;
-
-    &:first-child {
-      margin-right: 45px;
-    }
-
-    chef-icon {
-      position: relative;
-      top: 3px;
-    }
+  chef-button {
+    margin: 0;
+    height: 25px;
   }
 
 }
@@ -147,6 +139,7 @@ tbody > .detail-row {
     margin: 0;
     margin-left: 16px;
     height: 36px;
+    margin-top: 4px;
   }
 }
 
@@ -219,7 +212,7 @@ tbody > .detail-row {
 }
 
 .submenu .item-details {
-  padding: 15px;
+  padding: 0 15px 15px;
 }
 
 .accordion .submenu {
@@ -250,37 +243,15 @@ tbody > .detail-row {
 }
 
 .right-button-box {
-  cursor: pointer;
-  position: relative;
   float: right;
-}
 
-.edit-item {
-  font-size: 18px;
-  position: absolute;
-  right: 150px;
-}
-
-.edit-text {
-  margin-top: 0px;
-  position: absolute;
-  right: 120px;
-}
-
-.del-item {
-  font-size: 18px;
-  position: absolute;
-  right: 60px;
-}
-
-.del-text {
-  margin-top: 0px;
-  position: absolute;
-  right: 12px;
+  .material-icons {
+    font-size: 16px;
+  }
 }
 
 .dataBagItems {
   .page-body {
-    padding: 25px 30px;
+    padding: 0 25px 30px;
   }
 }

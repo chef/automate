@@ -69,23 +69,23 @@
                   <div class="item-details">
                     <chef-loading-spinner *ngIf="item.active && dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
                     <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
-                      <div class="expand-collapse">
-                        <span class="action" (click)="tree.expand()">
+                      <div class="expand-collapse edited">
+                        <chef-button tertiary class="action" (click)="tree.expand()">
                           <chef-icon>add_circle</chef-icon>
                           <span>Expand All</span>
-                        </span>
-                        <span class="action" (click)="tree.collapse()">
+                        </chef-button>
+                        <chef-button tertiary class="action" (click)="tree.collapse()">
                           <chef-icon>remove_circle</chef-icon>
                           <span>Collapse All</span>
-                        </span>
-                        <a class="right-button-box" (click)="startUpdateDataBagItem(item, selectedItemDetails)">
-                          <span class="material-icons edit-item">mode_edit</span>
-                          <span class="edit-text">Edit</span>
-                        </a>
-                        <a class="right-button-box" (click)="startDataBagItemDelete(item)">
-                          <span class="material-icons del-item">delete</span>
-                          <span class="del-text">Delete</span>
-                        </a>
+                        </chef-button>
+                        <chef-button tertiary class="action right-button-box" (click)="startDataBagItemDelete(item)">
+                          <chef-icon class="material-icons">delete</chef-icon>
+                          <span>Delete</span>
+                        </chef-button>
+                        <chef-button tertiary class="action right-button-box" (click)="startUpdateDataBagItem(item, selectedItemDetails)">
+                          <chef-icon class="material-icons">mode_edit</chef-icon>
+                          <span>Edit</span>
+                        </chef-button>
                       </div>
                       
                       <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>

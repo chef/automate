@@ -110,7 +110,6 @@ chef-modal.reset-client-modal {
         font-size: 12px;
         line-height: 20px;
         letter-spacing: 0.25px;
-        width: 80%;
         color: $white;
         text-transform: capitalize;
         margin-bottom: 0;
@@ -168,6 +167,10 @@ chef-modal.reset-client-modal {
           &:hover, &:focus {
             background-color: $chef-critical-light;
             border-color: $chef-critical-light;
+          }
+
+          &[disabled] {
+            color: $chef-critical-light;
           }
         }
 
