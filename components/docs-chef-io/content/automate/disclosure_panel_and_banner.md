@@ -35,9 +35,7 @@ You can create the file in any format which will be readable by Chef Automate. F
 {{< /note >}}
 
 - In the `.txt` file, you can write the message or the information you want to add to the disclosure panel.
-
 - Create a patch file and save it in the `.toml` file format.
-
 - In the `patch.toml` file, add the disclosure panel configuration settings as shown below:
 
 ```toml
@@ -66,7 +64,6 @@ The Banner looks like:
 To add a Banner to Chef Automate, follow the instructions given below:
 
 - Create a patch file and save it in the `.toml` file format.
-
 - In the `patch.toml` file, add the banner configuration settings as shown below:
 
 ```toml
