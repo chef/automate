@@ -108,7 +108,7 @@
         </chef-form-field>
       </div>
       <div id="button-org">
-        <chef-button id="cancel-org-popup" tertiary (click)="closeEvent()" data-cy="cancel-button">Cancel</chef-button>
+        <chef-button id="cancel-org-popup" tertiary [disabled]="creating" (click)="closeEvent()" data-cy="cancel-button">Cancel</chef-button>
         <chef-button
           primary
           data-cy="add-button"
