@@ -36,6 +36,14 @@ pushd ./automate.wiki
 ## Backward Incompatibilities
 -
 
+## Security
+
+### Security Improvements
+(examples: new security configurations)
+-
+### Security Updates
+(examples: dependency updates, CVE fixes)
+-
 ## Chef Product Versions
 
 This release uses:
