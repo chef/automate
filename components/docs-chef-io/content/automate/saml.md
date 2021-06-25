@@ -135,6 +135,7 @@ All of the other user groups that are _not_ in the list are discarded, and not a
 In the configuration example above, only users in either "group1" or "group2" may sign in, and those groups would appear as `team:saml:group1` and `team:saml:group2` respectively.
 
 Chef Automate supports using SAML to authenticate users and apply permissions to SAML groups. See [IAM Overview]({{< relref "iam_v2_overview.md" >}}).
+Member expressions are required for externally managed users, and teams, as well as API tokens.See [IAM Guide]({{< relref "iam_v2_guide.md#member-expressions" >}}).
 
 ```toml
 [dex.v1.sys.connectors.saml]
