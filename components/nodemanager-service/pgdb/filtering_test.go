@@ -36,3 +36,38 @@ func TestWhereFieldIn(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, "j.type IN ('exec''; DELETE FROM nodes;')", actual)
 }
+
+func TestWherePatternMatch(t *testing.T) {
+	field := "source_region"
+	tableAbbrev := "n"
+
+	arr := []string{}
+	result, err := wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE '')", result)
+
+	arr = []string{""}
+	result, err = wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL)", result)
+
+	arr = []string{"", "", "us-west-2"}
+	result, err = wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%')", result)
+
+	arr = []string{"", "", "us-west-2", "", ""}
+	result, err = wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%')", result)
+
+	arr = []string{"", "", "us-west-2", "", "", "us-east-2", "", " ", ""}
+	result, err = wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%') OR (n.source_region LIKE 'us-east-2%') OR (n.source_region LIKE ' %')", result)
+
+	arr = []string{"us-west-2", ""}
+	result, err = wherePatternMatch(field, arr, tableAbbrev)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "(n.source_region LIKE 'us-west-2%') OR (n.source_region LIKE '%' OR n.source_region is NULL)", result)
+}
