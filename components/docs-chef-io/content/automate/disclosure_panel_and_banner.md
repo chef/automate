@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 60
 +++
 
-Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the signin page and a **Banner** at the top of every page to highlight important information.
+Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the sign-in page and a **Banner** at the top of every page to highlight important information.
 
 
 ## Disclosure Panel
@@ -24,7 +24,7 @@ An example disclosure panel:
 
 {{< figure src="/images/automate/disclosure-panel-in-chef-automate.png" alt="An example Disclosure Panel in Chef Automate with Lorem Ipsum text" width="400" >}}
 
-To add a disclosure panel to the signin page:
+To add a disclosure panel to the sign-in page:
 
 1. Create a file with the message in `.html` or `.txt` format and save to a location that is available to Chef Automate.
 1. Create a `patch.toml` if one does not already exist for your Chef Automate installation.
@@ -33,7 +33,7 @@ To add a disclosure panel to the signin page:
 ```toml
 [global.v1]
   [global.v1.disclosure]
-    show = true # Set 'show' to 'true' to enable the disclosure panel on the sign in page. Set to 'false' to disable the disclosure panel. Default: false.
+    show = true # Set 'show' to 'true' to enable the disclosure panel on the sign-in page. Set to 'false' to disable the disclosure panel. Default: false.
 
     message_file_path = "/src/dev/disclosure-panel-message.txt" # The location of the file containing the disclosure panel message.
 
@@ -42,7 +42,7 @@ To add a disclosure panel to the signin page:
 
 ## Banner
 
-The  **Banner** displays custom content at the top of every page Chef Automate, including the sign in page. Use it to add a message, warning, or instructions to Chef Automate users.The Banner can display only one message, warning or an instruction throughout the interface.
+The  **Banner** displays custom content at the top of every page Chef Automate, including the sign-in page. Use it to add a message, warning, or instructions to Chef Automate users.The Banner can display only one message, warning or an instruction throughout the interface.
 
 An example banner:
 
