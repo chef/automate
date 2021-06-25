@@ -1,5 +1,5 @@
 +++
-title = "Add Custom Message"
+title = "Disclosure Panel and Banner"
 
 weight = 60
 draft = false
@@ -7,13 +7,13 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Add Custom Message"
+    title = "Disclosure Panel and Banner"
     parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/disclosure_panel_and_banner.md Add Custom Message"
+    identifier = "automate/configuring_automate/disclosure_panel_and_banner.md Disclosure Panel and Banner"
     weight = 60
 +++
 
-Chef Automate platform let's you manage application which helps in speed up your operations. Chef Automate allows you add disclosure statement or a highlighted content which can display information, a warning or any instruction accordingly. You can display the content in two different places.
+This page assists you in adding disclosure statement or a highlighted content which can display information, a warning or any instruction to the Chef Automate. You can display the content in two different places.
 
 - The Chef Automate login page, i.e., **Disclosure Panel**
 - The top of the Chef Automate Interface, i.e., **Banner**
