@@ -17,6 +17,6 @@ export class IntegrationsAzureFormComponent {
     return !no_creds;
   }
   isApiServiceType() {
-    return this.formGroup.value.service_type == "azure-api"
+    return this.formGroup.value.service_type === 'azure-api';
   }
 }
