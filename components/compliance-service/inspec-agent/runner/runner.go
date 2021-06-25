@@ -441,7 +441,6 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 
 	cleanupKeys(job.TargetConfig.KeyFiles)
 	logrus.Debugf("job '%s' finished", job.JobID)
-	
 	if job.NodeStatus == types.StatusRunning {
 		job.NodeStatus = types.StatusFailed
 	}
