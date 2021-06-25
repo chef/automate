@@ -41,7 +41,7 @@ To add a disclosure panel to the sign-in page:
 
 ## Banner
 
-The  **Banner** displays custom content at the top of every page in Chef Automate, including the sign-in page. Use it to add a message, warning, or instructions to Chef Automate users. The Banner can display only one message, warning or instruction throughout the interface.
+The **Banner** displays custom content at the top of every page in Chef Automate, including the sign-in page. Use it to add a message, warning, or instructions to Chef Automate users. The banner can display only one message, warning or instruction throughout the interface.
 
 An example banner:
 
