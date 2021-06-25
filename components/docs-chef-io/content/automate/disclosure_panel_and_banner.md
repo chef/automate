@@ -13,64 +13,50 @@ gh_repo = "automate"
     weight = 60
 +++
 
-This page assists you in adding disclosure statement or a highlighted content that can display information, a warning or any instruction to the Chef Automate. You can display the content in two different places.
+Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the signin page and a **Banner** at the top of every page to highlight important information.
 
-- The Chef Automate login page, i.e., **Disclosure Panel**
-- The top of the Chef Automate Interface, i.e., **Banner**
 
 ## Disclosure Panel
 
-**Disclosure Panel** is a content space in the login page of Chef Automate. In the panel, you can display custom message, warning, instruction or any important information for the one who is logging in should be well aware about.
+The **Disclosure Panel** is a space where you can add custom content to the Chef Automate sign-in page. Use this panel to display information, such as a message, warning, or instructions, that is during the sign-in process.
 
-The Disclosure Panel looks like:
+An example disclosure panel:
 
-{{< figure src="/images/automate/disclosure-panel-in-chef-automate.png" width="500" alt="Disclosure Panel in Chef Automate">}}
+{{< figure src="/images/automate/disclosure-panel-in-chef-automate.png" alt="An example Disclosure Panel in Chef Automate with Lorem Ipsum text" width="400" >}}
 
-To add a Disclosure Panel to the login page, follow the instructions given below:
+To add a disclosure panel to the signin page:
 
-- Create a `.txt` file and save to a location where the Chef Automate can track it.
-
-{{< note >}}
-You can create the file in any format which will be readable by Chef Automate. For example, `.html`, `.txt`.
-{{< /note >}}
-
-- In the `.txt` file, you can write the message or the information you want to add to the disclosure panel.
-- Create a patch file and save it in the `.toml` file format.
-- In the `patch.toml` file, add the disclosure panel configuration settings as shown below:
+1. Create a file with the message in `.html` or `.txt` format and save to a location that is available to Chef Automate.
+1. Create a `patch.toml` if one does not already exist for your Chef Automate installation.
+1. Add the disclosure panel configuration to the `patch.toml` file. Your configuration should look like:
 
 ```toml
 [global.v1]
   [global.v1.disclosure]
-    show = true # Set the value of `show` to `true` to enable the disclosure panel in the login page.
-    # The default value of show is `false`.
+    show = true # Set 'show' to 'true' to enable the disclosure panel on the sign in page. Set to 'false' to disable the disclosure panel. Default: false.
 
-    message_file_path = "/src/dev/disclosure-panel-message.txt" # The `.txt` file containing the message of the panel
+    message_file_path = "/src/dev/disclosure-panel-message.txt" # The location of the file containing the disclosure panel message.
 
-    # check your HTML validation at https://validator.w3.org/
+    # Validate your HTML at https://validator.w3.org/
 ```
-
-{{< note >}}
-To disable (default value) the disclosure panel, set the value of `show` to **false**.
-{{< /note >}}
 
 ## Banner
 
-**Banner** is a content space which is displayed across the top of the login page and the Chef Automate Interface to notify specific message about the product or their network. The Banner can be used to display custom message, warning, instruction or any important information.
+The  **Banner** displays custom content at the top of every page Chef Automate, including the sign in page. Use it to add a message, warning, or instructions to Chef Automate users.The Banner can display only one message, warning or an instruction throughout the interface.
 
-The Banner looks like:
+An example banner:
 
-{{< figure src="/images/automate/banner-in-chef-automate.png" width="500" alt="Banner in Chef Automate Interface">}}
+{{< figure src="/images/automate/banner-in-chef-automate.png" width="800" alt="Banner in Chef Automate Interface">}}
 
-To add a Banner to Chef Automate, follow the instructions given below:
+To add a banner to Chef Automate:
 
-- Create a patch file and save it in the `.toml` file format.
-- In the `patch.toml` file, add the banner configuration settings as shown below:
+1. Create a `patch.toml` if one does not already exist for your Chef Automate installation.
+1. Add the banner configuration to the `patch.toml` file. Your configuration should look like:
 
 ```toml
 [global.v1]
   [global.v1.banner]
-    show = true # Set the value of `show` to `true` to enable the banner
-    # The default value of show is `false`.
+    show = true # Set 'show' to 'true' to enable the banner. Set to 'false' to disable the banner. Default: false.
 
     message = "Lorem ipsum dolor sit amet" # Add the Message for the banner
     background_color = "3864f2" # Set the background color using the Hex Color Code (Do not add # to the code)
@@ -79,10 +65,3 @@ To add a Banner to Chef Automate, follow the instructions given below:
     # Find valid HEX codes at https://htmlcolorcodes.com/
 ```
 
-{{< note >}}
-To disable (default value) the banner, set the value of `show` to **false**.
-{{< /note >}}
-
-{{< note >}}
-The Banner can display only one message, warning or an instruction throughout the interface.
-{{< /note >}}
