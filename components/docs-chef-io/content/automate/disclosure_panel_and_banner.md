@@ -13,7 +13,7 @@ gh_repo = "automate"
     weight = 60
 +++
 
-This page assists you in adding disclosure statement or a highlighted content which can display information, a warning or any instruction to the Chef Automate. You can display the content in two different places.
+This page assists you in adding disclosure statement or a highlighted content that can display information, a warning or any instruction to the Chef Automate. You can display the content in two different places.
 
 - The Chef Automate login page, i.e., **Disclosure Panel**
 - The top of the Chef Automate Interface, i.e., **Banner**
