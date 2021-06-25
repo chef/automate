@@ -15,10 +15,9 @@ gh_repo = "automate"
 
 Customize your Chef Automate installation with a **Disclosure Panel** to add critical information about your unique environment on the sign-in page and a **Banner** at the top of every page to highlight important information.
 
-
 ## Disclosure Panel
 
-The **Disclosure Panel** is a space where you can add custom content to the Chef Automate sign-in page. Use this panel to display information, such as a message, warning, or instructions, that is during the sign-in process.
+The **Disclosure Panel** is a space where you can add custom content to the Chef Automate sign-in page. Use this panel to display information, such as a message, warning, or instructions, that appears during the sign-in process.
 
 An example disclosure panel:
 
@@ -42,7 +41,7 @@ To add a disclosure panel to the sign-in page:
 
 ## Banner
 
-The  **Banner** displays custom content at the top of every page Chef Automate, including the sign-in page. Use it to add a message, warning, or instructions to Chef Automate users.The Banner can display only one message, warning or an instruction throughout the interface.
+The  **Banner** displays custom content at the top of every page in Chef Automate, including the sign-in page. Use it to add a message, warning, or instructions to Chef Automate users. The Banner can display only one message, warning or instruction throughout the interface.
 
 An example banner:
 
@@ -64,4 +63,3 @@ To add a banner to Chef Automate:
 
     # Find valid HEX codes at https://htmlcolorcodes.com/
 ```
-
