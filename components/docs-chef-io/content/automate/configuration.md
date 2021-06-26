@@ -470,7 +470,7 @@ Configuration to display a custom banner on every Chef Automate page including t
 
 #### Disclosure Panel
 
-Configuration to display a disclosure on the sign in page. Requires a `.txt` or `.html` message stored in a location accessible to Chef Automate. Default: false
+Configuration to display a disclosure on the sign-in page. Requires a `.txt` or `.html` message stored in a location accessible to Chef Automate. Default: `false`.
 
 ```toml
 [global.v1]
