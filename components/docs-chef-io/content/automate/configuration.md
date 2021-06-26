@@ -454,7 +454,7 @@ Configuration to sign out users from Chef Automate when they close the browser.
 
 #### Disclosure Banner
 
-Configuration to display a custom banner on every Chef Automate page including the sign in page. Default: false
+Configuration to display a custom banner on every Chef Automate page, including the sign-in page. Default: `false`.
 
 ```toml
 [global.v1]
