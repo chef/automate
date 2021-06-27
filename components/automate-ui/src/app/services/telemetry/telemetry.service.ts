@@ -92,7 +92,7 @@ export class TelemetryService {
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
        this.engageTelemetry(this.trackingOperations);
-    }
+    } 
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
 
@@ -165,7 +165,7 @@ export class TelemetryService {
             // Currently we group users by license ID and customer ID
             this.group(this.licenseId);
             this.group(this.customerId);
-
+            
             // We want to make sure we have the config and the required calls are
             // queued up before starting to send things into analytics. So we don't
             // subscribe to trackingOperations before these are done.
@@ -174,7 +174,6 @@ export class TelemetryService {
             });
             this.trackInitialData();
            });
-
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
           console.log(`Error retrieving Segment API key: ${status}/${message}`);
@@ -182,38 +181,46 @@ export class TelemetryService {
   }
 
   track(event?: string, properties?: any) {
-    this.trackingOperations.next({
-      operation: 'track',
-      identifier: event,
-      properties: properties
-    });
+    if(this.chefSessionService.telemetry_enabled) {
+      this.trackingOperations.next({
+        operation: 'track',
+        identifier: event,
+        properties: properties
+      });
+    }
   }
 
   page(pageName?: string, properties?: any) {
-    this.trackingOperations.next({
-      operation: 'page',
-      identifier: pageName,
-      properties: properties
-    });
+    if(this.chefSessionService.isTelemetryPrefRestored() && this.chefSessionService.telemetry_enabled) {
+      this.trackingOperations.next({
+        operation: 'page',
+        identifier: pageName,
+        properties: properties
+      });
+    }
   }
 
   // private because we only need to call identify once, and it is done from the
   // constructor.
   private identify(userId?: string, traits?: any) {
-    this.trackingOperations.next({
-      operation: 'identify',
-      identifier: userId,
-      properties: traits
-    });
+    if(this.chefSessionService.telemetry_enabled) {
+      this.trackingOperations.next({
+        operation: 'identify',
+        identifier: userId,
+        properties: traits
+      });
+    }
   }
 
   // private because we want to control which groups are created
   private group(groupId?: string, traits?: any) {
-    this.trackingOperations.next({
-      operation: 'group',
-      identifier: groupId,
-      properties: traits
-    });
+    if(this.chefSessionService.telemetry_enabled) {
+      this.trackingOperations.next({
+        operation: 'group',
+        identifier: groupId,
+        properties: traits
+      });
+    }
   }
 
   private trackInitialData() {

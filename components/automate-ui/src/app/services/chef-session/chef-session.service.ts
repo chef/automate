@@ -239,6 +239,13 @@ export class ChefSessionService implements CanActivate {
     return this.user.uuid;
   }
 
+  isTelemetryPrefRestored() {
+    if(this.user && this.user.hasOwnProperty('telemetry_enabled')) {
+      return true;
+    }
+    return false;
+  }
+
   public fetchTelemetryPreference(): boolean | null {
     let telemetryEnabled: boolean | null;
     const telemStored = localStorage.getItem(this.userTelemetryStorageKey());
