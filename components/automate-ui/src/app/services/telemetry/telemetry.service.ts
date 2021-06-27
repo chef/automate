@@ -92,7 +92,7 @@ export class TelemetryService {
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
        this.engageTelemetry(this.trackingOperations);
-    } 
+    }
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
 
@@ -165,7 +165,7 @@ export class TelemetryService {
             // Currently we group users by license ID and customer ID
             this.group(this.licenseId);
             this.group(this.customerId);
-            
+
             // We want to make sure we have the config and the required calls are
             // queued up before starting to send things into analytics. So we don't
             // subscribe to trackingOperations before these are done.
@@ -174,6 +174,7 @@ export class TelemetryService {
             });
             this.trackInitialData();
            });
+
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
           console.log(`Error retrieving Segment API key: ${status}/${message}`);
