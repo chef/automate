@@ -76,7 +76,7 @@ func GetAzureCreds(secret *secrets.Secret) (string, string, string, string) {
 	if len(clientID) == 0 || len(clientSecret) == 0 || len(tenantID) == 0 {
 		logrus.Infof("GetAzureCreds attempting to use environment credentials")
 	}
-	
+
 	return clientID, clientSecret, tenantID, subscriptionID
 }
 
