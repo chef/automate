@@ -46,30 +46,30 @@ func TestWherePatternMatch(t *testing.T) {
 	arr := []string{}
 	result, err := wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE '')", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE ''", result)
 
 	arr = []string{""}
 	result, err = wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL)", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE '%'", result)
 
 	arr = []string{"", "", region}
 	result, err = wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%')", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE '%' OR COALESCE(n.source_region, '') LIKE 'us-west-2%'", result)
 
 	arr = []string{"", "", region, "", ""}
 	result, err = wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%')", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE '%' OR COALESCE(n.source_region, '') LIKE 'us-west-2%'", result)
 
 	arr = []string{"", "", region, "", "", region2, "", " ", ""}
 	result, err = wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE '%' OR n.source_region is NULL) OR (n.source_region LIKE 'us-west-2%') OR (n.source_region LIKE 'us-east-2%') OR (n.source_region LIKE ' %')", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE '%' OR COALESCE(n.source_region, '') LIKE 'us-west-2%' OR COALESCE(n.source_region, '') LIKE 'us-east-2%' OR COALESCE(n.source_region, '') LIKE ' %'", result)
 
 	arr = []string{region, ""}
 	result, err = wherePatternMatch(field, arr, tableAbbrev)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, "(n.source_region LIKE 'us-west-2%') OR (n.source_region LIKE '%' OR n.source_region is NULL)", result)
+	assert.Equal(t, "COALESCE(n.source_region, '') LIKE 'us-west-2%' OR COALESCE(n.source_region, '') LIKE '%'", result)
 }

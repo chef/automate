@@ -119,7 +119,7 @@ func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credent
 	sourceID := managerAcctId
 
 	err = Transact(db, func(tx *DBTrans) error {
-		uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "aws-api", sourceID, jsonTc, name, acctAlias, managerAcctId)
+		uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "aws-api", sourceID, jsonTc, name, region, managerAcctId)
 		if err != nil {
 			return errors.Wrapf(err, "AddManagerNodeToDB unable to insert node for account %s", acctAlias)
 		}

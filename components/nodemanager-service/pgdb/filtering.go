@@ -207,11 +207,11 @@ func patternMatchTags(field string, arr []string, tableAbbrev string) (condition
 }
 
 func Unique(a []string) []string {
-	seen := make(map[string]struct{})
-	b := a[:0]
+	seen := map[string]bool{}
+	var b []string
 	for _, v := range a {
 		if _, ok := seen[v]; !ok {
-			seen[v] = struct{}{}
+			seen[v] = true
 			b = append(b, v)
 		}
 	}
@@ -222,26 +222,21 @@ func wherePatternMatch(field string, arr []string, tableAbbrev string) (conditio
 	if !pgutils.IsSqlSafe(field) {
 		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
-	condition += fmt.Sprintf("(%s.%s LIKE ", tableAbbrev, field)
+	condition += fmt.Sprintf("COALESCE(%s.%s, '') LIKE ", tableAbbrev, field)
 
 	if len(arr) == 0 {
-		condition += "'')"
+		condition += "''"
 		return condition, nil
 	}
 	arr = Unique(arr)
 	for index, item := range arr {
 		item = strings.TrimSuffix(item, "*")
 		condition += fmt.Sprintf("'%s%%'", pgutils.EscapeLiteralForPGPatternMatch(item))
-		if item == "" {
-			condition += fmt.Sprintf(" OR %s.%s is NULL", tableAbbrev, field)
-		}
 		if index < len(arr)-1 {
-			condition += ")"
-			condition += fmt.Sprintf(" OR (%s.%s LIKE ", tableAbbrev, field)
+			condition += fmt.Sprintf(" OR COALESCE(%s.%s, '') LIKE ", tableAbbrev, field)
 		}
 	}
 
-	condition += ")"
 	return condition, nil
 }
 
