@@ -2,7 +2,11 @@
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
-    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length">
+    <div class="search-create-container">
+      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policy">
+      </app-infra-search-bar>
+    </div>
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (serachArr.length === 0) ">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p>No policy files available</p>
     </div>
@@ -16,8 +20,16 @@
             <chef-th class="no_border_th three-dot-column"></chef-th>
           </chef-tr>
         </chef-thead>
-        <chef-tbody>
+        <chef-tbody *ngIf="!searchFlag">
           <chef-tr *ngFor="let policyFile of pageOfItems">
+            <chef-td>{{ policyFile.name }}</chef-td>
+            <chef-td>{{ policyFile.revision_id }}</chef-td>
+            <chef-td></chef-td>
+            <chef-td class="three-dot-column"></chef-td>
+          </chef-tr>
+        </chef-tbody>
+        <chef-tbody *ngIf="searchFlag">
+          <chef-tr *ngFor="let policyFile of serachArr">
             <chef-td>{{ policyFile.name }}</chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>

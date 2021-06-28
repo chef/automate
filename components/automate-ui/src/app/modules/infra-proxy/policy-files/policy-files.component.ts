@@ -30,6 +30,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyFilesListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public searchFlag = false;
+  public serachArr: PolicyFile[];
   pageOfItems: Array<any>;
 
   constructor(
@@ -51,6 +55,31 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
         this.policyFiles = allPolicyFilesState;
+        this.policyFiles.push({
+          name: 'test3',
+          revision_id: '0',
+          policy_group: 'e'
+        });
+        this.policyFiles.push({
+          name: 'test4',
+          revision_id: '0',
+          policy_group: 'e'
+        });
+        this.policyFiles.push({
+          name: 'test5',
+          revision_id: '0',
+          policy_group: 'e'
+        });
+        this.policyFiles.push({
+          name: 'test6',
+          revision_id: '0',
+          policy_group: 'e'
+        });
+        this.policyFiles.push({
+          name: 'new1',
+          revision_id: '0',
+          policy_group: 'e'
+        });
         this.policyFilesListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyFilesListLoading = false;
@@ -71,5 +100,21 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public searchPolicyFiles(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.policyFiles || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.serachArr = this.policyFiles.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.name.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
   }
 }
