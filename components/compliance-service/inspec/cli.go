@@ -94,7 +94,6 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	}
 
 	stdOut, stdErr, err := run(args, target, timeout, env)
-
 	stdOutErr := ""
 	if len(stdOut) == 0 {
 		stdOutErr = "Empty STDOUT, we have a problem..."
@@ -163,7 +162,7 @@ func sanitizeEnv(env map[string]string) map[string]string {
 	outEnv := make(map[string]string, len(env))
 	for k, v := range env {
 		switch k {
-		case "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AZURE_CLIENT_SECRET":
+		case "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AZURE_CLIENT_SECRET", "AZURE_SUBSCRIPTION_ID":
 			outEnv[k] = "REDACTED"
 		default:
 			outEnv[k] = v
