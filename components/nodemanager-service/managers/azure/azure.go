@@ -3,7 +3,6 @@ package azure
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"strings"
 	"time"
 
@@ -754,9 +753,6 @@ func sendCommand(ctx context.Context, job *types.InspecJob, script string, scrip
 		Script:    &runCommandScript,
 	}
 	logrus.Infof("calling runcommand %s with nodename %s resourcegroupname %s", scriptTypeAZ, job.NodeName, job.MachineIdentifier)
-	fmt.Println(":::::: sendCommand params ::::::", params)
-	fmt.Println(":::::: sendCommand script ::::::", script)
-	fmt.Println(":::::: sendCommand scriptType ::::::", scriptType)
 	return client.RunCommand(ctx, job.MachineIdentifier, job.NodeName, params)
 }
 
@@ -774,8 +770,6 @@ func (creds *Creds) SendRunCommandJob(ctx context.Context, job *types.InspecJob,
 		job.NodeStatus = types.StatusFailed
 		return errors.Wrap(err, "unable to get command status")
 	}
-	data, _ := ioutil.ReadAll(future.Response().Body)
-	fmt.Println(":::: future Body  :::: ", string(data))
 	logrus.Infof("azure run command job for node %s status %s", job.NodeName, future.Status())
 	job.NodeStatus = types.StatusCompleted
 	return nil
