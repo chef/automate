@@ -74,7 +74,7 @@ func (db *DB) AddManagerSubscriptionsToDB(subs []*manager.ManagerNode, managerId
 		}
 
 		err = Transact(db, func(tx *DBTrans) error {
-			uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "azure-api", item.Id, jsonTc, name, "", tenantID)
+			uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "azure-api", item.Id, jsonTc, name, "azure-api-region", tenantID)
 			if err != nil {
 				return errors.Wrapf(err, "AddManagerSubscriptionsToDB unable to insert subscription with id %s", item.Id)
 			}

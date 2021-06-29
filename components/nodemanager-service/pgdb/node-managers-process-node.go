@@ -17,11 +17,11 @@ const sqlUpsertByIDRunData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7,''), COALESCE($8,''), COALESCE($9,''), $10, $11, $12)
+VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12)
 ON CONFLICT (id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5,
-	last_contact = $6, source_id = COALESCE($7,''), source_region = COALESCE($8,''), source_account_id = COALESCE($9,''), last_run = $10, projects_data = $11
+	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_run = $10, projects_data = $11
 WHERE nodes.source_state != 'TERMINATED';
 `
 
@@ -29,11 +29,11 @@ const sqlUpsertByIDScanData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7,''), COALESCE($8,''), COALESCE($9,''), $10, $11, $12, $13)
+VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12, $13)
 ON CONFLICT (id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5,
-	last_contact = $6, source_id = COALESCE($7,''), source_region = COALESCE($8,''), source_account_id = COALESCE($9,''), last_job = $10, last_scan = $11, projects_data = $12
+	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_job = $10, last_scan = $11, projects_data = $12
 WHERE nodes.source_state != 'TERMINATED';
 `
 
@@ -118,6 +118,9 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		}
 
 		if !hasCloudInformation(node) {
+			if node.GetManagerType() == "azure-api" && node.SourceRegion == "" {
+				node.SourceRegion = "azure-api-region"
+			}
 			err = tx.upsertByID(node, nodeDetails)
 		} else {
 			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)
