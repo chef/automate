@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"github.com/chef/automate/components/infra-proxy-service/validation"
 
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
@@ -158,4 +159,31 @@ func fromAPICookbookLocks(cLocks map[string]chef.CookbookLock) []*response.Cookb
 	}
 
 	return cl
+}
+
+// DeletePolicyfile deletes the policyfile
+func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicyfile) (*response.DeletePolicyfile, error) {
+	err := validation.New(validation.Options{
+		Target:          "policyfile",
+		Request:         *req,
+		RequiredDefault: true,
+	}).Validate()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = c.client.Policies.Delete(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.DeletePolicyfile{
+		Name: req.GetName(),
+	}, nil
 }
