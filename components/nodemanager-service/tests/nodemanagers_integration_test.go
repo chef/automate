@@ -99,6 +99,7 @@ func TestNodemanagers(t *testing.T) {
 		Order: 1,
 	})
 	require.NoError(t, err)
+	t.Log(":::::here", mgrsSortedDate.GetManagers()[0], mgrsSortedDate.GetManagers()[1], mgrsSortedDate.GetManagers()[2], mgrsSortedDate.GetManagers()[3])
 	assert.Equal(t, "Automate", mgrsSortedDate.GetManagers()[3].GetName())
 	assert.Equal(t, "my test aws-api mgr", mgrsSortedDate.GetManagers()[2].GetName())
 	assert.Equal(t, "my test aws-ec2 mgr", mgrsSortedDate.GetManagers()[1].GetName())
