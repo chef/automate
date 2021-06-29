@@ -423,6 +423,26 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/journalbeat-service",
+      "metadata": {
+        "name": "chef/journalbeat-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/keyval-service",
+      "metadata": {
+        "name": "chef/keyval-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/sample-data-service",
       "metadata": {
         "name": "chef/sample-data-service",
@@ -579,6 +599,8 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
+        "chef/keyval-service",
+        "chef/journalbeat-service",
         "chef/user-settings-service"
       ],
       "packages": null,
@@ -648,7 +670,8 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-prometheus"
+        "chef/automate-prometheus",
+        "chef/journalbeat-service"
       ],
       "packages": null,
       "dependencies": [

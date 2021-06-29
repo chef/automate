@@ -43,6 +43,8 @@
     "chef/automate-builder-api",
     "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
+    "chef/journalbeat-service",
+    "chef/keyval-service",
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
@@ -150,6 +152,8 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
+        "chef/keyval-service",
+        "chef/journalbeat-service",
         "chef/user-settings-service"
       ]
     },
@@ -192,7 +196,8 @@
       "hidden": true,
       "dependencies": ["automate"],
       "services": [
-        "chef/automate-prometheus"
+        "chef/automate-prometheus",
+        "chef/journalbeat-service"
       ]
     },
     {

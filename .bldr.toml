@@ -1112,6 +1112,12 @@ paths = [
   "lib/user/*",
   "lib/version/*"
 ]
+
+[journalbeat-service]
+plan_path = "components/journalbeat-service"
+paths = [
+  "components/journalbeat-service/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]

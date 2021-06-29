@@ -3,6 +3,7 @@ module github.com/chef/automate
 go 1.13
 
 require (
+	4d63.com/tz v1.2.0 // indirect
 	cloud.google.com/go v0.60.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
 	github.com/Azure/azure-sdk-for-go v30.1.0+incompatible
@@ -10,6 +11,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/squirrel v1.1.0
 	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/Shopify/sarama v1.29.1 // indirect
 	github.com/alexedwards/scs v1.4.1
 	github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7 // indirect
 	github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1 // indirect
@@ -35,19 +37,32 @@ require (
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/dop251/goja v0.0.0-20210614154742-14a1ffa82844 // indirect
+	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/elastic/beats v7.6.2+incompatible // indirect
+	github.com/elastic/ecs v1.10.0 // indirect
+	github.com/elastic/go-lumber v0.1.1 // indirect
+	github.com/elastic/go-seccomp-bpf v1.1.0 // indirect
+	github.com/elastic/go-structform v0.0.9 // indirect
+	github.com/elastic/go-sysinfo v1.7.0 // indirect
+	github.com/elastic/go-txfile v0.0.8 // indirect
+	github.com/elastic/go-ucfg v0.8.3 // indirect
+	github.com/elastic/gosigar v0.14.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/fatih/color v1.9.0
 	github.com/felixge/httpsnoop v1.0.0 // indirect
+	github.com/garyburd/redigo v1.6.2 // indirect
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 	github.com/go-chef/chef v0.23.2-0.20201213054559-3243f736d651
 	github.com/go-delve/delve v1.3.1
 	github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible
 	github.com/gocarina/gocsv v0.0.0-20170928100509-7099e67763c2
+	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.4.4
-	github.com/golang/protobuf v1.4.2
-	github.com/google/go-cmp v0.5.1
+	github.com/golang/protobuf v1.4.3
+	github.com/google/go-cmp v0.5.4
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
@@ -65,10 +80,12 @@ require (
 	github.com/leanovate/gopter v0.2.4
 	github.com/lib/pq v1.8.0
 	github.com/lyft/protoc-gen-star v0.4.16-0.20200805193024-077ca8f98fb2
+	github.com/magefile/mage v1.11.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 	github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
@@ -89,7 +106,6 @@ require (
 	github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021 // indirect
 	github.com/prometheus/client_golang v1.5.1
 	github.com/prometheus/procfs v0.0.11 // indirect
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/russellhaering/goxmldsig v0.0.0-20170911191014-b7efc6231e45 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
@@ -99,7 +115,7 @@ require (
 	github.com/spf13/cobra v1.0.1-0.20200713175500-884edc58ad08
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/teambition/rrule-go v0.0.0-20170616063102-9d6a7aa3e9f9
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/uber/jaeger-client-go v2.11.2+incompatible
@@ -111,11 +127,10 @@ require (
 	go.uber.org/multierr v1.5.0
 	go.uber.org/zap v1.15.0
 	gocloud.dev v0.19.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
-	golang.org/x/text v0.3.3
-	golang.org/x/tools v0.0.0-20200806022845-90696ccdc692 // indirect
+	golang.org/x/text v0.3.6
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.29.0
 	google.golang.org/genproto v0.0.0-20200901141002-b3bf27a9dbd1
@@ -126,7 +141,8 @@ require (
 	gopkg.in/olivere/elastic.v6 v6.2.35
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
+	k8s.io/api v0.21.2 // indirect
 )
 
 // https://github.com/dexidp/dex/issues/1578
