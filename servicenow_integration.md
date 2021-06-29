@@ -14,55 +14,36 @@ gh_repo = "automate"
 +++
 
 ## Chef Automate Scoped Certified Application
-
 This guide aids you to set up a customer’s instance for enabling the population of CMDB [Configuration Management Database] data from each node being managed by Chef Automate in the customer’s estate. It also includes configuration management status and compliance management status.
-
 ## ServiceNow Integration
-
 The integration between a Chef Automate server and a ServiceNow instance requires the following:
-
 - Chef Automate Scoped Application
 - Chef Automate server
-
 The Chef Automate application is a ServiceNow certified scoped application available from the ServiceNow store. The [Chef Automate server](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance, and integrates with the Chef Automate infrastructure and compliance functionality. This server sends HTTPS JSON data feeds to the Chef Automate application in a ServiceNow instance to create and update the _ServiceNow CMDB_ tables.
-
 {{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram">}}
-
 ### Prerequisites
-
 - The ServiceNow instance must be publicly reachable on https port 443.
 - [Chef automate server installation](https://docs.chef.io/chef_automate.html).
 - Service now package - System Import Sets com. `glide.system\_import\_set`, min version 1.0.0.
 - Service now package - Configuration Management (CMDB) 1.1.
 - Service now plugin - Configuration Management For Scoped Apps [com.snc.cmdb.scoped] 1.0.0.
-
 ## Installation
-
 ### Install Chef Automate application in ServiceNow
-
 The Chef Automate application exposes the REST API endpoint that facilitates the communication between Chef Automate and the ServiceNow instance.
-
 - Visit the ServiceNow store at <https://store.servicenow.com>.
 - Get the Chef Automate application.
 - In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
 - From the **Downloads** tab, install the **Chef Automate** application.
-
 ### Create Application Users
-
 The application provides several roles appropriate for integration, which can be assigned to existing or new ServiceNow users. The roles are as follows:
-
 - x_chef_automate.admin
 - x_chef_automate.user
 - x_chef_automate.api
-
 These roles are part of the package. Users can create their requisite roles and controls if any further restrictions are required.
-
 #### Role x_chef_automate.admin
-
 This role can be assigned to a user other than a Systems administrator to allow administration of the application properties and logs. Thus, administration can be carried out by a user who is not the system administrator. 
 Note that a systems administrator can perform all tasks that an `x_chef_automate.admin` role can. In addition, the Admin role is added by default in **ServiceNow** and is not part of the app.
 The **admin** role grants a user access to the:
-
 - Asset Imports module
 - Properties
 - Automate instances.
@@ -77,11 +58,8 @@ The **admin** role grants a user access to the:
 - Script includes
 - Transform maps
 - Chef servers
-
 #### Role x_chef_automate.user
-
 The role is suitable for users that require application access without administration access. The role grants a user access to the:
-
 - Chef Automate menu
 - Servers module
 - Client runs module.
@@ -94,9 +72,7 @@ The role is suitable for users that require application access without administr
 - Logs module
 - Properties module
 - Support module
-
 Note that for integration with CMDB data in ServiceNow, you need to assign the _OOB ITIL_ role.
-
 #### Role x_chef_automate.api
 This role should be assigned to a user who is responsible for integrating the Chef automate data into the application. It is recommended that a new user is created specifically for this. This user’s credentials are required to configure the Chef automate server for communication with the application. Note that for integration with CMDB data you need to assign the _OOB ITIL_ role. You need to select Web service access only for this user.
 #### References
