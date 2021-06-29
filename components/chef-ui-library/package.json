@@ -28,7 +28,7 @@
   "private": true,
   "dependencies": {
     "d3": "^5.9.7",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
     "prismjs": "^1.23.0",
@@ -52,6 +52,7 @@
     "tslint": "^5.18.0",
     "tslint-ionic-rules": "0.0.21",
     "typedoc": "^0.15.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "merge": "^2.1.1"
   }
 }

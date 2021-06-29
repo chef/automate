@@ -441,7 +441,6 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 
 	cleanupKeys(job.TargetConfig.KeyFiles)
 	logrus.Debugf("job '%s' finished", job.JobID)
-
 	if job.NodeStatus == types.StatusRunning {
 		job.NodeStatus = types.StatusFailed
 	}
@@ -702,6 +701,7 @@ func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, map[string]string
 		envsMap["AZURE_CLIENT_ID"] = tc.AzureClientID
 		envsMap["AZURE_CLIENT_SECRET"] = tc.AzureClientSecret
 		envsMap["AZURE_TENANT_ID"] = tc.AzureTenantID
+		envsMap["AZURE_SUBSCRIPTION_ID"] = tc.AzureSubscriptionID
 		return envsMap, inputs, nil
 	case "gcp":
 		if tc.GcpCredsJson != "" {

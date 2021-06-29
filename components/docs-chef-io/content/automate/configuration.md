@@ -431,14 +431,14 @@ Uncomment and change settings as needed, and then run `chef-automate config patc
 You can specify the maximum number of inflight data collector requests. The default value is sixty times the number of the machine's available CPUs.
 
 ```toml
-    [gateway.v1.sys.data_collector.limiter]
-    # Setting disable to true will allow an unbounded number of
-    # data collector requests to remain inflight concurrently.
-    disable = false
-    # max_inflight_requests will set the maximum number of
-    # concurrent inflight data collector requests. By default,
-    # this value is 60 * runtime.CpuCount()
-    max_inflight_requests = 100
+[gateway.v1.sys.data_collector.limiter]
+# Setting disable to true will allow an unbounded number of
+# data collector requests to remain inflight concurrently.
+disable = false
+# max_inflight_requests will set the maximum number of
+# concurrent inflight data collector requests. By default,
+# this value is 60 * runtime.CpuCount()
+max_inflight_requests = 100
 ```
 
 #### Sign-out on Browser Close
@@ -450,6 +450,36 @@ Configuration to sign out users from Chef Automate when they close the browser.
   # Setting persistent to false will disable persistent sessions.
   # Users will be signed out when their browser closes.
   persistent = false
+```
+
+#### Disclosure Banner
+
+Configuration to display a custom banner on every Chef Automate page, including the sign-in page. Default: `false`.
+
+```toml
+[global.v1]
+  [global.v1.banner]
+    show = true # Set 'show' to 'true' to enable the banner. Set to 'false' to disable the banner. Default: false.
+
+    message = "Lorem ipsum dolor sit amet" # Add the Message for the banner
+    background_color = "3864f2" # Set the background color using the Hex Color Code (Do not add # to the code)
+    text_color = "FFF" # Set the color of the text using the Hex Color Code (Do not add # to the code)
+
+    # Find valid HEX codes at https://htmlcolorcodes.com/
+```
+
+#### Disclosure Panel
+
+Configuration to display a disclosure on the sign-in page. Requires a `.txt` or `.html` message stored in a location accessible to Chef Automate. Default: `false`.
+
+```toml
+[global.v1]
+  [global.v1.disclosure]
+    show = true # Set 'show' to 'true' to enable the disclosure panel on the sign in page. Set to 'false' to disable the disclosure panel. Default: false.
+
+    message_file_path = "/src/dev/disclosure-panel-message.txt" # The location of the file containing the disclosure panel message.
+
+    # Validate your HTML at https://validator.w3.org/
 ```
 
 ### Troubleshooting
