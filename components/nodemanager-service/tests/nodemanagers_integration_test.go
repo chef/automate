@@ -38,9 +38,9 @@ func TestNodemanagers(t *testing.T) {
 
 	t.Log("add aws and azure managers")
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-api")
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(2 * time.Second)
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-ec2")
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(2 * time.Second)
 	mgrtesthelpers.AddAzureManager(ctx, mgrClient, "azure-api")
 	time.Sleep(100 * time.Millisecond)
 
