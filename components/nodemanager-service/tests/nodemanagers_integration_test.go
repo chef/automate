@@ -104,6 +104,10 @@ func TestNodemanagers(t *testing.T) {
 		Sort:  "date_added",
 		Order: 1,
 	})
+	t.Log("date added  0::::::", mgrsSortedDate.GetManagers()[0].GetName(), mgrsSortedDate.GetManagers()[0].GetDateAdded())
+	t.Log("date added  1::::::", mgrsSortedDate.GetManagers()[1].GetName(), mgrsSortedDate.GetManagers()[1].GetDateAdded())
+	t.Log("date added  2::::::", mgrsSortedDate.GetManagers()[2].GetName(), mgrsSortedDate.GetManagers()[2].GetDateAdded())
+	t.Log("date added  3::::::", mgrsSortedDate.GetManagers()[3].GetName(), mgrsSortedDate.GetManagers()[3].GetDateAdded())
 	require.NoError(t, err)
 	assert.Equal(t, "Automate", mgrsSortedDate.GetManagers()[3].GetName())
 	assert.Equal(t, "my test aws-api mgr", mgrsSortedDate.GetManagers()[2].GetName())
