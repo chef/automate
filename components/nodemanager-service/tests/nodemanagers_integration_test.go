@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -37,8 +38,11 @@ func TestNodemanagers(t *testing.T) {
 
 	t.Log("add aws and azure managers")
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-api")
+	time.Sleep(100 * time.Millisecond)
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-ec2")
+	time.Sleep(100 * time.Millisecond)
 	mgrtesthelpers.AddAzureManager(ctx, mgrClient, "azure-api")
+	time.Sleep(100 * time.Millisecond)
 
 	t.Log("try to add a manager with a bad secret")
 	awsMgr := manager.NodeManager{
@@ -49,6 +53,7 @@ func TestNodemanagers(t *testing.T) {
 			{Key: "AWS_SECRET_ACCESS_KEY", Value: "lala"}},
 	}
 	_, err = mgrClient.Create(ctx, &awsMgr)
+	time.Sleep(100 * time.Millisecond)
 	assert.Contains(t, err.Error(), "InvalidArgument desc")
 
 	t.Log("try to add a manager with an invalid type")
@@ -57,6 +62,7 @@ func TestNodemanagers(t *testing.T) {
 		Type: "mario",
 	}
 	_, err = mgrClient.Create(ctx, &mgr)
+	time.Sleep(100 * time.Millisecond)
 	assert.Contains(t, err.Error(), "InvalidArgument desc = valid types for node manager instance are [aws-ec2 aws-api azure-api aws azure azure-vm gcp gcp-api]")
 
 	t.Log("list nodemanagers")
