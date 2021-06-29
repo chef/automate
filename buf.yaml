@@ -5,7 +5,7 @@
 # This file configures the `buf` tool, you run buf's linter as `buf check lint`, or
 # use `lint_all_protobuf_components` in the habitat studio.
 #
-# ## References:
+# ## References: 
 # 
 # - Style Guide: https://buf.build/docs/style-guide/
 # - Docs for individual checkers: https://buf.build/docs/lint-checkers
@@ -125,6 +125,7 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -154,6 +155,7 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -189,6 +191,7 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -218,6 +221,7 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -253,6 +257,7 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # These interservice protos could be changed but the churn is very large:
@@ -282,6 +287,7 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
+      - interservice/user_settings/user_settings.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -339,6 +345,7 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # Used to parse external JSON:
@@ -357,6 +364,7 @@ lint:
       - interservice/nodemanager/manager/manager.proto
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
+      - interservice/user_settings/user_settings.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -379,6 +387,7 @@ lint:
       - external/nodes/manager/manager.proto
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
+      - external/user_settings/user_settings.proto
       # deployment protos are used by the CLI and can't be changed
       - interservice/authz/policy.proto
       # compliance protos used to parse external JSON:
@@ -396,6 +405,7 @@ lint:
       - interservice/nodemanager/manager/manager.proto
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
+      - interservice/user_settings/user_settings.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto

@@ -33,6 +33,17 @@ service UserSettingsService {
 			action: "global:userSettings:update"
 		};
 	};
+
+	// DeleteUserSettings deletes all settings for a given user
+	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (google.protobuf.Empty){
+		option (google.api.http) = {
+			delete: "/api/v0/user-settings/{user.name}/{user.connector}"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "global:userSettings:{user.name}:{user.connector}"
+			action: "global:userSettings:delete"
+		};
+	};
 }
 
 message User {
@@ -50,6 +61,11 @@ message PutUserSettingsRequest{
 	User user = 1;
 	// The user settings to persist.
 	map<string, UserSettingValue> settings = 2;
+}
+
+message DeleteUserSettingsRequest{
+	// ID of the user.
+	User user = 1;
 }
 
 message GetUserSettingsResponse {

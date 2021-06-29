@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"fmt"
-	//"github.com/chef/automate/lib/tls/certs"
 	"os"
 	"testing"
 

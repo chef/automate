@@ -47,6 +47,41 @@
           "UserSettingsService"
         ]
       },
+      "delete": {
+        "summary": "DeleteUserSettings deletes all settings for a given user",
+        "operationId": "UserSettingsService_DeleteUserSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.connector",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSettingsService"
+        ]
+      },
       "put": {
         "summary": "PutUserSettings upserts all of the preferences for a given user",
         "operationId": "UserSettingsService_PutUserSettings",
