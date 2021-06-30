@@ -75,8 +75,6 @@ SAML
 }
 
 resource "null_resource" "soften_mounts" {
-  depends_on = ["module.chef_baseline"]
-
   triggers = {
     always_do = "${uuid()}"
   }
