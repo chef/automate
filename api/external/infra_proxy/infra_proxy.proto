@@ -305,9 +305,16 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+
   rpc GetPolicyfile (infra_proxy.request.Policyfile) returns (infra_proxy.response.Policyfile) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+
+  rpc DeletePolicyfile (infra_proxy.request.DeletePolicyfile) returns (infra_proxy.response.DeletePolicyfile) {
+    option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
 }

@@ -9,6 +9,7 @@ import "google/protobuf/empty.proto";
 service UserSettingsService {
 	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {};
 	rpc PutUserSettings(PutUserSettingsRequest) returns (PutUserSettingsResponse) {};
+	rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (google.protobuf.Empty){};
 }
 
 message User {
@@ -23,6 +24,10 @@ message GetUserSettingsRequest{
 message PutUserSettingsRequest{
 	User user = 1;
 	map<string, UserSettingValue> settings = 2;
+}
+
+message DeleteUserSettingsRequest{
+	User user = 1;
 }
 
 message GetUserSettingsResponse {

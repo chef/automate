@@ -20,3 +20,12 @@ message Policyfile {
     // Policyfile revision ID.
     string revision_id = 4;
 }
+
+message DeletePolicyfile {
+    // Chef Organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Policyfile name.
+    string name = 3;
+}

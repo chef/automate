@@ -116,3 +116,20 @@ func fromUpstreamCookbookLocks(cLocks []*infra_res.CookbookLock) []*gwres.Cookbo
 
 	return cl
 }
+
+// DeletePolicyfiles deletes the policy
+func (a *InfraProxyServer) DeletePolicyfile(ctx context.Context, r *gwreq.DeletePolicyfile) (*gwres.DeletePolicyfile, error) {
+	req := &infra_req.DeletePolicyfile{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.DeletePolicyfile(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.DeletePolicyfile{
+		Name: res.GetName(),
+	}, nil
+}

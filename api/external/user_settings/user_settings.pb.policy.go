@@ -12,4 +12,7 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/PutUserSettings", "global:userSettings:{user.name}:{user.connector}", "global:userSettings:update", "PUT", "/api/v0/user-settings/{user.name}/{user.connector}", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.user_settings.UserSettingsService/DeleteUserSettings", "global:userSettings:{user.name}:{user.connector}", "global:userSettings:delete", "DELETE", "/api/v0/user-settings/{user.name}/{user.connector}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
