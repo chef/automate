@@ -34,7 +34,7 @@ export class WelcomeModalComponent {
 
   private isTelemetryServiceEnabled: boolean;
   private telemetryServiceSubscription: Subscription;
-
+  public telemetryWarningMessage: string;
   constructor(
     store: Store<NgrxStateAtom>,
     private localStorage: LocalStorageService,
@@ -54,6 +54,7 @@ export class WelcomeModalComponent {
             store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
         });
     }
+    console.log(this.telemetryWarningMessage);
   }
 
   public handleTriggerWelcome(state: TriggerWelcomeStatus): void {
@@ -111,6 +112,7 @@ export class WelcomeModalComponent {
     if (this.telemetryServiceSubscription) {
       this.telemetryServiceSubscription.unsubscribe();
     }
+    this.telemetryWarningMessage = '';
   }
 
   // Shows the modal and sets the has_been_seen flag to true.
@@ -140,6 +142,10 @@ export class WelcomeModalComponent {
     }
 
     // If the previous checks fail we do nothing.
+  }
+
+  showTelemetryWarningMessage(message) {
+    this.telemetryWarningMessage = message;
   }
 
 }
