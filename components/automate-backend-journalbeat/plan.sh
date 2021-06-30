@@ -1,5 +1,5 @@
 UPSTREAM_PKG_IDENT="chef/journalbeat/6.8.6"
-pkg_name="journalbeat"
+pkg_name="automate-backend-journalbeat"
 pkg_description="Wrapper package for chef/journalbeat"
 pkg_origin="chef"
 pkg_version="6.8.6"

@@ -6,7 +6,7 @@ level = "warning"
 to_files = "false"
 
 [journalbeat]
-registry_file = "/hab/svc/journalbeat-service/data/registry"
+registry_file = "/hab/svc/automate-backend-journalbeat/data/registry"
 
 #=========================== Journalbeat inputs ================================
 
@@ -24,7 +24,7 @@ hosts = [
 
 [setup]
 [setup.template]
-fields = "/hab/svc/journalbeat-service/config/fields.yml"
+fields = "/hab/svc/automate-backend-journalbeat/config/fields.yml"
 
 #============================== Processors =====================================
 

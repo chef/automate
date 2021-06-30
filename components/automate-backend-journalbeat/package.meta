@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-backend-journalbeat",
+  "uses_platform_scaffolding": true
+}
