@@ -54,7 +54,6 @@ export class WelcomeModalComponent {
             store.select(triggerWelcome).subscribe(this.handleTriggerWelcome.bind(this));
         });
     }
-    console.log(this.telemetryWarningMessage);
   }
 
   public handleTriggerWelcome(state: TriggerWelcomeStatus): void {
