@@ -1113,10 +1113,10 @@ paths = [
   "lib/version/*"
 ]
 
-[journalbeat-service]
-plan_path = "components/journalbeat-service"
+[automate-backend-journalbeat]
+plan_path = "components/automate-backend-journalbeat"
 paths = [
-  "components/journalbeat-service/*"
+  "components/automate-backend-journalbeat/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

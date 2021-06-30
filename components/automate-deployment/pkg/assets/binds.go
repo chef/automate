@@ -71,7 +71,6 @@ ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway ce
 ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
 keyval-service BINDING_MODE strict
-journalbeat-service BINDING_MODE strict
 license-control-service REQUIRED automate-pg-gateway pg-sidecar-service
 license-control-service BINDING_MODE strict
 local-user-service REQUIRED authz-service automate-dex teams-service
