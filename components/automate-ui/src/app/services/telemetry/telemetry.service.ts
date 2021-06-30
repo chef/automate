@@ -182,46 +182,38 @@ export class TelemetryService {
   }
 
   track(event?: string, properties?: any) {
-    if(this.chefSessionService.telemetry_enabled) {
-      this.trackingOperations.next({
-        operation: 'track',
-        identifier: event,
-        properties: properties
-      });
-    }
+    this.trackingOperations.next({
+      operation: 'track',
+      identifier: event,
+      properties: properties
+    });
   }
 
   page(pageName?: string, properties?: any) {
-    if(this.chefSessionService.isTelemetryPrefRestored() && this.chefSessionService.telemetry_enabled) {
-      this.trackingOperations.next({
-        operation: 'page',
-        identifier: pageName,
-        properties: properties
-      });
-    }
+    this.trackingOperations.next({
+      operation: 'page',
+      identifier: pageName,
+      properties: properties
+    });
   }
 
   // private because we only need to call identify once, and it is done from the
   // constructor.
   private identify(userId?: string, traits?: any) {
-    if(this.chefSessionService.telemetry_enabled) {
-      this.trackingOperations.next({
-        operation: 'identify',
-        identifier: userId,
-        properties: traits
-      });
-    }
+    this.trackingOperations.next({
+      operation: 'identify',
+      identifier: userId,
+      properties: traits
+    });
   }
 
   // private because we want to control which groups are created
   private group(groupId?: string, traits?: any) {
-    if(this.chefSessionService.telemetry_enabled) {
-      this.trackingOperations.next({
-        operation: 'group',
-        identifier: groupId,
-        properties: traits
-      });
-    }
+    this.trackingOperations.next({
+      operation: 'group',
+      identifier: groupId,
+      properties: traits
+    });
   }
 
   private trackInitialData() {
