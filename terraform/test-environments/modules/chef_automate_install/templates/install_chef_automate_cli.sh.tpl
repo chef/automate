@@ -6,6 +6,7 @@ set -e
 export HAB_NONINTERACTIVE="true"
 export HAB_NOCOLORING="true"
 export HAB_LICENSE=accept-no-persist
+export PATH="/usr/local/bin:$PATH"
 
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
