@@ -33,7 +33,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public searchFlag = false;
-  public serachArr: PolicyFile[];
+  public searchArr: PolicyFile[];
   pageOfItems: Array<any>;
 
   constructor(
@@ -55,7 +55,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
         this.policyFiles = allPolicyFilesState;
-        this.policyFilesListLoading = false;
+                this.policyFilesListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyFilesListLoading = false;
         this.authFailure = true;
@@ -83,7 +83,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     if (!this.policyFiles || !searchText) {
       this.searchFlag = false;
     } else {
-      this.serachArr = this.policyFiles.filter((key) => {
+      this.searchArr = this.policyFiles.filter((key) => {
         this.searchFlag = true;
         if (key) {
           return key.name.includes(searchText);

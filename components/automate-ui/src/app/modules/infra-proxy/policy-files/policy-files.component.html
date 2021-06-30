@@ -6,13 +6,14 @@
       <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policy">
       </app-infra-search-bar>
     </div>
-    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (serachArr.length === 0) ">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0) ">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p>No policy files available</p>
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue === ''">No policy files available</p>
     </div>
     <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
       <chef-table>
-        <chef-thead>
+        <chef-thead *ngIf="!searchFlag || searchArr.length">
           <chef-tr class="no_border_tr">
             <chef-th class="no_border_th">Name</chef-th>
             <chef-th class="no_border_th">Revision ID</chef-th>
@@ -20,16 +21,8 @@
             <chef-th class="no_border_th three-dot-column"></chef-th>
           </chef-tr>
         </chef-thead>
-        <chef-tbody *ngIf="!searchFlag">
+        <chef-tbody>
           <chef-tr *ngFor="let policyFile of pageOfItems">
-            <chef-td>{{ policyFile.name }}</chef-td>
-            <chef-td>{{ policyFile.revision_id }}</chef-td>
-            <chef-td></chef-td>
-            <chef-td class="three-dot-column"></chef-td>
-          </chef-tr>
-        </chef-tbody>
-        <chef-tbody *ngIf="searchFlag">
-          <chef-tr *ngFor="let policyFile of serachArr">
             <chef-td>{{ policyFile.name }}</chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>
@@ -38,8 +31,14 @@
         </chef-tbody>
       </chef-table>
     </div>
-    <app-pagination
+    <app-pagination *ngIf="!searchFlag"
       [items]="policyFiles"
+      class="policy-file-list-paging"
+      label="name"
+      (changePage)="onChangePage($event)">
+    </app-pagination>
+    <app-pagination *ngIf="searchFlag"
+      [items]="searchArr"
       class="policy-file-list-paging"
       label="name"
       (changePage)="onChangePage($event)">
