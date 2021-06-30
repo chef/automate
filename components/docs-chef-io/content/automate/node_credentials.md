@@ -46,7 +46,7 @@ Select _Add Credential_ and a dialog box appears as shown below. Select the _Cre
 
 Windows machines **must have** the following configurations:
 
-* Ports 3389(RDP), 80(HTTP), 443(HTTPS), 5985(WinRM) and 5986(WinRM) must be open.
+* Ports 3389(RDP), 80(HTTP), 443(HTTPS), 5985(WinRM) and 5986(WinRM) must be open and reachable from Chef Automate.
 * Use the below script to configure WinRM:
   ```powershell
   winrm quickconfig -q
