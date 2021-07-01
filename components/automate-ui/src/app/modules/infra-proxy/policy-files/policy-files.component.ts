@@ -55,7 +55,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
         this.policyFiles = allPolicyFilesState;
-                this.policyFilesListLoading = false;
+        this.policyFilesListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyFilesListLoading = false;
         this.authFailure = true;

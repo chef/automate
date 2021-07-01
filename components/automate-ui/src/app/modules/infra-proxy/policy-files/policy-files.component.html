@@ -3,7 +3,7 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policy">
+      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policy files">
       </app-infra-search-bar>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0) ">

@@ -147,9 +147,6 @@ describe('infra policy file', () => {
 
           cy.get('[data-cy=search-filter]').clear();
           cy.get('[data-cy=search-entity]').click();
-          // getPolicyFile().then((response) => {
-          //   checkResponse(response);
-          // });
         }
       });
     });
