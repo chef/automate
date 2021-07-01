@@ -81,6 +81,13 @@ To access these components for an organization, select **Chef Servers > Organiza
 
 A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuration and policy distribution. A cookbook contains recipes and other files, components, or directories.
 
+The Chef Infra Server UI lets you:
+
+- List out cookbooks with latest version
+- View different version of cookbook
+- View the contents of a cookbook
+- View the details of a cookbook
+
 ### Roles
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
