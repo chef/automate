@@ -13,6 +13,7 @@ gh_repo = "automate"
     weight = 40
 +++
 
+
 ## Chef Automate - CMDB Integration App in ServiceNow
 
 This guide provides instructions to configure a customer's instance for enabling the population of the Configuration Management Database (CMDB) data within ServiceNow. Chef Automate manages the CMDB data from each node in the customer's estate and the compliance and configuration management status across the Enterprise.
@@ -109,8 +110,8 @@ Note that for integration with CMDB data, you need to assign the _OOB ITIL_ role
 
 ### References
 
-- [Creating Users in ServiceNow](https://docs.servicenow.com/csh?topicname=t_CreateAUser.html)
-- [Assigning Roles in ServiceNow](https://docs.servicenow.com/csh?topicname=t_AssignARoleToAUser.html)
+- [Creating Users in ServiceNow] (https://docs.servicenow.com/csh?topicname=t_CreateAUser.html)
+- [Assigning Roles in ServiceNow] (https://docs.servicenow.com/csh?topicname=t_AssignARoleToAUser.html)
 
 ### Configuring Application Properties
 
@@ -130,8 +131,8 @@ The application system properties are:
 | `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by setting the property to **Yes**. | Default: `Yes` | 
 | `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` | 
 | `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` | 
-| `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li>Debug</li><li>Warn</li><li>Info</li> <li>Error</li></ul>It enables the selected logging level and is visible in logs. | Default: `Error`| 
-| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API is set to `Yes`. The possible values are: Yes, No | Default: `Yes` | 
+| `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li>Debug</li><li>Warn</li><li>Info</li> <li>Error</li></ul>It enables the selected logging level and is visible in logs. | Default: `Error` | 
+| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API is set to `Yes`. The possible values are: Yes, No. | Default: `Yes` | 
 | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` | 
 
 ### Scripted REST API
@@ -236,13 +237,13 @@ You can configure Chef Automate by following two methods:
 - Using the ServiceNow application
 - Using the Chef Automate UI
 
-{{< note >}}
+{{ < note > }}
 
 Ensure you set up the data imports using Chef Automate's **Data Feed** feature to avoid unnecessary performance impacts to your ServiceNow infrastructure. Initially, you can configure `feed_interval` setting to the larger time intervals, for example, **4 or 8 hours**, and with a smaller `node_batch_size` of **50**. 
 
 In addition, you can test it on your development infrastructure by using the **CIDR Filter** functionality. Thus, the Chef Automate's **Data Feed** feature may suit your production environment, depending on the size of your estate and the setup you made in the ServiceNow production environment.
 
-{{< /note >}}
+{{ < /note > }}
 
 ### Configuring Chef Automate from ServiceNow
 
@@ -266,7 +267,7 @@ Follow these steps to configure the Chef Automate integration from ServiceNow:
 
 ### Configuring Chef Automate from Chef Automate UI
 
-Follow these steps to configure the Chef Automate integration from the Chef Automate UI :
+Follow these steps to configure the Chef Automate integration from the Chef Automate UI:
 
 1. Navigate to the **Settings** menu.
 1. Click the **Data Feeds** link from the **General Settings**.
@@ -332,3 +333,4 @@ To uninstall the application:
 1. In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
 2. From the **Downloads** tab, select the **Chef Automate** link.
 3. In the **Related Links** section, select **Uninstall**. 
+
