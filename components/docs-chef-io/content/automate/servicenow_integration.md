@@ -332,3 +332,4 @@ To uninstall the application:
 1. In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
 2. From the **Downloads** tab, select the **Chef Automate** link.
 3. In the **Related Links** section, select **Uninstall**. 
+
