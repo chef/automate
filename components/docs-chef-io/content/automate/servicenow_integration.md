@@ -123,7 +123,7 @@ Select the **Chef Automate** > **Properties** menu item to navigate to the **Pro
 The application system properties are:
 
 | Property Name | Description | Default |
-| -------------- | ---------  | --------| 
+| --------------| ----------  | --------| 
 | `x_chef_automate.chef.default.status` | Used to set up the status of the service record as **inserted** or **updated**. | Default: `1`| 
 | `x_chef_automate.client_runs_per_node` | Used to set a maximum number of clients runs for a node. | Default: `5` | 
 | `x_chef_automate.compliance_reports_per_node` | Used to set a maximum number of compliance reports for a node. | Default: `5` | 
@@ -332,4 +332,3 @@ To uninstall the application:
 1. In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
 2. From the **Downloads** tab, select the **Chef Automate** link.
 3. In the **Related Links** section, select **Uninstall**. 
-
