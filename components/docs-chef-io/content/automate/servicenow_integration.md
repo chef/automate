@@ -122,18 +122,17 @@ Select the **Chef Automate** > **Properties** menu item to navigate to the **Pro
 
 The application system properties are:
 
-| Property Name | Description |
-| -------------- | ---------  |
-| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API is set to `Yes` by default. The possible values are: Yes, No | 
-| `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by setting the property to **Yes**. | 
-| `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. |
-| `x_chef_automate.client_runs_per_node` | These 2 properties are used to set a maximum number of clients runs and compliance reports for a node. The default value is **5**. |
-| `x_chef_automate.compliance_reports_per_node` | These 2 properties are used to set a maximum number of clients runs and compliance reports for a node. The default value is **5**. | 
-| `x_chef_automate.chef.user` | Used to set up user’s ID or sys ID for inserting the data. | 
-| `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. The default value is **No**. | 
-| `x_chef_automate.chef.default. status` | Used to set up the status of the service record as **inserted** or **updated**. | 
-| `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li>Debug</li><li>Warn</li><li>Info</li> <li>Error</li></ul>It enables the selected logging level and is visible in logs. | 
-| `x_chef_automate.discovery.source` | Sets the value for the discovery source. It takes import set when left blank by default. | 
+| Property Name | Description | Default |
+| -------------- | ---------  | --------| 
+| `x_chef_automate.chef.default.status` | Used to set up the status of the service record as **inserted** or **updated**. | Default: `1`| 
+| `x_chef_automate.client_runs_per_node` | Used to set a maximum number of clients runs for a node. | Default: `5` | 
+| `x_chef_automate.compliance_reports_per_node` | Used to set a maximum number of compliance reports for a node. | Default: `5` | 
+| `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by setting the property to **Yes**. | Default: `Yes` | 
+| `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` | 
+| `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` | 
+| `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li>Debug</li><li>Warn</li><li>Info</li> <li>Error</li></ul>It enables the selected logging level and is visible in logs. | Default: `Error`| 
+| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API is set to `Yes`. The possible values are: Yes, No | Default: `Yes` | 
+| `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` | 
 
 ### Scripted REST API
 
@@ -237,13 +236,13 @@ You can configure Chef Automate by following two methods:
 - Using the ServiceNow application
 - Using the Chef Automate UI
 
-{{Warning}}
+{{< note >}}
 
 Ensure you set up the data imports using Chef Automate's **Data Feed** feature to avoid unnecessary performance impacts to your ServiceNow infrastructure. Initially, you can configure `feed_interval` setting to the larger time intervals, for example, **4 or 8 hours**, and with a smaller `node_batch_size` of **50**. 
 
 In addition, you can test it on your development infrastructure by using the **CIDR Filter** functionality. Thus, the Chef Automate's **Data Feed** feature may suit your production environment, depending on the size of your estate and the setup you made in the ServiceNow production environment.
 
-((/Warning))
+{{< /note >}}
 
 ### Configuring Chef Automate from ServiceNow
 
@@ -280,7 +279,7 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
    - ServiceNow user: a ServiceNow user with **ITIL** and `x_chef_automate.api` roles.
    - ServiceNow password: Password of the ServiceNow user.
   
-   Note that the Data Feed URL is the ServiceNow application, `FQDN/api/x_chef_automate/asset`. For example,  <https://venxxx.service-now.com/api/x_chef_automate/asset>.
+   Note that to send data from Chef Automate to ServiceNow, you need to specify the **Data Feed URL** in the Chef Automate server `FQDN/api/x_chef_automate/asset` (Fully Qualified Domain Name (FQDN) is the domain name of the ServiceNow instance to configure in Chef Automate). For example, <https://venxxx.service-now.com/api/x_chef_automate/asset>.
 
 2. Click the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues. 
 3. Click **Create Data Feed**. The configuration is saved.
