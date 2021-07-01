@@ -423,9 +423,9 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/keyval-service",
+      "name": "chef/automate-backend-journalbeat",
       "metadata": {
-        "name": "chef/keyval-service",
+        "name": "chef/automate-backend-journalbeat",
         "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": true,
@@ -589,7 +589,6 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
-        "chef/keyval-service",
         "chef/user-settings-service"
       ],
       "packages": null,

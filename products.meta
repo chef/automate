@@ -43,7 +43,7 @@
     "chef/automate-builder-api",
     "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
-    "chef/keyval-service",
+    "chef/automate-backend-journalbeat",
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
@@ -151,8 +151,6 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
-        "chef/keyval-service",
-       
         "chef/user-settings-service"
       ]
     },
