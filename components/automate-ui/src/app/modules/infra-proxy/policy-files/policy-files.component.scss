@@ -63,4 +63,23 @@ chef-loading-spinner {
     height: 36px;
     margin-top: 4px;
   }
+  
+  ::ng-deep .mat-select-panel .mat-option {
+
+    &.secondary {
+      height: 2.3em;
+      background: $chef-white;
+      color: $chef-critical;
+    }
+
+    &:hover {
+      background: $chef-primary-bright;
+      color: $chef-white;
+
+      chef-icon.primary {
+        color: $chef-white;
+      }
+
+    }
+  }
 }
