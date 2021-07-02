@@ -40,13 +40,13 @@ The [Chef Automate](https://www.chef.io/automate/) provides a full suite of ente
 - ServiceNow plugin - Configuration Management (CMDB) 1.1.
 - ServiceNow plugin - Configuration Management for Scoped Apps [com.snc.cmdb.scoped] 1.0.0.
 
-{{<Note>}}
+{{< Note >}}
 
 You can obtain the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application.
 
 {{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins>}}
 
-{{</Note>}}
+{{< /Note >}}
 
 ### Installing Chef Automate application in ServiceNow
 
@@ -225,13 +225,13 @@ The **Transformation** events occur while transforming an import set table int
 
 You can configure Chef Automate either using the ServiceNow application or using the Chef Automate UI.
 
-{{<note >}}
+{{< note >}}
 
 Ensure you set up the data imports using Chef Automate's **Data Feed** feature to avoid unnecessary performance impacts to your ServiceNow infrastructure. Initially, you can configure `feed_interval` setting to the larger time intervals, for example, **4 or 8 hours**, and with a smaller `node_batch_size` of **50**. 
 
 In addition, you can test it on your development infrastructure by using the **CIDR Filter** functionality. Thus, the Chef Automate's **Data Feed** feature may suit your production environment, depending on the size of your estate and the setup you made in the ServiceNow production environment.
 
-{{</note>}}
+{{< /note >}}
 
 ### Configuring Chef Automate from ServiceNow
 
