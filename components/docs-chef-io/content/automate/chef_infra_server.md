@@ -83,8 +83,8 @@ A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuratio
 
 The Chef Infra Server UI lets you:
 
-- List out cookbooks with latest version
-- View different version of cookbook
+- List out cookbooks with the latest version
+- View different versions of a cookbook
 - View the contents of a cookbook
 - View the details of a cookbook
 
@@ -111,7 +111,7 @@ The dropdown shows the latest version of the cookbook.
 
 #### Cookbook Content
 
-The content tab of a cookbook comprised of recipes and other optional components. It also contains the files or directories of the components. You can view the content of the file by selecting the file from the component list.
+Select the content tab to view the recipes and other optional components of a cookbook. It also contains the files or directories of the components. You can view the content of the file by selecting the file from the component list.
 
 {{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
 
