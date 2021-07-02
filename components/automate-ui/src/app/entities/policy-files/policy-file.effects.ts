@@ -11,7 +11,10 @@ import {
   GetPolicyFilesSuccess,
   PolicyFilesSuccessPayload,
   GetPolicyFilesFailure,
-  PolicyFileActionTypes
+  PolicyFileActionTypes,
+  DeletePolicyFile,
+  DeletePolicyFileSuccess,
+  DeletePolicyFileFailure
 } from './policy-file.action';
 
 import { PolicyFileRequests } from './policy-file.requests';
@@ -43,4 +46,33 @@ export class PolicyFileEffects {
         });
       })));
 
+  deletePolicyFile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE),
+      mergeMap(({ payload: { server_id, org_id, name } }: DeletePolicyFile) =>
+        this.requests.deletePolicyFiles(server_id, org_id, name).pipe(
+          map(() => new DeletePolicyFileSuccess({ name })),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new DeletePolicyFileFailure(error)))))));
+
+  deletePolicyFileSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE_SUCCESS),
+      map(({ payload: { name } }: DeletePolicyFileSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Successfully deleted policy files - ${name}.`
+        });
+    })));
+
+  deletePolicyFileFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE_FAILURE),
+      map(({ payload: { error } }: DeletePolicyFileFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not delete policy files: ${msg || error}`
+        });
+    })));
 }

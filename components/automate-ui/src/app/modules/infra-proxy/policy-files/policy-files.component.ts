@@ -7,7 +7,7 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { EntityStatus } from 'app/entities/entities';
-import { GetPolicyFiles } from 'app/entities/policy-files/policy-file.action';
+import { GetPolicyFiles, DeletePolicyFile } from 'app/entities/policy-files/policy-file.action';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import {
   allPolicyFiles,
@@ -125,6 +125,9 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public deletePolicyfile(): void {
     this.deleting = true;
     this.closeDeleteModal();
+    this.store.dispatch(new DeletePolicyFile({
+      server_id: this.serverId, org_id: this.orgId, name: this.policyfileToDelete.name
+    }));
   }
 
   public closeDeleteModal(): void {
