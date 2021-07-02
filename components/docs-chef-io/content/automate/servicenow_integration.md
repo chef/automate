@@ -145,7 +145,7 @@ The **Scripted Rest API** is used to establish a connection between ServiceNow a
 
 #### Script Actions
 
-<need to check> You can navigate to the **Script Actions** section by selecting **Metrics** >**Script Actions** from ServiceNow. 
+**need to check** You can navigate to the **Script Actions** section by selecting **Metrics** >**Script Actions** from ServiceNow. 
 
 - The **Asset Process** script action processes the event and updates the node data into the _asset import_ table.
 
