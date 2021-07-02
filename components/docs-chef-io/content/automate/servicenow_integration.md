@@ -321,9 +321,9 @@ In addition, the application updates the CMDB file systems and software installe
 
 The user can drill down into **Client Run** detail from a server record by clicking the name on an individual Client Run. Client Run record displays related information for:
 
-- Client run cookbooks - cookbooks executed during the client run.
-- Client run lists - run lists executed during the client run.
-- Client run recipes - recipes executed during the client run.
+- Client run cookbooks: cookbooks executed during the client run.
+- Client run lists: run lists executed during the client run.
+- Client run recipes: recipes executed during the client run.
 
 The entire Chef Client Run details are available for each server. In addition, Client runs are also available from the **Client Runs** module.
 
