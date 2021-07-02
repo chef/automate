@@ -88,6 +88,41 @@ The Chef Infra Server UI lets you:
 - View the contents of a cookbook
 - View the details of a cookbook
 
+#### List of Cookbooks
+
+In Chef Infra Server, you can view all the cookbooks of an organization. Each Cookbook has its latest version mentioned in the list.
+
+{{< figure src="/images/automate/list-of-cookbooks.png" alt="List of Cookbooks">}}
+
+Select any cookbook from the list to view the details of that particular cookbook.
+
+#### View Different Versions of Cookbooks
+
+To view the different versions of the cookbook:
+
+- Select a specific cookbook from the list.
+- The interface contains a dropdown list for versions. Select any version to view the details.
+
+{{< note >}}
+The dropdown shows the latest version of the cookbook.
+{{< /note >}}
+
+{{< figure src="/images/automate/view-different-versions-of-cookbook.png" alt="Versions of a Cookbook">}}
+
+#### Cookbook Content
+
+The content tab of a cookbook comprised of recipes and other optional components. It also contains the files or directories of the components. You can view the content of the file by selecting the file from the component list.
+
+{{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
+
+In the above image, the content of the file `default.rb` of **attributes** component is displayed.
+
+#### Details of a Cookbook
+
+Select the **Details** tab to view all the details like the requirements, usage, resources, and license of a cookbook.
+
+{{< figure src="/images/automate/details-of-a-cookbook.png" alt="Details of a Cookbook">}}
+
 ### Roles
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
