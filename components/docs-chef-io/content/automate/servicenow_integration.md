@@ -301,7 +301,7 @@ The application system properties are:
 3. Make the required changes.
 4. Click Save. The application saves the configuration changes.
 
-## Navigation
+## Navigation - flow needs to be again checked
 
 In ServiceNow, the navigation of the application is through the **Chef Automate** menu.
 
