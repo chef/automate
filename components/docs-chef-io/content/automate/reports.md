@@ -88,7 +88,7 @@ Role
 
 Deep filtering provides reports on compliance profiles and controls. Apply deep filtering to see the compliance reporting for a profile version or one of its controls.
 
-Chef Automate saves computational time and storage space by computing compliance reporting statistics at the aggregate level. Deep filtering uses the `profile_id` attribute to drill down to the granular level of your compliance status. In contrast, filtering with the `profile_name` attribute instead of `profile_id` creates a report for every version of `profile_name` in your infrastructure.
+Chef Automate saves computational time and storage space by calculating compliance reporting statistics at the aggregate level. Deep filtering uses the `profile_id` attribute to drill down to the granular level of your compliance status. In contrast, filtering with the `profile_name` attribute instead of `profile_id` creates a report for every version of `profile_name` in your infrastructure.
 
 Deep filtering supports reports for:
 
