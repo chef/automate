@@ -97,7 +97,7 @@ Deep filtering supports reports for:
 
 #### Profile Deep Filtering
 
-Deep Filtering with `profile_id` queries a specific profile and creates a compliance report for that version of the profile in your infrastructure.
+Deep Filtering with `profile_id` scopes a compliance report to a versioned profile.
 
 To create a report at the profile level:
 
@@ -107,7 +107,7 @@ To create a report at the profile level:
 
 #### Control Deep Filtering
 
-Deep filtering for a control scopes the report to level of a single control within a versioned profile.
+Deep filtering for a control scopes the report to a single control within a versioned profile.
 
 To create a report at the control level:
 
