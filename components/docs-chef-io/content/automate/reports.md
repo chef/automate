@@ -107,7 +107,7 @@ To create a report at the profile level:
 
 #### Control Deep Filtering
 
-Deep filtering for a control scopes the report to a single control within a versioned profile.
+Deep filtering for a control scopes a compliance report to a single control within a versioned profile.
 
 To create a report at the control level:
 
