@@ -86,7 +86,7 @@ Role
 
 ### Deep Filtering
 
-Deep filtering provides reports on compliance profiles and controls. Apply deep filtering to see the compliance reporting for an entire profile or an individual control within a profile.
+Deep filtering provides reports on compliance profiles and controls. Apply deep filtering to see the compliance reporting for a profile version or one of its controls.
 
 Chef Automate saves computational time and storage space by computing compliance reporting statistics at the aggregate level. Deep filtering uses the `profile_id` attribute to drill down to the granular level of your compliance status. In contrast, filtering with the `profile_name` attribute instead of `profile_id` creates a report for every version of `profile_name` in your infrastructure.
 
@@ -115,7 +115,8 @@ To create a report at the control level:
     1. Add a control
     1. Apply additional reporting filters
 
-If the results returned by your filtering is incorrectly scoped, review the `profile_id` and control field contents.
+If the results returned by your deep filter are incorrectly scoped, review the `profile_id` and control field contents.
+
 ### Waivers
 
 A node's waived status appears if applicable in displays where a node's status appears in Chef Automate.
