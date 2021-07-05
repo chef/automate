@@ -46,7 +46,7 @@ The installation personnel performing the task of installing Chef Automate Integ
 
 You can obtain the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application.
 
-{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins>}}
+{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins">}}
 
 {{< /note >}}
 
