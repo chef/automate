@@ -10,7 +10,7 @@ describe('infra policy file', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const policyFileName = `${cypressPrefix}-policy-${now}-1`;
+  const policyFileName = `${cypressPrefix}-policyFie-${now}-1`;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -152,5 +152,36 @@ describe('infra policy file', () => {
     });
   });
 
+    it('can delete policy file', () => {
+      getPolicyFile().then((response) => {
+        if (checkResponse(response)) {
+          cy.get('[data-cy=search-filter]').type(`${cypressPrefix}-policyFile-${now}`);
+          cy.get('[data-cy=search-entity]').click();
+            cy.get('[data-cy=policy-file-table-container]').contains(policyFileName)
+              .should('exist');
+            cy.get('app-policy-files [data-cy=policy-file-table-container] chef-td a')
+              .contains(policyFileName).parent().parent().find('.mat-select-trigger').click();
+
+            cy.get('[data-cy=delete]').should('be.visible')
+              .click();
+            // accept dialog
+            cy.get('app-policy-files chef-button').contains('Delete').click();
+            // verify success notification and then dismiss it
+            cy.get('app-notification.info').
+              contains(`Successfully deleted policy file - ${policyFileName}.`);
+            cy.get('app-notification.info chef-icon').click();
+          
+            getPolicyFile().then((response) => {
+              checkResponse(response);
+            });
+
+            cy.get('[data-cy=search-filter]').clear();
+            cy.get('[data-cy=search-entity]').click();
+            getPolicyFile().then((response) => {
+              checkResponse(response);
+            });
+          }
+        });
+    });
   });
 });
