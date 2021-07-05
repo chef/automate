@@ -53,7 +53,7 @@ Windows machines **must have** the following configurations:
   winrm create winrm/config/Listener?Address=*+Transport=HTTP
   winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="1024"}'
   winrm set winrm/config '@{MaxTimeoutms="1800000"}'
-  winrm set winrm/config/winrs '@{MaxShellsPerUser="50"'
+  winrm set winrm/config/winrs '@{MaxShellsPerUser="50"}'
   winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="1024"}'
   winrm set winrm/config/service '@{AllowUnencrypted="true"}'
   winrm set winrm/config/service/auth '@{Basic="true"}'
