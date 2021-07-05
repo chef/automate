@@ -1,12 +1,12 @@
 UPSTREAM_PKG_IDENT="chef/journalbeat/6.8.6"
-pkg_name="automate-backend-journalbeat"
+pkg_name=journalbeat-service
 pkg_description="Wrapper package for chef/journalbeat"
 pkg_origin="chef"
-pkg_version="6.8.6"
+pkg_version="0.1.0"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
-pkg_upstream_url="https://www.chef.io/automate"
+pkg_upstream_url="http://github.com/chef/automate/components/journalbeat-service"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
 pkg_svc_user=root
 pkg_svc_group=root
@@ -17,7 +17,7 @@ pkg_deps=(
 )
 
 pkg_binds=(
-  [elasticsearch]="http-port root-ca admin_username admin_password"
+  [automate-elasticsearch]="http-port"
 )
 
 
