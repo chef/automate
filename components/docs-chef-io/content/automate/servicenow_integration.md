@@ -40,13 +40,15 @@ The [Chef Automate](https://www.chef.io/automate/) provides a full suite of ente
 - ServiceNow plugin - Configuration Management (CMDB) 1.1.
 - ServiceNow plugin - Configuration Management for Scoped Apps [com.snc.cmdb.scoped] 1.0.0.
 
-{{< Note >}}
+The installation personnel performing the task of installing Chef Automate Integration is advised to be aware of the installation and configuration of the ServiceNow app.
+
+{{< note >}}
 
 You can obtain the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application.
 
 {{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins>}}
 
-{{< /Note >}}
+{{< /note >}}
 
 ### Installing Chef Automate application in ServiceNow
 
@@ -227,9 +229,11 @@ You can configure Chef Automate either using the ServiceNow application or using
 
 {{< note >}}
 
-Ensure you set up the data imports using Chef Automate's **Data Feed** feature to avoid unnecessary performance impacts to your ServiceNow infrastructure. Initially, you can configure `feed_interval` setting to the larger time intervals, for example, **4 or 8 hours**, and with a smaller `node_batch_size` of **50**. 
-
-In addition, you can test it on your development infrastructure by using the **CIDR Filter** functionality. Thus, the Chef Automate's **Data Feed** feature may suit your production environment, depending on the size of your estate and the setup you made in the ServiceNow production environment.
+- Ensure you set up the data imports using Chef Automate's **Data Feed** feature to avoid unnecessary performance impacts to your ServiceNow infrastructure. 
+- Initially, you can configure `feed_interval` setting to the larger time intervals, for example, **4 or 8 hours**, and with a smaller `node_batch_size` of **50**. If more nodes are required, then you must increase the `feed_interval`.
+- The benchmark with `node_batch_size` set as **15** is tested, however you can set the value between **1** and **30**. 
+-  The size of Scans can be large as multiple profiles are run. Hence, you must ratain the `node_bach_size` smaller to avoid **4MB GRPC** limits being reached.
+- In addition, you can test it on your development infrastructure by using the **CIDR Filter** functionality. Thus, the Chef Automate's **Data Feed** feature may suit your production environment, depending on the size of your estate and the setup you made in the ServiceNow production environment.
 
 {{< /note >}}
 
