@@ -10,6 +10,7 @@ describe('infra policy file', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const policyFileName = `${cypressPrefix}-policy-${now}-1`;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -130,5 +131,26 @@ describe('infra policy file', () => {
         });
       });
     });
+
+    context('can search and change page in dataBag', () => {
+      it('can search a DataBag and check if empty or not', () => {
+      getPolicyFile().then((response) => {
+        if (checkResponse(response)) {
+          cy.get('[data-cy=search-filter]').type(policyFileName);
+          cy.get('[data-cy=search-entity]').click();
+          cy.get('[data-cy=policy-file-table-container]').then(body => {
+            if (body.text().includes(policyFileName)) {
+              cy.get('[data-cy=policy-file-table-container]')
+              .contains(policyFileName).should('exist');
+            }
+          });
+
+          cy.get('[data-cy=search-filter]').clear();
+          cy.get('[data-cy=search-entity]').click();
+        }
+      });
+    });
+  });
+
   });
 });
