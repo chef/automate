@@ -34,7 +34,7 @@ export class WelcomeModalComponent {
 
   private isTelemetryServiceEnabled: boolean;
   private telemetryServiceSubscription: Subscription;
-  
+
   constructor(
     store: Store<NgrxStateAtom>,
     private localStorage: LocalStorageService,
