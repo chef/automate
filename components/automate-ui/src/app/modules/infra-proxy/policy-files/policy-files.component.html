@@ -2,13 +2,18 @@
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
-    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length">
+    <div class="search-create-container">
+      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policy files">
+      </app-infra-search-bar>
+    </div>
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0) ">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p>No policy files available</p>
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+      <p *ngIf="searchValue === ''">No policy files available</p>
     </div>
     <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
       <chef-table>
-        <chef-thead>
+        <chef-thead *ngIf="!searchFlag || searchArr.length">
           <chef-tr class="no_border_tr">
             <chef-th class="no_border_th">Name</chef-th>
             <chef-th class="no_border_th">Revision ID</chef-th>
@@ -26,8 +31,14 @@
         </chef-tbody>
       </chef-table>
     </div>
-    <app-pagination
+    <app-pagination *ngIf="!searchFlag"
       [items]="policyFiles"
+      class="policy-file-list-paging"
+      label="name"
+      (changePage)="onChangePage($event)">
+    </app-pagination>
+    <app-pagination *ngIf="searchFlag"
+      [items]="searchArr"
       class="policy-file-list-paging"
       label="name"
       (changePage)="onChangePage($event)">

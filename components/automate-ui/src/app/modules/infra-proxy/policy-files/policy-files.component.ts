@@ -30,6 +30,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyFilesListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public searchFlag = false;
+  public searchArr: PolicyFile[];
   pageOfItems: Array<any>;
 
   constructor(
@@ -71,5 +75,21 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public searchPolicyFiles(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.policyFiles || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.searchArr = this.policyFiles.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.name.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
   }
 }
