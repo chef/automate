@@ -149,6 +149,27 @@ func (s *UserSettingsServer) PutUserSettings(ctx context.Context,
 	return putUserSettingsResp, nil
 }
 
+//rpc DeleteUserSettings(DeleteUserSettingsRequest) returns (DeleteUserSettingsResponse){
+func (s *UserSettingsServer) DeleteUserSettings(ctx context.Context, req *user_settings.DeleteUserSettingsRequest) (*pb.Empty, error) {
+	logrus.Infof("DeleteUserSettings from server.go")
+	name := req.GetUser().GetName()
+	if name == "" {
+		return nil, errors.New("invalid user Id")
+	}
+	connector := req.GetUser().GetConnector()
+	if connector == "" {
+		return nil, errors.New("invalid connector")
+	}
+	logrus.Infof("Put settings for connector: %s user: %s", connector, name)
+	// delete the user settings for this id
+	err := s.db.DeleteUserSettings(name, connector)
+	if err != nil {
+		return nil, err
+	}
+
+	return &empty, nil
+}
+
 func allowed(value string, validValues []string) bool {
 	//it's a setting that we support.. now check to see if it's set value is one that we allow
 	//we cannot guarantee that the array is sorted so we have to iterate over the whole thing to search it

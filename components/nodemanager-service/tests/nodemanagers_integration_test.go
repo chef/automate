@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
@@ -37,8 +38,11 @@ func TestNodemanagers(t *testing.T) {
 
 	t.Log("add aws and azure managers")
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-api")
+	time.Sleep(2 * time.Second)
 	mgrtesthelpers.AddAWSManager(ctx, mgrClient, "aws-ec2")
+	time.Sleep(2 * time.Second)
 	mgrtesthelpers.AddAzureManager(ctx, mgrClient, "azure-api")
+	time.Sleep(100 * time.Millisecond)
 
 	t.Log("try to add a manager with a bad secret")
 	awsMgr := manager.NodeManager{
@@ -49,6 +53,7 @@ func TestNodemanagers(t *testing.T) {
 			{Key: "AWS_SECRET_ACCESS_KEY", Value: "lala"}},
 	}
 	_, err = mgrClient.Create(ctx, &awsMgr)
+	time.Sleep(100 * time.Millisecond)
 	assert.Contains(t, err.Error(), "InvalidArgument desc")
 
 	t.Log("try to add a manager with an invalid type")
@@ -57,6 +62,7 @@ func TestNodemanagers(t *testing.T) {
 		Type: "mario",
 	}
 	_, err = mgrClient.Create(ctx, &mgr)
+	time.Sleep(100 * time.Millisecond)
 	assert.Contains(t, err.Error(), "InvalidArgument desc = valid types for node manager instance are [aws-ec2 aws-api azure-api aws azure azure-vm gcp gcp-api]")
 
 	t.Log("list nodemanagers")
@@ -98,6 +104,10 @@ func TestNodemanagers(t *testing.T) {
 		Sort:  "date_added",
 		Order: 1,
 	})
+	t.Log("date added  0::::::", mgrsSortedDate.GetManagers()[0].GetName(), mgrsSortedDate.GetManagers()[0].GetDateAdded())
+	t.Log("date added  1::::::", mgrsSortedDate.GetManagers()[1].GetName(), mgrsSortedDate.GetManagers()[1].GetDateAdded())
+	t.Log("date added  2::::::", mgrsSortedDate.GetManagers()[2].GetName(), mgrsSortedDate.GetManagers()[2].GetDateAdded())
+	t.Log("date added  3::::::", mgrsSortedDate.GetManagers()[3].GetName(), mgrsSortedDate.GetManagers()[3].GetDateAdded())
 	require.NoError(t, err)
 	assert.Equal(t, "Automate", mgrsSortedDate.GetManagers()[3].GetName())
 	assert.Equal(t, "my test aws-api mgr", mgrsSortedDate.GetManagers()[2].GetName())

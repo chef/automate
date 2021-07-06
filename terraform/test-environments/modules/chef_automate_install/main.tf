@@ -43,18 +43,6 @@ data "template_file" "install_chef_automate_cli" {
   }
 }
 
-module "chef_baseline" {
-  source = "github.com/chef/es-terraform//modules/cd_base"
-
-  instance_id   = "${var.instance_id}"
-  instance_fqdn = "${var.instance_fqdn}"
-  ssh_username  = "${var.ssh_username}"
-
-  enable_email      = "${var.enable_email}"
-  enable_monitoring = "${var.enable_monitoring}"
-  chef_environment  = "${var.chef_environment}"
-}
-
 locals {
   saml_config = <<SAML
 [dex.v1.sys.connectors.saml]
@@ -87,8 +75,6 @@ SAML
 }
 
 resource "null_resource" "soften_mounts" {
-  depends_on = ["module.chef_baseline"]
-
   triggers = {
     always_do = "${uuid()}"
   }

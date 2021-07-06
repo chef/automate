@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/external/common/query"
-	//"github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/components/user-settings-service/pkg/storage/postgres"
 )
 
@@ -44,13 +43,6 @@ func deleteAllUserSettings() {
 	if err != nil {
 		fmt.Printf("error clearing tables %v\n", err)
 	}
-
-	//for _, secret := range secrets {
-	//	_, err := db.(secret.Id)
-	//	if err != nil {
-	//		fmt.Printf("error deleting secret with ID %v error: %v\n", secret.Id, err)
-	//	}
-	//}
 }
 
 func appendKvs(kvs ...*query.Kv) []*query.Kv {

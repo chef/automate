@@ -725,6 +725,7 @@ type SecretsServiceClient interface {
 	//service_now: username, password
 	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
 	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	//azure: AZURE_SUBSCRIPTION_ID is optional
 	//gcp: GOOGLE_CREDENTIALS_JSON
 	//
 	//Example:
@@ -888,6 +889,7 @@ type SecretsServiceServer interface {
 	//service_now: username, password
 	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
 	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	//azure: AZURE_SUBSCRIPTION_ID is optional
 	//gcp: GOOGLE_CREDENTIALS_JSON
 	//
 	//Example:

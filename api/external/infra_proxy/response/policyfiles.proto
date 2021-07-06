@@ -96,3 +96,8 @@ message NamedRunList {
     // Run list associated with the policy.
     repeated string run_list = 2;
 }
+
+message DeletePolicyfile {
+    // Policyfile name.
+    string name = 1;
+}

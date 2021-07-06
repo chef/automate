@@ -13,8 +13,8 @@
         </div>
 
         <div class="button-bar options">
-          <chef-button tertiary (click)="closeCreateModal()">Cancel</chef-button>
-          <chef-button primary id="reset-button-object-modal" (click)="resetKeyClient()">
+          <chef-button tertiary [disabled]="resetting" (click)="closeCreateModal()">Cancel</chef-button>
+          <chef-button primary id="reset-button-object-modal" [disabled]="resetting" (click)="resetKeyClient()">
             <chef-loading-spinner *ngIf="resetting"></chef-loading-spinner>
             <span *ngIf="!resetting">Reset Key</span>
             <span *ngIf="resetting">Resetting...</span>

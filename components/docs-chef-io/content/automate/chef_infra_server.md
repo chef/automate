@@ -291,7 +291,7 @@ Select the client to view the _Public Key_ for that client. The _Public Key_ of 
 
 The Chef Infra Server lets you reset the _Public Key_ using the _Reset Key_ option. Selecting the _Reset Key_ option opens an alert stating _The current key will no longer be accepted._
 
-{{< figure src="/images/automate/reset-key-in-client-details.png" alt="Reset Key option of a Client" width="400" height="300">}}
+{{< figure src="/images/automate/reset-key-in-client-details.png" alt="Reset Key Option of a Client" width="400" height="300">}}
 
 Selecting the _Reset Key_ shown in the above image opens a new dialog box which contains the new _Private Key_ of that client. To download the new _Private Key_, select **Download**.
 

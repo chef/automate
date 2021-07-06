@@ -1,0 +1,12 @@
+@import "~styles/variables";
+@import "@carbon/layout/scss/layout";
+@import "@carbon/grid/scss/grid";
+
+:host {
+  display: flex;
+  align-items: center;
+
+  chef-button {
+    margin: 0 $spacing-03 0 0;
+  }
+}

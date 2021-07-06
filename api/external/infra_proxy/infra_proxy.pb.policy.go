@@ -884,4 +884,21 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeletePolicyfile", "infra:infraServers:{server_id}:orgs:{org_id}:policyfiles", "infra:infraServers:update", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.DeletePolicyfile); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

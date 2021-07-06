@@ -30,6 +30,11 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyFilesListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public searchFlag = false;
+  public searchArr: PolicyFile[];
+  pageOfItems: Array<any>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -62,8 +67,29 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.resetKeyRedirection.emit(resetLink);
   }
 
+  onChangePage(pageOfItems: Array<any>) {
+    // update current page of items
+    this.pageOfItems = pageOfItems;
+  }
+
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public searchPolicyFiles(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.policyFiles || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.searchArr = this.policyFiles.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.name.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
   }
 }

@@ -31,13 +31,13 @@
           </div>
         </form>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-default-button-object-modal"
             (click)="updateEnvironment()"
             [disabled]="defaultAttrParseError || !defaultAttributeForm?.valid ||
-              !defaultAttributeForm.dirty || conflictError">
+              !defaultAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -67,13 +67,13 @@
           </div>
         </form>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-override-button-object-modal"
             (click)="updateEnvironment()"
             [disabled]="overrideAttrParseError || !overrideAttributeForm?.valid ||
-              !overrideAttributeForm.dirty || conflictError">
+              !overrideAttributeForm.dirty || conflictError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
@@ -92,12 +92,12 @@
           [selectedCookbookNames]="selectedCookbookNames">
         </app-infra-environment-constraint>
         <div class="button-bar-box">
-          <chef-button tertiary (click)="closeEditModal()">Cancel</chef-button>
+          <chef-button tertiary [disabled]="updateInProgress" (click)="closeEditModal()">Cancel</chef-button>
           <chef-button
             primary
             id="create-constraints-button-object-modal"
             (click)="updateEnvironment()"
-            [disabled]="!isConstraints || conflictError || cookbookVersionError">
+            [disabled]="!isConstraints || conflictError || cookbookVersionError || updateInProgress">
             <chef-loading-spinner *ngIf="updateInProgress"></chef-loading-spinner>
             <span *ngIf="updateInProgress">Saving...</span>
             <span *ngIf="!updateInProgress">Save</span>
