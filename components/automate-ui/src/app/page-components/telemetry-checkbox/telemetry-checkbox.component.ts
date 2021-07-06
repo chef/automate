@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { isNil } from 'lodash';
 import { Subscription } from 'rxjs';
 
@@ -11,8 +11,6 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
   styleUrls: ['./telemetry-checkbox.component.scss']
 })
 export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
-
-  @Output() telemetryWarningAlert: EventEmitter<string> = new EventEmitter();
 
   // The user's preference to enable telemetry.
   // Bound to the telemetry checkbox in the welcome modal.
@@ -69,10 +67,5 @@ export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
   togglePersonalTelemetryCollection(): void {
     this.telemetryPersonalPref = !this.telemetryPersonalPref;
     this.telemetryService.setUserTelemetryPreference(this.telemetryPersonalPref);
-    if(!this.telemetryPersonalPref) {
-      this.telemetryWarningAlert.emit('This change is affected when you login again');
-    } else {
-      this.telemetryWarningAlert.emit('');
-    }
   }
 }
