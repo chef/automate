@@ -66,9 +66,9 @@ The Chef Automate application exposes the REST API endpoint that facilitates the
 
 The Chef Automate application provides several roles appropriate for integration. The existing or new ServiceNow users can be assigned these roles, which are as follows:
 
-- x_chef_automate.admin. Refer [Role x_chef_automate.admin]({{< relref "Role x_chef_automate.admin" >}}) section for more information.
-- x_chef_automate.user. Refer [Role x_chef_automate.user]({{< relref "Role x_chef_automate.user" >}}) section for more information. 
-- x_chef_automate.api. Refer [Role x_chef_automate.user]({{< relref "Role x_chef_automate.user" >}}) section for more information.
+- [Role x_chef_automate.admin]({{< relref "Role x_chef_automate.admin" >}}).
+- [Role x_chef_automate.user]({{< relref "Role x_chef_automate.user" >}}). 
+- [Role x_chef_automate.user]({{< relref "Role x_chef_automate.user" >}}).
 
 These roles are part of the package. Users can create their requisite roles and controls if any further restrictions are needed.
 
