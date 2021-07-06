@@ -46,7 +46,10 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 				}
 			}
 
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debugf("Rports SHA:: %v", reportProfilesShas)
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debugf("Reports Map:: %v", reportProfilesShasMissingMetaMap)
 			esProfilesMissingMeta, err := client.ProfilesMissing(reportProfilesShas)
+
 
 			var grpcErr error
 			if err != nil {
@@ -54,6 +57,8 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 				msg.FinishProcessingCompliance(grpcErr)
 				continue
 			}
+
+			logrus.Debugf("Kallol:: missing ptofiles:: %+v", esProfilesMissingMeta)
 
 			// If a report being ingested is missing the metadata for a profile, ES must have it in the backend, otherwise we can't continue
 			for _, esMissingSha := range esProfilesMissingMeta {
@@ -82,7 +87,7 @@ func complianceProfile(in <-chan message.Compliance, client *ingestic.ESClient) 
 					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
-
+				logrus.Debugf("Kallol:: Missing Meta:: %+v", esProfilesForMissingMeta)
 				// Loop through all report profiles to find the ones missing metadata
 				for _, repProfile := range msg.Report.Profiles {
 					// With profile 'name' being a require property, a profile missing it indicates that metadata stripping has
