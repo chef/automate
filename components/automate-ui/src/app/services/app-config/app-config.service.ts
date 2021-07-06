@@ -32,7 +32,7 @@ export class AppConfigService {
   constructor(private handler: HttpBackend) { }
 
   public loadAppConfig() {
-    return new HttpClient(this.handler).get('/banner.js')
+    return new HttpClient(this.handler).get('/custom_settings.js')
       .toPromise()
       .then(data => this.appConfig = data)
       // when there is no config, we can just reset the config to its initial empty values
