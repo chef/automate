@@ -462,8 +462,6 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
 
-
-
 ## Troubleshoot
 
 While fetching any objects like cookbooks, you might face an error `Could not get cookbooks: organization 'no-org' does not exist`, which means the provided organization does not exist on Chef Infra Server.
