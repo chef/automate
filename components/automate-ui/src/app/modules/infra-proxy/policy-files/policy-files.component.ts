@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -11,9 +11,9 @@ import { GetPolicyFiles, DeletePolicyFile } from 'app/entities/policy-files/poli
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import {
   allPolicyFiles,
-  getAllStatus as getAllPolicyFilesForOrgStatus
+  getAllStatus as getAllPolicyFilesForOrgStatus,
+  deleteStatus
 } from 'app/entities/policy-files/policy-file.selectors';
-
 
 @Component({
   selector: 'app-policy-files',
@@ -48,9 +48,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
-    this.store.dispatch(new GetPolicyFiles({
-      server_id: this.serverId, org_id: this.orgId
-    }));
+    this.getPolicyFiles();
 
     combineLatest([
       this.store.select(getAllPolicyFilesForOrgStatus),
@@ -59,32 +57,29 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
         this.policyFiles = allPolicyFilesState;
-        this.policyFiles.push({
-          name: 'test3',
-          revision_id: '0',
-          policy_group: 'e'
-        });
-        this.policyFiles.push({
-          name: 'test4',
-          revision_id: '0',
-          policy_group: 'e'
-        });
-        this.policyFiles.push({
-          name: 'test5',
-          revision_id: '0',
-          policy_group: 'e'
-        });
-        this.policyFiles.push({
-          name: 'test6',
-          revision_id: '0',
-          policy_group: 'e'
-        });
         this.policyFilesListLoading = false;
+        this.deleting = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyFilesListLoading = false;
         this.authFailure = true;
       }
     });
+
+    this.store.select(deleteStatus).pipe(
+      filter(status => status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.deleting = true;
+        this.getPolicyFiles();
+      });
+  }
+
+  getPolicyFiles() {
+    const payload = {
+      server_id: this.serverId,
+      org_id: this.orgId
+    };
+    this.store.dispatch(new GetPolicyFiles(payload));
   }
 
   resetKeyTabRedirection(resetLink: boolean) {

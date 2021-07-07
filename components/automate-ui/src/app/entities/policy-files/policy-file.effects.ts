@@ -61,7 +61,7 @@ export class PolicyFileEffects {
       map(({ payload: { name } }: DeletePolicyFileSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully deleted policy files - ${name}.`
+          message: `Successfully deleted policy file: ${name}.`
         });
     })));
 
@@ -72,7 +72,7 @@ export class PolicyFileEffects {
         const msg = error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not delete policy files: ${msg || error}`
+          message: `Could not delete policy file: ${msg || error}`
         });
     })));
 }
