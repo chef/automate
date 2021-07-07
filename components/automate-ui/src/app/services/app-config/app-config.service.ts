@@ -1,7 +1,7 @@
 import { HttpClient, HttpBackend } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface ConfigTypes {
+interface BannerConfigTypes {
   show?: boolean;
   message?: string;
   background_color?: string;
@@ -9,12 +9,25 @@ interface ConfigTypes {
   idle_timeout?: number
 }
 
+interface ConfigTypes {
+  banner?: BannerConfigTypes;
+}
+
 const initialConfig = {
+<<<<<<< HEAD
     show: null,
     message: null,
     background_color: null,
     text_color: null,
     idle_timeout: null
+=======
+    banner: {
+      show: null,
+      message: null,
+      background_color: null,
+      text_color: null
+    }
+>>>>>>> d88dca54ce7f5744d47c68326ea4ccae31a4fa17
 };
 
 @Injectable({
@@ -28,7 +41,7 @@ export class AppConfigService {
   constructor(private handler: HttpBackend) { }
 
   public loadAppConfig() {
-    return new HttpClient(this.handler).get('/banner.js')
+    return new HttpClient(this.handler).get('/custom_settings.js')
       .toPromise()
       .then(data => this.appConfig = data)
       // .then(data => console.log(data, "dataaß"))
@@ -38,15 +51,15 @@ export class AppConfigService {
   }
 
   get showBanner(): boolean {
-    return this.appConfig.show;
+    return this.appConfig.banner.show;
   }
 
   get bannerMessage(): string {
-    return this.appConfig.message;
+    return this.appConfig.banner.message;
   }
 
   get bannerBackgroundColor(): string {
-    return this.convertToHex(this.appConfig.background_color);
+    return this.convertToHex(this.appConfig.banner.background_color);
   }
 
   get idleTimeout(): number {
@@ -54,7 +67,7 @@ export class AppConfigService {
   }
 
   get bannerTextColor(): string {
-    return this.convertToHex(this.appConfig.text_color);
+    return this.convertToHex(this.appConfig.banner.text_color);
   }
 
   private convertToHex(color: string): string {
