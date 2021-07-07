@@ -10,7 +10,7 @@ describe('infra policy file', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  const policyFileName = `${cypressPrefix}-policyFie-${now}-1`;
+  const policyFileName = `${cypressPrefix}-policyFile-${now}-1`;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -170,7 +170,7 @@ describe('infra policy file', () => {
             cy.get('app-notification.info').
               contains(`Successfully deleted policy file - ${policyFileName}.`);
             cy.get('app-notification.info chef-icon').click();
-          
+
             getPolicyFile().then((response) => {
               checkResponse(response);
             });
