@@ -1,17 +1,17 @@
-### Set Up LDAP Server and Configure
+# Set Up LDAP Server and Configure
 
-Below server setup is tested on Ubuntu 18.04.5 LTS (Bionic Beaver) EC2 instance even Chef Automate running on the same machine
+The following steps are applicable to set up an LDAP server on Ubuntu 18.04.5 LTS (Bionic Beaver) EC2 instance along with Chef Automate.
 
-Server Prep
+**Server Prep**
  - SSH into your server and issue this command: `sudo apt-get update`
  
-Server Security
- - Enable Port 80 and 389 for LDAP via the AWS console, or you can go to EC2 instances select your instance select Security tab -> Security groups -> edit inbound rules -> type -> All traffic and save rules
+**Server Security**
+ - Enable Port 80 and 389 for LDAP via the AWS console. You can also go to EC2 instances select your instance and select `Security tab -> Security groups -> edit inbound rules -> type -> All traffic` and save rules.
 
-Install LDAP Server & Utilities
- - Execute this command via SSH: `sudo apt-get install slapd ldap-utils` You will be prompted to enter a password, so do so. (Password can be anything lets keep `123` for example)
+**Install LDAP Server & Utilities**
+ - Execute this command via SSH: `sudo apt-get install slapd ldap-utils` You will be prompted to enter a password. (Password can be anything lets keep `123` for example)
 
-LDAP Configuration
+**LDAP Configuration**
  - Execute this command via SSH: `sudo dpkg-reconfigure slapd` 
 
 You will be faced with anther set of prompts you must answer in order to configure OpenLDAP.
@@ -40,7 +40,7 @@ Move old database?
 Allow LDAPv2 Protocol?
  - No
 
-Use `ldapsearch -x -LLL -s base -b "" namingContexts` to check your base DN and verify OpenLDAP is configured correctly, it should return 
+Use `ldapsearch -x -LLL -s base -b "" namingContexts` to check your base DN and verify OpenLDAP is configured correctly. It should return 
 ```dn:
 namingContexts: dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com
 ```
@@ -51,10 +51,6 @@ If our DNS was `example.com` then DN would look like `dc=example,dc=com`
 ### Add Data/Users to LDAP
 
 Inorder to insert data into LDAP we shall use ldif files, just type `sudo vi add_entries.ldif` from root directory.
-
-{{< note >}}
-Remember to replace `X` in `ecX-X-XX-XX-XXX` with you EC2 instance IP where ever required
-{{< /note >}}
 
 Add below data and save the file:
 
@@ -99,11 +95,12 @@ sn: test
 cn: test
 
 ```
-
-{{< note >}}
-userPassword attribute is part of objectClass: simpleSecurityObject so we must have corresponding objectClass defined in oreder to use its attributes
-{{< /note >}}
-
+----
+**NOTE**  
+Remember to replace `X` in `ecX-X-XX-XX-XXX` with you EC2 instance IP where ever required.  
+userPassword attribute is part of objectClass: simpleSecurityObject.  
+So we must have corresponding objectClass defined in order to use its attributes
+----
 Use ldapadd command to save add_entries.ldif file contents into LDAP as shown below:
 
 `ldapadd -x -D cn=admin,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com -W -f add_entries.ldif`
@@ -112,10 +109,10 @@ it will ask for password:
 enter same password which we used at the time of LDAP installation which is `123` in this case.
 
 
-Explaination of above command:
+**Explanation of the above command:**
 
 `-x`: Use simple authentication instead of SASL.
-`-D` : binddn, Use the Distinguished Name binddn to bind to the LDAP directory. For SASL binds, the server is expected to ignore this value.
+`-D`: binddn, Use the Distinguished Name binddn to bind to the LDAP directory. For SASL binds, the server is expected to ignore this value.
 `cn=admin,dc=ecX-X-XX-XX-XXX,dc=us-east-2,dc=compute,dc=amazonaws,dc=com` : LDAP administrator DN(distinguished name)
 `-W`: Prompt for simple authentication. This is used instead of specifying the password on the command line.
 `-f`: file, Read the entry modification information from file instead of from standard input.
@@ -150,19 +147,18 @@ If you need to change your configured external identity provider settings, repla
 
 In Automate Sign in using LDAP:
 
-Usermane: test
+Username: test  
 Password: 123
-
 
 As we have only above two user in LDAP, we can add more users into LDAP and login, if needed.
 
-
-{{< note >}}
-Useful links
-https://openldap.org/doc/
-https://wiki.debian.org/LDAP/OpenLDAPSetup/
-https://ldapwiki.com/
-{{< /note >}}
+---
+**NOTE**  
+Useful links  
+https://openldap.org/doc/  
+https://wiki.debian.org/LDAP/OpenLDAPSetup/  
+https://ldapwiki.com/  
+---
 
 
 # LDAP Development via MSAD in AWS
