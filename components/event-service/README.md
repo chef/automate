@@ -31,3 +31,54 @@ With this simple design, NATS lets programs share common message-handling code, 
 and scale by easily handling an increase in message volume, whether those are service requests or stream data.
 
 ![NATS_Overview](../../dev-docs/images/nats_overview.png)
+
+## Event Configuration
+
+NATS can be configured by using a patch toml as below:
+
+```bigquery
+[service]
+host = "localhost"
+port = 10132
+event_limit = 100000
+listener_limit = 10000
+
+[tls]
+cert_path = "../../dev/certs/event-service.crt"
+key_path = "../../dev/certs/event-service.key"
+root_ca_path = "../../dev/certs/Chef_Automate_FAKE_Dev.crt"
+
+[log]
+format = "text"
+level = "debug"
+
+[handlers]
+feed = "0.0.0.0:10121"
+cfgingest = "0.0.0.0:10122"
+```
+
+### event_limit
+Event_limit defines the maximum size of the queue or the maximim number of messages the queue can hold at a time.
+
+### listener_limit
+Listener_limit defines the maximum number of concurrent listeners supported.
+
+### handlers
+Handlers are the workers to process the events. There are three type of handler supported:
+- **feed**: to handle Compliance events
+- **cfgingest**: to handle Config ingest or client run data 
+- **event_feed**: to handle event feed data 
+
+## Type of Events
+
+These are the different type of events allowed as of now:
+- compliance_ingest
+- cfgingest
+- event_feed
+- scanJobCreated
+- scanJobUpdated
+- scanJobDeleted
+- profileCreated
+- profileUpdate
+- profileDeleted
+- nodeTerminated
