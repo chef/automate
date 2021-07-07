@@ -10,10 +10,12 @@ import { isNull, isNil } from 'lodash';
 import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
+let enableIdleTimeout = true;
 
 export interface ChefSessionUser {
   fullname: string;
@@ -44,11 +46,17 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>, 
+    appConfigService: AppConfigService,
+    handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     window.onload = () => {
-      this.idleLogout();
+      if(enableIdleTimeout) {
+        this.idleLogout(300 * 1000); //5 mins
+        console.log(appConfigService, appConfigService.idleTimeout, "idleTimeout config") 
+      }
+
     }
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
@@ -204,10 +212,10 @@ export class ChefSessionService implements CanActivate {
 
 
 
-  idleLogout(): void {
+  idleLogout(idleTimeout: number): void {
     var idleTime = 0;
-    // Increment the idle time counter 3 sec.
-    setInterval(timerIncrement, 3000); // 3 sec
+    // Increment the idle time counter 5 mins.
+    setInterval(timerIncrement.bind(this), idleTimeout); // 5 mins
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer;  // catches touchscreen presses as well
@@ -222,8 +230,8 @@ export class ChefSessionService implements CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      if (idleTime > 2) { // 6 sec
-          console.log('logout')
+      if (idleTime > 2) { // 10 mins
+          this.logout()
           // window.location.reload();
       }
     }
