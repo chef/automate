@@ -44,8 +44,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.CustomSettings.Banner.BackgroundColor = w.String("3864f2") // Chef Success blue
 	c.V1.Sys.CustomSettings.Banner.TextColor = w.String("FFFFFF")
 
-	c.V1.Sys.CustomSettings.SessionSettings.IdleTimeout = w.Bool(false)
-	c.V1.Sys.CustomSettings.SessionSettings.TimeoutMin = w.Int32(30)
+	c.V1.Sys.CustomSettings.SessionSettings.EnableIdleTimeout = w.Bool(false)
+	c.V1.Sys.CustomSettings.SessionSettings.IdleTimeoutMinutes = w.Int32(30)
 
 	return c
 }
