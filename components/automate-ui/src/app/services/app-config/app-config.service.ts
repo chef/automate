@@ -28,7 +28,6 @@ export class AppConfigService {
   constructor(private handler: HttpBackend) { }
 
   public loadAppConfig() {
-    debugger
     return new HttpClient(this.handler).get('/banner.js')
       .toPromise()
       .then(data => this.appConfig = data)
