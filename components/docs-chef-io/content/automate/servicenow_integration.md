@@ -60,7 +60,7 @@ The Chef Automate application exposes the REST API endpoint that facilitates the
 4. Select **System Applications** > **All Available Applications** > **All** menu.
 5. Find the application using the filter criteria and search bar.
    Note that you can search for the application by its Name or ID. If you cannot find an application, you may have to request it from the ServiceNow Store.
-6. Click **Install**.
+6. Select **Install**.
 
 ### Creating Application Users
 
@@ -94,7 +94,7 @@ Follow these steps to configure the Chef Automate integration from ServiceNow:
 2. Locate **Chef Automate** menu.
    Alternatively, you can type **Chef** in the **Filer Navigator** text box, and the related Chef features display within **Chef Automate** menu.
 3. Select the **Automate Instances** module.
-4. Click the **New** button.
+4. Select the **New** button.
 5. Enter the following details:
 
    - **Name**: a unique name for the integration.
@@ -103,16 +103,16 @@ Follow these steps to configure the Chef Automate integration from ServiceNow:
    - **ServiceNow user**: a ServiceNow user with **ITIL** and `x_chef_automate.api` roles.
    - **ServiceNow password**: password of the ServiceNow user.
 
-6. Click the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
-7. Click **Submit**. The Automate instance detail is created.
+6. Select the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
+7. Select **Submit**. The Automate instance detail is created.
 
 ### Configuring Chef Automate from Chef Automate UI
 
 Follow these steps to configure the Chef Automate integration from the Chef Automate UI:
 
 1. Navigate to the **Settings** from the **Chef Automate UI** menu.
-2. Click the **Data Feeds** link from the **Settings**.
-3. Click the **Create Data Feed** button.
+2. Select the **Data Feeds** link from the **Settings**.
+3. Select the **Create Data Feed** button.
 4. Enter the following details:
 
    - **Name**: a unique name for the integration.
@@ -122,8 +122,8 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
 
    Note that to send data from Chef Automate to ServiceNow, you need to specify the **Data Feed URL** in the Chef Automate server `FQDN/api/x_chef_automate/asset` (Fully Qualified Domain Name (FQDN) is the domain name of the ServiceNow instance to configure in Chef Automate). For example, <https://venxxx.service-now.com/api/x_chef_automate/asset>.
 
-5. Click the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
-6. Click **Create Data Feed**. The data feed is created.
+5. Select the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
+6. Select **Create Data Feed**. The data feed is created.
 
 {{< figure src="/images/automate/snow_integration_create_data_feed.png" alt="Create Data Feed">}}
 
@@ -158,7 +158,7 @@ It enables the selected logging level and is visible in logs. | Default: `Error`
 | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
 
 3. Make the required changes.
-4. Click Save. The application saves the configuration changes.
+4. Select Save. The application saves the configuration changes.
 
 ## Navigation
 
@@ -178,7 +178,7 @@ In addition, the application updates the CMDB file systems and software installe
 
 ### Client Runs
 
-The user can drill down into **Client Run** detail from a server record by clicking the name on an individual Client Run. Client Run record displays related information for:
+The user can drill down into **Client Run** detail from a server record by selecting the name on an individual Client Run. Client Run record displays related information for:
 
 - Client run cookbooks: cookbooks executed during the client run.
 - Client run lists: run lists executed during the client run.
@@ -188,11 +188,11 @@ The entire Chef Client Run details are available for each server. In addition, C
 
 ### Attributes
 
-The user can drill down into the current server attributes detail from a server record by clicking on the attributes record. The entire OHAI attributes are available for each server.
+The user can drill down into the current server attributes detail from a server record by selecting on the attributes record. The entire OHAI attributes are available for each server.
 
 ### Compliance Reports
 
-The user can drill down into **Compliance** report detail from a server record by clicking the name on an individual **Compliance** report. The Compliance Report record displays related information for:
+The user can drill down into **Compliance** report detail from a server record by selecting the name on an individual **Compliance** report. The Compliance Report record displays related information for:
 
 - Compliance report profiles: all profiles executed during the compliance scan.
 - Compliance report results: all results from the compliance scan.
