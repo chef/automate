@@ -11,7 +11,7 @@ describe('infra policy file', () => {
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const policyFileName = `${cypressPrefix}-policyFile-${now}-1`;
-  
+
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
