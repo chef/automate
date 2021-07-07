@@ -6,13 +6,15 @@ interface ConfigTypes {
   message?: string;
   background_color?: string;
   text_color?: string;
+  idle_timeout?: number
 }
 
 const initialConfig = {
     show: null,
     message: null,
     background_color: null,
-    text_color: null
+    text_color: null,
+    idle_timeout: null
 };
 
 @Injectable({
@@ -26,11 +28,14 @@ export class AppConfigService {
   constructor(private handler: HttpBackend) { }
 
   public loadAppConfig() {
+    debugger
     return new HttpClient(this.handler).get('/banner.js')
       .toPromise()
       .then(data => this.appConfig = data)
+      .then(data => console.log(data, "dataaß"))
       // when there is no config, we can just reset the config to its initial empty values
-      .catch(_error => this.appConfig = initialConfig);
+      .catch(_error => console.log(_error, "error"));
+
   }
 
   get showBanner(): boolean {
@@ -43,6 +48,10 @@ export class AppConfigService {
 
   get bannerBackgroundColor(): string {
     return this.convertToHex(this.appConfig.background_color);
+  }
+
+  get idleTimeout(): number {
+    return Number(this.appConfig.idle_timeout);
   }
 
   get bannerTextColor(): string {
