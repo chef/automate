@@ -86,13 +86,36 @@ Role
 
 ### Deep Filtering
 
-Deep filtering shifts the perspective of the results from the node to the profile and its associated control.
-Use deep filtering to see the compliance reporting for an entire profile or an individual control within a profile.
+Deep filtering provides reports on compliance profiles and controls. Apply deep filtering to see the compliance reporting for a profile version or one of its controls.
 
-Deep filtering supports filtering for:
+Chef Automate saves computational time and storage space by calculating compliance reporting statistics at the aggregate level. Deep filtering uses the `profile_id` attribute to drill down to the granular level of your compliance status. In contrast, filtering with the `profile_name` attribute instead of `profile_id` creates a report for every version of `profile_name` in your infrastructure.
+
+Deep filtering supports reports for:
 
 - one profile
 - one profile and one of its associated controls
+
+#### Profile Deep Filtering
+
+Deep Filtering with `profile_id` scopes a compliance report to a versioned profile.
+
+To create a report at the profile level:
+
+    1. Specify the profile in the filter using `profile_id`
+    1. Leave the control filter empty
+    1. Apply additional reporting filters
+
+#### Control Deep Filtering
+
+Deep filtering for a control scopes a compliance report to a single control within a versioned profile.
+
+To create a report at the control level:
+
+    1. Enter the `profile_id` in the filter
+    1. Add a control
+    1. Apply additional reporting filters
+
+If the results returned by your deep filter are incorrectly scoped, review the `profile_id` and control field contents.
 
 ### Waivers
 
