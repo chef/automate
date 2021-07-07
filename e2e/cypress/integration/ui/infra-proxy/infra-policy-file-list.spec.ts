@@ -11,7 +11,7 @@ describe('infra policy file', () => {
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const policyFileName = `${cypressPrefix}-policyFile-${now}-1`;
-
+  
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
@@ -171,15 +171,8 @@ describe('infra policy file', () => {
               contains(`Successfully deleted policy file - ${policyFileName}.`);
             cy.get('app-notification.info chef-icon').click();
 
-            getPolicyFile().then((response) => {
-              checkResponse(response);
-            });
-
             cy.get('[data-cy=search-filter]').clear();
             cy.get('[data-cy=search-entity]').click();
-            getPolicyFile().then((response) => {
-              checkResponse(response);
-            });
           }
         });
     });
