@@ -345,6 +345,19 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 {{< figure src="/images/automate/delete-a-client.png" alt="Delete a Client">}}
 
+### Policy File
+
+A [Policyfile]({{< relref "/policyfile" >}}) is an optional way to manage role, environment, and community cookbook data with a single document that is uploaded to the Chef Infra Server. Policyfiles make things easier to test and promote code safely with a simpler interface.
+
+The Chef Infra Server integration lets you:
+
+- Search for a specific policyfile from the list
+- View the list of all the policyfiles
+
+Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to find a policy file from the list. Entering the name of the policy file in the search bar returns policyfiles matching your search criteria.
+
+IMAGE
+
 ### Nodes
 
 A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node will be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
@@ -448,6 +461,8 @@ Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-
 Delete individual existing nodes by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
+
+
 
 ## Troubleshoot
 
