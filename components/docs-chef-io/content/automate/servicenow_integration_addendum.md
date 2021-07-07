@@ -13,8 +13,6 @@ gh_repo = "automate"
     weight = 60
 +++
 
-## ServiceNow Integration Components
-
 This page includes information about the various ServiceNow components used while installing and configuring Chef Automate with CMDB App in ServiceNow.
 
 {{< note >}}
