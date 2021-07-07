@@ -1,5 +1,5 @@
 +++
-title = "ServiceNow Integration"
+title = "ServiceNow Integration Components"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "ServiceNow Integration"
+    title = "ServiceNow Integration Components"
     parent = "automate/reference"
-    identifier = "automate/reference/servicenow_integration.md ServiceNow Integration"
+    identifier = "automate/reference/servicenow_integration_addendum.md ServiceNow Integration Components"
     weight = 60
 +++
 
