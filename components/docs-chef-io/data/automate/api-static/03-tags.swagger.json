@@ -55,11 +55,26 @@
         "policies",
         "roles",
         "projects",
-        "rules"
+        "rules",
+        "user_settings"
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "tags": [
+        "InfraProxy"
       ]
     }
   ],
   "tags": [
+    {
+      "name": "InfraProxy",
+      "x-displayName": "Chef Infra Servers"
+    },
+    {
+      "name": "user_settings",
+      "x-displayName": "User Settings"
+    },
     {
       "name": "ReportingService",
       "x-displayName": "Reporting"

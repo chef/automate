@@ -1246,57 +1246,494 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type InfraProxyClient interface {
+	//
+	//List Chef Infra Servers
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:list
+	//```
 	GetServers(ctx context.Context, in *request.GetServers, opts ...grpc.CallOption) (*response.GetServers, error)
+	//
+	//Show a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetServer(ctx context.Context, in *request.GetServer, opts ...grpc.CallOption) (*response.GetServer, error)
+	//
+	//Create a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:create
+	//```
 	CreateServer(ctx context.Context, in *request.CreateServer, opts ...grpc.CallOption) (*response.CreateServer, error)
+	//
+	//Update a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateServer(ctx context.Context, in *request.UpdateServer, opts ...grpc.CallOption) (*response.UpdateServer, error)
+	//
+	//Delete a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:delete
+	//```
 	DeleteServer(ctx context.Context, in *request.DeleteServer, opts ...grpc.CallOption) (*response.DeleteServer, error)
+	//
+	//List Chef Organizations
+	//
+	//A Chef Infra Server may contain multiple organizations. Each Chef Organization is one set of nodes, cookbooks, policies and other objects.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetOrgs(ctx context.Context, in *request.GetOrgs, opts ...grpc.CallOption) (*response.GetOrgs, error)
+	//
+	//Show a Chef Organization
+	//
+	//An organization is a single instance of a Chef Infra Server, including the nodes that
+	//are managed by that Chef Infra Server and each of the workstations that will run knife and access
+	//the Chef Infra Server using the Chef Infra Server API.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetOrg(ctx context.Context, in *request.GetOrg, opts ...grpc.CallOption) (*response.GetOrg, error)
+	//
+	//Create a Chef Organization
+	//
+	//Create a new Chef Organization. Admin only.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateOrg(ctx context.Context, in *request.CreateOrg, opts ...grpc.CallOption) (*response.CreateOrg, error)
+	//
+	//Update a Chef Organization
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateOrg(ctx context.Context, in *request.UpdateOrg, opts ...grpc.CallOption) (*response.UpdateOrg, error)
+	//
+	//Delete a Chef Organization
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteOrg(ctx context.Context, in *request.DeleteOrg, opts ...grpc.CallOption) (*response.DeleteOrg, error)
+	//
+	//Reset Admin Key
+	//
+	//Reset the administrator key for a Chef organization.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	ResetOrgAdminKey(ctx context.Context, in *request.ResetOrgAdminKey, opts ...grpc.CallOption) (*response.ResetOrgAdminKey, error)
+	//
+	//List Cookbooks
+	//
+	//List the cookbooks used to manage an organization's nodes.
+	//A cookbook is the fundamental unit of configuration and policy distribution.
+	//A cookbook defines a scenario and contains everything that is required to support that scenario:
+	//
+	//- Recipes that specify the resources to use and the order in which they are to be applied
+	//- Attribute values
+	//- File distributions
+	//- Templates
+	//- Extensions to Chef, such as custom resources and libraries
+	//
+	//When a cookbook is uploaded, only files that are new or updated will be included. This approach minimizes the amount of storage and time that is required during the modify-upload-test cycle. To keep track of which files have already been uploaded, Chef Infra Client uses a checksum and assigns a checksum to each file. These checksums are used in the cookbook version manifest, alongside the same records that store the file description (name, specificity, and so on), as well as the checksum and the URL from which the file’s contents can be retrieved.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbooks(ctx context.Context, in *request.Cookbooks, opts ...grpc.CallOption) (*response.Cookbooks, error)
+	//
+	//List Cookbook Versions
+	//
+	//A cookbook version represents a set of functionality that is different from the cookbook on which it is based.
+	//A version may exist for many reasons, such as ensuring the correct use of a third-party component, updating a bug fix, or adding an improvement.
+	//A cookbook version is defined using syntax and operators, may be associated with environments, cookbook metadata, and/or run-lists, and may be frozen (to prevent unwanted updates from being made).
+	//
+	//A cookbook version is maintained just like a cookbook, with regard to source control, uploading it to the Chef Infra Server, and how Chef Infra Client applies that cookbook when configuring nodes.
+	//
+	//This returns a hash of the cookbooks and cookbook versions (including dependencies) that are required by the run_list array.
+	//Version constraints may be specified using the @ symbol after the cookbook name as a delimiter.
+	//Version constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbookVersions(ctx context.Context, in *request.CookbookVersions, opts ...grpc.CallOption) (*response.CookbookVersions, error)
+	//
+	//Show a cookbook version
+	//
+	//This returns a hash of a cookbook and cookbook versions (including dependencies) that are required by the run_list array.
+	//Version constraints may be specified using the @ symbol after the cookbook name as a delimiter.
+	//Version constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbook(ctx context.Context, in *request.Cookbook, opts ...grpc.CallOption) (*response.Cookbook, error)
+	//
+	//List Cookbook Files
+	//
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbookFileContent(ctx context.Context, in *request.CookbookFileContent, opts ...grpc.CallOption) (*response.CookbookFileContent, error)
+	//
+	//List Roles
+	//
+	//List the roles in an organization
+	//A role is a way to define certain patterns and processes that exist across nodes in an organization as belonging to a single job function.
+	//Each role consists of zero (or more) attributes and a run-list.
+	//Each node can have zero (or more) roles assigned to it.
+	//When a role is run against a node, the configuration details of that node are compared against the attributes of the role, and then the contents of that role’s run-list are applied to the node’s configuration details.
+	//When a Chef Infra Client runs, it merges its own attributes and run-lists with those contained within each assigned role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoles(ctx context.Context, in *request.Roles, opts ...grpc.CallOption) (*response.Roles, error)
+	//
+	//Show a Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error)
+	//
+	//Show a Run List
+	//
+	//Show the run list for an environment
+	//
+	//A run-list defines the information necessary for Chef to configure a node into the desired state. A run-list is:
+	//
+	//- An ordered list of roles and/or recipes that are run in the exact order defined in the run-list; if a recipe appears more than once in the run-list, Chef Infra Client will not run it twice
+	//- Always specific to the node on which it runs; nodes may have a run-list that is identical to the run-list used by other nodes
+	//- Stored as part of the node object on the Chef server
+	//- Maintained using knife and then uploaded from the workstation to the Chef Infra Server, or maintained using Chef Automate
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoleExpandedRunList(ctx context.Context, in *request.ExpandedRunList, opts ...grpc.CallOption) (*response.ExpandedRunList, error)
+	//
+	//List Chef Infra Server Environments
+	//
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoleEnvironments(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.RoleEnvironments, error)
+	//
+	//List Organization Roles
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateRole(ctx context.Context, in *request.CreateRole, opts ...grpc.CallOption) (*response.Role, error)
+	//
+	//Delete an Organization Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteRole(ctx context.Context, in *request.Role, opts ...grpc.CallOption) (*response.Role, error)
+	//
+	//Update an Organization Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateRole(ctx context.Context, in *request.UpdateRole, opts ...grpc.CallOption) (*response.Role, error)
+	//
+	//List Clients
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetClients(ctx context.Context, in *request.Clients, opts ...grpc.CallOption) (*response.Clients, error)
+	//
+	//Show a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error)
+	//
+	//Update a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateClient(ctx context.Context, in *request.CreateClient, opts ...grpc.CallOption) (*response.CreateClient, error)
+	//
+	//Delete a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteClient(ctx context.Context, in *request.Client, opts ...grpc.CallOption) (*response.Client, error)
+	//
+	//Reset a Client Key
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	ResetClientKey(ctx context.Context, in *request.ClientKey, opts ...grpc.CallOption) (*response.ResetClient, error)
+	//
+	//List Data Bags
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBags(ctx context.Context, in *request.DataBags, opts ...grpc.CallOption) (*response.DataBags, error)
+	//
+	//List Data Items
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBagItems(ctx context.Context, in *request.DataBagItems, opts ...grpc.CallOption) (*response.DataBagItems, error)
+	//
+	//Show a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error)
+	//
+	//Create a Data Bag
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateDataBag(ctx context.Context, in *request.CreateDataBag, opts ...grpc.CallOption) (*response.CreateDataBag, error)
+	//
+	//Create a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateDataBagItem(ctx context.Context, in *request.CreateDataBagItem, opts ...grpc.CallOption) (*response.CreateDataBagItem, error)
+	//
+	//Delete a Data Bag
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteDataBag(ctx context.Context, in *request.DataBag, opts ...grpc.CallOption) (*response.DataBag, error)
+	//
+	//Delete a Data Bag Item
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteDataBagItem(ctx context.Context, in *request.DataBagItem, opts ...grpc.CallOption) (*response.DataBagItem, error)
+	//
+	//Update a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateDataBagItem(ctx context.Context, in *request.UpdateDataBagItem, opts ...grpc.CallOption) (*response.UpdateDataBagItem, error)
+	//
+	//List Environments
+	//
+	//An environment is a way to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra.
+	//This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
+	//With environments, you can change cookbook configurations depending on the system’s designation.
+	//For example, by designating different staging and production environments, you can then define the correct URL of a database server for each environment.
+	//Environments also allow organizations to move new cookbook releases from staging to production with confidence by stepping releases through testing environments before entering production.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironments(ctx context.Context, in *request.Environments, opts ...grpc.CallOption) (*response.Environments, error)
+	//
+	//Show an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error)
+	//
+	//Create an Environment
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateEnvironment(ctx context.Context, in *request.CreateEnvironment, opts ...grpc.CallOption) (*response.Environment, error)
+	//
+	//Delete an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteEnvironment(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.Environment, error)
+	//
+	//Update an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateEnvironment(ctx context.Context, in *request.UpdateEnvironment, opts ...grpc.CallOption) (*response.Environment, error)
+	//
+	//List Recipes in an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironmentRecipes(ctx context.Context, in *request.Environment, opts ...grpc.CallOption) (*response.EnvironmentRecipesList, error)
+	//
+	//List Nodes for an Organization
+	//
+	//A node is any device—physical, virtual, cloud, network device, etc.—that is under management by Chef Infra.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*response.Nodes, error)
+	//
+	//Delete a Node
+	//
+	//Removes a node from an organization
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.DeleteNode, error)
+	//
+	//Update a Node
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNode(ctx context.Context, in *request.NodeDetails, opts ...grpc.CallOption) (*response.Node, error)
+	//
+	//Update Node Attributes
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeAttributes(ctx context.Context, in *request.UpdateNodeAttributes, opts ...grpc.CallOption) (*response.UpdateNodeAttributes, error)
+	//
+	//Show a Node
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNode(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.Node, error)
+	//
+	//Show Expanded Runlist
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNodeExpandedRunList(ctx context.Context, in *request.NodeExpandedRunList, opts ...grpc.CallOption) (*response.NodeExpandedRunList, error)
+	//
+	//Update Node Tags
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeTags(ctx context.Context, in *request.UpdateNodeTags, opts ...grpc.CallOption) (*response.UpdateNodeTags, error)
+	//
+	//Update Node Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeEnvironment(ctx context.Context, in *request.UpdateNodeEnvironment, opts ...grpc.CallOption) (*response.UpdateNodeEnvironment, error)
+	//
+	//List Policyfiles
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetPolicyfiles(ctx context.Context, in *request.Policyfiles, opts ...grpc.CallOption) (*response.Policyfiles, error)
+	//
+	//Show a Policyfile
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetPolicyfile(ctx context.Context, in *request.Policyfile, opts ...grpc.CallOption) (*response.Policyfile, error)
+	//
+	//Delete a Policyfile
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeletePolicyfile(ctx context.Context, in *request.DeletePolicyfile, opts ...grpc.CallOption) (*response.DeletePolicyfile, error)
 }
 
@@ -1778,57 +2215,494 @@ func (c *infraProxyClient) DeletePolicyfile(ctx context.Context, in *request.Del
 
 // InfraProxyServer is the server API for InfraProxy service.
 type InfraProxyServer interface {
+	//
+	//List Chef Infra Servers
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:list
+	//```
 	GetServers(context.Context, *request.GetServers) (*response.GetServers, error)
+	//
+	//Show a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetServer(context.Context, *request.GetServer) (*response.GetServer, error)
+	//
+	//Create a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:create
+	//```
 	CreateServer(context.Context, *request.CreateServer) (*response.CreateServer, error)
+	//
+	//Update a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateServer(context.Context, *request.UpdateServer) (*response.UpdateServer, error)
+	//
+	//Delete a Chef Infra Server
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:delete
+	//```
 	DeleteServer(context.Context, *request.DeleteServer) (*response.DeleteServer, error)
+	//
+	//List Chef Organizations
+	//
+	//A Chef Infra Server may contain multiple organizations. Each Chef Organization is one set of nodes, cookbooks, policies and other objects.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetOrgs(context.Context, *request.GetOrgs) (*response.GetOrgs, error)
+	//
+	//Show a Chef Organization
+	//
+	//An organization is a single instance of a Chef Infra Server, including the nodes that
+	//are managed by that Chef Infra Server and each of the workstations that will run knife and access
+	//the Chef Infra Server using the Chef Infra Server API.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetOrg(context.Context, *request.GetOrg) (*response.GetOrg, error)
+	//
+	//Create a Chef Organization
+	//
+	//Create a new Chef Organization. Admin only.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateOrg(context.Context, *request.CreateOrg) (*response.CreateOrg, error)
+	//
+	//Update a Chef Organization
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateOrg(context.Context, *request.UpdateOrg) (*response.UpdateOrg, error)
+	//
+	//Delete a Chef Organization
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteOrg(context.Context, *request.DeleteOrg) (*response.DeleteOrg, error)
+	//
+	//Reset Admin Key
+	//
+	//Reset the administrator key for a Chef organization.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	ResetOrgAdminKey(context.Context, *request.ResetOrgAdminKey) (*response.ResetOrgAdminKey, error)
+	//
+	//List Cookbooks
+	//
+	//List the cookbooks used to manage an organization's nodes.
+	//A cookbook is the fundamental unit of configuration and policy distribution.
+	//A cookbook defines a scenario and contains everything that is required to support that scenario:
+	//
+	//- Recipes that specify the resources to use and the order in which they are to be applied
+	//- Attribute values
+	//- File distributions
+	//- Templates
+	//- Extensions to Chef, such as custom resources and libraries
+	//
+	//When a cookbook is uploaded, only files that are new or updated will be included. This approach minimizes the amount of storage and time that is required during the modify-upload-test cycle. To keep track of which files have already been uploaded, Chef Infra Client uses a checksum and assigns a checksum to each file. These checksums are used in the cookbook version manifest, alongside the same records that store the file description (name, specificity, and so on), as well as the checksum and the URL from which the file’s contents can be retrieved.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbooks(context.Context, *request.Cookbooks) (*response.Cookbooks, error)
+	//
+	//List Cookbook Versions
+	//
+	//A cookbook version represents a set of functionality that is different from the cookbook on which it is based.
+	//A version may exist for many reasons, such as ensuring the correct use of a third-party component, updating a bug fix, or adding an improvement.
+	//A cookbook version is defined using syntax and operators, may be associated with environments, cookbook metadata, and/or run-lists, and may be frozen (to prevent unwanted updates from being made).
+	//
+	//A cookbook version is maintained just like a cookbook, with regard to source control, uploading it to the Chef Infra Server, and how Chef Infra Client applies that cookbook when configuring nodes.
+	//
+	//This returns a hash of the cookbooks and cookbook versions (including dependencies) that are required by the run_list array.
+	//Version constraints may be specified using the @ symbol after the cookbook name as a delimiter.
+	//Version constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbookVersions(context.Context, *request.CookbookVersions) (*response.CookbookVersions, error)
+	//
+	//Show a cookbook version
+	//
+	//This returns a hash of a cookbook and cookbook versions (including dependencies) that are required by the run_list array.
+	//Version constraints may be specified using the @ symbol after the cookbook name as a delimiter.
+	//Version constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbook(context.Context, *request.Cookbook) (*response.Cookbook, error)
+	//
+	//List Cookbook Files
+	//
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetCookbookFileContent(context.Context, *request.CookbookFileContent) (*response.CookbookFileContent, error)
+	//
+	//List Roles
+	//
+	//List the roles in an organization
+	//A role is a way to define certain patterns and processes that exist across nodes in an organization as belonging to a single job function.
+	//Each role consists of zero (or more) attributes and a run-list.
+	//Each node can have zero (or more) roles assigned to it.
+	//When a role is run against a node, the configuration details of that node are compared against the attributes of the role, and then the contents of that role’s run-list are applied to the node’s configuration details.
+	//When a Chef Infra Client runs, it merges its own attributes and run-lists with those contained within each assigned role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoles(context.Context, *request.Roles) (*response.Roles, error)
+	//
+	//Show a Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRole(context.Context, *request.Role) (*response.Role, error)
+	//
+	//Show a Run List
+	//
+	//Show the run list for an environment
+	//
+	//A run-list defines the information necessary for Chef to configure a node into the desired state. A run-list is:
+	//
+	//- An ordered list of roles and/or recipes that are run in the exact order defined in the run-list; if a recipe appears more than once in the run-list, Chef Infra Client will not run it twice
+	//- Always specific to the node on which it runs; nodes may have a run-list that is identical to the run-list used by other nodes
+	//- Stored as part of the node object on the Chef server
+	//- Maintained using knife and then uploaded from the workstation to the Chef Infra Server, or maintained using Chef Automate
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoleExpandedRunList(context.Context, *request.ExpandedRunList) (*response.ExpandedRunList, error)
+	//
+	//List Chef Infra Server Environments
+	//
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetRoleEnvironments(context.Context, *request.Role) (*response.RoleEnvironments, error)
+	//
+	//List Organization Roles
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateRole(context.Context, *request.CreateRole) (*response.Role, error)
+	//
+	//Delete an Organization Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteRole(context.Context, *request.Role) (*response.Role, error)
+	//
+	//Update an Organization Role
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateRole(context.Context, *request.UpdateRole) (*response.Role, error)
+	//
+	//List Clients
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetClients(context.Context, *request.Clients) (*response.Clients, error)
+	//
+	//Show a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetClient(context.Context, *request.Client) (*response.Client, error)
+	//
+	//Update a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateClient(context.Context, *request.CreateClient) (*response.CreateClient, error)
+	//
+	//Delete a Client
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteClient(context.Context, *request.Client) (*response.Client, error)
+	//
+	//Reset a Client Key
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	ResetClientKey(context.Context, *request.ClientKey) (*response.ResetClient, error)
+	//
+	//List Data Bags
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBags(context.Context, *request.DataBags) (*response.DataBags, error)
+	//
+	//List Data Items
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBagItems(context.Context, *request.DataBagItems) (*response.DataBagItems, error)
+	//
+	//Show a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetDataBagItem(context.Context, *request.DataBagItem) (*response.DataBagItem, error)
+	//
+	//Create a Data Bag
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateDataBag(context.Context, *request.CreateDataBag) (*response.CreateDataBag, error)
+	//
+	//Create a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateDataBagItem(context.Context, *request.CreateDataBagItem) (*response.CreateDataBagItem, error)
+	//
+	//Delete a Data Bag
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteDataBag(context.Context, *request.DataBag) (*response.DataBag, error)
+	//
+	//Delete a Data Bag Item
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteDataBagItem(context.Context, *request.DataBagItem) (*response.DataBagItem, error)
+	//
+	//Update a Data Bag Item
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateDataBagItem(context.Context, *request.UpdateDataBagItem) (*response.UpdateDataBagItem, error)
+	//
+	//List Environments
+	//
+	//An environment is a way to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra.
+	//This mapping is accomplished by setting attributes and pinning cookbooks at the environment level.
+	//With environments, you can change cookbook configurations depending on the system’s designation.
+	//For example, by designating different staging and production environments, you can then define the correct URL of a database server for each environment.
+	//Environments also allow organizations to move new cookbook releases from staging to production with confidence by stepping releases through testing environments before entering production.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironments(context.Context, *request.Environments) (*response.Environments, error)
+	//
+	//Show an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironment(context.Context, *request.Environment) (*response.Environment, error)
+	//
+	//Create an Environment
+	//
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	CreateEnvironment(context.Context, *request.CreateEnvironment) (*response.Environment, error)
+	//
+	//Delete an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteEnvironment(context.Context, *request.Environment) (*response.Environment, error)
+	//
+	//Update an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateEnvironment(context.Context, *request.UpdateEnvironment) (*response.Environment, error)
+	//
+	//List Recipes in an Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetEnvironmentRecipes(context.Context, *request.Environment) (*response.EnvironmentRecipesList, error)
+	//
+	//List Nodes for an Organization
+	//
+	//A node is any device—physical, virtual, cloud, network device, etc.—that is under management by Chef Infra.
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNodes(context.Context, *request.Nodes) (*response.Nodes, error)
+	//
+	//Delete a Node
+	//
+	//Removes a node from an organization
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeleteNode(context.Context, *request.Node) (*response.DeleteNode, error)
+	//
+	//Update a Node
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNode(context.Context, *request.NodeDetails) (*response.Node, error)
+	//
+	//Update Node Attributes
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeAttributes(context.Context, *request.UpdateNodeAttributes) (*response.UpdateNodeAttributes, error)
+	//
+	//Show a Node
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNode(context.Context, *request.Node) (*response.Node, error)
+	//
+	//Show Expanded Runlist
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetNodeExpandedRunList(context.Context, *request.NodeExpandedRunList) (*response.NodeExpandedRunList, error)
+	//
+	//Update Node Tags
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeTags(context.Context, *request.UpdateNodeTags) (*response.UpdateNodeTags, error)
+	//
+	//Update Node Environment
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	UpdateNodeEnvironment(context.Context, *request.UpdateNodeEnvironment) (*response.UpdateNodeEnvironment, error)
+	//
+	//List Policyfiles
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetPolicyfiles(context.Context, *request.Policyfiles) (*response.Policyfiles, error)
+	//
+	//Show a Policyfile
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:get
+	//```
 	GetPolicyfile(context.Context, *request.Policyfile) (*response.Policyfile, error)
+	//
+	//Delete a Policyfile
+	//
+	//Authorization Action:
+	//```
+	//infra:infraServers:update
+	//```
 	DeletePolicyfile(context.Context, *request.DeletePolicyfile) (*response.DeletePolicyfile, error)
 }
 

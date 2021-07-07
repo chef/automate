@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/api/v0/infra/servers": {
       "get": {
+        "summary": "List Chef Infra Servers",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServers",
         "responses": {
           "200": {
@@ -36,6 +38,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a Chef Infra Server",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateServer",
         "responses": {
           "200": {
@@ -68,6 +72,8 @@ func init() {
     },
     "/api/v0/infra/servers/{id}": {
       "get": {
+        "summary": "Show a Chef Infra Server",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetServer",
         "responses": {
           "200": {
@@ -97,6 +103,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Chef Infra Server",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteServer",
         "responses": {
           "200": {
@@ -126,6 +134,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a Chef Infra Server",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateServer",
         "responses": {
           "200": {
@@ -165,6 +175,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
+        "summary": "List Chef Organizations",
+        "description": "A Chef Infra Server may contain multiple organizations. Each Chef Organization is one set of nodes, cookbooks, policies and other objects.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrgs",
         "responses": {
           "200": {
@@ -194,6 +206,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a Chef Organization",
+        "description": "Create a new Chef Organization. Admin only.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateOrg",
         "responses": {
           "200": {
@@ -233,6 +247,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}": {
       "get": {
+        "summary": "Show a Chef Organization",
+        "description": "An organization is a single instance of a Chef Infra Server, including the nodes that\nare managed by that Chef Infra Server and each of the workstations that will run knife and access\nthe Chef Infra Server using the Chef Infra Server API.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetOrg",
         "responses": {
           "200": {
@@ -269,6 +285,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Chef Organization",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteOrg",
         "responses": {
           "200": {
@@ -305,6 +323,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a Chef Organization",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateOrg",
         "responses": {
           "200": {
@@ -351,6 +371,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{id}/reset-key": {
       "put": {
+        "summary": "Reset Admin Key",
+        "description": "Reset the administrator key for a Chef organization.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ResetOrgAdminKey",
         "responses": {
           "200": {
@@ -397,6 +419,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients": {
       "get": {
+        "summary": "List Clients",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetClients",
         "responses": {
           "200": {
@@ -456,6 +480,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Update a Client",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateClient",
         "responses": {
           "200": {
@@ -502,6 +528,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
       "get": {
+        "summary": "Show a Client",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetClient",
         "responses": {
           "200": {
@@ -545,6 +573,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Client",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteClient",
         "responses": {
           "200": {
@@ -590,6 +620,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset": {
       "put": {
+        "summary": "Reset a Client Key",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_ResetClientKey",
         "responses": {
           "200": {
@@ -643,6 +675,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
+        "summary": "List Cookbooks",
+        "description": "List the cookbooks used to manage an organization's nodes.\nA cookbook is the fundamental unit of configuration and policy distribution.\nA cookbook defines a scenario and contains everything that is required to support that scenario:\n\n- Recipes that specify the resources to use and the order in which they are to be applied\n- Attribute values\n- File distributions\n- Templates\n- Extensions to Chef, such as custom resources and libraries\n\nWhen a cookbook is uploaded, only files that are new or updated will be included. This approach minimizes the amount of storage and time that is required during the modify-upload-test cycle. To keep track of which files have already been uploaded, Chef Infra Client uses a checksum and assigns a checksum to each file. These checksums are used in the cookbook version manifest, alongside the same records that store the file description (name, specificity, and so on), as well as the checksum and the URL from which the file’s contents can be retrieved.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbooks",
         "responses": {
           "200": {
@@ -681,6 +715,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}": {
       "get": {
+        "summary": "List Cookbook Versions",
+        "description": "A cookbook version represents a set of functionality that is different from the cookbook on which it is based.\nA version may exist for many reasons, such as ensuring the correct use of a third-party component, updating a bug fix, or adding an improvement.\nA cookbook version is defined using syntax and operators, may be associated with environments, cookbook metadata, and/or run-lists, and may be frozen (to prevent unwanted updates from being made).\n\nA cookbook version is maintained just like a cookbook, with regard to source control, uploading it to the Chef Infra Server, and how Chef Infra Client applies that cookbook when configuring nodes.\n\nThis returns a hash of the cookbooks and cookbook versions (including dependencies) that are required by the run_list array.\nVersion constraints may be specified using the @ symbol after the cookbook name as a delimiter.\nVersion constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbookVersions",
         "responses": {
           "200": {
@@ -726,6 +762,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
+        "summary": "Show a cookbook version",
+        "description": "This returns a hash of a cookbook and cookbook versions (including dependencies) that are required by the run_list array.\nVersion constraints may be specified using the @ symbol after the cookbook name as a delimiter.\nVersion constraints may also be present when the cookbook_versions attributes is specified for an environment or when dependencies are specified by a cookbook.\n\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbook",
         "responses": {
           "200": {
@@ -778,6 +816,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
       "get": {
+        "summary": "List Cookbook Files",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetCookbookFileContent",
         "responses": {
           "200": {
@@ -837,6 +877,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags": {
       "get": {
+        "summary": "List Data Bags",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBags",
         "responses": {
           "200": {
@@ -873,6 +915,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a Data Bag",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateDataBag",
         "responses": {
           "200": {
@@ -919,6 +963,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
+        "summary": "List Data Items",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBagItems",
         "responses": {
           "200": {
@@ -985,6 +1031,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Data Bag",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteDataBag",
         "responses": {
           "200": {
@@ -1028,6 +1076,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a Data Bag Item",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateDataBagItem",
         "responses": {
           "200": {
@@ -1081,6 +1131,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}": {
       "put": {
+        "summary": "Update a Data Bag Item",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateDataBagItem",
         "responses": {
           "200": {
@@ -1141,6 +1193,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
       "get": {
+        "summary": "Show a Data Bag Item",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetDataBagItem",
         "responses": {
           "200": {
@@ -1191,6 +1245,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Data Bag Item",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteDataBagItem",
         "responses": {
           "200": {
@@ -1243,6 +1299,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments": {
       "get": {
+        "summary": "List Environments",
+        "description": "An environment is a way to map an organization’s real-life workflow to what can be configured and managed when using Chef Infra.\nThis mapping is accomplished by setting attributes and pinning cookbooks at the environment level.\nWith environments, you can change cookbook configurations depending on the system’s designation.\nFor example, by designating different staging and production environments, you can then define the correct URL of a database server for each environment.\nEnvironments also allow organizations to move new cookbook releases from staging to production with confidence by stepping releases through testing environments before entering production.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironments",
         "responses": {
           "200": {
@@ -1302,6 +1360,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create an Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateEnvironment",
         "responses": {
           "200": {
@@ -1348,6 +1408,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}": {
       "get": {
+        "summary": "Show an Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironment",
         "responses": {
           "200": {
@@ -1391,6 +1453,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete an Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteEnvironment",
         "responses": {
           "200": {
@@ -1434,6 +1498,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update an Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateEnvironment",
         "responses": {
           "200": {
@@ -1487,6 +1553,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes": {
       "get": {
+        "summary": "List Recipes in an Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetEnvironmentRecipes",
         "responses": {
           "200": {
@@ -1532,6 +1600,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}": {
       "get": {
+        "summary": "Show Expanded Runlist",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNodeExpandedRunList",
         "responses": {
           "200": {
@@ -1584,6 +1654,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
+        "summary": "List Nodes for an Organization",
+        "description": "A node is any device—physical, virtual, cloud, network device, etc.—that is under management by Chef Infra.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNodes",
         "responses": {
           "200": {
@@ -1645,6 +1717,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}": {
       "get": {
+        "summary": "Show a Node",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetNode",
         "responses": {
           "200": {
@@ -1688,6 +1762,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Node",
+        "description": "Removes a node from an organization\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteNode",
         "responses": {
           "200": {
@@ -1731,6 +1807,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a Node",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNode",
         "responses": {
           "200": {
@@ -1784,6 +1862,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes": {
       "put": {
+        "summary": "Update Node Attributes",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeAttributes",
         "responses": {
           "200": {
@@ -1837,6 +1917,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment": {
       "put": {
+        "summary": "Update Node Environment",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeEnvironment",
         "responses": {
           "200": {
@@ -1890,6 +1972,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags": {
       "put": {
+        "summary": "Update Node Tags",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateNodeTags",
         "responses": {
           "200": {
@@ -1943,6 +2027,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles": {
       "get": {
+        "summary": "List Policyfiles",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicyfiles",
         "responses": {
           "200": {
@@ -1981,6 +2067,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}": {
       "get": {
+        "summary": "Show a Policyfile",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetPolicyfile",
         "responses": {
           "200": {
@@ -2031,6 +2119,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a Policyfile",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeletePolicyfile",
         "responses": {
           "200": {
@@ -2076,6 +2166,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
+        "summary": "List Roles",
+        "description": "List the roles in an organization\nA role is a way to define certain patterns and processes that exist across nodes in an organization as belonging to a single job function.\nEach role consists of zero (or more) attributes and a run-list.\nEach node can have zero (or more) roles assigned to it.\nWhen a role is run against a node, the configuration details of that node are compared against the attributes of the role, and then the contents of that role’s run-list are applied to the node’s configuration details.\nWhen a Chef Infra Client runs, it merges its own attributes and run-lists with those contained within each assigned role\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoles",
         "responses": {
           "200": {
@@ -2135,6 +2227,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "List Organization Roles",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_CreateRole",
         "responses": {
           "200": {
@@ -2181,6 +2275,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
       "get": {
+        "summary": "Show a Role",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRole",
         "responses": {
           "200": {
@@ -2224,6 +2320,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete an Organization Role",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_DeleteRole",
         "responses": {
           "200": {
@@ -2267,6 +2365,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update an Organization Role",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_UpdateRole",
         "responses": {
           "200": {
@@ -2320,6 +2420,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/environments": {
       "get": {
+        "summary": "List Chef Infra Server Environments",
+        "description": "Authorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoleEnvironments",
         "responses": {
           "200": {
@@ -2365,6 +2467,8 @@ func init() {
     },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}/runlist/{environment}": {
       "get": {
+        "summary": "Show a Run List",
+        "description": "Show the run list for an environment\n\nA run-list defines the information necessary for Chef to configure a node into the desired state. A run-list is:\n\n- An ordered list of roles and/or recipes that are run in the exact order defined in the run-list; if a recipe appears more than once in the run-list, Chef Infra Client will not run it twice\n- Always specific to the node on which it runs; nodes may have a run-list that is identical to the run-list used by other nodes\n- Stored as part of the node object on the Chef server\n- Maintained using knife and then uploaded from the workstation to the Chef Infra Server, or maintained using Chef Automate\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:infraServers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "InfraProxy_GetRoleExpandedRunList",
         "responses": {
           "200": {
