@@ -98,10 +98,10 @@ Select a cookbook from the list to view the details of that cookbook.
 
 #### View Different Versions of Cookbooks
 
-To view the different versions of the cookbook:
+To view different versions of cookbook:
 
 - Select a specific cookbook from the list.
-- The interface contains a dropdown list for versions. Select any version to view the details.
+- Select any version from the dropdown list to view the details.
 
 {{< note >}}
 The dropdown shows the latest version of the cookbook.
@@ -111,15 +111,13 @@ The dropdown shows the latest version of the cookbook.
 
 #### Cookbook Content
 
-Select the content tab to view the recipes and other optional components of a cookbook. It also contains the files or directories of the components. You can view the content of the file by selecting the file from the component list.
+Select the content tab to view the recipes and other optional components of a cookbook. It also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
 
 {{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
 
-In the above image, the content of the file `default.rb` of **attributes** component is displayed.
-
 #### Details of a Cookbook
 
-Select the **Details** tab to view all the details like the requirements, usage, resources, and license of a cookbook.
+Select the **Details** tab to view the requirements, usage, resources, and license of a cookbook.
 
 {{< figure src="/images/automate/details-of-a-cookbook.png" alt="Details of a Cookbook">}}
 
