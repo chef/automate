@@ -83,12 +83,12 @@ To access these components for an organization, select **Chef Servers > Organiza
 
 A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuration and policy distribution. A cookbook contains recipes and other files, components, or directories.
 
-The Chef Infra Server lets you:
+The Chef Infra Server lets you view:
 
-- View the list of cookbooks with their latest version
-- View different versions of a cookbook
-- View the contents of a cookbook
-- View the details of a cookbook
+- List of cookbooks with their latest version
+- Different versions of a cookbook
+- Contents of a cookbook
+- Details of a cookbook
 
 #### List of Cookbooks
 
@@ -98,7 +98,7 @@ In Chef Infra Server, you can view all the cookbooks of an organization. The lat
 
 Select a cookbook from the list to view the details of that cookbook.
 
-#### View Different Versions of Cookbooks
+#### Different Versions of Cookbooks
 
 To view different versions of cookbook:
 
