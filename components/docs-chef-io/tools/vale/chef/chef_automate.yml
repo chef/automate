@@ -4,3 +4,5 @@ level: error
 ignorecase: false
 swap:
   '(?:[^\s]*) ?Automate': Chef Automate
+
+

@@ -1,0 +1,8 @@
+extends: substitution
+message: "Use '%s' instead of '%s'"
+level: error
+ignorecase: false
+swap:
+  '(?:[^\s]*) ?Automate app': Chef Automate ServiceNow Integration
+  '(?:[^\s]*) ?Automate application': Chef Automate ServiceNow Integration
+  '(?:[^\s]*) ?Automate plugin': Chef Automate ServiceNow Integration
