@@ -460,7 +460,7 @@ The Chef Infra Server integration lets you:
 
 Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to find a policy file from the list. Entering the name of the policy file in the search bar returns policyfiles matching your search criteria.
 
-IMAGE
+{{< figure src="/images/automate/policyfiles-list-and-searchbar.png" alt="Policyfile">}}
 
 ## Troubleshoot
 
