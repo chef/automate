@@ -15,7 +15,6 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
-let enableIdleTimeout = true;
 
 export interface ChefSessionUser {
   fullname: string;
@@ -51,10 +50,11 @@ export class ChefSessionService implements CanActivate {
     handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    console.log(appConfigService, appConfigService.idleTimeout, "idleTimeout confi11g") 
     window.onload = () => {
-      if(enableIdleTimeout) {
+      if(appConfigService.isIdleTimeoutEnabled) {
         this.idleLogout(300 * 1000); //5 mins
-        console.log(appConfigService, appConfigService.idleTimeout, "idleTimeout config") 
+        console.log(appConfigService, appConfigService.appConfig.session_settings, "idleTimeout config22") 
       }
 
     }
