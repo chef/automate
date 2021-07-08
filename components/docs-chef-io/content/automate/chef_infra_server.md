@@ -81,20 +81,20 @@ To access these components for an organization, select **Chef Servers > Organiza
 
 A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuration and policy distribution. A cookbook contains recipes and other files, components, or directories.
 
-The Chef Infra Server UI lets you:
+The Chef Infra Server lets you:
 
-- List out cookbooks with the latest version
+- View the list of cookbooks with their latest version
 - View different versions of a cookbook
 - View the contents of a cookbook
 - View the details of a cookbook
 
 #### List of Cookbooks
 
-In Chef Infra Server, you can view all the cookbooks of an organization. Each Cookbook has its latest version mentioned in the list.
+In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks are mentioned in the list.
 
 {{< figure src="/images/automate/list-of-cookbooks.png" alt="List of Cookbooks">}}
 
-Select any cookbook from the list to view the details of that particular cookbook.
+Select a cookbook from the list to view the details of that cookbook.
 
 #### View Different Versions of Cookbooks
 
@@ -127,10 +127,10 @@ Select the **Details** tab to view all the details like the requirements, usage,
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
-The Chef Infra Server UI lets you:
+The Chef Infra Server lets you:
 
 - Create a role
-- List out all the roles at one place.
+- List all the roles at one place.
 - Search for a specific role from a list of roles.
 - View the details of roles:
   - Run List
@@ -179,7 +179,7 @@ The Chef Infra Server UI lets you:
 
 - Create an environment.
 - Search for a specific environment from a list of environments.
-- List out all the environments at one place.
+- List all the environments at one place.
 - View the details of an environment.
 - Edit an environment.
 - Delete an environment.
@@ -233,7 +233,7 @@ The Chef Infra Server lets you delete environments one at a time. Select **Delet
 Chef Infra Server UI lets you:
 
 - Create a data bag.
-- List out all the data bags in one place.
+- List all the data bags in one place.
 - Search for a specific data bag item from a list of items.
 - Create a data bag item.
 - Edit a data bag item.
