@@ -102,8 +102,8 @@ Select a cookbook from the list to view the details of that cookbook.
 
 To view different versions of cookbook:
 
-- Select a specific cookbook from the list.
-- Select any version from the dropdown list to view the details.
+- Select a cookbook from the list.
+- The interface contains a dropdown list for versions. Select any version to view the details.
 
 {{< note >}}
 The dropdown shows the latest version of the cookbook.
