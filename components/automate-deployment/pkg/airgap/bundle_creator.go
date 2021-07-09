@@ -48,11 +48,7 @@ type HabBinaryDownloader interface {
 }
 
 const (
-	// Last version for which hab tars lived on bintray
-	lastBintrayVersion = "0.89.0"
-
 	pcioBaseURLFmt    = "https://packages.chef.io/files/habitat/%s/hab-x86_64-linux.tar.gz"
-	bintrayBaseURLFmt = "https://habitat.bintray.com/stable/linux/x86_64/hab-%s-%s-x86_64-linux.tar.gz"
 )
 
 // netHabDownloader downloads the habitat binary from either
@@ -67,21 +63,7 @@ func NewNetHabDownloader() HabBinaryDownloader {
 }
 
 func urlForVersion(version string, release string) (string, error) {
-	targetVersion, err := habpkg.ParseSemverishVersion(version)
-	if err != nil {
-		return "", err
-	}
-
-	switchoverVersion, err := habpkg.ParseSemverishVersion(lastBintrayVersion)
-	if err != nil {
-		return "", err
-	}
-
-	if habpkg.CompareSemverish(targetVersion, switchoverVersion) == habpkg.SemverishGreater {
-		return fmt.Sprintf(pcioBaseURLFmt, version), nil
-	} else {
-		return fmt.Sprintf(bintrayBaseURLFmt, version, release), nil
-	}
+	return fmt.Sprintf(pcioBaseURLFmt, version), nil
 }
 
 func (dl *netHabDownloader) DownloadHabBinary(version string, release string, w io.Writer) error {
