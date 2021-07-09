@@ -100,4 +100,9 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 			c.V1.Sys.CustomSettings.Banner.BackgroundColor.Value = backgroundColor
 		}
 	}
+
+	if g.GetV1().GetSessionSettings().GetEnableIdleTimeout() != nil {
+		c.V1.Sys.CustomSettings.SessionSettings.EnableIdleTimeout = w.Bool(g.GetV1().GetSessionSettings().GetEnableIdleTimeout().GetValue())
+		c.V1.Sys.CustomSettings.SessionSettings.IdleTimeoutMinutes = w.Int32(g.GetV1().GetSessionSettings().GetIdleTimeoutMinutes().GetValue())
+	}
 }
