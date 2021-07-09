@@ -31,7 +31,7 @@ Run scan jobs on:
 
 Jobs may be scheduled to be executed now, at some later point in time, as a one-off job, or a job that is executed at a given interval (like once a day, or every two hours).
 
-### Creating a Job
+### Creating a Job 
 
 When creating a scan job via ui, the user may select one or many managers. These managers would be the `Automate` manager (for nodes added manually in the ui), as well as any other managers added via the integrations (such as `aws-ec2`, or `aws-api`).
 The user may then build a query based on the base manager used to limit the set of items being scanned.

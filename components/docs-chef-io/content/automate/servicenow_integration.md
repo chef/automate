@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 ## Chef Automate Integration with CMDB App in ServiceNow
 
-The Chef Automate integration app plugin enables the Chef Automate to create and update client node records to Configuration Management Database (CMDB) tables of ServiceNow. This data aids in aggregating information about client nodes, the client runs, and compliance scans. The client runs and compliance scans monitor the state of configuration and compliance policies of your nodes.
+The Chef Automate integration app plugin enables the Chef Automate to create and update client node records to Configuration Management Database (CMDB) tables of ServiceNow. This data aids in aggregating information about client nodes, the client runs, and compliance scans. The client runs and compliance scans monitors the state of configuration and compliance policies of your nodes.
 
 ## Chef Automate and ServiceNow Integration
 
@@ -44,7 +44,7 @@ The installation personnel performing the task of installing and configuring the
 
 {{< note >}}
 
-You can obtain the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application. Alternatively, you can also find them in the **Plugins** section.
+You can locate the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application. Or, you can also find them in the **Plugins** section.
 
 {{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins">}}
 
@@ -64,13 +64,13 @@ The Chef Automate application exposes the REST API endpoint that facilitates the
 
 ### Creating Application Users
 
-The Chef Automate application provides several roles appropriate for integration. You can assign the following roles to the existing or new ServiceNow users:
+The Chef Automate application provides following roles appropriate for integration. You can assign these roles to the existing or new ServiceNow users:
 
-[Role x_chef_automate.admin]({{< relref "#role_x_chef_automate.admin" >}}))
-[Role x_chef_automate.user]({{< relref "#role_x_chef_automate.user" >}})
-[Role x_chef_automate.api]({{< relref "#role_x_chef_automate.api" >}})
+- [Role x_chef_automate.admin]({{< relref "#role_x_chef_automate.admin" >}}))
+- [Role x_chef_automate.user]({{< relref "#role_x_chef_automate.user" >}})
+- [Role x_chef_automate.api]({{< relref "#role_x_chef_automate.api" >}})
 
-These roles are part of the package. You can create the requisite roles and controls if any further restrictions are needed.
+These roles are part of the package. If there is a need for further restrictions, you can create the required roles and controls.
 
 ## Configuration
 
@@ -78,9 +78,9 @@ You can configure Chef Automate either using ServiceNow or using the Chef Automa
 
 {{< note >}}
 
-- You can configure `feed_interval` setting to **2 or 8 hours** based on the number of nodes. If more nodes are required, then you must increase the `feed_interval`.
-- The benchmark with `node_batch_size` set as **15** is tested. You can set the value between **1** and **30**.
-- The size of Scans can be large as multiple profiles are run. Hence, you must retain the `node_bach_size` smaller to avoid **4MB GRPC** limits exceeding.
+- You can configure `feed_interval` setting to **2 or 8 hours** based on the number of nodes. If there is a need to configure more nodes, you must increase the `feed_interval`.
+- The testing executed for benchmark with `node_batch_size` set as **15**. You can set the value between **1** and **30**.
+- The size of scans can be big to execute profiles in large numbers . Hence, you must maintain the `node_bach_size` smaller to avoid **4MB GRPC** limits exceeding.
 
 {{< /note >}}
 
@@ -92,7 +92,7 @@ Follow these steps to configure the Chef Automate integration from ServiceNow:
 
 1. Navigate to the **ServiceNow** instance.
 2. Locate **Chef Automate** menu.
-   Alternatively, you can type **Chef** in the **Filer Navigator** text box, and the related Chef features display within **Chef Automate** menu.
+   Or, you can type **Chef** in the **Filer Navigator** text box, and the related Chef features display within **Chef Automate** menu.
 3. Select the **Automate Instances** module.
 4. Select the **New** button.
 5. Enter the following details:
@@ -103,8 +103,11 @@ Follow these steps to configure the Chef Automate integration from ServiceNow:
    - **ServiceNow user**: a ServiceNow user with **ITIL** and `x_chef_automate.api` roles.
    - **ServiceNow password**: password of the ServiceNow user.
 
-6. Select the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
-7. Select **Submit**. The Automate instance detail is created.
+6. Select the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes.
+
+   A successful test displays the **service-now automate connectivity passed** message. Else, an error message displays detailing the connectivity or credentials issues and help you to resolve.
+
+7. Select **Submit**. The ServiceNow app creates the Automate instance detail.
 
 ### Configuring Chef Automate from Chef Automate UI
 
@@ -122,8 +125,11 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
 
    Note that to send data from Chef Automate to ServiceNow, you need to specify the **Data Feed URL** in the Chef Automate server `FQDN/api/x_chef_automate/asset` (Fully Qualified Domain Name (FQDN) is the domain name of the ServiceNow instance to configure in Chef Automate). For example, <https://venxxx.service-now.com/api/x_chef_automate/asset>.
 
-5. Select the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes. A successful test displays the **service-now automate connectivity passed** message. If there is an error, a message is displayed that will help resolve any connectivity or credentials issues.
-6. Select **Create Data Feed**. The data feed is created.
+5. Select the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes.
+
+   A successful test displays the **service-now automate connectivity passed** message. Else, an error message displays detailing the connectivity or credentials issues and helps you in resolving the error.
+
+6. Select **Create Data Feed**. The application creates the data feed.
 
 {{< figure src="/images/automate/snow_integration_create_data_feed.png" alt="Create Data Feed">}}
 
@@ -132,7 +138,7 @@ Follow these steps to configure the Chef Automate integration from the Chef Auto
 Users can configure the application properties with the `admin` or `x_chef_automate.admin` roles.
 
 1. Navigate to the **ServiceNow** application.
-2. Select the **Chef Automate** > **Properties** option from the left navigation pane. The **Chef Automate Properties** screen is displayed.
+2. Select the **Chef Automate** > **Properties** option from the left navigation pane. The **Chef Automate Properties** screen appears.
 
 {{< figure src="/images/automate/snow_integration_appproperties.png" alt="Chef Automate Properties">}}
 
@@ -141,24 +147,24 @@ The application system properties are:
 | Property Name | Description | Default |
 | --------------| ----------  | --------|
 | `x_chef_automate.chef.default.status` | Used to set up the status of the service record as **inserted** or **updated**. | Default: `1`|
-| `x_chef_automate.client_runs_per_node` | Used to set a maximum number of clients runs for a node. | Default: `5` |
-| `x_chef_automate.compliance_reports_per_node` | Used to set a maximum number of compliance reports for a node. | Default: `5` |
+| `x_chef_automate.client_runs_per_node` | Used to set a highest number of clients runs for a node. | Default: `5` |
+| `x_chef_automate.compliance_reports_per_node` | Used to set a highest number of compliance reports for a node. | Default: `5` |
 | `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by setting the property to **Yes**. | Default: `Yes` |
 | `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` |
 | `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` |
 | `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are:
-<ul>
-<li>Debug</li>
-<li>Warn</li>
-<li>Info</li>
-<li>Error</li>
-</ul>
+
+- Debug
+- Warn
+- Info
+- Error
+
 It enables the selected logging level and is visible in logs. | Default: `Error` |
-| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API is set to `Yes`. The possible values are: Yes, No. | Default: `Yes` |
+| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API set to `Yes`. The possible values are: Yes, No. | Default: `Yes` |
 | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
 
-3. Make the required changes.
-4. Select Save. The application saves the configuration changes.
+0. Make the required changes.
+1. Select Save. The application saves the configuration changes.
 
 ## Navigation
 
@@ -170,7 +176,7 @@ The **Automate Instances** module allows the user to configure the integration w
 
 The Chef Automate integration augments the existing CMDB servers and inserts new servers into CMDB. The application uses the ServiceNow Discovery IRE (Identification and Reconciliation Engine) when inserting or updating servers.
 
-In addition, the application updates the CMDB file systems and software installed tables and adds related information on the servers with associated data from Chef Automate:
+Also, the application updates the CMDB file systems and software installed tables and adds related information on the servers with associated data from Chef Automate:
 
 - Client Runs
 - Attributes
@@ -184,7 +190,7 @@ The user can drill down into **Client Run** detail from a server record by selec
 - Client run lists: run lists executed during the client run.
 - Client run recipes: recipes executed during the client run.
 
-The entire Chef Client Run details are available for each server. In addition, Client runs are also available from the **Client Runs** module.
+The entire Chef Client Run details are available for each server. Also, Client runs are also available from the **Client Runs** module.
 
 ### Attributes
 
@@ -197,11 +203,11 @@ The user can drill down into **Compliance** report detail from a server record b
 - Compliance report profiles: all profiles executed during the compliance scan.
 - Compliance report results: all results from the compliance scan.
 
-In addition, the user can drill down into each **Compliance** report profile to view the individual results for each profile. The entire Chef Compliance Report details are available for each server. Compliance reports are also available from the **Compliance** report module.
+Also, the user can drill down into each **Compliance** report profile to view the individual results for each profile. The entire Chef Compliance Report details are available for each server. Compliance reports are also available from the **Compliance** report module.
 
 ### Benchmarking
 
-The Chef Automate Installation team has tested the integration of the ServiceNow app with a maximum of 10K nodes Client Run data. Beyond this range, there might be performance issues. Also, the performance may get affected if you have any other applications running in your environment.
+The Chef Automate Installation team has tested the integration of the ServiceNow app with a maximal of 10K nodes Client Run data. Beyond this range, there might be performance issues. Also, the performance may get affected if you have any other applications running in your environment.
 
 The typical production instance of ServiceNow can have 8-12 nodes, which would mean the performance will be +10K nodes per hour processed with client run data. Benchmarking indicates that the increase in the number of nodes in the ServiceNow instance reduces the processing time.
 
