@@ -48,7 +48,7 @@ type HabBinaryDownloader interface {
 }
 
 const (
-	pcioBaseURLFmt    = "https://packages.chef.io/files/habitat/%s/hab-x86_64-linux.tar.gz"
+	pcioBaseURLFmt = "https://packages.chef.io/files/habitat/%s/hab-x86_64-linux.tar.gz"
 )
 
 // netHabDownloader downloads the habitat binary from either
