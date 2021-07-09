@@ -20,5 +20,5 @@ func TestHabBinaryDownload(t *testing.T) {
 	buf = sha256.New()
 	err = dl.DownloadHabBinary("1.6.181", "20201030172917", buf)
 	require.NoError(t, err)
-	assert.Equal(t, "b2eac315e995199845536642e27a79eb3b19ba0bc1607e33a95c4cb486e9b169", hex.EncodeToString(buf.Sum(nil)))
+	assert.Equal(t, "b9b96105d341613c0fcd9c34968b9966b26ee4597d6f298d8f18300190b1f799", hex.EncodeToString(buf.Sum(nil)))
 }
