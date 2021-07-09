@@ -1,0 +1,228 @@
+@import "~styles/variables";
+@import '../infra_shared/shared';
+@import '../../../../app/page-components/json-tree/json-tree.component.scss';
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-loading-spinner {
+  z-index: 199;
+}
+
+.policy-meta {
+  width: 350%;
+}
+
+.page-body {
+  margin-right: 33px;
+
+  .top-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+
+  .details-tab {
+    .spinner {
+      chef-loading-spinner {
+        width: auto;
+        z-index: 199;
+        background-color: $chef-white;
+        opacity: 0.7;
+      }
+    }
+
+    .node-details-section {
+      width: 600px;
+    }
+
+    form {
+      chef-form-field {
+        width: 600px;
+        margin-bottom: 30px;
+      }
+    }
+  }
+}
+
+.summary-body {
+  display: flex;
+  padding: 1em;
+  background: $chef-white;
+
+  table {
+    // width: 25%;
+    font-size: 14px;
+
+    &:first-child {
+      border-right: 1px solid $chef-grey;
+
+      tr {
+        td {
+          padding-right: 2.25em;
+        }
+      }
+    }
+
+    &:last-child {
+      tr {
+        th {
+          padding-left: 2.25em;
+        }
+      }
+    }
+
+    tr {
+      margin: 0;
+
+      th,
+      td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+        word-break: break-all;
+      }
+
+      th {
+        text-align: left;
+      }
+
+      td {
+        flex-grow: 2;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-light-grey;
+      }
+    }
+  }
+}
+
+.meta-box {
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  color: $chef-black;
+  margin-bottom: 36px;
+}
+
+::ng-deep mat-select {
+  width: 277px;
+}
+
+::ng-deep .chef-dropdown {
+  margin-top: 27px;
+
+  .mat-option {
+    border: 1px solid $chef-key-tab;
+  }
+}
+
+// CSS for accordion
+
+.accordion {
+  margin: auto;
+  border-radius: 4px;
+  padding-inline-start: 0px;
+  width: 100%;
+}
+
+.accordion {
+  ul {
+    list-style-type: none;
+  }
+
+  li {
+    list-style-type: none;
+    margin-bottom: 10px;
+  }
+}
+
+.accordion .menu {
+  background-color: $chef-white;
+  border-radius: 4px 4px 0px 0px;
+  border: 1px solid $chef-light-grey-2;
+  border-bottom: none;
+  cursor: pointer;
+  font-weight: bold;
+  height: 40px;
+  position: relative;
+  padding: 10px 10px 10px 15px;
+  transition: all 0.4s ease;
+}
+
+.accordion li:last-child .menu {
+  border-bottom: 0;
+}
+
+.accordion li .arrows {
+  right: 1rem;
+  left: auto;
+  float: right;
+}
+
+.accordion li .data-bag-name {
+  float: left;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.accordion li.active .arrows {
+  transform: rotate(180deg);
+}
+
+.accordion li.active .menu {
+  background: #DEE5FD;
+}
+
+.submenu {
+  background-color: $chef-white;
+  border: 1px solid $chef-light-grey-2;
+  border-top: none;
+  border-radius: 0px 0px 4px 4px;
+  font-size: 12px;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.4s ease;
+}
+
+.submenu .item-details {
+  padding: 0 15px 15px;
+}
+
+.accordion .submenu {
+  border-radius: 0 0 4px 4px;
+}
+
+.accordion li:last-child .submenu li:last-child {
+  border-bottom: 0;
+}
+
+.autoHeight {
+  height: auto;
+}
+
+.items-list-paging {
+  margin: 0 0 35px;
+}
+
+.item-details {
+  ::ng-deep .no_border_th,
+  .no_border_tr,
+  .no_border_tr:first-child,
+  .no_border_tr:last-child {
+    border: none;
+    font-size: 12px;
+    padding-bottom: 2px;
+  }
+}
+
+.empty-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
