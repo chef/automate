@@ -5,7 +5,7 @@ test_name="airgap_ow_upgrade"
 test_upgrades=true
 test_diagnostics_filters="~purge"
 
-CURRENT_OLDEST_VERSION=20190501153509
+CURRENT_OLDEST_VERSION=20191211163405
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 

@@ -11,13 +11,14 @@ import (
 
 func TestHabBinaryDownload(t *testing.T) {
 	dl := netHabDownloader{}
-	buf := sha256.New()
-	err := dl.DownloadHabBinary("0.56.0", "20180530234036", buf)
-	require.NoError(t, err)
-	assert.Equal(t, "d829ee385a7ca3cca980f5c52671643df2ee4f80104f2336884d3c565f9a2e13", hex.EncodeToString(buf.Sum(nil)))
 
-	buf = sha256.New()
-	err = dl.DownloadHabBinary("0.90.6", "20191112141314", buf)
+	buf := sha256.New()
+	err := dl.DownloadHabBinary("0.90.6", "20191112141314", buf)
 	require.NoError(t, err)
 	assert.Equal(t, "1d4cdb2165e967e7421b671512c6588cdfeb7b218f18a594bcfaf52325f8a934", hex.EncodeToString(buf.Sum(nil)))
+
+	buf = sha256.New()
+	err = dl.DownloadHabBinary("1.6.181", "20201030172917", buf)
+	require.NoError(t, err)
+	assert.Equal(t, "b2eac315e995199845536642e27a79eb3b19ba0bc1607e33a95c4cb486e9b169", hex.EncodeToString(buf.Sum(nil)))
 }
