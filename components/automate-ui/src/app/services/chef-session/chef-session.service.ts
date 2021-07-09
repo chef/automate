@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angular/common/http';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -33,11 +33,16 @@ const HTTP_STATUS_UNAUTHORIZED = 401;
 // of a hack. Something created for the purpose of route-guarding alone would
 // be better, and a good refactoring opportunity.
 @Injectable()
-export class ChefSessionService implements CanActivate {
+export class ChefSessionService implements OnInit, CanActivate {
   private user: ChefSessionUser;
   private httpHandler: HttpClient;
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
+  private appConfigService: AppConfigService;
+
+  isIdleTimeoutEnabled = false;
+  idleTimeout = 30; // 30mins
+  
 
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
@@ -45,19 +50,10 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, 
-    appConfigService: AppConfigService,
-    handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
-    console.log(appConfigService, appConfigService.idleTimeout, "idleTimeout confi11g") 
-    window.onload = () => {
-      if(appConfigService.isIdleTimeoutEnabled) {
-        this.idleLogout(300 * 1000); //5 mins
-        console.log(appConfigService, appConfigService.appConfig.session_settings, "idleTimeout config22") 
-      }
 
-    }
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
       this.setDefaultSession();
@@ -101,6 +97,15 @@ export class ChefSessionService implements CanActivate {
           }
         }
       );
+    }
+  }
+
+  ngOnInit(): void {
+    this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
+    this.idleTimeout = this.appConfigService.idleTimeout;
+
+    if(this.isIdleTimeoutEnabled) {
+      this.idleLogout(this.idleTimeout * 60000); //Convert minutes to milliseconds
     }
   }
 
