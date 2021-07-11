@@ -322,6 +322,7 @@ func TestInstallHabitat(t *testing.T) {
 	manifest := mockManifest(habResponseFixture("manifest"))
 	hasHabCmd := expectCommand("bash", "-c", "command -v hab")
 	habHabInstall := expectHabCommand("hab", "pkg", "install", "core/hab/0.54.0/20180221022026")
+	habBinlink := expectHabCommand("hab", "pkg", "binlink", "--force", "core/hab/0.54.0/20180221022026", "hab")
 
 	mockScriptInstall := func(t *testing.T, mockExec *command.MockExecutor, tempDir string, installError error) {
 		filename, err := testTempFileProvider.NextFileName()
@@ -342,13 +343,14 @@ func TestInstallHabitat(t *testing.T) {
 			func(t *testing.T, mockExec *command.MockExecutor, tempDir string) {
 				mockExec.Expect("CombinedOutput", hasHabCmd).Return("", errors.New("")).Once()
 				mockScriptInstall(t, mockExec, tempDir, nil)
-				mockExec.Expect("CombinedOutput", habHabInstall).Return("", nil).Once()
+				mockExec.Expect("CombinedOutput", habBinlink).Return("", nil).Once()
 			},
 		},
 		{"installs hab via the hab if hab is found", false,
 			func(t *testing.T, mockExec *command.MockExecutor, tempDir string) {
 				mockExec.Expect("CombinedOutput", hasHabCmd).Return("/bin/hab", nil).Once()
 				mockExec.Expect("CombinedOutput", habHabInstall).Return("", nil).Once()
+				mockExec.Expect("CombinedOutput", habBinlink).Return("", nil).Once()
 			},
 		},
 		{"returns error when hab script install fails", true,
