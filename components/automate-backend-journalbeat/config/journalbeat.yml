@@ -1,0 +1,3 @@
+{{toYaml cfg}}
+output.elasticsearch.username: admin
+output.elasticsearch.password: admin

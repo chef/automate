@@ -445,6 +445,20 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-backend-metricbeat",
+      "metadata": {
+        "name": "chef/automate-backend-metricbeat",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/automate-backend-journalbeat",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -648,7 +662,9 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-prometheus"
+        "chef/automate-prometheus",
+        "chef/automate-backend-journalbeat",
+        "chef/automate-backend-metricbeat"
       ],
       "packages": null,
       "dependencies": [

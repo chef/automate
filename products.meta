@@ -46,6 +46,8 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
+    "chef/automate-backend-metricbeat",
+    "chef/automate-backend-journalbeat",
     "core/rsync"
   ],
 
@@ -192,7 +194,9 @@
       "hidden": true,
       "dependencies": ["automate"],
       "services": [
-        "chef/automate-prometheus"
+        "chef/automate-prometheus",
+        "chef/automate-backend-journalbeat",
+        "chef/automate-backend-metricbeat"
       ]
     },
     {

@@ -1,0 +1,12 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{{pkgPathFor "core/systemd"}}/lib
+
+exec journalbeat \
+  -c "{{pkg.svc_config_path}}/journalbeat.yml" \
+  --path.config "{{pkg.svc_config_path}}" \
+  --path.data "{{pkg.svc_data_path}}" \
+  --path.home "{{pkg.svc_path}}" \
+  -e
