@@ -43,19 +43,19 @@ export class ChefSessionService implements CanActivate {
 
   isIdleTimeoutEnabled = false; // default it's false
   idleTimeout = 30; // 30mins default
-  
+
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
   //// Flag to store whether or not the modal has been displayed this session.
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend, 
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend,
     private appConfigService: AppConfigService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     setTimeout(() => this.callIdleTimeout(), 30 * 1000);
-    // callIdleTimeout will get excuted after 30 sec. 
+    // callIdleTimeout will get excuted after 30 sec.
 
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
@@ -108,7 +108,7 @@ export class ChefSessionService implements CanActivate {
     this.idleTimeout = this.appConfigService.idleTimeout;
 
     if(this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
-      let dividedTime = this.idleTimeout/2;
+      const dividedTime = this.idleTimeout / 2;
       this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
     }
   }
@@ -240,7 +240,7 @@ export class ChefSessionService implements CanActivate {
       if (idleTime > 2) {
           this.logout();
       }
-    } 
+    }
   }
 
   // TODO(sr) 2019/08/26: I don't think we should use these global variables.
