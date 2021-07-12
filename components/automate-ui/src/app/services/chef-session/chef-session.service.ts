@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angular/common/http';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -32,16 +32,19 @@ const HTTP_STATUS_UNAUTHORIZED = 401;
 // TODO 2017/11/06 sr: ChefSessionService implementing the route guard is a bit
 // of a hack. Something created for the purpose of route-guarding alone would
 // be better, and a good refactoring opportunity.
-@Injectable()
-export class ChefSessionService implements OnInit, CanActivate {
+@Injectable({
+  providedIn: 'root'
+})
+export class ChefSessionService implements CanActivate {
   private user: ChefSessionUser;
   private httpHandler: HttpClient;
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
-  private appConfigService: AppConfigService;
+  private isTimeoutStarted: boolean;
+  
 
   isIdleTimeoutEnabled = false;
-  idleTimeout = 30; // 30mins
+  idleTimeout = 0; // 30mins
   
 
   // Session state keys - We use session storage to save state here because
@@ -50,7 +53,8 @@ export class ChefSessionService implements OnInit, CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend, 
+    private appConfigService: AppConfigService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
 
@@ -83,6 +87,7 @@ export class ChefSessionService implements OnInit, CanActivate {
         token => {
           this.ingestIDToken(token);
           this.isRefreshing = false;
+          this.callIdleTimeout(appConfigService);
         },
         error => {
           this.isRefreshing = false;
@@ -91,8 +96,10 @@ export class ChefSessionService implements OnInit, CanActivate {
               this.logout();
             } else {
               console.log(`Session refresh failed: ${error.statusText}`);
+              this.callIdleTimeout(appConfigService);
             }
           } else {
+            this.callIdleTimeout(appConfigService);
             console.log(error);
           }
         }
@@ -100,12 +107,18 @@ export class ChefSessionService implements OnInit, CanActivate {
     }
   }
 
-  ngOnInit(): void {
+  callIdleTimeout(data: AppConfigService): void {
+    if(this.isTimeoutStarted || this.idleTimeout <= 0) {
+      return;
+    }
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
+    console.log(this.idleTimeout, this.isIdleTimeoutEnabled,  data.idleTimeout, "this.isIdleTimeoutEnabled")
 
     if(this.isIdleTimeoutEnabled) {
-      this.idleLogout(this.idleTimeout * 60000); //Convert minutes to milliseconds
+      let dividedTime = this.idleTimeout/2;
+      this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
+      this.isTimeoutStarted = true;
     }
   }
 
@@ -235,11 +248,11 @@ export class ChefSessionService implements OnInit, CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      if (idleTime > 2) { // 10 mins
+      console.log('called timerIncrement')
+      if (idleTime > 2) { // 30 mins
           this.logout()
-          // window.location.reload();
       }
-    }
+    } 
   }
 
   // TODO(sr) 2019/08/26: I don't think we should use these global variables.
