@@ -56,7 +56,7 @@ end
 # Install habitat so that we can build data artifacts
 
 hab_zip_path = ::File.join(Chef::Config[:file_cache_path], 'hab.tgz')
-hab_source = 'https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux'
+hab_source = 'https://packages.chef.io/files/current/habitat/latest/hab-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux'
 
 remote_file hab_zip_path do
   source hab_source
