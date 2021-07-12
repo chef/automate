@@ -100,20 +100,16 @@ Select a cookbook from the list to view the details of that cookbook.
 
 #### Different Versions of Cookbooks
 
-To view different versions of cookbook:
+To view different versions of a cookbook:
 
 - Select a cookbook from the list.
-- The interface contains a dropdown list for versions. Select any version to view the details.
-
-{{< note >}}
-The dropdown shows the latest version of the cookbook.
-{{< /note >}}
+- View the different versions of the cookbook using the dropdown list.
 
 {{< figure src="/images/automate/view-different-versions-of-cookbook.png" alt="Versions of a Cookbook">}}
 
 #### Cookbook Content
 
-Select the content tab to view the recipes and other optional components of a cookbook. It also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
+Select the **content** tab to view the recipes and other components of a cookbook. This view also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
 
 {{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
 
@@ -130,8 +126,8 @@ Select the **Details** tab to view the requirements, usage, resources, and licen
 The Chef Infra Server lets you:
 
 - Create a role
-- List all the roles at one place.
-- Search for a specific role from a list of roles.
+- View all roles
+- Search for a specific role
 - View the details of roles:
   - Run List
   - Attributes
@@ -177,12 +173,12 @@ An [environment]({{< relref "environments" >}}) can be used to map an organizati
 
 The Chef Infra Server UI lets you:
 
-- Create an environment.
-- Search for a specific environment from a list of environments.
-- List all the environments at one place.
-- View the details of an environment.
-- Edit an environment.
-- Delete an environment.
+- Create an environment
+- View all environments
+- Search for a specific environment
+- View the details of an environment
+- Edit an environment
+- Delete an environment
 
 #### Create an Environment
 
@@ -232,13 +228,13 @@ The Chef Infra Server lets you delete environments one at a time. Select **Delet
 
 Chef Infra Server UI lets you:
 
-- Create a data bag.
-- List all the data bags in one place.
-- Search for a specific data bag item from a list of items.
-- Create a data bag item.
-- Edit a data bag item.
-- Delete a data bag item.
-- Delete a data bag.
+- Create a data bag
+- View all data bags
+- Search for a specific data bag item
+- Create a data bag item
+- Edit a data bag item
+- Delete a data bag item
+- Delete a data bag
 
 #### Create a Data Bag
 
@@ -298,11 +294,11 @@ Chef Infra Server lets you delete the existing data bag one at a time. To delete
 
 Chef Infra Clients provide secure API access to the Chef Infra Server. Chef Infra Server UI lets you:
 
-- Create a client.
-- Search for a specific client from a list of clients.
-- List out all the clients at one place.
-- Reset a client key.
-- Delete a client.
+- Create a client
+- View all clients
+- Search for a specific client
+- Reset a client key
+- Delete a client
 
 #### Create a Client
 
@@ -351,8 +347,8 @@ A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. Dur
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific node from a list of nodes
-- View a list of all the connected nodes
+- Search for a specific node
+- View all nodes
 - Details of a node
 - Edit Run list
 - Edit Attributes
@@ -451,12 +447,12 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 ### Policyfiles
 
-A [Policyfile]({{< relref "/policyfile" >}}) is an optional way to manage role, environment, and community cookbook data with a single document that is uploaded to the Chef Infra Server. Policyfiles make things easier to test and promote code safely with a simpler interface.
+[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote code with simpler interface.
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific policyfile from the list
-- View the list of all the policyfiles
+- Search for a specific policyfiles
+- View all the policyfiles
 
 Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to find a policy file from the list. Entering the name of the policy file in the search bar returns policyfiles matching your search criteria.
 
