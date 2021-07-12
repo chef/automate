@@ -133,3 +133,22 @@ func (a *InfraProxyServer) DeletePolicyfile(ctx context.Context, r *gwreq.Delete
 		Name: res.GetName(),
 	}, nil
 }
+
+// GetPolicyfileRevisions fetches the policy file revisions
+func (a *InfraProxyServer) GetPolicyfileRevisions(ctx context.Context, r *gwreq.PolicyfileRevisions) (*gwres.PolicyfileRevisions, error) {
+	req := &infra_req.PolicyfileRevisions{
+		OrgId:      r.OrgId,
+		ServerId:   r.ServerId,
+		Name:       r.Name,
+	}
+
+	res, err := a.client.GetPolicyfileRevisions(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.PolicyfileRevisions{
+		Revisions: res.GetRevisions(),
+	}, nil
+}
+

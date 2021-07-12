@@ -3,14 +3,13 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
-
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/chef/automate/api/interservice/infra_proxy/request"
-	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -186,4 +185,24 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 	return &response.DeletePolicyfile{
 		Name: req.GetName(),
 	}, nil
+}
+
+// GetPolicyfile gets a policy file
+func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	policyfiles, err := c.client.Policies.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	fmt.Println(":::::: policyfiles :::::::", policyfiles)
+
+	return &response.PolicyfileRevisions{
+		Revisions: []string { "" },
+	}, nil
+
 }

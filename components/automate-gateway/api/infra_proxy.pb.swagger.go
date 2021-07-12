@@ -2074,6 +2074,51 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}/revisions": {
+      "get": {
+        "operationId": "InfraProxy_GetPolicyfileRevisions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileRevisions"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef Organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Policyfile name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "InfraProxy_GetRoles",
@@ -3896,6 +3941,18 @@ func init() {
         "policy_group": {
           "type": "string",
           "description": "Policyfile policy group."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.PolicyfileRevisions": {
+      "type": "object",
+      "properties": {
+        "revisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policyfile revisions."
         }
       }
     },

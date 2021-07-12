@@ -101,3 +101,8 @@ message DeletePolicyfile {
     // Policyfile name.
     string name = 1;
 }
+
+message PolicyfileRevisions {
+    // Policyfile revisions.
+    repeated string revisions = 1;
+}
