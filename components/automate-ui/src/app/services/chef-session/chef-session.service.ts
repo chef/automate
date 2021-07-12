@@ -40,12 +40,10 @@ export class ChefSessionService implements CanActivate {
   private httpHandler: HttpClient;
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
-  
 
   isIdleTimeoutEnabled = false; // default it's false
   idleTimeout = 30; // 30mins default
   
-
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
   //// Flag to store whether or not the modal has been displayed this session.
@@ -108,12 +106,11 @@ export class ChefSessionService implements CanActivate {
   callIdleTimeout(): void {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
-    console.log(this.idleTimeout, this.isIdleTimeoutEnabled, "this.isIdleTimeoutEnabled")
 
-    // if(this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
+    if(this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       let dividedTime = this.idleTimeout/2;
       this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
-    // }
+    }
   }
 
   private refresh(): Observable<string> {
@@ -222,10 +219,8 @@ export class ChefSessionService implements CanActivate {
     }
   }
 
-
-
   idleLogout(idleTimeout: number): void {
-    var idleTime = 0;
+    let idleTime = 0;
     // Increment the idle time counter after configured mins in config.toml.
     setInterval(timerIncrement.bind(this), idleTimeout);
     window.onload = resetTimer;
@@ -242,9 +237,8 @@ export class ChefSessionService implements CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      console.log('called timerIncrement')  
       if (idleTime > 2) {
-          this.logout()
+          this.logout();
       }
     } 
   }
