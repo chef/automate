@@ -51,12 +51,11 @@ const (
 	pcioBaseURLFmt = "https://packages.chef.io/files/habitat/%s/hab-x86_64-linux.tar.gz"
 )
 
-// netHabDownloader downloads the habitat binary from either
-// habitat.bintray.com or packages.chef.io.
+// netHabDownloader downloads the habitat binary from either packages.chef.io.
 type netHabDownloader struct{}
 
 // NewNetHabDownloader returns a new HabBinaryDownloader that pulls
-// from bintray or packages.chef.io based on the version being
+// from packages.chef.io based on the version being
 // requested.
 func NewNetHabDownloader() HabBinaryDownloader {
 	return &netHabDownloader{}
