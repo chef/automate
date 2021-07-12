@@ -18,6 +18,7 @@ message V1 {
   repeated chef.automate.infra.config.FrontendTLSCredential frontend_tls = 7;
   Disclosure disclosure = 8;
   Banner banner = 9;
+  SessionSettings session_settings = 10;
 }
 
 message External {
@@ -249,4 +250,9 @@ message Banner {
   google.protobuf.StringValue message = 2;
   google.protobuf.StringValue background_color = 3;
   google.protobuf.StringValue text_color = 4;
+}
+
+message SessionSettings {
+  google.protobuf.BoolValue enable_idle_timeout = 1;
+  google.protobuf.Int32Value idle_timeout_minutes = 2;
 }
