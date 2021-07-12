@@ -116,7 +116,7 @@
   <app-page-picker
     class="reporting-nodes-paging"
     [perPage]="reportData.nodesListParams.perPage"
-    [total]="reportData.nodesList.total"
+    [total]="reportData.filteredItemsCount"
     [page]="reportData.nodesListParams.page"
     (pageChanged)="onNodesListPageChanged($event)">
   </app-page-picker>
