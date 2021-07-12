@@ -40,11 +40,10 @@ export class ChefSessionService implements CanActivate {
   private httpHandler: HttpClient;
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
-  private isTimeoutStarted: boolean;
   
 
-  isIdleTimeoutEnabled = false;
-  idleTimeout = 0; // 30mins
+  isIdleTimeoutEnabled = false; // default it's false
+  idleTimeout = 30; // 30mins default
   
 
   // Session state keys - We use session storage to save state here because
@@ -57,6 +56,8 @@ export class ChefSessionService implements CanActivate {
     private appConfigService: AppConfigService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    setTimeout(() => this.callIdleTimeout(), 30 * 1000);
+    // callIdleTimeout will get excuted after 30 sec. 
 
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
@@ -87,7 +88,6 @@ export class ChefSessionService implements CanActivate {
         token => {
           this.ingestIDToken(token);
           this.isRefreshing = false;
-          this.callIdleTimeout(appConfigService);
         },
         error => {
           this.isRefreshing = false;
@@ -96,10 +96,8 @@ export class ChefSessionService implements CanActivate {
               this.logout();
             } else {
               console.log(`Session refresh failed: ${error.statusText}`);
-              this.callIdleTimeout(appConfigService);
             }
           } else {
-            this.callIdleTimeout(appConfigService);
             console.log(error);
           }
         }
@@ -107,19 +105,15 @@ export class ChefSessionService implements CanActivate {
     }
   }
 
-  callIdleTimeout(data: AppConfigService): void {
-    if(this.isTimeoutStarted || this.idleTimeout <= 0) {
-      return;
-    }
+  callIdleTimeout(): void {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
-    console.log(this.idleTimeout, this.isIdleTimeoutEnabled,  data.idleTimeout, "this.isIdleTimeoutEnabled")
+    console.log(this.idleTimeout, this.isIdleTimeoutEnabled, "this.isIdleTimeoutEnabled")
 
-    if(this.isIdleTimeoutEnabled) {
+    // if(this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       let dividedTime = this.idleTimeout/2;
       this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
-      this.isTimeoutStarted = true;
-    }
+    // }
   }
 
   private refresh(): Observable<string> {
@@ -232,8 +226,8 @@ export class ChefSessionService implements CanActivate {
 
   idleLogout(idleTimeout: number): void {
     var idleTime = 0;
-    // Increment the idle time counter 5 mins.
-    setInterval(timerIncrement.bind(this), idleTimeout); // 5 mins
+    // Increment the idle time counter after configured mins in config.toml.
+    setInterval(timerIncrement.bind(this), idleTimeout);
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer;  // catches touchscreen presses as well
@@ -248,8 +242,8 @@ export class ChefSessionService implements CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      console.log('called timerIncrement')
-      if (idleTime > 2) { // 30 mins
+      console.log('called timerIncrement')  
+      if (idleTime > 2) {
           this.logout()
       }
     } 
