@@ -38,6 +38,7 @@ export class ReportDataService {
     sort: 'latest_report.end_time',
     order: 'desc'
   };
+  filteredNodesCount: number;
 
   profilesListLoading = true;
   profilesListParams: any = {
@@ -85,13 +86,22 @@ export class ReportDataService {
       });
   }
 
-  getReportingNodesList(reportQuery: ReportQuery, listParams: any) {
+  getReportingNodesList(reportQuery: ReportQuery, listParams: any, nodeFilterStatus: string) {
     this.nodesListLoading = true;
     this.statsService.getNodes(reportQuery, listParams)
       .subscribe(data => {
         this.nodesListLoading = false;
         this.nodesListEmpty = this.isZero(data.total);
-        this.nodesList = Object.assign({}, this.nodesList, data);
+        let status: string;        
+        if(nodeFilterStatus === 'all') {
+          status = "total"  
+        } else {
+          status = "total_"+ nodeFilterStatus;
+        }        
+        this.nodesList = Object.assign({}, this.nodesList, data);        
+        if(status in this.nodesList) {
+          this.filteredNodesCount = this.nodesList[status]
+        }
       });
   }
 
