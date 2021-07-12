@@ -11,33 +11,33 @@
         <chef-heading data-cy="policy-file-head">{{PolicyFile?.name}}</chef-heading>
         <div class="meta-box" *ngIf="!policyFileDetailsLoading">
           <div class="summary-body">
-            <table>
+            <table summary="Policy file information">
               <tr>
-                <th>
+                <th id="information">
                   <p class="meta-head policy-meta">POLICY FILE INFORMATION</p>
                 </th>
               </tr>
               <tr>
-                <th>
+                <th id="policy-group">
                   Policy Group
                 </th>
                 <td data-cy="policy-file-env">{{PolicyFile?.policy_group === '' ? '--' : PolicyFile?.policy_group}}</td>
               </tr>
               <tr>
-                <th>
+                <th id="revision-id">
                   Revision Id
                 </th>
                 <td>{{PolicyFile?.revision_id}}</td>
               </tr>
             </table>
-            <table>
+            <table summary="Policy file meta data">
               <tr>
-                <th>
+                <th id="metadata">
                   <p class="meta-head">METADATA</p>
                 </th>
               </tr>
               <tr>
-                <th>
+                <th id="chef-server">
                   Chef Server
                 </th>
                 <td data-cy="policy-file-server">
@@ -45,7 +45,7 @@
                 </td>
               </tr>
               <tr>
-                <th>
+                <th id="chef-organization">
                   Chef Organization
                 </th>
                 <td data-cy="policy-file-org">
@@ -57,7 +57,6 @@
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='details' data-cy="details-tab">Content</chef-option>
-          <!-- <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option> -->
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
@@ -150,8 +149,6 @@
           </ng-container>
         </div>
       </section>
-      <!-- <section class="page-body attributes" *ngIf="tabValue === 'attributes'">
-      </section> -->
     </main>
   </div>
 </div>

@@ -24,7 +24,3 @@ export const deleteStatus = createSelector(
   policyFileState,
   (state) => state.deleteStatus
 );
-// export const policyList = createSelector(
-//   policyFileState,
-//   (state) => state.policyList
-// );
