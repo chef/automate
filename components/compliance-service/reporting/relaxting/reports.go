@@ -586,6 +586,7 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		Impact:         profileControl.Impact,
 		Title:          profileControl.Title,
 		SourceLocation: profileControl.SourceLocation,
+		Tags:           profileControl.Tags,
 		Results:        minResults,
 		WaivedStr:      reportControlMin.WaivedStr,
 	}
@@ -632,6 +633,7 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 			Url: ref.Url,
 		}
 	}
+	convertedControl.Tags = reportControlMin.Tags
 	return &convertedControl
 }
 

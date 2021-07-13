@@ -244,7 +244,7 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 		json.Unmarshal(byteRefs, &refs) // nolint: errcheck
 		control.Refs = refs
 
-		var tags map[string]string
+		var tags string
 		byteTags, _ := json.Marshal(esControl.Tags)
 		json.Unmarshal(byteTags, &tags) // nolint: errcheck
 		control.Tags = tags

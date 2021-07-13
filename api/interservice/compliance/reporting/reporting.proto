@@ -200,7 +200,7 @@ message Control {
 	SourceLocation source_location = 6;
 	repeated Result results = 7;
 	repeated Ref refs = 8;
-	map<string, string> tags = 9;
+	string tags = 9;
 	map<string, TagValues> string_tags = 10;
 	string waived_str = 11;
 	OrigWaiverData waiver_data = 12;
