@@ -70,6 +70,8 @@ infra-proxy-service BINDING_MODE strict
 ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service config-mgmt-service event-feed-service nodemanager-service pg-sidecar-service
 ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
+automate-backend-journalbeat REQUIRED automate-elasticsearch
+automate-backend-journalbeat BINDING_MODE strict
 license-control-service REQUIRED automate-pg-gateway pg-sidecar-service
 license-control-service BINDING_MODE strict
 local-user-service REQUIRED authz-service automate-dex teams-service

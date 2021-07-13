@@ -589,6 +589,7 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
+        "chef/automate-backend-journalbeat",
         "chef/user-settings-service"
       ],
       "packages": null,
@@ -658,7 +659,8 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-prometheus"
+        "chef/automate-prometheus",
+        "chef/automate-backend-journalbeat"
       ],
       "packages": null,
       "dependencies": [

@@ -151,6 +151,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
+        "chef/automate-backend-journalbeat",
         "chef/user-settings-service"
       ]
     },
@@ -193,8 +194,8 @@
       "hidden": true,
       "dependencies": ["automate"],
       "services": [
-        "chef/automate-prometheus"
-       
+        "chef/automate-prometheus",
+        "chef/automate-backend-journalbeat"
       ]
     },
     {

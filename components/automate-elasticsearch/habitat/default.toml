@@ -235,3 +235,6 @@
 
 [deprecated]
 external_es = false
+admin_username = "admin"
+admin_password = "admin"
+  

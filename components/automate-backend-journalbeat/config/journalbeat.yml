@@ -1,3 +1,6 @@
 {{toYaml cfg}}
-output.elasticsearch.username: {{bind.elasticsearch.first.cfg.admin_username}}
-output.elasticsearch.password: {{bind.elasticsearch.first.cfg.admin_password}}
+output.elasticsearch.username: 'admin'
+output.elasticsearch.password: 'admin'
+
+#output.elasticsearch.username: {{bind.elasticsearch.first.cfg.admin_username}}
+#output.elasticsearch.password: {{bind.elasticsearch.first.cfg.admin_password}}
