@@ -41,3 +41,15 @@ message Report {
 	string status = 43;
 	string status_message = 44;
 }
+
+message StreamRequest {
+	message Chunk {
+		bytes data = 1;
+		int64 position = 2;
+	}
+	string report_uuid = 1;
+	Chunk chunk = 2;
+}
+
+message StreamResponse {
+}

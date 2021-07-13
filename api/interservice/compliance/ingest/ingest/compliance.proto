@@ -10,6 +10,7 @@ import "interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
 service ComplianceIngesterService {
+	rpc StreamComplianceReport (stream chef.automate.domain.compliance.ingest.events.compliance.StreamRequest) returns (chef.automate.domain.compliance.ingest.events.compliance.StreamResponse) {};
 	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			post: "/api/v0/events/compliance/report"
@@ -27,3 +28,4 @@ message ProjectUpdateStatusResp {
     google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;
 }
+

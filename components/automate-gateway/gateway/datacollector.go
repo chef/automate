@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -38,6 +39,8 @@ const (
 	LivenessAgentMsg
 	ComplianceReportMsg
 )
+
+const ChunkLimit = 1 * 1024 * 1024
 
 // Custom Unmarshaler
 var unmarshaler = jsonpb.Unmarshaler{AllowUnknownFields: true}
@@ -91,7 +94,7 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 	case LivenessAgentMsg:
 		s.processLivenessPing(ctx, w, body)
 	case ComplianceReportMsg:
-		s.processComplianceReport(ctx, w, body)
+		s.processComplianceReportStream(ctx, w, body)
 	default:
 		// if we reach this, we don't know what to do with the message
 		http.Error(w, "message type not found", http.StatusBadRequest) // Code Unimplemented? Unsupported?
@@ -155,17 +158,73 @@ func (s *Server) processLivenessPing(ctx context.Context, w http.ResponseWriter,
 	}
 }
 
-// processComplianceReport process a ComplianceReport message
-func (s *Server) processComplianceReport(ctx context.Context, w http.ResponseWriter, body []byte) {
+func (s *Server) processComplianceReportStream(ctx context.Context, w http.ResponseWriter, body []byte) {
 	// Create report object from the request body
 	report := ParseBytesToComplianceReport(body)
 
+	fmt.Printf("Kallol:: %+v", report)
 	// Talk directly to the ingest-compliance-service
 	complianceIngester, err := s.clientsFactory.ComplianceIngesterClient()
 	if err != nil {
 		http.Error(w, "GRPC ComplianceIngester Unavailable", http.StatusServiceUnavailable)
 		return
 	}
+
+	stream, err := complianceIngester.StreamComplianceReport(ctx)
+	if err != nil {
+		http.Error(w, "GRPC StreamComplianceReport Failed", http.StatusServiceUnavailable)
+		return
+	}
+
+	var chunk []byte
+	var position int64 = 0
+	for len(body) > ChunkLimit {
+		chunk, body = body[:ChunkLimit], body[ChunkLimit:]
+		req := &complianceEvent.StreamRequest {
+			ReportUuid: report.ReportUuid,
+			Chunk: &complianceEvent.StreamRequest_Chunk{
+				Data: chunk,
+				Position: position,
+			},
+		}
+		err = stream.Send(req)
+		position += 1
+	}
+
+	if len(body) > 0 {
+		req := &complianceEvent.StreamRequest {
+			ReportUuid: report.GetReportUuid(),
+			Chunk: &complianceEvent.StreamRequest_Chunk{
+				Data: body,
+				Position: position,
+			},
+		}
+
+		err = stream.Send(req)
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		http.Error(w, "GRPC Receive Response Failed", http.StatusServiceUnavailable)
+		return
+	}
+
+	fmt.Printf("Received response %v", res)
+}
+
+// processComplianceReport process a ComplianceReport message
+func (s *Server) processComplianceReport(ctx context.Context, w http.ResponseWriter, body []byte) {
+	// Create report object from the request body
+	report := ParseBytesToComplianceReport(body)
+
+	fmt.Printf("Kallol:: %+v", report)
+	// Talk directly to the ingest-compliance-service
+	complianceIngester, err := s.clientsFactory.ComplianceIngesterClient()
+	if err != nil {
+		http.Error(w, "GRPC ComplianceIngester Unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
 
 	_, err = complianceIngester.ProcessComplianceReport(ctx, report)
 	if err != nil {
