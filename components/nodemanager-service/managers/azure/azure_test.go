@@ -188,3 +188,58 @@ func TestHandleStateResponse(t *testing.T) {
 	state := handleStateResponse(&statuses)
 	assert.Equal(t, "RUNNING", state)
 }
+
+func TestHandleReFilterNameAndRegion(t *testing.T) {
+
+	vmList := []*manager.ManagerNode{
+		{Name: "test-1A", Region: "eastus", Id: "1234"},
+		{Name: "test-2B", Region: "eastus1", Id: "3234"},
+		{Name: "test-3C", Region: "eastus2", Id: "1434"},
+		{Name: "test-4D", Region: "eastus", Id: "12234"},
+	}
+
+	filters := []*common.Filter{
+		{Key: "name", Values: []string{"test-1"}},
+	}
+	filteredResources := reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+	assert.Equal(t, "test-1A", filteredResources[0].Name)
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 2, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "name", Values: []string{"test-4"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	t.Log("filteredResources...", filteredResources)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 3, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 2, len(filteredResources))
+}
