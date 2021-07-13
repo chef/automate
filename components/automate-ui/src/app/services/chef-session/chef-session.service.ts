@@ -221,6 +221,8 @@ export class ChefSessionService implements CanActivate {
 
   idleLogout(idleTimeout: number): void {
     let idleTime = 0;
+    const bc = new BroadcastChannel("tabsCheckForIdleTimeout");
+
     // Increment the idle time counter after configured mins in config.toml.
     setInterval(timerIncrement.bind(this), idleTimeout);
     window.onload = resetTimer;
@@ -230,9 +232,17 @@ export class ChefSessionService implements CanActivate {
     window.onclick = resetTimer;      // catches touchpad clicks as well
     window.onkeydown = resetTimer;
     window.addEventListener('scroll', resetTimer, true);
+    bc.onmessage = resetTimer; // catches different tabs activity
+    bc.onmessageerror = function() {
+      resetTimer();
+      console.log('error calling broadcast api');
+    }
 
     function resetTimer() {
-      idleTime = 0;
+      if(idleTime > 0) {
+        bc.postMessage('resetTimer');
+        idleTime = 0;
+      }
     }
 
     function timerIncrement() {
