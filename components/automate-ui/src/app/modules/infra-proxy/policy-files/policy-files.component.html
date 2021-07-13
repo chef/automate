@@ -1,5 +1,13 @@
 <section class="policy-files">
   <chef-loading-spinner *ngIf="policyFilesListLoading" size="50"></chef-loading-spinner>
+  <app-delete-infra-object-modal
+    [visible]="deleteModalVisible"
+    objectNoun="policyFile"
+    [objectName]="policyfileToDelete?.name"
+    (close)="closeDeleteModal()"
+    (deleteClicked)="deletePolicyfile()"
+    objectAction="Delete">
+  </app-delete-infra-object-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <div class="search-create-container">
@@ -11,6 +19,7 @@
       <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
       <p *ngIf="searchValue === ''">No policy files available</p>
     </div>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="deleting" size="50" fixed></chef-loading-spinner>
     <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
       <chef-table>
         <chef-thead *ngIf="!searchFlag || searchArr.length">
@@ -26,7 +35,17 @@
             <chef-td>{{ policyFile.name }}</chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>
-            <chef-td class="three-dot-column"></chef-td>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu">
+                <mat-option 
+                  data-cy="delete"
+                  class="secondary"
+                  (onSelectionChange)="startpolicyFilesDelete(policyFile)">
+                  Delete
+                  <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
+                </mat-option>
+              </mat-select>
+            </chef-td>
           </chef-tr>
         </chef-tbody>
       </chef-table>

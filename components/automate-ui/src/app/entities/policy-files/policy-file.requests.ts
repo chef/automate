@@ -17,4 +17,9 @@ export class PolicyFileRequests {
     return this.http.get<PolicyFilesSuccessPayload>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/policyfiles`, {headers});
   }
+
+  public deletePolicyFiles(server_id: string, org_id: string, name: string): Observable<{}> {
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/policyfiles/${name}`,
+    {headers});
+  }
 }
