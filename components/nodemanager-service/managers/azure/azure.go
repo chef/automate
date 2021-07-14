@@ -33,6 +33,12 @@ type Creds struct {
 	SubscriptionID string
 }
 
+type filtersAzure struct {
+	name   []*common.Filter
+	region []*common.Filter
+	others []*common.Filter
+}
+
 // New returns a Creds struct of ServicePrincipalToken and TenantID given azure creds
 func New(clientID string, clientSecret string, tenantID string, subscriptionID string) (Creds, error) {
 	if len(clientID) == 0 && len(clientSecret) == 0 && len(tenantID) == 0 {
@@ -394,12 +400,6 @@ func handleStateResponse(statuses *[]compute.InstanceViewStatus) string {
 		}
 	}
 	return ""
-}
-
-type filtersAzure struct {
-	name   []*common.Filter
-	region []*common.Filter
-	others []*common.Filter
 }
 
 func (creds *Creds) getVMPoolTasks(ctx context.Context, subs []*manager.ManagerNode, filters []*common.Filter) []*pool.Task {
