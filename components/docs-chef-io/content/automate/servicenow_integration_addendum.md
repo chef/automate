@@ -126,6 +126,8 @@ The **Scripted Rest API** feature aids in establishing a connection between Serv
 
 ### Roles
 
+You can associate a single user with more than one roles.
+
 #### Role x_chef_automate.admin
 
 You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow administration of the application properties and logs. Thus, a user who is not a system administrator performs the administration.
