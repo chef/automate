@@ -739,7 +739,6 @@ func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map
 	} else {
 		logrus.Errorf("We had errors retrieving nodes from azure: %+v", poolOfTasks.GetErrors())
 	}
-
 	return vmList, nil
 }
 
