@@ -1,5 +1,5 @@
 +++
-title = "ServiceNow Integration Components"
+title = "ServiceNow Integration Reference"
 
 draft = false
 
@@ -7,21 +7,23 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "ServiceNow Integration Components"
+    title = "ServiceNow Integration Reference"
     parent = "automate/reference"
     identifier = "automate/reference/servicenow_integration_addendum.md ServiceNow Integration Components"
     weight = 60
 +++
 
-This page includes information about the various ServiceNow components used while installing and configuring Chef Automate with CMDB App in ServiceNow.
+This page details information on the topics that will aid you while installing and configuring the Chef Automate plugin in the  ServiceNow ecosystem.
+
+Refer to the [ServiceNow Integration]({{< relref "servicenow_integration" >}}) page to install and configure the Chef Automate plugin in the ServiceNow ecosystem.
 
 {{< note >}}
 
-You can list the Chef Automate features in the ServiceNow instance by typing **Chef** in the **Filer Navigator** text box. All Chef features are displayed within **Chef Automate** menu.
+You can list the Chef Automate features in the ServiceNow instance by typing **Chef** in the **Filer Navigator** text box. All Chef features displays within **Chef Automate** menu.
 
 {{< /note >}}
 
-### Events
+## Events
 
 You can navigate to the **Events** section by selecting **Chef Automate** >**Events** from ServiceNow.
 
@@ -35,7 +37,7 @@ You can navigate to the **Events** section by selecting **Chef Automate** >**Eve
 
 ### Script Actions***
 
-You can navigate to the **Script Actions** section by selecting **Chef Automate** >**Script Actions** from ServiceNow, and make the required changes.
+You can navigate to the **Script Actions** section by selecting **Chef Automate** >**Script Actions** from ServiceNow and make the required changes.
 
 - The **Asset Process** script action processes the event and updates the node data into the _asset import_ table.
 
@@ -104,7 +106,7 @@ The **Transformation** events occur while transforming an import set table int
 
 - **On Before:** Mapping manufacturer, CPU manufacturer, model category, and model by using this script.
 
-- **On After:** The  five **On After** scripts required to update the various values are as follows:
+- **On After:** The  five **On After** scripts required to update the values are as follows:
 
     1. Update **node id**, **node name**, **organization**, **IP address** and insert the record into Chef Automate client run cookbooks, Chef Automate client run recipes, Chef Automate client run lists.
     2. Update **software**, **name** and installed in _CMDB software instance_ table.
@@ -124,16 +126,11 @@ The **Scripted Rest API** feature aids in establishing a connection between Serv
 
 ### Roles
 
-Refer to the following pages on how to create users and assign roles in ServiceNow:
-
-- [Creating Users in ServiceNow](https://docs.servicenow.com/csh?topicname=t_CreateAUser.html)
-- [Assigning Roles in ServiceNow](https://docs.servicenow.com/csh?topicname=t_AssignARoleToAUser.html)
-
 #### Role x_chef_automate.admin
 
-The `x_chef_automate.admin` role is assigned to a user other than a System Administrator to allow administration of the application properties and logs. Thus, a user who is not a system administrator performs the administration.
+You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow administration of the application properties and logs. Thus, a user who is not a system administrator performs the administration.
 
-Note that a System Administrator can perform all tasks that this role can. In addition, the **Admin** role is added by default in ServiceNow.
+Note that a System Administrator can perform all tasks that this role can.
 
 The **Admin** role grants user access to the:
 
@@ -173,6 +170,6 @@ Ensure that you need to assign the _OOB ITIL_ role for integration with CMDB dat
 
 #### Role x_chef_automate.api
 
-The `x_chef_automate.api` role is suitable for users responsible for integrating the Chef Automate data into the application. It is advisable to create a new user specifically for this role. This user's credentials are needed to configure the Chef Automate server for communication with the application.
+The `x_chef_automate.api` role is suitable for users responsible for integrating the Chef Automate data into ServiceNow. It's advisable to create a new user specifically for this role. This user's credentials are needed to configure the Chef Automate server for communication with the application.
 
-Note that for integration with CMDB data, you need to assign the _OOB ITIL_ role. In addition, you must select **Web service** access for this user role.
+Note that for integration with CMDB data, you need to assign the _OOB ITIL_ role. Also, you must select **Web service** access for this user role.
