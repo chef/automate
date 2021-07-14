@@ -19,3 +19,8 @@ export const infraPolicyFileFromRoute = createSelector(
   routeParams,
   (state, { revision_id }) => find({ revision_id }, state)
 );
+
+export const deleteStatus = createSelector(
+  policyFileState,
+  (state) => state.deleteStatus
+);
