@@ -109,7 +109,7 @@ To view different versions of a cookbook:
 
 #### Cookbook Content
 
-Select the **content** tab to view the recipes and other components of a cookbook. This view also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
+Select the **Content** tab to view the recipes and other components of a cookbook. This view also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
 
 {{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
 
