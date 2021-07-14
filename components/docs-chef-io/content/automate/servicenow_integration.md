@@ -41,7 +41,7 @@ The ServiceNow instance must be publicly reachable on https port 443.
 #### Software Requirements
 
 - A running [Chef Automate](https://docs.chef.io/chef_automate.html) instance.
-- A running [ServiceNow] instance
+- A running [ServiceNow](https://www.servicenow.com/) instance
 
 #### Required ServiceNow Plugins
 
@@ -79,7 +79,7 @@ The Chef Automate application exposes the REST API endpoint that facilitates the
 
 You must have the `x_chef_automate.api` role assigned to configure Chef Automate in ServiceNow and receive data from Chef Automate to ServiceNow instance.
 
-{< /note >}}
+{{< /note >}}
 
 The Chef Automate application provides the following roles by default for integration in ServiceNow:
 
@@ -189,15 +189,13 @@ You must have the `admin` or `x_chef_automate.admin` roles assigned to change th
    | `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` |
    | `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` |
    | `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are:
-
    - Debug
    - Warn
    - Info
    - Error
-
    It enables the selected logging level and is visible in logs. | Default: `Error` |
-| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API set to `Yes`. The possible values are: Yes, No. | Default: `Yes` |
-| `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
+   | `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API set to `Yes`. The possible values are: Yes, No. | Default: `Yes` |
+   | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
 
 1. Make the required changes.
 1. Select Save. The application saves the configuration changes.
