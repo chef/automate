@@ -188,7 +188,7 @@ You must have the `admin` or `x_chef_automate.admin` roles assigned to change th
    | `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by setting the property to **Yes**. | Default: `Yes` |
    | `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` |
    | `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` |
-   | `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li> Debug </li> <li> Warn </li> <li> Info </li> <li> Error </li> </ul>. It enables the selected logging level and is visible in logs. | Default: `Error` |
+   | `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. The possible values are: <ul><li> Debug </li> <li> Warn </li> <li> Info </li> <li> Error </li> </ul>It enables the selected logging level and is visible in logs. | Default: `Error` |
    | `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow when Turn on REST API set to `Yes`. The possible values are: Yes, No. | Default: `Yes` |
    | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
 
