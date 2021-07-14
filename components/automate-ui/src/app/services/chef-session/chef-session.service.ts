@@ -108,7 +108,7 @@ export class ChefSessionService implements CanActivate {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
 
-    if(this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
+    if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       const dividedTime = this.idleTimeout / 2;
       this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
     }
@@ -237,7 +237,7 @@ export class ChefSessionService implements CanActivate {
     broadcastChannel.onmessage = resetTimer; // catches different tabs activity
 
     function resetTimer() {
-      if(idleTime > 0) {
+      if (idleTime > 0) {
         broadcastChannel.postMessage('resetTimer');
         console.log('called resetTimer');
         idleTime = 0;
