@@ -455,67 +455,48 @@ func (creds *Creds) getVMPoolTasks(ctx context.Context, subs []*manager.ManagerN
 }
 
 func reFilterNameAndRegion(filters []*common.Filter, vmList []*manager.ManagerNode) []*manager.ManagerNode {
-	m := &filtersAzure{}
+	filterObject := &filtersAzure{}
 	for _, filter := range filters {
 		if filter.Key == "region" {
-			m.region = append(m.region, filter)
+			filterObject.region = append(filterObject.region, filter)
 		}
 		if filter.Key == "name" {
-			m.name = append(m.name, filter)
+			filterObject.name = append(filterObject.name, filter)
 		}
-		// if filter.Key != "name" && filter.Key != "region" && filter.Key != "subscription_id" {
-		// 	m.others = append(m.others, filter)
-		// }
 	}
 
-	var filteredVmList []*manager.ManagerNode
 	var includeArr []string
 	var excludeArr []string
-
-	if len(m.region) > 0 {
-		for _, filter := range m.region {
+	if len(filterObject.region) > 0 {
+		for _, filter := range filterObject.region {
 			if filter.Exclude {
 				excludeArr = append(excludeArr, filter.Values...)
 			} else {
-				includeArr = filter.Values
+				includeArr = append(includeArr, filter.Values...)
 			}
-			filteredVmList = append(filteredVmList, filterRegions(vmList, isRegionMaching, includeArr, []string{})...)
 		}
-		filteredVmList = filterRegions(filteredVmList, isRegionMaching, []string{}, excludeArr)
+		vmList = filterRegions(vmList, isRegionMaching, includeArr, false)
+		vmList = filterRegions(vmList, isRegionMaching, excludeArr, true)
 	}
 
-	if len(m.name) > 0 {
-		if len(filteredVmList) == 0 {
-			filteredVmList = vmList
-		}
+	includeArr = []string{}
+	excludeArr = []string{}
+	if len(filterObject.name) > 0 {
 		var filteredVmListName []*manager.ManagerNode
-		for _, filter := range m.name {
+		for _, filter := range filterObject.name {
 			if filter.Exclude {
 				excludeArr = append(excludeArr, filter.Values...)
 			} else {
-				includeArr = filter.Values
+				includeArr = append(includeArr, filter.Values...)
 			}
-			filteredVmListName = append(filteredVmListName, filterNames(filteredVmList, isNameMaching, includeArr, []string{})...)
 		}
-		filteredVmListName = filterNames(filteredVmListName, isNameMaching, []string{}, excludeArr)
-		filteredVmList = filteredVmListName
+		filteredVmListName = filterNames(vmList, isNameMaching, includeArr, false)
+		filteredVmListName = filterNames(filteredVmListName, isNameMaching, excludeArr, true)
+		vmList = filteredVmListName
 	}
 
-	filteredVmList = UniqueListByID(filteredVmList)
-
-	// fmt.Println("::::debug::::viost", vmList)
-	// if len(m.others) > 0 {
-	// 	for _, filter := range m.others {
-	// 		if filter.Exclude {
-	// 			excludeArr = filter.Values
-	// 		} else {
-	// 			includeArr = filter.Values
-	// 		}
-	// 		filteredVmList = filterTags(filter.Key, filteredVmList, isTagMatching, includeArr, excludeArr)
-	// 	}
-	// }
-
-	return filteredVmList
+	vmList = UniqueListByID(vmList)
+	return vmList
 }
 
 func UniqueListByID(a []*manager.ManagerNode) []*manager.ManagerNode {
@@ -530,96 +511,58 @@ func UniqueListByID(a []*manager.ManagerNode) []*manager.ManagerNode {
 	return b
 }
 
-func filterNames(ss []*manager.ManagerNode, test func(string, []string, []string) bool, includeArr []string, excludeArr []string) (ret []*manager.ManagerNode) {
+func filterNames(ss []*manager.ManagerNode, test func(string, []string, bool) bool, includeArr []string, exclude bool) (ret []*manager.ManagerNode) {
 	for _, s := range ss {
-		if test(s.Name, includeArr, excludeArr) {
+		if test(s.Name, includeArr, exclude) {
 			ret = append(ret, s)
 		}
 	}
 	return
 }
 
-func filterRegions(ss []*manager.ManagerNode, test func(string, []string, []string) bool, includeArr []string, excludeArr []string) (ret []*manager.ManagerNode) {
+func filterRegions(ss []*manager.ManagerNode, test func(string, []string, bool) bool, includeArr []string, exclude bool) (ret []*manager.ManagerNode) {
 	for _, s := range ss {
-		if test(s.Region, includeArr, excludeArr) {
+		if test(s.Region, includeArr, exclude) {
 			ret = append(ret, s)
 		}
 	}
 	return
 }
 
-// func filterTags(key string, ss []*manager.ManagerNode, test func([]*common.Kv, []string, []string, string) bool, includeArr []string, excludeArr []string) (ret []*manager.ManagerNode) {
-// 	for _, s := range ss {
-// 		if test(s.Tags, includeArr, excludeArr, key) {
-// 			ret = append(ret, s)
-// 		}
-// 	}
-// 	return
-// }
-
-func isNameMaching(s string, includeArr []string, excludeArr []string) bool {
+func isNameMaching(s string, arr []string, exclude bool) bool {
 	initBool := true
-	if len(includeArr) > 0 {
+	if exclude {
+		initBool = true
+		for _, val := range arr {
+			initBool = initBool && s != val
+		}
+	} else {
 		initBool = false
-		for _, val := range includeArr {
+		for _, val := range arr {
 			initBool = initBool || strings.Contains(
 				strings.ToLower(s),
 				strings.ToLower(val),
 			)
 		}
 	}
-	if len(excludeArr) > 0 {
-		initBool = true
-		for _, val := range excludeArr {
-			initBool = initBool && s != val
-		}
-	}
 	return initBool
 }
 
-func isRegionMaching(s string, includeArr []string, excludeArr []string) bool {
+func isRegionMaching(s string, arr []string, exclude bool) bool {
 	initBool := true
-	if len(includeArr) > 0 {
+	if exclude {
+		initBool = true
+		for _, val := range arr {
+			initBool = initBool && s != val
+		}
+	} else {
 		initBool = false
-		for _, val := range includeArr {
+		for _, val := range arr {
 			initBool = initBool || s == val
 		}
 	}
-	if len(excludeArr) > 0 {
-		initBool = true
-		for _, val := range excludeArr {
-			initBool = initBool && s != val
-		}
-	}
 	return initBool
 }
-
-// func isTagMatching(s []*common.Kv, includeArr []string, excludeArr []string, key string) bool {
-// 	initBool := true
-// 	fmt.Println("::::debug::::includeArr", includeArr)
-// 	fmt.Println("::::debug::::pr", s)
-// 	if len(includeArr) > 0 {
-// 		initBool = false
-// 		for _, val := range includeArr {
-// 			for _, v := range s {
-// 				if v.Key == key {
-// 					initBool = initBool || v.Value == val
-// 				}
-// 			}
-// 		}
-// 	}
-// 	if len(excludeArr) > 0 {
-// 		initBool = true
-// 		for _, val := range excludeArr {
-// 			for _, v := range s {
-// 				if v.Key == key {
-// 					initBool = initBool && v.Value != val
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return initBool
-// }
 
 func (creds *Creds) buildVMList(ctx context.Context, vms []compute.VirtualMachine, sub *manager.ManagerNode, vmList []*manager.ManagerNode, resourceGroupName string) ([]*manager.ManagerNode, error) {
 	vmNodeList, err := creds.parseVMInfo(ctx, vms, sub, resourceGroupName)

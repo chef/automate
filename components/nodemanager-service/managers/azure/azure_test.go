@@ -224,7 +224,6 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
-	t.Log("filteredResources...", filteredResources)
 	assert.Equal(t, 1, len(filteredResources))
 
 	filters = []*common.Filter{
@@ -242,4 +241,20 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 2, len(filteredResources))
+
+	vmList = []*manager.ManagerNode{
+		{Name: "ljkp-ubuntu", Region: "eastus", Id: "xxxxxx-373e-48e5-8e0f-xxxxxxxx"},
+		{Name: "ljkp-win", Region: "eastus", Id: "xxxxxxx-37a4-48f7-9314-xxxxxxxx"},
+		{Name: "vj-win-2000", Region: "eastus", Id: "xxxxxxxx-36a5-4514-b864-xxxxxxxx"},
+		{Name: "ljkp-ubuntu20", Region: "eastus", Id: "xxxxxx-83a4-4b02-a43e-xxxxxxxx"},
+		{Name: "ljkp-ubuntu2", Region: "eastus", Id: "xxxxxxxx-a269-4001-ad60-xxxxxxxx"},
+		{Name: "vault-testing", Region: "eastus", Id: "xxxxxxx-1e14-4efe-8221-xxxxxxxxx"},
+	}
+	filters = []*common.Filter{
+		{Key: "name", Values: []string{"ljkp"}, Exclude: false},
+		{Key: "name", Values: []string{"ljkp-win"}, Exclude: true},
+		{Key: "region", Values: []string{"eastus"}, Exclude: false},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 3, len(filteredResources))
 }
