@@ -445,8 +445,10 @@ func (creds *Creds) getVMPoolTasks(ctx context.Context, subs []*manager.ManagerN
 					}
 				}
 			}
-
-			vtr.Nodes = reFilterNameAndRegion(filters, vmList)
+			if len(filters) > 0 {
+				vmList = reFilterNameAndRegion(filters, vmList)
+			}
+			vtr.Nodes = vmList
 			return pool.TaskResult(vtr), nil
 		}
 		tasks = append(tasks, pool.NewTask(f))
