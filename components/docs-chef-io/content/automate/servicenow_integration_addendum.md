@@ -35,7 +35,7 @@ You can navigate to the **Events** section by selecting **Chef Automate** >**Eve
 
 {{< figure src="/images/automate/snow_integration_event_registration1.png" alt="Event Registration - Process Installation">}}
 
-### Script Actions***
+### Script Actions
 
 You can navigate to the **Script Actions** section by selecting **Chef Automate** >**Script Actions** from ServiceNow and make the required changes.
 
