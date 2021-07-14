@@ -6,6 +6,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer } from 'rxjs';
 import { map, mergeMap, filter } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
+import { BroadcastChannel } from 'broadcast-channel';
 
 import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
@@ -222,7 +223,7 @@ export class ChefSessionService implements CanActivate {
 
   idleLogout(idleTimeout: number): void {
     let idleTime = 0;
-    const bc = new BroadcastChannel("tabsCheckForIdleTimeout");
+    const broadcastChannel = new BroadcastChannel('tabsCheckForIdleTimeout');
 
     // Increment the idle time counter after configured mins in config.toml.
     setInterval(timerIncrement.bind(this), idleTimeout);
@@ -233,15 +234,12 @@ export class ChefSessionService implements CanActivate {
     window.onclick = resetTimer;      // catches touchpad clicks as well
     window.onkeydown = resetTimer;
     window.addEventListener('scroll', resetTimer, true);
-    bc.onmessage = resetTimer; // catches different tabs activity
-    bc.onmessageerror = function() {
-      resetTimer();
-      console.log('error calling broadcast api');
-    }
+    broadcastChannel.onmessage = resetTimer; // catches different tabs activity
 
     function resetTimer() {
       if(idleTime > 0) {
-        bc.postMessage('resetTimer');
+        broadcastChannel.postMessage('resetTimer');
+        console.log('called resetTimer');
         idleTime = 0;
       }
     }
