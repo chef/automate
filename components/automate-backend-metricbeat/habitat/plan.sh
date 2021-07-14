@@ -1,24 +1,26 @@
 # shellcheck disable=SC2148
-UPSTREAM_PKG_IDENT="chef/journalbeat/6.8.6"
-pkg_name="automate-backend-journalbeat"
-pkg_description="Wrapper package for chef/journalbeat"
+UPSTREAM_PKG_IDENT="chef/metricbeat/6.8.6"
+pkg_name="automate-backend-metricbeat"
+pkg_description="Wrapper package for chef/metricbeat"
 pkg_origin="chef"
-pkg_version="6.8.6"
+pkg_version="0.1.0"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=("${UPSTREAM_PKG_IDENT}")
-pkg_svc_user=root
-pkg_svc_group=root
 pkg_deps=(
   chef/mlsa
   core/bash
   "${UPSTREAM_PKG_IDENT}"
 )
 
+#pkg_binds_optional=(
+ # [automate-pg-gateway]="port"
+#)
+
 pkg_binds=(
-  [automate-elasticsearch]="http-port"
+  [automate-es-gateway]="http-port"
 )
 
 #pkg_version() {
@@ -26,8 +28,8 @@ pkg_binds=(
 #}
 
 do_before() {
- # if [ ! -f "$PLAN_CONTEXT/../../VERSION" ]; then
-  #  exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 56
+  #if [ ! -f "$PLAN_CONTEXT/../../VERSION" ]; then
+   # exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 56
   #fi
   update_pkg_version
 }
