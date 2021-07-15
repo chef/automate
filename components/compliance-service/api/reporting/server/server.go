@@ -8,9 +8,7 @@ import (
 	"io"
 	sorter "sort"
 	"strings"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"time"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
@@ -20,7 +18,8 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
-	"time"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
