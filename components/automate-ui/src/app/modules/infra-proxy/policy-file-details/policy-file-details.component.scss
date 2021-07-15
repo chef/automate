@@ -12,6 +12,7 @@ chef-loading-spinner {
 
 .revision-id {
   width: 30%;
+  vertical-align: text-top;
 }
 
 .page-body {
@@ -51,7 +52,6 @@ chef-loading-spinner {
   background: $chef-white;
 
   table {
-    // width: 25%;
     font-size: 14px;
 
     &:first-child {
