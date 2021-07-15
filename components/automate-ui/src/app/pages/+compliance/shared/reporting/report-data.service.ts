@@ -54,6 +54,7 @@ export class ReportDataService {
     skipped: 0,
     waived: 0
   };
+  filteredProfileCount: number;
 
   controlsListLoading = true;
   controlsListParams: any = {
@@ -92,26 +93,35 @@ export class ReportDataService {
       .subscribe(data => {
         this.nodesListLoading = false;
         this.nodesListEmpty = this.isZero(data.total);
-        let status: string;        
-        if(nodeFilterStatus === 'all') {
-          status = "total"  
+        let status: string;
+        if (nodeFilterStatus === 'all') {
+          status = 'total';
         } else {
-          status = "total_"+ nodeFilterStatus;
-        }        
-        this.nodesList = Object.assign({}, this.nodesList, data);        
-        if(status in this.nodesList) {
-          this.filteredNodesCount = this.nodesList[status]
+          status = 'total_' + nodeFilterStatus;
+        }
+        this.nodesList = Object.assign({}, this.nodesList, data);
+        if (status in this.nodesList) {
+          this.filteredNodesCount = this.nodesList[status];
         }
       });
   }
 
-  getReportingProfilesList(reportQuery: ReportQuery, listParams: any) {
+  getReportingProfilesList(reportQuery: ReportQuery, listParams: any, profileFilterStatus: string) {
     this.profilesListLoading = true;
     this.statsService.getProfiles(reportQuery, listParams)
       .subscribe(data => {
         this.profilesListLoading = false;
         this.profilesListEmpty = this.isEmpty(data.items);
+        let status: string;
+        if (profileFilterStatus === 'all') {
+          status = 'total';
+        } else {
+          status = profileFilterStatus;
+        }
         this.profilesList = Object.assign({}, this.profilesList, data);
+        if (status in this.profilesList) {
+          this.filteredProfileCount = this.profilesList[status];
+        }
       });
   }
 
