@@ -471,6 +471,7 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 					convertedControls := make([]*reportingapi.Control, 0)
 					// Enrich min report controls with profile metadata
 					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
+						reportControlMin.Tags = profileControlsMap[reportControlMin.ID].Tags
 						// store controls to returned report
 						convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
 						if convertedControl != nil {
