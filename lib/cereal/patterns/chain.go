@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/chef/automate/lib/cereal"
 )
@@ -211,6 +212,7 @@ func (instance *ChainWorkflowInstance) Err() error {
 
 func (m *ChainWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	parameters, err := m.getParameters(w)
+	fmt.Println(":: data-feed-service OnStart::", parameters)
 	if err != nil {
 		return w.Fail(err)
 	}
@@ -237,7 +239,7 @@ func (m *ChainWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.Sta
 	} else if decision.IsComplete() {
 		return m.startNext(w, 0, parameters, payload)
 	}
-
+	fmt.Println(":: data-feed-service OnStart payload::", payload)
 	return w.Continue(payload)
 }
 

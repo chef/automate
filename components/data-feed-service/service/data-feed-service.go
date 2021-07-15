@@ -127,7 +127,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	} else if err != nil {
 		return err
 	}
-
+	fmt.Println(":: data-feed-service main start::")
 	return manager.Start(context.Background())
 }
 

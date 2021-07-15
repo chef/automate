@@ -1,0 +1,70 @@
+[global]
+  [global.v1]
+    fqdn = "a2-dev.test"
+
+    [[global.v1.frontend_tls]]
+      cert = "-----BEGIN CERTIFICATE-----\nMIIDfDCCAmSgAwIBAgIJAM77M3Q7fd3GMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNV\nBAYTAlVTMRYwFAYDVQQKDA1DaGVmIFNvZnR3YXJlMRYwFAYDVQQLDA1DaGVmIEF1\ndG9tYXRlMRQwEgYDVQQDDAthMi1kZXYudGVzdDAeFw0xODA3MTgxMzU0MjRaFw0y\nODA3MTUxMzU0MjRaMFMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKDA1DaGVmIFNvZnR3\nYXJlMRYwFAYDVQQLDA1DaGVmIEF1dG9tYXRlMRQwEgYDVQQDDAthMi1kZXYudGVz\ndDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOy5P5u4MVazNqAEGaYO\nuBq3j1dgw3L5OUWn0THHpetpRd+bZ8Pb/Z6Kit/GveoSWpvpcKS9NdUROL+iy4yf\n7ArEpbl08eQVbT77JxE42Qo/AGpHMAFRq7FlTVvEkQJtdT4q1v+NVqcHFOAI1QFe\nifTU4CFi9lL0lD2v1wlFoVWD6+BZqLC5fNRw1oRuNGLDWoM2gom2sG1EubXMOBeB\nOVxjL7PEA5cmVwv2ftnwuxEZu73WsIASMwpFFwjAvlfCwEUwlt4PaFlZ/KdAXh5Z\nqWxQmbBxecjN5v8glCSXKJpnG6o/w0vAYns6J2eh46ocWtkP6KZ0xkLeb7aBO3Xx\nHUECAwEAAaNTMFEwHQYDVR0OBBYEFGT6HbLy4PEDzZ/OBr6lQGLEKKXkMB8GA1Ud\nIwQYMBaAFGT6HbLy4PEDzZ/OBr6lQGLEKKXkMA8GA1UdEwEB/wQFMAMBAf8wDQYJ\nKoZIhvcNAQELBQADggEBADW/bnIzU4wIJmmuiGiDrTtaa37biSmk/y1uzDE6IaWN\nd1wPvLyJt69TTTsBOaWiXwBhS95CIRVpdzUlHrN05e+BgI/o3eQKfzwC6i3VBlkF\n0Wet0ar2s5U+gzUXMo6GnohTChgneGp2bGG+a/SYdrUxPpZD7waIrOirzxawjY9h\nZgnPNzRwh0dJwdAr4p+GBZ7r+DOOkVVu9a/Nf6XZfgjJYNoOxy4W8xb4I53Qi80Z\nfq6nFbvnZttJiEW9KsfteWP6FnW+T5Y6o2uZungMZDLUv/MEWkWWhaa8ogp4aTXp\njSobOaBgKjr9whCaa59078oI2zy3rvgbbJ3CditkliA=\n-----END CERTIFICATE-----"
+      key = "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDsuT+buDFWszag\nBBmmDrgat49XYMNy+TlFp9Exx6XraUXfm2fD2/2eiorfxr3qElqb6XCkvTXVETi/\nosuMn+wKxKW5dPHkFW0++ycRONkKPwBqRzABUauxZU1bxJECbXU+Ktb/jVanBxTg\nCNUBXon01OAhYvZS9JQ9r9cJRaFVg+vgWaiwuXzUcNaEbjRiw1qDNoKJtrBtRLm1\nzDgXgTlcYy+zxAOXJlcL9n7Z8LsRGbu91rCAEjMKRRcIwL5XwsBFMJbeD2hZWfyn\nQF4eWalsUJmwcXnIzeb/IJQklyiaZxuqP8NLwGJ7OidnoeOqHFrZD+imdMZC3m+2\ngTt18R1BAgMBAAECggEAGH5Oa5FSYZMnesUR1lG9kN4fUb4sWvAYkfF8PrdWnpYE\n6c8NnIFdq5LQLblFmzuM7obn5dPCByrCAWoZv5IofTC9qQPFp4DkDdk0wJ5uLpY4\nN8bn26sUpcVCjNU439RthiIunsCED8I20bt4Nq0OfyuriSjRLeIqmHtiN45h1BQg\nWWXT5B4LDWHYReAzpC0QOVZkOnT/1WtnpQb4HdAJn0M5c9X7cVyKZGbqBA0v+9e/\nLH1hVEiOIpgDyx1+ooYUD7O+fkReB0Zav1Z5HuAJ+pdnVI/Rz9tjpsxjVVvEaOm+\nJmgUnLiaaSXnJItqigndtzP0r4B07iIpw1O7h6j1tQKBgQD2qBh54zl1G3t+xfuz\nUBtC4Izg6EzNXRezMzgFByB/FUZNUa4/VW36W7DwuaIua4SCSyaLINTDPzmrEweL\njYpqHAB7m8/cjelLInj7QG928Q8D1HsX0xO0OlE9da2vYQ/Yx++6TGsonQi9rzBm\n0Uq6wuL261bYNeaLc7iW2vFEBwKBgQD1sNRefHxS8n9EDDMZIDiOY8gJ3vq7hTzN\ntsR6w6iq5rLZIamrqrXq3ecodbuw0AbljYwGDNSerRnncYp4Xf6NlwR1CK5NBpWA\nVrZhV/Z452cdR2aIBtJXOwykzYaIaZ7gHiRHfD95wS/t/Q5r/f1jyw92t0LCk0An\nZ3XlEm4SdwKBgQCMvZ+xtPDtHHBcBvY2+8eCYoSgNIzWRX8ndltJqyZkvSvvJGNL\nqiBl0Xnl8dZTrG/gtKbajjI48lOihOoyO+I156Jy5ZY2oBb1E0d6/epcMPJDWjOe\nhYdhuEDw07v2LWkQZg0o/T/L3cbGDTeOA3Ajnt5IzEIyfpb9DVvPYEB4cwKBgQCi\nwvptfdp+uNdGpS5Uvtu4uLGUmHtSLvoQ7btL+MKMNTjWT06vwu+xIEA6tYQZpjZr\nbFIO0AEq/VHj2Xv6MYqpEhqJza5qqKnx04APDM7jWakd5GcwRhSiZSQDKYSuagou\nPsmZ8d27MxgleTdMo35x1dvwsYcwj4w4jnmzv3ncEQKBgQCfMrcZlcjyIkh3cM7N\nBFcx3mHj8+EnWdU9BJ1TQZUYRL66axIa1fI7rTNAan/t9Xx1NHwZbbPCMBuolM9p\n8lxQALm1wyg3dFmy0otFLRDzf+Dk3F09S/vcQvjSd3A2MVHagXtZHl8MV3xMLRot\nOhLQB1XeN74ezxt5eHocIRrWow==\n-----END PRIVATE KEY-----"
+
+[deployment]
+  [deployment.v1]
+    [deployment.v1.svc]
+      channel = "dev"
+      upgrade_strategy = "at-once"
+      deployment_type = "local"
+      override_origin = "smudassi"
+      hartifacts_path = "/src/results"
+      manifest_cache_expiry = "0s"
+      package_cleanup_mode = "disabled"
+      products = ["automate-dev"]
+
+[dex]
+  [dex.v1]
+    [dex.v1.sys]
+      [dex.v1.sys.connectors]
+        [dex.v1.sys.connectors.saml]
+          ca_contents = "-----BEGIN CERTIFICATE-----\nMIIDnjCCAoagAwIBAgIGAUtB26KcMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB2dldGNoZWYxHDAaBgkqhkiG9w0BCQEWDWlu\nZm9Ab2t0YS5jb20wHhcNMTUwMTMxMjExNzA4WhcNNDUwMTMxMjExODA4WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdnZXRjaGVmMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvaLXQkwf\nXxRu8NBruKXftYwVo9+WuH2iw/6cZB1u1sxbXHDlDxGPA5e9kecQNRB/LE/My7byr/gNakAsNIg3\nnTINxBe8pwKCGrNghzrCEbBxA0iphk/mYcM7+pkSqNZpRGPBUn8AIgxtihfUz/f56v2YhA15huO8\nk8fJoUyjwXu9/BGCkCP16ksJ50r9IHI+qabTq4c1lMOGxZGbZ7tQjbpKdiAPclgaTzSdQ/9lomnR\nuCvrnVwciDp60tGuAATdt68Re5X/5uOizlNh6k9snUWH9TQmIdyYn5bNtDa+3STXj0mIMVaAfiqQ\n5pyrWRRXXb4Uqx4/9lQM1/Lh/O8yeQIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQCgSlK+ZlmQsYtz\nA30/rbU5ZlW8/FtgcH7FjrSfYmfxi79Wtff3mHYDZjpPQQsncGnf+9BxwOEoBXVOoqwd+OSeWIJa\npSRbDj8Iog7ldXRLo3/+PzRrnjhrP6xj8VwPDFpzdj6Hn/QBhk0qjXd6gV7mrrAJzss3XwHKWPoC\n8m2vkhGDLhmQBKCz18cVn+Z4Xhs0s9l9iWG+Ic9NBZu1KwxXI1e7yR2+xZRDPnBggDa410uDkXSb\nbDZqKKny7qHKs4bioZ/HtS9NfgFV+pz1GpI50nw6ojItCPhqhgaFwtvf2brq9BHSK/DUmA3vF7/d\nXoB1V6vwQXRubclyH8Ei2+1j\n-----END CERTIFICATE-----"
+          sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
+          email_attr = "email"
+          username_attr = "email"
+          groups_attr = "groups"
+          entity_issuer = "https://automate.chef.co/dex/callback"
+
+[elasticsearch]
+  [elasticsearch.v1]
+    [elasticsearch.v1.sys]
+      [elasticsearch.v1.sys.network]
+        host = "0.0.0.0"
+      [elasticsearch.v1.sys.runtime]
+        es_java_opts = "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=a2-dev.test"
+        heapsize = "2g"
+
+[gateway]
+  [gateway.v1]
+    [gateway.v1.sys]
+      [gateway.v1.sys.service]
+        trial_license_url = "https://licensing-dev.chef.io/create-trial"
+
+[license_control]
+  [license_control.v1]
+    [license_control.v1.sys]
+      [license_control.v1.sys.telemetry]
+        url = "https://telemetry-acceptance.chef.io"
+
+[postgresql]
+  [postgresql.v1]
+    [postgresql.v1.sys]
+      [postgresql.v1.sys.pg]
+        shared_buffers = "1GB"
+
+[data_feed_service.v1.sys]
+  [data_feed_service.v1.sys.service]
+        feed_interval = "2h"
+        node_batch_size = 10
+        updated_nodes_only = true
+        disable_cidr_filter = true
+        cidr_filter = "0.0.0.0/0"
+        accepted_status_codes = [200, 201, 202, 203, 204]
+      [data_feed_service.v1.sys.log]
+        level = "debug"
+

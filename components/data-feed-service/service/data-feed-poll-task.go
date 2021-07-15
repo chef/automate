@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -81,6 +82,7 @@ func parseCIDRFilters(config *config.DataFeedConfig) (map[string]*net.IPNet, err
 }
 
 func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	fmt.Println("run pool-task")
 	params := DataFeedPollTaskParams{}
 	err := task.GetParameters(&params)
 	if err != nil {
@@ -114,7 +116,9 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
 	taskResults.NodeIDs = nodeIDs
-
+	fmt.Println(":: taskResults ::", taskResults)
+	// totalNodeIDS = 50
+	// 10
 	return taskResults, nil
 }
 
@@ -220,6 +224,10 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 		}
 	}
 	log.Debugf("found %v nodes", len(nodeIDs))
+	for key, nodeIDsData := range nodeIDs {
+		log.Debugf("nodeIDsData %v", nodeIDsData)
+		log.Debugf("nodeIDsData1 %v", key)
+	}
 	return nodeIDs, nil
 }
 

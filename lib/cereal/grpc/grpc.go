@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"encoding/binary"
+	"fmt"
 	"io"
 	"time"
 
@@ -48,6 +50,8 @@ func (g *GrpcBackend) DefaultWorkflowPollInterval() time.Duration {
 }
 
 func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *cereal.WorkflowInstanceData) error {
+	fmt.Println(":: data-feed-service EnqueueWorkflow start::")
+
 	if _, err := g.client.EnqueueWorkflow(ctx, &grpccereal.EnqueueWorkflowRequest{
 		Domain:       g.domain,
 		InstanceName: workflow.InstanceName,
@@ -100,6 +104,7 @@ func (c *workflowCompleter) finish(err error) error {
 		return err
 	}
 	committedMsg, err := c.s.Recv()
+	fmt.Println(":: data-feed-service  cereal committedMsg::", committedMsg)
 	if err != nil {
 		logrus.WithError(err).Error("Did not get committed message")
 		return err
@@ -120,6 +125,7 @@ func (c *workflowCompleter) Continue(payload []byte) error {
 			},
 		},
 	})
+	fmt.Println(":: data-feed-service Continue ::", string(payload))
 	return c.finish(err)
 }
 
@@ -131,6 +137,7 @@ func (c *workflowCompleter) Fail(errMsg error) error {
 			},
 		},
 	})
+	fmt.Println(":: data-feed-service Fail ::", errMsg.Error())
 	return c.finish(err)
 }
 
@@ -142,6 +149,7 @@ func (c *workflowCompleter) Done(result []byte) error {
 			},
 		},
 	})
+	fmt.Println(":: data-feed-service result ::", string(result))
 	return c.finish(err)
 }
 
@@ -154,6 +162,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	ctx, cancel := context.WithCancel(ctx)
 	s, err := g.client.DequeueWorkflow(ctx)
 	if err != nil {
+		fmt.Println(":: data-feed-service g.client.DequeueWorkflow(v) ::", err)
 		cancel()
 		return nil, nil, err
 	}
@@ -166,32 +175,39 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			},
 		},
 	}); err != nil {
+		fmt.Println(":: data-feed-service s.Send(&grpccereal.DequeueWorkflowRequest{ ::", err)
 		cancel()
 		return nil, nil, err
 	}
 
 	resp, err := s.Recv()
+	fmt.Println(":: data-feed-service resp ::", resp)
 	if err != nil {
 		cancel()
 		if st, ok := status.FromError(err); ok {
 			if st.Code() == codes.NotFound {
+				fmt.Println(":: data-feed-service s.Recv() ErrNoWorkflowInstances ::", cereal.ErrNoWorkflowInstances)
 				return nil, nil, cereal.ErrNoWorkflowInstances
 			}
 		}
+		fmt.Println(":: data-feed-service  s.Recv() ::", err)
 		return nil, nil, err
 	}
 
 	deq := resp.GetDequeue()
 	if deq == nil {
+		fmt.Println(":: data-feed-service errors.New('unexpected') deq::", "unexpected")
 		cancel()
 		return nil, nil, errors.New("unexpected")
 	}
 
 	tsProto := deq.GetEvent().GetEnqueuedAt()
+	fmt.Println(":: data-feed-service tsProto ::", tsProto)
 	ts := time.Time{}
 	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
 		if err != nil {
+			fmt.Println(":: data-feed-service errors.Wrap('invalid enqueued_at') ts, err = ptypes.Timestamp(tsProto)::", "invalid enqueued_at")
 			cancel()
 			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
 		}
@@ -206,6 +222,11 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			ErrorText:  tr.GetErrorText(),
 			Result:     tr.GetResult(),
 		}
+		fmt.Println(":: data-feed-service tr.GetParameters() ::", string(tr.GetParameters()))
+		fmt.Println(":: data-feed-service tr.GetTaskName() ::", tr.GetTaskName())
+		fmt.Println(":: data-feed-service cereal.TaskStatusType(tr.GetStatus()) ::", cereal.TaskStatusType(tr.GetStatus()))
+		fmt.Println(":: data-feed-service ErrorText ::", tr.GetErrorText())
+		fmt.Println(":: data-feed-service Result ::", string(tr.GetResult()))
 	}
 	backendInstance := grpcWorkflowInstanceToBackend(deq.GetInstance())
 	wevt := &cereal.WorkflowEvent{
@@ -224,6 +245,8 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 }
 
 func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) cereal.WorkflowInstanceData {
+	fmt.Println(":: data-feed-service grpcWorkflowInstanceToBackend start::")
+
 	var err error
 	if grpcInstance.Err != "" {
 		err = errors.New(grpcInstance.Err)
@@ -240,6 +263,8 @@ func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) ce
 }
 
 func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	fmt.Println(":: data-feed-service CancelWorkflow start::")
+
 	_, err := g.client.CancelWorkflow(ctx, &grpccereal.CancelWorkflowRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -257,6 +282,8 @@ func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, w
 }
 
 func (g *GrpcBackend) KillWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	fmt.Println(":: data-feed-service KillWorkflow start::")
+
 	_, err := g.client.KillWorkflow(ctx, &grpccereal.KillWorkflowRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -284,6 +311,8 @@ func (c *taskCompleter) Context() context.Context {
 }
 
 func (c *taskCompleter) Fail(errMsg string) error {
+	fmt.Println(":: data-feed-service Fail start::")
+
 	defer c.s.CloseSend() // nolint: errcheck
 	transformErr := func(err error) error {
 		if err != nil {
@@ -317,7 +346,8 @@ func (c *taskCompleter) Fail(errMsg string) error {
 	return nil
 }
 
-func (c *taskCompleter) Succeed(result []byte) error {
+func (c *taskCompleter) Succeed(result []byte, position []int64) error {
+	fmt.Println(":: data-feed-service Succeed start::")
 	defer c.s.CloseSend() // nolint: errcheck
 	transformErr := func(err error) error {
 		if err != nil {
@@ -330,17 +360,21 @@ func (c *taskCompleter) Succeed(result []byte) error {
 		}
 		return nil
 	}
+	fmt.Println(":: data-feed-service Succeed byte::", binary.Size(result))
+	fmt.Println(":: data-feed-service Succeed kb::", binary.Size(result)/1024)
+	fmt.Println(":: data-feed-service Succeed mb::", binary.Size(result)/1024/1024)
+	fmt.Println(":: data-feed-service Succeed len::", len(result))
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Succeed_{
 			Succeed: &grpccereal.DequeueTaskRequest_Succeed{
-				Result: result,
+				Result:   result,
+				Position: position,
 			},
 		},
 	})
 	if err != nil {
 		return transformErr(err)
 	}
-
 	// The stream will be closed once the server has processed the
 	// request.
 	// We must wait to figure out if it was successful
@@ -348,11 +382,13 @@ func (c *taskCompleter) Succeed(result []byte) error {
 	if err == nil || err == io.EOF {
 		return nil
 	} else {
+		fmt.Println(":: data-feed-service Succeed doneChan::")
 		return transformErr(err)
 	}
 }
 
 func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
+	fmt.Println(":: data-feed-service  DequeueTask::", ctx)
 	ctx, cancel := context.WithCancel(ctx)
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
@@ -373,6 +409,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 	}
 
 	resp, err := s.Recv()
+	fmt.Println(":: data-feed-service  DequeueTask Recv()::", resp)
 	if err != nil {
 		cancel()
 		if st, ok := status.FromError(err); ok {
@@ -436,6 +473,8 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 }
 
 func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
+	fmt.Println(":: data-feed-service CreateWorkflowSchedule start::")
+
 	nextRunAtProto, err := ptypes.TimestampProto(nextRunAt)
 	if err != nil {
 		return err
@@ -457,10 +496,13 @@ func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName s
 		}
 		return err
 	}
+	fmt.Println(":: data-feed-service CreateWorkflowSchedule end::")
 	return nil
 }
 
 func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Schedule, error) {
+	fmt.Println(":: data-feed-service ListWorkflowSchedules start::")
+
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -487,10 +529,13 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Sche
 			schedules = append(schedules, grpcSchedToBackend(resp.Schedule))
 		}
 	}
+	fmt.Println(":: data-feed-service ListWorkflowSchedules end::")
 	return schedules, nil
 }
 
 func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*cereal.Schedule, error) {
+
+	fmt.Println(":: data-feed-service GetWorkflowScheduleByName start::")
 	resp, err := g.client.GetWorkflowScheduleByName(ctx, &grpccereal.GetWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -508,6 +553,7 @@ func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceNam
 		logrus.Error("Missing schedule")
 		return nil, cereal.ErrWorkflowScheduleNotFound
 	}
+	fmt.Println(":: data-feed-service GetWorkflowScheduleByName end::")
 	return grpcSchedToBackend(resp.Schedule), nil
 }
 
@@ -557,6 +603,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *cereal.Schedule {
 }
 
 func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts cereal.WorkflowScheduleUpdateOptions) error {
+	fmt.Println(":: data-feed-service UpdateWorkflowScheduleByName start::")
 	req := grpccereal.UpdateWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -595,11 +642,13 @@ func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instance
 		}
 		return err
 	}
+	fmt.Println(":: data-feed-service UpdateWorkflowScheduleByName end::")
 
 	return nil
 }
 
 func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*cereal.WorkflowInstanceData, error) {
+	fmt.Println(":: data-feed-service GetWorkflowInstanceByName start::")
 	resp, err := g.client.GetWorkflowInstanceByName(ctx, &grpccereal.GetWorkflowInstanceByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -618,10 +667,13 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 		return nil, cereal.ErrWorkflowInstanceNotFound
 	}
 	backendInstance := grpcWorkflowInstanceToBackend(resp.WorkflowInstance)
+	fmt.Println(":: data-feed-service GetWorkflowInstanceByName end::", backendInstance)
+
 	return &backendInstance, nil
 }
 
 func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts cereal.ListWorkflowOpts) ([]*cereal.WorkflowInstanceData, error) {
+	fmt.Println(":: data-feed-service ListWorkflowInstances start::")
 	req := grpccereal.ListWorkflowInstancesRequest{
 		Domain: g.domain,
 	}
@@ -663,6 +715,7 @@ func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts cereal.Lis
 		backendInstance := grpcWorkflowInstanceToBackend(instance.WorkflowInstance)
 		instances = append(instances, &backendInstance)
 	}
+	fmt.Println(":: data-feed-service ListWorkflowInstances stop instances::", instances)
 	return instances, nil
 }
 

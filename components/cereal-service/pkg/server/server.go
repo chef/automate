@@ -149,6 +149,7 @@ func writeDeqWorkRespMsg(ctx context.Context, s cereal.CerealService_DequeueWork
 
 	select {
 	case <-ctx.Done():
+		fmt.Println(":: data-feed-service <-ctx.Done() ::", <-ctx.Done())
 		return ctx.Err()
 	case err := <-out:
 		return err
@@ -156,6 +157,7 @@ func writeDeqWorkRespMsg(ctx context.Context, s cereal.CerealService_DequeueWork
 }
 
 func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflowServer) error {
+	fmt.Println(":: data-feed-service  cereal req::", &req)
 	ctx, cancel := context.WithTimeout(req.Context(), time.Minute)
 	defer cancel()
 
@@ -165,7 +167,9 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 	})
 	// read dequeue message
 	var deqMsg *cereal.DequeueWorkflowRequest_Dequeue
+	fmt.Println(":: data-feed-service  cereal deqMsg::", &deqMsg)
 	msg, err := readDeqWorkReqMsg(ctx, req)
+	fmt.Println(":: data-feed-service  cereal msg::", msg)
 	if err != nil {
 		return err
 	}
@@ -188,7 +192,12 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 	for _, workflowName := range deqMsg.WorkflowNames {
 		workflowNames = append(workflowNames, namespace(deqMsg.Domain, workflowName))
 	}
+	fmt.Println(":: data-feed-service  before evt::", msg)
+
 	evt, completer, err := s.backend.DequeueWorkflow(ctx, workflowNames)
+
+	fmt.Println(":: data-feed-service  after evt::", evt)
+
 	if err != nil {
 		if err == libcereal.ErrNoWorkflowInstances {
 			return status.Error(codes.NotFound, err.Error())
@@ -224,6 +233,8 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 			ErrorText:  evt.TaskResult.ErrorText,
 			Result:     evt.TaskResult.Result,
 		}
+		fmt.Println("::data-feed-service  taskResult 1::", taskResult)
+
 	}
 	grpcInstance := cerealWorkflowInstanceToGrpc(&evt.Instance)
 	err = writeDeqWorkRespMsg(ctx, req, &cereal.DequeueWorkflowResponse{
@@ -240,6 +251,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 			},
 		},
 	})
+	fmt.Println("::data-feed-service  taskResult 2::", taskResult)
 	if err != nil {
 		logctx.WithError(err).Error("failed to respond with workflow event")
 		return err
@@ -302,7 +314,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 		logctx.WithError(err).Error("failed to respond with committed message")
 		return err
 	}
-
+	fmt.Println("::data-feed-service dequeue end ::")
 	return nil
 }
 

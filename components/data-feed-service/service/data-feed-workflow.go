@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/chef/automate/components/data-feed-service/config"
@@ -59,6 +60,7 @@ func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.
 	}
 
 	initialPayload := DataFeedWorkflowPayload{}
+	fmt.Println(":: initialPayload ::", initialPayload.NodeIDs)
 	return w.Continue(&initialPayload)
 }
 
@@ -139,6 +141,7 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 	if tasksComplete {
 		return w.Complete()
 	}
+	fmt.Println(":: data-feed-service &payload ::", &payload)
 	return w.Continue(&payload)
 
 }
@@ -163,6 +166,7 @@ func batchNodeIDs(batchSize int, nodeIDs map[string]NodeIDs) []map[string]NodeID
 	count := 0
 	// split the nodeIDs map into a batches of smaller maps of batchSize
 	for k, v := range nodeIDs {
+		fmt.Println("k v batchSize", k, v, batchSize)
 		if count%batchSize == 0 {
 			if count != 0 {
 				batch++

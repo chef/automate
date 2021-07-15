@@ -2,6 +2,7 @@ package cereal
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,6 +46,7 @@ func (w *WorkflowScheduler) Trigger() {
 func (w *WorkflowScheduler) Run(ctx context.Context) {
 	var err error
 	var nextSleep time.Duration
+	fmt.Println(":: data-feed-service  ctx ::", ctx)
 	for {
 		select {
 		case <-ctx.Done():
