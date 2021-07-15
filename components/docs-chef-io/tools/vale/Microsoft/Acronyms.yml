@@ -11,6 +11,7 @@ exceptions:
   - API
   - ASP
   - CLI
+  - CMDB
   - CPU
   - CSS
   - CSV
@@ -43,6 +44,7 @@ exceptions:
   - POST
   - RAM
   - REPL
+  - REST
   - RSA
   - SCM
   - SCSS

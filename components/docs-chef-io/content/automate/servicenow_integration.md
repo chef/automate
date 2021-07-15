@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate Integration App for ServiceNow"
+title = "Chef Automate Integration App"
 draft = false
 
 gh_repo = "automate"
@@ -50,7 +50,7 @@ Locate the **System Import Sets**, **CMDB 1.1**, and **Configuration Management 
 
 ### Install the Chef Automate Integration App
 
-The Chef Automate Integration App exposes the REST API endpoint for communication between Chef Automate and the ServiceNow instance.Chef Automate sends HTTPS JSON data feeds to the Chef Automate Integration App in a ServiceNow instance to create and update the _ServiceNow CMDB_ tables, client run, and compliance report tables.
+The Chef Automate Integration App exposes the REST API endpoint for communication between Chef Automate and the ServiceNow instance. Chef Automate sends HTTPS JSON data feeds to the Chef Automate Integration App in a ServiceNow instance to create and update the _ServiceNow CMDB_ tables, client run, and compliance report tables.
 
 1. Navigate to the ServiceNow store at <https://store.servicenow.com>.
 2. Search for **Chef Automate**.
@@ -66,7 +66,7 @@ The Chef Automate Integration App exposes the REST API endpoint for communicatio
 
 The ServiceNow users must have the `x_chef_automate.api` role to set up the ServiceNow instance to receive data from Chef Automate. Changing the **Application Properties** defaults requires the `x_chef_automate.admin` role.
 
-The Chef Automate Integration App has four default roles:
+The Chef Automate Integration App has three default roles:
 
 - [Role x_chef_automate.admin]({{< relref "#role_x_chef_automate.admin" >}}))
 - [Role x_chef_automate.user]({{< relref "#role_x_chef_automate.user" >}})
@@ -256,4 +256,4 @@ To uninstall the Chef Automate Integration App:
 1. Navigate to the **Related Links** section
 1. select **Uninstall**.
 
-Refer to the [ServiceNow Integration Reference]({{< relref "servicenow_integration_addendum" >}}) page to find information on the topics that will help you while installing and configuring Chef Automate in ServiceNow.
+Refer to the [ServiceNow Integration Reference]({{< relref "servicenow_integration_reference" >}}) page to find information on the topics that will help you while installing and configuring Chef Automate in ServiceNow.
