@@ -102,7 +102,7 @@ Select a cookbook from the list to view the details of that cookbook.
 
 To view different versions of cookbook:
 
-- Select a specific cookbook from the list.
+- Select a cookbook from the list.
 - Select any version from the dropdown list to view the details.
 
 {{< note >}}
