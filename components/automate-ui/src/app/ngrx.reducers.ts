@@ -45,6 +45,7 @@ import * as orgEntity from './entities/orgs/org.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
+import * as policyFileDetailsEntity from './entities/policy-files/policy-file-details.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as recipeEntity from './entities/recipes/recipe.reducer';
@@ -116,6 +117,7 @@ export interface NgrxStateAtom {
   orgs: orgEntity.OrgEntityState;
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
+  policyFileDetails: policyFileDetailsEntity.PolicyFileDetailsEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   recipes: recipeEntity.RecipeEntityState;
@@ -246,6 +248,7 @@ export const defaultInitialState = {
   notificationRules: NotificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
   policyFiles: policyFileEntity.PolicyFileEntityInitialState,
+  policyFileDetails: policyFileDetailsEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   recipes: recipeEntity.RecipeEntityInitialState,
@@ -314,6 +317,7 @@ export const ngrxReducers = {
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
   policyFiles: policyFileEntity.policyFileEntityReducer,
+  policyFileDetails: policyFileDetailsEntity.policyFileDetailsEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
