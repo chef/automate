@@ -18,12 +18,6 @@
                 </th>
               </tr>
               <tr>
-                <th id="policy-group">
-                  Policy Group
-                </th>
-                <td data-cy="policy-file-env">{{PolicyFile?.policy_group === '' ? '--' : PolicyFile?.policy_group}}</td>
-              </tr>
-              <tr>
                 <th id="revision-id">
                   Revision Id
                 </th>
@@ -66,7 +60,7 @@
             <chef-loading-spinner *ngIf="policyFileDetailsLoading" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!policyFileDetailsLoading">
-            <ul id="accordion" class="accordion" >
+            <ul id="included-policy-accordion" class="accordion" >
               <li class="items" [class.active]="showIncludedPolicies">
                 <div class="menu" (click)="handlePolicyFileSelected()">
                   <div class="data-bag-name" data-cy="included-policy">
@@ -106,7 +100,7 @@
                 </div>
               </li>
             </ul>
-            <ul id="accordion1" class="accordion" >
+            <ul id="run-list-accordion" class="accordion" >
               <li class="items" [class.active]="showRunList">
                 <div class="menu" (click)="handleRunListSelected()">
                   <div class="data-bag-name"  data-cy="run-list">

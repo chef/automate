@@ -90,6 +90,7 @@ chef-loading-spinner {
 
       td {
         flex-grow: 2;
+        padding-right: 5em;
       }
 
       chef-icon {
@@ -171,7 +172,7 @@ chef-loading-spinner {
 }
 
 .accordion li.active .menu {
-  background: #DEE5FD;
+  background: var(--chef-badge-primary-background);
 }
 
 .submenu {

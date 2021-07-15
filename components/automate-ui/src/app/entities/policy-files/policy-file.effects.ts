@@ -78,6 +78,7 @@ export class PolicyFileEffects {
           message: `Could not delete policy file: ${msg || error}`
         });
     })));
+
   getPolicyFile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PolicyFileActionTypes.GET),
