@@ -234,12 +234,11 @@ export class ChefSessionService implements CanActivate {
     window.onclick = resetTimer;      // catches touchpad clicks as well
     window.onkeydown = resetTimer;
     window.addEventListener('scroll', resetTimer, true);
-    broadcastChannel.onmessage = resetTimer; // catches different tabs activity
+    broadcastChannel.onmessage = resetTimer; // catches different tabs/window of same browser activity
 
     function resetTimer() {
       if (idleTime > 0) {
         broadcastChannel.postMessage('resetTimer');
-        console.log('called resetTimer');
         idleTime = 0;
       }
     }
