@@ -189,9 +189,9 @@ The `x_chef_automate.user` role is suitable for those users who require applicat
 - Properties module
 - Support module
 
-{{< Note >}}
+{{< note >}}
 For integration with CMDB data, you need to assign the _OOB ITIL_ role.role for integration with CMDB data in ServiceNow.
-{{< /Note >}}
+{{< /note >}}
 
 #### Role `x_chef_automate.api`
 
