@@ -453,10 +453,24 @@ The Chef Infra Server integration lets you:
 
 - Search for a specific policyfiles
 - View all the policyfiles
+- Details of policyfiles
+- Delete policyfiles
+
+#### Search for Policyfiles
 
 Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to find a policy file from the list. Entering the name of the policy file in the search bar returns policyfiles matching your search criteria.
 
 {{< figure src="/images/automate/policyfiles-list-and-searchbar.png" alt="Policyfile">}}
+
+#### Details of Policyfiles
+
+Select a specific policyfile to view the content
+
+#### Delete Policyfiles
+
+Delete individual policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
+
+{{< figure src="/images/automate/delete-policyfiles.png" alt="Delete Policyfiles">}}
 
 ## Troubleshoot
 
