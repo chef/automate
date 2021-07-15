@@ -399,10 +399,7 @@ func init() {
           "description": "External supporting documents for the control."
         },
         "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
+          "type": "string",
           "description": "Metadata defined on the control in key-value format."
         },
         "waived_str": {

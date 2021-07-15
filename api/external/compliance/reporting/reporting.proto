@@ -630,7 +630,7 @@ message Control {
 	// External supporting documents for the control.
 	repeated Ref refs = 8;
 	// Metadata defined on the control in key-value format.
-	map<string, string> tags = 9;
+	string tags = 9;
 	// Indicates if the control has been waived or not
 	string waived_str = 11;
 	// Additional details for waived controls
