@@ -697,7 +697,7 @@ type PolicyfileRevisions struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Policyfile revisions.
-	Revisions []string `protobuf:"bytes,1,rep,name=revisions,proto3" json:"revisions,omitempty"`
+	Revisions []*PolicyfileRevision `protobuf:"bytes,1,rep,name=revisions,proto3" json:"revisions,omitempty"`
 }
 
 func (x *PolicyfileRevisions) Reset() {
@@ -732,28 +732,23 @@ func (*PolicyfileRevisions) Descriptor() ([]byte, []int) {
 	return file_external_infra_proxy_response_policyfiles_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *PolicyfileRevisions) GetRevisions() []string {
+func (x *PolicyfileRevisions) GetRevisions() []*PolicyfileRevision {
 	if x != nil {
 		return x.Revisions
 	}
 	return nil
 }
 
-type PolicyfileRevisionList struct {
+type PolicyfileRevision struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Policyfile name.
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Policyfile Revision ID.
-	RevisionId string `protobuf:"bytes,3,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
-	// Policyfile policy group.
-	PolicyGroup string `protobuf:"bytes,2,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
+	RevisionId string `protobuf:"bytes,1,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty"`
 }
 
-func (x *PolicyfileRevisionList) Reset() {
-	*x = PolicyfileRevisionList{}
+func (x *PolicyfileRevision) Reset() {
+	*x = PolicyfileRevision{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_external_infra_proxy_response_policyfiles_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -761,13 +756,13 @@ func (x *PolicyfileRevisionList) Reset() {
 	}
 }
 
-func (x *PolicyfileRevisionList) String() string {
+func (x *PolicyfileRevision) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PolicyfileRevisionList) ProtoMessage() {}
+func (*PolicyfileRevision) ProtoMessage() {}
 
-func (x *PolicyfileRevisionList) ProtoReflect() protoreflect.Message {
+func (x *PolicyfileRevision) ProtoReflect() protoreflect.Message {
 	mi := &file_external_infra_proxy_response_policyfiles_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -779,28 +774,14 @@ func (x *PolicyfileRevisionList) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PolicyfileRevisionList.ProtoReflect.Descriptor instead.
-func (*PolicyfileRevisionList) Descriptor() ([]byte, []int) {
+// Deprecated: Use PolicyfileRevision.ProtoReflect.Descriptor instead.
+func (*PolicyfileRevision) Descriptor() ([]byte, []int) {
 	return file_external_infra_proxy_response_policyfiles_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *PolicyfileRevisionList) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *PolicyfileRevisionList) GetRevisionId() string {
+func (x *PolicyfileRevision) GetRevisionId() string {
 	if x != nil {
 		return x.RevisionId
-	}
-	return ""
-}
-
-func (x *PolicyfileRevisionList) GetPolicyGroup() string {
-	if x != nil {
-		return x.PolicyGroup
 	}
 	return ""
 }
@@ -925,21 +906,22 @@ var file_external_infra_proxy_response_policyfiles_proto_rawDesc = []byte{
 	0x28, 0x09, 0x52, 0x07, 0x72, 0x75, 0x6e, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x26, 0x0a, 0x10, 0x44,
 	0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69, 0x6c, 0x65, 0x12,
 	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x22, 0x33, 0x0a, 0x13, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69, 0x6c,
-	0x65, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x1c, 0x0a, 0x09, 0x72, 0x65,
-	0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x72,
-	0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x70, 0x0a, 0x16, 0x50, 0x6f, 0x6c, 0x69,
-	0x63, 0x79, 0x66, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x4c, 0x69,
-	0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65, 0x76, 0x69, 0x73, 0x69,
-	0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x65, 0x76,
-	0x69, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x21, 0x0a, 0x0c, 0x70, 0x6f, 0x6c, 0x69, 0x63,
-	0x79, 0x5f, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x70,
-	0x6f, 0x6c, 0x69, 0x63, 0x79, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75,
-	0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x72,
-	0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f,
-	0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x6d, 0x65, 0x22, 0x6f, 0x0a, 0x13, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69, 0x6c,
+	0x65, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x58, 0x0a, 0x09, 0x72, 0x65,
+	0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3a, 0x2e,
+	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x72, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69, 0x6c,
+	0x65, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x09, 0x72, 0x65, 0x76, 0x69, 0x73,
+	0x69, 0x6f, 0x6e, 0x73, 0x22, 0x35, 0x0a, 0x12, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x66, 0x69,
+	0x6c, 0x65, 0x52, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65,
+	0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x72, 0x65, 0x76, 0x69, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x42, 0x3c, 0x5a, 0x3a, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61,
+	0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x65, 0x78, 0x74, 0x65,
+	0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79,
+	0x2f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -956,18 +938,18 @@ func file_external_infra_proxy_response_policyfiles_proto_rawDescGZIP() []byte {
 
 var file_external_infra_proxy_response_policyfiles_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_external_infra_proxy_response_policyfiles_proto_goTypes = []interface{}{
-	(*Policyfiles)(nil),            // 0: chef.automate.api.infra_proxy.response.Policyfiles
-	(*PolicyfileListItem)(nil),     // 1: chef.automate.api.infra_proxy.response.PolicyfileListItem
-	(*Policyfile)(nil),             // 2: chef.automate.api.infra_proxy.response.Policyfile
-	(*IncludedPolicyLock)(nil),     // 3: chef.automate.api.infra_proxy.response.IncludedPolicyLock
-	(*CookbookLock)(nil),           // 4: chef.automate.api.infra_proxy.response.CookbookLock
-	(*SCMDetail)(nil),              // 5: chef.automate.api.infra_proxy.response.SCMDetail
-	(*SourceOptions)(nil),          // 6: chef.automate.api.infra_proxy.response.SourceOptions
-	(*NamedRunList)(nil),           // 7: chef.automate.api.infra_proxy.response.NamedRunList
-	(*DeletePolicyfile)(nil),       // 8: chef.automate.api.infra_proxy.response.DeletePolicyfile
-	(*PolicyfileRevisions)(nil),    // 9: chef.automate.api.infra_proxy.response.PolicyfileRevisions
-	(*PolicyfileRevisionList)(nil), // 10: chef.automate.api.infra_proxy.response.PolicyfileRevisionList
-	(*ExpandedRunList)(nil),        // 11: chef.automate.api.infra_proxy.response.ExpandedRunList
+	(*Policyfiles)(nil),         // 0: chef.automate.api.infra_proxy.response.Policyfiles
+	(*PolicyfileListItem)(nil),  // 1: chef.automate.api.infra_proxy.response.PolicyfileListItem
+	(*Policyfile)(nil),          // 2: chef.automate.api.infra_proxy.response.Policyfile
+	(*IncludedPolicyLock)(nil),  // 3: chef.automate.api.infra_proxy.response.IncludedPolicyLock
+	(*CookbookLock)(nil),        // 4: chef.automate.api.infra_proxy.response.CookbookLock
+	(*SCMDetail)(nil),           // 5: chef.automate.api.infra_proxy.response.SCMDetail
+	(*SourceOptions)(nil),       // 6: chef.automate.api.infra_proxy.response.SourceOptions
+	(*NamedRunList)(nil),        // 7: chef.automate.api.infra_proxy.response.NamedRunList
+	(*DeletePolicyfile)(nil),    // 8: chef.automate.api.infra_proxy.response.DeletePolicyfile
+	(*PolicyfileRevisions)(nil), // 9: chef.automate.api.infra_proxy.response.PolicyfileRevisions
+	(*PolicyfileRevision)(nil),  // 10: chef.automate.api.infra_proxy.response.PolicyfileRevision
+	(*ExpandedRunList)(nil),     // 11: chef.automate.api.infra_proxy.response.ExpandedRunList
 }
 var file_external_infra_proxy_response_policyfiles_proto_depIdxs = []int32{
 	1,  // 0: chef.automate.api.infra_proxy.response.Policyfiles.policies:type_name -> chef.automate.api.infra_proxy.response.PolicyfileListItem
@@ -978,11 +960,12 @@ var file_external_infra_proxy_response_policyfiles_proto_depIdxs = []int32{
 	6,  // 5: chef.automate.api.infra_proxy.response.IncludedPolicyLock.source_options:type_name -> chef.automate.api.infra_proxy.response.SourceOptions
 	5,  // 6: chef.automate.api.infra_proxy.response.CookbookLock.SCMDetail:type_name -> chef.automate.api.infra_proxy.response.SCMDetail
 	6,  // 7: chef.automate.api.infra_proxy.response.CookbookLock.source_options:type_name -> chef.automate.api.infra_proxy.response.SourceOptions
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	10, // 8: chef.automate.api.infra_proxy.response.PolicyfileRevisions.revisions:type_name -> chef.automate.api.infra_proxy.response.PolicyfileRevision
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_external_infra_proxy_response_policyfiles_proto_init() }
@@ -1113,7 +1096,7 @@ func file_external_infra_proxy_response_policyfiles_proto_init() {
 			}
 		}
 		file_external_infra_proxy_response_policyfiles_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PolicyfileRevisionList); i {
+			switch v := v.(*PolicyfileRevision); i {
 			case 0:
 				return &v.state
 			case 1:

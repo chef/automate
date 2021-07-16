@@ -3944,13 +3944,21 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.PolicyfileRevision": {
+      "type": "object",
+      "properties": {
+        "revision_id": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.PolicyfileRevisions": {
       "type": "object",
       "properties": {
         "revisions": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileRevision"
           },
           "description": "Policyfile revisions."
         }

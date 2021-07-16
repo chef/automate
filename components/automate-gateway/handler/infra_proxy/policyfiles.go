@@ -148,7 +148,18 @@ func (a *InfraProxyServer) GetPolicyfileRevisions(ctx context.Context, r *gwreq.
 	}
 
 	return &gwres.PolicyfileRevisions{
-		Revisions: res.GetRevisions(),
+		Revisions: fromUpstreamPolicyfileRevision(res.Revisions),
 	}, nil
+}
+
+func fromUpstreamPolicyfileRevision(revisions []*infra_res.PolicyfileRevision) []*gwres.PolicyfileRevision {
+	r := make([]*gwres.PolicyfileRevision, len(revisions))
+
+	for i, c := range revisions {
+		r[i] = &gwres.PolicyfileRevision{
+			RevisionId:  c.GetRevisionId(),
+		}
+	}
+	return r
 }
 

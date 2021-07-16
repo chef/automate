@@ -10,6 +10,7 @@ import (
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"reflect"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -194,15 +195,51 @@ func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.Policy
 		return nil, err
 	}
 
-	policyfiles, err := c.client.Policies.Get(req.Name)
+	policyfile, err := c.client.Policies.Get(req.Name)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
 
-	fmt.Println(":::::: policyfiles :::::::", policyfiles)
+
 
 	return &response.PolicyfileRevisions{
-		Revisions: []string { "" },
+		Revisions: fromAPIIncludedPolicyfileRevisions(policyfile),
 	}, nil
+}
 
+// fromAPINamedRunList a response included policy locks
+func fromAPIIncludedPolicyfileRevisions(p chef.PolicyGetResponse) []*response.PolicyfileRevision {
+
+	var revisions []*response.PolicyfileRevision
+
+	//for _, rl := range p {
+	//	for _, rev := range rl {
+	//		for _, rd := range rev {
+	//			s, _ := rd.(string)
+	//			item := &response.PolicyfileRevision {
+	//				RevisionId: s,
+	//			}
+	//			revisions = append(revisions, item)
+	//		}
+	//	}
+	//}
+
+	for _, rev := range p {
+		keys := reflect.ValueOf(rev).MapKeys()
+		revisions := make([]string, len(keys))
+		fmt.Println(revisions)
+		//for i, key := range keys {
+		//	var a = &response.PolicyfileRevision {
+		//		RevisionId: key.String(),
+		//	}
+		//	revisions[i] = a
+		//}
+		//item := &response.PolicyfileRevisions{
+		//	Revisions:  revisions,
+		//}
+		//revisions = append(revisions, item)
+	}
+
+	fmt.Println(":::::: policyfiles :::::::", revisions)
+	return revisions
 }

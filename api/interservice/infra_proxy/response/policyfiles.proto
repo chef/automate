@@ -104,5 +104,9 @@ message DeletePolicyfile {
 
 message PolicyfileRevisions {
     // Policyfile revisions.
-    repeated string revisions = 1;
+    repeated PolicyfileRevision revisions = 1;
+}
+
+message PolicyfileRevision {
+    string revision_id = 1;
 }
