@@ -85,4 +85,5 @@ service InfraProxyService {
     rpc GetPolicyfiles (chef.automate.domain.infra_proxy.request.Policyfiles) returns (chef.automate.domain.infra_proxy.response.Policyfiles) {};
     rpc GetPolicyfile (chef.automate.domain.infra_proxy.request.Policyfile) returns (chef.automate.domain.infra_proxy.response.Policyfile) {};
     rpc DeletePolicyfile (chef.automate.domain.infra_proxy.request.DeletePolicyfile) returns (chef.automate.domain.infra_proxy.response.DeletePolicyfile) {};
+    rpc GetPolicygroup (chef.automate.domain.infra_proxy.request.Policygroup) returns (chef.automate.domain.infra_proxy.response.Policygroup) {};
 }

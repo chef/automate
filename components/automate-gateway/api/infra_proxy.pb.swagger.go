@@ -2074,6 +2074,51 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}": {
+      "get": {
+        "operationId": "InfraProxy_GetPolicygroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policygroup"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef Organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Policygroup name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "InfraProxy_GetRoles",
@@ -3623,6 +3668,19 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.GroupPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policyfile name."
+        },
+        "revision_id": {
+          "type": "string",
+          "description": "Policyfile Revision ID."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.IncludedPolicyLock": {
       "type": "object",
       "properties": {
@@ -3908,6 +3966,26 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.PolicyfileListItem"
           },
           "description": "Policyfiles list."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Policygroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policygroup name."
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GroupPolicy"
+          },
+          "description": "Policygroup policyfiles."
+        },
+        "uri": {
+          "type": "string",
+          "description": "policygroup uri."
         }
       }
     },

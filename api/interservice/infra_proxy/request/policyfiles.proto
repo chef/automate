@@ -31,3 +31,12 @@ message DeletePolicyfile {
     // Policyfile name.
     string name = 3;
 }
+
+message Policygroup {
+    // Chef Organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+    // Policygroup name.
+    string name = 3;
+}

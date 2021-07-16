@@ -187,3 +187,38 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 		Name: req.GetName(),
 	}, nil
 }
+
+// GetPolicyfile gets a policy file
+func (s *Server) GetPolicygroup(ctx context.Context, req *request.Policygroup) (*response.Policygroup, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	policygroup, err := c.client.PolicyGroups.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.Policygroup{
+		Name:        req.GetName(),
+		Uri:         policygroup.Uri,
+		Policies:    fromAPIGroupPolicies(policygroup),
+	}, nil
+
+}
+
+// fromAPIGroupPolicies a response included policy revision
+func fromAPIGroupPolicies(pg chef.PolicyGroup) []*response.GroupPolicy {
+	var policies []*response.GroupPolicy
+
+	for p, rev := range pg.Policies {
+		item := &response.GroupPolicy{
+			Name:        p,
+			RevisionId:  rev["revision_id"],
+		}
+		policies = append(policies, item)
+	}
+
+	return policies
+}
