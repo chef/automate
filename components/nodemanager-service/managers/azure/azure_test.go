@@ -188,3 +188,73 @@ func TestHandleStateResponse(t *testing.T) {
 	state := handleStateResponse(&statuses)
 	assert.Equal(t, "RUNNING", state)
 }
+
+func TestHandleReFilterNameAndRegion(t *testing.T) {
+
+	vmList := []*manager.ManagerNode{
+		{Name: "test-1A", Region: "eastus", Id: "1234"},
+		{Name: "test-2B", Region: "eastus1", Id: "3234"},
+		{Name: "test-3C", Region: "eastus2", Id: "1434"},
+		{Name: "test-4D", Region: "eastus", Id: "12234"},
+	}
+
+	filters := []*common.Filter{
+		{Key: "name", Values: []string{"test-1"}},
+	}
+	filteredResources := reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+	assert.Equal(t, "test-1A", filteredResources[0].Name)
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 2, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "name", Values: []string{"test-4"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 3, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 2, len(filteredResources))
+
+	vmList = []*manager.ManagerNode{
+		{Name: "ljkp-ubuntu", Region: "eastus", Id: "xxxxxx-373e-48e5-8e0f-xxxxxxxx"},
+		{Name: "ljkp-win", Region: "eastus", Id: "xxxxxxx-37a4-48f7-9314-xxxxxxxx"},
+		{Name: "vj-win-2000", Region: "eastus", Id: "xxxxxxxx-36a5-4514-b864-xxxxxxxx"},
+		{Name: "ljkp-ubuntu20", Region: "eastus", Id: "xxxxxx-83a4-4b02-a43e-xxxxxxxx"},
+		{Name: "ljkp-ubuntu2", Region: "eastus", Id: "xxxxxxxx-a269-4001-ad60-xxxxxxxx"},
+		{Name: "vault-testing", Region: "eastus", Id: "xxxxxxx-1e14-4efe-8221-xxxxxxxxx"},
+	}
+	filters = []*common.Filter{
+		{Key: "name", Values: []string{"ljkp"}, Exclude: false},
+		{Key: "name", Values: []string{"ljkp-win"}, Exclude: true},
+		{Key: "region", Values: []string{"eastus"}, Exclude: false},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 3, len(filteredResources))
+}
