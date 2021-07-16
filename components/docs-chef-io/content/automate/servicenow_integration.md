@@ -177,16 +177,6 @@ The Chef Automate Integration App has nine configurable **Application Properties
 `x_chef_automate.enable.system.app`
 : Used to enable software installed mappings. Default: `No`.
 
-| Property Name | Description | Default |
-| --------------| ----------  | --------|
-| `x_chef_automate.chef.default.status` | Used to set up the status of the service record as **inserted** or **updated**. | Default: `1`|
-| `x_chef_automate.client_runs_per_node` | Used to set a highest number of clients runs for a node. | Default: `5` |
-| `x_chef_automate.compliance_reports_per_node` | Used to set a highest number of compliance reports for a node. | Default: `5` |
-| `x_chef_automate.insert_manufacturer` | Inserts the new record during the import if a model is not found in the _core\_company_ table by settingthe property to **Yes**. | Default: `Yes` |
-| `x_chef_automate.insert_model` | Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. | Default: `Yes` |
-| `x_chef_automate. logging.enabled` | Used to flag the logging with **enable** or **disable** values. | Default: `No` |
-| `x_chef_automate.logging.verbosity` | Debugs the data in ServiceNow. Enables the selected logging level and is visible in logs. Valid values: `Debug`, `Warn`, `Info`, `Error` | Default: `Error` |
-| `x_chef_automate.Rest.api` | Enables the Chef Automate API from ServiceNow. Set to `Yes` to enable and `No` to disable. Valid Values: `Yes`, `No`.| Default: `Yes` |
 | `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
 
 1. Navigate to the **ServiceNow** application.
