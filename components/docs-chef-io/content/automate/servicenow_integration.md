@@ -20,7 +20,7 @@ The Chef Automate Integration App for ServiceNow enables the integration of Chef
 
 ## Installation
 
-[Chef Automate](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance. The integration between a Chef Automate server and a ServiceNow instance requires the following components:
+[Chef Automate](/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance. The integration between a Chef Automate server and a ServiceNow instance requires the following components:
 
 - Chef Automate Scoped Application
 - Chef Automate Server
@@ -33,7 +33,7 @@ The ServiceNow instance must be reachable on port 443 from Chef Automate.
 
 ### Software Requirements
 
-- A running [Chef Automate](https://docs.chef.io/chef_automate.html) instance.
+- A running [Chef Automate](/chef_automate/) instance.
 - A running [ServiceNow](https://www.servicenow.com/) instance
 
 ### Required ServiceNow Plugins
@@ -68,11 +68,13 @@ The ServiceNow users must have the `x_chef_automate.api` role to set up the Serv
 
 The Chef Automate Integration App has three default roles:
 
-- [Role x_chef_automate.admin]({{< relref "#role_x_chef_automate.admin" >}}))
-- [Role x_chef_automate.user]({{< relref "#role_x_chef_automate.user" >}})
-- [Role x_chef_automate.api]({{< relref "#role_x_chef_automate.api" >}})
+- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role_x_chef_automate.admin" >}}))
+- [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role_x_chef_automate.user" >}})
+- [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role_x_chef_automate.api" >}})
 
 You can assign these roles to the existing or new ServiceNow users. These roles are part of the package. If there is a need for further restrictions, you can create the required roles and controls. Also, you can associate a single user with more than one role.
+
+The `x_chef_automate.user` role is suitable for those users who require application access without administration rights. To alter the system properties, you need to have the `x_chef_automate.admin` role.
 
 Refer to the following pages on how to create users and assign roles in ServiceNow:
 
@@ -84,7 +86,7 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 You can configure Chef Automate Integration App from your ServiceNow or Chef Automate instance.
 
 `feed_interval`
-: Valid values: `2` or `8` hours, based on the number of nodes. Increase the `feed_interval` to configure more nodes
+: Valid values: `2` to `8` hours, based on the number of nodes. Increase the `feed_interval` to configure more nodes.
 
 `node_batch_size`
 : The testing executed for a benchmark. The size of a compliance scan is proportional to the number of profiles applied. Scans exceeding 4MB may fail or display incorrectly in reports. Use a lower `node_batch_size` setting to reduce the number of profiles applied in a single batch. Valid values: Between `1` and `30`.  Default: `15`
