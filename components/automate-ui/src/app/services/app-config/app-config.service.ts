@@ -8,8 +8,14 @@ interface BannerConfigTypes {
   text_color?: string;
 }
 
+interface SessionSettings {
+  enable_idle_timeout?: boolean;
+  idle_timeout_minutes?: number;
+}
+
 interface ConfigTypes {
   banner?: BannerConfigTypes;
+  session_settings?: SessionSettings;
 }
 
 const initialConfig = {
@@ -18,6 +24,10 @@ const initialConfig = {
       message: null,
       background_color: null,
       text_color: null
+    },
+    session_settings: {
+      enable_idle_timeout: null,
+      idle_timeout_minutes: null
     }
 };
 
@@ -34,7 +44,7 @@ export class AppConfigService {
   public loadAppConfig() {
     return new HttpClient(this.handler).get('/custom_settings.js')
       .toPromise()
-      .then(data => this.appConfig = data)
+      .then((data: any) => this.appConfig = data)
       // when there is no config, we can just reset the config to its initial empty values
       .catch(_error => this.appConfig = initialConfig);
   }
@@ -45,6 +55,14 @@ export class AppConfigService {
 
   get bannerMessage(): string {
     return this.appConfig.banner.message;
+  }
+
+  get idleTimeout(): number {
+    return this.appConfig.session_settings.idle_timeout_minutes;
+  }
+
+  get isIdleTimeoutEnabled(): boolean {
+    return this.appConfig.session_settings.enable_idle_timeout;
   }
 
   get bannerBackgroundColor(): string {
