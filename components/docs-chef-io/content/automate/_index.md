@@ -27,7 +27,7 @@ For this demonstration, you need:
 * Administrator (root) access to your system
 * A virtualization product such as [VirtualBox](https://www.virtualbox.org/) installed on your system
 * [Vagrant](https://www.vagrantup.com/intro/getting-started/) installed on your system
-* 4GB RAM, or more, available for the VM
+* 8GB RAM, or more, available for the VM
 
 ## Quickstart Overview
 
