@@ -6,4 +6,5 @@ swap:
   'Microsoft Windows': Windows
   'windows': Windows
   'linux': Linux
+  'Chef Infra Client Run': Chef Infra Client run
 

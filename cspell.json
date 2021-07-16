@@ -1700,5 +1700,8 @@
         "srenatus",
         "tflechtner",
         "vjeffrey"
+    ],
+    "enableFiletypes": [
+        "markdown"
     ]
 }
