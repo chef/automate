@@ -297,6 +297,17 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
       : StoreDevtoolsModule.instrument({ maxAge: 25 /* states */, actionSanitizer, stateSanitizer })
   ],
   providers: [
+    // Initilization for warning banner component
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => {
+        return () => {
+          return appConfigService.loadAppConfig();
+        };
+      }
+    },
     AdminKeyRequests,
     ApiTokenRequests,
     AttributesService,
@@ -360,18 +371,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
-    UserRequests,
-    // Initilization for warning banner component
-    {
-      provide: APP_INITIALIZER,
-      multi: true,
-      deps: [AppConfigService],
-      useFactory: (appConfigService: AppConfigService) => {
-        return () => {
-          return appConfigService.loadAppConfig();
-        };
-      }
-    }
+    UserRequests
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

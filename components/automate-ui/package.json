@@ -45,6 +45,7 @@
     "@ngrx/store": "11.0.1",
     "@ngrx/store-devtools": "11.0.1",
     "@nguniversal/express-engine": "11.2.1",
+    "broadcast-channel": "^3.7.0",
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.9.1",
     "d3": "^6.6.0",

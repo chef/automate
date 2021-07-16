@@ -6,10 +6,12 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer } from 'rxjs';
 import { map, mergeMap, filter } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
+import { BroadcastChannel } from 'broadcast-channel';
 
 import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
@@ -38,15 +40,22 @@ export class ChefSessionService implements CanActivate {
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
 
+  isIdleTimeoutEnabled = false; // default it's false
+  idleTimeout = 30; // 30mins default
+
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
   //// Flag to store whether or not the modal has been displayed this session.
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend,
+    private appConfigService: AppConfigService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    setTimeout(() => this.callIdleTimeout(), 30 * 1000);
+    // callIdleTimeout will get excuted after 30 sec.
+
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
       this.setDefaultSession();
@@ -105,6 +114,16 @@ export class ChefSessionService implements CanActivate {
         return obj['id_token'];
       })
     );
+  }
+
+  callIdleTimeout(): void {
+    this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
+    this.idleTimeout = this.appConfigService.idleTimeout;
+
+    if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
+      const dividedTime = this.idleTimeout / 2;
+      this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
+    }
   }
 
   ingestIDToken(idToken: string): void {
@@ -197,6 +216,37 @@ export class ChefSessionService implements CanActivate {
     localStorage.setItem(this.userTelemetryStorageKey(), this.booleanToString(isOptedIn));
     if (this.user) {
       this.user.telemetry_enabled = isOptedIn;
+    }
+  }
+
+  idleLogout(idleTimeout: number): void {
+    let idleTime = 0;
+    const broadcastChannel = new BroadcastChannel('tabsCheckForIdleTimeout');
+
+    // Increment the idle time counter after configured mins in config.toml.
+    setInterval(timerIncrement.bind(this), idleTimeout);
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer;  // catches touchscreen presses as well
+    window.ontouchstart = resetTimer; // catches touchscreen swipes as well
+    window.onclick = resetTimer;      // catches touchpad clicks as well
+    window.onkeydown = resetTimer;
+    window.addEventListener('scroll', resetTimer, true);
+    broadcastChannel.onmessage = resetTimer;
+    // catches different tabs/window of same browser activity
+
+    function resetTimer() {
+      if (idleTime > 0) {
+        broadcastChannel.postMessage('resetTimer');
+        idleTime = 0;
+      }
+    }
+
+    function timerIncrement() {
+      idleTime = idleTime + 1;
+      if (idleTime >= 2) {
+          this.logout();
+      }
     }
   }
 
