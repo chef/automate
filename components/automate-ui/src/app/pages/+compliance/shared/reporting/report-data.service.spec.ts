@@ -93,9 +93,10 @@ describe('ReportDataService', () => {
       };
       const params = {};
       const data = [];
+      const nodeFilterStatus = '';
       spyOn(statsService, 'getNodes').and.returnValue(observableOf(data));
 
-      service.getReportingNodesList(reportQuery, params);
+      service.getReportingNodesList(reportQuery, params, nodeFilterStatus);
 
       expect(statsService.getNodes).toHaveBeenCalledWith(reportQuery, params);
     });
@@ -116,9 +117,10 @@ describe('ReportDataService', () => {
       };
       const params = {};
       const data = [];
+      const profileFilterStatus = '';
       spyOn(statsService, 'getProfiles').and.returnValue(observableOf(data));
 
-      service.getReportingProfilesList(reportQuery, params);
+      service.getReportingProfilesList(reportQuery, params, profileFilterStatus);
 
       expect(statsService.getProfiles).toHaveBeenCalledWith(reportQuery, params);
     });

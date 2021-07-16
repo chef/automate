@@ -9,6 +9,8 @@ import { StatsService, ReportQueryService, ReportDataService,
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
 import * as moment from 'moment/moment';
 import { ActivatedRoute, Router } from '@angular/router';
+import { includes } from 'lodash/fp';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-reporting-profiles',
@@ -27,6 +29,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
 
   scanResultsPane = 0;
   openControls = {};
+  private allowedStatus = ['failed', 'passed', 'skipped', 'waived'];
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -36,7 +39,8 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private telemetryService: TelemetryService
   ) {}
 
   ngOnInit() {
@@ -53,16 +57,22 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
 
   filterProfileStatus(_event, status) {
     this.profileFilterStatus = status;
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    delete queryParams['status'];
+    delete queryParams['page'];
+
+    if ( includes(status, this.allowedStatus) ) {
+      queryParams['status'] = status;
+      this.telemetryService.track('applicationsStatusFilter',
+        { entity: 'reportingNodes', statusFilter: status});
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
   isProfileStatusSelected(status): boolean {
     return this.profileFilterStatus === status;
-  }
-
-  filteredProfiles(profiles) {
-    return this.profileFilterStatus === 'all'
-      ? profiles
-      : profiles.filter((profile) => profile.status === this.profileFilterStatus);
   }
 
   onProfilesListPageChanged(event) {
@@ -133,7 +143,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
 
   getData(reportQuery: ReportQuery) {
     const params = this.reportData.profilesListParams;
-    this.reportData.getReportingProfilesList(reportQuery, params);
+    this.reportData.getReportingProfilesList(reportQuery, params, this.profileFilterStatus);
   }
 
   displayScanResults(profile) {
