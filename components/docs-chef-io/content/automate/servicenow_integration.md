@@ -175,9 +175,7 @@ The Chef Automate Integration App has nine configurable **Application Properties
 :Enables the Chef Automate API from ServiceNow. Set to `Yes` to enable and `No` to disable. Valid Values: `Yes`, `No`. Default: `Yes`.
 
 `x_chef_automate.enable.system.app`
-: Used to enable software installed mappings. Default: `No`.
-
-| `x_chef_automate.enable.system.app` | Used to enable software installed mappings. | Default: `No` |
+: Used to enable software installed mappings. Valid Values: `Yes`, `No`.  Default: `No`
 
 1. Navigate to the **ServiceNow** application.
 1. Select the **Chef Automate** > **Properties** option from the left navigation pane. The **Chef Automate Properties** screen appears.
