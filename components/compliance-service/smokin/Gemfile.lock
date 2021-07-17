@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     bcrypt_pbkdf (1.0.1)
     berkshelf (7.0.9)
@@ -150,7 +150,7 @@ GEM
       tty-color (~> 0.5)
     plist (3.5.0)
     proxifier (1.0.3)
-    public_suffix (4.0.3)
+    public_suffix (4.0.6)
     rack (2.2.3)
     retryable (3.0.5)
     rubyntlm (0.6.2)
