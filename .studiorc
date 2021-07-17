@@ -76,7 +76,7 @@ if ls -A /src/.studio &>/dev/null; then
     # shellcheck disable=SC1090
     source "$file"
   done
-  source_msg="$source_msg and your local .studio folder";
+  # source_msg="$source_msg and your local .studio folder";
 fi
 
 # Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
