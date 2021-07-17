@@ -107,13 +107,19 @@ curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"nam
 
 #### Load Balancer Certificate and Private Key
 
-To change the load balancer certificate and private key of your Chef Automate installation, create a TOML file that contains the partial configuration:
+To change the load balancer certificate and private key of your Chef Automate installation, create a TOML file that contains the partial configuration. When using an internal root CA, you will want to provide the full chain back to and including the root CA:
 
 ```toml
 [[global.v1.frontend_tls]]
 # The TLS certificate for the load balancer frontend.
 cert = """-----BEGIN CERTIFICATE-----
-<your certificate>
+<your automate host certificate>
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+<your intermediate certificate>
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+<your root CA signing certificate>
 -----END CERTIFICATE-----
 """
 
