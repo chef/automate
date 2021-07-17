@@ -1527,6 +1527,58 @@
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}": {
+      "get": {
+        "operationId": "InfraProxy_GetNodeExpandedRunList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeExpandedRunList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Node name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "environment",
+            "description": "Node environment.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
         "operationId": "InfraProxy_GetNodes",
@@ -1968,6 +2020,49 @@
             "description": "Policyfile revision ID.",
             "in": "query",
             "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      },
+      "delete": {
+        "operationId": "InfraProxy_DeletePolicyfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeletePolicyfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Chef Organization ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Policyfile name.",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -3366,6 +3461,15 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DeletePolicyfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Policyfile name."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.DeleteServer": {
       "type": "object",
       "properties": {
@@ -3642,6 +3746,22 @@
         "ip_address": {
           "type": "string",
           "description": "Node IP address."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.NodeExpandedRunList": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the run list collection."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
+          },
+          "description": "List of the run list."
         }
       }
     },
