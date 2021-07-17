@@ -4,6 +4,7 @@
 package sys
 
 import (
+	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -32,8 +33,8 @@ func findMountEntry(path string, mountList []string) string {
 
 // MountFor returns the closest match in the mount table for the given
 // path.
-func MountFor(path string) (string, error) {
-	if !strings.HasPrefix(path, "/") {
+func MountFor(pathLocation string) (string, error) {
+	if !strings.HasPrefix(pathLocation, "/") {
 		return "", errors.New("absolute path expected")
 	}
 
@@ -42,9 +43,9 @@ func MountFor(path string) (string, error) {
 		return "", errors.Wrap(err, "failed to get mount table")
 	}
 
-	parts := strings.Split(path, "/")
+	parts := strings.Split(pathLocation, "/")
 	for len(parts) > 0 {
-		testPath := strings.Join(parts, "/")
+		testPath := path.Join(parts...)
 		entry := findMountEntry(testPath, mounts)
 		if entry != "" {
 			return entry, nil

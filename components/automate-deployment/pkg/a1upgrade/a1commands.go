@@ -448,7 +448,10 @@ func testRabbitQueueIsZero(client *http.Client, url, rabbitMgmtPw string) error 
 }
 
 func insecureHTTPSClient() *http.Client {
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	tlsConfig := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: true,
+	}
 	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	return &http.Client{Transport: tr, Timeout: 10 * time.Second}
 }

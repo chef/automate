@@ -24,6 +24,7 @@ func TestHTTPClientForIssuer(t *testing.T) {
 	p := httptest.NewUnstartedServer(dexServer)
 	dexCerts := devDexCerts(t)
 	p.TLS = &tls.Config{
+		MinVersion:   tls.VersionTLS12,
 		Certificates: []tls.Certificate{*dexCerts.ServiceKeyPair},
 	}
 	p.StartTLS()

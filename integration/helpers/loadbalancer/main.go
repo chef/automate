@@ -74,7 +74,7 @@ func main() {
 
 	addr := "0.0.0.0:443"
 	server := &http.Server{Addr: addr, Handler: proxy}
-	tlsConfig := &tls.Config{
+	tlsConfig := &tls.Config{MinVersion: SSL.VersionTLS13,
 		Certificates: []tls.Certificate{*svcCerts.ServiceKeyPair},
 		NextProtos:   []string{"http/1.1"},
 	}
@@ -103,6 +103,7 @@ func newReverseProxy(urls []*url.URL) *httputil.ReverseProxy {
 		Director: director,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: true,
 			},
 		},

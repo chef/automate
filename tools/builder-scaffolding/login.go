@@ -42,6 +42,7 @@ func init() {
 func doLogin(username, password string) (string, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
+			MinVersion:         tls.VersionTLS12,
 			InsecureSkipVerify: true,
 		},
 	}

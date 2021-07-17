@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"sort"
 	"strings"
 
@@ -228,7 +229,7 @@ func (p *depImportReducer) RegisterReduceRules(f ...depImportReduceRule) {
 
 // Reduce the imports paths according to the reduce rules, sort them and uniq
 // them.
-func (p *depImportReducer) Reduce(path, deps string) (GoDepInfo, error) {
+func (p *depImportReducer) Reduce(pathLocation, deps string) (GoDepInfo, error) {
 	info := GoDepInfo{}
 
 	scanner := bufio.NewScanner(strings.NewReader(deps))
@@ -236,7 +237,7 @@ func (p *depImportReducer) Reduce(path, deps string) (GoDepInfo, error) {
 		line := scanner.Text()
 		line = strings.TrimLeft(line, "/")
 
-		if strings.Contains(line, path) {
+		if strings.Contains(line, pathLocation) {
 			continue
 		}
 
@@ -246,7 +247,7 @@ func (p *depImportReducer) Reduce(path, deps string) (GoDepInfo, error) {
 		for _, f := range p.rules {
 			if strings.HasPrefix(line, f.reduce) {
 				if f.to > 0 {
-					dep = strings.Join(parts[0:min(f.to, len(parts))], "/")
+					dep = path.Join(parts[0:min(f.to, len(parts))]...)
 				} else {
 					dep = line
 				}
