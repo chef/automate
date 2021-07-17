@@ -158,7 +158,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		log.Error("Error creating request")
 		return err
 	}
-	request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
+	request.Header.Add("Authorization", notification.credentials.GetValues().AuthorizationHeader)
 	request.Header.Add("Content-Type", notification.contentType)
 	request.Header.Add("Content-Encoding", "gzip")
 	request.Header.Add("Accept", notification.contentType)

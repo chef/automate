@@ -89,8 +89,8 @@ func TestNewCredentialsFactoryBasicAuth(t *testing.T) {
 		t.Logf("Expected BasicAuthCredentials, got %v", reflect.TypeOf(credentials))
 		t.Fail()
 	}
-	if credentials.GetAuthorizationHeaderValue() != basicAuthHeaderValue {
-		t.Logf("Expected header %v, got %v", basicAuthHeaderValue, credentials.GetAuthorizationHeaderValue())
+	if credentials.GetValues().AuthorizationHeader != basicAuthHeaderValue {
+		t.Logf("Expected header %v, got %v", basicAuthHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -132,8 +132,8 @@ func TestNewCredentialsFactorySplunk(t *testing.T) {
 		t.Logf("Expected SplunkAuthCredentials, got %v", reflect.TypeOf(credentials))
 		t.Fail()
 	}
-	if credentials.GetAuthorizationHeaderValue() != splunkHeaderValue {
-		t.Logf("Expected header %v, got %v", splunkHeaderValue, credentials.GetAuthorizationHeaderValue())
+	if credentials.GetValues().AuthorizationHeader != splunkHeaderValue {
+		t.Logf("Expected header %v, got %v", splunkHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -201,8 +201,8 @@ func TestGetCredentialsBasicAuth(t *testing.T) {
 	if credentials == nil {
 		t.Log("Expected credentials, got nil")
 		t.Fail()
-	} else if credentials.GetAuthorizationHeaderValue() != basicAuthHeaderValue {
-		t.Logf("Expected header: %s, got %s", basicAuthHeaderValue, credentials.GetAuthorizationHeaderValue())
+	} else if credentials.GetValues().AuthorizationHeader != basicAuthHeaderValue {
+		t.Logf("Expected header: %s, got %s", basicAuthHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -228,8 +228,8 @@ func TestGetCredentialsSplunk(t *testing.T) {
 	if credentials == nil {
 		t.Log("Expected credentials, got nil")
 		t.Fail()
-	} else if credentials.GetAuthorizationHeaderValue() != splunkHeaderValue {
-		t.Logf("Expected header: %s, got %s", splunkHeaderValue, credentials.GetAuthorizationHeaderValue())
+	} else if credentials.GetValues().AuthorizationHeader != splunkHeaderValue {
+		t.Logf("Expected header: %s, got %s", splunkHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
