@@ -3,14 +3,12 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"reflect"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -195,7 +193,7 @@ func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.Policy
 		return nil, err
 	}
 
-	policyfile, err := c.client.Policies.Get(req.Name)
+	policyfileRevision, err := c.client.Policies.Get(req.Name)
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
@@ -203,7 +201,7 @@ func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.Policy
 
 
 	return &response.PolicyfileRevisions{
-		Revisions: fromAPIIncludedPolicyfileRevisions(policyfile),
+		Revisions: fromAPIIncludedPolicyfileRevisions(policyfileRevision),
 	}, nil
 }
 
@@ -212,34 +210,14 @@ func fromAPIIncludedPolicyfileRevisions(p chef.PolicyGetResponse) []*response.Po
 
 	var revisions []*response.PolicyfileRevision
 
-	//for _, rl := range p {
-	//	for _, rev := range rl {
-	//		for _, rd := range rev {
-	//			s, _ := rd.(string)
-	//			item := &response.PolicyfileRevision {
-	//				RevisionId: s,
-	//			}
-	//			revisions = append(revisions, item)
-	//		}
-	//	}
-	//}
-
 	for _, rev := range p {
-		keys := reflect.ValueOf(rev).MapKeys()
-		revisions := make([]string, len(keys))
-		fmt.Println(revisions)
-		//for i, key := range keys {
-		//	var a = &response.PolicyfileRevision {
-		//		RevisionId: key.String(),
-		//	}
-		//	revisions[i] = a
-		//}
-		//item := &response.PolicyfileRevisions{
-		//	Revisions:  revisions,
-		//}
-		//revisions = append(revisions, item)
+		for key, _ := range rev {
+			revision := &response.PolicyfileRevision{
+				RevisionId: key,
+			}
+			revisions = append(revisions, revision)
+		}
 	}
 
-	fmt.Println(":::::: policyfiles :::::::", revisions)
 	return revisions
 }
