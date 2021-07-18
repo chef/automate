@@ -220,7 +220,7 @@ func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []str
 // GetReports returns all reports in a given timeframe
 // TODO: support timeframe and pagination
 func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string][]string,
-	sortField string, sortAsc bool) ([]*reportingapi.Report, int64, error) {
+	sortField string, sortAsc bool) ([]*reportingapi.ReportSummaryLevelOne, int64, error) {
 	myName := "GetReports"
 
 	depth, err := backend.NewDepth(filters, false)
@@ -281,7 +281,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 	}
 	logrus.Debugf("GetReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
 		searchResult.TookInMillis)
-	reports := make([]*reportingapi.Report, 0)
+	reports := make([]*reportingapi.ReportSummaryLevelOne, 0)
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			item := ESInSpecReport{}
@@ -290,7 +290,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 				if err == nil {
 					t := item.EndTime.Round(1 * time.Second)
 					timestamp, _ := ptypes.TimestampProto(t)
-					report := reportingapi.Report{
+					report := reportingapi.ReportSummaryLevelOne{
 						Id:       hit.Id,
 						NodeId:   item.NodeID,
 						NodeName: item.NodeName,

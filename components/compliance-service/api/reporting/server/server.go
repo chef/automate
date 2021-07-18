@@ -38,8 +38,8 @@ func New(es *relaxting.ES2Backend) *Server {
 }
 
 // ListReports returns a list of reports based on query
-func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
-	var reports reporting.Reports
+func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*reporting.ReportsSummaryLevelOne, error) {
+	var reports reporting.ReportsSummaryLevelOne
 	var SORT_FIELDS = map[string]string{
 		"node_name":                              "node_name.lower",
 		"latest_report.end_time":                 "end_time",
