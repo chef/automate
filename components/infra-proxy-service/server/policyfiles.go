@@ -186,7 +186,7 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 	}, nil
 }
 
-// GetPolicyfile gets a policy file
+// GetPolicyfileRevisions gets a policy file revisions
 func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
 	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
 	if err != nil {
@@ -198,14 +198,12 @@ func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.Policy
 		return nil, ParseAPIError(err)
 	}
 
-
-
 	return &response.PolicyfileRevisions{
 		Revisions: fromAPIIncludedPolicyfileRevisions(policyfileRevision),
 	}, nil
 }
 
-// fromAPINamedRunList a response included policy locks
+// fromAPIIncludedPolicyfileRevisions a response included policyfile revision
 func fromAPIIncludedPolicyfileRevisions(p chef.PolicyGetResponse) []*response.PolicyfileRevision {
 
 	var revisions []*response.PolicyfileRevision

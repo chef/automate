@@ -108,5 +108,6 @@ message PolicyfileRevisions {
 }
 
 message PolicyfileRevision {
+    // policyfile revision
     string revision_id = 1;
 }

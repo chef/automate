@@ -134,7 +134,7 @@ func (a *InfraProxyServer) DeletePolicyfile(ctx context.Context, r *gwreq.Delete
 	}, nil
 }
 
-// GetPolicyfileRevisions fetches the policy file revisions
+// GetPolicyfileRevisions fetches the policyfile revisions
 func (a *InfraProxyServer) GetPolicyfileRevisions(ctx context.Context, r *gwreq.PolicyfileRevisions) (*gwres.PolicyfileRevisions, error) {
 	req := &infra_req.PolicyfileRevisions{
 		OrgId:      r.OrgId,
