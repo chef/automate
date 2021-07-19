@@ -2047,7 +2047,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Reports"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne"
             }
           },
           "default": {
@@ -4963,6 +4963,58 @@
         }
       }
     },
+    "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}": {
+      "get": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_GetNodeExpandedRunList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Node name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Node environment.",
+            "name": "environment",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeExpandedRunList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes": {
       "get": {
         "tags": [
@@ -5397,6 +5449,49 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Policyfile"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "InfraProxy"
+        ],
+        "operationId": "InfraProxy_DeletePolicyfile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Chef Infra Server ID.",
+            "name": "server_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Chef Organization ID.",
+            "name": "org_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Policyfile name.",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DeletePolicyfile"
             }
           },
           "default": {
@@ -7199,7 +7294,7 @@
     },
     "/api/v0/secrets": {
       "post": {
-        "description": "Creates a secret. Requires values for name, type, and data.\n\nSupported types: ssh, winrm, sudo, aws, azure, gcp, service_now\nSupported keys by type: \nssh: username, password, key\nwinrm: username, password\nsudo: username, password\nservice_now: username, password\naws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN\nazure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID\ngcp: GOOGLE_CREDENTIALS_JSON\n\nExample:\n```\n{\n\"name\": \"my ssh secret\",\n\"type\": \"ssh\",\n\"data\": [\n{ \"key\": \"username\", \"value\": \"vagrant\" },\n{ \"key\": \"password\", \"value\": \"vagrant\"} \n]\n}\n```\n\nAuthorization Action:\n```\nsecrets:secrets:create\n```",
+        "description": "Creates a secret. Requires values for name, type, and data.\n\nSupported types: ssh, winrm, sudo, aws, azure, gcp, service_now\nSupported keys by type: \nssh: username, password, key\nwinrm: username, password\nsudo: username, password\nservice_now: username, password\naws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN\nazure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID\nazure: AZURE_SUBSCRIPTION_ID is optional \ngcp: GOOGLE_CREDENTIALS_JSON\n\nExample:\n```\n{\n\"name\": \"my ssh secret\",\n\"type\": \"ssh\",\n\"data\": [\n{ \"key\": \"username\", \"value\": \"vagrant\" },\n{ \"key\": \"password\", \"value\": \"vagrant\"} \n]\n}\n```\n\nAuthorization Action:\n```\nsecrets:secrets:create\n```",
         "tags": [
           "SecretsService"
         ],
@@ -7380,6 +7475,119 @@
             "schema": {
               "$ref": "#/definitions/chef.automate.api.telemetry.TelemetryResponse"
             }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      }
+    },
+    "/api/v0/user-settings/{user.name}/{user.connector}": {
+      "get": {
+        "tags": [
+          "UserSettingsService"
+        ],
+        "summary": "GetUserSettings returns all of the preferences for a given user",
+        "operationId": "UserSettingsService_GetUserSettings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "user.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "user.connector",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.user_settings.GetUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "UserSettingsService"
+        ],
+        "summary": "PutUserSettings upserts all of the preferences for a given user",
+        "operationId": "UserSettingsService_PutUserSettings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "user.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "user.connector",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.user_settings.PutUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "UserSettingsService"
+        ],
+        "summary": "DeleteUserSettings deletes all settings for a given user",
+        "operationId": "UserSettingsService_DeleteUserSettings",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "user.name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "user.connector",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response",
@@ -12827,6 +13035,40 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne": {
+      "type": "object",
+      "properties": {
+        "controls": {
+          "description": "Intentionally blank.",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary"
+        },
+        "end_time": {
+          "description": "The time that the report was completed.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "description": "A unique report identifier.",
+          "type": "string"
+        },
+        "ipaddress": {
+          "description": "The reporting node IP address.",
+          "type": "string"
+        },
+        "node_id": {
+          "description": "The reporting node's unique ID.",
+          "type": "string"
+        },
+        "node_name": {
+          "description": "The reporting node name.",
+          "type": "string"
+        },
+        "status": {
+          "description": "The status of the run the report was made from.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.Reports": {
       "type": "object",
       "properties": {
@@ -12835,6 +13077,24 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Report"
+          }
+        },
+        "total": {
+          "description": "Total number of reports matching the filters.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne": {
+      "type": "object",
+      "title": "ReportsSummaryLevelOne used for ListReports call",
+      "properties": {
+        "reports": {
+          "description": "Paginated results of summary level reports matching the filters.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne"
           }
         },
         "total": {
@@ -17029,6 +17289,15 @@
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DeletePolicyfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Policyfile name.",
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.DeleteServer": {
       "type": "object",
       "properties": {
@@ -17305,6 +17574,22 @@
         "uptime": {
           "description": "Node uptime.",
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.NodeExpandedRunList": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "ID of the run list collection.",
+          "type": "string"
+        },
+        "run_list": {
+          "description": "List of the run list.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RunList"
+          }
         }
       }
     },
@@ -19192,6 +19477,80 @@
           "format": "boolean"
         },
         "telemetry_url": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.GetUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/chef.automate.api.user_settings.UserSettingValue"
+          }
+        },
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.PutUserSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "description": "The user settings to persist.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/chef.automate.api.user_settings.UserSettingValue"
+          }
+        },
+        "user": {
+          "description": "ID of the user. Cannot be changed. Used to sign in.",
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.PutUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/chef.automate.api.user_settings.User"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.User": {
+      "type": "object",
+      "properties": {
+        "connector": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.user_settings.UserSettingValue": {
+      "type": "object",
+      "properties": {
+        "default_value": {
+          "description": "Default value for this setting.",
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Enabled"
+        },
+        "valid_values": {
+          "description": "Valid values for this setting.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "value": {
+          "description": "Value for this setting.",
           "type": "string"
         }
       }
