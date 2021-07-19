@@ -86,10 +86,10 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 You can configure Chef Automate Integration App from your ServiceNow or Chef Automate instance.
 
 `feed_interval`
-: Valid values: `2` to `8` hours, based on the number of nodes. Increase the `feed_interval` to configure more nodes.
+: The frequency in hours for refreshing the data feed. The duration between data feed refreshes is proportional to the node count, with more nodes requiring higher settings. Valid values: Any integer in the range of `2` to `8`. Default: 2.
 
 `node_batch_size`
-: The testing executed for a benchmark. The size of a compliance scan is proportional to the number of profiles applied. Scans exceeding 4MB may fail or display incorrectly in reports. Use a lower `node_batch_size` setting to reduce the number of profiles applied in a single batch. Valid values: Between `1` and `30`.  Default: `15`
+: The testing executed for a benchmark. The size of a compliance scan is proportional to the number of profiles applied. Scans exceeding 4MB may fail or display incorrectly in reports. Use a lower `node_batch_size` setting to reduce the number of profiles applied in a single batch. Valid values: Between `1` and `30`.  Default: `15`.
 
 ### Configure Chef Automate from ServiceNow
 
