@@ -36,7 +36,7 @@ type Creds struct {
 type filtersAzure struct {
 	name   []*common.Filter
 	region []*common.Filter
-	others []*common.Filter
+	others map[string][]*common.Filter
 }
 
 // New returns a Creds struct of ServicePrincipalToken and TenantID given azure creds
@@ -462,8 +462,11 @@ func reFilterNameAndRegion(filters []*common.Filter, vmList []*manager.ManagerNo
 		if filter.Key == "region" {
 			filterObject.region = append(filterObject.region, filter)
 		}
-		if filter.Key == "name" {
-			filterObject.name = append(filterObject.name, filter)
+		if filter.Key != "region" && filter.Key != "subscription_id" {
+			if filterObject.others == nil {
+				filterObject.others = map[string][]*common.Filter{}
+			}
+			filterObject.others[filter.Key] = append(filterObject.others[filter.Key], filter)
 		}
 	}
 
@@ -481,20 +484,27 @@ func reFilterNameAndRegion(filters []*common.Filter, vmList []*manager.ManagerNo
 		vmList = filterRegions(vmList, isRegionMaching, excludeArr, true)
 	}
 
-	includeArr = []string{}
-	excludeArr = []string{}
-	if len(filterObject.name) > 0 {
-		var filteredVmListName []*manager.ManagerNode
-		for _, filter := range filterObject.name {
-			if filter.Exclude {
-				excludeArr = append(excludeArr, filter.Values...)
-			} else {
-				includeArr = append(includeArr, filter.Values...)
+	if len(filterObject.others) > 0 {
+		for key, filterTypes := range filterObject.others {
+			if len(filterTypes) > 0 {
+				includeArr = []string{}
+				excludeArr = []string{}
+				for _, filter := range filterTypes {
+					if filter.Exclude {
+						excludeArr = append(excludeArr, filter.Values...)
+					} else {
+						includeArr = append(includeArr, filter.Values...)
+					}
+				}
+				if key == "name" {
+					vmList = filterNames(vmList, isNameMaching, includeArr, false)
+					vmList = filterNames(vmList, isNameMaching, excludeArr, true)
+				} else {
+					vmList = filterTags(key, vmList, isTagMatching, includeArr, false)
+					vmList = filterTags(key, vmList, isTagMatching, excludeArr, true)
+				}
 			}
 		}
-		filteredVmListName = filterNames(vmList, isNameMaching, includeArr, false)
-		filteredVmListName = filterNames(filteredVmListName, isNameMaching, excludeArr, true)
-		vmList = filteredVmListName
 	}
 
 	vmList = UniqueListByID(vmList)
@@ -531,6 +541,15 @@ func filterRegions(ss []*manager.ManagerNode, test func(string, []string, bool) 
 	return
 }
 
+func filterTags(key string, ss []*manager.ManagerNode, test func([]*common.Kv, []string, bool, string) bool, arr []string, exclude bool) (ret []*manager.ManagerNode) {
+	for _, s := range ss {
+		if test(s.Tags, arr, exclude, key) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}
+
 func isNameMaching(s string, arr []string, exclude bool) bool {
 	initBool := true
 	if exclude {
@@ -561,6 +580,30 @@ func isRegionMaching(s string, arr []string, exclude bool) bool {
 		initBool = false
 		for _, val := range arr {
 			initBool = initBool || s == val
+		}
+	}
+	return initBool
+}
+
+func isTagMatching(s []*common.Kv, arr []string, exclude bool, key string) bool {
+	initBool := true
+	if exclude {
+		initBool = true
+		for _, val := range arr {
+			for _, v := range s {
+				if v.Key == key {
+					initBool = initBool && v.Value != val
+				}
+			}
+		}
+	} else {
+		initBool = false
+		for _, val := range arr {
+			for _, v := range s {
+				if v.Key == key {
+					initBool = initBool || v.Value == val
+				}
+			}
 		}
 	}
 	return initBool
