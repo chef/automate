@@ -177,7 +177,7 @@ The Chef Automate Integration App has nine configurable **Application Properties
 `x_chef_automate.enable.system.app`
 : Used to enable software installed mappings. Valid Values: `Yes`, `No`. Default: `No`.
 
-Follow these steps to alter the default values in the **Application Properties**:
+Follow these steps to alter the default values in the **Application Properties** screen:
 
 1. Navigate to the **ServiceNow** application.
 1. Select the **Chef Automate** > **Properties** option from the left navigation pane. The **Chef Automate Properties** screen appears.
