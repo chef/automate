@@ -15,7 +15,7 @@ gh_repo = "automate"
 
 This page details information on the topics that will aid you while installing and configuring the Chef Automate Integration App in the  ServiceNow ecosystem.
 
-Refer to the [ServiceNow Integration]({{< relref "servicenow_integration" >}}) page to install and configure the Chef Automate Integration APp in the ServiceNow ecosystem.
+Refer to the [ServiceNow Integration]({{< relref "servicenow_integration" >}}) page to install and configure the Chef Automate Integration App in the ServiceNow ecosystem.
 
 {{< note >}}
 
