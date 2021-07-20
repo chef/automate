@@ -34,7 +34,6 @@ type Creds struct {
 }
 
 type filtersAzure struct {
-	name   []*common.Filter
 	region []*common.Filter
 	others map[string][]*common.Filter
 }
