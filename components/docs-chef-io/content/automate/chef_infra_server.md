@@ -464,7 +464,9 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a specific policyfile to view the content
+Select a policyfile to view the details, that is the **Policy Group**, **Revision Id** and the **METADATA** of the policyfile. The **Content** tab contains the list of all the **Included Policies** and **Run List**.
+
+{{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
 #### Delete Policyfiles
 
