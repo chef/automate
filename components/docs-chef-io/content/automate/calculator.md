@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 <!-- markdownlint-disable-file MD033  -->
 <div class="grid-container padding-0">
-  <div class="grid-x align-justify small-up-4">
+  <div class="grid-x align-justify large-up-4 small-up-1">
     <div class="cell">
       <div class="card shadow bordered radius margin-1">
         <div class="card-divider">
@@ -158,28 +158,111 @@ gh_repo = "automate"
     <button type="button" class="button large radius bordered shadow primary" data-open="exampleModal1">Calculate</button>
   </div>
 </div>
-<div class="reveal" id="exampleModal1" data-reveal>
+<div class="reveal padding-3" id="exampleModal1" data-reveal>
+  <div class="warning callout small">Copy before closing results</div>
   <div class="source" contenteditable="true">
-    <label>Total Number of Nodes:
-      <output name="result" for="a b">60</output>
-    </label>
-    <label>Total Node Data:
-      <output name="result" for="a b">60</output>
-    </label>
-    <label>Storage/Day (TB):
-      <output name="result" for="a b">60</output>
-    </label>
+    <div class="grid-x align-right">
+      <button class="button copy-button width-100 grid-x align-right medium radius bordered shadow primary margin-bottom-0">Copy
+      </button>
+    </div>
+    <h4>Chef Infra Client Run Data</h4>
+      <label>Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Node Data Size (MB):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Run Interval (HR):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Data Retention (Days):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Node Data:
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Storage/Day (TB):
+        <output name="result" for="a b">60</output>
+      </label>
+    <h4>Compliance Run Data</h4>
+      <label>Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Node Data Size (MB):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Run Interval (HR):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Data Retention (Days):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Node Data:
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Storage/Day (TB):
+        <output name="result" for="a b">60</output>
+      </label>
+    <h4>Event Feed Data</h4>
+      <label>Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Node Data Size (MB):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Run Interval (HR):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Data Retention (Days):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Node Data:
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Storage/Day (TB):
+        <output name="result" for="a b">60</output>
+      </label>
+    <h4>Service Group Data</h4>
+      <label>Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Node Data Size (MB):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Run Interval (HR):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Data Retention (Days):<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Number of Nodes:<label>
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Total Node Data:
+        <output name="result" for="a b">60</output>
+      </label>
+      <label>Storage/Day (TB):
+        <output name="result" for="a b">60</output>
+      </label>
     <label>HA Total Storage (TB):
       <output name="result" for="a b">60</output>
     </label>
+  <h4>High Availability</h4>
     <label>HA # ES Nodes:
       <output name="result" for="a b">60</output>
     </label>
     <label>HA Per ES Node Storage (TB):
       <output name="result" for="a b">60</output>
     </label>
-    <button class="button copy-button small radius bordered shadow alert margin-top-1">Copy
-    </button>
   </div>
   <button class="close-button" data-close aria-label="Close modal" type="button">
     <span aria-hidden="true">&times;</span>
