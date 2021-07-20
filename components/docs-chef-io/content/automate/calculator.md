@@ -166,19 +166,19 @@ gh_repo = "automate"
       </button>
     </div>
     <h4>Chef Infra Client Run Data</h4>
-      <label>Number of Nodes:<label>
+      <label>Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
-      <label>Node Data Size (MB):<label>
+      <label>Node Data Size (MB):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Run Interval (HR):<label>
+      <label>Run Interval (HR):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Data Retention (Days):<label>
+      <label>Data Retention (Days):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Total Number of Nodes:<label>
+      <label>Total Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
       <label>Total Node Data:
@@ -188,19 +188,19 @@ gh_repo = "automate"
         <output name="result" for="a b">60</output>
       </label>
     <h4>Compliance Run Data</h4>
-      <label>Number of Nodes:<label>
+      <label>Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
-      <label>Node Data Size (MB):<label>
+      <label>Node Data Size (MB):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Run Interval (HR):<label>
+      <label>Run Interval (HR):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Data Retention (Days):<label>
+      <label>Data Retention (Days):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Total Number of Nodes:<label>
+      <label>Total Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
       <label>Total Node Data:
@@ -210,19 +210,19 @@ gh_repo = "automate"
         <output name="result" for="a b">60</output>
       </label>
     <h4>Event Feed Data</h4>
-      <label>Number of Nodes:<label>
+      <label>Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
-      <label>Node Data Size (MB):<label>
+      <label>Node Data Size (MB):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Run Interval (HR):<label>
+      <label>Run Interval (HR):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Data Retention (Days):<label>
+      <label>Data Retention (Days):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Total Number of Nodes:<label>
+      <label>Total Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
       <label>Total Node Data:
@@ -232,19 +232,19 @@ gh_repo = "automate"
         <output name="result" for="a b">60</output>
       </label>
     <h4>Service Group Data</h4>
-      <label>Number of Nodes:<label>
+      <label>Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
-      <label>Node Data Size (MB):<label>
+      <label>Node Data Size (MB):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Run Interval (HR):<label>
+      <label>Run Interval (HR):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Data Retention (Days):<label>
+      <label>Data Retention (Days):
         <output name="result" for="a b">60</output>
       </label>
-      <label>Total Number of Nodes:<label>
+      <label>Total Number of Nodes:
         <output name="result" for="a b">60</output>
       </label>
       <label>Total Node Data:
