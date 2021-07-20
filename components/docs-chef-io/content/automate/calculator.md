@@ -18,7 +18,7 @@ gh_repo = "automate"
     <div class="cell">
       <div class="card shadow bordered radius margin-1">
         <div class="card-divider">
-          Styled Card
+          Chef Infra Client Run Data
         </div>
         <div class="card-section">
             <label>Number of Nodes
@@ -52,7 +52,7 @@ gh_repo = "automate"
     <div class="cell">
       <div class="card shadow bordered radius margin-1">
         <div class="card-divider">
-          Styled Card
+          Compliance Run Data
         </div>
         <div class="card-section">
             <label>Number of Nodes
@@ -86,7 +86,7 @@ gh_repo = "automate"
     <div class="cell">
       <div class="card shadow bordered radius margin-1">
         <div class="card-divider">
-          Styled Card
+          Event Feed Data
         </div>
         <div class="card-section">
             <label>Number of Nodes
@@ -120,7 +120,7 @@ gh_repo = "automate"
     <div class="cell">
       <div class="card shadow bordered radius margin-1">
         <div class="card-divider">
-          Styled Card
+          Service Groups Data
         </div>
         <div class="card-section">
             <label>Number of Nodes
