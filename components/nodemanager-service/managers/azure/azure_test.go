@@ -308,6 +308,14 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 		{Key: "Team", Values: []string{"ga"}},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
-	t.Log(filteredResources)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "Team", Values: []string{"dev", "ga"}},
+		{Key: "Team", Values: []string{"dev"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
 }
