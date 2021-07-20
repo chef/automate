@@ -507,20 +507,7 @@ func reFilterNameAndRegion(filters []*common.Filter, vmList []*manager.ManagerNo
 		}
 	}
 
-	vmList = UniqueListByID(vmList)
 	return vmList
-}
-
-func UniqueListByID(a []*manager.ManagerNode) []*manager.ManagerNode {
-	seen := map[string]bool{}
-	var b []*manager.ManagerNode
-	for _, v := range a {
-		if _, ok := seen[v.Id]; !ok {
-			seen[v.Id] = true
-			b = append(b, v)
-		}
-	}
-	return b
 }
 
 func filterNames(ss []*manager.ManagerNode, test func(string, []string, bool) bool, includeArr []string, exclude bool) (ret []*manager.ManagerNode) {

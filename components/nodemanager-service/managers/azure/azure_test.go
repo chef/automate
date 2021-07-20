@@ -247,8 +247,14 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 		{Name: "ljkp-win", Region: "eastus", Id: "xxxxxxx-37a4-48f7-9314-xxxxxxxx"},
 		{Name: "vj-win-2000", Region: "eastus", Id: "xxxxxxxx-36a5-4514-b864-xxxxxxxx"},
 		{Name: "ljkp-ubuntu20", Region: "eastus", Id: "xxxxxx-83a4-4b02-a43e-xxxxxxxx"},
-		{Name: "ljkp-ubuntu2", Region: "eastus", Id: "xxxxxxxx-a269-4001-ad60-xxxxxxxx"},
-		{Name: "vault-testing", Region: "eastus", Id: "xxxxxxx-1e14-4efe-8221-xxxxxxxxx"},
+		{Name: "ljkp-ubuntu2", Region: "eastus", Id: "xxxxxxxx-a269-4001-ad60-xxxxxxxx", Tags: []*common.Kv{
+			{Key: "Team", Value: "ga"},
+		}},
+		{Name: "vault-testing", Region: "eastus", Id: "xxxxxxx-1e14-4efe-8221-xxxxxxxxx", Tags: []*common.Kv{
+			{Key: "Environment", Value: "uat"},
+			{Key: "Environment", Value: "uat1"},
+			{Key: "Team", Value: "dev"},
+		}},
 	}
 	filters = []*common.Filter{
 		{Key: "name", Values: []string{"ljkp"}, Exclude: false},
@@ -257,4 +263,51 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 3, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "name", Values: []string{"vault-testing"}},
+		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
+		{Key: "Environment", Values: []string{"uat", "uat1"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "Environment", Values: []string{"uat", "uat1"}},
+		{Key: "name", Values: []string{"vault-testing"}},
+		{Key: "Environment", Values: []string{"uat"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "Environment", Values: []string{"uat", "uat1"}},
+		{Key: "name", Values: []string{"ljkp-ubuntu2"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 0, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "Environment", Values: []string{"uat", "uat1"}},
+		{Key: "Team", Values: []string{"dev"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"eastus"}},
+		{Key: "region", Values: []string{"eastus2"}},
+		{Key: "Team", Values: []string{"ga"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	t.Log(filteredResources)
+	assert.Equal(t, 1, len(filteredResources))
 }
