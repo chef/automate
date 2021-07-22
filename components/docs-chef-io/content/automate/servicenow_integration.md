@@ -56,7 +56,7 @@ The Chef Automate Integration App exposes the REST API endpoint for communicatio
 2. Search for **Chef Automate**.
 3. Select the **Chef Automate Integration App**.
 4. Select **Get** and follow the instructions by specifying your ServiceNow credentials.
-5. Open your **ServiceNow Service Management** application
+5. Open your **ServiceNow Service Management** application.
 6. Select **System Applications** > **All Available Applications** > **All** menu.
 7. Find the application using the filter criteria and search bar.
    You can search for the application by its `Name` or `ID`. If you cannot find an application, you may have to request it from the ServiceNow Store.
@@ -86,7 +86,7 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 You can configure Chef Automate Integration App from your ServiceNow or Chef Automate instance.
 
 `feed_interval`
-: The frequency in hours for refreshing the data feed. The duration between data feed refreshes is proportional to the node count, with more nodes requiring higher settings. Valid values: Any integer in the range of `2` to `8`. Default: 4.
+: The frequency in hours for refreshing the data feed. The duration between data feed refreshes is proportional to the node count, with more nodes requiring higher settings. Valid values: Any integer in the range of `2` to `8`. Default: `4`.
 
 `node_batch_size`
 : The testing executed for a benchmark. The size of a compliance scan is proportional to the number of profiles applied. Scans exceeding 4MB may fail or display incorrectly in reports. Use a lower `node_batch_size` setting to reduce the number of profiles applied in a single batch. Valid values: Between `1` and `30`.  Default: `15`.
@@ -163,13 +163,13 @@ The Chef Automate Integration App has nine configurable **Application Properties
 : Inserts the new record during the import if a model is not found in the _core\_company_ table by settingthe property to **Yes**. Default: `Yes`.
 
 `x_chef_automate.insert_model`
-: Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**.Default: `Yes`
+: Inserts the new record during the import if a model is not found in the _cmdb\_model_ table by setting the property to **Yes**. Default: `Yes`
 
 `x_chef_automate. logging.enabled`
 : Used to flag the logging with **enable** or **disable** values. Default: `No`.
 
 `x_chef_automate.logging.verbosity`
-: Debugs the data in ServiceNow. Enables the selected logging level and is visible in logs. Valid values: `Debug`, `Warn`, `Info`, `Error` Default: `Error`.
+: Debugs the data in ServiceNow. Enables the selected logging level and is visible in logs. Valid values: `Debug`, `Warn`, `Info`, `Error`. Default: `Error`.
 
 `x_chef_automate.Rest.api`
 : Enables the Chef Automate API from ServiceNow. Set to `Yes` to enable and `No` to disable. Valid Values: `Yes`, `No`. Default: `Yes`.
@@ -245,7 +245,7 @@ To uninstall the Chef Automate Integration App:
 
 1. In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
 1. Open the **Downloads** tab and select the **Chef Automate** link.
-1. Navigate to the **Related Links** section
+1. Navigate to the **Related Links** section.
 1. select **Uninstall**.
 
 Refer to the [ServiceNow Integration Reference]({{< relref "servicenow_integration_reference" >}}) page to find information on the topics that will help you while installing and configuring Chef Automate in ServiceNow.
