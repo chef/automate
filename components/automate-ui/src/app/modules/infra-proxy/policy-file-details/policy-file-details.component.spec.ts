@@ -18,12 +18,14 @@ import { PolicyFileDetailsComponent } from './policy-file-details.component';
 import { MockComponent } from 'ng2-mock-component';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyFileSuccess } from 'app/entities/policy-files/policy-file.action';
+import { By } from '@angular/platform-browser';
 
 describe('PolicyFileDetailsComponent', () => {
   let component: PolicyFileDetailsComponent;
   let fixture: ComponentFixture<PolicyFileDetailsComponent>;
   let router: Router;
   let store: Store<NgrxStateAtom>;
+  let element;
 
   const server_id = 'chef-server-dev-test';
   const org_id = 'chef-org-dev';
@@ -93,6 +95,7 @@ describe('PolicyFileDetailsComponent', () => {
     fixture = TestBed.createComponent(PolicyFileDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    element = fixture.debugElement;
   });
 
   const policyFile: PolicyFile = {
@@ -107,7 +110,9 @@ describe('PolicyFileDetailsComponent', () => {
       revision_id: '434979ef36f20af46a24c5c83e25d7bc4c667b4178ff5184109ed62e750fcdc5'
     }],
     policy_group: 'test_group',
-    revision_id: '434979ef36f20af46a24c5c83e25d7bc4c667b4178ff5184109ed62e750fcdc5'
+    revision_id: '434979ef36f20af46a24c5c83e25d7bc4c667b4178ff5184109ed62e750fcdc5',
+    default_attributes: '{"my-cookbook": {"port": 80, "code": {"location": "github"}}}',
+    override_attributes: '{}'
   };
 
   it('should be created', () => {
@@ -117,5 +122,11 @@ describe('PolicyFileDetailsComponent', () => {
   it('load policy file details', () => {
     store.dispatch(new GetPolicyFileSuccess(policyFile));
     expect(component.PolicyFile).not.toBeNull();
+  });
+
+  describe('Attributes Tab', () => {
+    it('renders the attributes tab correctly', () => {
+      expect(element.query(By.css('.jsontree_value_object'))).toBeNull();
+    });
   });
 });

@@ -4,6 +4,8 @@ export interface PolicyFile {
   policy_group: string;
   cookbook_locks?: CookbookLocks[];
   included_policy_locks?: IncludedPolicyLocks[];
+  default_attributes?: string;
+  override_attributes?: string;
 }
 
 export interface CookbookLocks {

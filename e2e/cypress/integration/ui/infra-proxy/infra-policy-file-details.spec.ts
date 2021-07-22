@@ -10,6 +10,8 @@ describe('infra policy details', () => {
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   let policyFileName = '';
   let revision = '';
+  const defaultAttribute = {default: 'test'};
+  const overrideAttribute = {override: 'test'};
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -182,6 +184,46 @@ describe('infra policy details', () => {
         getPolicyFileDetails().then(response => {
           checkRunlistResponse(response);
         });
+      }
+    });
+  });
+
+  describe('inside attribute tab ', () => {
+
+    // attribute tab specs
+    it('can can switch to attribute tab', () => {
+      if (policyFileName !== '') {
+        cy.get('[data-cy=attributes-tab]').contains('Attributes').click();
+      }
+    });
+
+    it('attribute page', () => {
+      if (policyFileName !== '') {
+        cy.get('.default').contains('Default Attributes');
+        cy.get('[data-cy=expand-default-attribute]').contains('Expand All');
+        cy.get('[data-cy=collapse-default-attribute]').contains('Collapse All');
+        cy.get('[data-cy=edit-default-attribute]').contains('Edit');
+
+        cy.get('.override').contains('Override Attributes');
+        cy.get('[data-cy=expand-override-attribute]').contains('Expand All');
+        cy.get('[data-cy=collapse-override-attribute]').contains('Collapse All');
+        cy.get('[data-cy=edit-override-attribute]').contains('Edit');
+      }
+    });
+
+    it('can expand a default attribute', () => {
+      if (policyFileName !== '') {
+        cy.get('[data-cy=expand-default-attribute]').contains('Expand All').click();
+        cy.wait(2000);
+        cy.get('[data-cy=collapse-default-attribute]').contains('Collapse All').click();
+      }
+    });
+
+    it('can expand a override attribute', () => {
+      if (policyFileName !== '') {
+        cy.get('[data-cy=expand-override-attribute]').contains('Expand All').click();
+        cy.wait(2000);
+        cy.get('[data-cy=collapse-override-attribute]').contains('Collapse All').click();
       }
     });
   });

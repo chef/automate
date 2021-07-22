@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -10,6 +10,7 @@ import { identity } from 'lodash/fp';
 import { PolicyFile, CookbookLocks, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyFile } from 'app/entities/policy-files/policy-file.action';
 import { policyFileFromRoute } from 'app/entities/policy-files/policy-file-details.selectors';
+import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
 export type PolicyFileTabName = 'details' | 'runList' | 'attributes';
 
@@ -38,12 +39,19 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
   public cookbook_locks: CookbookLocks[] = [];
   public included_policy_locks: IncludedPolicyLocks[] = [];
 
+  public defaultAttributes = [];
+  public overrideAttributes = [];
+  public hasDefaultattributes = false;
+  public hasOverrideattributes = false;
+
+  @ViewChild(JsonTreeTable, { static: true })
+  tree: JsonTreeTable;
+
   constructor(
     private router: Router,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
-  ) {
-  }
+  ) { }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
@@ -88,6 +96,15 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
       this.cookbook_locks = policyFile.cookbook_locks;
       this.included_policy_locks = policyFile.included_policy_locks;
       this.policyFileDetailsLoading = false;
+      // load attributes
+      this.defaultAttributes = (policyFile.default_attributes
+        && JSON.parse(policyFile.default_attributes)) || {};
+      this.hasDefaultattributes = Object.keys(
+        JSON.parse(policyFile.default_attributes)).length > 0 ? true : false;
+      this.overrideAttributes = (policyFile.override_attributes
+       && JSON.parse(policyFile.override_attributes)) || {};
+      this.hasOverrideattributes = Object.keys(
+        JSON.parse(policyFile.override_attributes)).length > 0 ? true : false;
     });
   }
 
