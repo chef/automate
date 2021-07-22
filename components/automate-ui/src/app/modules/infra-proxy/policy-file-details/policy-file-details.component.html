@@ -177,7 +177,9 @@
                   #tree
                   [json]="defaultAttributes">
                 </app-json-tree-table>
-                <div data-cy="empty-default-attribute" *ngIf="!hasDefaultattributes" class="empty-section">
+                <div
+                 *ngIf="!hasDefaultattributes"
+                  class="empty-section empty-default-attribute">
                   <img alt="No preview" src="/assets/img/no_preview.gif" />
                   <p>There are no items for Display.</p>
                 </div>
@@ -213,7 +215,9 @@
                   #override
                   [json]="overrideAttributes">
                 </app-json-tree-table>
-                <div data-cy="empty-override-attribute" *ngIf="!hasOverrideattributes" class="empty-section">
+                <div
+                 *ngIf="!hasOverrideattributes"
+                  class="empty-section empty-override-attribute">
                   <img alt="No preview" src="/assets/img/no_preview.gif" />
                   <p>There are no items for Display.</p>
                 </div>

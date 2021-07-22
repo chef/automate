@@ -202,28 +202,34 @@ describe('infra policy details', () => {
         cy.get('.default').contains('Default Attributes');
         cy.get('[data-cy=expand-default-attribute]').contains('Expand All');
         cy.get('[data-cy=collapse-default-attribute]').contains('Collapse All');
-        cy.get('[data-cy=edit-default-attribute]').contains('Edit');
 
         cy.get('.override').contains('Override Attributes');
         cy.get('[data-cy=expand-override-attribute]').contains('Expand All');
         cy.get('[data-cy=collapse-override-attribute]').contains('Collapse All');
-        cy.get('[data-cy=edit-override-attribute]').contains('Edit');
       }
     });
 
     it('can expand a default attribute', () => {
       if (policyFileName !== '') {
-        cy.get('[data-cy=expand-default-attribute]').contains('Expand All').click();
-        cy.wait(2000);
-        cy.get('[data-cy=collapse-default-attribute]').contains('Collapse All').click();
+        cy.get('body').then($body => {
+          if ($body.find('.empty-default-attribute').length <= 0) {
+            cy.get('[data-cy=expand-default-attribute]').contains('Expand All').click();
+            cy.wait(2000);
+            cy.get('[data-cy=collapse-default-attribute]').contains('Collapse All').click();
+          }
+        });
       }
     });
 
     it('can expand a override attribute', () => {
       if (policyFileName !== '') {
-        cy.get('[data-cy=expand-override-attribute]').contains('Expand All').click();
-        cy.wait(2000);
-        cy.get('[data-cy=collapse-override-attribute]').contains('Collapse All').click();
+        cy.get('body').then($body => {
+          if ($body.find('.empty-override-attribute').length <= 0) {
+            cy.get('[data-cy=expand-override-attribute]').contains('Expand All').click();
+            cy.wait(2000);
+            cy.get('[data-cy=collapse-override-attribute]').contains('Collapse All').click();
+          }
+        });
       }
     });
   });
