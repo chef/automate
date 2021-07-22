@@ -249,3 +249,4 @@ To uninstall the Chef Automate Integration App:
 1. select **Uninstall**.
 
 Refer to the [ServiceNow Integration Reference]({{< relref "servicenow_integration_reference" >}}) page to find information on the topics that will help you while installing and configuring Chef Automate in ServiceNow.
+{"mode":"full","isActive":false}
