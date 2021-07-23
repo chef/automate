@@ -45,7 +45,6 @@ import * as orgEntity from './entities/orgs/org.reducer';
 import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
-import * as policyFileDetailsEntity from './entities/policy-files/policy-file-details.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as recipeEntity from './entities/recipes/recipe.reducer';
@@ -61,6 +60,7 @@ import * as nodeCredentialDetailsEntity from './entities/node-credentials/node-c
 import * as nodeCredentialList from './pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
+import * as userPreferencesEntity from './services/user-preferences/user-preferences.reducer';
 import * as userSelfEntity from './entities/users/userself.reducer';
 
 import { LayoutActionTypes, UpdateSidebars } from './entities/layout/layout.actions';
@@ -117,7 +117,6 @@ export interface NgrxStateAtom {
   orgs: orgEntity.OrgEntityState;
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
-  policyFileDetails: policyFileDetailsEntity.PolicyFileDetailsEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   recipes: recipeEntity.RecipeEntityState;
@@ -132,6 +131,7 @@ export interface NgrxStateAtom {
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
+  userPreferences: userPreferencesEntity.UserPreferencesEntityState;
   userSelf: userSelfEntity.UserSelfEntityState;
 }
 
@@ -248,7 +248,6 @@ export const defaultInitialState = {
   notificationRules: NotificationRuleEntity.NotificationRuleEntityInitialState,
   policies: policyEntity.PolicyEntityInitialState,
   policyFiles: policyFileEntity.PolicyFileEntityInitialState,
-  policyFileDetails: policyFileDetailsEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   recipes: recipeEntity.RecipeEntityInitialState,
@@ -265,6 +264,7 @@ export const defaultInitialState = {
   desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
+  userPreferences: userPreferencesEntity.UserPreferencesEntityInitialState,
   userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
@@ -317,7 +317,6 @@ export const ngrxReducers = {
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
   policyFiles: policyFileEntity.policyFileEntityReducer,
-  policyFileDetails: policyFileDetailsEntity.policyFileDetailsEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
@@ -334,6 +333,7 @@ export const ngrxReducers = {
   desktops: desktopEntity.desktopEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
+  userPreferences: userPreferencesEntity.userPreferencesEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
 };
 

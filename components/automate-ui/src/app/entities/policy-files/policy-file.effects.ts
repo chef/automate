@@ -11,13 +11,10 @@ import {
   GetPolicyFilesSuccess,
   PolicyFilesSuccessPayload,
   GetPolicyFilesFailure,
+  PolicyFileActionTypes,
   DeletePolicyFile,
   DeletePolicyFileSuccess,
-  DeletePolicyFileFailure,
-  GetPolicyFile,
-  GetPolicyFileSuccess,
-  GetPolicyFileFailure,
-  PolicyFileActionTypes
+  DeletePolicyFileFailure
 } from './policy-file.action';
 
 import { PolicyFileRequests } from './policy-file.requests';
@@ -78,25 +75,4 @@ export class PolicyFileEffects {
           message: `Could not delete policy file: ${msg || error}`
         });
     })));
-
-  getPolicyFile$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(PolicyFileActionTypes.GET),
-      mergeMap(({ payload: { server_id, org_id, name, revision } }: GetPolicyFile) =>
-        this.requests.getPolicyFile(server_id, org_id, name, revision).pipe(
-          map((resp) => new GetPolicyFileSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-          observableOf(new GetPolicyFileFailure(error)))))));
-
-  getPolicyFileFailure$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(PolicyFileActionTypes.GET_FAILURE),
-      map(({ payload }: GetPolicyFileFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not get policy file: ${msg || payload.error}`
-        });
-    })));
-
 }

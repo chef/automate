@@ -42,6 +42,7 @@ import { RuleEffects } from './entities/rules/rule.effects';
 import { RunlistEffects } from './entities/runlists/runlists.effects';
 import { ServerEffects } from './entities/servers/server.effects';
 import { ServiceGroupsEffects } from './entities/service-groups/service-groups.effects';
+import { UserPreferencesEffects } from './services/user-preferences/user-preferences.effects';
 import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effects';
 import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';
@@ -94,7 +95,8 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       TeamEffects,
       UserEffects,
       UserSelfEffects,
-      UserPermEffects
+      UserPermEffects,
+      UserPreferencesEffects
     ])
   ],
   exports: [

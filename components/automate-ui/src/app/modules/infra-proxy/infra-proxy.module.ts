@@ -42,7 +42,6 @@ import { OrgDetailsComponent } from './org-details/org-details.component';
 import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PaginationComponent } from './pagination/components/pagination.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
-import { PolicyFileDetailsComponent } from './policy-file-details/policy-file-details.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
@@ -94,7 +93,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
     OrgEditComponent,
     PaginationComponent,
     PolicyFilesComponent,
-    PolicyFileDetailsComponent,
     ResetAdminKeyComponent,
     ResetClientKeyComponent,
     ResetNodeKeyComponent,

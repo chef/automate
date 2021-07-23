@@ -11,6 +11,7 @@ import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
+import { UserPreferencesService } from '../user-preferences/user-preferences.service';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -44,7 +45,7 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend, private userPrefService: UserPreferencesService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     this.tokenProvider = new ReplaySubject(1);
@@ -144,6 +145,8 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
+    const connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
+    this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + connector;
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
