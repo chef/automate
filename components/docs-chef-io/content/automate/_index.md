@@ -90,7 +90,7 @@ TERMS
   config.vm.provider "virtualbox" do |v|
     v.name       = 'chef-automate'
     v.memory     = 8192
-    v.cpus       = 2
+    v.cpus       = 4
     v.customize ['modifyvm', :id, '--audio', 'none']
   end
 
