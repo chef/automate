@@ -123,7 +123,7 @@ func serve(_ *cobra.Command, args []string) {
 	}
 
 	bind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.HTTPPort)
-	grpcBind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.GRPCPort)
+	grpcBind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.GrpcPort)
 
 	signInURL := mustParseURL(cfg.SignInURL)
 
