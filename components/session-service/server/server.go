@@ -22,7 +22,7 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 
-	"github.com/chef/automate/components/secrets-service/grpc"
+	"github.com/chef/automate/components/applications-service/pkg/grpc"
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/db"
@@ -82,7 +82,8 @@ func New(
 	bldrClient *BldrClient,
 	signInURL *url.URL,
 	serviceCerts *certs.ServiceCerts,
-	persistent bool) (*Server, error) {
+	persistent bool,
+	grpcProt string) (*Server, error) {
 
 	oidcClient, err := oidc.New(oidcCfg, 1, serviceCerts, l)
 	if err != nil {
@@ -111,6 +112,7 @@ func New(
 		serviceCerts: serviceCerts,
 	}
 	s.initHandlers()
+	s.startGRPCServer(grpcProt)
 
 	return &s, nil
 }
@@ -199,8 +201,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s *Server) startGRPCServer() {
-	lis, err := net.Listen("tcp", ":9000")
+func (s *Server) startGRPCServer(port uint) {
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("Failed to listen on port 9000: %v", err)
 	}

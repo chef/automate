@@ -58,6 +58,7 @@ type config struct {
 	LogLevel         string `mapstructure:"log-level"`
 	HTTPListen       string `mapstructure:"http-listen"`
 	HTTPPort         uint   `mapstructure:"http-port"`
+	GrpcPort         string `mapstructure:"grpc-port"`
 	DexURL           string `mapstructure:"dex-url"`
 	IssuerURL        string `mapstructure:"issuer-url"`
 	ClientID         string `mapstructure:"client-id"`
@@ -153,7 +154,8 @@ func serve(_ *cobra.Command, args []string) {
 		bldrClient,
 		signInURL,
 		serviceCerts,
-		cfg.Persistent)
+		cfg.Persistent,
+		cfg.GrpcPort)
 	if err != nil {
 		fail(errors.Wrap(err, "init server"))
 	}
