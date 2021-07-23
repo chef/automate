@@ -32,10 +32,7 @@
         </chef-thead>
         <chef-tbody>
           <chef-tr *ngFor="let policyFile of pageOfItems">
-            <chef-td>
-              <a [routerLink]="['/infrastructure','chef-servers', serverId,
-              'organizations', orgId, 'policyfiles', policyFile.name, 'revision',policyFile.revision_id]">{{ policyFile.name }}</a>
-            </chef-td>
+            <chef-td>{{ policyFile.name }}</chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>
             <chef-td class="three-dot-column">

@@ -57,7 +57,7 @@ import { TableCellComponent } from './table/table-cell/table-cell.component';
 import { TableRowComponent } from './table/table-row/table-row.component';
 import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
 import { TableHeaderComponent } from './table/table-header/table-header.component';
-
+import { TimeComponent } from './time/time.component';
 @NgModule({
   imports: [
     ChefPipesModule,
@@ -116,6 +116,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     TableRowComponent,
     TableHeaderCellComponent,
     TableHeaderComponent,
+    TimeComponent,
 
     // Directives
     ErrorDirective,
@@ -160,7 +161,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
-    TableHeaderComponent
+    TableHeaderComponent,
+    TimeComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
