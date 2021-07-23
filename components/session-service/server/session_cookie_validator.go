@@ -34,7 +34,7 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 	if err != nil && err != sql.ErrNoRows {
 		// log the error
 		fmt.Println(err, "sessionKeyErr")
-		return &session.SessionKeyResp{Valid: false, Exist: false}, nil
+		return nil, err
 	}
 
 	diff := expiry.Sub(time.Now())
