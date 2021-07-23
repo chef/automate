@@ -46,6 +46,11 @@ describe('PolicyFilesComponent', () => {
           inputs: ['default', 'visible', 'objectNoun', 'objectName'],
           outputs: ['close', 'deletePolicyFile']
         }),
+        MockComponent({
+          selector: 'app-revision-id',
+          inputs: ['serverId'],
+          outputs: ['close']
+        }),
         PolicyFilesComponent
       ],
       providers: [

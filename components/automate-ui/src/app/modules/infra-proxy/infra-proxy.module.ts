@@ -46,6 +46,7 @@ import { PolicyFileDetailsComponent } from './policy-file-details/policy-file-de
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
+import { RevisionIdComponent } from './revision-id/revision-id.component';
 import { UpdateNodeTagModalComponent } from './update-node-tag-modal/update-node-tag-modal.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -98,6 +99,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ResetAdminKeyComponent,
     ResetClientKeyComponent,
     ResetNodeKeyComponent,
+    RevisionIdComponent,
     UpdateNodeTagModalComponent
   ],
   imports: [

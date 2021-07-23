@@ -14,6 +14,7 @@ import {
   getAllStatus as getAllPolicyFilesForOrgStatus,
   deleteStatus
 } from 'app/entities/policy-files/policy-file.selectors';
+import { Revision } from 'app/entities/revisions/revision.model';
 
 @Component({
   selector: 'app-policy-files',
@@ -40,6 +41,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public deleting = false;
 
+  public policyfileName: string;
+  public revisions: Revision[] = [];
+  // open revision id slider
+  public openRevisionIdSlider = new EventEmitter<boolean>();
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -112,6 +117,11 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.searching = false;
   }
 
+  public revisionIdList(policyFile: PolicyFile): void {
+    this.policyfileName = policyFile.name;
+    this.openRevisionIdSlider.emit();
+  }
+
   public startpolicyFilesDelete(policyFile: PolicyFile): void {
     this.policyfileToDelete = policyFile;
     this.deleteModalVisible = true;
@@ -129,5 +139,4 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
     this.deleting = false;
   }
-
 }

@@ -137,6 +137,24 @@ describe('infra policy details', () => {
     }
   }
 
+  function getRevisionId(policyFile: string) {
+    return cy.request({
+      auth: { bearer: adminIdToken },
+      failOnStatusCode: false,
+      method: 'GET',
+      url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/policyfiles/${policyFile}/revisions`
+    });
+  }
+
+  function checkRevisionIdResponse(response: any) {
+    if (response.body.revisions.length === 0) {
+      cy.get('[data-cy=empty-list]').should('be.visible');
+    } else {
+      cy.get('[data-cy=revision-id-table-container] chef-th').contains('Revision ID');
+      return true;
+    }
+  }
+
   describe('infra policy file list page', () => {
     it('displays org details', () => {
       cy.get('.page-title').contains(orgName);
@@ -183,6 +201,16 @@ describe('infra policy details', () => {
         cy.get('[data-cy=run-list]').contains('Run List').click();
         getPolicyFileDetails().then(response => {
           checkRunlistResponse(response);
+        });
+      }
+    });
+
+    it('can show revision id of policy file', () => {
+      if (policyFileName !== '') {
+        cy.get('[data-cy=revisions]').contains('Revisions').click();
+        getRevisionId(policyFileName).then((revisionResponse) => {
+          checkRevisionIdResponse(revisionResponse);
+          cy.get('[data-cy=close-button]').click();
         });
       }
     });

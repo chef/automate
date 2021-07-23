@@ -8,6 +8,12 @@
     (deleteClicked)="deletePolicyfile()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
+  <app-revision-id
+    [openEvent]="openRevisionIdSlider"
+    [serverId]="serverId"
+    [orgId]="orgId"
+    [policyfileName]="policyfileName">
+  </app-revision-id>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <div class="search-create-container">
@@ -40,6 +46,13 @@
             <chef-td></chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
+                <mat-option 
+                  data-cy="revision-id"
+                  class="primary"
+                  (onSelectionChange)="revisionIdList(policyFile)">
+                  Revisions
+                  <chef-icon aria-hidden="true" class="primary">add</chef-icon>
+                </mat-option>
                 <mat-option 
                   data-cy="delete"
                   class="secondary"

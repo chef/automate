@@ -1,6 +1,7 @@
 @import "~styles/variables";
 @import '../infra_shared/shared';
 @import '../../../../app/page-components/json-tree/json-tree.component.scss';
+@import '../infra_shared/slide-panel';
 
 chef-page-header {
   padding-bottom: 0;
@@ -294,4 +295,22 @@ img {
 
 chef-tab-selector chef-option {
   width: 130px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+
+  chef-heading {
+    flex-grow: 2;
+    text-align: left;
+  }
+
+  chef-button {
+    margin-left: 16px;
+    margin-top: -4px;
+    border: none;
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+  }
 }
