@@ -214,6 +214,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) StartGRPCServer(addr string) error {
+	s.log.Printf("listening (grpc) on %s", addr)
 	s.grpcServer = s.connFactory.NewServer()
 
 	session.RegisterValidateSessionServiceServer(s.grpcServer, &SessionCookieValidator{pgDB: s.pgDB})
