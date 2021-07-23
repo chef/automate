@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -18,7 +20,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
+	"google.golang.org/grpc"
 
+	"github.com/chef/automate/components/secrets-service/grpc"
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/db"
@@ -193,6 +197,18 @@ func (s *Server) ListenAndServe(addr string) error {
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
+}
+
+func (s *Server) startGRPCServer() {
+	lis, err := net.Listen("tcp", ":9000")
+	if err != nil {
+		log.Fatalf("Failed to listen on port 9000: %v", err)
+	}
+	grpcServer := grpc.NewServer()
+
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to server grpcServer over port 9000: %v", err)
+	}
 }
 
 func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
