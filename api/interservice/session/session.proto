@@ -16,4 +16,4 @@ message SessionKeyResp {
 
 service ValidateSessionService {
     rpc ValidateSessionCookie(SessionKeyReq) returns (SessionKeyResp) {}
-} 
+}
