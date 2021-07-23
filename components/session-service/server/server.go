@@ -22,7 +22,6 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 
-	"github.com/chef/automate/components/applications-service/pkg/grpc"
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/db"
@@ -112,7 +111,7 @@ func New(
 		serviceCerts: serviceCerts,
 	}
 	s.initHandlers()
-	s.startGRPCServer(grpcProt)
+	s.startGRPCServer(grpcProt, store)
 
 	return &s, nil
 }
@@ -201,15 +200,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s *Server) startGRPCServer(port uint) {
+func (s *Server) startGRPCServer(port string, store scs.Store) {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("Failed to listen on port 9000: %v", err)
+		log.Fatalf("Failed to listen on port %v: %v", port, err)
 	}
 	grpcServer := grpc.NewServer()
 
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Failed to server grpcServer over port 9000: %v", err)
+		log.Fatalf("Failed to server grpcServer over port %v: %v", port, err)
 	}
 }
 
