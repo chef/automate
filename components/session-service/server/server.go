@@ -5,10 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"crypto/tls"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/chef/automate/api/interservice/session"
+	"github.com/chef/automate/lib/version"
 	"net"
 	"net/http"
 	"net/url"
@@ -42,12 +44,15 @@ type BldrClient struct {
 type Server struct {
 	mux               http.Handler
 	log               logger.Logger
+	pgDB              *sql.DB
 	mgr               *scs.Manager
 	client            oidc.Client
 	bldrClient        *BldrClient
 	signInURL         *url.URL
 	remainingDuration time.Duration
 	serviceCerts      *certs.ServiceCerts
+	connFactory       *secureconn.Factory
+	grpcServer        *grpc.Server
 }
 
 const (
@@ -81,8 +86,12 @@ func New(
 	bldrClient *BldrClient,
 	signInURL *url.URL,
 	serviceCerts *certs.ServiceCerts,
-	persistent bool,
-	grpcProt string) (*Server, error) {
+	persistent bool) (*Server, error) {
+
+	factory := secureconn.NewFactory(*serviceCerts, secureconn.WithVersionInfo(
+		version.Version,
+		version.GitSHA,
+	))
 
 	oidcClient, err := oidc.New(oidcCfg, 1, serviceCerts, l)
 	if err != nil {
@@ -93,7 +102,12 @@ func New(
 		return nil, errors.Wrap(err, "migrations")
 	}
 
-	store, err := initStore(migrationConfig.PG)
+	pgDB, err := db.PGOpen(migrationConfig.PG.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "open DB")
+	}
+
+	store, err := initStore(pgDB)
 	if err != nil {
 		return nil, errors.Wrap(err, "init store")
 	}
@@ -103,15 +117,20 @@ func New(
 	s := Server{
 		log:               l,
 		client:            oidcClient,
+		pgDB:              pgDB,
 		signInURL:         signInURL,
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
 		mgr:          scsManager,
 		serviceCerts: serviceCerts,
+		connFactory:  factory,
 	}
 	s.initHandlers()
+<<<<<<< HEAD
 	s.startGRPCServer(grpcProt, store)
+=======
+>>>>>>> fd59e50991cd57d467801f24e61502fe18324a49
 
 	return &s, nil
 }
@@ -148,13 +167,8 @@ func NewInMemory(
 	return &s, nil
 }
 
-func initStore(pgURL *url.URL) (scs.Store, error) {
-	d, err := db.PGOpen(pgURL.String())
-	if err != nil {
-		return nil, errors.Wrap(err, "open DB")
-	}
-
-	return pgstore.New(d, dbCleanupInterval), nil
+func initStore(pgDB *sql.DB) (scs.Store, error) {
+	return pgstore.New(pgDB, dbCleanupInterval), nil
 }
 
 func (s *Server) initHandlers() {
@@ -200,16 +214,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func (s *Server) startGRPCServer(port string, store scs.Store) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("Failed to listen on port %v: %v", port, err)
-	}
-	grpcServer := grpc.NewServer()
+func (s *Server) StartGRPCServer(addr string) error {
+	s.grpcServer = s.connFactory.NewServer()
 
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Failed to server grpcServer over port %v: %v", port, err)
+	session.RegisterValidateSessionServiceServer(s.grpcServer, &SessionCookieValidator{pgDB: s.pgDB})
+
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("Failed to listen on port 9000: %v", err)
 	}
+
+	if err := s.grpcServer.Serve(lis); err != nil {
+		return fmt.Errorf("Failed to server grpcServer over port 9000: %v", err)
+	}
+
+	return nil
 }
 
 func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
