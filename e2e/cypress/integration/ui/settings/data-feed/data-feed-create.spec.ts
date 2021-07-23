@@ -178,8 +178,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -210,8 +208,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-password]').type(password);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -260,8 +256,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -277,8 +271,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-password]').type(password);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -309,8 +301,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -325,36 +315,31 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-secret-key]').type(minioSecret);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.info').should('be.visible');
-      cy.get('.data-feed-slider app-notification.info chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
     it('create data feed for S3', () => {
       cy.get('[data-cy=create-data-feed]').click();
-      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy="S3"]').click();
       cy.get('[data-cy=add-name]').type(name + reusableDate);
       cy.get('[data-cy=add-bucket-name]').type(bucketName);
       cy.get('[data-cy=add-access-key]').type(accessKey);
       cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=add-button]').click();
-      cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('[data-cy=close-feed-button]').click();
       cy.contains('Data Feeds').click();
       cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
     });
 
     it('error in creating data feed for S3', () => {
       cy.get('[data-cy=create-data-feed]').click();
-      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy="S3"]').click();
       cy.get('[data-cy=add-name]').type(name + reusableDate);
       cy.get('[data-cy=add-bucket-name]').type(bucketName);
       cy.get('[data-cy=add-access-key]').type(accessKey);
       cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -362,15 +347,13 @@ describe('chef datafeed', () => {
       const date = Date.now();
       cy.get('[data-cy=create-data-feed]').click();
       cy.get('app-data-feed-create').scrollTo('bottom');
-      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy="S3"]').click();
       cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-bucket-name]').type(bucketName);
       cy.get('[data-cy=add-access-key]').type(accessKey);
       cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
   });
@@ -414,8 +397,7 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-url]').type(url);
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=add-button]').click();
-      cy.get('app-notification.info').should('be.visible');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('[data-cy=close-feed-button]').click();
       cy.contains('Data Feeds').click();
       cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
     });
@@ -428,8 +410,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -459,8 +439,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -491,8 +469,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.error').should('be.visible');
-      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
 
@@ -507,8 +483,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=add-secret-key]').type(minioSecret);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('.data-feed-slider app-notification.info').should('be.visible');
-      cy.get('.data-feed-slider app-notification.info chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
   });

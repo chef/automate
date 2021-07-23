@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"io/ioutil"
+	"math/rand"
 	"testing"
 
 	"encoding/json"
@@ -311,6 +312,26 @@ func TestSummary(t *testing.T) {
 	expectedProfiles := parseESProfiles(fileContents("test_data/inspec_report_profiles_out.json"))
 
 	passert.Equal(t, expectedProfiles, actualProfiles, "profiles doc match")
+
+	// ------------------------------- ReportProfilesFromInSpecProfiles string limit test --------------------------------- //
+	for _, profile := range []*inspec.Profile{profile1, profile2}{
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				result.CodeDesc = randomString(maxESKeywordBytes+10)
+				result.Message = randomString(maxESKeywordBytes+11)
+				result.SkipMessage = randomString(maxESKeywordBytes+12)
+			}
+		}
+	}
+	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles)
+	for _, profile := range actualProfilesMin{
+		for _, control := range profile.Controls{
+			for _, result := range control.Results{
+				assert.Len(t, result.Message, maxESKeywordBytes)
+				assert.Len(t, result.SkipMessage, maxESKeywordBytes)
+			}
+		}
+	}
 }
 
 // ------------------------------- Inherited test --------------------------------- //
@@ -447,4 +468,13 @@ func profilesToJsonMin(profiles []*relaxting.ESInspecProfile) (str string) {
 		panic(fmt.Sprintf("Error marshalling profiles: %s", err))
 	}
 	return string(profsBytes)
+}
+
+func randomString(length int) string {
+	var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	byteArr := make([]byte, length)
+	for i := range byteArr {
+		byteArr[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(byteArr)
 }

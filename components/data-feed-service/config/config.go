@@ -138,13 +138,16 @@ func Configure() (*DataFeedConfig, error) {
 		var err error
 		log.Infof("Database %s", config.PostgresConfig.Database)
 		config.PostgresConfig.ConnectionString, err = platform_config.PGURIFromEnvironment(config.PostgresConfig.Database)
-		log.Infof("Database connection string %s", config.PostgresConfig.ConnectionString)
+		maskedDBConnString := MaskPGCredInURI(config.PostgresConfig.ConnectionString)
+		log.Infof("Masked Database connection string %s", maskedDBConnString)
 		if err != nil {
 			log.WithError(err).Error("Failed to get pg uri")
 			return nil, err
 		}
 	}
-	log.Debugf("DATA FEED SERVICE CONFIG: %+v", config)
+	logConfigForDebug := fmt.Sprintf("DATA FEED SERVICE CONFIG: %+v", config)
+	maskedLogConfigForDebug := MaskPGCredInURI(logConfigForDebug)
+	log.Debug(maskedLogConfigForDebug)
 	log.Debug("end config.go Configure() ->")
 	return config, nil
 }

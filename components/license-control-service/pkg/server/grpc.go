@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -30,7 +31,12 @@ func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize storage backend")
 	}
-
+	// Create deployment id and save it in DB
+	err = storeDeploymentID(backend)
+	if err != nil {
+		// TODO: ask to return error or not
+		return nil, err
+	}
 	srv := NewLicenseControlServer(ctx, backend, licenseParser, config)
 	lc.RegisterLicenseControlServiceServer(grpcServer, srv)
 	health.RegisterHealthServer(grpcServer, srv.health)
@@ -54,4 +60,18 @@ func StartGRPC(ctx context.Context, config *Config) error {
 	}
 
 	return g.Serve(listener)
+}
+
+//storeDeploymentID: Stores the deployment id in DB
+func storeDeploymentID(backend storage.CurrentBackend) error {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "failed to create deployment id")
+	}
+	deploymentId := id.String()
+	err = backend.StoreDeployment(context.Background(), deploymentId)
+	if err != nil {
+		return errors.Wrap(err, "failed to save deployment id")
+	}
+	return nil
 }

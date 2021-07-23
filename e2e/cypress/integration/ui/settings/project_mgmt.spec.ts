@@ -34,6 +34,22 @@ describe('project management', () => {
 
   beforeEach(() => {
     cy.restoreStorage();
+    cy.get('body').then($body => {
+      if ($body.find('[data-cy=close-x]').length > 0) {
+        // evaluates as true if button exists at all
+        cy.get('[data-cy=close-x]').then($btn => {
+          if ($btn.is(':visible')) {
+            // you get here only if button EXISTS and is VISIBLE
+            cy.get('[data-cy=close-x]').click();
+          } else {
+            // you get here only if button EXISTS but is INVISIBLE
+          }
+        });
+      } else {
+        // you get here if the button DOESN'T EXIST
+        assert.isOk('everything', 'everything is OK');
+      }
+    });
   });
 
   afterEach(() => {
@@ -59,6 +75,17 @@ describe('project management', () => {
   });
 
   it('can create a project without adding a custom ID', () => {
+    cy.wait(2000);
+    // if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+    //   // cy.get('[data-cy=close-x]').click();
+    //   cy.get('[data-cy=close-x]').then($button => {
+    //     if ($button.is(':visible')){
+    //       cy.get('[data-cy=close-x]').click();
+    //       //you get here only if button is visible
+    //     }
+    //   })
+    // }
+
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 

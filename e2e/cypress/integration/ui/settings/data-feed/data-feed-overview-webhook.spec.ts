@@ -104,8 +104,6 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=name-input]').type('-1');
       cy.get('[data-cy=url-input]').type('/v1');
       cy.get('[data-cy=save-connection]').click();
-      cy.get('app-notification.error').should('be.visible');
-      cy.get('app-notification.error chef-icon').click();
     });
 
     it('check GlobalDataFeedConfig details', () => {

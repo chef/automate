@@ -235,7 +235,7 @@
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>No run list is set for the node.</p>
               </div>
-              <div *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
+              <div data-cy="error-runlist" *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
                 <p>Cannot load run_list!</p>
               </div>
@@ -269,7 +269,6 @@
                     <span>Collapse All</span>
                   </chef-button>
                   <chef-button tertiary class="right-button-box"
-                    [disabled]="conflictError"
                     (click)="openEditAttrModal(InfraNode.normal_attributes)"
                     data-cy="node-edit-attributes">
                     <span class="material-icons edit-item">mode_edit</span>

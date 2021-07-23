@@ -129,8 +129,8 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 					Status:      result.Status,
 					CodeDesc:    stringLimitBytes(result.CodeDesc, maxESKeywordBytes),
 					RunTime:     result.RunTime,
-					Message:     result.Message,
-					SkipMessage: result.SkipMessage,
+					Message:     stringLimitBytes(result.Message, maxESKeywordBytes),
+					SkipMessage: stringLimitBytes(result.SkipMessage, maxESKeywordBytes),
 				}
 			}
 
