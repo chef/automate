@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/chef/automate/api/interservice/session"
 )
@@ -13,7 +14,7 @@ type SessionCookieValidator struct {
 }
 
 const (
-	getSessionKey = `SELECT * FROM sessions WHERE session_id= (Key)`
+	getSessionKey = `SELECT * FROM sessions WHERE token = (Key);`
 )
 
 func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
@@ -21,12 +22,33 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 
 	// This is for tests which runs InMemory
 	if s.pgDB == nil {
-		return &session.SessionKeyResp{Valid: true, Exist: true}, nil
+		return &session.SessionKeyResp{Valid: false, Exist: false}, nil
 	}
 
 	fmt.Println("REQ::", req)
 	sessionKey := s.pgDB.QueryRow(getSessionKey, req.Key)
-	fmt.Println(sessionKey, "sessionKey")
+	var token string
+	var expiry time.Time
+	err := sessionKey.Scan(&token, &expiry)
 
-	return &session.SessionKeyResp{Valid: true, Exist: true}, nil
+	if err != nil && err != sql.ErrNoRows {
+		// log the error
+		fmt.Println(err, "sessionKeyErr")
+		return &session.SessionKeyResp{Valid: false, Exist: false}, nil
+	}
+
+	diff := expiry.Sub(time.Now())
+	var valid bool
+	if diff.Minutes() < 17 {
+		valid = false
+	} else {
+		valid = true
+	}
+
+	if token != req.Key {
+		return &session.SessionKeyResp{Valid: valid, Exist: false}, nil
+	}
+	fmt.Println(sessionKey, "sessionKey")
+	return &session.SessionKeyResp{Valid: valid, Exist: true}, nil
+
 }
