@@ -119,13 +119,13 @@
           <div class="expand-collapse">
             <chef-button tertiary class="action"
               [disabled]= !hasOverrideJson
-              (click)="tree.expand()">
+              (click)="override.expand()">
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
             <chef-button tertiary class="action"
               [disabled]= !hasOverrideJson
-              (click)="tree.collapse()">
+              (click)="override.collapse()">
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
@@ -143,7 +143,7 @@
               <app-json-tree-table
                 class="json-tree-container"
                 [hidden]="hasOverrideJson? false : true"
-                #tree
+                #override
                 [json]="selectedAttrs?.override_attributes">
               </app-json-tree-table>
               <div *ngIf="!hasOverrideJson" class="img-section">

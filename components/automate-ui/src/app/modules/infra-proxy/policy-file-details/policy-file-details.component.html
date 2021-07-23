@@ -51,6 +51,7 @@
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='details' data-cy="details-tab">Content</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
@@ -141,6 +142,88 @@
               </li>
             </ul>
           </ng-container>
+        </div>
+      </section>
+
+      <section class="page-body" *ngIf="tabValue === 'attributes'">
+        <chef-loading-spinner class="top-spinner" *ngIf="policyFileDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="attributes-tab" *ngIf="!policyFileDetailsLoading">
+          <label>
+            <span class="label default">Default Attributes</span>
+          </label>
+          <div class="attr">
+            <div class="expand-collapse">
+              <chef-button tertiary class="action"
+                [disabled]= !hasDefaultattributes
+                (click)="tree.expand()"
+                data-cy="expand-default-attribute">
+                <chef-icon>add_circle</chef-icon>
+                <span>Expand All</span>
+              </chef-button>
+              <chef-button tertiary class="action" 
+                [disabled]= !hasDefaultattributes
+                (click)="tree.collapse()"
+                data-cy="collapse-default-attribute">
+                <chef-icon>remove_circle</chef-icon>
+                <span>Collapse All</span>
+              </chef-button>
+            </div>
+            <hr class="divider-constraints" />
+            <div class="json-container">
+              <div class="scroll">
+                <app-json-tree-table
+                  class="json-tree-container" 
+                  [hidden]="hasDefaultattributes? false : true"
+                  #tree
+                  [json]="defaultAttributes">
+                </app-json-tree-table>
+                <div
+                 *ngIf="!hasDefaultattributes"
+                  class="empty-section empty-default-attribute">
+                  <img alt="No preview" src="/assets/img/no_preview.gif" />
+                  <p>There are no items for Display.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <label class="override">
+            <span class="label">Override Attributes</span>
+          </label>
+          <div class="attr">
+            <div class="expand-collapse">
+              <chef-button tertiary class="action"
+                [disabled]= !hasOverrideattributes
+                (click)="override.expand()"
+                data-cy="expand-override-attribute">
+                <chef-icon>add_circle</chef-icon>
+                <span>Expand All</span>
+              </chef-button>
+              <chef-button tertiary class="action"
+                [disabled]= !hasOverrideattributes
+                (click)="override.collapse()"
+                data-cy="collapse-override-attribute">
+                <chef-icon>remove_circle</chef-icon>
+                <span>Collapse All</span>
+              </chef-button>
+            </div>
+            <hr class="divider-constraints" />
+            <div class="json-container">
+              <div class="scroll">
+                <app-json-tree-table
+                  class="json-tree-container"
+                  [hidden]="hasOverrideattributes? false : true"
+                  #override
+                  [json]="overrideAttributes">
+                </app-json-tree-table>
+                <div
+                 *ngIf="!hasOverrideattributes"
+                  class="empty-section empty-override-attribute">
+                  <img alt="No preview" src="/assets/img/no_preview.gif" />
+                  <p>There are no items for Display.</p>
+                </div>
+              </div>
+            </div>
+          </div>    
         </div>
       </section>
     </main>
