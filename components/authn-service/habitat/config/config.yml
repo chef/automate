@@ -61,6 +61,9 @@ cereal_address: 127.0.0.1:{{cereal-service.cfg.port}}
 legacy_data_collector_token: {{cfg.service.a1_data_collector_token}}
 {{~/if}}
 
+{{~#if session-service.cfg.port}}
+session_address: 127.0.0.1:{{session-service.cfg.port}}
+{{~/if}}
 
 logger:
   format: {{cfg.logger.format}}

@@ -220,11 +220,12 @@ func (s *Server) StartGRPCServer(addr string) error {
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		return fmt.Errorf("Failed to listen on port 9000: %v", err)
+		return fmt.Errorf("failed to listen on port %v: %v", addr, err)
 	}
+	fmt.Println("listening on port", addr)
 
 	if err := s.grpcServer.Serve(lis); err != nil {
-		return fmt.Errorf("Failed to server grpcServer over port 9000: %v", err)
+		return fmt.Errorf("failed to server grpcServer over port %v: %v", addr, err)
 	}
 
 	return nil
