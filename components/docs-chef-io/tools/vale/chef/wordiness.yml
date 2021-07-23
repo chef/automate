@@ -1,0 +1,6 @@
+extends: existence
+message: "'%s' is too wordy."
+ignorecase: true
+level: warning
+tokens:
+  - thus
