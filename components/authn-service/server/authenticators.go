@@ -57,15 +57,19 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
+	for _, cookie := range req.Cookies() {
+		if cookie.Name == "session" {
+			sessionData, err := s.sessionClient.ValidateSessionCookie(ctx, &session.SessionKeyReq{Key: cookie.Value})
 
-	sessionData, err := s.sessionClient.ValidateSessionCookie(ctx, &session.SessionKeyReq{Key: "234sdfdfgdsaf"})
+			if err != nil {
+				return nil, status.Errorf(codes.Unauthenticated, err.Error())
+			}
 
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	if !sessionData.Valid || !sessionData.Exist {
-		return nil, status.Error(codes.InvalidSession, err.Error())
+			if !sessionData.Valid || !sessionData.Exist {
+				return nil, status.Errorf(codes.Internal, "failed to verify session key: %v", err.Error())
+			}
+			break
+		}
 	}
 
 	if user, ok := requestor.(authenticator.LocalUser); ok {
