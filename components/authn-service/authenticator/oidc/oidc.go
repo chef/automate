@@ -14,7 +14,6 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/api/config/session"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/lib/httputils"
@@ -68,11 +67,10 @@ type Config struct {
 
 // Authenticator is used for configuring oidc authenticators
 type Authenticator struct {
-	ctx           context.Context
-	cancel        context.CancelFunc
-	verifier      IDTokenVerifier
-	logger        *zap.Logger
-	sessionClient session.ValidateSessionServiceClient
+	ctx      context.Context
+	cancel   context.CancelFunc
+	verifier IDTokenVerifier
+	logger   *zap.Logger
 }
 
 // NewAuthenticator returns an oidc authenticator that does full ID token
