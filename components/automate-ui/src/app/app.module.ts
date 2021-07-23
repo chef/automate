@@ -107,7 +107,7 @@ import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
 import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
-
+import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 
 // Helpers
 import { HistorySelection } from './helpers/history-selection/history-selection';
@@ -358,6 +358,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,
+    UserPreferencesRequests,
     SessionStorageService,
     TeamRequests,
     TelemetryService,

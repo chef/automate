@@ -1,0 +1,3 @@
+<span>
+  {{ time | datetime: (userPrefsService.timeformat$ | async)?.value }}
+</span>
