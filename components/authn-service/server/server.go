@@ -15,6 +15,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/session"
 	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -41,6 +42,7 @@ type Config struct {
 	TeamsAddress             string // "ip:port"
 	AuthzAddress             string
 	LegacyDataCollectorToken string
+	SessionAddress           string
 }
 
 // Server is the top level object.
@@ -56,6 +58,7 @@ type Server struct {
 	policiesClient authz.PoliciesServiceClient
 	authzClient    authz.AuthorizationServiceClient
 	health         *health.Service
+	sessionClient  session.ValidateSessionServiceClient
 }
 
 // NewServer constructs a server from the provided config.
@@ -135,6 +138,12 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
 	}
 
+	sessionConn, err := factory.Dial("session-service", c.SessionAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "dial session-service (%s)", c.SessionAddress)
+	}
+	sessionClient := session.NewValidateSessionServiceClient(sessionConn)
+
 	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
@@ -161,6 +170,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		connFactory:    factory,
 		teamsClient:    teams.NewTeamsServiceClient(teamsConn),
 		health:         health.NewService(),
+		sessionClient:  sessionClient,
 	}
 
 	// make grpc-go log through zap

@@ -32,7 +32,7 @@ func main() {
 	cmd.PersistentFlags().StringP("log-format", "f", "text", "log format")
 	cmd.PersistentFlags().String("http-listen", "127.0.0.1", "listen interface")
 	cmd.PersistentFlags().Int("http-port", 7777, "listen port")
-	cmd.PersistentFlags().Int("grpc-port", 9000, "GRPC listen port")
+	cmd.PersistentFlags().String("grpc-port", "10108", "GRPC listen port")
 	cmd.PersistentFlags().String("issuer-url", "", "issuer URL")
 	cmd.PersistentFlags().String("client-id", "automate-session", "client ID")
 	cmd.PersistentFlags().String("client-secret", "", "client secret")
@@ -123,7 +123,7 @@ func serve(_ *cobra.Command, args []string) {
 	}
 
 	bind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.HTTPPort)
-	grpcBind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.GrpcPort)
+	grpcBind := fmt.Sprintf("%s:%s", cfg.HTTPListen, cfg.GrpcPort)
 
 	signInURL := mustParseURL(cfg.SignInURL)
 
