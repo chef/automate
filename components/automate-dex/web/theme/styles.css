@@ -191,13 +191,18 @@ main.password {
   flex-grow: 2;
 }
 
+/* for login page */
+.password .theme-panel {
+  margin-top: 140px;
+}
+
 .signin-login-container {
   padding-top: 1em;
   text-align: center;
 }
 
 .disclosure {
-  margin-top: 30px;
+  margin: 38px 35px 0px 35px;
   padding: 2em;
   width: 90%;
   max-width: 588px;
@@ -206,6 +211,7 @@ main.password {
   border: 2px solid #E6EBEE;
   border-radius: 4px;
   overflow-y: scroll;
+  text-align: left;
 }
 
 .disclosure h3 {
