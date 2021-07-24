@@ -282,7 +282,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
-    const types = { 'json': 'application/json', 'csv': 'text/csv' };
+    const types = { 'json': 'application/json', 'csv': 'text/csv', 'xml': 'application/xml' };
     const onNext = data => {
       const type = types[format];
       const blob = new Blob([data], { type });
