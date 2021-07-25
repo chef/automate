@@ -7,7 +7,7 @@ import { userPreferenceTimeformatSelector } from './user-preferences.selector';
 import {
   GetUserPreferences,
   UpdateUserPreferences,
-  TestUpdateUserTimeformat } from './user-preferences.actions';
+  SaveUserTimeformatInternal } from './user-preferences.actions';
 
 
 
@@ -18,11 +18,11 @@ export class UserPreferencesService {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  timeformat$: Observable<UserPreferenceTimeformat> = this.store.select(userPreferenceTimeformatSelector);
+  timeformat$: Observable<UserPreferenceTimeformat> = this.store
+  .select(userPreferenceTimeformatSelector);
 
-    // only for testing development - will be removed or modified before release
-  testUpdateUserTimeformat(format: string) {
-    this.store.dispatch(new TestUpdateUserTimeformat(format));
+  saveUserTimeformatInternal(format: string) {
+    this.store.dispatch(new SaveUserTimeformatInternal(format));
   }
 
   getUserPreferences() {

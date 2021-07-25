@@ -15,8 +15,9 @@ export interface UserPreferencesEntityState {
 export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   list: {
     timeformat: {
-        value: 'YYYY-MM-DD',
-        valid_values: ["ddd, DD MMM YYYY HH:mm:ss [UTC]","YYYY-M-D","ddd, DD MMM YYYY","DD MMM YYYY","ddd, DD MMM","YYYY-MM-DD"]
+        value: 'ddd, DD MMM YYYY',
+        valid_values: ['ddd, DD MMM YYYY HH:mm:ss [UTC]', 'YYYY-M-D',
+          'ddd, DD MMM YYYY', 'DD MMM YYYY', 'ddd, DD MMM', 'YYYY-MM-DD']
     }
   },
   error: null,
@@ -48,11 +49,7 @@ export function userPreferencesEntityReducer(
     case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_SUCCESS:
       return set('status', EntityStatus.loadingSuccess, state) as UserPreferencesEntityState;
 
-    // This is purely hacky way to change timeformat for dev purposes only
-    case UserPreferencesActionTypes.TEST_UPDATE_USER_TIMEFORMAT:
-      console.log('not updating yet - user-prefs.reducer.ts');
-      console.log(action.payload);
-
+    case UserPreferencesActionTypes.SAVE_TIMEFORMAT_INTERNAL:
       const timeformat = { value: action.payload };
       return set('list.timeformat', timeformat, state);
 

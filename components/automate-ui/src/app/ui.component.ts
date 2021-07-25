@@ -8,6 +8,7 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 import { AppConfigService } from './services/app-config/app-config.service';
 import { GetUserPreferences } from './services/user-preferences/user-preferences.actions';
+import { ChefSessionService } from './services/chef-session/chef-session.service';
 
 @Component({
   selector: 'app-ui',
@@ -40,7 +41,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
     private router: Router,
     public layoutFacade: LayoutFacadeService,
     private cdRef: ChangeDetectorRef,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    private chefSessionService: ChefSessionService
   ) {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
@@ -75,6 +77,8 @@ export class UIComponent implements OnInit, AfterViewChecked {
 
     // Initial call
     this.store.dispatch(new GetAllUserPerms());
-    this.store.dispatch(new GetUserPreferences());
+    if (this.chefSessionService.connector && this.chefSessionService.connector === 'local') {
+      this.store.dispatch(new GetUserPreferences());
+    }
   }
 }
