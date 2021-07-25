@@ -320,7 +320,7 @@ export const ngrxReducers = {
   notificationRules: NotificationRuleEntity.notificationRuleEntityReducer,
   policies: policyEntity.policyEntityReducer,
   policyFiles: policyFileEntity.policyFileEntityReducer,
-  policyFileDetails: policyFileDetailsEntity.PolicyFileEntityInitialState,
+  policyFileDetails: policyFileDetailsEntity.policyFileDetailsEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
