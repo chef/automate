@@ -29,7 +29,7 @@ export class UserPreferencesEffects {
     private requests: UserPreferencesRequests
   ) {}
 
-  getUserPreferences$ = createEffect(() =>{
+  getUserPreferences$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(UserPreferencesActionTypes.GET_USER_PREFERENCES),
       mergeMap(() =>
@@ -42,11 +42,11 @@ export class UserPreferencesEffects {
                 valid_values: response.settings.date_format.valid_values
               }
             };
-            return new GetUserPreferencesSuccess(userPref)
+            return new GetUserPreferencesSuccess(userPref);
           }),
           catchError((error: HttpErrorResponse) => of(new GetUserPreferencesFailure(error))
           ))
-      ))
+      ));
     }
   );
 

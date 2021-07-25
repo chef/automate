@@ -24,6 +24,7 @@ export interface ChefSessionUser {
   telemetry_enabled?: boolean;
   uuid: string;
   id_token: string;
+  connector?: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -45,7 +46,9 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend, private userPrefService: UserPreferencesService) {
+  constructor(private store: Store<NgrxStateAtom>,
+     handler: HttpBackend,
+     private userPrefService: UserPreferencesService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     this.tokenProvider = new ReplaySubject(1);
@@ -145,8 +148,8 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
-    const connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
-    this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + connector;
+    this.user.connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
+    this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + this.user.connector;
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -166,6 +169,7 @@ export class ChefSessionService implements CanActivate {
       isLocalUser
     };
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.user.connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -228,6 +232,10 @@ export class ChefSessionService implements CanActivate {
 
   get id_token(): string {
     return this.user.id_token;
+  }
+
+  get connector(): string {
+    return this.user.connector;
   }
 
   get token_provider(): ReplaySubject<string> {
