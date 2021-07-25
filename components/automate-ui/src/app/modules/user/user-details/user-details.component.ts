@@ -50,7 +50,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private url: string;
   public userDetails: UserDetails;
   public timeformat: string;
-
+  public isTimeformatDirty = false;
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
@@ -122,6 +122,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public handlePasswordInput(): void {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
+  }
+
+  public handleTimeFormatChange(): void {
+    this.isTimeformatDirty = true;
   }
 }
 
