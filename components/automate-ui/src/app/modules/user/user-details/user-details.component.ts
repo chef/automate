@@ -71,7 +71,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.layoutFacade.showSidebar(Sidebar.Settings);
         this.userDetails = new UserProfileDetails(
           this.store, this.layoutFacade, this.isDestroyed, this.fb,
-           this.userPrefsService, this.chefSessionService);
+          this.userPrefsService, this.chefSessionService);
         this.loading = false;
       } else {
         this.layoutFacade.showSidebar(Sidebar.Profile);
@@ -89,11 +89,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           if (routeId === currentUserId) {
             this.userDetails = new UserAdminSelfDetails(
               this.store, this.layoutFacade, this.isDestroyed, this.fb,
-               this.userPrefsService, this.chefSessionService);
+              this.userPrefsService, this.chefSessionService);
           } else {
             this.userDetails = new UserAdminDetails(routeId,
               this.store, this.layoutFacade, this.isDestroyed, this.fb,
-               this.userPrefsService, this.chefSessionService);
+              this.userPrefsService, this.chefSessionService);
           }
           this.loading = false;
         });
