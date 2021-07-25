@@ -163,8 +163,11 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
-    this.user.connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
-    this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + this.user.connector;
+    const id: IDToken = Jwt.parseIDToken(this.user.id_token);
+    if (id && id.federated_claims) {
+      this.user.connector = id.federated_claims.connector_id;
+      this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + this.user.connector;
+    }
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -184,7 +187,11 @@ export class ChefSessionService implements CanActivate {
       isLocalUser
     };
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
-    this.user.connector = Jwt.parseIDToken(this.user.id_token).federated_claims.connector_id;
+    const id: IDToken = Jwt.parseIDToken(this.user.id_token);
+    if (id && id.federated_claims) {
+      this.user.connector = id.federated_claims.connector_id;
+      this.userPrefService.apiEndpoint = '/' + this.user.username + '/' + this.user.connector;
+    }
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
