@@ -50,7 +50,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private url: string;
   public userDetails: UserDetails;
   public timeformat: string;
-  public isTimeformatDirty = false;
+  public timeformatControl = {
+    isTimeformatDirty: false
+  };
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
@@ -125,7 +127,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public handleTimeFormatChange(): void {
-    this.isTimeformatDirty = true;
+    this.timeformatControl.isTimeformatDirty = true;
   }
 }
 
@@ -150,7 +152,7 @@ abstract class UserDetails {
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
   }
 
-  public saveUserPreference(timeformat): void {
+  public saveUserPreference(timeformat, timeformatControl): void {
     const payload = {
       user: {
          name: this.chefSessionService.username,
@@ -168,6 +170,7 @@ abstract class UserDetails {
     this.store.dispatch(this.createUpdateNameUserAction(name));
     this.store.dispatch(new UpdateUserPreferences(payload));
     this.userPrefsService.saveUserTimeformatInternal(timeformat.value);
+    timeformatControl.isTimeformatDirty = false;
   }
 
   protected abstract createPasswordForm(fb: FormBuilder): FormGroup;
