@@ -3,14 +3,12 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"github.com/chef/automate/api/interservice/infra_proxy/request"
+	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
-
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/chef/automate/api/interservice/infra_proxy/request"
-	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -186,4 +184,38 @@ func (s *Server) DeletePolicyfile(ctx context.Context, req *request.DeletePolicy
 	return &response.DeletePolicyfile{
 		Name: req.GetName(),
 	}, nil
+}
+
+// GetPolicyfileRevisions gets a policy file revisions
+func (s *Server) GetPolicyfileRevisions(ctx context.Context, req *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error) {
+	c, err := s.createClient(ctx, req.OrgId, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	policyfileRevision, err := c.client.Policies.Get(req.Name)
+	if err != nil {
+		return nil, ParseAPIError(err)
+	}
+
+	return &response.PolicyfileRevisions{
+		Revisions: fromAPIIncludedPolicyfileRevisions(policyfileRevision),
+	}, nil
+}
+
+// fromAPIIncludedPolicyfileRevisions a response included policyfile revision
+func fromAPIIncludedPolicyfileRevisions(p chef.PolicyGetResponse) []*response.PolicyfileRevision {
+
+	var revisions []*response.PolicyfileRevision
+
+	for _, rev := range p {
+		for key, _ := range rev {
+			revision := &response.PolicyfileRevision{
+				RevisionId: key,
+			}
+			revisions = append(revisions, revision)
+		}
+	}
+
+	return revisions
 }
