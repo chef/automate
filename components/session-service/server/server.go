@@ -677,7 +677,6 @@ func generateRelayState() (string, error) {
 func createSCSManager(store scs.Store, persistent bool) *scs.Manager {
 	manager := scs.NewManager(store)
 	manager.SameSite("Lax")
-	manager.Lifetime(20 * time.Minute)
 
 	if persistent {
 		manager.Persist(true)
