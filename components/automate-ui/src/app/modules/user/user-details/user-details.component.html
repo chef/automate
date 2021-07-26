@@ -32,7 +32,7 @@
           </chef-form-field>
           <chef-form-field class="timezone-field">
             <label for="timeformat">Time Format</label>
-            <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value" (change)="handleTimeFormatChange()">
+            <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value" (change)="handleTimeFormatChange()" data-cy="timeformat-dropdown">
               <chef-option value="ddd, DD MMM">ddd, DD MMM</chef-option>
               <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
               <chef-option value="DD MMM YYYY">DD MMM YYYY</chef-option>
