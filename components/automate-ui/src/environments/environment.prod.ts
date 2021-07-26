@@ -22,6 +22,7 @@ export const environment = {
   infra_proxy_url: '/api/v0/infra',
   deployment_url: '/api/v0/deployment',
   gateway_url: '/api/v0',
+  user_preference_url: '/api/v0/user-settings',
   elasticsearch_url: '/api/v0/elasticsearch',
   notifier_url: '/api/v0/notifications',
   data_feed_url: '/api/v0/datafeed',
