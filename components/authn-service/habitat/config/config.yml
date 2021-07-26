@@ -63,7 +63,7 @@ legacy_data_collector_token: {{cfg.service.a1_data_collector_token}}
 
 {{~#eachAlive bind.session-service.members as |session-service|}}
 {{~#if @last}}
-session_address: 127.0.0.1:{{session-service.cfg.port}}
+session_address: 127.0.0.1:{{session-service.cfg.grpc-port}}
 {{~/if}}
 {{~/eachAlive}}
 
