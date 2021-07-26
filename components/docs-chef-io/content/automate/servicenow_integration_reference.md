@@ -155,11 +155,11 @@ Refer [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-managem
 
 Reconciliation is the synchronization of two or more matching database segments to ensure consistency across them.
 
-Identification rules identifies new CIs and existing CIs. It applies to a CI class and it can be single or multiple with different priority.
+Identification rules identify new CIs and existing CIs. It applies to a CI class, and it can be single or multiple with different priorities.
 
-Reconciliation rules specify which discovery sources can update a table or a set of table attributes, and the precedence order among these discovery sources. They can be defined at the parent and/or the child class level. Without reconciliation rules, discovery sources are allowed to overwrite each other's updates to attribute values.
+Reconciliation rules specify which discovery sources can update a table or a set of table attributes, and the precedence order among these discovery sources. They can be defined at the parent or at the child class level. Without reconciliation rules, discovery sources are overwritten with each other's updates to attribute values.
 
-The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help to prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow only authoritative data sources to update CI records in the CMDB.
+The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow only authoritative data sources to update CI records in the CMDB.
 
 Refer [CMDB Identification and Reconciliation](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/concept/c_CMDBIdentifyandReconcile.html) page for detailed information on these rules.
 

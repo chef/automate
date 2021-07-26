@@ -83,7 +83,7 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 
 ### Discovery Source
 
-The Chef Automate Integration App provides unique ID as discovery source that distinguishes between discovered CIs and imported CIs. The **Discovery Source** field is part of the `cmdb_servers` table and it takes **ChefAutomate** value while importing CIs by default .
+The Chef Automate Integration App provides a unique ID as a discovery source that distinguishes between discovered CIs and imported CIs. The **Discovery Source** field is part of the `cmdb_servers` table, and it takes **ChefAutomate** value while importing CIs by default.
 
 {{< figure src="/images/automate/snow_integration_plugins.png" alt="Discovery Source">}}
 
@@ -95,7 +95,7 @@ The servers recognized by Chef Automate Integration App have discovery source va
 
 Refer [Add New Discovery Source](https://developer.servicenow.com/connect.do#!/event/knowledge19/LAB0577/knowledge19_LAB0577_add_new_discovery_source) page to create a new and unique discovery source that distinguishes discovered CIs and imported CIs.
 
-Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results. This might be desirable if Discovery is running on your network together with another discovery product, and you want to use customized identifiers.
+Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results. 
 
 ## Configuration
 
