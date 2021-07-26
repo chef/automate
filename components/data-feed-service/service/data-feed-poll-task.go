@@ -2,12 +2,15 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"net"
 	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
@@ -114,6 +117,12 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
 	taskResults.NodeIDs = nodeIDs
+
+	data, _ := ioutil.ReadFile("res.json")
+	var n map[string]NodeIDs
+	json.Unmarshal(data, &n)
+	logrus.Println(":::::dsdsd", n)
+	taskResults.NodeIDs = n
 
 	return taskResults, nil
 }

@@ -77,6 +77,10 @@ message DequeueWorkflowResponse {
   }
 }
 
+message DequeueWorkflowResponseChunk {
+  bytes chunk = 1;
+}
+
 message EnqueueWorkflowRequest {
   string domain = 1;
   string instance_name = 2;
@@ -211,6 +215,8 @@ service CerealService {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
       returns (stream DequeueWorkflowResponse);
+  rpc DequeueWorkflowChunk(stream DequeueWorkflowRequest)
+      returns (stream DequeueWorkflowResponseChunk);
   rpc CancelWorkflow(CancelWorkflowRequest) returns (CancelWorkflowResponse);
   rpc KillWorkflow(KillWorkflowRequest) returns (KillWorkflowResponse);
   rpc DequeueTask(stream DequeueTaskRequest)

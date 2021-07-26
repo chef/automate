@@ -58,6 +58,15 @@ type WorkflowCompleter interface {
 	Close() error
 }
 
+type WorkflowCompleterChunk interface {
+	EnqueueTask(task *TaskData, opts TaskEnqueueOptions) error
+
+	Continue(payload []byte) error
+	Fail(err error) error
+	Done(result []byte) error
+	Close() error
+}
+
 type ScheduledWorkflowCompleter interface {
 	EnqueueAndUpdateScheduledWorkflow(s *Schedule) error
 	DisableSchedule(s *Schedule) error
