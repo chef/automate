@@ -60,7 +60,6 @@ func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.
 	}
 
 	initialPayload := DataFeedWorkflowPayload{}
-	fmt.Println(":: initialPayload ::", initialPayload.NodeIDs)
 	return w.Continue(&initialPayload)
 }
 
@@ -77,7 +76,6 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 	if err != nil {
 		return w.Fail(err)
 	}
-
 	switch ev.TaskName {
 	case dataFeedPollTaskName:
 		taskResults, err := getPollTaskResults(ev)
@@ -141,7 +139,6 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 	if tasksComplete {
 		return w.Complete()
 	}
-	fmt.Println(":: data-feed-service &payload ::", &payload)
 	return w.Continue(&payload)
 
 }

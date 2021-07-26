@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"strings"
 	"time"
@@ -116,10 +118,24 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
 	taskResults.NodeIDs = nodeIDs
-	fmt.Println(":: taskResults ::", taskResults)
+	// jsonFile, err := os.Open("./data.json")
+	// // if we os.Open returns an error then handle it
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println("Successfully Opened users.json")
+	// // defer the closing of our jsonFile so that we can parse it later on
+	// defer jsonFile.Close()
+	byteValue, err := ioutil.ReadFile("/src/components/data-feed-service/service/data.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var result DataFeedPollTaskResults
+	json.Unmarshal([]byte(byteValue), &result)
 	// totalNodeIDS = 50
 	// 10
-	return taskResults, nil
+
+	return result, nil
 }
 
 // getFeedTimes determines the start and end times for the next interval to poll

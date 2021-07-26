@@ -46,7 +46,7 @@ type IntervalSuggester interface {
 type TaskCompleter interface {
 	Context() context.Context
 	Fail(err string) error
-	Succeed(result []byte, position []int64) error
+	Succeed(result []byte) error
 }
 
 type WorkflowCompleter interface {

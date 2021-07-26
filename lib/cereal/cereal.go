@@ -2,7 +2,6 @@ package cereal
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -953,7 +952,6 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *TaskData, taskCompl
 	} else {
 
 		jsonResults, err := jsonify(result)
-		fmt.Println(":: data-feed-service jsonResults 1::", string(jsonResults))
 		if err != nil {
 			logctx.WithError(err).Error("Could not convert returned results to JSON")
 			if err := taskCompleter.Fail(err.Error()); err != nil {
@@ -961,54 +959,14 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *TaskData, taskCompl
 				return err
 			}
 		}
-		chunkResult(jsonResults, taskCompleter, logctx)
-		// err = taskCompleter.Succeed(jsonResults)
-		// if err != nil {
-		// 	logctx.WithError(err).Error("Failed to mark task as successful")
-		// 	return err
-		// }
+		// chunkResult(jsonResults, taskCompleter, logctx)
+		err = taskCompleter.Succeed(jsonResults)
+		if err != nil {
+			logctx.WithError(err).Error("Failed to mark task as successful")
+			return err
+		}
 	}
-	fmt.Println(":: data-feed-service jsonResults 2::", result)
 	logctx.Debug("Task completed successfully")
-	return nil
-}
-func chunkResult(result []byte, taskCompleter TaskCompleter, logctx *logrus.Entry) error {
-	fmt.Println(":: data-feed-service chunkResult byte::", binary.Size(result))
-	fmt.Println(":: data-feed-service chunkResult kb::", binary.Size(result)/1024)
-	fmt.Println(":: data-feed-service chunkResult mb::", binary.Size(result)/1024/1024)
-	fmt.Println(":: data-feed-service chunkResult len::", len(result))
-	fmt.Println(":: data-feed-service chunkResult start::")
-	// const ChunkLimit = 1 * 1024 * 1024
-	const ChunkLimit = 20
-	var chunk []byte
-	var position int64 = 0
-	var arrayOfPosition []int64
-	var arrayOfChunk []byte
-
-	fmt.Println(":: data-feed-service chunkResult 1::")
-	for len(result) > ChunkLimit {
-		chunk, result = result[:ChunkLimit], result[ChunkLimit:]
-		fmt.Println(" data-feed-service chunkResult chunk", chunk)
-		fmt.Println(" data-feed-service chunkResult chunk position", position)
-		position += 1
-		arrayOfChunk = append(arrayOfChunk, chunk...)
-		arrayOfPosition = append(arrayOfPosition, position)
-
-	}
-	err := taskCompleter.Succeed(arrayOfChunk, arrayOfPosition)
-	if err != nil {
-		logctx.WithError(err).Error("Failed to mark task as successful")
-		return err
-	}
-	// if len(result) > 0 {
-	// 	fmt.Println(":: data-feed-service chunkResult else::")
-	// 	err := taskCompleter.Succeed(result, position)
-	// 	if err != nil {
-	// 		logctx.WithError(err).Error("Failed to mark task as successful")
-	// 		return err
-	// 	}
-	// }
-
 	return nil
 }
 
@@ -1045,7 +1003,6 @@ func (m *Manager) Start(ctx context.Context) error {
 	m.taskDequeuePool.Start(ctx)
 	if m.workflowScheduler != nil {
 		go m.workflowScheduler.Run(ctx)
-		fmt.Println(":: data-feed-service Run::")
 	}
 
 	go m.runWorkflowExecutor(ctx)

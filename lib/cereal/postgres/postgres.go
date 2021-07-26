@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/golang-migrate/migrate"
@@ -671,10 +670,8 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *cereal.Workfl
 
 func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
-	fmt.Println(":: data-feed-service db ::")
 
 	tx, err := pg.db.BeginTx(ctx, nil)
-	fmt.Println(":: data-feed-service tx ::", tx)
 	if err != nil {
 		cancel()
 		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
@@ -917,7 +914,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 }
 
 // TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
-func (taskc *PostgresTaskCompleter) Succeed(results []byte, position int64) error {
+func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	defer taskc.cancel()
 
 	taskc.pinger.Stop()
@@ -928,8 +925,7 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte, position int64) erro
 	default:
 	}
 
-	data, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, cereal.TaskStatusSuccess, "", results, position)
-	fmt.Println(":: data-feed-service ::", data, err)
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, cereal.TaskStatusSuccess, "", results)
 
 	if err != nil {
 		if isErrTaskLost(err) {

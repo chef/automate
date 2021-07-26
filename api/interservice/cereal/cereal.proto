@@ -109,10 +109,7 @@ message DequeueTaskRequest {
     string task_name = 2;
   }
   message Fail { string error = 1; }
-  message Succeed { 
-    bytes result = 1; 
-    repeated int64 position = 2; 
-  }
+  message Succeed { bytes result = 1; }
 
   oneof cmd {
     Dequeue dequeue = 1;
@@ -210,16 +207,6 @@ message ListWorkflowInstancesRequest {
 message ListWorkflowInstancesResponse {
   WorkflowInstance workflow_instance = 1;
 }
-message StreamDataRequest{
-	message Chunk {
-		bytes data = 1;
-		int64 position = 2;
-	}
-	Chunk chunk = 1;
-}
-message StreamDataResponse{
-
-}
 
 service CerealService {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
@@ -241,6 +228,4 @@ service CerealService {
       returns (GetWorkflowInstanceByNameResponse);
   rpc ListWorkflowInstances(ListWorkflowInstancesRequest)
       returns (stream ListWorkflowInstancesResponse);
-  rpc StreamData(StreamDataRequest)
-      returns (stream StreamDataResponse);
 }
