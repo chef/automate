@@ -26,7 +26,7 @@ pkg_binds=(
   [teams-service]="port"
   [authz-service]="port"
   [cereal-service]="port"
-  [session-service]="port"
+  [session-service]="grpc-port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
