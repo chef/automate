@@ -418,33 +418,6 @@ message ControlSummary {
 	Total  waived = 5;
 }
 
-//LicenseUsageNodesReports used for LicenseUsageNodes call
-message LicenseUsageNodesReports {
-	// Paginated results of summary level reports matching the filters.
-	repeated LicenseUsageNodesReport reports = 1;
-	// Total number of reports matching the filters.
-	int32 total = 2;
-}
-
-message LicenseUsageNodesReport {
-	// A unique report identifier.
-	string id = 1;
-	// The compliance scan job ID associated with the report.
-	string job_id = 2;
-	// The reporting node's unique ID.
-	string node_id = 3;
-	// The reporting node name.
-	string node_name = 4;
-	// The environment of the node making the report.
-	string environment = 5;
-	// The platform of the nodes making the report.
-	Platform platform = 6;
-	// The time that the report was completed.
-	google.protobuf.Timestamp end_time = 7;
-	// The status of the run the report was made from.
-	string status = 8;
-}
-
 //ReportsSummaryLevelOne used for ListReports call
 message ReportsSummaryLevelOne {
 	// Paginated results of summary level reports matching the filters.
