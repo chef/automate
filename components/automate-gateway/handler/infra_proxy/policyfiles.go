@@ -163,6 +163,7 @@ func fromUpstreamPolicyfileRevision(revisions []*infra_res.PolicyfileRevision) [
 	return r
 }
 
+// GetPolicygroup fetches the policy group details
 func (a *InfraProxyServer) GetPolicygroup(ctx context.Context, r *gwreq.Policygroup) (*gwres.Policygroup, error) {
 	req := &infra_req.Policygroup{
 		OrgId:    r.OrgId,
