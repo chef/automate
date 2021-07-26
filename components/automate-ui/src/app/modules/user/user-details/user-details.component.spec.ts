@@ -29,6 +29,8 @@ import {
 } from 'app/entities/users/userself.actions';
 import { UserDetailsComponent } from './user-details.component';
 import { EntityStatus } from 'app/entities/entities';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -97,7 +99,8 @@ describe('UserDetailsComponent', () => {
         ],
         providers: [
           FeatureFlagsService,
-          { provide: ActivatedRoute, useValue: {data: isNonAdmin} }
+          { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
+          { provide: ChefSessionService, useClass: MockChefSessionService }
         ]
       });
       store = TestBed.inject(Store);
@@ -258,7 +261,8 @@ describe('UserDetailsComponent', () => {
         ],
         providers: [
           FeatureFlagsService,
-          { provide: ActivatedRoute, useValue: {data: isNonAdmin} }
+          { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
+          { provide: ChefSessionService, useClass: MockChefSessionService }
         ]
       });
       store = TestBed.inject(Store);
