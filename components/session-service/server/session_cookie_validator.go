@@ -14,7 +14,7 @@ type SessionCookieValidator struct {
 }
 
 const (
-	getSessionKey = `SELECT * FROM sessions WHERE token = (Key);`
+	getSessionKey = `SELECT * FROM sessions WHERE token = ($1);`
 )
 
 func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
@@ -29,7 +29,8 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 	sessionKey := s.pgDB.QueryRow(getSessionKey, req.Key)
 	var token string
 	var expiry time.Time
-	err := sessionKey.Scan(&token, &expiry)
+	var data string
+	err := sessionKey.Scan(&token, &data, &expiry)
 
 	if err != nil && err != sql.ErrNoRows {
 		// log the error
