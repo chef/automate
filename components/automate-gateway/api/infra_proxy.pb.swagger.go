@@ -3948,7 +3948,8 @@ func init() {
       "type": "object",
       "properties": {
         "revision_id": {
-          "type": "string"
+          "type": "string",
+          "title": "policyfile revision"
         }
       }
     },

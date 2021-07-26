@@ -744,6 +744,7 @@ type PolicyfileRevision struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// policyfile revision
 	RevisionId string `protobuf:"bytes,1,opt,name=revision_id,json=revisionId,proto3" json:"revision_id,omitempty" toml:"revision_id,omitempty" mapstructure:"revision_id,omitempty"`
 }
 
