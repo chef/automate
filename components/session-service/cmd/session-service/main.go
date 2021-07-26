@@ -161,13 +161,21 @@ func serve(_ *cobra.Command, args []string) {
 	if err != nil {
 		fail(errors.Wrap(err, "init server"))
 	}
+	l.Debugf("Kallol:: Starting http")
 	if err := srv.ListenAndServe(bind); err != nil {
 		fail(errors.Wrap(err, "listen/bind"))
 	}
-
+	l.Debugf("Kallol:: Started http")
+	l.Debugf("Kallol:: Starting grpc")
 	if err = srv.StartGRPCServer(grpcBind); err != nil {
 		fail(errors.Wrap(err, "starting grpc server"))
 	}
+	l.Debugf("Kallol:: Started grpc")
+
+	if err = srv.StartSignalHandler(); err != nil {
+		fail(errors.Wrap(err, "starting signal handler"))
+	}
+
 }
 
 // fail outputs the error and exits with a non-zero code
