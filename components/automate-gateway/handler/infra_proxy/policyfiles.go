@@ -162,3 +162,35 @@ func fromUpstreamPolicyfileRevision(revisions []*infra_res.PolicyfileRevision) [
 	}
 	return r
 }
+
+// GetPolicygroup fetches the policy group details
+func (a *InfraProxyServer) GetPolicygroup(ctx context.Context, r *gwreq.Policygroup) (*gwres.Policygroup, error) {
+	req := &infra_req.Policygroup{
+		OrgId:    r.OrgId,
+		ServerId: r.ServerId,
+		Name:     r.Name,
+	}
+	res, err := a.client.GetPolicygroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.Policygroup{
+		Name:     res.GetName(),
+		Uri:      res.GetUri(),
+		Policies: fromUpstreamGroupPolicyfiles(res.Policies),
+	}, nil
+}
+
+func fromUpstreamGroupPolicyfiles(policies []*infra_res.GroupPolicy) []*gwres.GroupPolicy {
+	gp := make([]*gwres.GroupPolicy, len(policies))
+
+	for i, c := range policies {
+		gp[i] = &gwres.GroupPolicy{
+			Name:       c.GetName(),
+			RevisionId: c.GetRevisionId(),
+		}
+	}
+
+	return gp
+}

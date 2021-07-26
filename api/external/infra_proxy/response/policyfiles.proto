@@ -111,3 +111,19 @@ message PolicyfileRevision {
     // policyfile revision
     string revision_id = 1;
 }
+
+message Policygroup {
+    // Policygroup name.
+    string name = 1;
+    // Policygroup policyfiles.
+    repeated GroupPolicy policies = 2;
+    // policygroup uri.
+    string uri = 3;
+}
+
+message GroupPolicy {
+    // Policyfile name.
+    string name = 1;
+    // Policyfile Revision ID.
+    string revision_id = 2;
+}
