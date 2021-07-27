@@ -544,15 +544,14 @@ func isNameMaching(s string, arr []string, exclude bool) bool {
 			initBool = initBool && s != val
 		}
 	} else {
-		if len(arr) == 0 {
-			return true
-		}
-		initBool = false
-		for _, val := range arr {
-			initBool = initBool || strings.Contains(
-				strings.ToLower(s),
-				strings.ToLower(val),
-			)
+		if len(arr) > 0 {
+			initBool = false
+			for _, val := range arr {
+				initBool = initBool || strings.Contains(
+					strings.ToLower(s),
+					strings.ToLower(val),
+				)
+			}
 		}
 	}
 	return initBool
@@ -566,12 +565,11 @@ func isRegionMaching(s string, arr []string, exclude bool) bool {
 			initBool = initBool && s != val
 		}
 	} else {
-		if len(arr) == 0 {
-			return true
-		}
-		initBool = false
-		for _, val := range arr {
-			initBool = initBool || s == val
+		if len(arr) > 0 {
+			initBool = false
+			for _, val := range arr {
+				initBool = initBool || s == val
+			}
 		}
 	}
 	return initBool
@@ -589,14 +587,13 @@ func isTagMatching(s []*common.Kv, arr []string, exclude bool, key string) bool 
 			}
 		}
 	} else {
-		if len(arr) == 0 {
-			return true
-		}
-		initBool = false
-		for _, val := range arr {
-			for _, v := range s {
-				if v.Key == key {
-					initBool = initBool || v.Value == val
+		if len(arr) > 0 {
+			initBool = false
+			for _, val := range arr {
+				for _, v := range s {
+					if v.Key == key {
+						initBool = initBool || v.Value == val
+					}
 				}
 			}
 		}
