@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -60,7 +59,6 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 	}
 	for _, cookie := range req.Cookies() {
 		if cookie.Name == "session" {
-			fmt.Println(cookie.Value, "cookie.Name")
 			sessionData, err := s.sessionClient.ValidateSessionCookie(ctx, &session.SessionKeyReq{Key: cookie.Value})
 
 			if err != nil {

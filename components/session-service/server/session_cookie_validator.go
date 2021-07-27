@@ -13,8 +13,9 @@ type SessionCookieValidator struct {
 	pgDB *sql.DB
 }
 
+const expiryComparisionTime = 2
 const (
-	getSessionKey = `SELECT * FROM sessions WHERE token = ($1);`
+	getSessionKey = `SELECT token, expiry FROM sessions WHERE token = ($1);`
 )
 
 func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
@@ -25,12 +26,10 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 		return &session.SessionKeyResp{Valid: false, Exist: false}, nil
 	}
 
-	fmt.Println("REQ::", req)
 	sessionKey := s.pgDB.QueryRow(getSessionKey, req.Key)
 	var token string
 	var expiry time.Time
-	var data string
-	err := sessionKey.Scan(&token, &data, &expiry)
+	err := sessionKey.Scan(&token, &expiry)
 
 	if err != nil && err != sql.ErrNoRows {
 		// log the error
@@ -40,7 +39,10 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 
 	diff := expiry.Sub(time.Now())
 	var valid bool
-	if diff.Minutes() < 17 {
+	// By default session expiry is 24hrs which gets updated every minute
+	// So for the sake of comparision taking 2 minutes difference
+	// we can think of different number too
+	if diff.Minutes() < 1440-expiryComparisionTime {
 		valid = false
 	} else {
 		valid = true
@@ -49,7 +51,5 @@ func (s *SessionCookieValidator) ValidateSessionCookie(ctx context.Context,
 	if token != req.Key {
 		return &session.SessionKeyResp{Valid: valid, Exist: false}, nil
 	}
-	fmt.Println(sessionKey, "sessionKey")
 	return &session.SessionKeyResp{Valid: valid, Exist: true}, nil
-
 }
