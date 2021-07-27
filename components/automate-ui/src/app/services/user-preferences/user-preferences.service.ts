@@ -7,9 +7,8 @@ import { userPreferenceTimeformatSelector } from './user-preferences.selector';
 import {
   GetUserPreferences,
   UpdateUserPreferences,
-  SaveUserTimeformatInternal } from './user-preferences.actions';
-
-
+  SetUserTimeformatInternal
+} from './user-preferences.actions';
 
 @Injectable({ providedIn: 'root'})
 export class UserPreferencesService {
@@ -21,8 +20,8 @@ export class UserPreferencesService {
   timeformat$: Observable<UserPreferenceTimeformat> = this.store
   .select(userPreferenceTimeformatSelector);
 
-  saveUserTimeformatInternal(format: string) {
-    this.store.dispatch(new SaveUserTimeformatInternal(format));
+  setUserTimeformatInternal(format: string) {
+    this.store.dispatch(new SetUserTimeformatInternal(format));
   }
 
   getUserPreferences() {

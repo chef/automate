@@ -29,27 +29,27 @@ export function userPreferencesEntityReducer(
   action: UserPreferencesActions): UserPreferencesEntityState {
   switch (action.type) {
 
-    case UserPreferencesActionTypes.GET_USER_PREFERENCES:
+    case UserPreferencesActionTypes.GET:
       return set('status', EntityStatus.loading, state) as UserPreferencesEntityState;
 
-    case UserPreferencesActionTypes.GET_USER_PREFERENCES_SUCCESS:
+    case UserPreferencesActionTypes.GET_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
         set('list.timeformat', action.payload.time_format))(state) as UserPreferencesEntityState;
 
-    case UserPreferencesActionTypes.GET_USER_PREFERENCES_FAILURE:
-    case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_FAILURE: // fallthrough
+    case UserPreferencesActionTypes.GET_FAILURE:
+    case UserPreferencesActionTypes.UPDATE_FAILURE: // fallthrough
       return pipe(
         set('status', EntityStatus.loadingFailure),
         set('error', action.payload))(state) as UserPreferencesEntityState;
 
-    case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES:
+    case UserPreferencesActionTypes.UPDATE:
       return set('status', EntityStatus.loading, state) as UserPreferencesEntityState;
 
-    case UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_SUCCESS:
+    case UserPreferencesActionTypes.UPDATE_SUCCESS:
       return set('status', EntityStatus.loadingSuccess, state) as UserPreferencesEntityState;
 
-    case UserPreferencesActionTypes.SAVE_TIMEFORMAT_INTERNAL:
+    case UserPreferencesActionTypes.SET_TIMEFORMAT:
       const timeformat = { value: action.payload };
       return set('list.timeformat', timeformat, state);
 

@@ -1,55 +1,54 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import {
-  UserPreferencesPayload, UserPreferenceResponse
+  UserPreferencesPayload,
+  UserPreferenceResponse
 } from './user-preferences.model';
 
 export enum UserPreferencesActionTypes {
-  GET_USER_PREFERENCES         = 'USER_PREFERENCES::GET',
-  GET_USER_PREFERENCES_SUCCESS = 'USER_PREFERENCES::GET::SUCCESS',
-  GET_USER_PREFERENCES_FAILURE = 'USER_PREFERENCES::GET::FAILURE',
-
-  UPDATE_USER_PREFERENCES         = 'USER_PREFERENCES::UPDATE',
-  UPDATE_USER_PREFERENCES_SUCCESS = 'USER_PREFERENCES::UPDATE::SUCCESS',
-  UPDATE_USER_PREFERENCES_FAILURE = 'USER_PREFERENCES::UPDATE::FAILURE',
-
-  SAVE_TIMEFORMAT_INTERNAL = 'SAVE_TIMEFORMAT_INTERNAL'
+  GET            = 'USER_PREFERENCES::GET',
+  GET_SUCCESS    = 'USER_PREFERENCES::GET::SUCCESS',
+  GET_FAILURE    = 'USER_PREFERENCES::GET::FAILURE',
+  UPDATE         = 'USER_PREFERENCES::UPDATE',
+  UPDATE_SUCCESS = 'USER_PREFERENCES::UPDATE::SUCCESS',
+  UPDATE_FAILURE = 'USER_PREFERENCES::UPDATE::FAILURE',
+  SET_TIMEFORMAT = 'USER_PREFERENCES::SET::TIMEFORMAT'
 }
 
 export class GetUserPreferences implements Action {
-  readonly type = UserPreferencesActionTypes.GET_USER_PREFERENCES;
+  readonly type = UserPreferencesActionTypes.GET;
 }
 
 export class GetUserPreferencesSuccess implements Action {
-  readonly type = UserPreferencesActionTypes.GET_USER_PREFERENCES_SUCCESS;
+  readonly type = UserPreferencesActionTypes.GET_SUCCESS;
 
   constructor(public payload: UserPreferenceResponse) {}
 }
 
 export class GetUserPreferencesFailure implements Action {
-  readonly type = UserPreferencesActionTypes.GET_USER_PREFERENCES_FAILURE;
+  readonly type = UserPreferencesActionTypes.GET_FAILURE;
 
   constructor(public payload: HttpErrorResponse) { }
 }
 
 export class UpdateUserPreferences implements Action {
-  readonly type = UserPreferencesActionTypes.UPDATE_USER_PREFERENCES;
+  readonly type = UserPreferencesActionTypes.UPDATE;
   constructor(public payload: UserPreferencesPayload) {}
 }
 
 export class UpdateUserPreferencesSuccess implements Action {
-  readonly type = UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_SUCCESS;
+  readonly type = UserPreferencesActionTypes.UPDATE_SUCCESS;
   constructor(public payload: any) {}
 }
 
 export class UpdateUserPreferencesFailure implements Action {
-  readonly type = UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_FAILURE;
+  readonly type = UserPreferencesActionTypes.UPDATE_FAILURE;
 
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class SaveUserTimeformatInternal implements Action {
-  readonly type = UserPreferencesActionTypes.SAVE_TIMEFORMAT_INTERNAL;
+export class SetUserTimeformatInternal implements Action {
+  readonly type = UserPreferencesActionTypes.SET_TIMEFORMAT;
 
   constructor(public payload: string) {}
 }
@@ -61,4 +60,4 @@ export type UserPreferencesActions =
   | UpdateUserPreferences
   | UpdateUserPreferencesSuccess
   | UpdateUserPreferencesFailure
-  | SaveUserTimeformatInternal;
+  | SetUserTimeformatInternal;
