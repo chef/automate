@@ -32,7 +32,11 @@
           </chef-form-field>
           <chef-form-field class="timezone-field">
             <label for="timeformat">Time Format</label>
-            <chef-select #timeformat [value]="(userPrefsService.timeformat$ | async)?.value" (change)="handleTimeFormatChange()" data-cy="timeformat-dropdown">
+            <chef-select 
+            #timeformat 
+            [value]="(userPrefsService.timeformat$ | async)?.value" 
+            (change)="handleTimeFormatChange()" 
+            data-cy="timeformat-dropdown">
               <chef-option value="ddd, DD MMM">ddd, DD MMM</chef-option>
               <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
               <chef-option value="DD MMM YYYY">DD MMM YYYY</chef-option>
@@ -42,8 +46,11 @@
             </chef-select>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !timeformatControl.isTimeformatDirty" primary inline
-          (click)="userDetails.saveUserPreference(timeformat, timeformatControl)" data-cy="user-details-submit-button">
+        <chef-button 
+        [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !timeformatControl.isTimeformatDirty" 
+        primary inline 
+        (click)="userDetails.saveUserPreference(timeformat, timeformatControl)" 
+        data-cy="user-details-submit-button">
           <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
           <span *ngIf="userDetails.saveInProgress">Saving...</span>
           <span *ngIf="!userDetails.saveInProgress">Save</span>
