@@ -60,7 +60,7 @@
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
               </chef-td>
               <chef-td class="created-date">
-                <app-chef-time [time]='token.created_at'></app-chef-time>
+                <app-time [time]='token.created_at'></app-time>
               </chef-td>
               <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>
