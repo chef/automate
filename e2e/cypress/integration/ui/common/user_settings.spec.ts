@@ -1,20 +1,16 @@
 describe('login the app', () => {
     describe('load and update user preference', () => {
         before(() => {
-            cy.visit('/');
-            cy.contains('Sign in as a local user').click({ force: true }).then(() => {
-                cy.get('#login').type('admin');
-                cy.get('#password').type('chefautomate');
-                cy.get('[type=submit]').click();
+            cy.adminLogin('/').then(() => {
+                cy.server();
+                cy.route({
+                    method: 'GET',
+                    url: 'https://a2-dev.test/api/v0/user-settings/admin/local'
+                }).as('getUserPreferenceData');
             });
         });
 
         it('get user preference data after login', function () {
-            cy.server();
-            cy.route({
-                method: 'GET',
-                url: 'https://a2-dev.test/api/v0/user-settings/admin/local'
-            }).as('getUserPreferenceData');
             cy.get('#app-container').should('exist').then(() => {
                 cy.wait('@getUserPreferenceData').its('status').should('be', 200);
             });
