@@ -42,13 +42,17 @@ describe('InfraNodesComponent', () => {
           outputs: ['close', 'deleteNode']
         }),
         MockComponent({
+          selector: 'app-reset-node-key',
+          inputs: ['openEvent', 'serverId', 'orgId', 'name']
+        }),
+        MockComponent({
           selector: 'app-update-node-tag-modal',
           inputs: ['openEvent', 'serverId', 'orgId', 'name']
         }),
         MockComponent({
           selector: 'app-edit-infra-node-modal',
           inputs: ['label', 'openEvent', 'orgId', 'availableType',
-            'node', 'serverId', 'selected'],
+            'node', 'serverId', 'selected', 'runlistError'],
           outputs: ['closeRunlist']
         }),
         MockComponent({

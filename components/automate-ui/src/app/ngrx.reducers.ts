@@ -49,6 +49,7 @@ import * as policyFileDetailsEntity from './entities/policy-files/policy-file-de
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as recipeEntity from './entities/recipes/recipe.reducer';
+import * as revisionEntity from './entities/revisions/revision.reducer';
 import * as roleEnvironmentEntity from './entities/role-environments/role-environments.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
@@ -121,6 +122,7 @@ export interface NgrxStateAtom {
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   recipes: recipeEntity.RecipeEntityState;
+  revisions: revisionEntity.RevisionEntityState;
   roleEnvironments: roleEnvironmentEntity.RoleEnvironmentEntityState;
   roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
@@ -252,6 +254,7 @@ export const defaultInitialState = {
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   recipes: recipeEntity.RecipeEntityInitialState,
+  revisions: revisionEntity.RevisionEntityInitialState,
   roleEnvironments: roleEnvironmentEntity.RoleEnvironmentEntityInitialState,
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
@@ -321,6 +324,7 @@ export const ngrxReducers = {
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
+  revisions: revisionEntity.revisionEntityReducer,
   roleEnvironments: roleEnvironmentEntity.roleEnvironmentEntityReducer,
   roles: roleEntity.roleEntityReducer,
   rules: ruleEntity.ruleEntityReducer,

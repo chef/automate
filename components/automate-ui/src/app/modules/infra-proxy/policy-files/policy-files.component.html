@@ -41,6 +41,13 @@
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
                 <mat-option 
+                  data-cy="revision-id"
+                  class="primary"
+                  (click)="slide.slidePanel(policyFile.name)">
+                  Revisions
+                  <chef-icon aria-hidden="true" class="primary">add</chef-icon>
+                </mat-option>
+                <mat-option 
                   data-cy="delete"
                   class="secondary"
                   (onSelectionChange)="startpolicyFilesDelete(policyFile)">
@@ -66,4 +73,9 @@
       (changePage)="onChangePage($event)">
     </app-pagination>
   </ng-container>
+  <app-revision-id
+    #slide
+    [serverId]="serverId"
+    [orgId]="orgId">
+  </app-revision-id>
 </section>
