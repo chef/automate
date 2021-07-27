@@ -11,4 +11,5 @@ export class TimeComponent {
   constructor(
     public userPrefsService: UserPreferencesService
   ) {}
+
 }

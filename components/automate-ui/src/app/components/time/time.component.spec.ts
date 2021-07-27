@@ -31,4 +31,10 @@ describe('TimeComponent', () => {
   it('should create', () => {
     expect(component).toBeDefined();
   });
+
+  it('render timeformat', () => {
+    component.time = '2021-07-26T10:50:42.529876072Z';
+    const element = fixture.debugElement.nativeElement;
+    expect(element.querySelector('span').textContent).toContain('Tue, 27 Jul 2021');
+  });
 });
