@@ -134,6 +134,7 @@ type ESInSpecReportControl struct {
 	Results              []*ESInSpecReportControlsResult            `json:"results"`
 	WaiverData           *ESInSpecReportControlsWaiverData          `json:"waiver_data"`
 	WaivedStr            string                                     `json:"waived_str"`
+	Tags                 string                                     `json:"tags"`
 	StringTags           []ESInSpecReportControlStringTags          `json:"string_tags"`
 	Refs                 []ESInSpecReportControlRefs                `json:"refs"`
 	RemovedResultsCounts *ESInSpecReportControlRemovedResultsCounts `json:"removed_results_counts"`
