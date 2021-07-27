@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
@@ -46,8 +46,6 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
 
   @ViewChild(JsonTreeTable, { static: true })
   tree: JsonTreeTable;
-  // open revision id slider
-  public openRevisionIdSlider = new EventEmitter<boolean>();
 
   constructor(
     private router: Router,
@@ -139,9 +137,5 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
       this.showRunList = false;
       this.activeRunlist = '';
     }
-  }
-
-  public revisionIdList(): void {
-    this.openRevisionIdSlider.emit();
   }
 }

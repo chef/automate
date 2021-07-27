@@ -1,4 +1,13 @@
-import { Component, Input, OnInit, OnDestroy, EventEmitter, Output, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  EventEmitter,
+  Output,
+  OnChanges,
+  SimpleChanges,
+  HostBinding
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -20,30 +29,21 @@ import { Revision } from 'app/entities/revisions/revision.model';
   styleUrls: ['./revision-id.component.scss']
 })
 
-export class RevisionIdComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() openEvent: EventEmitter<void>;
+export class RevisionIdComponent implements OnDestroy, OnChanges {
   @Input() serverId: string;
   @Input() orgId: string;
   @Input() policyfileName: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
-  @Output() close = new EventEmitter();
 
   private isDestroyed = new Subject<boolean>();
 
-  public visible = false;
   public revisions: Revision[] = [];
   public revisionsListLoading = true;
+  @HostBinding('class.active') isSlideOpen = false;
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
-
-  ngOnInit() {
-    this.openEvent.pipe(takeUntil(this.isDestroyed))
-      .subscribe(() => {
-        this.visible = true;
-    });
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.policyfileName?.currentValue) {
@@ -57,8 +57,17 @@ export class RevisionIdComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   closeRevisionId() {
-    this.close.emit();
-    this.visible = false;
+    this.toggleSlide();
+  }
+
+  toggleSlide() {
+    this.isSlideOpen = !this.isSlideOpen;
+  }
+
+  slidePanel(policyfile: string) {
+    this.policyfileName = policyfile;
+    this.isSlideOpen = true;
+    this.loadRevisions(this.policyfileName);
   }
 
   private loadRevisions(policyfileName): void {

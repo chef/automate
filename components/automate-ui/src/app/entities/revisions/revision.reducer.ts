@@ -38,7 +38,6 @@ export function revisionEntityReducer(
     case RevisionActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
-
     default:
       return state;
   }

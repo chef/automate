@@ -8,12 +8,6 @@
     (deleteClicked)="deletePolicyfile()"
     objectAction="Delete">
   </app-delete-infra-object-modal>
-  <app-revision-id
-    [openEvent]="openRevisionIdSlider"
-    [serverId]="serverId"
-    [orgId]="orgId"
-    [policyfileName]="policyfileName">
-  </app-revision-id>
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <div class="search-create-container">
@@ -49,7 +43,7 @@
                 <mat-option 
                   data-cy="revision-id"
                   class="primary"
-                  (onSelectionChange)="revisionIdList(policyFile)">
+                  (click)="slide.slidePanel(policyFile.name)">
                   Revisions
                   <chef-icon aria-hidden="true" class="primary">add</chef-icon>
                 </mat-option>
@@ -79,4 +73,9 @@
       (changePage)="onChangePage($event)">
     </app-pagination>
   </ng-container>
+  <app-revision-id
+    #slide
+    [serverId]="serverId"
+    [orgId]="orgId">
+  </app-revision-id>
 </section>
