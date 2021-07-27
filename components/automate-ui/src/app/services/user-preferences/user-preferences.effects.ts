@@ -31,7 +31,7 @@ export class UserPreferencesEffects {
 
   getUserPreferences$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(UserPreferencesActionTypes.GET_USER_PREFERENCES),
+      ofType(UserPreferencesActionTypes.GET),
       mergeMap(() =>
           this.requests.fetchUserPreferences().pipe(
           map((response: any) => {
@@ -52,7 +52,7 @@ export class UserPreferencesEffects {
 
   updateUserPreferences$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(UserPreferencesActionTypes.UPDATE_USER_PREFERENCES),
+      ofType(UserPreferencesActionTypes.UPDATE),
       mergeMap((action: UpdateUserPreferences) =>
         this.requests.updateUserPreferences(action.payload).pipe(
           map((response: any) =>
@@ -64,7 +64,7 @@ export class UserPreferencesEffects {
 
   updateUserPreferencesSuccess$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_SUCCESS),
+      ofType(UserPreferencesActionTypes.UPDATE_SUCCESS),
       mergeMap(() => {
         const msg = 'Updated user preferences.';
         return [
@@ -78,7 +78,7 @@ export class UserPreferencesEffects {
 
   updateUserPreferencesFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(UserPreferencesActionTypes.UPDATE_USER_PREFERENCES_FAILURE),
+      ofType(UserPreferencesActionTypes.UPDATE_FAILURE),
       map((action: UpdateUserPreferencesFailure) => {
         const msg = `Could not update user preferences: ${action.payload.error}`;
         return new CreateNotification({
@@ -90,7 +90,7 @@ export class UserPreferencesEffects {
 
   getUserPreferencesFailure$ = createEffect(() =>
     this.actions$.pipe(
-    ofType(UserPreferencesActionTypes.GET_USER_PREFERENCES_FAILURE),
+    ofType(UserPreferencesActionTypes.GET_FAILURE),
     map((action: GetUserPreferencesFailure) => {
       const msg = `Could not get user preferences: ${action.payload.error}`;
       return new CreateNotification({
