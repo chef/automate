@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
-  selector: 'app-chef-time',
+  selector: 'app-time',
   templateUrl: './time.component.html'
 })
 export class TimeComponent {
