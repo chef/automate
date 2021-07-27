@@ -169,7 +169,7 @@ abstract class UserDetails {
     const name = this.displayNameForm.get('displayName').value.trim();
     this.store.dispatch(this.createUpdateNameUserAction(name));
     this.store.dispatch(new UpdateUserPreferences(payload));
-    this.userPrefsService.saveUserTimeformatInternal(timeformat.value);
+    this.userPrefsService.setUserTimeformatInternal(timeformat.value);
     timeformatControl.isTimeformatDirty = false;
   }
 
