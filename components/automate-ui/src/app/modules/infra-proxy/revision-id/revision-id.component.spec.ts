@@ -2,7 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RevisionIdComponent } from './revision-id.component';
-import { EventEmitter } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
@@ -60,7 +59,6 @@ describe('RevisionIdComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RevisionIdComponent);
     component = fixture.componentInstance;
-    component.openEvent = new EventEmitter();
     element = fixture.debugElement;
     fixture.detectChanges();
   });
