@@ -105,9 +105,9 @@ import { PolicyFileRequests } from './entities/policy-files/policy-file.requests
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
+import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 import { UserRequests } from './entities/users/user.requests';
 import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
-import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 
 
 // Helpers
@@ -359,11 +359,11 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     OrgRequests,
     PolicyFileRequests,
     ServiceGroupsRequests,
-    UserPreferencesRequests,
     SessionStorageService,
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
+    UserPreferencesRequests,
     UserRequests,
     // Initilization for warning banner component
     {
