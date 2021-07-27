@@ -199,9 +199,21 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 
 	filters := []*common.Filter{
-		{Key: "name", Values: []string{"test-1"}},
+		{Key: "name", Values: []string{"xyz"}, Exclude: true},
 	}
 	filteredResources := reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 4, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "name", Values: []string{"xyz"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 0, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "name", Values: []string{"test-1"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
 	assert.Equal(t, "test-1A", filteredResources[0].Name)
 
@@ -210,6 +222,18 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 2, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"xyz"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 4, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "region", Values: []string{"xyz"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 0, len(filteredResources))
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
@@ -309,6 +333,18 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "Team", Values: []string{"vga"}, Exclude: true},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 6, len(filteredResources))
+
+	filters = []*common.Filter{
+		{Key: "Team", Values: []string{"vga"}},
+	}
+	filteredResources = reFilterNameAndRegion(filters, vmList)
+	assert.Equal(t, 0, len(filteredResources))
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
