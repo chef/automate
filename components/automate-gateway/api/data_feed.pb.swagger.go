@@ -329,6 +329,14 @@ func init() {
         }
       }
     },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.ListDestinationRequest": {
       "type": "object"
     },
