@@ -54,7 +54,7 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -181,7 +181,7 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	if err != nil {
 		log.Warnf("Could not get destination details for delete response id: %d,  err: %s", destination.Id, err)
 	} else {
-		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret}
+		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret, Services: fullDestination.Services, IntegrationTypes: fullDestination.IntegrationTypes}
 	}
 
 	err = datafeedServer.db.DeleteDestination(destination)
@@ -213,7 +213,7 @@ func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, dest
 
 func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
 	log.Infof("UpdateDestination %s", destination)
-	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes}
 	err := datafeedServer.db.UpdateDestination(destination)
 
 	response.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
