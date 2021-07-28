@@ -17,18 +17,33 @@ describe('login the app', () => {
             });
         });
 
-        xit('change and save timeformat value', function () {
-            cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
-                cy.get('[value=YYYY-M-D]').click().then(() => {
-                    cy.get('[data-cy=timeformat-dropdown]').should('have.value', 'YYYY-M-D')
-                    .then(() => {
-                        cy.server();
-                        cy.route({
-                            method: 'PUT',
-                            url: 'https://a2-dev.test/api/v0/user-settings/admin/local'
-                        }).as('updateUserPreference');
-                        cy.get('[data-cy=user-details-submit-button]').click().then(() => {
-                            cy.wait('@updateUserPreference').its('status').should('be', 200);
+        it('change and save timeformat value', function () {
+            cy.get('[data-cy=timeformat-dropdown]').then((dropdown) => {
+                const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
+                let selectTimeformat = '';
+                for (let i = 0; i < timeformatList.length; i++) {
+                    if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
+                        selectTimeformat = timeformatList[i];
+                        break;
+                    }
+                }
+                const attrSelector = '[value=' + selectTimeformat + ']';
+                cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
+                    cy.get(attrSelector).click({force: true}).then(() => {
+                        cy.get('[data-cy=timeformat-dropdown]')
+                            .should('have.value', selectTimeformat)
+                            .then(() => {
+                                cy.server();
+                                cy.route({
+                                    method: 'PUT',
+                                    url: 'https://a2-dev.test/api/v0/user-settings/admin/local'
+                                }).as('updateUserPreference');
+                                cy.get('[data-cy=user-details-submit-button]')
+                                    .click({force: true}).then(() => {
+                                        cy.wait('@updateUserPreference')
+                                            .its('status')
+                                            .should('be', 200);
+                                });
                         });
                     });
                 });
