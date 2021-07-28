@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"strconv"
-	"strings"
 
 	//"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -133,23 +132,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
 
-	if credentials.GetAuthType() == service.HEADER_AUTH {
-		headerString := credentials.GetValues().HeaderJSONString
-		var headerMap map[string]string
-		err := json.Unmarshal([]byte(headerString), &headerMap)
-		if err != nil {
-			log.Warnf("Error parsing headers %v", err)
-		}
-		for key, value := range headerMap {
-			httpRequest.Header.Set(key, value)
-		}
-	} else {
-		authHeader := credentials.GetValues().AuthorizationHeader
-		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
-		if tokenValue != "" {
-			httpRequest.Header.Add("Authorization", authHeader)
-		}
-	}
+	service.AddCustomHeader(credentials, httpRequest.Header)
 
 	client := http.Client{}
 	httpResponse, err := client.Do(httpRequest)

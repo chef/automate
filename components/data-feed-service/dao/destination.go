@@ -14,12 +14,12 @@ import (
 const uniqueViolation = "23505"
 
 type Destination struct {
-	ID                int64  `db:"id"`
-	Name              string `db:"name"`
-	URL               string `db:"url"`
-	Secret            string `db:"secret"`
-	Services          string `db:"services"`
-	Integration_types string `db:"integration_types"`
+	ID               int64  `db:"id"`
+	Name             string `db:"name"`
+	URL              string `db:"url"`
+	Secret           string `db:"secret"`
+	Services         string `db:"services"`
+	IntegrationTypes string `db:"integration_types"`
 }
 
 func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
@@ -29,7 +29,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
-	newDestination.Integration_types = inDestination.IntegrationTypes
+	newDestination.IntegrationTypes = inDestination.IntegrationTypes
 
 	return &newDestination
 }
@@ -53,7 +53,7 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Url = inDestination.URL
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
-	newDestination.IntegrationTypes = inDestination.Integration_types
+	newDestination.IntegrationTypes = inDestination.IntegrationTypes
 
 	return &newDestination
 }

@@ -145,9 +145,9 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
 
-func (n datafeedNotification) addCustomHeader(header http.Header) {
-	if n.credentials.GetAuthType() == HEADER_AUTH {
-		headerString := n.credentials.GetValues().HeaderJSONString
+func AddCustomHeader(credentials Credentials, header http.Header) {
+	if credentials.GetAuthType() == HEADER_AUTH {
+		headerString := credentials.GetValues().HeaderJSONString
 		var headerMap map[string]string
 		err := json.Unmarshal([]byte(headerString), &headerMap)
 		if err != nil {
@@ -157,7 +157,7 @@ func (n datafeedNotification) addCustomHeader(header http.Header) {
 			header.Set(key, value)
 		}
 	} else {
-		authHeader := n.credentials.GetValues().AuthorizationHeader
+		authHeader := credentials.GetValues().AuthorizationHeader
 		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
 		if tokenValue != "" {
 			header.Add("Authorization", authHeader)
@@ -191,12 +191,9 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 			return err
 		}
 
-		request.Header.Add("Content-Type", notification.contentType)
-		request.Header.Add("Content-Encoding", "gzip")
-		request.Header.Add("Accept", notification.contentType)
-		request.Header.Add("Chef-Data-Feed-Message-Version", version)
+	AddCustomHeader(notification.credentials, request.Header)
 
-		notification.addCustomHeader(request.Header)
+		//notification.addCustomHeader(request.Header)
 
 		response, err := client.client.Do(request)
 		if err != nil {

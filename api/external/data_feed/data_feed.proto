@@ -73,9 +73,8 @@ message AddDestinationRequest {
   string name    = 2;
   string url     = 3;
   string secret  = 4;
-  string services  = 5;
-  string integration_types  = 6;
-  
+  string services = 5;
+  string integration_types = 6;
 }
 
 message AddDestinationResponse {
@@ -83,8 +82,8 @@ message AddDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
-  string services  = 5;
-  string integration_types  = 6;
+  string services = 5;
+  string integration_types = 6;
 }
 
 message GetDestinationRequest {
@@ -96,8 +95,8 @@ message GetDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
-  string services  = 5;
-  string integration_types  = 6;
+  string services = 5;
+  string integration_types = 6;
 }
 
 message DeleteDestinationRequest {
@@ -109,8 +108,8 @@ message DeleteDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
-  string services  = 5;
-  string integration_types  = 6;
+  string services = 5;
+  string integration_types = 6;
 }
 
 message UpdateDestinationRequest {	
@@ -127,8 +126,8 @@ message UpdateDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
-  string services  = 5;
-  string integration_types  = 6;
+  string services = 5;
+  string integration_types = 6;
 }
 
 message ListDestinationRequest {}
