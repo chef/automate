@@ -208,6 +208,23 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.datafeed.AWS": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
@@ -222,6 +239,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -241,6 +264,12 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -259,6 +288,12 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
         }
       }
     },
@@ -276,6 +311,28 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
           "type": "string"
         }
       }
@@ -322,6 +379,12 @@ func init() {
         },
         "secret_id": {
           "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
+        },
+        "header": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.Header"
+        },
+        "aws": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
         }
       }
     },
@@ -338,6 +401,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }
@@ -356,6 +425,12 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
           "type": "string"
         }
       }

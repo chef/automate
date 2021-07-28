@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	//"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -53,7 +54,7 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -70,6 +71,12 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	// otherwise use passwd
 	username := ""
 	password := ""
+	headers := ""
+	accesskey := ""
+	secretAccessKey := ""
+	region := ""
+	bucket := ""
+
 	var err error
 	var credentials service.Credentials
 	url := request.Url
@@ -78,6 +85,16 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
+	case *datafeed.URLValidationRequest_Header:
+		headers = request.GetHeader().GetValue()
+		credentials = service.NewCustomHeaderCredentials(headers)
+	case *datafeed.URLValidationRequest_Aws:
+		accesskey = request.GetAws().GetAccessKey()
+		secretAccessKey = request.GetAws().GetSecretAccessKey()
+		region = request.GetAws().GetRegion()
+		bucket = request.GetAws().GetBucket()
+		credentials = service.NewS3Credentials(accesskey, secretAccessKey, region, bucket)
+
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
@@ -115,6 +132,25 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	httpRequest.Header.Add("Content-Type", "application/json")
 	httpRequest.Header.Add("Content-Encoding", "gzip")
 	httpRequest.Header.Add("Accept", "application/json")
+
+	if credentials.GetAuthType() == service.HEADER_AUTH {
+		headerString := credentials.GetValues().HeaderJSONString
+		var headerMap map[string]string
+		err := json.Unmarshal([]byte(headerString), &headerMap)
+		if err != nil {
+			log.Warnf("Error parsing headers %v", err)
+		}
+		for key, value := range headerMap {
+			httpRequest.Header.Set(key, value)
+		}
+	} else {
+		authHeader := credentials.GetValues().AuthorizationHeader
+		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
+		if tokenValue != "" {
+			httpRequest.Header.Add("Authorization", authHeader)
+		}
+	}
+
 	client := http.Client{}
 	httpResponse, err := client.Do(httpRequest)
 	if err != nil {
@@ -145,7 +181,7 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	if err != nil {
 		log.Warnf("Could not get destination details for delete response id: %d,  err: %s", destination.Id, err)
 	} else {
-		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret}
+		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret, Services: fullDestination.Services, IntegrationTypes: fullDestination.IntegrationTypes}
 	}
 
 	err = datafeedServer.db.DeleteDestination(destination)
@@ -177,7 +213,7 @@ func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, dest
 
 func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
 	log.Infof("UpdateDestination %s", destination)
-	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret}
+	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes}
 	err := datafeedServer.db.UpdateDestination(destination)
 
 	response.Id, _ = strconv.ParseInt(destination.Id, 10, 64)

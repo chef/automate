@@ -34,6 +34,7 @@ type Credentials interface {
 	GetAuthType() string
 }
 
+
 type CredentialsFactory struct {
 	data map[string]string
 }
@@ -50,7 +51,34 @@ func (c *CredentialsFactory) NewCredentials() (Credentials, error) {
 	if splunk, ok := c.data["Splunk"]; ok {
 		return NewSplunkAuthCredentials(splunk), nil
 	}
+	if auth_type, ok := c.data["auth_type"]; ok {
+		if auth_type == HEADER_AUTH {
+			return NewCustomHeaderCredentials(c.data["headers"]), nil
+		}
+	}
+	if c.data["auth_type"] == AWS_AUTH {
+		return NewS3Credentials(c.data["access_key"], c.data["secret_access_key"], c.data["region"], c.data["bucket"]), nil 
+	}
 	return nil, errors.New(CredentialsError)
+}
+
+func NewS3Credentials(AccessKey string, secretAccessKey string, region string, bucket string) AwsCredentials {
+	return AwsCredentials{accesskey: AccessKey, secretAccessKey: secretAccessKey, region: region, bucket: bucket}
+}
+
+func (c AwsCredentials) GetValues() AuthTypes {
+	return AuthTypes{
+		AwsCreds: AwsCredentials{
+			accesskey:       c.accesskey,
+			secretAccessKey: c.secretAccessKey,
+			region:          c.region,
+			bucket:          c.bucket,
+		},
+	}
+}
+
+func (c AwsCredentials) GetAuthType() string {
+	return AWS_AUTH
 }
 
 type BasicAuthCredentials struct {
@@ -68,13 +96,13 @@ func (c BasicAuthCredentials) GetValues() AuthTypes {
 	}
 }
 
+func (c BasicAuthCredentials) GetAuthType() string {
+	return BASIC_AUTH
+}
+
 func (c BasicAuthCredentials) basicAuth() string {
 	auth := c.username + ":" + c.password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
-}
-
-func (c BasicAuthCredentials) GetAuthType() string {
-	return BASIC_AUTH
 }
 
 type SplunkAuthCredentials struct {
@@ -93,6 +121,24 @@ func (c SplunkAuthCredentials) GetValues() AuthTypes {
 
 func (c SplunkAuthCredentials) GetAuthType() string {
 	return SPLUNK_AUTH
+}
+
+type CustomHeaderCredentials struct {
+	headers string
+}
+
+func NewCustomHeaderCredentials(headers string) CustomHeaderCredentials {
+	return CustomHeaderCredentials{headers: headers}
+}
+
+func (c CustomHeaderCredentials) GetValues() AuthTypes {
+	return AuthTypes{
+		HeaderJSONString: c.headers,
+	}
+}
+
+func (c CustomHeaderCredentials) GetAuthType() string {
+	return HEADER_AUTH
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (Credentials, error) {
