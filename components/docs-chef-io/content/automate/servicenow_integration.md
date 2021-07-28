@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 [ServiceNow](https://www.servicenow.com/) provides cloud-based services that automate enterprise IT operations. ServiceNow specializes in IT service management (ITSM) applications and provides forms-based workflow application development. It supports third-party application and data integrations. The most common integrations are for configuration management database (CMDB), incident management, problem management, change management, user administration, and single sign-on authentication.
 
-The Chef Automate Integration App for ServiceNow enables the integration of Chef Automate in the ServiceNow. The Chef Automate integration is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. The Chef Automate Integration App enables Chef Automate to create and update client node records to the configuration management database (CMDB) tables of ServiceNow. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time. 
+The Chef Automate Integration App for ServiceNow enables the integration of Chef Automate in the ServiceNow. The Chef Automate integration is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. The Chef Automate Integration App enables Chef Automate to create and update client node records to the configuration management database (CMDB) tables of ServiceNow. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time.
 
 {{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram">}}
 
@@ -80,6 +80,22 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 
 - [Creating Users in ServiceNow](https://docs.servicenow.com/csh?topicname=t_CreateAUser.html)
 - [Assigning Roles in ServiceNow](https://docs.servicenow.com/csh?topicname=t_AssignARoleToAUser.html)
+
+### Discovery Source
+
+The Chef Automate Integration App provides a unique ID as a discovery source that distinguishes between discovered CIs and imported CIs. The **Discovery Source** field is part of the `cmdb_servers` table, and it takes **ChefAutomate** value while importing CIs by default.
+
+{{< figure src="/images/automate/snow_integration_plugins.png" alt="Discovery Source">}}
+
+{{< note >}}
+
+The servers recognized by Chef Automate Integration App have discovery source value as **ChefAutomate**.
+
+{{< /note >}}
+
+Refer [Add New Discovery Source](https://developer.servicenow.com/connect.do#!/event/knowledge19/LAB0577/knowledge19_LAB0577_add_new_discovery_source) page to create a new and unique discovery source that distinguishes discovered CIs and imported CIs.
+
+Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results. 
 
 ## Configuration
 
