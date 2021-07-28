@@ -1,29 +1,10 @@
 describe('login the app', () => {
     describe('load and update user preference', () => {
-        before(() => {
-            cy.adminLogin('/').then(() => {
-                cy.server();
-                cy.route({
-                    method: 'GET',
-                    url: 'https://a2-dev.test/api/v0/user-settings/admin/local'
-                }).as('getUserPreferenceData');
-            });
-        });
-
-        it('get user preference data after login', function () {
-            cy.get('#app-container').should('exist').then(() => {
-                cy.wait('@getUserPreferenceData').its('status').should('be', 200);
-            });
-        });
 
         it('open profile menu if exist', function () {
-            cy.get('[data-cy=welcome-title]').should('exist').then(() => {
-                cy.get('[data-cy=close-x]').click().then(() => {
-                    cy.get('[data-cy=user-profile-button]').should('exist').then(() => {
-                        cy.get('[data-cy=user-profile-button]').click().then(() => {
-                            cy.get('.dropdown-list-item .profile').should('exist');
-                        });
-                    });
+            cy.get('[data-cy=user-profile-button]').should('exist').then(() => {
+                cy.get('[data-cy=user-profile-button]').click().then(() => {
+                    cy.get('.dropdown-list-item .profile').should('exist');
                 });
             });
         });
