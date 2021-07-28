@@ -95,7 +95,7 @@ The servers recognized by Chef Automate Integration App have discovery source va
 
 Refer [Add New Discovery Source](https://developer.servicenow.com/connect.do#!/event/knowledge19/LAB0577/knowledge19_LAB0577_add_new_discovery_source) page to create a new and unique discovery source that distinguishes discovered CIs and imported CIs.
 
-Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results. 
+Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results.
 
 ## Configuration
 
