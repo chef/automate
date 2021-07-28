@@ -49,9 +49,9 @@ func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.ControlI
 }
 
 // should cover /reports
-func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
+func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*reporting.ReportsSummaryLevelOne, error) {
 	inDomain := &reportingService.Query{}
-	out := &reporting.Reports{}
+	out := &reporting.ReportsSummaryLevelOne{}
 	f := func() (proto.Message, error) {
 		return a.client.ListReports(ctx, inDomain)
 	}

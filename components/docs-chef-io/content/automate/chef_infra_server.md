@@ -32,6 +32,8 @@ The objects that you can manage from the Chef Infra Server are:
 - Environments
 - Data Bags
 - Clients
+- Nodes
+- Policyfiles
 
 ## Connect Chef Infra Servers to Chef Automate
 
@@ -81,15 +83,51 @@ To access these components for an organization, select **Chef Servers > Organiza
 
 A [cookbook]({{< relref "cookbooks" >}}) is the fundamental unit of configuration and policy distribution. A cookbook contains recipes and other files, components, or directories.
 
+The Chef Infra Server lets you view:
+
+- List of cookbooks with their latest version
+- Different versions of a cookbook
+- Contents of a cookbook
+- Details of a cookbook
+
+#### List of Cookbooks
+
+In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks are mentioned in the list.
+
+{{< figure src="/images/automate/list-of-cookbooks.png" alt="List of Cookbooks">}}
+
+Select a cookbook from the list to view the details of that cookbook.
+
+#### Different Versions of Cookbooks
+
+To view different versions of a cookbook:
+
+- Select a cookbook from the list.
+- View the different versions of the cookbook using the dropdown list.
+
+{{< figure src="/images/automate/view-different-versions-of-cookbook.png" alt="Versions of a Cookbook">}}
+
+#### Cookbook Content
+
+Select the **Content** tab to view the recipes and other components of a cookbook. This view also contains the files or directories of the components. To view the cookbook content, select the file from the component list.
+
+{{< figure src="/images/automate/contents-of-a-cookbook.png" alt="Cookbook Contents">}}
+
+#### Details of a Cookbook
+
+Select the **Details** tab to view the requirements, usage, resources, and license of a cookbook.
+
+{{< figure src="/images/automate/details-of-a-cookbook.png" alt="Details of a Cookbook">}}
+
 ### Roles
 
 [Roles]({{< relref "roles" >}}) let you define patterns and processes that exist across nodes in an organization as belonging to a single job function. Each role consists of zero (or more) attributes and a run-list.
 
-The Chef Infra Server UI lets you:
+The Chef Infra Server lets you:
 
 - Create a role
-- List out all the roles at one place.
-- Search for a specific role from a list of roles.
+- View all roles
+- Search for a specific role
 - View the details of roles:
   - Run List
   - Attributes
@@ -135,12 +173,12 @@ An [environment]({{< relref "environments" >}}) can be used to map an organizati
 
 The Chef Infra Server UI lets you:
 
-- Create an environment.
-- Search for a specific environment from a list of environments.
-- List out all the environments at one place.
-- View the details of an environment.
-- Edit an environment.
-- Delete an environment.
+- Create an environment
+- View all environments
+- Search for a specific environment
+- View the details of an environment
+- Edit an environment
+- Delete an environment
 
 #### Create an Environment
 
@@ -190,13 +228,13 @@ The Chef Infra Server lets you delete environments one at a time. Select **Delet
 
 Chef Infra Server UI lets you:
 
-- Create a data bag.
-- List out all the data bags in one place.
-- Search for a specific data bag item from a list of items.
-- Create a data bag item.
-- Edit a data bag item.
-- Delete a data bag item.
-- Delete a data bag.
+- Create a data bag
+- View all data bags
+- Search for a specific data bag item
+- Create a data bag item
+- Edit a data bag item
+- Delete a data bag item
+- Delete a data bag
 
 #### Create a Data Bag
 
@@ -256,11 +294,11 @@ Chef Infra Server lets you delete the existing data bag one at a time. To delete
 
 Chef Infra Clients provide secure API access to the Chef Infra Server. Chef Infra Server UI lets you:
 
-- Create a client.
-- Search for a specific client from a list of clients.
-- List out all the clients at one place.
-- Reset a client key.
-- Delete a client.
+- Create a client
+- View all clients
+- Search for a specific client
+- Reset a client key
+- Delete a client
 
 #### Create a Client
 
@@ -309,8 +347,8 @@ A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. Dur
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific node from a list of nodes
-- View a list of all the connected nodes
+- Search for a specific node
+- View all nodes
 - Details of a node
 - Edit Run list
 - Edit Attributes
@@ -406,6 +444,35 @@ Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-
 Delete individual existing nodes by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-a-node.png" alt="Delete a Node">}}
+
+### Policyfiles
+
+[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote code with simpler interface.
+
+The Chef Infra Server integration lets you:
+
+- Search for a specific policyfiles
+- View all the policyfiles
+- Details of policyfiles
+- Delete policyfiles
+
+#### Search for Policyfiles
+
+Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to find a policy file from the list. Enter the name of a policy file in the search bar to view matching Policyfiles.
+
+{{< figure src="/images/automate/policyfiles-list-and-searchbar.png" alt="Policyfile">}}
+
+#### Details of Policyfiles
+
+Select a policyfile to view the details, that is the **Revision Id** and the **METADATA** of the policyfile. The **Content** tab contains the list of all the **Included Policies** and **Run List**.
+
+{{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
+
+#### Delete Policyfiles
+
+Delete individual policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
+
+{{< figure src="/images/automate/delete-policyfiles.png" alt="Delete Policyfiles">}}
 
 ## Troubleshoot
 

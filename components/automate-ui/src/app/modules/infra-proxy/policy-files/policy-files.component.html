@@ -32,11 +32,21 @@
         </chef-thead>
         <chef-tbody>
           <chef-tr *ngFor="let policyFile of pageOfItems">
-            <chef-td>{{ policyFile.name }}</chef-td>
+            <chef-td>
+              <a [routerLink]="['/infrastructure','chef-servers', serverId,
+              'organizations', orgId, 'policyfiles', policyFile.name, 'revision',policyFile.revision_id]">{{ policyFile.name }}</a>
+            </chef-td>
             <chef-td>{{ policyFile.revision_id }}</chef-td>
             <chef-td></chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
+                <mat-option 
+                  data-cy="revision-id"
+                  class="primary"
+                  (click)="slide.slidePanel(policyFile.name)">
+                  Revisions
+                  <chef-icon aria-hidden="true" class="primary">add</chef-icon>
+                </mat-option>
                 <mat-option 
                   data-cy="delete"
                   class="secondary"
@@ -63,4 +73,9 @@
       (changePage)="onChangePage($event)">
     </app-pagination>
   </ng-container>
+  <app-revision-id
+    #slide
+    [serverId]="serverId"
+    [orgId]="orgId">
+  </app-revision-id>
 </section>

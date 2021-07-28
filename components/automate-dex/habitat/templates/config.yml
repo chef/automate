@@ -221,9 +221,7 @@ oauth2:
     - token
     - id_token
   skipApprovalScreen: true
-{{- if cfg.connectors.saml}}
   alwaysShowLoginScreen: true
-{{- end}}
 
 {{- if cfg.bootstrap.insecure_admin}}
 staticPasswords:

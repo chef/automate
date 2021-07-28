@@ -1,5 +1,5 @@
 +++
-title = "ServiceNow Integration"
+title = "Chef Automate Incident Creation"
 
 draft = false
 
@@ -7,13 +7,17 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "ServiceNow Integration"
+    title = "Chef Automate Incident Creation"
     parent = "automate/reference"
     identifier = "automate/reference/servicenow_integration_install.md ServiceNow Integration"
     weight = 40
 +++
 
 This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Infra Client runs and Compliance scans.
+
+This App is for Chef Automate customers to easily generate incidents in their ServiceNow platforms whenever they have failures in their Chef managed estate due to either Infrastructure automation updates failing or automated Compliance check failures. Capture all failures across your estate for resolution and tracking to ensure any infrastructure automation problems are resolved rapidly and compliance failures are tracked and corrected as per your internal best practices.
+
+This integration gives a single place to track all issues seen across your automated infrastructure and improving the usefulness of both ServiceNow and Chef Automate within the Enterprise by reducing the overall effects of any failure scenarios.
 
 ## Chef Automate ServiceNow Integration
 

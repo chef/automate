@@ -8,9 +8,7 @@ import (
 	"io"
 	sorter "sort"
 	"strings"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"time"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
@@ -20,7 +18,8 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
-	"time"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -38,8 +37,8 @@ func New(es *relaxting.ES2Backend) *Server {
 }
 
 // ListReports returns a list of reports based on query
-func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
-	var reports reporting.Reports
+func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*reporting.ReportsSummaryLevelOne, error) {
+	var reports reporting.ReportsSummaryLevelOne
 	var SORT_FIELDS = map[string]string{
 		"node_name":                              "node_name.lower",
 		"latest_report.end_time":                 "end_time",

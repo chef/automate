@@ -93,6 +93,7 @@ import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
 import { RecipeRequests } from './entities/recipes/recipe.requests';
+import { RevisionRequests } from './entities/revisions/revision.requests';
 import { RoleEnvironmentRequests } from './entities/role-environments/role-environments.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
@@ -346,6 +347,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     ProjectsFilterRequests,
     ProjectsFilterService,
     RecipeRequests,
+    RevisionRequests,
     RoleEnvironmentRequests,
     RoleRequests,
     RuleRequests,
