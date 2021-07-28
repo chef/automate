@@ -668,6 +668,11 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *cereal.Workfl
 	return nil
 }
 
+// empty method unimplmented
+func (pg *PostgresBackend) DequeueWorkflowChunk(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleterChunk, error) {
+	return nil, nil, nil
+}
+
 func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 

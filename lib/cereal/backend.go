@@ -10,6 +10,7 @@ type Driver interface {
 
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstanceData) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
+	DequeueWorkflowChunk(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleterChunk, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
 	KillWorkflow(ctx context.Context, instanceName string, workflowName string) error
 

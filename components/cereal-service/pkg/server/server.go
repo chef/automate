@@ -147,7 +147,6 @@ func readDeqWorkReqMsgChunk(ctx context.Context, s cereal.CerealService_DequeueW
 		// s.Recv will return once it receives a message or its underlying
 		// context is canceled
 		msg, err := s.Recv()
-		logrus.Println(":::::reader", msg, err)
 		select {
 		case <-ctx.Done():
 		case in <- chanMsg{Msg: msg, Err: err}:
@@ -393,7 +392,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 }
 
 func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWorkflowChunkServer) error {
-	ctx, cancel := context.WithCancel((req.Context()))
+	ctx, cancel := context.WithTimeout(req.Context(), 5*time.Minute)
 	defer cancel()
 
 	logctx := logrus.WithFields(logrus.Fields{
@@ -425,7 +424,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 	for _, workflowName := range deqMsg.WorkflowNames {
 		workflowNames = append(workflowNames, namespace(deqMsg.Domain, workflowName))
 	}
-	evt, completer, err := s.backend.DequeueWorkflow(ctx, workflowNames)
+	evt, completer, err := s.backend.DequeueWorkflowChunk(ctx, workflowNames)
 	if err != nil {
 		if err == libcereal.ErrNoWorkflowInstances {
 			return status.Error(codes.NotFound, err.Error())
