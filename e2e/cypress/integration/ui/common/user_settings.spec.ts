@@ -17,7 +17,7 @@ describe('login the app', () => {
             });
         });
 
-        it('change and save timeformat value', function () {
+        xit('change and save timeformat value', function () {
             cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
                 cy.get('[value=YYYY-M-D]').click().then(() => {
                     cy.get('[data-cy=timeformat-dropdown]').should('have.value', 'YYYY-M-D')
