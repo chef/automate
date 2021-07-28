@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"strings"
@@ -124,7 +125,13 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 	logrus.Println(":::::dsdsd", n)
 	taskResults.NodeIDs = n
 
-	return taskResults, nil
+	byteValue, err := ioutil.ReadFile("/src/components/data-feed-service/service/data.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var result DataFeedPollTaskResults
+	json.Unmarshal([]byte(byteValue), &result)
+	return result, nil
 }
 
 // getFeedTimes determines the start and end times for the next interval to poll

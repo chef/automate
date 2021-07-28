@@ -283,7 +283,11 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	var resp *grpccereal.DequeueWorkflowResponseChunk
 	for {
 		resp, err = s.Recv()
-		logrus.Println(":::resp", resp)
+		logrus.Println(":::resp", string(resp.GetChunk()))
+		if string(resp.GetChunk()) == "EOF" {
+			logrus.Printf("GOT EOF !!!!!!!!!!!!!!")
+			break
+		}
 		if err != nil {
 			if err == io.EOF {
 				logrus.Printf("Transfer of %d bytes successful", len(blob))
@@ -300,18 +304,28 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		blob = append(blob, resp.GetChunk()...)
 	}
 
-	logrus.Println(":::blob", blob)
+	// logrus.Println(string(blob))
 
-	deq := &grpccereal.DequeueWorkflowResponse{}
+	deq := &grpccereal.DequeueWorkflowResponse_Dequeue{}
 
-	json.Unmarshal(blob, deq)
+	// str := strings.Replace(string(blob), "")
+
+	// err = ioutil.WriteFile("/src/output.json", blob, 0644)
+	// if err != nil {
+	// 	logrus.Println(err)
+	// }
+	err = json.Unmarshal(blob, deq)
+	if err != nil {
+		logrus.Println(":::errrrrrr!!!!!!!!", err)
+	}
+	logrus.Println(":::deq!!!!!!!!", deq)
 
 	// if deq == nil {
 	// 	cancel()
 	// 	return nil, nil, errors.New("unexpected")
 	// }
 	// deq := resp.GetDequeue()
-	tsProto := deq.GetDequeue().GetEvent().GetEnqueuedAt()
+	tsProto := deq.GetEvent().GetEnqueuedAt()
 	ts := time.Time{}
 	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
@@ -322,7 +336,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	}
 
 	var taskResult *cereal.TaskResultData
-	if tr := deq.GetDequeue().GetEvent().GetTaskResult(); tr != nil {
+	if tr := deq.GetEvent().GetTaskResult(); tr != nil {
 		taskResult = &cereal.TaskResultData{
 			TaskName:   tr.GetTaskName(),
 			Parameters: tr.GetParameters(),
@@ -331,12 +345,12 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			Result:     tr.GetResult(),
 		}
 	}
-	backendInstance := grpcWorkflowInstanceToBackend(deq.GetDequeue().GetInstance())
+	backendInstance := grpcWorkflowInstanceToBackend(deq.GetInstance())
 	wevt := &cereal.WorkflowEvent{
 		Instance:           backendInstance,
-		Type:               cereal.WorkflowEventType(deq.GetDequeue().GetEvent().GetType()),
-		EnqueuedTaskCount:  int(deq.GetDequeue().GetEvent().GetEnqueuedTaskCount()),
-		CompletedTaskCount: int(deq.GetDequeue().GetEvent().GetCompletedTaskCount()),
+		Type:               cereal.WorkflowEventType(deq.GetEvent().GetType()),
+		EnqueuedTaskCount:  int(deq.GetEvent().GetEnqueuedTaskCount()),
+		CompletedTaskCount: int(deq.GetEvent().GetCompletedTaskCount()),
 		TaskResult:         taskResult,
 		EnqueuedAt:         ts,
 	}

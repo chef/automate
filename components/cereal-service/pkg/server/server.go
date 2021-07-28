@@ -176,7 +176,10 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 		defer close(out)
 		// s.Send will return once it sends the message or its underlying context
 		// is closed
-		bt, _ := json.Marshal(msg)
+		// reqBodyBytes := new(bytes.Buffer)
+		// json.NewEncoder(reqBodyBytes).Encode(msg)
+		// bt := reqBodyBytes.Bytes()
+		bt, _ := json.Marshal(msg.GetDequeue())
 		var err error
 		chnk := []byte{}
 		for currentByte := 0; currentByte < len(bt); currentByte += chunkSize {
@@ -191,6 +194,12 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			if err = s.Send(data); err != nil {
 				fmt.Println(err)
 			}
+		}
+		data := &cereal.DequeueWorkflowResponseChunk{
+			Chunk: []byte("EOF"),
+		}
+		if err = s.Send(data); err != nil {
+			fmt.Println(err)
 		}
 
 		// err := s.Send(msg)
@@ -384,7 +393,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.CerealService_DequeueWorkflow
 }
 
 func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWorkflowChunkServer) error {
-	ctx, cancel := context.WithTimeout(req.Context(), time.Minute)
+	ctx, cancel := context.WithCancel((req.Context()))
 	defer cancel()
 
 	logctx := logrus.WithFields(logrus.Fields{
