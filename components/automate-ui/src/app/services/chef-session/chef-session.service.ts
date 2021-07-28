@@ -4,7 +4,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter } from 'rxjs/operators';
+import { map, mergeMap, filter, retry } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
 import { environment } from 'environments/environment';
@@ -66,12 +66,18 @@ export class ChefSessionService implements CanActivate {
       // and components/session-service and chef-session-service -- it would
       // make sense to try to refresh the session if we get a 401 from the API,
       // before giving up and calling logout().
+
       timer(0, minute).pipe(
-        filter(() => !this.isRefreshing),
+        filter(() => {
+          console.log( !this.isRefreshing, " !this.isRefreshing")
+          return !this.isRefreshing
+        }),
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
-        })
+        }),
+        // retry 2 times on error
+        retry(2)
       ).subscribe(
         token => {
           this.ingestIDToken(token);
@@ -86,7 +92,7 @@ export class ChefSessionService implements CanActivate {
               console.log(`Session refresh failed: ${error.statusText}`);
             }
           } else {
-            console.log(error);
+            console.log(error, "retried 2 times on error");
           }
         }
       );
@@ -95,6 +101,7 @@ export class ChefSessionService implements CanActivate {
 
   private refresh(): Observable<string> {
     if(!this.id_token) {
+      this.isRefreshing = false;
       console.log('comingggg regfresh didnt call', this.id_token);
       return throwError('id_token is yet to be retrived');
     }
@@ -110,6 +117,7 @@ export class ChefSessionService implements CanActivate {
         return obj['id_token'];
       })
     );
+    // return throwError('id_token is yet to be retrived out');
   }
 
   ingestIDToken(idToken: string): void {
