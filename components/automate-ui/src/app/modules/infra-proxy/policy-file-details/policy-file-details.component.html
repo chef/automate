@@ -74,7 +74,7 @@
                   </div>
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
-                <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''"> 
+                <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''">
                   <div class="item-details">
                     <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
                       <img alt="No preview" src="/assets/img/no_preview.gif" />
@@ -84,7 +84,7 @@
                       <chef-table>
                         <chef-thead>
                           <chef-tr class="no_border_tr">
-                            <chef-th class="no_border_th">Policy Files</chef-th>
+                            <chef-th class="no_border_th">Policyfiles</chef-th>
                             <chef-th class="no_border_th">Revision ID</chef-th>
                             <chef-th class="no_border_th"></chef-th>
                             <chef-th class="no_border_th three-dot-column"></chef-th>
@@ -102,7 +102,7 @@
                         </chef-tbody>
                       </chef-table>
                     </div>
-                  </div>  
+                  </div>
                 </div>
               </li>
             </ul>
@@ -114,7 +114,7 @@
                   </div>
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
-                <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''"> 
+                <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''">
                   <div class="item-details">
                     <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
                       <img alt="No preview" src="/assets/img/no_preview.gif" />
@@ -142,7 +142,7 @@
                         </chef-tbody>
                       </chef-table>
                     </div>
-                  </div>  
+                  </div>
                 </div>
               </li>
             </ul>
@@ -165,7 +165,7 @@
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button tertiary class="action" 
+              <chef-button tertiary class="action"
                 [disabled]= !hasDefaultattributes
                 (click)="tree.collapse()"
                 data-cy="collapse-default-attribute">
@@ -177,7 +177,7 @@
             <div class="json-container">
               <div class="scroll">
                 <app-json-tree-table
-                  class="json-tree-container" 
+                  class="json-tree-container"
                   [hidden]="hasDefaultattributes? false : true"
                   #tree
                   [json]="defaultAttributes">
@@ -228,7 +228,7 @@
                 </div>
               </div>
             </div>
-          </div>    
+          </div>
         </div>
       </section>
       <app-revision-id
