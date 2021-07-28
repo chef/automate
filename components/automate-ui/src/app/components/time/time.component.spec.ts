@@ -5,6 +5,7 @@ import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { TimeComponent } from './time.component';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import * as moment from 'moment/moment';
 
 describe('TimeComponent', () => {
   let component: TimeComponent;
@@ -35,6 +36,6 @@ describe('TimeComponent', () => {
   it('render timeformat', () => {
     component.time = '2021-07-26T10:50:42.529876072Z';
     const element = fixture.debugElement.nativeElement;
-    expect(element.querySelector('span').textContent).toContain('Tue, 27 Jul 2021');
+    expect(element.querySelector('span').textContent).toContain(moment(new Date()).format('ddd, DD MMM YYYY'));
   });
 });

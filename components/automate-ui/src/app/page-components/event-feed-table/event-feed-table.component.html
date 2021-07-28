@@ -2,7 +2,7 @@
   <caption class="visually-hidden">Event Feed Table</caption>
   <li *ngFor="let event of events; index as i" class="event-row">
     <div class="event-date-time">
-      <app-time [time]='event.startTime' class="chef-time-format"></app-time>
+      <app-time [time]='event.startTime' class="time-format"></app-time>
     </div>
     <div class="event-info">
       <div class="event-chat-bubble">
