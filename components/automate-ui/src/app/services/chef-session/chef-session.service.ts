@@ -3,7 +3,7 @@ import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angula
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Observable, ReplaySubject, timer } from 'rxjs';
+import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
 import { map, mergeMap, filter } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
@@ -94,12 +94,17 @@ export class ChefSessionService implements CanActivate {
   }
 
   private refresh(): Observable<string> {
+    if(!this.id_token) {
+      console.log('comingggg regfresh didnt call', this.id_token);
+      return throwError('id_token is yet to be retrived');
+    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.id_token}`
       })
     };
+    console.log('calling refresh', this.id_token)
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
@@ -108,6 +113,9 @@ export class ChefSessionService implements CanActivate {
   }
 
   ingestIDToken(idToken: string): void {
+    if(!idToken) {
+      return;
+    }
     const id = Jwt.parseIDToken(idToken);
     if (id === null) {
       return;
@@ -224,7 +232,10 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    return this.user.id_token;
+    if(this.user) {
+      return this.user.id_token;
+    }
+    return;
   }
 
   get token_provider(): ReplaySubject<string> {
