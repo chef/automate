@@ -14,10 +14,12 @@ import (
 const uniqueViolation = "23505"
 
 type Destination struct {
-	ID     int64  `db:"id"`
-	Name   string `db:"name"`
-	URL    string `db:"url"`
-	Secret string `db:"secret"`
+	ID                int64  `db:"id"`
+	Name              string `db:"name"`
+	URL               string `db:"url"`
+	Secret            string `db:"secret"`
+	Services          string `db:"services"`
+	Integration_types string `db:"integration_types"`
 }
 
 func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
@@ -26,6 +28,8 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
+	newDestination.Services = inDestination.Services
+	newDestination.Integration_types = inDestination.IntegrationTypes
 
 	return &newDestination
 }
@@ -36,6 +40,8 @@ func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *De
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
+	newDestination.Services = inDestination.Services
+	newDestination.Integration_types = inDestination.IntegrationTypes
 
 	return &newDestination
 }
@@ -46,6 +52,8 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Name = inDestination.Name
 	newDestination.Url = inDestination.URL
 	newDestination.Secret = inDestination.Secret
+	newDestination.Services = inDestination.Services
+	newDestination.IntegrationTypes = inDestination.Integration_types
 
 	return &newDestination
 }
