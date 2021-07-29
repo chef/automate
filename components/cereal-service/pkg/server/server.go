@@ -187,12 +187,18 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 		var err error
 		if msgType == BodyType.dequeue {
 			bt, err = json.Marshal(msg.GetDequeue())
+
 		} else if msgType == BodyType.committed {
 			bt, err = json.Marshal(msg.GetCommitted())
 		} else {
 			err = errors.New("Please provide valid body type")
 		}
-		chnk := []byte{}
+		if err != nil {
+			logrus.Errorln("Error marshaling data:", err)
+			out <- err
+			return
+		}
+		var chnk []byte
 		for currentByte := 0; currentByte < len(bt); currentByte += chunkSize {
 			if currentByte+chunkSize > len(bt) {
 				chnk = bt[currentByte:]
@@ -204,7 +210,11 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			}
 			err = s.Send(data)
 			if err != nil {
-				logrus.Errorln("Error sending data:", err)
+				if err != nil {
+					logrus.Errorln("Error sending data:", err)
+					out <- err
+					return
+				}
 				break
 			}
 		}
@@ -216,7 +226,6 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			logrus.Errorln("Error sending data:", err)
 		}
 
-		// err := s.Send(msg)
 		select {
 		case <-ctx.Done():
 		case out <- err:
