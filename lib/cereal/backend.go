@@ -10,7 +10,6 @@ type Driver interface {
 
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstanceData) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
-	DequeueWorkflowChunk(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleterChunk, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
 	KillWorkflow(ctx context.Context, instanceName string, workflowName string) error
 
@@ -51,15 +50,6 @@ type TaskCompleter interface {
 }
 
 type WorkflowCompleter interface {
-	EnqueueTask(task *TaskData, opts TaskEnqueueOptions) error
-
-	Continue(payload []byte) error
-	Fail(err error) error
-	Done(result []byte) error
-	Close() error
-}
-
-type WorkflowCompleterChunk interface {
 	EnqueueTask(task *TaskData, opts TaskEnqueueOptions) error
 
 	Continue(payload []byte) error

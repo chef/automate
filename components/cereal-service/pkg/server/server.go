@@ -24,6 +24,14 @@ import (
 var errInvalidMsg = errors.New("invalid msg")
 var domainRegex = regexp.MustCompile("^[a-zA-Z0-9_\\-\\.]+$")
 
+var BodyType = struct {
+	committed string
+	dequeue   string
+}{
+	committed: "committed",
+	dequeue:   "dequeue",
+}
+
 type CerealService struct {
 	workflowScheduler *libcereal.WorkflowScheduler
 	backend           libcereal.Driver
@@ -132,7 +140,7 @@ func readDeqWorkReqMsg(ctx context.Context, s cereal.CerealService_DequeueWorkfl
 	}
 }
 
-func readDeqWorkReqMsgChunk(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer) (*cereal.DequeueWorkflowRequest, error) {
+func readDeqWorkReqMsgForChunkServer(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer) (*cereal.DequeueWorkflowRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -166,7 +174,7 @@ func readDeqWorkReqMsgChunk(ctx context.Context, s cereal.CerealService_DequeueW
 
 const chunkSize = 64 * 1024 // 64 KiB
 
-func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer, msg *cereal.DequeueWorkflowResponse) error {
+func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer, msgType string, msg *cereal.DequeueWorkflowResponse) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -175,11 +183,15 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 		defer close(out)
 		// s.Send will return once it sends the message or its underlying context
 		// is closed
-		// reqBodyBytes := new(bytes.Buffer)
-		// json.NewEncoder(reqBodyBytes).Encode(msg)
-		// bt := reqBodyBytes.Bytes()
-		bt, _ := json.Marshal(msg.GetDequeue())
+		var bt []byte
 		var err error
+		if msgType == BodyType.dequeue {
+			bt, err = json.Marshal(msg.GetDequeue())
+		} else if msgType == BodyType.committed {
+			bt, err = json.Marshal(msg.GetCommitted())
+		} else {
+			err = errors.New("Please provide valid body type")
+		}
 		chnk := []byte{}
 		for currentByte := 0; currentByte < len(bt); currentByte += chunkSize {
 			if currentByte+chunkSize > len(bt) {
@@ -190,15 +202,18 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			data := &cereal.DequeueWorkflowResponseChunk{
 				Chunk: chnk,
 			}
-			if err = s.Send(data); err != nil {
-				fmt.Println(err)
+			err = s.Send(data)
+			if err != nil {
+				logrus.Errorln("Error sending data:", err)
+				break
 			}
 		}
 		data := &cereal.DequeueWorkflowResponseChunk{
 			Chunk: []byte("EOF"),
 		}
-		if err = s.Send(data); err != nil {
-			fmt.Println(err)
+		err = s.Send(data)
+		if err != nil {
+			logrus.Errorln("Error sending data:", err)
 		}
 
 		// err := s.Send(msg)
@@ -397,11 +412,11 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
-		"method": "DequeueWorkflow",
+		"method": "DequeueWorkflowChunk",
 	})
 	// read dequeue message
 	var deqMsg *cereal.DequeueWorkflowRequest_Dequeue
-	msg, err := readDeqWorkReqMsgChunk(ctx, req)
+	msg, err := readDeqWorkReqMsgForChunkServer(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -424,7 +439,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 	for _, workflowName := range deqMsg.WorkflowNames {
 		workflowNames = append(workflowNames, namespace(deqMsg.Domain, workflowName))
 	}
-	evt, completer, err := s.backend.DequeueWorkflowChunk(ctx, workflowNames)
+	evt, completer, err := s.backend.DequeueWorkflow(ctx, workflowNames)
 	if err != nil {
 		if err == libcereal.ErrNoWorkflowInstances {
 			return status.Error(codes.NotFound, err.Error())
@@ -462,7 +477,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 		}
 	}
 	grpcInstance := cerealWorkflowInstanceToGrpc(&evt.Instance)
-	err = writeDeqWorkRespMsgChunk(ctx, req, &cereal.DequeueWorkflowResponse{
+	err = writeDeqWorkRespMsgChunk(ctx, req, BodyType.dequeue, &cereal.DequeueWorkflowResponse{
 		Cmd: &cereal.DequeueWorkflowResponse_Dequeue_{
 			Dequeue: &cereal.DequeueWorkflowResponse_Dequeue{
 				Instance: grpcInstance,
@@ -482,7 +497,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 	}
 
 	// read workflow completion message
-	msg, err = readDeqWorkReqMsgChunk(ctx, req)
+	msg, err = readDeqWorkReqMsgForChunkServer(ctx, req)
 	if err != nil {
 		logctx.WithError(err).Error("failed to read workflow event completion response!!!")
 		return err
@@ -529,7 +544,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 		return errInvalidMsg
 	}
 
-	err = writeDeqWorkRespMsgChunk(ctx, req, &cereal.DequeueWorkflowResponse{
+	err = writeDeqWorkRespMsgChunk(ctx, req, BodyType.committed, &cereal.DequeueWorkflowResponse{
 		Cmd: &cereal.DequeueWorkflowResponse_Committed_{
 			Committed: &cereal.DequeueWorkflowResponse_Committed{},
 		},
