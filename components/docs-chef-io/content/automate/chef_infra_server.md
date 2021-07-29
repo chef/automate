@@ -469,17 +469,19 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 Select a policyfile to view the details of the policyfile. The details are the **METADATA**, **Content**, **Attributes** and **Revision id** of the policyfiles.
 
-IMAGE
+{{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
 The **content** tab contains the list of all the *included policies* and *run list*, whereas the **attributes** tab displays the *default* and the *override* attributes of the policyfiles.
 
-IMAGE
+{{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
 You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
 
 {{< note >}}
 You can find the **revision id** window directly by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} of a policyfile. Selecting the option opens a pop-up which contains the detailed revision id.
 {{< /note >}}
+
+{{< figure src="/images/automate/revision-id-of-policyfiles.png" alt="Revision id of Policyfiles">}}
 
 #### Delete Policyfiles
 
