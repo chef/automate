@@ -68,10 +68,7 @@ export class ChefSessionService implements CanActivate {
       // before giving up and calling logout().
 
       timer(0, minute).pipe(
-        filter(() => {
-          console.log( !this.isRefreshing, " !this.isRefreshing")
-          return !this.isRefreshing
-        }),
+        filter(() => !this.isRefreshing),
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
@@ -92,7 +89,7 @@ export class ChefSessionService implements CanActivate {
               console.log(`Session refresh failed: ${error.statusText}`);
             }
           } else {
-            console.log(error, "retried 2 times on error");
+            console.log(error, 'retried 2 times on error');
           }
         }
       );
@@ -100,10 +97,9 @@ export class ChefSessionService implements CanActivate {
   }
 
   private refresh(): Observable<string> {
-    if(!this.id_token) {
+    if (!this.id_token) {
       this.isRefreshing = false;
-      console.log('comingggg regfresh didnt call', this.id_token);
-      return throwError('id_token is yet to be retrived');
+      return throwError('id_token is yet to be retrieved');
     }
     const httpOptions = {
       headers: new HttpHeaders({
@@ -111,17 +107,15 @@ export class ChefSessionService implements CanActivate {
         'Authorization': `Bearer ${this.id_token}`
       })
     };
-    console.log('calling refresh', this.id_token)
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
       })
     );
-    // return throwError('id_token is yet to be retrived out');
   }
 
   ingestIDToken(idToken: string): void {
-    if(!idToken) {
+    if (!idToken) {
       return;
     }
     const id = Jwt.parseIDToken(idToken);
@@ -240,7 +234,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    if(this.user) {
+    if (this.user) {
       return this.user.id_token;
     }
     return;
