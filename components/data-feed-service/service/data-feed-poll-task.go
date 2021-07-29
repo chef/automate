@@ -114,6 +114,7 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
 	taskResults.NodeIDs = nodeIDs
+
 	return taskResults, nil
 }
 
