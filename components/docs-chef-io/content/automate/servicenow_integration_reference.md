@@ -167,9 +167,9 @@ You can navigate to the reconcile rule section by selecting **CI Class Manager**
 
 {{< figure src="/images/automate/snow_integration_reconcile.png" alt="Reconciliation Rules">}}
 
-{{< figure src="/images/automate/snow_integration_reconcile1.png" alt="Create Reconcile Rule">}}
-
 Refer [Create a CI reconciliation rule](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/task/t_CreateCIReconciliationRule.html) page on how to set a reconciliation rule.
+
+{{< figure src="/images/automate/snow_integration_reconcile1.png" alt="Create Reconcile Rule">}}
 
 {{< note >}}
 
