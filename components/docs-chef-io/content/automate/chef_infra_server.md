@@ -478,7 +478,7 @@ The **content** tab contains the list of all the *included policies* and *run li
 You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
 
 {{< note >}}
-You can find the **revision id** window directly by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} of a policyfile. Selecting the option opens a pop-up which contains the detailed revision id.
+You can find the **revision id** window directly by selecting the ellipses icon of a policyfile. Selecting the option opens a pop-up which contains the detailed revision id.
 {{< /note >}}
 
 {{< figure src="/images/automate/revision-id-of-policyfiles.png" alt="Revision id of Policyfiles">}}
