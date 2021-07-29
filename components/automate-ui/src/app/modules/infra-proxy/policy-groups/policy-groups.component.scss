@@ -1,0 +1,17 @@
+@import "~styles/variables";
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+  
+th {
+  text-align: left;
+  padding: 0px;
+  letter-spacing: 0.2px;
+}
+
+.search-create-container {
+  margin: 24px 0 18px;
+}
