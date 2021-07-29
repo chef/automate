@@ -155,19 +155,19 @@ Refer [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-managem
 
 Reconciliation is the synchronization of two or more matching database segments to ensure consistency across them.
 
+The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow authoritative data sources to update CI records in the CMDB.
+
 Identification rules identify new CIs and existing CIs. It applies to a CI class, and it can be single or multiple with different priorities.
 
 Reconciliation rules specify which discovery sources can update a table or a set of table attributes, and the precedence order among these discovery sources. You can define these rules at the parent or at the child class level. Without reconciliation rules, discovery sources are overwritten with each other's updates to attribute values.
 
-The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow authoritative data sources to update CI records in the CMDB.
-
-Refer [CMDB Identification and Reconciliation](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/concept/c_CMDBIdentifyandReconcile.html) page for detailed information on these rules.
+Refer to ServiceNow's [CMDB Identification and Reconciliation](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/concept/c_CMDBIdentifyandReconcile.html) page for detailed information on these rules.
 
 You can navigate to the reconcile rule section by selecting **CI Class Manager** > **Hierarchy** > **CI Classes** > **Reconciliation Rules** from ServiceNow.
 
 {{< figure src="/images/automate/snow_integration_reconcile.png" alt="Reconciliation Rules">}}
 
-{{< figure src="/images/automate/snow_integration__reconcile1.png" alt="Create Reconcile Rule">}}
+{{< figure src="/images/automate/snow_integration_reconcile1.png" alt="Create Reconcile Rule">}}
 
 Refer [Create a CI reconciliation rule](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/task/t_CreateCIReconciliationRule.html) page on how to set a reconciliation rule.
 

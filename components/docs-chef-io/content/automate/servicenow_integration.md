@@ -16,7 +16,7 @@ gh_repo = "automate"
 
 The Chef Automate Integration App for ServiceNow enables the integration of Chef Automate in the ServiceNow. The Chef Automate integration is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. The Chef Automate Integration App enables Chef Automate to create and update client node records to the configuration management database (CMDB) tables of ServiceNow. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time.
 
-{{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram">}}
+{{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram" >}}
 
 ## Installation
 
@@ -46,7 +46,7 @@ Install following ServiceNow plugins:
 
 Locate the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application.
 
-{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins">}}
+{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins" >}}
 
 ### Install the Chef Automate Integration App
 
@@ -68,9 +68,9 @@ The ServiceNow users must have the `x_chef_automate.api` role to set up the Serv
 
 The Chef Automate Integration App has three default roles:
 
-- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role_x_chef_automate.admin" >}})
-- [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role_x_chef_automate.user" >}})
-- [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role_x_chef_automate.api" >}})
+- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role x_chef_automate.admin" >}})
+- [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role x_chef_automate.user" >}})
+- [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role x_chef_automate.api" >}})
 
 You can assign these roles to the existing or new ServiceNow users. These roles are part of the package. If there is a need for further restrictions, you can create the required roles and controls. Also, you can associate a single user with more than one role.
 
@@ -83,19 +83,15 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 
 ### Discovery Source
 
-The Chef Automate Integration App provides a unique ID as a discovery source that distinguishes between discovered CIs and imported CIs. The **Discovery Source** field is part of the `cmdb_servers` table, and it takes **ChefAutomate** value while importing CIs by default.
+The Chef Automate Integration App provides a unique ID as a discovery source that distinguishes between discovered Configuration Items (CIs) and imported CIs. The **Discovery Source** field is part of the `cmdb_servers` table, and it takes **ChefAutomate** value while importing CIs by default.
 
-{{< figure src="/images/automate/snow_integration_plugins.png" alt="Discovery Source">}}
+{{< figure src="/images/automate/snow_integration_discovery.png" alt="Discovery Source">}}
 
 {{< note >}}
 
 The servers recognized by Chef Automate Integration App have discovery source value as **ChefAutomate**.
 
 {{< /note >}}
-
-Refer [Add New Discovery Source](https://developer.servicenow.com/connect.do#!/event/knowledge19/LAB0577/knowledge19_LAB0577_add_new_discovery_source) page to create a new and unique discovery source that distinguishes discovered CIs and imported CIs.
-
-Refer [Change Discovery Source Name](https://docs.servicenow.com/bundle/rome-it-operations-management/page/product/discovery/task/t_ChangeTheDiscoverySourceName.html) page to change the source name of discovery results.
 
 ## Configuration
 
