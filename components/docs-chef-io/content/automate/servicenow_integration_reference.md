@@ -83,7 +83,7 @@ You can navigate to the **Script Includes** section by selecting **Chef Automate
 
 ### Scripted REST API
 
-The **Scripted Rest API** feature aids in establishing a connection between ServiceNow and the Chef Automate application with authentication. You can navigate this section by selecting **Chef Automate** > **Script Rest API** from ServiceNow.
+The **Scripted Rest API** feature aids in establishing a connection between ServiceNow and the Chef Automate application with authentication. You can navigate to this section by selecting **Chef Automate** > **Script Rest API** from ServiceNow.
 
 {{< figure src="/images/automate/snow_integration_scripted_restapi_1.png" alt="Scripted REST Service">}}
 
@@ -144,6 +144,38 @@ The **Field Maps** establishes a relationship between a field in an import set t
   1. Insert or update data in the _cmdb\_ci\_network\_adapter_ table.
 
 {{< figure src="/images/automate/snow_integration_transform_map_scripts1.png" alt="Transform Map Scripts">}}
+
+## Discovery
+
+[ServiceNow](https://www.servicenow.com/) Discovery feature finds applications and devices on your network, and then updates the CMDB with the information it finds. It discovers both physical and logical components, including virtual machines, servers, storage, databases, applications, and more.
+
+Refer [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-management/page/product/discovery/reference/r-discovery.html) page for information on Discovery and its types.
+
+### Identification and Reconciliation
+
+Reconciliation is the synchronization of two or more matching database segments to ensure consistency across them.
+
+Identification rules identify new CIs and existing CIs. It applies to a CI class, and it can be single or multiple with different priorities.
+
+Reconciliation rules specify which discovery sources can update a table or a set of table attributes, and the precedence order among these discovery sources. You can define these rules at the parent or at the child class level. Without reconciliation rules, discovery sources are overwritten with each other's updates to attribute values.
+
+The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow authoritative data sources to update CI records in the CMDB.
+
+Refer [CMDB Identification and Reconciliation](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/concept/c_CMDBIdentifyandReconcile.html) page for detailed information on these rules.
+
+You can navigate to the reconcile rule section by selecting **CI Class Manager** > **Hierarchy** > **CI Classes** > **Reconciliation Rules** from ServiceNow.
+
+{{< figure src="/images/automate/snow_integration_reconcile.png" alt="Reconciliation Rules">}}
+
+{{< figure src="/images/automate/snow_integration__reconcile1.png" alt="Create Reconcile Rule">}}
+
+Refer [Create a CI reconciliation rule](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/task/t_CreateCIReconciliationRule.html) page on how to set a reconciliation rule.
+
+{{< note >}}
+
+The Chef Automate Integration App does not provide any reconciliation rules.
+
+{{< /note >}}
 
 ## Roles
 
