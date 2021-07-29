@@ -111,7 +111,6 @@ func (c *workflowCompleter) finish(err error) error {
 		return err
 	}
 	if committedMsg.GetCommitted() == nil {
-		logrus.Println("workflowCompleter: errUnknownMessage")
 		return errUnknownMessage
 	}
 
@@ -526,7 +525,6 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 			logrus.Debug("Received committed")
 			errOut = nil
 		} else {
-			logrus.Println("dequeue: errUnknownMessage")
 			errOut = errUnknownMessage
 		}
 		cancel()
