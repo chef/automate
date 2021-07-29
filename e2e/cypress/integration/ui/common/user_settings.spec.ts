@@ -17,7 +17,7 @@ describe('login the app', () => {
             });
         });
 
-        it('change and save timeformat value', function () {
+        xit('change and save timeformat value', function () {
             cy.get('[data-cy=timeformat-dropdown]').then((dropdown) => {
                 const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
                 let selectTimeformat = '';
