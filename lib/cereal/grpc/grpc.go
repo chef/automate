@@ -187,7 +187,8 @@ func (c *workflowCompleterChunk) finish(err error) error {
 	var resp *grpccereal.DequeueWorkflowResponseChunk
 	for {
 		resp, err = c.s.Recv()
-		if string(resp.GetChunk()) == "EOF" {
+		chunk := resp.GetChunk()
+		if len(chunk) == 3 && string(chunk) == "EOF" {
 			logrus.Debugln("Got EOF in finish")
 			break
 		}
@@ -195,7 +196,7 @@ func (c *workflowCompleterChunk) finish(err error) error {
 			logrus.WithError(err).Error("Did not get committed message in chunk workflow")
 			return err
 		}
-		blob = append(blob, resp.GetChunk()...)
+		blob = append(blob, chunk...)
 	}
 
 	deq := &grpccereal.DequeueWorkflowResponse_Committed{}
@@ -273,7 +274,8 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	var resp *grpccereal.DequeueWorkflowResponseChunk
 	for {
 		resp, err = s.Recv()
-		if string(resp.GetChunk()) == "EOF" {
+		chunk := resp.GetChunk()
+		if len(chunk) == 3 && string(chunk) == "EOF" {
 			logrus.Debugln("Got EOF in DequeueWorkflow")
 			break
 		}
@@ -286,7 +288,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			}
 			return nil, nil, err
 		}
-		blob = append(blob, resp.GetChunk()...)
+		blob = append(blob, chunk...)
 	}
 
 	deq := &grpccereal.DequeueWorkflowResponse_Dequeue{}
