@@ -213,6 +213,19 @@ export class ChefSessionService implements CanActivate {
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
 
+  // blacklistIdToken call /logout endpoint in session-service
+  blacklistIdToken(idToken: string): void {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      })
+    };
+    this.httpHandler.get('/session/logout', httpOptions);
+    debugger
+    return;
+  }
+
   // deleteSession removes the session information from localStorage
   deleteSession(): void {
     localStorage.removeItem(sessionKey);
@@ -226,6 +239,11 @@ export class ChefSessionService implements CanActivate {
   // url: UI route to go back to when the (next) signin process has succeeded
   // noHint: for the sign in, don't try to skip the method selection
   logout(url?: string, noHint?: boolean): void {
+    if(this.user) {
+      this.blacklistIdToken(this.user.id_token);
+      console.log('called this.user.id_token', this.user.id_token)
+    }
+
     this.deleteSession();
     url = url || this.currentPath();
     // note: url will end up url-encoded in this string (magic)

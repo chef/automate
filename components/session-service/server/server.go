@@ -162,6 +162,8 @@ func (s *Server) initHandlers() {
 	r.HandleFunc("/callback", s.callbackHandler).
 		Methods("GET").
 		HeadersRegexp("Cookie", "session=.+")
+	r.HandleFunc("/logout", s.logoutHandler).
+		Methods("GET")
 
 	// these are only to be used if Builder is configured to authenticate with Automate
 	r.HandleFunc("/token", s.tokenHandler).
@@ -197,6 +199,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
 	httpError(w, http.StatusUnauthorized)
+}
+
+func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	idToken, err := util.ExtractBearerToken(r)
+	if err != nil {
+		s.log.Debug("no bearer token")
+		httpError(w, http.StatusUnauthorized)
+		return
+	}
+	fmt.Println(idToken, "Abd::idToken")
 }
 
 // Authorization redirect callback from OAuth2 auth flow.
