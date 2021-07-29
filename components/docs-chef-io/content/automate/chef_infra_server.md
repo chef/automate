@@ -453,7 +453,10 @@ The Chef Infra Server integration lets you:
 
 - Search for a specific policyfiles
 - View all the policyfiles
-- Details of policyfiles
+- View the details of policyfiles:
+  - Content
+  - Attributes
+  - Revision id
 - Delete policyfiles
 
 #### Search for Policyfiles
@@ -464,9 +467,19 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a policyfile to view the details, that is the **Revision Id** and the **METADATA** of the policyfile. The **Content** tab contains the list of all the **Included Policies** and **Run List**.
+Select a policyfile to view the details of the policyfile. The details are the **METADATA**, **Content**, **Attributes** and **Revision id** of the policyfiles.
 
-{{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
+IMAGE
+
+The **content** tab contains the list of all the *included policies* and *run list*, whereas the **attributes** tab displays the *default* and the *override* attributes of the policyfiles.
+
+IMAGE
+
+You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
+
+{{< note >}}
+You can find the **revision id** window directly by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} of a policyfile. Selecting the option opens a pop-up which contains the detailed revision id.
+{{< /note >}}
 
 #### Delete Policyfiles
 
