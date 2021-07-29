@@ -184,7 +184,7 @@ func (c *workflowCompleterChunk) finish(err error) error {
 	}
 
 	var blob []byte
-	var resp *grpccereal.DequeueWorkflowResponseChunk
+	var resp *grpccereal.DequeueWorkflowChunkResponse
 	for {
 		resp, err = c.s.Recv()
 		chunk := resp.GetChunk()
@@ -212,9 +212,9 @@ func (c *workflowCompleterChunk) finish(err error) error {
 }
 
 func (c *workflowCompleterChunk) Continue(payload []byte) error {
-	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
-		Cmd: &grpccereal.DequeueWorkflowRequest_Continue_{
-			Continue: &grpccereal.DequeueWorkflowRequest_Continue{
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Continue_{
+			Continue: &grpccereal.DequeueWorkflowChunkRequest_Continue{
 				Payload: payload,
 				Tasks:   c.tasks,
 			},
@@ -224,9 +224,9 @@ func (c *workflowCompleterChunk) Continue(payload []byte) error {
 }
 
 func (c *workflowCompleterChunk) Fail(errMsg error) error {
-	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
-		Cmd: &grpccereal.DequeueWorkflowRequest_Fail_{
-			Fail: &grpccereal.DequeueWorkflowRequest_Fail{
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Fail_{
+			Fail: &grpccereal.DequeueWorkflowChunkRequest_Fail{
 				Err: errMsg.Error(),
 			},
 		},
@@ -235,9 +235,9 @@ func (c *workflowCompleterChunk) Fail(errMsg error) error {
 }
 
 func (c *workflowCompleterChunk) Done(result []byte) error {
-	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
-		Cmd: &grpccereal.DequeueWorkflowRequest_Done_{
-			Done: &grpccereal.DequeueWorkflowRequest_Done{
+	err := c.s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Done_{
+			Done: &grpccereal.DequeueWorkflowChunkRequest_Done{
 				Result: result,
 			},
 		},
@@ -258,9 +258,9 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		return nil, nil, err
 	}
 
-	if err := s.Send(&grpccereal.DequeueWorkflowRequest{
-		Cmd: &grpccereal.DequeueWorkflowRequest_Dequeue_{
-			Dequeue: &grpccereal.DequeueWorkflowRequest_Dequeue{
+	if err := s.Send(&grpccereal.DequeueWorkflowChunkRequest{
+		Cmd: &grpccereal.DequeueWorkflowChunkRequest_Dequeue_{
+			Dequeue: &grpccereal.DequeueWorkflowChunkRequest_Dequeue{
 				Domain:        g.domain,
 				WorkflowNames: workflowNames,
 			},
@@ -271,7 +271,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	}
 
 	var blob []byte
-	var resp *grpccereal.DequeueWorkflowResponseChunk
+	var resp *grpccereal.DequeueWorkflowChunkResponse
 	for {
 		resp, err = s.Recv()
 		chunk := resp.GetChunk()

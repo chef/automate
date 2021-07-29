@@ -140,12 +140,12 @@ func readDeqWorkReqMsg(ctx context.Context, s cereal.CerealService_DequeueWorkfl
 	}
 }
 
-func readDeqWorkReqMsgForChunkServer(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer) (*cereal.DequeueWorkflowRequest, error) {
+func readDeqWorkReqMsgForChunkServer(ctx context.Context, s cereal.CerealService_DequeueWorkflowChunkServer) (*cereal.DequeueWorkflowChunkRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	type chanMsg struct {
-		Msg *cereal.DequeueWorkflowRequest
+		Msg *cereal.DequeueWorkflowChunkRequest
 		Err error
 	}
 
@@ -205,20 +205,17 @@ func writeDeqWorkRespMsgChunk(ctx context.Context, s cereal.CerealService_Dequeu
 			} else {
 				chnk = bt[currentByte : currentByte+chunkSize]
 			}
-			data := &cereal.DequeueWorkflowResponseChunk{
+			data := &cereal.DequeueWorkflowChunkResponse{
 				Chunk: chnk,
 			}
 			err = s.Send(data)
 			if err != nil {
-				if err != nil {
-					logrus.Errorln("Error sending data:", err)
-					out <- err
-					return
-				}
-				break
+				logrus.Errorln("Error sending data:", err)
+				out <- err
+				return
 			}
 		}
-		data := &cereal.DequeueWorkflowResponseChunk{
+		data := &cereal.DequeueWorkflowChunkResponse{
 			Chunk: []byte("EOF"),
 		}
 		err = s.Send(data)
@@ -424,7 +421,7 @@ func (s *CerealService) DequeueWorkflowChunk(req cereal.CerealService_DequeueWor
 		"method": "DequeueWorkflowChunk",
 	})
 	// read dequeue message
-	var deqMsg *cereal.DequeueWorkflowRequest_Dequeue
+	var deqMsg *cereal.DequeueWorkflowChunkRequest_Dequeue
 	msg, err := readDeqWorkReqMsgForChunkServer(ctx, req)
 	if err != nil {
 		return err
