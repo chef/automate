@@ -467,7 +467,7 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a policyfile to view the details of the policyfile. The details are the **METADATA**, **Content**, **Attributes** and **Revision id** of the policyfiles.
+Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, and **Revision ID** of that Policyfile.
 
 {{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
