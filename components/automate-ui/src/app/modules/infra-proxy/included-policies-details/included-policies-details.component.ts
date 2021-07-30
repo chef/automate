@@ -1,12 +1,10 @@
 import {
   Component,
   Input,
-  OnDestroy,
   EventEmitter,
   Output,
   HostBinding
 } from '@angular/core';
-import { Subject } from 'rxjs';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import { PolicyFileRequests } from 'app/entities/policy-files/policy-file.requests';
 
@@ -16,11 +14,10 @@ import { PolicyFileRequests } from 'app/entities/policy-files/policy-file.reques
   styleUrls: ['./included-policies-details.component.scss']
 })
 
-export class IncludedPoliciesDetailsComponent implements OnDestroy {
+export class IncludedPoliciesDetailsComponent {
   @Input() serverId: string;
   @Input() orgId: string;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
-  private isDestroyed = new Subject<boolean>();
 
   public error = false;
   public policyfileName: string;
@@ -32,11 +29,6 @@ export class IncludedPoliciesDetailsComponent implements OnDestroy {
   constructor(
     private policyFileRequests: PolicyFileRequests
   ) { }
-
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
-  }
 
   closeIncludedPolicyDetails() {
     this.toggleSlide();
