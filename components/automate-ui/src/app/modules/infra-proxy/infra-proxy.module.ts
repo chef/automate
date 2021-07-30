@@ -29,6 +29,7 @@ import { EditInfraNodeAttributeModalComponent } from './edit-infra-node-attribut
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
+import { IncludedPoliciesDetailsComponent } from './included-policies-details/included-policies-details.component';
 import { InfraEnvironmentConstraintComponent } from './infra-environment-constraint/infra-environment-constraint.component';
 import { InfraNodesComponent } from './infra-nodes/infra-nodes.component';
 import { InfraNodeDetailsComponent } from './infra-node-details/infra-node-details.component';
@@ -83,6 +84,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
     JsonTreeTableComponent,
+    IncludedPoliciesDetailsComponent,
     InfraEnvironmentConstraintComponent,
     InfraNodesComponent,
     InfraNodeDetailsComponent,
