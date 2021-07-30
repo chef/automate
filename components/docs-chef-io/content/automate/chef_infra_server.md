@@ -456,7 +456,7 @@ The Chef Infra Server integration lets you:
 - View the details of policyfiles:
   - Content
   - Attributes
-  - Revision id
+  - Revision ID
 - Delete policyfiles
 
 #### Search for Policyfiles
