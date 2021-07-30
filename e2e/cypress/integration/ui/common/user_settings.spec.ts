@@ -12,6 +12,7 @@ describe('login the app', () => {
               connector = admin.connector;
               cy.request({
                 auth: { bearer: adminIdToken },
+                failOnStatusCode: false,
                 method: 'GET',
                 url: 'api/v0/user-settings/' + username + '/' + connector
               }).then((resp) => {
@@ -57,6 +58,7 @@ describe('login the app', () => {
             }
             cy.request({
                 auth: { bearer: adminIdToken },
+                failOnStatusCode: false,
                 method: 'PUT',
                 url: 'api/v0/user-settings/' + username + '/' + connector,
                 body: {
