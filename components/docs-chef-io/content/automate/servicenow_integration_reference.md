@@ -179,7 +179,7 @@ The Chef Automate Integration App does not provide any reconciliation rules.
 
 You can associate a single user with more than one roles.
 
-### Role `x_chef_automate.admin`
+### Role x_chef_automate.admin
 
 You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow another user to manage the application properties and logs.
 
@@ -202,7 +202,7 @@ The **Admin** role grants user access to the:
 - Transform maps
 - Chef Infra Servers
 
-### Role `x_chef_automate.user`
+### Role x_chef_automate.user
 
 The `x_chef_automate.user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
 
@@ -223,7 +223,7 @@ The `x_chef_automate.user` role is suitable for those users who require applicat
 For integration with CMDB data, you need to assign the _OOB ITIL_ role.role for integration with CMDB data in ServiceNow.
 {{< /note >}}
 
-### Role `x_chef_automate.api`
+### Role x_chef_automate.api
 
 The `x_chef_automate.api` role is suitable for users responsible for integrating the Chef Automate data into ServiceNow. We recommend creating a new user specifically for this role. The Chef Automate Integration App requires the API role to set up communication with Chef Automate.
 
