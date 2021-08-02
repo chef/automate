@@ -17,7 +17,7 @@ pkg_deps=(
 )
 
 pkg_binds=(
-  [automate-elasticsearch]="http-port"
+  #[automate-elasticsearch]="http-port"
 )
 
 

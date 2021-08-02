@@ -30,6 +30,7 @@ import (
 	gateway "github.com/chef/automate/api/config/gateway"
 	infraproxy "github.com/chef/automate/api/config/infra_proxy"
 	ingest "github.com/chef/automate/api/config/ingest"
+	journal "github.com/chef/automate/api/config/journal"
 	licensecontrol "github.com/chef/automate/api/config/license_control"
 	loadbalancer "github.com/chef/automate/api/config/load_balancer"
 	localuser "github.com/chef/automate/api/config/local_user"
@@ -82,6 +83,7 @@ func NewAutomateConfig() *AutomateConfig {
 		Global:           shared.NewGlobalConfig(),
 		InfraProxy:       infraproxy.NewConfigRequest(),
 		Ingest:           ingest.NewConfigRequest(),
+		Journal:          journal.NewConfigRequest(),
 		LicenseControl:   licensecontrol.NewConfigRequest(),
 		LoadBalancer:     loadbalancer.NewConfigRequest(),
 		LocalUser:        localuser.NewConfigRequest(),
@@ -134,6 +136,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		Global:           shared.DefaultGlobalConfig(),
 		InfraProxy:       infraproxy.DefaultConfigRequest(),
 		Ingest:           ingest.DefaultConfigRequest(),
+		Journal:          journal.DefaultConfigRequest(),
 		LicenseControl:   licensecontrol.DefaultConfigRequest(),
 		LoadBalancer:     loadbalancer.DefaultConfigRequest(),
 		LocalUser:        localuser.DefaultConfigRequest(),
@@ -162,7 +165,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate(), c.Journal.Validate())
 	if err == nil {
 		return nil
 	}
@@ -222,6 +225,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.Cds.SetGlobalConfig(c.Global)
 	c.SampleData.SetGlobalConfig(c.Global)
 	c.UserSettings.SetGlobalConfig(c.Global)
+	c.Journal.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -317,6 +321,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.SampleData, true
 	case "user-settings-service":
 		return c.UserSettings, true
+	case "automate-backend-journalbeat":
+		return c.Journal, true
 	default:
 		return nil, false
 	}

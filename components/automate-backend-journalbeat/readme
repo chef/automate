@@ -1,3 +1,6 @@
+
+compile_go_protobuf_component config
+install_protoc_toolchain
 # shellcheck disable=SC2148
 UPSTREAM_PKG_IDENT="chef/journalbeat/6.8.6"
 pkg_name="automate-backend-journalbeat"
