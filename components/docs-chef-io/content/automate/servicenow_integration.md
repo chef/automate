@@ -68,7 +68,7 @@ The ServiceNow users must have the `x_chef_automate.api` role to set up the Serv
 
 The Chef Automate Integration App has three default roles:
 
-- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#roles_role-x_chef_automateadmin" >}})
+- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role-x_chef_automateadmin" >}})
 - [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role-x_chef_automateuser" >}})
 - [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role-x_chef_automateapi" >}})
 
