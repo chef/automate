@@ -63,6 +63,7 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 	}
 	nodeIDs := params.NodeIDs
 	log.Debugf("DataFeedAggregateTask.Run %v", nodeIDs)
+	log.Println("total node ids got in aggregrate task is", len(nodeIDs))
 	datafeedMessages, err := d.buildDatafeed(ctx, nodeIDs, params.UpdatedNodesOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build chef client data")
@@ -124,6 +125,7 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 		log.Debugf("buildDataFeed resourceId %s, value %v", resourceId, nodeID)
 		// if resourceId is an IP address we get client data returned
 		nodeData, err := d.getNodeClientData(ctx, resourceId, nodeID, updatedNodesOnly)
+		log.Println("nodeData recieved :::::", len(nodeData))
 		if err != nil {
 			log.Warnf("Error getting node data %v", err)
 		}
@@ -139,6 +141,7 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 		nodeMessages[resourceId] = nodeData
 	}
 	log.Debugf("%v node attribute messages retrieved in interval", len(nodeMessages))
+	log.Println("node messages recieved :::::", len(nodeMessages))
 	return nodeMessages, nil
 }
 
