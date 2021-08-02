@@ -453,11 +453,11 @@ The Chef Infra Server integration lets you:
 
 - Search for a specific Policyfiles
 - View all the Policyfiles
-- View the details of policyfiles:
+- View the details of Policyfiles:
   - Content
   - Attributes
   - Revision ID
-- Delete policyfiles
+- Delete Policyfiles
 
 #### Search for Policyfiles
 
