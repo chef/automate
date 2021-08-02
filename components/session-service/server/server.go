@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"crypto/tls"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -45,6 +46,7 @@ type Server struct {
 	signInURL         *url.URL
 	remainingDuration time.Duration
 	serviceCerts      *certs.ServiceCerts
+	pgDB              *sql.DB
 }
 
 const (
@@ -89,7 +91,12 @@ func New(
 		return nil, errors.Wrap(err, "migrations")
 	}
 
-	store, err := initStore(migrationConfig.PG)
+	pgDB, err := db.PGOpen(migrationConfig.PG.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "open DB")
+	}
+
+	store, err := initStore(pgDB)
 	if err != nil {
 		return nil, errors.Wrap(err, "init store")
 	}
@@ -105,6 +112,7 @@ func New(
 
 		mgr:          scsManager,
 		serviceCerts: serviceCerts,
+		pgDB:         pgDB,
 	}
 	s.initHandlers()
 
@@ -143,13 +151,8 @@ func NewInMemory(
 	return &s, nil
 }
 
-func initStore(pgURL *url.URL) (scs.Store, error) {
-	d, err := db.PGOpen(pgURL.String())
-	if err != nil {
-		return nil, errors.Wrap(err, "open DB")
-	}
-
-	return pgstore.New(d, dbCleanupInterval), nil
+func initStore(pgDB *sql.DB) (scs.Store, error) {
+	return pgstore.New(pgDB, dbCleanupInterval), nil
 }
 
 func (s *Server) initHandlers() {
@@ -208,7 +211,11 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
-	fmt.Println(idToken, "Abd::idToken")
+
+	s.pgDB.Exec(``) // Dump id_token in blacklistIdTokenTable
+
+	fmt.Println(idToken, "Abd::idToken11")
+	w.WriteHeader(http.StatusOK)
 }
 
 // Authorization redirect callback from OAuth2 auth flow.

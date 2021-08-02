@@ -214,16 +214,33 @@ export class ChefSessionService implements CanActivate {
   }
 
   // blacklistIdToken call /logout endpoint in session-service
-  blacklistIdToken(idToken: string): void {
+  blacklistIdToken(idToken: string, url?: string, noHint?: boolean): void {
+    if (!idToken) {
+      this.deleteSession();
+      window.location.href = `/session/new?state=${url}`;
+    }
+    console.log('calleddd')
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${idToken}`
       })
     };
-    this.httpHandler.get('/session/logout', httpOptions);
-    debugger
-    return;
+    this.httpHandler.get('/session/logout', httpOptions).subscribe(
+      () => {
+        url = url || this.currentPath();
+        // note: url will end up url-encoded in this string (magic)
+        let signinURL: string;
+        if (!noHint && this.user && this.user.id_token) {
+          signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
+        }
+        this.deleteSession();
+        window.location.href = signinURL;
+      },
+      () => {
+        this.deleteSession();
+        window.location.href = `/session/new?state=${url}`;
+      })
   }
 
   // deleteSession removes the session information from localStorage
@@ -239,22 +256,7 @@ export class ChefSessionService implements CanActivate {
   // url: UI route to go back to when the (next) signin process has succeeded
   // noHint: for the sign in, don't try to skip the method selection
   logout(url?: string, noHint?: boolean): void {
-    if(this.user) {
-      this.blacklistIdToken(this.user.id_token);
-      console.log('called this.user.id_token', this.user.id_token)
-    }
-
-    this.deleteSession();
-    url = url || this.currentPath();
-    // note: url will end up url-encoded in this string (magic)
-    let signinURL: string;
-    if (!noHint && this.user && this.user.id_token) {
-      signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
-    } else {
-      signinURL = `/session/new?state=${url}`;
-    }
-
-    window.location.href = signinURL;
+      this.blacklistIdToken(this.id_token, url, noHint);
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
@@ -321,10 +323,10 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    if (this.user) {
+    if(this.user) {
       return this.user.id_token;
     }
-    return;
+    return null;
   }
 
   get connector(): string {
