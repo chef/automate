@@ -215,9 +215,11 @@ export class ChefSessionService implements CanActivate {
 
   // blacklistIdToken call /logout endpoint in session-service
   blacklistIdToken(idToken: string, url?: string, noHint?: boolean): void {
+    url = url || this.currentPath();
+
     if (!idToken) {
-      this.deleteSession();
       window.location.href = `/session/new?state=${url}`;
+      this.deleteSession();
     }
     console.log('calleddd')
     const httpOptions = {
@@ -228,18 +230,17 @@ export class ChefSessionService implements CanActivate {
     };
     this.httpHandler.get('/session/logout', httpOptions).subscribe(
       () => {
-        url = url || this.currentPath();
         // note: url will end up url-encoded in this string (magic)
-        let signinURL: string;
-        if (!noHint && this.user && this.user.id_token) {
-          signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
+        if (!noHint && idToken) {
+          window.location.href = `/session/new?state=${url}&id_token_hint=${idToken}`;
+        } else {
+          window.location.href = `/session/new?state=${url}`;
         }
         this.deleteSession();
-        window.location.href = signinURL;
       },
       () => {
-        this.deleteSession();
         window.location.href = `/session/new?state=${url}`;
+        this.deleteSession();
       })
   }
 
