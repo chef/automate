@@ -451,8 +451,8 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific policyfiles
-- View all the policyfiles
+- Search for a specific Policyfiles
+- View all the Policyfiles
 - View the details of policyfiles:
   - Content
   - Attributes
