@@ -33,7 +33,7 @@ this setting later.
 
 We have configured sonarcloud with automate with GitHub Action method.
 First, you need to sign in into sonarcloud with our existing GitHub account on the repository service that hosts the code you
-want to analyze. 
+want to analyze.  
 Once you have successfully logged in, you will see the SonarCloud welcome screen. Click on Import projects from GitHub.
 
 On the SonarCloud Dashboard, Click on + option at the right-hand side to select  project which you want to analyze.
