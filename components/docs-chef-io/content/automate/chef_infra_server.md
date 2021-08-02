@@ -485,7 +485,7 @@ You can find the **Revision ID** window directly by selecting the ellipses icon 
 
 #### Delete Policyfiles
 
-Delete individual policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
+Delete individual Policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-policyfiles.png" alt="Delete Policyfiles">}}
 
