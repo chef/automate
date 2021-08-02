@@ -6,12 +6,12 @@ import { isNil } from 'lodash/fp';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
-import { GetPolicyFiles } from 'app/entities/policy-files/policy-file.action';
+import { GetPolicyGroups } from 'app/entities/policy-files/policy-file.action';
 import { PolicyFile } from 'app/entities/policy-files/policy-file.model';
 import {
-  allPolicyFiles,
-  getAllStatus as getAllPolicyFilesForOrgStatus
-} from 'app/entities/policy-files/policy-file.selectors';
+  getGroupsStatus,
+  policyFile
+} from 'app/entities/policy-files/policy-group.selectors';
 @Component({
   selector: 'app-policy-groups',
   templateUrl: './policy-groups.component.html',
@@ -26,9 +26,11 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public policyGroups: PolicyFile[] = [];
   public policyGroupsListLoading = true;
   public authFailure = false;
+  public searching = false;
   public searchValue = '';
   public searchFlag = false;
-  public searchArr: [];
+  public searchArr;
+  public pageOfItems;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -41,14 +43,13 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     this.getPolicyGropus();
 
     combineLatest([
-      this.store.select(getAllPolicyFilesForOrgStatus),
-      this.store.select(allPolicyFiles)
+      this.store.select(getGroupsStatus),
+      this.store.select(policyFile)
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
-        this.policyGroups = allPolicyFilesState;
+        this.policyGroups = allPolicyFilesState.policyFile;
         this.policyGroupsListLoading = false;
-        // console.log("this.policyGroups -->", this.policyGroups)
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;
         this.authFailure = true;
@@ -70,6 +71,28 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       org_id: this.orgId
     };
-    this.store.dispatch(new GetPolicyFiles(payload));
+    this.store.dispatch(new GetPolicyGroups(payload));
+  }
+
+  onChangePage(pageOfItems: Array<any>) {
+    // update current page of items
+    this.pageOfItems = pageOfItems;
+  }
+
+  searchPolicyGroups(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.policyGroups || !searchText) {
+      this.searchFlag = false;
+    } else {
+      this.searchArr = this.policyGroups.filter((key) => {
+        this.searchFlag = true;
+        if (key) {
+          return key.policy_group.includes(searchText);
+        }
+      });
+    }
+    this.searching = false;
+    // console.log("this.searchArr -->", this.searchArr);
   }
 }

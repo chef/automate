@@ -27,7 +27,6 @@ export class PolicyGroupsListComponent implements OnInit {
         this.policyGroupsList.forEach((k) => {
           if (k[key] === x[key]) {
             k['occurrence']++;
-          console.log(x);
           }
         });
       } else {
@@ -37,9 +36,7 @@ export class PolicyGroupsListComponent implements OnInit {
         a[key] = x[key];
         a['occurrence'] = 1;
         this.policyGroupsList.push(a);
-        console.log(a);
       }
     });
   }
-
 }
