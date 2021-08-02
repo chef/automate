@@ -10,7 +10,7 @@ export class PolicyGroupsListComponent implements OnInit {
   @Input() policyGroupsListLoading: boolean;
 
   public policyGroupsList = [];
-  
+
   constructor() { }
 
   ngOnInit(): void {
