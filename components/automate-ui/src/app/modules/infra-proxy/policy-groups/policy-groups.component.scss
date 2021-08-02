@@ -4,14 +4,26 @@ thead {
   font-size: 14px;
   letter-spacing: 0.2px;
   color: $chef-primary-dark;
-}
-  
-th {
-  text-align: left;
-  padding: 0px;
-  letter-spacing: 0.2px;
+
+  th {
+    text-align: left;
+    padding: 0px;
+    letter-spacing: 0.2px;
+  }
 }
 
-.search-create-container {
-  margin: 24px 0 18px;
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+  z-index: 199;
 }

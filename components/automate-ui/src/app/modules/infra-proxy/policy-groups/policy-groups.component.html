@@ -1,36 +1,18 @@
-<section class="policy-files">
-  <ng-container *ngIf="true">
-    <div class="search-create-container">
-      <app-infra-search-bar placeHolder="Policyfiles group by name.....">
-      </app-infra-search-bar>
-    </div>
-    <div data-cy="empty-list" class="empty-section" *ngIf="false">
+<section class="policy-groups">
+  <chef-loading-spinner *ngIf="policyGroupsListLoading" size="50"></chef-loading-spinner>
+  <app-empty-state *ngIf="authFailure" moduleTitle="policyGroups" (resetKeyRedirection)="resetKeyTabRedirection($event)">
+  </app-empty-state>
+  <ng-container *ngIf="!policyGroupsListLoading && !authFailure">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyGroups.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
-      <p *ngIf="searchValue === ''">No policy files available</p>
+      <p>No policy groups available</p>
     </div>
 
-    <div id="policy-file-table-container" *ngIf="true" data-cy="policy-file-table-container">
-      <chef-table>
-        <chef-thead *ngIf="!searchFlag || searchArr.length">
-          <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Policyfiles Group</chef-th>
-            <chef-th class="no_border_th">Chef Server</chef-th>
-            <chef-th class="no_border_th">Organization</chef-th>
-            <chef-th class="no_border_th">Number of Policyfiles</chef-th>
-            <chef-th class="no_border_th three-dot-column"></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <chef-tr>
-            <chef-td>policyFile.name</chef-td>
-            <chef-td>policyFile.revision_id </chef-td>
-            <chef-td></chef-td>
-            <chef-td></chef-td>
-            <chef-td class="three-dot-column"></chef-td>
-          </chef-tr>
-        </chef-tbody>
-      </chef-table>
+    <div id="policy-group-table-container" *ngIf="policyGroups.length" data-cy="policy-group-table-container">
+      <app-policy-groups-list
+        [policyGroups]= "policyGroups"
+        [policyGroupsListLoading]= "policyGroupsListLoading">
+      </app-policy-groups-list>
     </div>
   </ng-container>
 </section>
