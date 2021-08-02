@@ -201,7 +201,7 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 	if err != nil {
 		return nil, err
 	}
-	logrus.Println("total number of inventoryNodes start", len(inventoryNodes.Nodes))
+	log.Println("total number of inventoryNodes start", len(inventoryNodes.Nodes))
 
 	nodeIDs := make(map[string]NodeIDs, 0)
 	log.Debugf("No of inventory nodes %v", len(inventoryNodes.Nodes))
@@ -218,7 +218,7 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 
 		inventoryNodes, err = d.cfgMgmt.GetInventoryNodes(ctx, nodesRequest)
 		log.Debugf("inventory nodes %v, cursor %v", len(inventoryNodes.Nodes), lastNode.Id)
-		logrus.Println("total number of inventoryNodes end", len(inventoryNodes.Nodes))
+		log.Println("total number of inventoryNodes end", len(inventoryNodes.Nodes))
 		if err != nil {
 			return nil, err
 		}
