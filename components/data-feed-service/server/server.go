@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	//"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	"bytes"
@@ -74,37 +75,45 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	secretAccessKey := ""
 	region := ""
 	bucket := ""
-	serviceType := ""
 
 	var err error
 	var credentials service.Credentials
 	url := request.Url
+	serviceType := request.Services
+	integrationType := request.IntegrationTypes
+
+	
+	zaMap := make(map[string]string, 0)
+	for _, kv := range request.MetaData {
+		zaMap[kv.Key] = kv.Value
+	}
+	jsonMap, err := json.Marshal(zaMap)
+	if err != nil {
+		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+	}
+	metaData := string(jsonMap)
+
+
 	switch request.Credentials.(type) {
 	case *datafeed.URLValidationRequest_UsernamePassword:
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
-		serviceType = service.Webhook
+
 	case *datafeed.URLValidationRequest_Header:
 		headers = request.GetHeader().GetValue()
 		credentials = service.NewCustomHeaderCredentials(headers)
-		serviceType = service.Webhook
 	case *datafeed.URLValidationRequest_Aws:
 		accesskey = request.GetAws().GetAccessKey()
 		secretAccessKey = request.GetAws().GetSecretAccessKey()
 		region = request.GetAws().GetRegion()
 		bucket = request.GetAws().GetBucket()
 		credentials = service.NewS3Credentials(accesskey, secretAccessKey, region, bucket)
-		if request.GetUrl() == "null" {
-			serviceType = service.S3
-		} else {
-			serviceType = service.Minio
-		}
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
-		
-		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, service.Customs, service.Webhook, "")
+
+		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, serviceType, integrationType, metaData)
 		if err != nil {
 			return response, err
 		}

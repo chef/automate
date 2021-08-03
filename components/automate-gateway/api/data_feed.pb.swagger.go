@@ -414,6 +414,18 @@ func init() {
         },
         "aws": {
           "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
