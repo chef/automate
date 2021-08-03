@@ -2,13 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-policy-groups-list',
-  templateUrl: './policy-groups-list.component.html',
-  styleUrls: ['./policy-groups-list.component.scss']
+  templateUrl: './policy-groups-list.component.html'
 })
 export class PolicyGroupsListComponent implements OnInit {
   @Input() policyGroups: [];
-  @Input() policyGroupsListLoading: boolean;
-
   public policyGroupsList = [];
 
   constructor() { }

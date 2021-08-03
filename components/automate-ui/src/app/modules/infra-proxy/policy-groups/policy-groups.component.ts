@@ -1,4 +1,10 @@
-import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  EventEmitter,
+  Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -12,6 +18,7 @@ import {
   getGroupsStatus,
   policyFile
 } from 'app/entities/policy-files/policy-group.selectors';
+
 @Component({
   selector: 'app-policy-groups',
   templateUrl: './policy-groups.component.html',
@@ -26,11 +33,6 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public policyGroups: PolicyFile[] = [];
   public policyGroupsListLoading = true;
   public authFailure = false;
-  public searching = false;
-  public searchValue = '';
-  public searchFlag = false;
-  public searchArr;
-  public pageOfItems;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -57,7 +59,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     });
   }
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
@@ -72,27 +74,5 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       org_id: this.orgId
     };
     this.store.dispatch(new GetPolicyGroups(payload));
-  }
-
-  onChangePage(pageOfItems: Array<any>) {
-    // update current page of items
-    this.pageOfItems = pageOfItems;
-  }
-
-  searchPolicyGroups(searchText: string): void {
-    this.searching = true;
-    this.searchValue = searchText;
-    if (!this.policyGroups || !searchText) {
-      this.searchFlag = false;
-    } else {
-      this.searchArr = this.policyGroups.filter((key) => {
-        this.searchFlag = true;
-        if (key) {
-          return key.policy_group.includes(searchText);
-        }
-      });
-    }
-    this.searching = false;
-    // console.log("this.searchArr -->", this.searchArr);
   }
 }
