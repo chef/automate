@@ -147,9 +147,9 @@ The **Field Maps** establishes a relationship between a field in an import set t
 
 ## Discovery
 
-[ServiceNow](https://www.servicenow.com/) Discovery feature finds applications and devices on your network, and then updates the Configuration Management Database (CMDB) with the information it finds. It discovers both physical and logical components, including virtual machines, servers, storage, databases, applications, and more.
+[ServiceNow's](https://www.servicenow.com/) Discovery feature finds applications and devices on your network, and then updates the Configuration Management Database (CMDB) with the information it finds. It discovers both physical and logical components, including virtual machines, servers, storage, databases, applications, and more.
 
-Refer [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-management/page/product/discovery/reference/r-discovery.html) page for information on Discovery and its types.
+Refer to ServiceNow's [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-management/page/product/discovery/reference/r-discovery.html) page for information on Discovery and its types.
 
 ### Identification and Reconciliation
 
