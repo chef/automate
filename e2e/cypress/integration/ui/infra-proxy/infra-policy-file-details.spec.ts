@@ -122,7 +122,7 @@ describe('infra policy details', () => {
     if (response.body.included_policy_locks.length === 0) {
       cy.get('[data-cy=empty-list]').should('be.visible');
     } else {
-      cy.get('[data-cy=included-policy-table-container] chef-th').contains('Policy Files');
+      cy.get('[data-cy=included-policy-table-container] chef-th').contains('Policyfiles');
       cy.get('[data-cy=included-policy-table-container] chef-th').contains('Revision ID');
       includedPolicyFileName = response.body.included_policy_locks[0].name;
       includedPolicyRevision = response.body.included_policy_locks[0].revision_id;
