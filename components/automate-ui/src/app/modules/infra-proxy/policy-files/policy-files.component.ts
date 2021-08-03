@@ -129,5 +129,4 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
     this.deleting = false;
   }
-
 }

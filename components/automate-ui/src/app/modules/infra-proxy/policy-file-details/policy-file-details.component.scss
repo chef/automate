@@ -295,3 +295,21 @@ img {
 chef-tab-selector chef-option {
   width: 130px;
 }
+
+.header {
+  display: flex;
+  flex-direction: row;
+
+  chef-heading {
+    flex-grow: 2;
+    text-align: left;
+  }
+
+  chef-button {
+    margin-left: 16px;
+    margin-top: -4px;
+    border: none;
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+  }
+}

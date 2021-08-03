@@ -70,6 +70,11 @@ describe('PolicyFileDetailsComponent', () => {
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
+        MockComponent({
+          selector: 'app-revision-id',
+          inputs: ['serverId'],
+          outputs: ['close']
+        }),
         PolicyFileDetailsComponent
       ],
       providers: [
