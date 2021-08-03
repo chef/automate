@@ -40,6 +40,8 @@ message Policyfile {
     string override_attributes = 9;
     // Expanded run-list associated with the policy.
     repeated ExpandedRunList expanded_run_list = 10;
+    // Solution Dependencies versions.
+    SolutionDependencies solution_dependecies = 11;
 }
 
 message IncludedPolicyLock {
@@ -95,6 +97,22 @@ message NamedRunList {
     string name = 1;
     // Run list associated with the policy.
     repeated string run_list = 2;
+}
+
+message SolutionDependencies {
+    // Policyfile data
+    repeated Dependencies policyfile = 1;
+    // Dependencies data
+    repeated Dependencies cookbook_dependencies = 2;
+}
+
+message Dependencies {
+    // cookbook name.
+    string name = 1;
+    // cookbook version.
+    string version = 2;
+    // cookbook dependencies
+    repeated Dependencies dependencies = 3;
 }
 
 message DeletePolicyfile {

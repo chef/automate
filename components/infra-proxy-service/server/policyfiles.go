@@ -3,12 +3,14 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strconv"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -75,7 +77,45 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		CookbookLocks:       fromAPICookbookLocks(policy.CookbookLocks),
 		DefaultAttributes:   string(defaultAttrs),
 		OverrideAttributes:  string(overrideAttrs),
+		SolutionDependecies: fromAPIIncludedSolutionDependencies(policy.SolutionDependencies),
 	}, nil
+
+}
+
+
+func fromAPIIncludedSolutionDependencies(sp chef.SolutionDep) *response.SolutionDependencies {
+	var sol_d *response.SolutionDependencies
+	var policyfile []*response.Dependencies
+	var dependencies []*response.Dependencies
+
+	//dep_array := sp.Dependencies.(string)
+
+	fmt.Println(":::::: policyfile :::::::", sp)
+
+
+	for _, p := range sp.PolicyFile {
+		for key, _ := range sp.Dependencies.(string) {
+			if strconv.Itoa(key) == p[0] {
+				item1 := &response.Dependencies{
+					Name: strconv.Itoa(key),
+					Version: "",
+				}
+				dependencies = append(dependencies, item1)
+			}
+		}
+		item := &response.Dependencies{
+			Name: p[0],
+			Version: p[1],
+		}
+		policyfile = append(policyfile, item)
+	}
+
+	sol_d = &response.SolutionDependencies{
+		Policyfile: policyfile,
+		CookbookDependencies: dependencies,
+	}
+
+	return sol_d
 
 }
 
