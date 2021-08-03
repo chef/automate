@@ -3,7 +3,6 @@ package dao
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"github.com/lib/pq"
