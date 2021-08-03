@@ -451,10 +451,13 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific policyfiles
-- View all the policyfiles
-- Details of policyfiles
-- Delete policyfiles
+- Search for a specific Policyfiles
+- View all the Policyfiles
+- View the details of Policyfiles:
+  - Content
+  - Attributes
+  - Revision ID
+- Delete Policyfiles
 
 #### Search for Policyfiles
 
@@ -464,13 +467,25 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a policyfile to view the details, that is the **Revision Id** and the **METADATA** of the policyfile. The **Content** tab contains the list of all the **Included Policies** and **Run List**.
+Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, and **Revision ID** of that Policyfile.
 
 {{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
+The **Content** tab contains the list of all the *included policies* and *run lists*, whereas the **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
+
+{{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
+
+You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
+
+{{< note >}}
+You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
+{{< /note >}}
+
+{{< figure src="/images/automate/revision-id-of-policyfiles.png" alt="Revision id of Policyfiles">}}
+
 #### Delete Policyfiles
 
-Delete individual policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
+Delete individual Policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-policyfiles.png" alt="Delete Policyfiles">}}
 
