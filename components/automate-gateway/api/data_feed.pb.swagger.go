@@ -208,6 +208,36 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
+    "chef.automate.api.datafeed.AWS": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "secret_access_key": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
@@ -223,6 +253,18 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -241,14 +283,18 @@ func init() {
         },
         "secret": {
           "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.datafeed.CustomHeader": {
-      "type": "object",
-      "properties": {
-        "headers": {
+        },
+        "services": {
           "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -267,6 +313,18 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -284,6 +342,26 @@ func init() {
           "type": "string"
         },
         "secret": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        }
+      }
+    },
+    "chef.automate.api.datafeed.Header": {
+      "type": "object",
+      "properties": {
+        "value": {
           "type": "string"
         }
       }
@@ -319,14 +397,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.datafeed.TokenAuth": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.datafeed.URLValidationRequest": {
       "type": "object",
       "properties": {
@@ -339,11 +409,11 @@ func init() {
         "secret_id": {
           "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
         },
-        "token_auth": {
-          "$ref": "#/definitions/chef.automate.api.datafeed.TokenAuth"
+        "header": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.Header"
         },
-        "custom_header": {
-          "$ref": "#/definitions/chef.automate.api.datafeed.CustomHeader"
+        "aws": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
         }
       }
     },
@@ -361,6 +431,18 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -379,6 +461,18 @@ func init() {
         },
         "secret": {
           "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },

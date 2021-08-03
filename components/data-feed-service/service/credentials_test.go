@@ -92,7 +92,7 @@ func TestNewCredentialsFactoryBasicAuth(t *testing.T) {
 		t.Fail()
 	}
 	if credentials.GetValues().AuthorizationHeader != basicAuthHeaderValue {
-		t.Logf("Expected header %v, got %v", basicAuthHeaderValue, credentials.GetValues())
+		t.Logf("Expected header %v, got %v", basicAuthHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -135,7 +135,7 @@ func TestNewCredentialsFactorySplunk(t *testing.T) {
 		t.Fail()
 	}
 	if credentials.GetValues().AuthorizationHeader != splunkHeaderValue {
-		t.Logf("Expected header %v, got %v", splunkHeaderValue, credentials.GetValues())
+		t.Logf("Expected header %v, got %v", splunkHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -204,7 +204,7 @@ func TestGetCredentialsBasicAuth(t *testing.T) {
 		t.Log("Expected credentials, got nil")
 		t.Fail()
 	} else if credentials.GetValues().AuthorizationHeader != basicAuthHeaderValue {
-		t.Logf("Expected header: %s, got %s", basicAuthHeaderValue, credentials.GetValues())
+		t.Logf("Expected header: %s, got %s", basicAuthHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -231,7 +231,7 @@ func TestGetCredentialsSplunk(t *testing.T) {
 		t.Log("Expected credentials, got nil")
 		t.Fail()
 	} else if credentials.GetValues().AuthorizationHeader != splunkHeaderValue {
-		t.Logf("Expected header: %s, got %s", splunkHeaderValue, credentials.GetValues())
+		t.Logf("Expected header: %s, got %s", splunkHeaderValue, credentials.GetValues().AuthorizationHeader)
 		t.Fail()
 	}
 }
@@ -244,80 +244,6 @@ func appendKvs(kvs ...*query.Kv) []*query.Kv {
 	}
 
 	return array
-}
-
-func TestNewTokenAuthCredentials(t *testing.T) {
-
-	credentials := NewTokenAuthCredentials(bearerToken)
-	if credentials.token != bearerToken {
-		t.Logf("expected token: %s, got: %s", bearerToken, credentials.token)
-		t.Fail()
-	}
-}
-
-func TestTokenAuthCredentials(t *testing.T) {
-
-	credentials := &TokenAuthCredentials{token: bearerToken}
-	if credentials.token != bearerToken {
-		t.Logf("expected token: %s, got: %s", bearerToken, credentials.token)
-		t.Fail()
-	}
-}
-
-func TestNewCredentialsFactoryToken(t *testing.T) {
-	data := map[string]string{"token": bearerToken, "auth_type": TOKEN_AUTH}
-	credentialsFactory := NewCredentialsFactory(data)
-	credentials, err := credentialsFactory.NewCredentials()
-	if err != nil {
-		t.Logf("expected error: nil, got %v", err)
-		t.Fail()
-	}
-	if credentials == nil {
-		t.Logf("expected credentials, got nil")
-		t.Fail()
-	}
-	switch credentials.(type) {
-	case TokenAuthCredentials:
-		break
-	default:
-		t.Logf("Expected TokenAuthCredentials, got %v", reflect.TypeOf(credentials))
-		t.Fail()
-	}
-	if credentials.GetValues().AuthorizationHeader != bearerToken {
-		t.Logf("Expected header %v, got %v", bearerToken, credentials.GetValues())
-		t.Fail()
-	}
-	if credentials.GetAuthType() != TOKEN_AUTH {
-		t.Logf("Expected type %v, got %v", TOKEN_AUTH, credentials.GetAuthType())
-		t.Fail()
-	}
-}
-
-func TestGetCredentialsToken(t *testing.T) {
-	secret := &secrets.Secret{
-		Name: "name",
-		Type: "ssh",
-		Data: appendKvs(&query.Kv{Key: "token", Value: bearerToken}, &query.Kv{Key: "auth_type", Value: TOKEN_AUTH}),
-	}
-	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
-	secretsClient.EXPECT().Read(
-		context.Background(),
-		gomock.Any(),
-	).Return(secret, nil)
-
-	credentials, err := GetCredentials(context.Background(), secretsClient, secretId)
-
-	if err != nil {
-		t.Logf("Expected error: nil, got %v", err)
-		t.Fail()
-	}
-	if credentials == nil {
-		t.Log("Expected credentials, got nil")
-		t.Fail()
-	} else if credentials.GetValues().AuthorizationHeader != bearerToken {
-		t.Logf("Expected header: %s, got %s", bearerToken, credentials.GetValues())
-		t.Fail()
-	}
 }
 
 func TestNewCustomHeadersAuthCredentials(t *testing.T) {
@@ -339,7 +265,7 @@ func TestCustomHeadersCredentials(t *testing.T) {
 }
 
 func TestNewCredentialsFactoryCustomHeaders(t *testing.T) {
-	data := map[string]string{"headers": customHeaders, "auth_type": CUSTOM_HEADER_AUTH}
+	data := map[string]string{"headers": customHeaders, "auth_type": HEADER_AUTH}
 	credentialsFactory := NewCredentialsFactory(data)
 	credentials, err := credentialsFactory.NewCredentials()
 	if err != nil {
@@ -361,8 +287,8 @@ func TestNewCredentialsFactoryCustomHeaders(t *testing.T) {
 		t.Logf("Expected header %v, got %v", customHeaders, credentials.GetValues())
 		t.Fail()
 	}
-	if credentials.GetAuthType() != CUSTOM_HEADER_AUTH {
-		t.Logf("Expected type %v, got %v", CUSTOM_HEADER_AUTH, credentials.GetAuthType())
+	if credentials.GetAuthType() != HEADER_AUTH {
+		t.Logf("Expected type %v, got %v", HEADER_AUTH, credentials.GetAuthType())
 		t.Fail()
 	}
 }
@@ -371,7 +297,7 @@ func TestGetCredentialsCustomHeaders(t *testing.T) {
 	secret := &secrets.Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&query.Kv{Key: "headers", Value: customHeaders}, &query.Kv{Key: "auth_type", Value: CUSTOM_HEADER_AUTH}),
+		Data: appendKvs(&query.Kv{Key: "headers", Value: customHeaders}, &query.Kv{Key: "auth_type", Value: HEADER_AUTH}),
 	}
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 	secretsClient.EXPECT().Read(
@@ -393,8 +319,8 @@ func TestGetCredentialsCustomHeaders(t *testing.T) {
 			t.Logf("Expected header: %s, got %s", customHeaders, credentials.GetValues())
 			t.Fail()
 		}
-		if credentials.GetAuthType() != CUSTOM_HEADER_AUTH {
-			t.Logf("Expected type %v, got %v", CUSTOM_HEADER_AUTH, credentials.GetAuthType())
+		if credentials.GetAuthType() != HEADER_AUTH {
+			t.Logf("Expected type %v, got %v", HEADER_AUTH, credentials.GetAuthType())
 			t.Fail()
 		}
 	}
