@@ -48,9 +48,9 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       this.store.select(getGroupsStatus),
       this.store.select(policyFile)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([ getPolicyFilesSt, allPolicyFilesState]) => {
-      if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(allPolicyFilesState)) {
-        this.policyGroups = allPolicyFilesState.policyFile;
+    .subscribe(([ getPolicyFilesSt, policyFilesState]) => {
+      if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(policyFilesState)) {
+        this.policyGroups = policyFilesState;
         this.policyGroupsListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;

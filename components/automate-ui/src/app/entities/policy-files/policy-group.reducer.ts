@@ -6,9 +6,7 @@ import { PolicyFile } from './policy-file.model';
 
 export interface PolicyGroupEntityState extends EntityState<PolicyFile> {
   getGroupsStatus: EntityStatus;
-  policyFile: {
-    policyFile: PolicyFile[];
-  };
+  policyFile: PolicyFile[];
 }
 
 const GET_GROUPS_STATUS = 'getGroupsStatus';
@@ -35,7 +33,7 @@ export function policyGroupsEntityReducer(
     case PolicyFileActionTypes.GET_GROUPS_SUCCESS:
       return pipe(
         set(GET_GROUPS_STATUS, EntityStatus.loadingSuccess),
-        set('policyFile.policyFile', action.payload.policies || [])
+        set('policyFile', action.payload.policies || [])
         )(state) as PolicyGroupEntityState;
 
     case PolicyFileActionTypes.GET_GROUPS_FAILURE:
