@@ -83,10 +83,12 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
       this.serverId = server_id;
       this.orgId = org_id;
       this.name = name;
-      this.revision = revision_id;
-      this.store.dispatch(new GetPolicyFile({
-        server_id: server_id, org_id: org_id, name: name, revision: revision_id
-      }));
+      if (revision_id !== this.revision) {
+        this.revision = revision_id;
+        this.store.dispatch(new GetPolicyFile({
+          server_id: server_id, org_id: org_id, name: name, revision: revision_id
+        }));
+      }
     });
     this.store.select(policyFileFromRoute).pipe(
       filter(identity),

@@ -10,6 +10,8 @@ describe('infra policy details', () => {
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   let policyFileName = '';
   let revision = '';
+  let includedPolicyFileName = '';
+  let includedPolicyRevision = '';
   const defaultAttribute = {default: 'test'};
   const overrideAttribute = {override: 'test'};
 
@@ -106,13 +108,13 @@ describe('infra policy details', () => {
     }
   }
 
-  function getPolicyFileDetails() {
+  function getPolicyFileDetails(policyName: string, policyRevision: string) {
     const url = `/api/v0/infra/servers/${serverID}/orgs/${orgID}/policyfiles`;
     return cy.request({
       auth: { bearer: adminIdToken },
       failOnStatusCode: false,
       method: 'GET',
-      url: `${url}/${policyFileName}?revision_id=${revision}`
+      url: `${url}/${policyName}?revision_id=${policyRevision}`
     });
   }
 
@@ -122,6 +124,20 @@ describe('infra policy details', () => {
     } else {
       cy.get('[data-cy=included-policy-table-container] chef-th').contains('Policy Files');
       cy.get('[data-cy=included-policy-table-container] chef-th').contains('Revision ID');
+      includedPolicyFileName = response.body.included_policy_locks[0].name;
+      includedPolicyRevision = response.body.included_policy_locks[0].revision_id;
+      return true;
+    }
+  }
+
+  function checkIncludedPolicyDetailsResponse(response: any) {
+    if (response.status !== 200) {
+      cy.get('[data-cy=empty-list]').should('be.visible');
+      cy.get('[data-cy=close-policy-button]').click();
+    } else {
+      cy.get('[data-cy=policyfile-heading]').contains(includedPolicyFileName);
+      cy.get('[data-cy=policyfile-info]').contains('POLICY FILE INFORMATION');
+      cy.get('[data-cy=policyfile-meta-info]').contains('METADATA');
       return true;
     }
   }
@@ -155,17 +171,17 @@ describe('infra policy details', () => {
     }
   }
 
-  describe('infra policy file list page', () => {
+  describe('infra policyfile list page', () => {
     it('displays org details', () => {
       cy.get('.page-title').contains(orgName);
     });
 
-    // policy file tabs specs
-    it('can switch to policy file tab', () => {
+    // policyfile tabs specs
+    it('can switch to policyfile tab', () => {
       cy.get('.nav-tab').contains('Policyfiles').click();
     });
 
-    it('can check if policy file has list or not', () => {
+    it('can check if policyfile has list or not', () => {
         getPolicyFile().then((response) => {
           checkResponse(response);
         });
@@ -177,7 +193,7 @@ describe('infra policy details', () => {
       }
     });
 
-    it('displays infra node details', () => {
+    it('displays policyfile details', () => {
       if (policyFileName !== '') {
         cy.get('.page-title').contains(policyFileName);
         cy.get('[data-cy=policy-file-head]').contains(policyFileName);
@@ -186,31 +202,56 @@ describe('infra policy details', () => {
       }
     });
 
+    describe('included policyfiles details page', () => {
+      it('can check if included policy have data or not', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=included-policy]').contains('Included Policies').click();
+          getPolicyFileDetails(policyFileName, revision).then(response => {
+            checkIncludedPolicyResponse(response);
+          });
+        }
+      });
 
-    it('can check if included policy have data or not', () => {
-      if (policyFileName !== '') {
-        cy.get('[data-cy=included-policy]').contains('Included Policies').click();
-        getPolicyFileDetails().then(response => {
-          checkIncludedPolicyResponse(response);
-        });
-      }
+      it('can go to includedd policy file details page', () => {
+        if (includedPolicyFileName !== '') {
+          cy.get('[data-cy=included-policy-table-container] chef-td')
+          .contains(includedPolicyFileName).click();
+          getPolicyFileDetails(includedPolicyFileName, includedPolicyRevision).then(response => {
+            if (checkIncludedPolicyDetailsResponse(response)) {
+              cy.get('[data-cy=close-policy-button]').click();
+            }
+          });
+        }
+      });
+
+      it('can click go to details page button', () => {
+        if (includedPolicyFileName !== '') {
+          cy.get('[data-cy=included-policy-table-container] chef-td')
+          .contains(includedPolicyFileName).click();
+          getPolicyFileDetails(includedPolicyFileName, includedPolicyRevision).then(response => {
+            if (checkIncludedPolicyDetailsResponse(response)) {
+              cy.get('[data-cy=policyfile-details]').contains('Go to Policyfile Details >').click();
+            }
+          });
+        }
+      });
     });
 
     it('can check if run list have data or not', () => {
       if (policyFileName !== '') {
         cy.get('[data-cy=run-list]').contains('Run List').click();
-        getPolicyFileDetails().then(response => {
+        getPolicyFileDetails(policyFileName, revision).then(response => {
           checkRunlistResponse(response);
         });
       }
     });
 
-    it('can show revision id of policy file', () => {
+    it('can show revision id of policyfile', () => {
       if (policyFileName !== '') {
         cy.get('[data-cy=revisions]').contains('Revisions').click();
         getRevisionId(policyFileName).then((revisionResponse) => {
           checkRevisionIdResponse(revisionResponse);
-          cy.get('[data-cy=close-button]').click();
+          cy.get('[data-cy=close-revision-id-button]').click();
         });
       }
     });
