@@ -1,0 +1,5 @@
+[dex]
+    [dex.v1]
+        [dex.v1.sys]
+            [dex.v1.sys.expiry]
+                id_tokens = "4m"
