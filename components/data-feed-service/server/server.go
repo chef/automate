@@ -158,7 +158,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		httpRequest.Header.Add("Content-Encoding", "gzip")
 		httpRequest.Header.Add("Accept", "application/json")
 
-		service.AddCustomHeader(credentials, httpRequest.Header, service.Webhook)
+		service.AddCustomHeader(credentials, httpRequest.Header)
 
 		client := http.Client{}
 		httpResponse, err := client.Do(httpRequest)

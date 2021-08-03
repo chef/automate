@@ -32,14 +32,18 @@ type DBData struct {
 
 type Credentials interface {
 	GetValues() AuthTypes
+	GetAuthType() string
 }
 
 const (
-	Webhook = "Webhook"
-	Storage = "Storage"
-	S3      = "S3"
-	Minio   = "Minio"
-	Customs = "Customs"
+	Webhook      = "Webhook"
+	Storage      = "Storage"
+	S3           = "S3"
+	Minio        = "Minio"
+	BASIC_AUTH   = "basic_auth"
+	SPLUNK_AUTH  = "splunk_auth"
+	HEADER_AUTH  = "header_auth"
+	STORAGE_AUTH = "storage_auth"
 )
 
 type CredentialsFactory struct {
@@ -60,7 +64,7 @@ func (c *CredentialsFactory) NewCredentials(data DBData) (Credentials, error) {
 			return NewSplunkAuthCredentials(splunk), nil
 		}
 		if auth_type, ok := c.data["auth_type"]; ok {
-			if auth_type == "Custom" {
+			if auth_type == HEADER_AUTH {
 				return NewCustomHeaderCredentials(c.data["headers"]), nil
 			}
 		}
@@ -93,6 +97,10 @@ func (c AwsCredentials) GetValues() AuthTypes {
 	}
 }
 
+func (c AwsCredentials) GetAuthType() string {
+	return STORAGE_AUTH
+}
+
 type BasicAuthCredentials struct {
 	username string
 	password string
@@ -100,6 +108,9 @@ type BasicAuthCredentials struct {
 
 func NewBasicAuthCredentials(username string, password string) BasicAuthCredentials {
 	return BasicAuthCredentials{username: username, password: password}
+}
+func (c BasicAuthCredentials) GetAuthType() string {
+	return BASIC_AUTH
 }
 
 func (c BasicAuthCredentials) GetValues() AuthTypes {
@@ -127,6 +138,10 @@ func (c SplunkAuthCredentials) GetValues() AuthTypes {
 	}
 }
 
+func (c SplunkAuthCredentials) GetAuthType() string {
+	return SPLUNK_AUTH
+}
+
 type CustomHeaderCredentials struct {
 	headers string
 }
@@ -139,6 +154,9 @@ func (c CustomHeaderCredentials) GetValues() AuthTypes {
 	return AuthTypes{
 		HeaderJSONString: c.headers,
 	}
+}
+func (c CustomHeaderCredentials) GetAuthType() string {
+	return HEADER_AUTH
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string, Services string, IntegrationType string, MetaData string) (Credentials, error) {
