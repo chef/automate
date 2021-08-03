@@ -78,7 +78,6 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
-	fmt.Println("inDestination.MetaData", inDestination.MetaData)
 	var zaMap map[string]string
 	err := json.Unmarshal([]byte(inDestination.MetaData), &zaMap)
 	if err != nil {
@@ -191,7 +190,6 @@ func (db *DB) ListDestinations() (*datafeed.ListDestinationResponse, error) {
 	}
 	listOfDestinations := make([]*datafeed.GetDestinationResponse, 0)
 	for _, d := range destinations {
-		fmt.Println("list data", dbToGetDestinationResponse(&d))
 		listOfDestinations = append(listOfDestinations, dbToGetDestinationResponse(&d))
 	}
 	return &datafeed.ListDestinationResponse{Destinations: listOfDestinations}, err

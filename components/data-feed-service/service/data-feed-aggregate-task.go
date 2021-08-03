@@ -93,7 +93,6 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			"integration_types": destinations[destination].IntegrationTypes,
 			"MetaData":          destinations[destination].MetaData,
 		}).Debug("Destination")
-		fmt.Println("destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData", destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData)
 		credentials, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret, destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData)
 
 		if err != nil {

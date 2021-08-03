@@ -65,6 +65,10 @@ func init() {
 				switch want {
 				case "url":
 					return m.Url
+				case "services":
+					return m.Services
+				case "integration_types":
+					return m.IntegrationTypes
 				default:
 					return ""
 				}
