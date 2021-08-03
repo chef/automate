@@ -5,8 +5,8 @@ import { Component, Input, OnInit } from '@angular/core';
   templateUrl: './policy-groups-list.component.html'
 })
 export class PolicyGroupsListComponent implements OnInit {
-  @Input() policyGroups: [];
-  public policyGroupsList = [];
+  @Input() policyFiles: [];
+  public policyGroups = [];
 
   constructor() { }
 
@@ -16,12 +16,12 @@ export class PolicyGroupsListComponent implements OnInit {
 
   filterDataGroupWise() {
     const key = 'policy_group';
-    this.policyGroups.forEach((x) => {
+    this.policyFiles.forEach((x) => {
       // Checking if there is any object in this.policyGroupsList
       // which contains the key value
-      if (this.policyGroupsList.some((val) => val[key] === x[key])) {
+      if (this.policyGroups.some((val) => val[key] === x[key])) {
         // If yes! then increase the occurrence by 1
-        this.policyGroupsList.forEach((k) => {
+        this.policyGroups.forEach((k) => {
           if (k[key] === x[key]) {
             k['occurrence']++;
           }
@@ -32,7 +32,7 @@ export class PolicyGroupsListComponent implements OnInit {
         const a = {};
         a[key] = x[key];
         a['occurrence'] = 1;
-        this.policyGroupsList.push(a);
+        this.policyGroups.push(a);
       }
     });
   }

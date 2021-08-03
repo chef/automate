@@ -21,7 +21,7 @@ describe('PolicyGroupsComponent', () => {
       declarations: [
         MockComponent({
           selector: 'app-policy-groups-list',
-          inputs: ['policyGroups']
+          inputs: ['policyFiles']
         }),
         PolicyGroupsComponent
       ],
@@ -66,13 +66,13 @@ describe('PolicyGroupsComponent', () => {
 
     it('render the policy group list', () => {
       store.dispatch(new GetPolicyGroupsSuccess({policies: availablePolicyGroups}));
-      expect(component.policyGroups.length).not.toBeNull();
+      expect(component.policyFiles.length).not.toBeNull();
       expect(element.query(By.css('.empty-section'))).toBeNull();
     });
 
     it('show no preview image', () => {
       store.dispatch(new GetPolicyGroupsSuccess({policies: emptyPolicyGroup}));
-      expect(component.policyGroups.length).toBe(0);
+      expect(component.policyFiles.length).toBe(0);
     });
   });
 });

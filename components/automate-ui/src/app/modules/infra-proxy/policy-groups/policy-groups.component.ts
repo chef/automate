@@ -30,7 +30,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   private isDestroyed = new Subject<boolean>();
-  public policyGroups: PolicyFile[] = [];
+  public policyFiles: PolicyFile[] = [];
   public policyGroupsListLoading = true;
   public authFailure = false;
 
@@ -50,7 +50,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     ]).pipe(takeUntil(this.isDestroyed))
     .subscribe(([ getPolicyFilesSt, policyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(policyFilesState)) {
-        this.policyGroups = policyFilesState;
+        this.policyFiles = policyFilesState;
         this.policyGroupsListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;
