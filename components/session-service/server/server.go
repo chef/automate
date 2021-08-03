@@ -214,7 +214,7 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	s.pgDB.Exec(``) // Dump id_token in blacklistIdTokenTable
 
-	fmt.Println(idToken, "Abd::idToken11")
+	fmt.Println(idToken, "Abd::idToken1122333")
 	w.WriteHeader(http.StatusOK)
 }
 
