@@ -7,6 +7,9 @@ import "google/api/annotations.proto";
 
 import "external/annotations/iam/annotations.proto";
 
+import "google/protobuf/struct.proto";
+import "external/common/query/parameters.proto";
+
 service DatafeedService {
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
@@ -75,6 +78,7 @@ message AddDestinationRequest {
   string secret  = 4;
   string services = 5;
   string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message AddDestinationResponse {
@@ -84,6 +88,7 @@ message AddDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message GetDestinationRequest {
@@ -97,6 +102,7 @@ message GetDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
+repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message DeleteDestinationRequest {
@@ -110,6 +116,7 @@ message DeleteDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
+repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message UpdateDestinationRequest {	
@@ -119,8 +126,12 @@ message UpdateDestinationRequest {
   string secret = 4;
   string services  = 5;
   string integration_types  = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
-
+message AWSMetaData {
+	string bucket = 1;
+	string region = 2;
+}
 message UpdateDestinationResponse {
   int64 id = 1;
   string name   = 2;
@@ -128,6 +139,7 @@ message UpdateDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message ListDestinationRequest {}
@@ -141,8 +153,9 @@ message UsernamePassword {
   string password = 2;
 }
 
-message SecretId {
-  string id = 1;
+message SecretAndDestinationId {
+  string secret = 1;
+  string destination = 2;
 }
 
 message Header {
@@ -160,7 +173,7 @@ message URLValidationRequest {
   string url = 1;
   oneof credentials {
     UsernamePassword username_password = 2;
-    SecretId secret_id = 3;
+    SecretAndDestinationId secret_and_destination_id = 3;
 	Header header = 4;
 	AWS aws = 5;
    }

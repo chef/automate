@@ -34,10 +34,12 @@ import (
 const version = "1"
 
 type datafeedNotification struct {
-	credentials Credentials
-	url         string
-	data        bytes.Buffer
-	contentType string
+	credentials      Credentials
+	url              string
+	data             bytes.Buffer
+	contentType      string
+	services         string
+	integrationTypes string
 }
 
 type DataClient struct {
@@ -145,8 +147,8 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
 
-func AddCustomHeader(credentials Credentials, header http.Header) {
-	if credentials.GetAuthType() == HEADER_AUTH {
+func AddCustomHeader(credentials Credentials, header http.Header, service string) {
+	if service == Webhook {
 		headerString := credentials.GetValues().HeaderJSONString
 		var headerMap map[string]string
 		err := json.Unmarshal([]byte(headerString), &headerMap)
@@ -179,10 +181,10 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		return err
 	}
 
-	if notification.credentials.GetAuthType() == AWS_AUTH {
+	if notification.services == "S3" || notification.services == "Minio" {
 		cred := notification.credentials.GetValues().AwsCreds
-		sess := connectAWS(cred, notification.url, "minio_auth")
-		fileUploadInAws(sess, cred, notification.data.Bytes())
+		sess := ConnectAWS(cred, notification.url, notification.services)
+		FileUploadInAws(sess, cred, notification.data.Bytes(), "Prod")
 
 	} else {
 		request, err := http.NewRequest("POST", notification.url, &contentBuffer)
@@ -191,7 +193,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 			return err
 		}
 
-	AddCustomHeader(notification.credentials, request.Header)
+		AddCustomHeader(notification.credentials, request.Header, notification.services)
 
 		//notification.addCustomHeader(request.Header)
 
@@ -333,9 +335,9 @@ func getHostAttributes(attributesJson map[string]interface{}) (string, string, s
 
 	return ipAddress, macAddress, hostname
 }
-func connectAWS(cred AwsCredentials, url string, IntegrationType string) *session.Session {
+func ConnectAWS(cred AwsCredentials, url string, service string) *session.Session {
 	var config *aws.Config
-	if IntegrationType == "minio_auth" {
+	if service == "Minio" {
 		config = &aws.Config{
 			Endpoint:         aws.String(url),
 			Region:           aws.String("us-east-2"),
@@ -356,7 +358,7 @@ func connectAWS(cred AwsCredentials, url string, IntegrationType string) *sessio
 	return sess
 }
 
-func fileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte) (*s3manager.UploadOutput, error) {
+func FileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte, FolderName string) (*s3manager.UploadOutput, error) {
 	t := time.Now().UTC()
 	year := t.Year()
 	month := int(t.Month())
@@ -365,11 +367,11 @@ func fileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte) (*
 	min := t.Minute()
 	sec := t.Second()
 
-	filePathAndName :=
+	filePathAndName := "automate/" + FolderName + "/" +
 		strconv.Itoa(year) + "/" +
-			strconv.Itoa(month) + "/" +
-			strconv.Itoa(day) + "/" +
-			strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + ".json"
+		strconv.Itoa(month) + "/" +
+		strconv.Itoa(day) + "/" +
+		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + ".json"
 
 	uploader := s3manager.NewUploader(sess)
 

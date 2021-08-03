@@ -208,6 +208,19 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
     "chef.automate.api.datafeed.AWS": {
       "type": "object",
       "properties": {
@@ -246,6 +259,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -270,6 +289,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -294,6 +319,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -318,6 +349,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -400,6 +437,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
@@ -424,6 +467,12 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
         }
       }
     },
