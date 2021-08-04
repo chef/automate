@@ -100,19 +100,23 @@ message NamedRunList {
 }
 
 message SolutionDependencies {
-    // Policyfile data
-    repeated Dependencies policyfile = 1;
-    // Dependencies data
-    repeated Dependencies cookbook_dependencies = 2;
+    repeated SolutionDependenciesData dependencies =1;
 }
 
-message Dependencies {
+message SolutionDependenciesData {
     // cookbook name.
     string name = 1;
     // cookbook version.
     string version = 2;
     // cookbook dependencies
-    repeated Dependencies dependencies = 3;
+    repeated DepedenciesData dependencies = 3;
+}
+
+message DepedenciesData {
+    // cookbook name.
+    string name = 1;
+    // cookbook version.
+    string version = 2;
 }
 
 message DeletePolicyfile {

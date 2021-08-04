@@ -6,7 +6,6 @@ import (
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
-	"strconv"
 )
 
 // GetPolicyfiles fetches an array of existing policies
@@ -52,33 +51,26 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 }
 
 func fromUpstreamIncludeSolutionDependecies(sp *infra_res.SolutionDependencies) *gwres.SolutionDependencies {
+	sol_d_data := make([]*gwres.SolutionDependenciesData, len(sp.Dependencies))
+	var d_data []*gwres.DepedenciesData
 	var sol_d *gwres.SolutionDependencies
-	var policyfile []*gwres.Dependencies
-	var dependencies []*gwres.Dependencies
-
-	for _, p := range sp.Policyfile {
-		for key, _ := range sp.CookbookDependencies {
-			if strconv.Itoa(key) == p.Name {
-				item1 := &gwres.Dependencies{
-					Name: strconv.Itoa(key),
-					Version: "",
-				}
-				dependencies = append(dependencies, item1)
+	for i, cb := range sp.GetDependencies() {
+		for ii, cbb := range cb.Dependencies {
+			d_data[ii] = &gwres.DepedenciesData{
+				Name: cbb.Name,
+				Version: cbb.Version,
 			}
 		}
-		item := &gwres.Dependencies{
-			Name: p.Name,
-			Version: p.Version,
-
+		sol_d_data[i] = &gwres.SolutionDependenciesData{
+			Name:             cb.GetName(),
+			Version:          cb.GetVersion(),
+			Dependencies:     d_data,
 		}
-		policyfile = append(policyfile, item)
 	}
 
 	sol_d = &gwres.SolutionDependencies{
-		Policyfile: policyfile,
-		CookbookDependencies: dependencies,
+		Dependencies: sol_d_data,
 	}
-
 	return sol_d
 }
 

@@ -3572,7 +3572,7 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.Dependencies": {
+    "chef.automate.api.infra_proxy.response.DepedenciesData": {
       "type": "object",
       "properties": {
         "name": {
@@ -3582,13 +3582,6 @@ func init() {
         "version": {
           "type": "string",
           "description": "cookbook version."
-        },
-        "dependencies": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Dependencies"
-          },
-          "title": "cookbook dependencies"
         }
       }
     },
@@ -4292,19 +4285,31 @@ func init() {
     "chef.automate.api.infra_proxy.response.SolutionDependencies": {
       "type": "object",
       "properties": {
-        "policyfile": {
+        "dependencies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Dependencies"
-          },
-          "title": "Policyfile data"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependenciesData"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SolutionDependenciesData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "cookbook name."
         },
-        "cookbook_dependencies": {
+        "version": {
+          "type": "string",
+          "description": "cookbook version."
+        },
+        "dependencies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Dependencies"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DepedenciesData"
           },
-          "title": "Dependencies data"
+          "title": "cookbook dependencies"
         }
       }
     },
