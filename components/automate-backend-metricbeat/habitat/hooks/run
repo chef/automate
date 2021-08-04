@@ -1,0 +1,11 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+
+exec metricbeat \
+  -c "{{pkg.svc_config_path}}/metricbeat.yml" \
+  --path.config "{{pkg.svc_config_path}}" \
+  --path.data "{{pkg.svc_data_path}}" \
+  --path.home "{{pkg.svc_path}}" \
+  --path.logs "{{pkg.svc_var_path}}/logs"
