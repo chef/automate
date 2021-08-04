@@ -76,40 +76,56 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		CookbookLocks:       fromAPICookbookLocks(policy.CookbookLocks),
 		DefaultAttributes:   string(defaultAttrs),
 		OverrideAttributes:  string(overrideAttrs),
-		SolutionDependecies: fromAPIIncludedSolutionDependencies(policy.SolutionDependencies),
+		SolutionDependecies: FromAPIIncludedSolutionDependencies(policy.SolutionDependencies),
 	}, nil
 
 }
 
-
-func fromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
-	var d_data []*response.SolutionDependencies
+func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
+	var dData []*response.SolutionDependencies
 
 	for _, p := range sp.PolicyFile {
+		if len(p) == 0 {
+			continue
+		}
 		var dependencies []*response.DepedenciesData
-		ver := strings.TrimSpace(strings.Split(p[1], "=")[1])
+		name := strings.TrimSpace(p[0])
+		ver := "0.0.0"
+		if len(p) == 2 {
+			ver = strings.TrimSpace(p[1])
+		}
 		value, ok := sp.Dependencies.(map[string][][]string)
+		// Check for type conversion failure
 		if ok {
 			for key, val := range value {
-				if key == p[0]+" "+"("+ver+")" {
+				cookBookName := strings.Split(key, " ")[0]
+				if cookBookName == name {
 					for _, value := range val {
+						if len(value) == 0 {
+							continue
+						}
+						dependencyName := value[0]
+						dependencyVersion := "0.0.0"
+						if len(value) > 1 {
+							dependencyVersion = value[1]
+						}
 						item1 := &response.DepedenciesData{
-							Name:    value[0],
-							Version: value[1],
+							Name:    dependencyName,
+							Version: dependencyVersion,
 						}
 						dependencies = append(dependencies, item1)
 					}
 				}
 			}
-			sol_dep := &response.SolutionDependencies{
-				Name:         p[0],
+			solDep := &response.SolutionDependencies{
+				Name:         name,
 				Version:      ver,
 				Dependencies: dependencies,
 			}
-			d_data = append(d_data, sol_dep)
+			dData = append(dData, solDep)
 		}
 	}
-	return d_data
+	return dData
 
 }
 
