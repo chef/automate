@@ -3,15 +3,18 @@ import { Action } from '@ngrx/store';
 import { PolicyFile } from './policy-file.model';
 
 export enum PolicyFileActionTypes {
-  GET_ALL         = 'POLICYFILES::GET_ALL',
-  GET_ALL_SUCCESS = 'POLICYFILES::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'POLICYFILES::GET_ALL::FAILURE',
-  DELETE          = 'POLICYFILES::DELETE',
-  DELETE_SUCCESS  = 'POLICYFILES::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'POLICYFILES::DELETE::FAILURE',
-  GET             = 'POLICYFILES::GET',
-  GET_SUCCESS     = 'POLICYFILES::GET::SUCCESS',
-  GET_FAILURE     = 'POLICYFILES::GET::FAILURE'
+  GET_ALL            = 'POLICYFILES::GET_ALL',
+  GET_ALL_SUCCESS    = 'POLICYFILES::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE    = 'POLICYFILES::GET_ALL::FAILURE',
+  DELETE             = 'POLICYFILES::DELETE',
+  DELETE_SUCCESS     = 'POLICYFILES::DELETE::SUCCESS',
+  DELETE_FAILURE     = 'POLICYFILES::DELETE::FAILURE',
+  GET                = 'POLICYFILES::GET',
+  GET_SUCCESS        = 'POLICYFILES::GET::SUCCESS',
+  GET_FAILURE        = 'POLICYFILES::GET::FAILURE',
+  GET_GROUPS         = 'POLICYFILES::GET_GROUPS',
+  GET_GROUPS_SUCCESS = 'POLICYFILES::GET_GROUPS::SUCCESS',
+  GET_GROUPS_FAILURE = 'POLICYFILES::GET_GROUPS::FAILURE'
 }
 
 export interface PolicyFilesSuccessPayload {
@@ -64,6 +67,21 @@ export class GetPolicyFileFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetPolicyGroups implements Action {
+  readonly type = PolicyFileActionTypes.GET_GROUPS;
+  constructor(public payload: { server_id: string, org_id: string }) { }
+}
+
+export class GetPolicyGroupsSuccess implements Action {
+  readonly type = PolicyFileActionTypes.GET_GROUPS_SUCCESS;
+  constructor(public payload: PolicyFilesSuccessPayload) { }
+}
+
+export class GetPolicyGroupsFailure implements Action {
+  readonly type = PolicyFileActionTypes.GET_GROUPS_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type PolicyFileActions =
   | GetPolicyFiles
   | GetPolicyFilesSuccess
@@ -73,4 +91,7 @@ export type PolicyFileActions =
   | DeletePolicyFileFailure
   | GetPolicyFile
   | GetPolicyFileSuccess
-  | GetPolicyFileFailure;
+  | GetPolicyFileFailure
+  | GetPolicyGroups
+  | GetPolicyGroupsSuccess
+  | GetPolicyGroupsFailure;
