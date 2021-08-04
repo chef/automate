@@ -3,10 +3,14 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="policyGroups" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!policyGroupsListLoading && !authFailure">
-    
-    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />      
-      <p>No policy groups available</p>
+    <div class="search-create-container">
+      <app-infra-search-bar (searchButtonClick)="searchPolicyGroups($event)" placeHolder="Policyfiles group by name...">
+      </app-infra-search-bar>
+    </div>
+    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0)">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />  
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>    
+      <p *ngIf="searchValue === ''">No policy groups available</p>
     </div>
 
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
