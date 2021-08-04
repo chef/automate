@@ -4,7 +4,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, retry } from 'rxjs/operators';
+import { map, mergeMap, filter, retryWhen, delay } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
 import { environment } from 'environments/environment';
@@ -73,8 +73,11 @@ export class ChefSessionService implements CanActivate {
           this.isRefreshing = true;
           return this.refresh();
         }),
-        // retry 2 times on error
-        retry(2)
+        retryWhen(error =>
+          error.pipe(
+            delay(1000)  // retry in 1000ms if errored
+          )
+        )
       ).subscribe(
         token => {
           this.ingestIDToken(token);
@@ -87,9 +90,11 @@ export class ChefSessionService implements CanActivate {
               this.logout();
             } else {
               console.log(`Session refresh failed: ${error.statusText}`);
+              return throwError(error);
             }
           } else {
-            console.log(error, 'retried 2 times on error');
+            console.log(error, 'retried after 1sec on error');
+            return throwError(error);
           }
         }
       );
