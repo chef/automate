@@ -261,8 +261,14 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
+	sqlStatement := `
+		INSERT INTO blacklisted_id_tokens (id_token)
+		VALUES ($1)`
 
-	s.pgDB.Exec(``) // Dump id_token in blacklistIdTokenTable
+	_, err = s.pgDB.Exec(sqlStatement, idToken) // Dump id_token in blacklisted_id_tokens
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Println(idToken, "Abd::idToken1122333")
 	w.WriteHeader(http.StatusOK)
