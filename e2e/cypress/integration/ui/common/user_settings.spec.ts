@@ -58,6 +58,7 @@ describe('login the app', () => {
         attrSelector = '[value=' + selectTimeformat + ']';
         cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
           cy.get(attrSelector).click({force: true}).then(() => {
+            count = 2;
             count = 0;
             while (dropdown[0].innerText.indexOf(selectTimeformat) !== 0 && count < 10) {
                 cy.get(attrSelector).click({force: true});
