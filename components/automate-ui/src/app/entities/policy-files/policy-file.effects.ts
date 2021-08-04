@@ -82,14 +82,14 @@ export class PolicyFileEffects {
         });
     })));
 
-  /*getPolicyFile$ = createEffect(() =>
+  getPolicyFile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PolicyFileActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, name, revision } }: GetPolicyFile) =>
         this.requests.getPolicyFile(server_id, org_id, name, revision).pipe(
           map((resp) => new GetPolicyFileSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetPolicyFileFailure(error)))))));*/
+          observableOf(new GetPolicyFileFailure(error)))))));
 
   getPolicyFileFailure$ = createEffect(() =>
     this.actions$.pipe(
