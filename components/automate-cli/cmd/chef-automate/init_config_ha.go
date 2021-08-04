@@ -278,10 +278,10 @@ var initConfigHACmd = &cobra.Command{
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	if args[0] == "aws" {
-		writer.Printf("Jay ##Init for config aws")
+		writer.Printf("Generating initial automate high availablity configuration for AWS deployment")
 		return runInitConfigAwsHACmd()
 	} else if args[0] == "existing_node" {
-		writer.Printf("Jay ##Init for config existing node")
+		writer.Printf("Generating initial automate high availablity configuration for existing infra nodes deployment")
 		return runInitConfigExistingNodeHACmd()
 	}
 	return nil
