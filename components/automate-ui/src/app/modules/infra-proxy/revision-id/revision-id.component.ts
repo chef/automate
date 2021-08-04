@@ -4,8 +4,6 @@ import {
   OnDestroy,
   EventEmitter,
   Output,
-  OnChanges,
-  SimpleChanges,
   HostBinding
 } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -29,7 +27,7 @@ import { Revision } from 'app/entities/revisions/revision.model';
   styleUrls: ['./revision-id.component.scss']
 })
 
-export class RevisionIdComponent implements OnDestroy, OnChanges {
+export class RevisionIdComponent implements OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
   @Input() policyfileName: string;
@@ -44,12 +42,6 @@ export class RevisionIdComponent implements OnDestroy, OnChanges {
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes?.policyfileName?.currentValue) {
-      this.loadRevisions(changes.policyfileName.currentValue);
-    }
-  }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
