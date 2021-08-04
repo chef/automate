@@ -36,6 +36,7 @@ type Credentials interface {
 }
 
 const (
+	Custom       = "Custom"
 	Webhook      = "Webhook"
 	Storage      = "Storage"
 	S3           = "S3"
