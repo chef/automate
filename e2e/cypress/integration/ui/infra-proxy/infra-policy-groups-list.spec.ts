@@ -10,6 +10,7 @@ describe('infra policy groups', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const policyGroupName = `${cypressPrefix}-policyGroup-${now}-1`;
   let policies: any;
 
   before(() => {
@@ -117,6 +118,26 @@ describe('infra policy groups', () => {
     it('can check if policy group has list or not', () => {
       getPolicyGroups().then((response) => {
         checkResponse(response);
+      });
+    });
+
+    context('can search and change page in policyfile', () => {
+      it('can search a Policyfile and check if empty or not', () => {
+        getPolicyGroups().then((response) => {
+          if (checkResponse(response)) {
+            cy.get('[data-cy=search-filter]').type(policyGroupName);
+            cy.get('[data-cy=search-entity]').click();
+            cy.get('[data-cy=policy-group-table-container]').then(body => {
+              if (body.text().includes(policyGroupName)) {
+                cy.get('[data-cy=policy-group-table-container]')
+                .contains(policyGroupName).should('exist');
+              }
+            });
+
+            cy.get('[data-cy=search-filter]').clear();
+            cy.get('[data-cy=search-entity]').click();
+          }
+        });
       });
     });
   });
