@@ -18,9 +18,6 @@ schedules:
   - name: cleanup_abandoned_a2_instances
     description: Cleanup abandoned a2instances
     cronline: "0 1 * * *" # every day at 1am
-  - name: unlock_staging_area_in_case_of_stall
-    description: Unlock staging area in case of stall
-    cronline: "0 2 * * *" # every day at 2am
 
 # These are our Buildkite pipelines where deploys take place
 pipelines:
@@ -168,8 +165,3 @@ subscriptions:
   - workload: schedule_triggered:{{agent_id}}:cleanup_abandoned_a2_instances:*
     actions:
       - bash:.expeditor/cleanup-abandoned-a2-instances.sh
-  - workload: schedule_triggered:{{agent_id}}:unlock_staging_area_in_case_of_stall:*
-    actions:
-      - unlock_staging_area:post_merge:
-          post_commit: true
-          always_run: true
