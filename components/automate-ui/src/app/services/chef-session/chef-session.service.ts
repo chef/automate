@@ -257,10 +257,10 @@ export class ChefSessionService implements CanActivate {
     // catches different tabs/window of same browser activity
 
     function resetTimer() {
-      if (idleTime > 0) {
-        broadcastChannel.postMessage('resetTimer');
-        idleTime = 0;
-      }
+      // this is for testing multi tabs
+      console.log('called broadcast message on different tab')
+      idleTime = 0;
+      broadcastChannel.postMessage('resetTimer');
     }
 
     function timerIncrement() {
