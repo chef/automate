@@ -50,28 +50,25 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 	}, nil
 }
 
-func fromUpstreamIncludeSolutionDependecies(sp *infra_res.SolutionDependencies) *gwres.SolutionDependencies {
-	sol_d_data := make([]*gwres.SolutionDependenciesData, len(sp.Dependencies))
+func fromUpstreamIncludeSolutionDependecies(sp []*infra_res.SolutionDependencies) []*gwres.SolutionDependencies {
+	sol_d_data := make([]*gwres.SolutionDependencies, len(sp))
 	var d_data []*gwres.DepedenciesData
-	var sol_d *gwres.SolutionDependencies
-	for i, cb := range sp.GetDependencies() {
+	for i, cb := range sp {
 		for ii, cbb := range cb.Dependencies {
 			d_data[ii] = &gwres.DepedenciesData{
 				Name: cbb.Name,
 				Version: cbb.Version,
 			}
 		}
-		sol_d_data[i] = &gwres.SolutionDependenciesData{
+		sol_d_data[i] = &gwres.SolutionDependencies{
 			Name:             cb.GetName(),
 			Version:          cb.GetVersion(),
 			Dependencies:     d_data,
 		}
 	}
 
-	sol_d = &gwres.SolutionDependencies{
-		Dependencies: sol_d_data,
-	}
-	return sol_d
+
+	return sol_d_data
 }
 
 

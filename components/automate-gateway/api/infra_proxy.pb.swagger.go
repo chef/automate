@@ -3997,7 +3997,10 @@ func init() {
           "description": "Expanded run-list associated with the policy."
         },
         "solution_dependecies": {
-          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependencies",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependencies"
+          },
           "description": "Solution Dependencies versions."
         }
       }
@@ -4283,17 +4286,6 @@ func init() {
       }
     },
     "chef.automate.api.infra_proxy.response.SolutionDependencies": {
-      "type": "object",
-      "properties": {
-        "dependencies": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependenciesData"
-          }
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.SolutionDependenciesData": {
       "type": "object",
       "properties": {
         "name": {

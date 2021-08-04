@@ -82,37 +82,34 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 }
 
 
-func fromAPIIncludedSolutionDependencies(sp chef.SolutionDep) *response.SolutionDependencies {
-	var sol_d *response.SolutionDependencies
-	var solu_d_data []*response.SolutionDependenciesData
+func fromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
+	var d_data []*response.SolutionDependencies
 
 	for _, p := range sp.PolicyFile {
 		var dependencies []*response.DepedenciesData
 		ver := strings.TrimSpace(strings.Split(p[1], "=")[1])
-		for key, val := range sp.Dependencies.(map[string][][]string) {
-			if key == p[0]+" "+"("+ver+")" {
-				for _, value := range val {
-					item1 := &response.DepedenciesData{
-						Name:    value[0],
-						Version: value[1],
+		value, ok := sp.Dependencies.(map[string][][]string)
+		if ok {
+			for key, val := range value {
+				if key == p[0]+" "+"("+ver+")" {
+					for _, value := range val {
+						item1 := &response.DepedenciesData{
+							Name:    value[0],
+							Version: value[1],
+						}
+						dependencies = append(dependencies, item1)
 					}
-					dependencies = append(dependencies, item1)
 				}
 			}
+			sol_dep := &response.SolutionDependencies{
+				Name:         p[0],
+				Version:      ver,
+				Dependencies: dependencies,
+			}
+			d_data = append(d_data, sol_dep)
 		}
-		sol_dep := &response.SolutionDependenciesData{
-			Name:         p[0],
-			Version:      ver,
-			Dependencies: dependencies,
-		}
-		solu_d_data = append(solu_d_data, sol_dep)
 	}
-
-	sol_d = &response.SolutionDependencies{
-		Dependencies: solu_d_data,
-	}
-
-	return sol_d
+	return d_data
 
 }
 
