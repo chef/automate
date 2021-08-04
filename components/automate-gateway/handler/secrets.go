@@ -54,6 +54,15 @@ func (a *Secrets) Read(ctx context.Context, in *secrets.Id) (*secrets.Secret, er
 	if key, found := FindKeyValue(out.Data, "key"); found {
 		key.Value = ""
 	}
+	if key, found := FindKeyValue(out.Data, "headers"); found {
+		key.Value = ""
+	}
+	if key, found := FindKeyValue(out.Data, "access_key"); found {
+		key.Value = ""
+	}
+	if key, found := FindKeyValue(out.Data, "secret_access_key"); found {
+		key.Value = ""
+	}
 	return out, nil
 }
 
