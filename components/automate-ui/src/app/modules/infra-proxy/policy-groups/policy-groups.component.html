@@ -4,7 +4,9 @@
   </app-empty-state>
   <ng-container *ngIf="!policyGroupsListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchPolicyGroups($event)" placeHolder="Policyfiles group by name...">
+      <app-infra-search-bar 
+      (input)="onSearchChange($event.target.value)"
+       placeHolder="Policyfiles group by name...">
       </app-infra-search-bar>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0)">
@@ -15,7 +17,14 @@
 
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
       <app-policy-groups-list
-        [policyFiles]= "policyFiles">
+      *ngIf="!searchFlag"
+        [policyFiles]= "policyFiles"
+        [searchFlag]= "searchFlag">
+      </app-policy-groups-list>
+      <app-policy-groups-list
+        *ngIf="searchFlag"
+        [policyFiles]= "list"
+        [searchFlag]="searchFlag">
       </app-policy-groups-list>
     </div>
   </ng-container>
