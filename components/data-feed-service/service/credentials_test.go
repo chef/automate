@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
@@ -237,7 +239,7 @@ func TestGetCredentialsSplunk(t *testing.T) {
 		gomock.Any(),
 	).Return(secret, nil)
 
-	credentials, err := GetCredentials(context.Background(), secretsClient, secretId, "Services", serviceSplunk, "{}")
+	credentials, err := GetCredentials(context.Background(), secretsClient, secretId, serviceSplunk, Webhook, "{}")
 
 	if err != nil {
 		t.Logf("Expected error: nil, got %v", err)
@@ -423,11 +425,17 @@ func TesStorageCredentials(t *testing.T) {
 	}
 }
 func TestGetCredentialsStorage(t *testing.T) {
+	var AWS_REGION = os.Getenv("AWS_REGION")
+	var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
+	var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	secret := &secrets.Secret{
 		Name: "name",
 		Type: "data-feed",
 		Data: appendKvs(&query.Kv{Key: "accesskey", Value: accessKey}, &query.Kv{Key: "secretAccessKey", Value: secretAccessKey}),
 	}
+	fmt.Println("::::::::: AWS_REGION", AWS_REGION)
+	fmt.Println("::::::::: AWS_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID)
+	fmt.Println("::::::::: AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY)
 	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 	secretsClient.EXPECT().Read(
 		context.Background(),
@@ -435,7 +443,7 @@ func TestGetCredentialsStorage(t *testing.T) {
 	).Return(secret, nil)
 	// need to Mock the secret using witout a splunk or basic auth
 	credentials, err := GetCredentials(context.Background(), secretsClient, secretId, S3, Storage, `{"bucket":"`+bucket+`","region":"`+region+`"}`)
-	if err != nil {
+	if err == nil {
 		t.Logf("Expected error: nil, got %v", err)
 		t.Fail()
 	}
