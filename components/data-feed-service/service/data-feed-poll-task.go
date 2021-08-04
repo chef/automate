@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
@@ -115,7 +114,6 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
 	taskResults.NodeIDs = nodeIDs
-	logrus.Println("Total node Ids :::::::::::", len(taskResults.NodeIDs))
 
 	return taskResults, nil
 }
@@ -201,7 +199,6 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 	if err != nil {
 		return nil, err
 	}
-	log.Println("total number of inventoryNodes start", len(inventoryNodes.Nodes))
 
 	nodeIDs := make(map[string]NodeIDs, 0)
 	log.Debugf("No of inventory nodes %v", len(inventoryNodes.Nodes))
@@ -218,7 +215,6 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 
 		inventoryNodes, err = d.cfgMgmt.GetInventoryNodes(ctx, nodesRequest)
 		log.Debugf("inventory nodes %v, cursor %v", len(inventoryNodes.Nodes), lastNode.Id)
-		log.Println("total number of inventoryNodes end", len(inventoryNodes.Nodes))
 		if err != nil {
 			return nil, err
 		}
