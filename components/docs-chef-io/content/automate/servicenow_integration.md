@@ -83,15 +83,9 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 
 ### Discovery Source
 
-The Chef Automate Integration App provides a unique ID that distinguishes between discovered Configuration Items (CIs) and imported CIs. Chef Infra Servers and other CIs discovered by the Integration App take a value of **Chef Automate** by default in the **Discovery Source** field part of the `cmdb_servers` table while importing CIs.
+The Chef Automate Integration App provides a unique ID that distinguishes between discovered Configuration Items (CIs) and imported CIs. Chef Infra Servers and other CIs discovered by the Integration App take a value of **Chef Automate** by default in the **Discovery Source** field part of the `cmdb_servers` table.
 
 {{< figure src="/images/automate/snow_integration_discovery.png" alt="Discovery Source">}}
-
-{{< note >}}
-
-The servers recognized by Chef Automate Integration App have discovery source value as **ChefAutomate**.
-
-{{< /note >}}
 
 ## Configuration
 
