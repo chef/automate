@@ -113,7 +113,7 @@ describe('PolicyGroupsComponent', () => {
         ['has mixed alphabet, number, special character', 'policy-test!+ test1']
       ], function (description: string, input: string) {
         it(('when the name ' + description), () => {
-          component.onSearchChange(input);
+          component.searchPolicyFiles(input);
           expect(component.policyFiles.length).toBe(0);
         });
       });
@@ -151,7 +151,7 @@ describe('PolicyGroupsComponent', () => {
         ['contains space', '    test1']
       ], function (description: string, input: string) {
         it(('when the name only' + description), () => {
-          component.onSearchChange(input);
+          component.searchPolicyFiles(input);
           expect(component.policyFiles.length).toBe(0);
         });
       });

@@ -82,11 +82,12 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetPolicyGroups(payload));
   }
 
-  onSearchChange(searchText: string): void {
+  searchPolicyFiles(searchText: string): void {
     this.searching = true;
     this.searchValue = searchText;
     if (!this.policyFiles || !searchText) {
       this.searchFlag = false;
+      this.list = this.policyFiles;
     } else {
       this.list = [];
       this.list = this.policyFiles.filter((key) => {
