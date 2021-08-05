@@ -18,7 +18,7 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
       <app-policy-groups-list
-        [policyFiles]= "list"
+        [policyFiles]= "groupList"
         [searchFlag]="searchFlag">
       </app-policy-groups-list>
     </div>
