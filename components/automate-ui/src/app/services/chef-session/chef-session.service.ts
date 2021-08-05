@@ -139,8 +139,7 @@ export class ChefSessionService implements CanActivate {
     console.log(this.appConfigService.isIdleTimeoutEnabled, "this.appConfigService.isIdleTimeoutEnabled")
 
     if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
-      const dividedTime = this.idleTimeout / 2;
-      this.idleLogout(dividedTime * 60000); // Convert minutes to milliseconds
+      this.idleLogout(this.idleTimeout); // Time in minutes
     }
   }
 
@@ -246,8 +245,8 @@ export class ChefSessionService implements CanActivate {
     let idleTime = 0;
     const broadcastChannel = new BroadcastChannel('tabsCheckForIdleTimeout');
 
-    // Increment the idle time counter after configured mins in config.toml.
-    setInterval(timerIncrement.bind(this), idleTimeout);
+    // Increment the idle time counter after every minute.
+    setInterval(timerIncrement.bind(this), 60 * 1000);
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer;  // catches touchscreen presses as well
@@ -269,7 +268,7 @@ export class ChefSessionService implements CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      if (idleTime >= 2) {
+      if (idleTime === idleTimeout) {
           this.logout();
       }
     }
