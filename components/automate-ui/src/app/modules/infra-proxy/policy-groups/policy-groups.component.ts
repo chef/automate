@@ -89,13 +89,14 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       this.searchFlag = false;
       this.groupList = this.policyFiles;
     } else {
-      this.groupList = [];
-      this.groupList = this.policyFiles.filter((key) => {
+      let list = [];
+      list = this.policyFiles.filter((key) => {
         this.searchFlag = true;
         if (key) {
           return key.policy_group.includes(this.searchValue);
         }
       });
+      this.groupList = list;
     }
     this.searchArr = this.groupList;
     this.searching = false;
