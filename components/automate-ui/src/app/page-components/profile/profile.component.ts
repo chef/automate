@@ -29,6 +29,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   buildVersion: string;
   displayName: string;
   isLocalUser: boolean;
+  isProfileMenu = true;
   public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
 
@@ -48,6 +49,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     public userPrefsService: UserPreferencesService
   ) {
     this.isLocalUser = chefSessionService.isLocalUser;
+    this.isProfileMenu = userPrefsService.uiSettings.isProfileMenu;
   }
 
   ngOnInit() {

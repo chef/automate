@@ -16,7 +16,7 @@
       <li class="dropdown-list-item">
         Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
       </li>
-      <li class="dropdown-list-item" *ngIf="userPrefsService.uiSettings.isProfileMenu">
+      <li class="dropdown-list-item" *ngIf="isProfileMenu">
         <a [routerLink]="['/user-details', userName]"
           (click)="closeDropdown()"
           (keydown.arrowup)="handleArrowUp($event)"
