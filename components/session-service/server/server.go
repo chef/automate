@@ -17,7 +17,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/chef/automate/api/interservice/session"
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/lib/version"
 
 	"github.com/alexedwards/scs"
@@ -233,7 +233,7 @@ func (s *Server) StartGRPCServer(addr string) error {
 	s.log.Debugf("listening (grpc) on %s", addr)
 	s.grpcServer = s.connFactory.NewServer()
 
-	session.RegisterValidateSessionServiceServer(s.grpcServer, &SessionCookieValidator{pgDB: s.pgDB})
+	id_token.RegisterValidateIdTokenServiceServer(s.grpcServer, &IdTokenValidator{pgDB: s.pgDB})
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -262,7 +262,7 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sqlStatement := `
-		INSERT INTO blacklisted_id_tokens (id_token)
+		INSERT INTO blacklisted_id_tokens (token)
 		VALUES ($1)`
 
 	_, err = s.pgDB.Exec(sqlStatement, idToken) // Dump id_token in blacklisted_id_tokens
