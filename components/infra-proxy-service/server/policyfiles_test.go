@@ -32,7 +32,7 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 			[]*response.SolutionDependencies{
 				&response.SolutionDependencies{
 					Name:    "nginx",
-					Version: "= 11.5.3",
+					Version: "11.5.3",
 					Dependencies: []*response.DepedenciesData{
 						&response.DepedenciesData{
 							Name:    "ohai",
@@ -48,16 +48,23 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					PolicyFile: [][]string{
 						[]string{"viv-test", ">= 0.0.0"},
 					},
-					Dependencies: map[string][][]string{
-						"viv-test (0.1.0)": [][]string{},
+					Dependencies: map[string]interface{}{
+						"viv-test (0.1.0)": []interface{}{
+							[]string{"ohai", "~> 5.2"},
+						},
 					},
 				},
 			},
 			[]*response.SolutionDependencies{
 				&response.SolutionDependencies{
-					Name:         "viv-test",
-					Version:      ">= 0.0.0",
-					Dependencies: nil,
+					Name:    "nginx",
+					Version: "11.5.3",
+					Dependencies: []*response.DepedenciesData{
+						&response.DepedenciesData{
+							Name:    "ohai",
+							Version: "~> 5.2",
+						},
+					},
 				},
 			},
 		},

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
@@ -94,20 +95,30 @@ func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.Soluti
 		if len(p) == 2 {
 			ver = strings.TrimSpace(p[1])
 		}
-		value, ok := sp.Dependencies.(map[string][][]string)
+
+		value, ok := sp.Dependencies.(map[string]interface{})
 		// Check for type conversion failure
 		if ok {
-			for key, val := range value {
+			for key, v := range value {
+				val, ok := v.([]interface{})
+				if !ok {
+					continue
+				}
 				cookBookName := strings.Split(key, " ")[0]
 				if cookBookName == name {
 					for _, value := range val {
-						if len(value) == 0 {
+						fmt.Printf("KALLOL:: %T\n", value)
+						cookDeps := value.([]interface{})
+						if len(cookDeps) == 0 {
 							continue
 						}
-						dependencyName := value[0]
+						dependencyName, ok := cookDeps[0].(string)
+						if !ok {
+							continue
+						}
 						dependencyVersion := "0.0.0"
-						if len(value) > 1 {
-							dependencyVersion = value[1]
+						if len(cookDeps) > 1 {
+							dependencyVersion = cookDeps[1].(string)
 						}
 						item1 := &response.DepedenciesData{
 							Name:    dependencyName,
@@ -117,13 +128,14 @@ func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.Soluti
 					}
 				}
 			}
-			solDep := &response.SolutionDependencies{
-				Name:         name,
-				Version:      ver,
-				Dependencies: dependencies,
-			}
-			dData = append(dData, solDep)
+
 		}
+		solDep := &response.SolutionDependencies{
+			Name:         name,
+			Version:      ver,
+			Dependencies: dependencies,
+		}
+		dData = append(dData, solDep)
 	}
 	return dData
 
