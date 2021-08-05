@@ -156,6 +156,13 @@ message UsernamePassword {
 message SecretId {
   string id = 1;
 }
+message SecretIdWithExtraPrams {
+	string id = 1;
+	string services = 2;
+    string integration_types = 3;
+    repeated chef.automate.api.common.query.Kv meta_data = 4;
+  }
+
 
 message Header {
 	string value = 1;
@@ -173,12 +180,10 @@ message URLValidationRequest {
   oneof credentials {
     UsernamePassword username_password = 2;
     SecretId secret_id = 3;
-	Header header = 4;
-	AWS aws = 5;
+	SecretIdWithExtraPrams secret_id_with_addon = 4;
+	Header header = 5;
+	AWS aws = 6;
    }
-   string services = 6;
-   string integration_types = 7;
-   repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message TestDestinationResponse {

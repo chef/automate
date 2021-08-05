@@ -114,12 +114,6 @@ func TestTestDestination(t *testing.T) {
 }
 
 func TestTestDestinationError(t *testing.T) {
-	var AWS_REGION = os.Getenv("AWS_REGION")
-	var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-	var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	fmt.Println("::::::::: AWS_REGION", AWS_REGION)
-	fmt.Println("::::::::: AWS_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID)
-	fmt.Println("::::::::: AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY)
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
 }

@@ -75,48 +75,62 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	secretAccessKey := ""
 	region := ""
 	bucket := ""
-
+	serviceType := ""
+	integrationType := ""
 	var err error
 	var credentials service.Credentials
 	url := request.Url
-	serviceType := request.Services
-	integrationType := request.IntegrationTypes
-
-	
-	zaMap := make(map[string]string, 0)
-	for _, kv := range request.MetaData {
-		zaMap[kv.Key] = kv.Value
-	}
-	jsonMap, err := json.Marshal(zaMap)
-	if err != nil {
-		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
-	}
-	metaData := string(jsonMap)
-
 
 	switch request.Credentials.(type) {
 	case *datafeed.URLValidationRequest_UsernamePassword:
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
-
+		integrationType = service.Webhook
 	case *datafeed.URLValidationRequest_Header:
 		headers = request.GetHeader().GetValue()
 		credentials = service.NewCustomHeaderCredentials(headers)
+		integrationType = service.Webhook
 	case *datafeed.URLValidationRequest_Aws:
 		accesskey = request.GetAws().GetAccessKey()
 		secretAccessKey = request.GetAws().GetSecretAccessKey()
 		region = request.GetAws().GetRegion()
 		bucket = request.GetAws().GetBucket()
 		credentials = service.NewS3Credentials(accesskey, secretAccessKey, region, bucket)
+		if url == "null" {
+			serviceType = "S3"
+		} else {
+			serviceType = "Minio"
+		}
+		integrationType = service.Storage
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
+		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, "", service.Webhook, "{}")
+		if err != nil {
+			return response, err
+		}
+	case *datafeed.URLValidationRequest_SecretIdWithAddon:
+		secretId := request.GetSecretIdWithAddon().GetId()
+		// call secrets api
+		serviceType = request.GetSecretIdWithAddon().Services
+		integrationType = request.GetSecretIdWithAddon().IntegrationTypes
+
+		zaMap := make(map[string]string, 0)
+		for _, kv := range request.GetSecretIdWithAddon().MetaData {
+			zaMap[kv.Key] = kv.Value
+		}
+		jsonMap, err := json.Marshal(zaMap)
+		if err != nil {
+			logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+		}
+		metaData := string(jsonMap)
 
 		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, serviceType, integrationType, metaData)
 		if err != nil {
 			return response, err
 		}
+
 	}
 
 	messageBytes, err := json.Marshal(map[string]string{
