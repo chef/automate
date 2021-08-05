@@ -35,7 +35,6 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public searching = false;
   public searchValue = '';
-  public searchFlag = false;
   public searchArr;
   public groupList = [];
 
@@ -86,11 +85,9 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     this.searching = true;
     this.searchValue = searchText;
     if (!this.policyFiles || !searchText) {
-      this.searchFlag = false;
       this.groupList = this.policyFiles;
     } else {
       const list = this.policyFiles.filter((key) => {
-        this.searchFlag = true;
         if (key) {
           return key.policy_group.includes(this.searchValue);
         }

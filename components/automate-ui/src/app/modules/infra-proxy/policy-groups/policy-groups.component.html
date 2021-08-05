@@ -9,7 +9,7 @@
         placeHolder="Policy group by name...">
       </app-infra-search-bar>
     </div>
-    <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0)">
+    <div data-cy="empty-list" class="empty-section" *ngIf="!groupList.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />  
       <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>    
       <p *ngIf="searchValue === ''">No policy groups available</p>
@@ -18,8 +18,7 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
       <app-policy-groups-list
-        [policyFiles]= "groupList"
-        [searchFlag]="searchFlag">
+        [policyFiles]= "groupList">
       </app-policy-groups-list>
     </div>
   </ng-container>
