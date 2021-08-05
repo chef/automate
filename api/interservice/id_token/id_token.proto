@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package chef.automate.domain.id_token;
+option go_package = "github.com/chef/automate/api/interservice/id_token";
+
+message IdTokenReq {
+    // id_token
+    string token = 1;
+}
+
+message IdTokenResp {
+    bool exist = 1;
+}
+
+service ValidateIdTokenService {
+    rpc ValidateIdToken(IdTokenReq) returns (IdTokenResp) {}
+}

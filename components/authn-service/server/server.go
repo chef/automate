@@ -15,7 +15,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/session"
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -58,7 +58,7 @@ type Server struct {
 	policiesClient authz.PoliciesServiceClient
 	authzClient    authz.AuthorizationServiceClient
 	health         *health.Service
-	sessionClient  session.ValidateSessionServiceClient
+	sessionClient  id_token.ValidateIdTokenServiceClient
 }
 
 // NewServer constructs a server from the provided config.
@@ -142,7 +142,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial session-service (%s)", c.SessionAddress)
 	}
-	sessionClient := session.NewValidateSessionServiceClient(sessionConn)
+	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
 
 	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
 	if err != nil {

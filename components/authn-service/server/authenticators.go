@@ -14,11 +14,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/session"
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/authenticator/mock"
 	"github.com/chef/automate/components/authn-service/authenticator/oidc"
 	"github.com/chef/automate/components/authn-service/authenticator/tokens"
+	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -57,19 +58,17 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
-	for _, cookie := range req.Cookies() {
-		if cookie.Name == "session" {
-			sessionData, err := s.sessionClient.ValidateSessionCookie(ctx, &session.SessionKeyReq{Key: cookie.Value})
+	idToken, err := util.ExtractBearerToken(req)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
 
-			if err != nil {
-				return nil, status.Errorf(codes.Unauthenticated, err.Error())
-			}
-
-			if !sessionData.Valid || !sessionData.Exist {
-				return nil, status.Errorf(codes.Internal, "failed to verify session key: %v", err.Error())
-			}
-			break
-		}
+	sessionResp, err := s.sessionClient.ValidateIdToken(ctx, &id_token.IdTokenReq{Token: idToken})
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+	if sessionResp.Exist {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
 	if user, ok := requestor.(authenticator.LocalUser); ok {
