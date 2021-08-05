@@ -74,7 +74,7 @@ const haExistingNodesConfigTemplate = `
 # 'chef-automate deploy' with this config file and it should
 # successfully create a new Chef Automate HA instances with default settings.
 
-[architecture.aws]
+[architecture.existing_nodes]
 secrets_key_file = "{{ .SecretsKeyFile }}"
 secrets_store_file = "{{ .SecretsStoreFile }}"
 architecture = "{{ .Architecture }}"
