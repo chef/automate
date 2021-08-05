@@ -166,8 +166,10 @@ abstract class UserDetails {
      };
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const name = this.displayNameForm.get('displayName').value.trim();
-    this.store.dispatch(this.createUpdateNameUserAction(name));
+    if (this.userPrefsService.uiSettings.isDisplayNameEditable) {
+      const name = this.displayNameForm.get('displayName').value.trim();
+      this.store.dispatch(this.createUpdateNameUserAction(name));
+    }
     this.store.dispatch(new UpdateUserPreferences(payload));
     this.userPrefsService.setUserTimeformatInternal(timeformat.value);
     timeformatControl.isTimeformatDirty = false;

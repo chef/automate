@@ -17,6 +17,7 @@ import { userSelf, getStatus } from 'app/entities/users/userself.selectors';
 import {
   GetUserSelf
  } from 'app/entities/users/userself.actions';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-profile',
@@ -43,7 +44,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   constructor(
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    public userPrefsService: UserPreferencesService
   ) {
     this.isLocalUser = chefSessionService.isLocalUser;
   }
