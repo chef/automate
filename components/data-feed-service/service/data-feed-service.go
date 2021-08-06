@@ -184,20 +184,32 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
 	os, _ := attributes["os"].(string)
 	if strings.ToLower(os) == "windows" {
-		kernel, ok := attributes["kernel"].(map[string]interface{})
+		dmi, ok := attributes["dmi"].(map[string]interface{})
 		if !ok {
 			nodeDataContent["serial_number"] = ""
+		}
+		system, ok := dmi["system"].(map[string]interface{})
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+		}
+		serialNumber, ok := system["serial_number"].(string)
+		if !ok {
+			nodeDataContent["serial_number"] = ""
+		}
+
+		nodeDataContent["serial_number"] = serialNumber
+		fmt.Println(nodeDataContent["serial_number"], serialNumber)
+
+		kernel, ok := attributes["kernel"].(map[string]interface{})
+		if !ok {
 			nodeDataContent["os_service_pack"] = ""
-			return
 		}
 
 		osInfo, ok := kernel["os_info"].(map[string]interface{})
 		if !ok {
-			nodeDataContent["serial_number"] = ""
 			nodeDataContent["os_service_pack"] = ""
-			return
 		}
-		nodeDataContent["serial_number"] = osInfo["serial_number"]
+
 		nodeDataContent["os_service_pack"] = ""
 		majorVersion, ok := osInfo["service_pack_major_version"].(float64)
 		if !ok {

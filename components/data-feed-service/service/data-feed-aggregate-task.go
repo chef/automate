@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"time"
 
@@ -228,6 +229,7 @@ func (d *DataFeedAggregateTask) getNodeData(ctx context.Context, filters []strin
 	nodeDataContent["ipaddress"] = ipaddress
 	nodeDataContent["automate_fqdn"] = d.externalFqdn
 	addDataContent(nodeDataContent, automaticAttrs)
+	fmt.Println(nodeDataContent, ":::::", automaticAttrs)
 	nodeData["node"] = nodeDataContent
 	return nodeData, nil
 }

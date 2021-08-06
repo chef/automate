@@ -37,7 +37,7 @@ var mockErr = errors.New(mockErrMsg)
 var mockAttrString = "{\"foo\":\"bar\"}"
 var mockAttrs = map[string]string{"foo": "bar"}
 var automaticAttrs = "{\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}},\"hostname\":\"test.chef.com\",\"hostnamectl\":{\"operating_system\":\"ubuntu\"},\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\",\"os\":\"linux\",\"os_version\":\"4.13.0-45-generic\"}"
-var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
+var automaticAttrsWin = "{\"os\":\"windows\",\"kernel\":{\"os_info\":{\"serial_number\":\"serial-number\",\"service_pack_major_version\":2,\"service_pack_minor_version\":1}},\"dmi\":{\"system\":{\"serial_number\":\"serial-number\"}},\"hostname\":\"test.chef.com\",\"ipaddress\":\"172.18.2.120\",\"macaddress\":\"00:1C:42:C1:2D:87\"}"
 var mockConfig = &config.DataFeedConfig{}
 var acceptedStatusCodes []int32 = []int32{200, 201, 202, 203, 204}
 var mockCredentials = NewBasicAuthCredentials("user", "pass")
@@ -385,15 +385,23 @@ func TestAddDataContentWindows(t *testing.T) {
 	attributes := make(map[string]interface{})
 	attributes["os"] = "windows"
 	kernel := make(map[string]interface{})
+	dmi := make(map[string]interface{})
+
+	system := make(map[string]interface{})
+	system["serial_number"] = serialNumber
+	dmi["system"] = system
+
 	osInfo := make(map[string]interface{})
 	osInfo["serial_number"] = serialNumber
 	osInfo["service_pack_major_version"] = servicePackMajorVersion
 	osInfo["service_pack_minor_version"] = servicePackMinorVersion
 	kernel["os_info"] = osInfo
 	attributes["kernel"] = kernel
+	attributes["dmi"] = dmi
 
 	nodeDataContent := make(map[string]interface{})
 
+	t.Log(attributes)
 	addDataContent(nodeDataContent, attributes)
 	if len(nodeDataContent) != 2 {
 		t.Log("expected nodeDataContent to have length 2")
@@ -418,6 +426,12 @@ func TestAddDataContentWindowsNoSPMajorVer(t *testing.T) {
 	osInfo["service_pack_minor_version"] = servicePackMinorVersion
 	kernel["os_info"] = osInfo
 	attributes["kernel"] = kernel
+
+	dmi := make(map[string]interface{})
+	system := make(map[string]interface{})
+	system["serial_number"] = serialNumber
+	dmi["system"] = system
+	attributes["dmi"] = dmi
 
 	nodeDataContent := make(map[string]interface{})
 
@@ -445,6 +459,12 @@ func TestAddDataContentWindowsNoSPMinorVer(t *testing.T) {
 	osInfo["service_pack_major_version"] = servicePackMajorVersion
 	kernel["os_info"] = osInfo
 	attributes["kernel"] = kernel
+
+	dmi := make(map[string]interface{})
+	system := make(map[string]interface{})
+	system["serial_number"] = serialNumber
+	dmi["system"] = system
+	attributes["dmi"] = dmi
 
 	nodeDataContent := make(map[string]interface{})
 
