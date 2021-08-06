@@ -33,6 +33,10 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyGroupsListLoading = true;
   public authFailure = false;
+  public searching = false;
+  public searchValue = '';
+  public searchArr;
+  public groupList = [];
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -51,6 +55,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, policyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(policyFilesState)) {
         this.policyFiles = policyFilesState;
+        this.groupList = this.policyFiles;
         this.policyGroupsListLoading = false;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;
@@ -74,5 +79,22 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       org_id: this.orgId
     };
     this.store.dispatch(new GetPolicyGroups(payload));
+  }
+
+  searchPolicyFiles(searchText: string): void {
+    this.searching = true;
+    this.searchValue = searchText;
+    if (!this.policyFiles || !searchText) {
+      this.groupList = this.policyFiles;
+    } else {
+      const list = this.policyFiles.filter((key) => {
+        if (key) {
+          return key.policy_group.includes(this.searchValue);
+        }
+      });
+      this.groupList = list;
+    }
+    this.searchArr = this.groupList;
+    this.searching = false;
   }
 }
