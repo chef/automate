@@ -107,4 +107,5 @@ message AutomateConfig {
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 	chef.automate.infra.journal.ConfigRequest journal = 49;
+
 }

@@ -433,6 +433,10 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-backend-ctl",
+      "metadata": null
+    },
+    {
       "name": "chef/sample-data-service",
       "metadata": {
         "name": "chef/sample-data-service",
@@ -590,6 +594,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cds",
         "chef/automate-backend-journalbeat",
+        "chef/automate-backend-ctl",
         "chef/user-settings-service"
       ],
       "packages": null,
@@ -660,6 +665,7 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-prometheus",
+        "chef/automate-backend-ctl",
         "chef/automate-backend-journalbeat"
       ],
       "packages": null,

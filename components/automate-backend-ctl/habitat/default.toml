@@ -1,0 +1,5 @@
+[service]
+port = 10196
+
+[mlsa]
+accept = false

@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-backend-ctl",
+  "uses_platform_scaffolding": true
+}

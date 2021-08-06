@@ -18,6 +18,7 @@ pkg_deps=(
 
 pkg_binds=(
   #[automate-elasticsearch]="http-port"
+  ["automate-es-gateway"]="http-port"
 )
 
 

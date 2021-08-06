@@ -44,6 +44,7 @@
     "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
     "chef/automate-backend-journalbeat",
+    "chef/automate-backend-ctl",
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
@@ -152,6 +153,7 @@
       "services": [
         "chef/automate-cds",
         "chef/automate-backend-journalbeat",
+        "chef/automate-backend-ctl",
         "chef/user-settings-service"
       ]
     },
@@ -195,6 +197,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-prometheus",
+        "chef/automate-backend-ctl",
         "chef/automate-backend-journalbeat"
       ]
     },
