@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-backend-metricbeat",
+  "uses_platform_scaffolding": true
+}

@@ -51,6 +51,7 @@ import "config/builder_memcached/config_request.proto";
 import "config/sample_data/config_request.proto";
 import "config/user_settings/config_request.proto";
 import "config/journal/config_request.proto";
+import "config/metric/config_request.proto";
 
 
 message AutomateConfig {
@@ -107,5 +108,5 @@ message AutomateConfig {
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 	chef.automate.infra.journal.ConfigRequest journal = 49;
-
+	chef.automate.infra.metric.ConfigRequest metric = 50;
 }

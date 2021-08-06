@@ -79,3 +79,5 @@ automate-builder-api-proxy components/automate-builder-api-proxy
 sample-data-service components/sample-data-service
 user-settings-service components/user-settings-service
 automate-backend-journalbeat components/automate-backend-journalbeat
+automate-backend-metricbeat components/automate-backend-metricbeat
+

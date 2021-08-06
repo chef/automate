@@ -45,6 +45,7 @@
     "chef/automate-prometheus",
     "chef/automate-backend-journalbeat",
     "chef/automate-backend-ctl",
+    "chef/automate-backend-metricbeat",
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
@@ -154,6 +155,7 @@
         "chef/automate-cds",
         "chef/automate-backend-journalbeat",
         "chef/automate-backend-ctl",
+        "chef/automate-backend-metricbeat",
         "chef/user-settings-service"
       ]
     },
@@ -198,7 +200,8 @@
       "services": [
         "chef/automate-prometheus",
         "chef/automate-backend-ctl",
-        "chef/automate-backend-journalbeat"
+        "chef/automate-backend-journalbeat",
+        "chef/automate-backend-metricbeat"
       ]
     },
     {

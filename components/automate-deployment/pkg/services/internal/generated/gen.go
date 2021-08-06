@@ -433,8 +433,14 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-backend-ctl",
-      "metadata": null
+      "name": "chef/automate-backend-metricbeat",
+      "metadata": {
+        "name": "chef/automate-backend-metricbeat",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/sample-data-service",
@@ -594,7 +600,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-cds",
         "chef/automate-backend-journalbeat",
-        "chef/automate-backend-ctl",
+        "chef/automate-backend-metricbeat",
         "chef/user-settings-service"
       ],
       "packages": null,
@@ -666,7 +672,8 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-prometheus",
         "chef/automate-backend-ctl",
-        "chef/automate-backend-journalbeat"
+         "chef/automate-backend-journalbeat",
+        "chef/automate-backend-metricbeat"
       ],
       "packages": null,
       "dependencies": [
