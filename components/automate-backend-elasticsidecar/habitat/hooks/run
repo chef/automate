@@ -1,0 +1,10 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+echo "extracting ops dashboards"
+mkdir -p /hab/svc/automate-backend-elasticsidecar/config/dashboards/
+tar -xzf {{pkg.path}}/data/dashboards.tar.gz -C /hab/svc/automate-backend-elasticsidecar/config/dashboards/
+
+echo "starting elastic sidecar"
+GEM_PATH={{pkg.path}}/lib/gems exec {{pkgPathFor "core/ruby26"}}/bin/ruby {{pkg.path}}/bin/elastic_sidecar.rb

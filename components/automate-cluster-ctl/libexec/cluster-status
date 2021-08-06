@@ -1,0 +1,147 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl status
+# Summary: Show Automate cluster status information
+# Built-in help
+# provide completions
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+require 'tty/table'
+
+class AutomateClusterStatus < AutomateCluster::Command
+  option ['-f', '--format'], 'FORMAT', 'Output format', default: 'text'
+  parameter "[NAME]", "Filter by service name", attribute_name: :name
+
+  def execute
+    be_service_data = []
+    fe_service_data = []
+
+    wait_while 'Fetching service status' do
+      fe_service_data += fe_status('automate') if name.nil? || name == 'automate'
+      fe_service_data += fe_status('chef_server') if name.nil? || name == 'chef_server'
+      be_service_data += postgresql_status if name.nil? || name == 'postgresql'
+      be_service_data += elasticsearch_status if name.nil? || name == 'elasticsearch'
+    end
+
+    render_status(['Service', 'Public IP', 'Status', 'Elasticsearch'], fe_service_data, title: "Frontend Services")
+    render_status(['Service', 'Public IP', 'Health', 'Process', 'Uptime', 'Role'], be_service_data, title: 'Backend Services')
+  end
+
+  def automate_status_code(code)
+    case code
+    when 0
+      'OK'
+    when 97
+      'WARN'
+    when 99
+      'ERROR'
+    end
+  end
+
+  def be_sudo_password
+    @be_sudo_password ||= AutomateCluster.secrets['be_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def fe_sudo_password
+    @fe_sudo_password ||= AutomateCluster.secrets['fe_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def fe_status(service)
+    ssh = AutomateCluster::SSH.new
+
+    service_data = []
+
+    ssh.connections(service: service) do |type, conn|
+      automate_status = conn.run("echo '#{fe_sudo_password}' | sudo -S chef-automate status", valid_exit_codes: [0, 97, 99])
+
+      data = {
+        status: automate_status_code(automate_status.exit_status),
+        services: automate_status.stdout
+      }
+
+      es_data = conn.curl_es('_cluster/health', port: 10144, valid_exit_codes: [0, 7])
+      if es_data['status']
+        data[:es_status] = "#{es_data['status']} (Active: #{es_data['active_shards_percent_as_number']})"
+      else
+        data[:es_status] = "Unknown"
+      end
+
+      service_data << fe_service_summary_for(type, conn.ip, data)
+    end
+
+    service_data
+  end
+
+  def elasticsearch_status
+    service_data = []
+    AutomateCluster.hab_info.service_data('elasticsearch') do |ip, data|
+      service_data << be_service_summary_for('elasticsearch', ip, data)
+    end
+
+    service_data
+  end
+
+  def postgresql_status
+    service_data = []
+    AutomateCluster.hab_info.service_data('postgresql') do |ip, data|
+      service_data << be_service_summary_for('postgresql', ip, data)
+    end
+
+    service_data
+  end
+
+  def fe_service_summary_for(service, ip, data)
+    [
+      service, ip, data[:status], data[:es_status]
+    ]
+  end
+
+  def be_service_summary_for(service, ip, data)
+    state_entered = data.dig('process', 'state_entered')
+    elapsed = state_entered.nil? ? 0 : elasped_time(Time.now.utc.to_i - state_entered)
+    [
+      service, ip, data.dig('health_check', 'status'),
+      "#{data.dig('process', 'state') || 'Unknown' } (pid: #{data.dig('process', 'pid')})",
+      elapsed, data['role']
+    ]
+  end
+
+  def elasped_time(distance)
+    seconds = distance % 60
+    minutes = (distance / 60) % 60
+    hours = distance / (60 * 60)
+
+    sprintf("%02dh %02dm %02ds", hours, minutes, seconds)
+  end
+
+  def render_status(header, data, **opts)
+    case format
+    when 'text'
+      puts '' # intentionally left blank
+      puts term.bold(opts[:title])
+
+      render_fancy_table(header, data)
+    when 'json'
+      render_json(header, data)
+    else
+      signal_usage_error "Unknown format #{format}, valid options are 'text' or 'json'"
+    end
+  end
+
+  def render_json(header, data)
+    json = data.map { |service| header.zip(service).to_h }
+    services = { backend: json }
+    puts services.to_json
+  end
+
+  def render_fancy_table(headers, data, **opts)
+    opts.merge!({ multiline: true, padding: [0,1,0,1], alignments: [:left, :left]})
+
+    table = TTY::Table.new(headers, data)
+    puts table.render(:ascii, opts)
+  end
+end
+
+AutomateClusterStatus.run
