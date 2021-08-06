@@ -14,19 +14,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const DefaultRegion string = "us-east-1"
+
 var (
-	automateApiToken      = os.Getenv("AUTOMATE_API_TOKEN")
-	addData               = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"custom", "integration_types": "webhook"}`)
-	addDataValues         = []string{"test", "https://test.com", "secret", "custom", "webhook"}
-	emptyAddData          = []byte(`{}`)
-	updateData            = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
-	updateDataValues      = []string{"test update", "https://update.test.com", "updated secret"}
-	testSuccessData       = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
-	testFailsData         = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
-	testSuccessHeaderData = []byte(`{"url":"http://localhost:38080/success", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
-	testFailsHeaderData   = []byte(`{"url":"http://localhost:38080/fails", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
-	secretData            = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
-	client                = NewClient()
+	automateApiToken           = os.Getenv("AUTOMATE_API_TOKEN")
+	automateAwsRegion          = os.Getenv("AWS_REGION")
+	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
+	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
+	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"custom", "integration_types": "webhook"}`)
+	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
+	emptyAddData               = []byte(`{}`)
+	updateData                 = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
+	updateDataValues           = []string{"test update", "https://update.test.com", "updated secret"}
+	testSuccessData            = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
+	testFailsData              = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
+	testSuccessHeaderData      = []byte(`{"url":"http://localhost:38080/success", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
+	testFailsHeaderData        = []byte(`{"url":"http://localhost:38080/fails", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
+	secretData                 = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+
+	client = NewClient()
 )
 
 func NewClient() *http.Client {
@@ -38,6 +44,11 @@ func NewClient() *http.Client {
 
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %s", automateApiToken)
+	fmt.Println("AUTOMATE_API_TOKEN", os.Getenv("AUTOMATE_API_TOKEN"))
+	fmt.Println("automateAwsRegion", automateAwsRegion)
+	fmt.Println("automateAwsAccessKey", automateAwsAccessKey)
+	fmt.Println("automateAwsSecretAccessKey", automateAwsSecretAccessKey)
+
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
