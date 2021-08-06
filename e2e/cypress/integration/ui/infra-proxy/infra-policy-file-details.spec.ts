@@ -136,7 +136,7 @@ describe('infra policy details', () => {
       cy.get('[data-cy=close-policy-button]').click();
     } else {
       cy.get('[data-cy=policyfile-heading]').contains(includedPolicyFileName);
-      cy.get('[data-cy=policyfile-info]').contains('POLICY FILE INFORMATION');
+      cy.get('[data-cy=policyfile-info]').contains('POLICYFILE INFORMATION');
       cy.get('[data-cy=policyfile-meta-info]').contains('METADATA');
       return true;
     }
