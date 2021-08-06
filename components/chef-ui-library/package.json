@@ -34,7 +34,8 @@
     "prismjs": "^1.24.0",
     "redux": "^4.0.4",
     "redux-devtools-extension": "^2.13.8",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "tar": "^3.2.3"
   },
   "devDependencies": {
     "@stencil/core": "^1.2.3",
