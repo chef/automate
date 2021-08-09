@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -14,11 +15,11 @@ import (
 	"google.golang.org/grpc/status"
 
 	api "github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/authenticator/mock"
 	"github.com/chef/automate/components/authn-service/authenticator/oidc"
 	"github.com/chef/automate/components/authn-service/authenticator/tokens"
+
 	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
