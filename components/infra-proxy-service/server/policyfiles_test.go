@@ -16,32 +16,6 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 		args args
 		want []*response.SolutionDependencies
 	}{
-		{"Should transform a solution dependency with similar version",
-			args{
-				sp: chef.SolutionDep{
-					PolicyFile: [][]string{
-						[]string{"nginx", "= 11.5.3"},
-					},
-					Dependencies: map[string][][]string{
-						"nginx (11.5.3)": [][]string{
-							[]string{"ohai", "~> 5.2"},
-						},
-					},
-				},
-			},
-			[]*response.SolutionDependencies{
-				&response.SolutionDependencies{
-					Name:    "nginx",
-					Version: "11.5.3",
-					Dependencies: []*response.DepedenciesData{
-						&response.DepedenciesData{
-							Name:    "ohai",
-							Version: "~> 5.2",
-						},
-					},
-				},
-			},
-		},
 		{"Should transform a solution dependency with non-similar version",
 			args{
 				sp: chef.SolutionDep{
@@ -50,15 +24,15 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 					Dependencies: map[string]interface{}{
 						"viv-test (0.1.0)": []interface{}{
-							[]string{"ohai", "~> 5.2"},
+							[]interface{}{"ohai", "~> 5.2"},
 						},
 					},
 				},
 			},
 			[]*response.SolutionDependencies{
 				&response.SolutionDependencies{
-					Name:    "nginx",
-					Version: "11.5.3",
+					Name:    "viv-test",
+					Version: ">= 0.0.0",
 					Dependencies: []*response.DepedenciesData{
 						&response.DepedenciesData{
 							Name:    "ohai",
@@ -116,14 +90,12 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 				},
 				&response.SolutionDependencies{
-					Name:         "chocolatey",
-					Version:      "= 3.0.0",
-					Dependencies: []*response.DepedenciesData{},
+					Name:    "chocolatey",
+					Version: "= 3.0.0",
 				},
 				&response.SolutionDependencies{
-					Name:         "homebrew",
-					Version:      "= 5.2.1",
-					Dependencies: []*response.DepedenciesData{},
+					Name:    "homebrew",
+					Version: "= 5.2.1",
 				},
 				&response.SolutionDependencies{
 					Name:    "mingw",
@@ -136,9 +108,8 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 				},
 				&response.SolutionDependencies{
-					Name:         "mycookbook",
-					Version:      "= 0.1.0",
-					Dependencies: []*response.DepedenciesData{},
+					Name:    "mycookbook",
+					Version: "= 0.1.0",
 				},
 				&response.SolutionDependencies{
 					Name:    "pantry",
@@ -159,9 +130,8 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 				},
 				&response.SolutionDependencies{
-					Name:         "seven_zip",
-					Version:      "= 4.2.1",
-					Dependencies: []*response.DepedenciesData{},
+					Name:    "seven_zip",
+					Version: "= 4.2.1",
 				},
 			},
 		},
