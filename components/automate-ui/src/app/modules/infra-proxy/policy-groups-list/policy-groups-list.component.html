@@ -1,12 +1,12 @@
 <chef-table>
-  <chef-thead *ngIf="policyGroups.length">
+  <chef-thead *ngIf="policyFiles.length">
     <chef-tr class="no_border_tr">
       <chef-th class="no_border_th">Policy Group</chef-th>
       <chef-th class="no_border_th">Number of Policyfiles</chef-th>
     </chef-tr>
   </chef-thead>
   <chef-tbody>
-    <chef-tr *ngFor="let policyGroup of policyGroups">
+    <chef-tr *ngFor="let policyGroup of policyFiles">
       <chef-td>{{policyGroup.policy_group}}</chef-td>
       <chef-td>{{policyGroup.occurrence}}</chef-td>
     </chef-tr>

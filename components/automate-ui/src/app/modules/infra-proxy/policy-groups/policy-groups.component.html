@@ -18,8 +18,29 @@
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching" size="50" fixed></chef-loading-spinner>
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
       <app-policy-groups-list
-        [policyFiles]= "groupList">
+        *ngIf="!searchFlag"
+        [policyFiles]= "policyGroups"
+        [pageOfItems]= "pageOfItems">
+      </app-policy-groups-list>
+      <app-policy-groups-list
+        *ngIf="searchFlag"
+        [policyFiles]= "groupList"
+        [pageOfItems]= "pageOfItems">
       </app-policy-groups-list>
     </div>
   </ng-container>
+  <app-pagination
+    *ngIf="searchFlag"
+    [items]="groupList"
+    class="policy-group-list-paging"
+    label="name"
+    (changePage)="onChangePage($event)">
+  </app-pagination>
+  <app-pagination
+    *ngIf="!searchFlag"
+    [items]="policyGroups"
+    class="policy-group-list-paging"
+    label="name"
+    (changePage)="onChangePage($event)">
+  </app-pagination>
 </section>
