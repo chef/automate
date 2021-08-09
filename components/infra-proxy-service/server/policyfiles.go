@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
@@ -107,7 +106,6 @@ func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.Soluti
 				cookBookName := strings.Split(key, " ")[0]
 				if cookBookName == name {
 					for _, value := range val {
-						fmt.Printf("KALLOL:: %T\n", value)
 						cookDeps := value.([]interface{})
 						if len(cookDeps) == 0 {
 							continue

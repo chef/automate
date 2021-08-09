@@ -82,19 +82,19 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 					Dependencies: map[string]interface{}{
 						"build-essential (8.2.1)": []interface{}{
-							[]string{"seven_zip", ">= 0.0.0"},
-							[]string{"mingw", ">= 1.1.0"},
+							[]interface{}{"seven_zip", ">= 0.0.0"},
+							[]interface{}{"mingw", ">= 1.1.0"},
 						},
 						"chocolatey (3.0.0)": []interface{}{},
 						"homebrew (5.2.1)":   []interface{}{},
 						"mingw (2.1.1)": []interface{}{
-							[]string{"seven_zip", ">= 0.0.0"},
+							[]interface{}{"seven_zip", ">= 0.0.0"},
 						},
 						"mycookbook (5.2.1)": []interface{}{},
 						"pantry (1.0.0)": []interface{}{
-							[]string{"homebrew", ">= 0.0.0"},
-							[]string{"build-essential", ">= 0.0.0"},
-							[]string{"chocolatey", ">= 0.0.0"},
+							[]interface{}{"homebrew", ">= 0.0.0"},
+							[]interface{}{"build-essential", ">= 0.0.0"},
+							[]interface{}{"chocolatey", ">= 0.0.0"},
 						},
 						"seven_zip (4.2.1)": []interface{}{},
 					},
@@ -110,14 +110,14 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 							Version: ">= 0.0.0",
 						},
 						&response.DepedenciesData{
-							Name:    "seven_zip",
+							Name:    "mingw",
 							Version: ">= 1.1.0",
 						},
 					},
 				},
 				&response.SolutionDependencies{
 					Name:         "chocolatey",
-					Version:      "= 8.2.1",
+					Version:      "= 3.0.0",
 					Dependencies: []*response.DepedenciesData{},
 				},
 				&response.SolutionDependencies{
@@ -127,17 +127,17 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 				},
 				&response.SolutionDependencies{
 					Name:    "mingw",
-					Version: "= 0.1.0",
+					Version: "= 2.1.1",
 					Dependencies: []*response.DepedenciesData{
 						&response.DepedenciesData{
-							Name:    "mingw",
+							Name:    "seven_zip",
 							Version: ">= 0.0.0",
 						},
 					},
 				},
 				&response.SolutionDependencies{
 					Name:         "mycookbook",
-					Version:      "= 2.1.1",
+					Version:      "= 0.1.0",
 					Dependencies: []*response.DepedenciesData{},
 				},
 				&response.SolutionDependencies{
@@ -169,7 +169,7 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := FromAPIIncludedSolutionDependencies(tt.args.sp); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FromAPIIncludedSolutionDependencies() = %v, want %v", got, tt.want)
+				t.Errorf("FromAPIIncludedSolutionDependencies() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}
