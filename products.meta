@@ -46,6 +46,11 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
+    "chef/automate-backend-ctl",
+    "chef/automate-backend-elasticsearch",
+    "chef/automate-backend-elasticsidecar",
+    "chef/automate-backend-haproxy",
+    "chef/automate-cluster-ctl",
     "core/rsync"
   ],
 
