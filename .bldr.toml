@@ -1112,6 +1112,12 @@ paths = [
   "lib/user/*",
   "lib/version/*"
 ]
+
+[automate-backend-elasticsearch]
+plan_path = "components/automate-backend-elasticsearch"
+paths = [
+  "components/automate-backend-elasticsearch/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
