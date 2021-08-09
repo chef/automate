@@ -23,18 +23,32 @@ var (
 	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
 	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
 	emptyAddData               = []byte(`{}`)
-	updateData                 = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
 	updateDataValues           = []string{"test update", "https://update.test.com", "updated secret"}
 	testSuccessData            = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
 	testFailsData              = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
 	testSuccessHeaderData      = []byte(`{"url":"http://localhost:38080/success", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
 	testFailsHeaderData        = []byte(`{"url":"http://localhost:38080/fails", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
 	testSuccessAwsData         = []byte(`{"url":"null", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
-	testFailsAwsData           = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
+	testFailsAwsData           = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"automateAwsBucket","region":"` + automateAwsRegion + `"}}`)
 	testSuccessMinioData       = []byte(`{"url":"http://ec2-13-233-122-5.ap-south-1.compute.amazonaws.com:9000", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
 	testFailsMinioData         = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
-
-	secretData   = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	secretData                 = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	updateData                 = []byte(`{"name":"test update",
+										  	"url":"https://update.test.com", 
+										  	"secret":"updated secret",
+										  	"services": "S3",
+										  	"integration_types":"Storage",
+												"enable": true,
+												"meta_data":[
+													{
+														"key":"bucket",
+														"value":"s3.to.elastic.search"
+													},{
+														"key":"region",
+														"value":"us-east-2"
+													}
+												]
+											}}`)
 	secretDataS3 = []byte(`{
 		"name": "s3val",
 		"type": "data_feed",
@@ -92,8 +106,11 @@ func TestAddError(t *testing.T) {
 func TestUpdateUniqueViolation(t *testing.T) {
 	destinationId1 := addDestination(t, addData, addDataValues)
 	destinationId2 := addDestination(t, updateData, updateDataValues)
+	enableData := []byte(`{ "id":` + destinationId1 + `,"enable":false}`)
+
 	// update should return 400 Bad Request destinationId1 and destinationId2 cannot have the same name
 	updateDestinationRequest(t, destinationId1, updateData, 400)
+	enableDestinationRequest(t, destinationId1, enableData, 400)
 	// clean up the test data
 	deleteDestination(t, destinationId1, addDataValues)
 	deleteDestination(t, destinationId2, updateDataValues)
@@ -190,6 +207,30 @@ func TestDestinationWithSecretAddon(t *testing.T) {
 	assert.Nil(t, err, "%v", err)
 }
 
+func TestDestinationWithSecretAddonFail(t *testing.T) {
+	secretId, err := addSecretRequest(secretDataS3, 200)
+	assert.Nil(t, err, "%v", err)
+	dataWithSecret := []byte(`{
+		"url":"http://localhost:38080/fails",
+		"secret_id_with_addon": {
+			"id":"` + secretId + `",
+		"services":"S3",
+		"integration_types":"Storage",
+		"enable":true,
+		"meta_data":[
+			{
+				 "key":"bucket",
+				  "value":"automateAwsBucket"
+			},{
+				"key":"region",
+				"value":"` + automateAwsRegion + `"
+			}
+	   ]
+		}}`)
+	testDestinationWithAwsWithSecretAddonFail(t, dataWithSecret)
+	err = deleteSecretRequest(secretId, 200)
+	assert.Nil(t, err, "%v", err)
+}
 
 func validateResponseBody(t *testing.T, responseBody map[string]interface{}, values []string) (bool, string) {
 	isValid := validateResponseBodyFields(t, responseBody, values)
@@ -280,6 +321,16 @@ func getDestination(t *testing.T, destinationId string, statusCode int) {
 
 func updateDestinationRequest(t *testing.T, destinationId string, data []byte, statusCode int) *http.Response {
 	update, err := http.NewRequest("PATCH", "https://127.0.0.1/api/v0/datafeed/destination/"+destinationId, bytes.NewBuffer(data))
+	update.Header.Add("api-token", automateApiToken)
+	response, err := client.Do(update)
+	if assert.Nil(t, err, "Error sending request %v", err) {
+		assert.True(t, response.StatusCode == statusCode, "Expected status code %d, got: %d", statusCode, response.StatusCode)
+	}
+	return response
+}
+
+func enableDestinationRequest(t *testing.T, destinationId string, data []byte, statusCode int) *http.Response {
+	update, err := http.NewRequest("PATCH", "https://127.0.0.1/api/v0/datafeed/destination/enable/"+destinationId, bytes.NewBuffer(data))
 	update.Header.Add("api-token", automateApiToken)
 	response, err := client.Do(update)
 	if assert.Nil(t, err, "Error sending request %v", err) {
@@ -410,6 +461,17 @@ func testDestinationAwsRequestFail(t *testing.T, data []byte) {
 	}
 }
 
+func testDestinationWithAwsWithSecretAddonFail(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 500, response.StatusCode, "Expected 500, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.Contains(t, responseBody["error"], "NoSuchBucket: The specified bucket does not exist")
+		}
+	}
+}
 func testDestinationMinioRequestFail(t *testing.T, data []byte) {
 	response, err := testDestinationRequest(t, data)
 	assert.Nil(t, err, "Error: %v", err)

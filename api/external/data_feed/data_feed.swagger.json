@@ -43,6 +43,44 @@
         ]
       }
     },
+    "/api/v0/datafeed/destination/enable/{id}": {
+      "patch": {
+        "operationId": "DatafeedService_EnableDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationEnableRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
     "/api/v0/datafeed/destination/{id}": {
       "get": {
         "operationId": "DatafeedService_GetDestination",
@@ -163,44 +201,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationRequest"
-            }
-          }
-        ],
-        "tags": [
-          "DatafeedService"
-        ]
-      }
-    },
-    "/api/v0/datafeed/destinations/enable/{id}": {
-      "patch": {
-        "operationId": "DatafeedService_EnableDestination",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationEnableRequest"
             }
           }
         ],

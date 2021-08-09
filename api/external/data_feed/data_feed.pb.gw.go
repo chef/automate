@@ -723,7 +723,7 @@ var (
 
 	pattern_DatafeedService_TestDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "datafeed", "destinations", "test"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DatafeedService_EnableDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "datafeed", "destinations", "enable", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DatafeedService_EnableDestination_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "datafeed", "destination", "enable", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
