@@ -445,6 +445,10 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-backend-elasticsearch",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
@@ -580,7 +584,8 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
-        "chef/user-settings-service"
+        "chef/user-settings-service",
+        "chef/automate-backend-elasticsearch"
       ],
       "packages": null,
       "dependencies": [
