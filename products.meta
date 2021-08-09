@@ -113,7 +113,8 @@
       "dependencies": ["core"],
       "services": [
         "chef/automate-gateway",
-        "chef/automate-ui"
+        "chef/automate-ui",
+        "chef/user-settings-service"
       ]
     },
     {
@@ -140,8 +141,7 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/user-settings-service"
+        "chef/event-gateway"
       ]
     },
     {
