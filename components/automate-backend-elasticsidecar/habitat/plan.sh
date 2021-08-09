@@ -18,7 +18,7 @@ pkg_build_deps=(
 pkg_interpreters=(bin/ruby)
 
 pkg_version() {
-  cat "$PLAN_CONTEXT/../../VERSION"
+  cat "$PLAN_CONTEXT/../../../VERSION"
 }
 
 # currently broken, these should be required binds, but they are never found
@@ -29,7 +29,7 @@ pkg_binds=(
 pkg_lib_dirs=(lib)
 
 do_before() {
-  if [ ! -f "$PLAN_CONTEXT/../../VERSION" ]; then
+  if [ ! -f "$PLAN_CONTEXT/../../../VERSION" ]; then
     exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 56
   fi
   update_pkg_version

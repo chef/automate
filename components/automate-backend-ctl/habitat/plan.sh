@@ -3,17 +3,17 @@ pkg_origin="chef"
 pkg_maintainer="The Chef Server Maintainers <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_description="Provides automate-backend-ctl for Automate HA Backend Services"
-pkg_version="0.1.0"
-#pkg_version() {
-  #cat "$PLAN_CONTEXT/../../../VERSION"
-#}
 
-#do_before() {
-#  if [ ! -f "$PLAN_CONTEXT/../../../VERSION" ]; then
-#    exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 
-#  fi
-  #update_pkg_version
-#}
+pkg_version() {
+  cat "$PLAN_CONTEXT/../../../VERSION"
+}
+
+do_before() {
+  if [ ! -f "$PLAN_CONTEXT/../../../VERSION" ]; then
+    exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 
+  fi
+  update_pkg_version
+}
 
 pkg_deps=(
   core/ruby26
@@ -21,7 +21,7 @@ pkg_deps=(
   chef/mlsa
   core/bash
   core/coreutils
-  #core/bundler
+  core/bundler
   core/glibc
   core/postgresql-client
 )

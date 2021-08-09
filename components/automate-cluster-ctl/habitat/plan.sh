@@ -3,7 +3,6 @@ pkg_description="A package for automate-cluster-ctl for the A2 HA Backend."
 pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Apache-2.0")
-pkg_version="0.1.0"
 pkg_deps=(
   core/ruby26
   chef/inspec
@@ -30,14 +29,14 @@ pkg_build_deps=(
 
 pkg_bin_dirs=(bin)
 
-#pkg_version() {
- # cat "$PLAN_CONTEXT/../../../VERSION"
-#}
+pkg_version() {
+  cat "$PLAN_CONTEXT/../../../VERSION"
+}
 
 do_before() {
-  #if [ ! -f "$PLAN_CONTEXT/../../../VERSION" ]; then
-   # exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 56
-  #fi
+  if [ ! -f "$PLAN_CONTEXT/../../../VERSION" ]; then
+    exit_with "Cannot find VERSION file! You must enter the studio from the project's top-level directory." 56
+  fi
   update_pkg_version
 }
 
