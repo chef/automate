@@ -140,7 +140,8 @@
         "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway"
+        "chef/event-gateway",
+        "chef/user-settings-service"
       ]
     },
     {
