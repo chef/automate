@@ -3,6 +3,9 @@
 package main
 
 import (
+	"errors"
+
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
 
@@ -277,12 +280,19 @@ var initConfigHACmd = &cobra.Command{
 }
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
-	if args[0] == "aws" {
+	if len(args) == 0 {
+		msg := "one argument expected as any of deplyment mode like aws or existing_node. "
+		writer.Printf(msg)
+		return status.Wrap(errors.New(msg), status.ConfigError, msg)
+	} else if args[0] == "aws" {
 		writer.Printf("Generating initial automate high availablity configuration for AWS deployment")
 		return runInitConfigAwsHACmd()
 	} else if args[0] == "existing_node" {
 		writer.Printf("Generating initial automate high availablity configuration for existing infra nodes deployment")
 		return runInitConfigExistingNodeHACmd()
+	} else {
+		msg := "Incorrect argument expected is any of deplyment mode like aws or existing_node. "
+		writer.Printf(msg)
+		return status.Wrap(errors.New(msg), status.ConfigError, msg)
 	}
-	return nil
 }
