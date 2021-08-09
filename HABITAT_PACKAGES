@@ -78,3 +78,8 @@ automate-builder-api components/automate-builder-api
 automate-builder-api-proxy components/automate-builder-api-proxy
 sample-data-service components/sample-data-service
 user-settings-service components/user-settings-service
+automate-cluster-ctl components/automate-cluster-ctl
+automate-backend-ctl components/automate-backend-ctl
+automate-backend-elasticsearch components/automate-backend-elasticsearch
+automate-backend-elasticsidecar components/automate-backend-elasticsidecar
+automate-backend-haproxy components/automate-backend-haproxy
