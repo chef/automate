@@ -392,7 +392,6 @@ func TestAddDataContentWindows(t *testing.T) {
 	dmi["system"] = system
 
 	osInfo := make(map[string]interface{})
-	osInfo["serial_number"] = serialNumber
 	osInfo["service_pack_major_version"] = servicePackMajorVersion
 	osInfo["service_pack_minor_version"] = servicePackMinorVersion
 	kernel["os_info"] = osInfo
@@ -455,7 +454,6 @@ func TestAddDataContentWindowsNoSPMinorVer(t *testing.T) {
 	attributes["os"] = "windows"
 	kernel := make(map[string]interface{})
 	osInfo := make(map[string]interface{})
-	osInfo["serial_number"] = serialNumber
 	osInfo["service_pack_major_version"] = servicePackMajorVersion
 	kernel["os_info"] = osInfo
 	attributes["kernel"] = kernel
@@ -483,10 +481,59 @@ func TestAddDataContentWindowsNoSPMinorVer(t *testing.T) {
 	}
 }
 
-func TestAddDataContentWindowsEmptyKernel(t *testing.T) {
+func TestAddDataContentWindowsEmptyKernelAndEmptyDmi(t *testing.T) {
 	attributes := make(map[string]interface{})
 	attributes["os"] = "windows"
 	attributes["kernel"] = make(map[string]interface{})
+	attributes["dmi"] = make(map[string]interface{})
+	nodeDataContent := make(map[string]interface{})
+
+	addDataContent(nodeDataContent, attributes)
+	if len(nodeDataContent) != 2 {
+		t.Log("expected nodeDataContent to have length 2")
+		t.Fail()
+	}
+	if nodeDataContent["serial_number"].(string) != "" {
+		t.Logf("expected serial number %s, got %v", "", nodeDataContent["serial_number"])
+		t.Fail()
+	}
+	if nodeDataContent["os_service_pack"].(string) != "" {
+		t.Logf("expected service pack '', got %v", nodeDataContent["os_service_pack"])
+		t.Fail()
+	}
+}
+
+func TestAddDataContentWindowsEmptyOsinfo(t *testing.T) {
+	attributes := make(map[string]interface{})
+	attributes["os"] = "windows"
+	kernel := make(map[string]interface{})
+	osInfo := make(map[string]interface{})
+	kernel["os_info"] = osInfo
+	attributes["kernel"] = kernel
+	nodeDataContent := make(map[string]interface{})
+
+	addDataContent(nodeDataContent, attributes)
+	if len(nodeDataContent) != 2 {
+		t.Log("expected nodeDataContent to have length 2")
+		t.Fail()
+	}
+	if nodeDataContent["serial_number"].(string) != "" {
+		t.Logf("expected serial number %s, got %v", "", nodeDataContent["serial_number"])
+		t.Fail()
+	}
+	if nodeDataContent["os_service_pack"].(string) != "" {
+		t.Logf("expected service pack '', got %v", nodeDataContent["os_service_pack"])
+		t.Fail()
+	}
+}
+
+func TestAddDataContentWindowsEmptySystem(t *testing.T) {
+	attributes := make(map[string]interface{})
+	attributes["os"] = "windows"
+	dmi := make(map[string]interface{})
+	system := make(map[string]interface{})
+	dmi["system"] = system
+	attributes["dmi"] = dmi
 	nodeDataContent := make(map[string]interface{})
 
 	addDataContent(nodeDataContent, attributes)
