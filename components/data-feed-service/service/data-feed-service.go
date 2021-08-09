@@ -196,9 +196,7 @@ func addDataContent(nodeDataContent map[string]interface{}, attributes map[strin
 		if !ok {
 			nodeDataContent["serial_number"] = ""
 		}
-
 		nodeDataContent["serial_number"] = serialNumber
-		fmt.Println(nodeDataContent["serial_number"], serialNumber)
 
 		kernel, ok := attributes["kernel"].(map[string]interface{})
 		if !ok {
@@ -209,7 +207,6 @@ func addDataContent(nodeDataContent map[string]interface{}, attributes map[strin
 		if !ok {
 			nodeDataContent["os_service_pack"] = ""
 		}
-
 		nodeDataContent["os_service_pack"] = ""
 		majorVersion, ok := osInfo["service_pack_major_version"].(float64)
 		if !ok {
