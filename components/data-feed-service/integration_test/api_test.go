@@ -14,23 +14,42 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const DefaultRegion string = "us-east-1"
-
 var (
 	automateApiToken           = os.Getenv("AUTOMATE_API_TOKEN")
 	automateAwsRegion          = os.Getenv("AWS_REGION")
 	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
 	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"custom", "integration_types": "webhook"}`)
+	automateAwsBucket          = "s3awsintegrationtest"
+	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
 	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
 	emptyAddData               = []byte(`{}`)
 	updateData                 = []byte(`{"name":"test update", "url":"https://update.test.com", "secret":"updated secret"}`)
 	updateDataValues           = []string{"test update", "https://update.test.com", "updated secret"}
 	testSuccessData            = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
 	testFailsData              = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
-	testSuccessHeaderData      = []byte(`{"url":"http://localhost:38080/success", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
-	testFailsHeaderData        = []byte(`{"url":"http://localhost:38080/fails", "header": "{"Authorization":"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85","Testheader":"something"}"}`)
-	secretData                 = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	testSuccessHeaderData      = []byte(`{"url":"http://localhost:38080/success", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
+	testFailsHeaderData        = []byte(`{"url":"http://localhost:38080/fails", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
+	testSuccessAwsData         = []byte(`{"url":"null", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
+	testFailsAwsData           = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
+	testSuccessMinioData       = []byte(`{"url":"http://ec2-13-233-122-5.ap-south-1.compute.amazonaws.com:9000", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
+	testFailsMinioData         = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
+
+	secretData   = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	secretDataS3 = []byte(`{
+		"name": "s3val",
+		"type": "data_feed",
+		"data":[
+			 {
+				  "key":"access_key",
+				  "value":"` + automateAwsAccessKey + `"
+			 },
+			 {
+				  "key":"secret_access_key",
+				  "value":"` + automateAwsSecretAccessKey + `"
+			 }
+		 ]
+	
+	}`)
 
 	client = NewClient()
 )
@@ -44,10 +63,6 @@ func NewClient() *http.Client {
 
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %s", automateApiToken)
-	t.Logf("automateAwsRegion: %s", automateAwsRegion)
-	t.Logf("automateAwsAccessKey: %s", automateAwsAccessKey)
-	t.Logf("automateAwsSecretAccessKey: %s", automateAwsSecretAccessKey)
-
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
@@ -121,11 +136,16 @@ func TestDeleteNonExistent(t *testing.T) {
 func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
 	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
+	testDestinationAwsRequestSuccess(t, testSuccessAwsData)
+	testDestinationMinioRequestSuccess(t, testSuccessMinioData)
+
 }
 
 func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
+	testDestinationAwsRequestFail(t, testFailsAwsData)
+	testDestinationMinioRequestFail(t, testFailsMinioData)
 }
 
 func TestDestinationWithSecret(t *testing.T) {
@@ -145,6 +165,31 @@ func TestDestinationWithSecretError(t *testing.T) {
 	err = deleteSecretRequest(secretId, 200)
 	assert.Nil(t, err, "%v", err)
 }
+func TestDestinationWithSecretAddon(t *testing.T) {
+	secretId, err := addSecretRequest(secretDataS3, 200)
+	assert.Nil(t, err, "%v", err)
+	dataWithSecret := []byte(`{
+		"url":"null", 
+		"secret_id_with_addon": {
+			"id":"` + secretId + `",
+		"services":"S3",
+		"integration_types":"Storage",
+		"enable":true,
+		"meta_data":[
+			{
+				 "key":"bucket",
+				  "value":"` + automateAwsBucket + `"
+			},{
+				"key":"region",
+				"value":"` + automateAwsRegion + `"
+			}
+	   ]
+		}}`)
+	testDestinationRequestSuccess(t, dataWithSecret)
+	err = deleteSecretRequest(secretId, 200)
+	assert.Nil(t, err, "%v", err)
+}
+
 
 func validateResponseBody(t *testing.T, responseBody map[string]interface{}, values []string) (bool, string) {
 	isValid := validateResponseBodyFields(t, responseBody, values)
@@ -305,6 +350,30 @@ func testDestinationHeaderRequestSuccess(t *testing.T, data []byte) {
 	}
 }
 
+func testDestinationAwsRequestSuccess(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 200, response.StatusCode, "Expected 200, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.True(t, responseBody["success"].(bool), "Expected success=true, got %v", responseBody["success"])
+		}
+	}
+}
+
+func testDestinationMinioRequestSuccess(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 200, response.StatusCode, "Expected 200, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.True(t, responseBody["success"].(bool), "Expected success=true, got %v", responseBody["success"])
+		}
+	}
+}
+
 func testDestinationRequestFail(t *testing.T, data []byte) {
 	response, err := testDestinationRequest(t, data)
 	assert.Nil(t, err, "Error: %v", err)
@@ -325,6 +394,30 @@ func testDestinationHeaderRequestFail(t *testing.T, data []byte) {
 			responseBody, err := parseResponse(response.Body)
 			assert.Nil(t, err, "Error parsing response %v", err)
 			assert.Equal(t, "404 Not Found posting test message to: http://localhost:38080/fails", responseBody["error"], "Expected 404 Not Found posting test message to: http://localhost:38080/fails, got %v", responseBody["error"])
+		}
+	}
+}
+
+func testDestinationAwsRequestFail(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 500, response.StatusCode, "Expected 500, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.Equal(t, "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"], "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"])
+		}
+	}
+}
+
+func testDestinationMinioRequestFail(t *testing.T, data []byte) {
+	response, err := testDestinationRequest(t, data)
+	assert.Nil(t, err, "Error: %v", err)
+	if assert.NotNil(t, response, "expected a response got nil") {
+		if assert.Equal(t, 500, response.StatusCode, "Expected 500, got %d", response.StatusCode) {
+			responseBody, err := parseResponse(response.Body)
+			assert.Nil(t, err, "Error parsing response %v", err)
+			assert.Equal(t, "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"], "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"])
 		}
 	}
 }

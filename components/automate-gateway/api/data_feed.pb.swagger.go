@@ -174,6 +174,44 @@ func init() {
         ]
       }
     },
+    "/api/v0/datafeed/destinations/enable/{id}": {
+      "patch": {
+        "operationId": "DatafeedService_EnableDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationEnableRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
     "/api/v0/datafeed/destinations/test": {
       "post": {
         "operationId": "DatafeedService_TestDestination",
@@ -260,6 +298,10 @@ func init() {
         "integration_types": {
           "type": "string"
         },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "meta_data": {
           "type": "array",
           "items": {
@@ -289,6 +331,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -320,6 +366,10 @@ func init() {
         "integration_types": {
           "type": "string"
         },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "meta_data": {
           "type": "array",
           "items": {
@@ -349,6 +399,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -400,6 +454,10 @@ func init() {
         "integration_types": {
           "type": "string"
         },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "meta_data": {
           "type": "array",
           "items": {
@@ -440,6 +498,18 @@ func init() {
         }
       }
     },
+    "chef.automate.api.datafeed.UpdateDestinationEnableRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "chef.automate.api.datafeed.UpdateDestinationRequest": {
       "type": "object",
       "properties": {
@@ -460,6 +530,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -490,6 +564,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
