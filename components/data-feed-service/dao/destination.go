@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"strconv"
@@ -24,6 +25,7 @@ type Destination struct {
 	Services         string `db:"services"`
 	IntegrationTypes string `db:"integration_types"`
 	MetaData         string `db:"meta_data"`
+	Enable           bool   `db:"enable"`
 }
 
 func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
@@ -34,6 +36,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	newDestination.Enable = inDestination.Enable
 	zaMap := make(map[string]string, 0)
 	for _, kv := range inDestination.MetaData {
 		zaMap[kv.Key] = kv.Value
@@ -55,6 +58,7 @@ func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *De
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	newDestination.Enable = inDestination.Enable
 	zaMap := make(map[string]string, 0)
 	for _, kv := range inDestination.MetaData {
 		zaMap[kv.Key] = kv.Value
@@ -68,6 +72,12 @@ func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *De
 
 	return &newDestination
 }
+func updateToDBDestinationEnable(inDestination *datafeed.UpdateDestinationEnableRequest) *Destination {
+	newDestination := Destination{}
+	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10, 64)
+	newDestination.Enable = inDestination.Enable
+	return &newDestination
+}
 
 func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestinationResponse {
 	newDestination := datafeed.GetDestinationResponse{}
@@ -77,6 +87,7 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	newDestination.Enable = inDestination.Enable
 	var zaMap map[string]string
 	err := json.Unmarshal([]byte(inDestination.MetaData), &zaMap)
 	if err != nil {
@@ -209,4 +220,17 @@ func (db *DB) ListDBDestinations() ([]Destination, error) {
 		return nil, err
 	}
 	return destinations, nil
+}
+
+func (db *DB) EnableDestination(ctx context.Context, destination *datafeed.UpdateDestinationEnableRequest) error {
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	_, err := db.Db.ExecContext(ctx,
+		`UPDATE destinations SET enable =$2 WHERE id = $1`,
+		destination.Id, destination.Enable)
+	if err != nil {
+		return errors.Wrap(err, "failed to update EnableDestination")
+	}
+	return nil
 }

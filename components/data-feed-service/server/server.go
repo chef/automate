@@ -53,7 +53,7 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData}
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData, Enable: destination.Enable}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -244,6 +244,19 @@ func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, des
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return response, nil
+}
+func (datafeedServer *DatafeedServer) EnableDestination(ctx context.Context, destination *datafeed.UpdateDestinationEnableRequest) (*datafeed.GetDestinationResponse, error) {
+	log.Infof("UpdateDestination %s", destination)
+	GetdestinationRequest := &datafeed.GetDestinationRequest{}
+	err := datafeedServer.db.EnableDestination(ctx, destination)
+
+	GetdestinationRequest.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	// Id, _ = strconv.ParseInt(destination.Id, 10, 64)
+	res, err := datafeedServer.GetDestination(ctx, GetdestinationRequest)
+	return res, nil
 }
 
 // Health returns the servers embedded health check service

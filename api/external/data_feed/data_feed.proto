@@ -69,6 +69,16 @@ service DatafeedService {
 			action: "datafeed:destinations:test"
 		};
 	}
+	rpc EnableDestination(UpdateDestinationEnableRequest) returns (GetDestinationResponse) {
+		option (google.api.http) = {
+			patch: "/api/v0/datafeed/destinations/enable/{id}"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destinations:{id}"
+			action: "datafeed:destinations:update"
+		};
+	}
 }
 
 message AddDestinationRequest {	
@@ -78,7 +88,8 @@ message AddDestinationRequest {
   string secret  = 4;
   string services = 5;
   string integration_types = 6;
-  repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message AddDestinationResponse {
@@ -88,7 +99,8 @@ message AddDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
-  repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message GetDestinationRequest {
@@ -102,7 +114,8 @@ message GetDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
-repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message DeleteDestinationRequest {
@@ -116,7 +129,8 @@ message DeleteDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
-repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message UpdateDestinationRequest {	
@@ -126,7 +140,8 @@ message UpdateDestinationRequest {
   string secret = 4;
   string services  = 5;
   string integration_types  = 6;
-  repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 message AWSMetaData {
 	string bucket = 1;
@@ -139,8 +154,14 @@ message UpdateDestinationResponse {
   string secret = 4;
   string services = 5;
   string integration_types = 6;
-  repeated chef.automate.api.common.query.Kv meta_data =7;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
+
+message UpdateDestinationEnableRequest {
+	string id = 1;
+	bool enable = 3;
+  }
 
 message ListDestinationRequest {}
 
@@ -160,7 +181,8 @@ message SecretIdWithExtraPrams {
 	string id = 1;
 	string services = 2;
     string integration_types = 3;
-    repeated chef.automate.api.common.query.Kv meta_data = 4;
+	bool enable = 4;
+	repeated chef.automate.api.common.query.Kv meta_data =5;
   }
 
 
