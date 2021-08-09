@@ -183,24 +183,13 @@ func (c *workflowCompleterChunk) finish(err error) error {
 		return err
 	}
 
-	var blob []byte
-	var resp *grpccereal.DequeueWorkflowChunkResponse
-	for {
-		resp, err = c.s.Recv()
-		chunk := resp.GetChunk()
-		if len(chunk) == 3 && string(chunk) == "EOF" {
-			logrus.Debugln("Got EOF in finish")
-			break
-		}
-		if err != nil {
-			logrus.WithError(err).Error("Did not get committed message in chunk workflow")
-			return err
-		}
-		blob = append(blob, chunk...)
+	blob, err := recieveChunk(c.s)
+	if err != nil {
+		logrus.WithError(err).Error("Did not get committed message in chunk workflow")
+		return err
 	}
 
 	deq := &grpccereal.DequeueWorkflowResponse_Committed{}
-
 	err = json.Unmarshal(blob, deq)
 	if err != nil {
 		return err
@@ -270,25 +259,10 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		return nil, nil, err
 	}
 
-	var blob []byte
-	var resp *grpccereal.DequeueWorkflowChunkResponse
-	for {
-		resp, err = s.Recv()
-		chunk := resp.GetChunk()
-		if len(chunk) == 3 && string(chunk) == "EOF" {
-			logrus.Debugln("Got EOF in DequeueWorkflow")
-			break
-		}
-		if err != nil {
-			cancel()
-			if st, ok := status.FromError(err); ok {
-				if st.Code() == codes.NotFound {
-					return nil, nil, cereal.ErrNoWorkflowInstances
-				}
-			}
-			return nil, nil, err
-		}
-		blob = append(blob, chunk...)
+	blob, err := recieveChunk(s)
+	if err != nil {
+		cancel()
+		return nil, nil, err
 	}
 
 	deq := &grpccereal.DequeueWorkflowResponse_Dequeue{}
@@ -332,6 +306,30 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		s:      s,
 		cancel: cancel,
 	}, nil
+}
+
+func recieveChunk(s grpccereal.CerealService_DequeueWorkflowChunkClient) ([]byte, error) {
+	var blob []byte
+	var resp *grpccereal.DequeueWorkflowChunkResponse
+	var err error
+	for {
+		resp, err = s.Recv()
+		chunk := resp.GetChunk()
+		if len(chunk) == 3 && string(chunk) == "EOF" {
+			logrus.Debugln("Got EOF")
+			break
+		}
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				if st.Code() == codes.NotFound {
+					return nil, cereal.ErrNoWorkflowInstances
+				}
+			}
+			return nil, err
+		}
+		blob = append(blob, chunk...)
+	}
+	return blob, nil
 }
 
 func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) cereal.WorkflowInstanceData {
