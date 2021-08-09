@@ -1,0 +1,80 @@
+[kibana_yaml]
+  [kibana_yaml.server]
+    port = "5601"
+    host = "0.0.0.0"
+
+    [kibana_yaml.server.ssl]
+      enabled = true
+      certificate =  "/hab/svc/automate-backend-kibana/config/certificates/kibana.pem"
+      key = "/hab/svc/automate-backend-kibana/config/certificates/kibana.key"
+      supportedProtocols = ['TLSv1.2']
+      cipherSuites = ['ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305', 'ECDHE-RSA-CHACHA20-POLY1305', 'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256']
+
+  [kibana_yaml.elasticsearch]
+    url = "https://localhost:9200"
+    [kibana_yaml.elasticsearch.ssl]
+      certificateAuthorities = "/hab/svc/automate-backend-kibana/config/certificates/CA.pem"
+      verificationMode = "certificate"
+
+  [kibana_yaml.path]
+    data = "/hab/svc/automate-backend-kibana/data/"
+
+  [kibana_yaml.pid]
+    file = "/hab/svc/automate-backend-kibana/var/kibana.pid"
+
+# default self signed keys for testing, override in production
+# Certificate used for kibana interface
+[opendistro_ssl]
+ssl_cert = """
+-----BEGIN CERTIFICATE-----
+MIIDQjCCAioCCQCxr9UD+71aVzANBgkqhkiG9w0BAQsFADBlMQswCQYDVQQGEwJV
+UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UE
+CgwRQ2hlZiBTb2Z0d2FyZSBJbmMxEzARBgNVBAMMCmNoZWZyb290Y2EwHhcNMTkw
+NjA1MTcxMzE4WhcNMjkwNDEzMTcxMzE4WjBhMQswCQYDVQQGEwJVUzETMBEGA1UE
+CAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEaMBgGA1UECgwRQ2hlZiBT
+b2Z0d2FyZSBJbmMxDzANBgNVBAMMBmtpYmFuYTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAPEgc7Zyp+0bo8rm45vJySe2yp79oLvhRgdDCEEW2VKMyN/Y
+d411oRQtqaIps+PHAxybLreng7boA1o351OQkdofOjGbCb9GkpUEuI1Z+F+MQjPo
+gAMyk7XY7AD++HlBj4MS6ESkjaduDwMx7RN/39MA35wFfkOQjhGu8sbu4KLlZoIn
+WPCEHqb5hJtBgkausx/z6uOX4Rm0OWSX1IYZ7Ft0DjFIjsubvsB65SZrnri+3dBD
+Gbk1fMhyrkXXy8BYwz9mBdkGrUHe/giSdm8ejHbY6J3ssSV4BkfyiBzaamt3b+al
+JB/hVfbiT6l9QJRc6LRpomeFoaSgbGx9eBGEjKsCAwEAATANBgkqhkiG9w0BAQsF
+AAOCAQEACm2BQ+66sTSz21CZXIpge6Fh3n7kVFCM+DJaZ6uqh9uYNNkkYi2ePosg
++z+8kFM1vqpiX7v5rmCMaVsdQV4aDsty3aLcTuWiRUCV9092zqaFI3byjkh9ekhd
+bBFtAxddOyKNEtisWHxHOpVg4BJUNKvhTiHkjhg1+NypDFdO1tEbMZb/FY/XyA0J
+XpS/9m7PuZ2RIssYepvmFi83HugKAJZTQ6nx6ebb2HOktakOwOWB5GWdzuLDyiuA
+dfnhIBYAqdCfYPejVMyfEmuWp+PRmjDqbLEFxh1ZLAgixPa4p6d8EN7aL2By+Z88
+Ds0oKf8zQvq2j4eGRkxY73MFEVu2Kg==
+-----END CERTIFICATE-----
+"""
+
+ssl_key = """
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDxIHO2cqftG6PK
+5uObyckntsqe/aC74UYHQwhBFtlSjMjf2HeNdaEULamiKbPjxwMcmy63p4O26ANa
+N+dTkJHaHzoxmwm/RpKVBLiNWfhfjEIz6IADMpO12OwA/vh5QY+DEuhEpI2nbg8D
+Me0Tf9/TAN+cBX5DkI4RrvLG7uCi5WaCJ1jwhB6m+YSbQYJGrrMf8+rjl+EZtDlk
+l9SGGexbdA4xSI7Lm77AeuUma564vt3QQxm5NXzIcq5F18vAWMM/ZgXZBq1B3v4I
+knZvHox22Oid7LEleAZH8ogc2mprd2/mpSQf4VX24k+pfUCUXOi0aaJnhaGkoGxs
+fXgRhIyrAgMBAAECggEBALqUCNV5PLU8+O2s4RwP9KXVTE3gJTqb4ssFtGJhIsI8
+i8ahwkhkZ8KsXqFLMZYjzSWacnjLlyC1wLpTnZzMtf8YwLfXpqAqJIxIfeFqZ8TP
+S/7Mfhl7Tk6czmkq4es5rqmWvME4rx+KCvXG8RJwlSm5eE1K9tujBDtsqxEBkDKa
+XKp7dOmjAmFzdqF60AhDrGY2zo32F0pZJawrBuvvkz/u4Jyn7KshBobG1zcrWP00
+ebmVzSInVag1KNA6DBchsVjNIZ1RWXCcDcZk6KtUkj03Mhm5MZapY2L0iSp03nzg
+8NUNaQCmlTpbMlnCkdhknwJCnXxbn43TI7O0PV34QgkCgYEA/ud7g9TTxXSC60lw
+MvadJUYY5E+OijGHqfx9jVIh8eiUwuOV1LvlDKDvxLauPT4NYIXHFBH5BTCXKbLC
+JA1pEe8zq4eiM8QiN3Dg4RlIV4x+T1GfKvwYEUDv6CB3bnxkDuSgVLti7ymeu+Vj
+WJ3GJTYs9e9dhxX9ERawha4s0a8CgYEA8inOw5xOwuTxlUVunqPYXVVLIKSz0ksN
+HWBBEr39SHYVD1faOjmlSpH4MDjiDiVGcosCEZj6STj8wVU5dytpvGBfsZq2gmBQ
+XQg5m26tg+VVcrMnVnoXQe9pBbZl5bAL7JdO8/YlnTtiMjRWqxy8ZWPTnyRn/pAE
+kAJO9pZNH8UCgYEAucPXFuc2gjL76h61/t4M/goMv+5escWQ2cfhc+lERbi7GSCk
+o8lfDooG0rRTXNxpAUvdHnpOoYKc102oAIApb2GEpWAOTG2GhiLkMAet2efQcVvJ
+hJj9rS1G6UMn5sQOY3AojDeXzTXmsYZllUI+EgZeU8jivzy+FgMUGAgsL48CgYEA
+yqBK3whKKu+QaTuInPsxzp7Q1waZZGviFGN276zDYz9SzdzPwAp+ERBkoEzocbek
+47EG0Ry0yFIDw+2AwQM1XScyyxROhHb8p2t7cGBClett/SSE1Oohzcz6jooZZwBQ
+ae4NZTrgLFkFCEcdAd5wkVHfP/khfzKYbrtPwSrwa5UCgYBQLoEk3o3YCjYk77j5
+VriPaU7pZU6V+MKS2x//912oWOkKHT9j4Y9Ma7PvOthmppo+4qMqva6x9WYjWu/g
+W1uzyA/94hbfNNumyhyjVczwQC3DRrZUPWwDeEFPxnqNcn/Eui/Qcclef3YBwQye
+qwAs66b7bSZdxsH3EhNUzu9e9A==
+-----END PRIVATE KEY-----
+"""
