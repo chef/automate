@@ -269,8 +269,6 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(idToken, "Abd::idToken1122333")
 	w.WriteHeader(http.StatusOK)
 }
 

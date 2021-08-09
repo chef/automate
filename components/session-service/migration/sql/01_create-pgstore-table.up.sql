@@ -6,7 +6,7 @@ CREATE TABLE sessions (
 CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 
 CREATE TABLE blacklisted_id_tokens (
-    id_token TEXT
+    token TEXT
 );
-CREATE INDEX blacklist_session_idx ON blacklisted_id_tokens (id_token);
+CREATE INDEX blacklist_session_idx ON blacklisted_id_tokens (token);
 
