@@ -223,13 +223,13 @@ export class ChefSessionService implements CanActivate {
     };
     this.httpHandler.get('/session/logout', httpOptions).subscribe(
       (res) => {
-        console.log('response', res)
+        console.log('response', res);
         return;
       },
       (e) => {
-        console.log('error', e)
+        console.log('error', e);
         return;
-      })
+      });
   }
 
   // deleteSession removes the session information from localStorage
@@ -324,7 +324,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    if(this.user) {
+    if (this.user) {
       return this.user.id_token;
     }
     return null;
