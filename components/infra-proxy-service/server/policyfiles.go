@@ -82,13 +82,12 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 }
 
 func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
-	var dData []*response.SolutionDependencies
-
+	dData := make([]*response.SolutionDependencies, 0)
 	for _, p := range sp.PolicyFile {
 		if len(p) == 0 {
 			continue
 		}
-		var dependencies []*response.DepedenciesData
+		dependencies := make([]*response.DepedenciesData, 0)
 		name := strings.TrimSpace(p[0])
 		ver := "0.0.0"
 		if len(p) == 2 {
