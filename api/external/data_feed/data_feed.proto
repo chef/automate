@@ -71,7 +71,7 @@ service DatafeedService {
 	}
 	rpc EnableDestination(UpdateDestinationEnableRequest) returns (GetDestinationResponse) {
 		option (google.api.http) = {
-			patch: "/api/v0/datafeed/destinations/enable/{id}"
+			patch: "/api/v0/datafeed/destination/enable/{id}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
