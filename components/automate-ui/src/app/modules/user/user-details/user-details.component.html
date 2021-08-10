@@ -21,7 +21,8 @@
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="userDetails.displayNameForm">
-          <chef-form-field>
+          <!-- displayname is shown for saml & ldap users in future -->
+          <chef-form-field *ngIf="userPrefsService.uiSettings.userType === 'local'">
             <label for="displayName">Display Name <span aria-hidden="true">*</span></label>
             <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input" [readonly]="!userPrefsService.uiSettings.isDisplayNameEditable">

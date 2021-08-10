@@ -364,7 +364,9 @@ class UserProfileDetails extends UserDetails {
     chefSessionService: ChefSessionService) {
       super(store, userPrefsService, chefSessionService);
 
-      store.dispatch(new GetUserSelf());
+      if (userPrefsService.uiSettings.userType === 'local') {
+        store.dispatch(new GetUserSelf());
+      }
       layoutFacade.showSidebar(Sidebar.Profile);
 
       this.createForms(fb);

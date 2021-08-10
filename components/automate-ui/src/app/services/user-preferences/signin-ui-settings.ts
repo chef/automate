@@ -3,6 +3,7 @@ export interface SigninUiSetting {
     isDisplayNameEditable: boolean;
     isProfileMenu: boolean;
     isTimeformatExist: boolean;
+    userType: string;
 }
 
 class LocalUser implements SigninUiSetting {
@@ -10,6 +11,7 @@ class LocalUser implements SigninUiSetting {
   isDisplayNameEditable = true;
   isProfileMenu = true;
   isTimeformatExist = true;
+  userType = 'local';
 }
 
 class SamlUser implements SigninUiSetting {
@@ -17,6 +19,7 @@ class SamlUser implements SigninUiSetting {
   isDisplayNameEditable = false;
   isProfileMenu = true;
   isTimeformatExist = true;
+  userType = 'saml';
 }
 
 class LdapUser implements SigninUiSetting {
@@ -24,6 +27,7 @@ class LdapUser implements SigninUiSetting {
   isDisplayNameEditable = false;
   isProfileMenu = true;
   isTimeformatExist = true;
+  userType = 'ldap';
 }
 
 export class UISettings {
