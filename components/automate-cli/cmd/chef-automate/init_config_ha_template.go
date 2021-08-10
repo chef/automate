@@ -1,4 +1,4 @@
-package deployment
+package main
 
 const haAwsConfigTemplate = `
 # This is a Chef Automate AWS HA mode configuration file. You can run
@@ -12,14 +12,14 @@ architecture = "aws"
 workspace_path = "/src"
 ssh_user = "centos"
 ssh_key_file = "/src/a2ha-jay-singapore.pem"
-# sudo_password = "{{ .SudoPassword }}"
-# logging_monitoring_management = "{{ .LoggingMonitoringManagement }}"
-# new_elk = "{{ .NewElk }}"
-# existing_elk_instance_ip "{{ .ExistingElk }}"
-# existing_elk_port "{{ .ExistingElkPort }}"
-# existing_elk_cert "{{ .ExistingElkCert }}"
-# existing_elk_username "{{ .ExistingElkUsername }}"
-# existing_elk_password "{{ .ExistingElkPassword }}"
+# sudo_password = ""
+# logging_monitoring_management = ""
+# new_elk = ""
+# existing_elk_instance_ip ""
+# existing_elk_port ""
+# existing_elk_cert ""
+# existing_elk_username ""
+# existing_elk_password ""
 backup_mount = "/mnt/automate_backups"
 
 [automate.config]
@@ -117,3 +117,11 @@ elasticsearch_private_ips = []
 postgresql_ips = []
 postgresql_private_ips = []
 `
+
+func GetHaAwsConfigTemplate() string {
+	return haAwsConfigTemplate
+}
+
+func GetHaExistingNodesConfigTemplate() string {
+	return haExistingNodesConfigTemplate
+}
