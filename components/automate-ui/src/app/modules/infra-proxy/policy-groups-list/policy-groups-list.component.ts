@@ -1,7 +1,6 @@
 import {
   Component,
   Input,
-  OnInit,
   OnChanges,
   SimpleChanges } from '@angular/core';
 
@@ -9,13 +8,11 @@ import {
   selector: 'app-policy-groups-list',
   templateUrl: './policy-groups-list.component.html'
 })
-export class PolicyGroupsListComponent implements OnInit, OnChanges {
+export class PolicyGroupsListComponent implements OnChanges {
   @Input() policyFiles: [];
   @Input() pageOfItems: [];
 
   constructor() { }
-
-  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.pageOfItems) {

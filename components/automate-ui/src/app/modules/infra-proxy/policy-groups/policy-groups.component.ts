@@ -101,10 +101,10 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
         } else {
           // If not! Then create a new object initialize
           // it with the present iteration key's value and set the occurrence to 1
-          const a = {};
-          a[key] = x[key];
-          a['occurrence'] = 1;
-          this.policyGroups.push(a);
+          const listArr = {};
+          listArr[key] = x[key];
+          listArr['occurrence'] = 1;
+          this.policyGroups.push(listArr);
         }
       });
     } else {
