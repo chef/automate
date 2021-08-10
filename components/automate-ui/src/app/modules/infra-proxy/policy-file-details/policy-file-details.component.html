@@ -61,96 +61,100 @@
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <chef-loading-spinner class="top-spinner" *ngIf="policyFileDetailsLoading" size="50"></chef-loading-spinner>
-        <div class="details-tab" *ngIf="!policyFileDetailsLoading">
-          <div class="spinner">
-            <chef-loading-spinner *ngIf="policyFileDetailsLoading" size="50" fixed></chef-loading-spinner>
-          </div>
-          <ng-container *ngIf="!policyFileDetailsLoading">
-            <ul id="included-policy-accordion" class="accordion" >
-              <li class="items" [class.active]="showIncludedPolicies">
-                <div class="menu" (click)="handlePolicyFileSelected()">
-                  <div class="data-bag-name" data-cy="included-policy">
-                    Included Policies
-                  </div>
-                  <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+        <div class="cookbook-button" *ngIf="!policyFileDetailsLoading">
+          <chef-button
+            id="cookbook-dependencies"
+            primary
+            (click)="cookbook.slidePanel(cookbookRuleList, cookbookDependencyList)"
+            data-cy="cookbook-dependencies-button">
+            Cookbook Dependencies
+          </chef-button>
+        </div>
+        <div class="accordion-section" *ngIf="!policyFileDetailsLoading">
+          <ul id="included-policy-accordion" class="accordion" >
+            <li class="items" [class.active]="showIncludedPolicies">
+              <div class="menu" (click)="handlePolicyFileSelected()">
+                <div class="data-bag-name" data-cy="included-policy">
+                  Included Policies
                 </div>
-                <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''">
-                  <div class="item-details">
-                    <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
-                      <img alt="No preview" src="/assets/img/no_preview.gif" />
-                      <p>No policy files available</p>
-                    </div>
-                    <div id="included-policy-table-container" *ngIf="included_policy_locks.length" data-cy="included-policy-table-container">
-                      <chef-table>
-                        <chef-thead>
-                          <chef-tr class="no_border_tr">
-                            <chef-th class="no_border_th">Policyfiles</chef-th>
-                            <chef-th class="no_border_th">Revision ID</chef-th>
-                            <chef-th class="no_border_th"></chef-th>
-                            <chef-th class="no_border_th three-dot-column"></chef-th>
-                          </chef-tr>
-                        </chef-thead>
-                        <chef-tbody>
-                          <chef-tr *ngFor="let included_policy_lock of included_policy_locks">
-                            <chef-td>
-                              <a
-                                (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
-                                class="included-policy-link">
-                                {{included_policy_lock.name}}
-                              </a>
-                            </chef-td>
-                            <chef-td>{{included_policy_lock.revision_id}}</chef-td>
-                            <chef-td></chef-td>
-                            <chef-td class="three-dot-column"></chef-td>
-                          </chef-tr>
-                        </chef-tbody>
-                      </chef-table>
-                    </div>
+                <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+              </div>
+              <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''">
+                <div class="item-details">
+                  <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
+                    <img alt="No preview" src="/assets/img/no_preview.gif" />
+                    <p>No policy files available</p>
                   </div>
-                </div>
-              </li>
-            </ul>
-            <ul id="run-list-accordion" class="accordion" >
-              <li class="items" [class.active]="showRunList">
-                <div class="menu" (click)="handleRunListSelected()">
-                  <div class="data-bag-name"  data-cy="run-list">
-                    Run List
-                  </div>
-                  <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
-                </div>
-                <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''">
-                  <div class="item-details">
-                    <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
-                      <img alt="No preview" src="/assets/img/no_preview.gif" />
-                      <p>No policy files available</p>
-                    </div>
-                    <div id="run-list-table-container" *ngIf="cookbook_locks.length" data-cy="run-list-table-container">
-                      <chef-table>
-                        <chef-thead>
-                          <chef-tr class="no_border_tr">
-                            <chef-th class="no_border_th">Run Items</chef-th>
-                            <chef-th class="no_border_th">Current Version</chef-th>
-                            <chef-th class="no_border_th">Source</chef-th>
-                            <chef-th class="no_border_th three-dot-column"></chef-th>
-                          </chef-tr>
-                        </chef-thead>
-                        <chef-tbody>
-                          <chef-tr *ngFor="let cookbook_lock of cookbook_locks">
-                            <chef-td>
-                              {{cookbook_lock.name}}
-                            </chef-td>
-                            <chef-td>{{cookbook_lock.version}}</chef-td>
-                            <chef-td>{{cookbook_lock.source}}</chef-td>
-                            <chef-td class="three-dot-column"></chef-td>
-                          </chef-tr>
-                        </chef-tbody>
-                      </chef-table>
-                    </div>
+                  <div id="included-policy-table-container" *ngIf="included_policy_locks.length" data-cy="included-policy-table-container">
+                    <chef-table>
+                      <chef-thead>
+                        <chef-tr class="no_border_tr">
+                          <chef-th class="no_border_th">Policyfiles</chef-th>
+                          <chef-th class="no_border_th">Revision ID</chef-th>
+                          <chef-th class="no_border_th"></chef-th>
+                          <chef-th class="no_border_th three-dot-column"></chef-th>
+                        </chef-tr>
+                      </chef-thead>
+                      <chef-tbody>
+                        <chef-tr *ngFor="let included_policy_lock of included_policy_locks">
+                          <chef-td>
+                            <a
+                              (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
+                              class="included-policy-link">
+                              {{included_policy_lock.name}}
+                            </a>
+                          </chef-td>
+                          <chef-td>{{included_policy_lock.revision_id}}</chef-td>
+                          <chef-td></chef-td>
+                          <chef-td class="three-dot-column"></chef-td>
+                        </chef-tr>
+                      </chef-tbody>
+                    </chef-table>
                   </div>
                 </div>
-              </li>
-            </ul>
-          </ng-container>
+              </div>
+            </li>
+          </ul>
+          <ul id="run-list-accordion" class="accordion" >
+            <li class="items" [class.active]="showRunList">
+              <div class="menu" (click)="handleRunListSelected()">
+                <div class="data-bag-name"  data-cy="run-list">
+                  Run List
+                </div>
+                <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+              </div>
+              <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''">
+                <div class="item-details">
+                  <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
+                    <img alt="No preview" src="/assets/img/no_preview.gif" />
+                    <p>No policy files available</p>
+                  </div>
+                  <div id="run-list-table-container" *ngIf="cookbook_locks.length" data-cy="run-list-table-container">
+                    <chef-table>
+                      <chef-thead>
+                        <chef-tr class="no_border_tr">
+                          <chef-th class="no_border_th">Run Items</chef-th>
+                          <chef-th class="no_border_th">Current Version</chef-th>
+                          <chef-th class="no_border_th">Source</chef-th>
+                          <chef-th class="no_border_th three-dot-column"></chef-th>
+                        </chef-tr>
+                      </chef-thead>
+                      <chef-tbody>
+                        <chef-tr *ngFor="let cookbook_lock of cookbook_locks">
+                          <chef-td>
+                            {{cookbook_lock.name}}
+                          </chef-td>
+                          <chef-td>{{cookbook_lock.version}}</chef-td>
+                          <chef-td>{{cookbook_lock.source}}</chef-td>
+                          <chef-td class="three-dot-column"></chef-td>
+                        </chef-tr>
+                      </chef-tbody>
+                    </chef-table>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -245,6 +249,11 @@
         [serverId]="serverId"
         [orgId]="orgId">
       </app-included-policies-details>
+      <app-cookbook-dependencies
+        #cookbook
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-cookbook-dependencies>
     </main>
   </div>
 </div>

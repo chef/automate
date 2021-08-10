@@ -7,12 +7,26 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { PolicyFile, CookbookLocks, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
+import { PolicyFile, CookbookLocks, IncludedPolicyLocks, SolutionDependencies } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyFile } from 'app/entities/policy-files/policy-file.action';
 import { policyFileFromRoute } from 'app/entities/policy-files/policy-file-details.selectors';
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
 export type PolicyFileTabName = 'details' | 'runList' | 'attributes';
+export class CookbookRuleList {
+  name: string;
+  operator: string;
+  version: string;
+}
+
+export class CookbookDependencyList {
+  name: string;
+  operator: string;
+  version: string;
+  dependName: string;
+  dependOperator: string;
+  dependVersion: string;
+}
 
 @Component({
   selector: 'app-policy-file-details',
@@ -38,7 +52,8 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
   public showIncludedPolicies = false;
   public cookbook_locks: CookbookLocks[] = [];
   public included_policy_locks: IncludedPolicyLocks[] = [];
-
+  public cookbookRuleList: CookbookRuleList[] = [];
+  public cookbookDependencyList: CookbookDependencyList[] = [];
   public defaultAttributes = [];
   public overrideAttributes = [];
   public hasDefaultattributes = false;
@@ -97,6 +112,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
       this.PolicyFile = policyFile;
       this.cookbook_locks = policyFile.cookbook_locks;
       this.included_policy_locks = policyFile.included_policy_locks;
+      this.loadDependenciesRule(policyFile.solution_dependecies);
       this.policyFileDetailsLoading = false;
       // load attributes
       this.defaultAttributes = (policyFile.default_attributes
@@ -138,6 +154,40 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
     } else {
       this.showRunList = false;
       this.activeRunlist = '';
+    }
+  }
+
+  loadDependenciesRule(solution_dependecies: SolutionDependencies[]) {
+    const cookbook_dependent = [];
+    for (let i = 0; i < solution_dependecies.length; i++) {
+      const version = solution_dependecies[i].version.split(' ');
+      this.cookbookRuleList.push({
+        name: solution_dependecies[i].name,
+        operator: version[0],
+        version: version[1]
+      });
+
+      if (solution_dependecies[i].dependencies.length > 0) {
+        cookbook_dependent.push(solution_dependecies[i]);
+      }
+    }
+    for (let i = 0; i < cookbook_dependent.length; i++) {
+      const name = cookbook_dependent[i].name;
+      const cookbook_version = cookbook_dependent[i].version.split(' ');
+      const operator = cookbook_version[0];
+      const version = cookbook_version[1];
+      const cookbook_dependencies = cookbook_dependent[i].dependencies;
+      for (let j = 0; j < cookbook_dependencies.length; j++) {
+        const depend_version = cookbook_dependencies[j].version.split(' ');
+        this.cookbookDependencyList.push({
+          name: name,
+          operator: operator,
+          version: version,
+          dependName: cookbook_dependencies[j].name,
+          dependOperator: depend_version[0],
+          dependVersion: depend_version[1]
+        });
+      }
     }
   }
 }

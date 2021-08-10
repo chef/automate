@@ -15,6 +15,10 @@ chef-loading-spinner {
   vertical-align: text-top;
 }
 
+.accordion-section {
+  margin-top: 20px;
+}
+
 .page-body {
 
   .top-spinner {
@@ -23,26 +27,14 @@ chef-loading-spinner {
     width: 100px;
   }
 
-  .details-tab {
-    .spinner {
-      chef-loading-spinner {
-        width: auto;
-        z-index: 199;
-        background-color: $chef-white;
-        opacity: 0.7;
-      }
-    }
+  .cookbook-button {
+    float: right;
+    margin-bottom: -19px;
+    margin-top: -12px;
+  }
 
-    .node-details-section {
-      width: 600px;
-    }
-
-    form {
-      chef-form-field {
-        width: 600px;
-        margin-bottom: 30px;
-      }
-    }
+  .accordion-section {
+    margin-top: 51px;
   }
 }
 
