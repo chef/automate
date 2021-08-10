@@ -268,7 +268,7 @@ export class ChefSessionService implements CanActivate {
 
     function timerIncrement() {
       idleTime = idleTime + 1;
-      if (idleTime === idleTimeout) {
+      if (idleTime === idleTimeout + 1) {
           this.logout();
       }
     }
