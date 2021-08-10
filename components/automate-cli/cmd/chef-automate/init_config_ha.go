@@ -88,6 +88,8 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
+
+	RootCmd.AddCommand(initConfigHACmd)
 }
 
 var initConfigHACmd = &cobra.Command{
