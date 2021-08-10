@@ -10,26 +10,13 @@ import (
 )
 
 func runInitConfigExistingNodeHACmd() error {
-	initConfigHAPath := initConfigHAFlags.path
+	initConfigHAPath := initConfigHAPathFlags.path
 	if _, err := os.Stat(initConfigHAPath); err == nil {
 		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
 		return nil
 	}
 
-	cfg, err := deployment.GenerateInitHAConfig(
-		deployment.InitialSecretsKeyFile(initConfigHAFlags.SecretsKeyFile),
-		deployment.InitialSecretsStoreFile(initConfigHAFlags.SecretsStoreFile),
-		deployment.InitialArchitecture(initConfigHAFlags.Architecture),
-		deployment.InitialWorkspacePath(initConfigHAFlags.WorkspacePath),
-		deployment.InitialSshUser(initConfigHAFlags.SshUser),
-		deployment.InitialSshKeyFile(initConfigHAFlags.SshKeyFile),
-		deployment.InitialBackupMount(initConfigHAFlags.BackupMount),
-		deployment.InitialAutomateInstanceCount(initConfigHAFlags.AutomateInstanceCount),
-		deployment.InitialAutomateConfigFile(initConfigHAFlags.AutomateConfigFile),
-		deployment.InitialChefServerInstanceCount(initConfigHAFlags.ChefServerInstanceCount),
-		deployment.InitialElasticSearchInstanceCount(initConfigHAFlags.ElasticSearchInstanceCount),
-		deployment.InitialPostgresqlInstanceCount(initConfigHAFlags.PostgresqlInstanceCount),
-	)
+	cfg, err := deployment.GenerateInitHAConfig()
 
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Generating initial configuration failed")

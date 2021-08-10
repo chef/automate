@@ -9,264 +9,85 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var initConfigHAPathFlags = struct {
+	path string
+}{}
+
 var initConfigHAFlags = struct {
-	path                                 string
-	SecretsKeyFile                       string
-	SecretsStoreFile                     string
-	Architecture                         string
-	WorkspacePath                        string
-	SshUser                              string
-	SshKeyFile                           string
-	BackupMount                          string
-	AutomateInstanceCount                string
-	AutomateConfigFile                   string
-	ChefServerInstanceCount              string
-	ElasticSearchInstanceCount           string
-	PostgresqlInstanceCount              string
-	AwsProfile                           string
-	AwsRegion                            string
-	AwsSshKeyPairName                    string
-	AwsAutomateServerInstaceType         string
-	AwsChefServerInstanceType            string
-	AwsElasticSearchServerInstaceType    string
-	AwsPostgresqlServerInstanceType      string
-	AwsAutomateLBCertificateARN          string
-	AwsChefServerLBCertificateARN        string
-	AwsAutomateEbsVolumeIops             string
-	AwsAutomateEbsVolumeSize             string
-	AwsAutomateEbsVolumeType             string
-	AwsChefEbsVolumeIops                 string
-	AwsChefEbsVolumeSize                 string
-	AwsChefEbsVolumeType                 string
-	AwsEsEbsVolumeIops                   string
-	AwsEsEbsVolumeSize                   string
-	AwsEsEbsVolumeType                   string
-	AwsPgsEbsVolumeIops                  string
-	AwsPgsEbsVolumeSize                  string
-	AwsPgsEbsVolumeType                  string
-	ExistingNodesAutomateIPs             string
-	ExistingNodesAutomatePrivateIPs      string
-	ExistingNodesChefServerPrivateIPs    string
-	ExistingNodesElasticsearchIPs        string
-	ExistingNodesElasticsearchPrivateIPs string
-	ExistingNodesPostgresqlIPs           string
-	ExistingNodesPostgresqlPrivateIps    string
+	SecretsKeyFile                    string `toml:"architecture.aws.secrets_key_file"`
+	SecretsStoreFile                  string `toml:"architecture.aws.secrets_store_file"`
+	Architecture                      string `toml:"architecture.aws.architecture"`
+	WorkspacePath                     string `toml:"architecture.aws.workspace_path"`
+	SshUser                           string `toml:"architecture.aws.ssh_user"`
+	SshKeyFile                        string `toml:"architecture.aws.ssh_key_file"`
+	SudoPassword                      string `toml:"architecture.aws.sudo_password"`
+	BackupMount                       string `toml:"architecture.aws.backup_mount"`
+	AutomateAdminPassword             string `toml:"automate.config.admin_password"`
+	AutomateFQDN                      string `toml:"automate.config.fqdn"`
+	AutomateTeamsPort                 string `toml:"automate.config.AutomateTeamsPort"`
+	AutomateInstanceCount             string `toml:"automate.config.instance_count"`
+	AutomateConfigFile                string `toml:"automate.config.config_file"`
+	ChefServerInstanceCount           string `toml:"chef_server.config.instance_count"`
+	ElasticSearchInstanceCount        string `toml:"elasticsearch.config.instance_count"`
+	PostgresqlInstanceCount           string `toml:"postgresql.config.instance_count"`
+	AwsProfile                        string `toml:"aws.config.profile"`
+	AwsRegion                         string `toml:"aws.config.region"`
+	AwsSshKeyPairName                 string `toml:"aws.config.ssh_key_pair_name"`
+	AwsAutomateServerInstaceType      string `toml:"aws.config.automate_server_instance_type"`
+	AwsChefServerInstanceType         string `toml:"aws.config.chef_server_instance_type"`
+	AwsElasticSearchServerInstaceType string `toml:"aws.config.elasticsearch_server_instance_type"`
+	AwsPostgresqlServerInstanceType   string `toml:"aws.config.postgresql_server_instance_type"`
+	AwsAutomateLBCertificateARN       string `toml:"aws.config.automate_lb_certificate_arn"`
+	AwsChefServerLBCertificateARN     string `toml:"aws.config.chef_server_lb_certificate_arn"`
+	AwsAutomateEbsVolumeIops          string `toml:"aws.config.automate_ebs_volume_iops"`
+	AwsAutomateEbsVolumeSize          string `toml:"aws.config.automate_ebs_volume_size"`
+	AwsAutomateEbsVolumeType          string `toml:"aws.config.automate_ebs_volume_type"`
+	AwsChefEbsVolumeIops              string `toml:"aws.config.chef_ebs_volume_iops"`
+	AwsChefEbsVolumeSize              string `toml:"aws.config.chef_ebs_volume_size"`
+	AwsChefEbsVolumeType              string `toml:"aws.config.chef_ebs_volume_type"`
+	AwsEsEbsVolumeIops                string `toml:"aws.config.elasticsearch_ebs_volume_iops"`
+	AwsEsEbsVolumeSize                string `toml:"aws.config.elasticsearch_ebs_volume_size"`
+	AwsEsEbsVolumeType                string `toml:"aws.config.elasticsearch_ebs_volume_type"`
+	AwsPgsEbsVolumeIops               string `toml:"aws.config.postgresql_ebs_volume_iops"`
+	AwsPgsEbsVolumeSize               string `toml:"aws.config.postgresql_ebs_volume_size"`
+	AwsPgsEbsVolumeType               string `toml:"aws.config.postgresql_ebs_volume_type"`
+	AwsTagContact                     string `toml:"aws.config.X-Contact"`
+	AwsTagDept                        string `toml:"aws.config.X-Dept"`
+	AwsTagProject                     string `toml:"aws.config.X-Project"`
+}{}
+
+var initConfigHAExistingNodesFlags = struct {
+	SecretsKeyFile                       string `toml:"architecture.existing_nodes.secrets_key_file"`
+	SecretsStoreFile                     string `toml:"architecture.existing_nodes.secrets_store_file"`
+	Architecture                         string `toml:"architecture.existing_nodes.architecture"`
+	WorkspacePath                        string `toml:"architecture.existing_nodes.workspace_path"`
+	SshUser                              string `toml:"architecture.existing_nodes.ssh_user"`
+	SshKeyFile                           string `toml:"architecture.existing_nodes.ssh_key_file"`
+	SudoPassword                         string `toml:"architecture.existing_nodes.sudo_password"`
+	BackupMount                          string `toml:"architecture.existing_nodes.backup_mount"`
+	AutomateAdminPassword                string `toml:"automate.config.admin_password"`
+	AutomateFQDN                         string `toml:"automate.config.fqdn"`
+	AutomateTeamsPort                    string `toml:"automate.config.AutomateTeamsPort"`
+	AutomateInstanceCount                string `toml:"automate.config.instance_count"`
+	AutomateConfigFile                   string `toml:"automate.config.config_file"`
+	ChefServerInstanceCount              string `toml:"chef_server.config.instance_count"`
+	ElasticSearchInstanceCount           string `toml:"elasticsearch.config.instance_count"`
+	PostgresqlInstanceCount              string `toml:"postgresql.config.instance_count"`
+	ExistingNodesAutomateIPs             string `toml:"existing_nodes.config.automate_ips"`
+	ExistingNodesAutomatePrivateIPs      string `toml:"existing_nodes.config.chef_server_ips"`
+	ExistingNodesChefServerPrivateIPs    string `toml:"existing_nodes.config.chef_server_private_ips"`
+	ExistingNodesElasticsearchIPs        string `toml:"existing_nodes.config.elasticsearch_ips"`
+	ExistingNodesElasticsearchPrivateIPs string `toml:"existing_nodes.config.elasticsearch_private_ips"`
+	ExistingNodesPostgresqlIPs           string `toml:"existing_nodes.config.postgresql_ips"`
+	ExistingNodesPostgresqlPrivateIps    string `toml:"existing_nodes.config.postgresql_private_ips"`
 }{}
 
 func init() {
 	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.path,
+		&initConfigHAPathFlags.path,
 		"file",
 		"config.toml",
 		"File path to write the config")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.SecretsKeyFile,
-		"secrets_key_file",
-		"/etc/chef-automate/secrets.key",
-		"automate secret keys")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.SecretsStoreFile,
-		"secrets_store_file",
-		"secrets.json",
-		"automate store file keys")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.Architecture,
-		"architecture",
-		"aws",
-		"deployment architecture")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.WorkspacePath,
-		"workspace_path",
-		"/src",
-		"workspace path")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.SshUser,
-		"ssh_user",
-		"centos",
-		"ssh user name default centos")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.SshKeyFile,
-		"ssh_key_file",
-		"/src/a2ha-jay-singapore.pem",
-		"ssh pem file path")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.BackupMount,
-		"backup_mount",
-		"/mnt/automate_backups",
-		"backup mount path")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AutomateInstanceCount,
-		"instance_count",
-		"1",
-		"No of instances need to be up for automate")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AutomateConfigFile,
-		"config_file",
-		"configs/automate.toml",
-		"Path for automate configuration file")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.ChefServerInstanceCount,
-		"instance_count_chef",
-		"1",
-		"No of instances need to be up for chef server")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.ElasticSearchInstanceCount,
-		"instance_count_es",
-		"1",
-		"No of instances need to be up for Elastic Search")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.PostgresqlInstanceCount,
-		"instance_count_pgsql",
-		"1",
-		"No of instances need to be up for postgresql")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsProfile,
-		"profile",
-		"default",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsRegion,
-		"region",
-		"ap-southeast-1",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsSshKeyPairName,
-		"ssh_key_pair_name",
-		"a2ha-jay-singapore",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsAutomateServerInstaceType,
-		"automate_server_instance_type",
-		"t3a.medium",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsChefServerInstanceType,
-		"chef_server_instance_type",
-		"t3a.medium",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsElasticSearchServerInstaceType,
-		"elasticsearch_server_instance_type",
-		"m5a.large",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPostgresqlServerInstanceType,
-		"postgresql_server_instance_type",
-		"t3a.medium",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsAutomateLBCertificateARN,
-		"automate_lb_certificate_arn",
-		"arn:aws:acm....",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsChefServerLBCertificateARN,
-		"chef_server_lb_certificate_arn",
-		"arn:aws:acm....",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsAutomateEbsVolumeIops,
-		"automate_ebs_volume_iops",
-		"100",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsAutomateEbsVolumeSize,
-		"automate_ebs_volume_size",
-		"50",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsAutomateEbsVolumeType,
-		"automate_ebs_volume_type",
-		"gp2",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsChefEbsVolumeIops,
-		"chef_ebs_volume_iops",
-		"100",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsChefEbsVolumeSize,
-		"chef_ebs_volume_size",
-		"50",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsChefEbsVolumeType,
-		"chef_ebs_volume_type",
-		"gp2",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsEsEbsVolumeIops,
-		"elasticsearch_ebs_volume_iops",
-		"100",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsEsEbsVolumeSize,
-		"elasticsearch_ebs_volume_size",
-		"50",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsEsEbsVolumeType,
-		"elasticsearch_ebs_volume_type",
-		"gp2",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeIops,
-		"postgresql_ebs_volume_iops",
-		"100",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeSize,
-		"postgresql_ebs_volume_size",
-		"50",
-		"Aws profile")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"postgresql_ebs_volume_type",
-		"gp2",
-		"Aws profile")
-	RootCmd.AddCommand(initConfigHACmd)
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"automate_ips",
-		"[]",
-		"Automate cluster public ips addresses")
-	RootCmd.AddCommand(initConfigHACmd)
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"automate_private_ips",
-		"[]",
-		"Automate cluster private ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"chef_server_ips",
-		"[]",
-		"Chef server cluster public ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"chef_server_private_ips",
-		"[]",
-		"Chef server cluster private ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"elasticsearch_ips",
-		"[]",
-		"elastic search cluster public ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"elasticsearch_private_ips",
-		"[]",
-		"elastic search cluster private ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"postgresql_ips",
-		"[]",
-		"postgresql search cluster public ips addresses")
-	initConfigHACmd.PersistentFlags().StringVar(
-		&initConfigHAFlags.AwsPgsEbsVolumeType,
-		"postgresql_private_ips",
-		"[]",
-		"postgresql search cluster private ips addresses")
-	RootCmd.AddCommand(initConfigHACmd)
 }
 
 var initConfigHACmd = &cobra.Command{
