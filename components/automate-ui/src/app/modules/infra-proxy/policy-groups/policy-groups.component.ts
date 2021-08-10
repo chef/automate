@@ -38,7 +38,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public groupList = [];
   public pageOfItems: Array<any>;
   public searchFlag: boolean;
-  public policyGroups;
+  public policyGroups: Array<any>;
 
   constructor(
     private store: Store<NgrxStateAtom>,

@@ -19,12 +19,12 @@
     <div id="policy-group-table-container" *ngIf="policyFiles.length" data-cy="policy-group-table-container">
       <app-policy-groups-list
         *ngIf="!searchFlag"
-        [policyFiles]= "policyGroups"
+        [policyGroups]= "policyGroups"
         [pageOfItems]= "pageOfItems">
       </app-policy-groups-list>
       <app-policy-groups-list
         *ngIf="searchFlag"
-        [policyFiles]= "groupList"
+        [policyGroups]= "groupList"
         [pageOfItems]= "pageOfItems">
       </app-policy-groups-list>
     </div>

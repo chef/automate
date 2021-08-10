@@ -9,7 +9,7 @@ import {
   templateUrl: './policy-groups-list.component.html'
 })
 export class PolicyGroupsListComponent implements OnChanges {
-  @Input() policyFiles: [];
+  @Input() policyGroups: [];
   @Input() pageOfItems: [];
 
   constructor() { }
@@ -17,7 +17,7 @@ export class PolicyGroupsListComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.pageOfItems) {
       if (changes.pageOfItems.currentValue !== changes.pageOfItems.previousValue) {
-        this.policyFiles = this.pageOfItems;
+        this.policyGroups = this.pageOfItems;
       }
     }
   }
