@@ -19,11 +19,6 @@ export class PolicyGroupsListComponent implements OnChanges {
       if (changes.pageOfItems.currentValue !== changes.pageOfItems.previousValue) {
         this.policyFiles = this.pageOfItems;
       }
-    } else {
-      // update list if items array has changed
-      if (changes.policyFiles.currentValue !== changes.policyFiles.previousValue) {
-        this.policyFiles = this.policyFiles;
-      }
     }
   }
 }
