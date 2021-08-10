@@ -1,7 +1,8 @@
 package server
 
 import (
-	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	gwres "github.com/chef/automate/api/external/infra_proxy/response"
+	"github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
 	"github.com/go-chef/chef"
 	"reflect"
 	"testing"
@@ -14,7 +15,7 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []*response.SolutionDependencies
+		want []*gwres.SolutionDependencies
 	}{
 		{"Should transform a solution dependency with non-similar version",
 			args{
@@ -29,12 +30,12 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 				},
 			},
-			[]*response.SolutionDependencies{
-				&response.SolutionDependencies{
+			[]*gwres.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "viv-test",
 					Version: ">= 0.0.0",
-					Dependencies: []*response.DepedenciesData{
-						&response.DepedenciesData{
+					Dependencies: []*gwres.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "ohai",
 							Version: "~> 5.2",
 						},
@@ -74,71 +75,76 @@ func TestFromAPIIncludedSolutionDependencies(t *testing.T) {
 					},
 				},
 			},
-			[]*response.SolutionDependencies{
-				&response.SolutionDependencies{
+			[]*gwres.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "build-essential",
 					Version: "= 8.2.1",
-					Dependencies: []*response.DepedenciesData{
-						&response.DepedenciesData{
+					Dependencies: []*gwres.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "seven_zip",
 							Version: ">= 0.0.0",
 						},
-						&response.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "mingw",
 							Version: ">= 1.1.0",
 						},
 					},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "chocolatey",
 					Version: "= 3.0.0",
+					Dependencies: []*gwres.DepedenciesData{},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "homebrew",
 					Version: "= 5.2.1",
+					Dependencies: []*gwres.DepedenciesData{},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "mingw",
 					Version: "= 2.1.1",
-					Dependencies: []*response.DepedenciesData{
-						&response.DepedenciesData{
+					Dependencies: []*gwres.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "seven_zip",
 							Version: ">= 0.0.0",
 						},
 					},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "mycookbook",
 					Version: "= 0.1.0",
+					Dependencies: []*gwres.DepedenciesData{},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "pantry",
 					Version: "= 1.0.0",
-					Dependencies: []*response.DepedenciesData{
-						&response.DepedenciesData{
+					Dependencies: []*gwres.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "homebrew",
 							Version: ">= 0.0.0",
 						},
-						&response.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "build-essential",
 							Version: ">= 0.0.0",
 						},
-						&response.DepedenciesData{
+						&gwres.DepedenciesData{
 							Name:    "chocolatey",
 							Version: ">= 0.0.0",
 						},
 					},
 				},
-				&response.SolutionDependencies{
+				&gwres.SolutionDependencies{
 					Name:    "seven_zip",
 					Version: "= 4.2.1",
+					Dependencies: []*gwres.DepedenciesData{},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FromAPIIncludedSolutionDependencies(tt.args.sp); !reflect.DeepEqual(got, tt.want) {
+			iproxy_data := FromAPIIncludedSolutionDependencies(tt.args.sp)
+			if got := infra_proxy.FromUpstreamIncludeSolutionDependecies(iproxy_data); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FromAPIIncludedSolutionDependencies() = %+v, want %+v", got, tt.want)
 			}
 		})

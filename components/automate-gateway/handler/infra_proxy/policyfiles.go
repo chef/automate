@@ -46,11 +46,11 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 		CookbookLocks:       fromUpstreamCookbookLocks(res.GetCookbookLocks()),
 		DefaultAttributes:   res.GetDefaultAttributes(),
 		OverrideAttributes:  res.GetOverrideAttributes(),
-		SolutionDependecies: fromUpstreamIncludeSolutionDependecies(res.SolutionDependecies),
+		SolutionDependecies: FromUpstreamIncludeSolutionDependecies(res.SolutionDependecies),
 	}, nil
 }
 
-func fromUpstreamIncludeSolutionDependecies(sp []*infra_res.SolutionDependencies) []*gwres.SolutionDependencies {
+func FromUpstreamIncludeSolutionDependecies(sp []*infra_res.SolutionDependencies) []*gwres.SolutionDependencies {
 	sol_d_data := make([]*gwres.SolutionDependencies, 0)
 	for _, cb := range sp {
 		d_data := make([]*gwres.DepedenciesData, 0)
