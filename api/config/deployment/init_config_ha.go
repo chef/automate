@@ -6,6 +6,79 @@ import (
 	"text/template"
 )
 
+var initConfigHAPathFlags = struct {
+	path string
+}{}
+
+var initConfigHAFlags = struct {
+	SecretsKeyFile                    string `toml:"architecture.aws.secrets_key_file"`
+	SecretsStoreFile                  string `toml:"architecture.aws.secrets_store_file"`
+	Architecture                      string `toml:"architecture.aws.architecture"`
+	WorkspacePath                     string `toml:"architecture.aws.workspace_path"`
+	SshUser                           string `toml:"architecture.aws.ssh_user"`
+	SshKeyFile                        string `toml:"architecture.aws.ssh_key_file"`
+	SudoPassword                      string `toml:"architecture.aws.sudo_password"`
+	BackupMount                       string `toml:"architecture.aws.backup_mount"`
+	AutomateAdminPassword             string `toml:"automate.config.admin_password"`
+	AutomateFQDN                      string `toml:"automate.config.fqdn"`
+	AutomateTeamsPort                 string `toml:"automate.config.AutomateTeamsPort"`
+	AutomateInstanceCount             string `toml:"automate.config.instance_count"`
+	AutomateConfigFile                string `toml:"automate.config.config_file"`
+	ChefServerInstanceCount           string `toml:"chef_server.config.instance_count"`
+	ElasticSearchInstanceCount        string `toml:"elasticsearch.config.instance_count"`
+	PostgresqlInstanceCount           string `toml:"postgresql.config.instance_count"`
+	AwsProfile                        string `toml:"aws.config.profile"`
+	AwsRegion                         string `toml:"aws.config.region"`
+	AwsSshKeyPairName                 string `toml:"aws.config.ssh_key_pair_name"`
+	AwsAutomateServerInstaceType      string `toml:"aws.config.automate_server_instance_type"`
+	AwsChefServerInstanceType         string `toml:"aws.config.chef_server_instance_type"`
+	AwsElasticSearchServerInstaceType string `toml:"aws.config.elasticsearch_server_instance_type"`
+	AwsPostgresqlServerInstanceType   string `toml:"aws.config.postgresql_server_instance_type"`
+	AwsAutomateLBCertificateARN       string `toml:"aws.config.automate_lb_certificate_arn"`
+	AwsChefServerLBCertificateARN     string `toml:"aws.config.chef_server_lb_certificate_arn"`
+	AwsAutomateEbsVolumeIops          string `toml:"aws.config.automate_ebs_volume_iops"`
+	AwsAutomateEbsVolumeSize          string `toml:"aws.config.automate_ebs_volume_size"`
+	AwsAutomateEbsVolumeType          string `toml:"aws.config.automate_ebs_volume_type"`
+	AwsChefEbsVolumeIops              string `toml:"aws.config.chef_ebs_volume_iops"`
+	AwsChefEbsVolumeSize              string `toml:"aws.config.chef_ebs_volume_size"`
+	AwsChefEbsVolumeType              string `toml:"aws.config.chef_ebs_volume_type"`
+	AwsEsEbsVolumeIops                string `toml:"aws.config.elasticsearch_ebs_volume_iops"`
+	AwsEsEbsVolumeSize                string `toml:"aws.config.elasticsearch_ebs_volume_size"`
+	AwsEsEbsVolumeType                string `toml:"aws.config.elasticsearch_ebs_volume_type"`
+	AwsPgsEbsVolumeIops               string `toml:"aws.config.postgresql_ebs_volume_iops"`
+	AwsPgsEbsVolumeSize               string `toml:"aws.config.postgresql_ebs_volume_size"`
+	AwsPgsEbsVolumeType               string `toml:"aws.config.postgresql_ebs_volume_type"`
+	AwsTagContact                     string `toml:"aws.config.X-Contact"`
+	AwsTagDept                        string `toml:"aws.config.X-Dept"`
+	AwsTagProject                     string `toml:"aws.config.X-Project"`
+}{}
+
+var initConfigHAExistingNodesFlags = struct {
+	SecretsKeyFile                       string `toml:"architecture.existing_nodes.secrets_key_file"`
+	SecretsStoreFile                     string `toml:"architecture.existing_nodes.secrets_store_file"`
+	Architecture                         string `toml:"architecture.existing_nodes.architecture"`
+	WorkspacePath                        string `toml:"architecture.existing_nodes.workspace_path"`
+	SshUser                              string `toml:"architecture.existing_nodes.ssh_user"`
+	SshKeyFile                           string `toml:"architecture.existing_nodes.ssh_key_file"`
+	SudoPassword                         string `toml:"architecture.existing_nodes.sudo_password"`
+	BackupMount                          string `toml:"architecture.existing_nodes.backup_mount"`
+	AutomateAdminPassword                string `toml:"automate.config.admin_password"`
+	AutomateFQDN                         string `toml:"automate.config.fqdn"`
+	AutomateTeamsPort                    string `toml:"automate.config.AutomateTeamsPort"`
+	AutomateInstanceCount                string `toml:"automate.config.instance_count"`
+	AutomateConfigFile                   string `toml:"automate.config.config_file"`
+	ChefServerInstanceCount              string `toml:"chef_server.config.instance_count"`
+	ElasticSearchInstanceCount           string `toml:"elasticsearch.config.instance_count"`
+	PostgresqlInstanceCount              string `toml:"postgresql.config.instance_count"`
+	ExistingNodesAutomateIPs             string `toml:"existing_nodes.config.automate_ips"`
+	ExistingNodesAutomatePrivateIPs      string `toml:"existing_nodes.config.chef_server_ips"`
+	ExistingNodesChefServerPrivateIPs    string `toml:"existing_nodes.config.chef_server_private_ips"`
+	ExistingNodesElasticsearchIPs        string `toml:"existing_nodes.config.elasticsearch_ips"`
+	ExistingNodesElasticsearchPrivateIPs string `toml:"existing_nodes.config.elasticsearch_private_ips"`
+	ExistingNodesPostgresqlIPs           string `toml:"existing_nodes.config.postgresql_ips"`
+	ExistingNodesPostgresqlPrivateIps    string `toml:"existing_nodes.config.postgresql_private_ips"`
+}{}
+
 // InitConfigHA is a struct that contains fields that correspond to user facing
 // configuration values that we'll use when rendering the config template.
 type InitConfigHA struct {
@@ -72,262 +145,6 @@ func NewInitConfigHA() *InitConfigHA {
 // InitConfigHAOpt is an option that can be passed to the
 // GenerateInitConfig
 type InitConfigHAOpt func(*InitConfigHA) error
-
-// Initial Secrets key file
-func InitialSecretsKeyFile(secretsKeyFile string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.SecretsKeyFile = secretsKeyFile
-		return nil
-	}
-}
-
-// Initial sets the SecretsStoreFile for the generated configuration
-func InitialSecretsStoreFile(secretsStoreFile string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.SecretsStoreFile = secretsStoreFile
-		return nil
-	}
-}
-
-// Initial sets the Architecture for the generated configuration
-func InitialArchitecture(architecture string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.Architecture = architecture
-		return nil
-	}
-}
-
-// Initial sets the WorkspacePath for the generated configuration
-func InitialWorkspacePath(workspacePath string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.WorkspacePath = workspacePath
-		return nil
-	}
-}
-
-// Initial sets the SshUser for the generated configuration
-func InitialSshUser(sshUser string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.SshUser = sshUser
-		return nil
-	}
-}
-
-// Initial sets the SshKeyFile for the generated configuration
-func InitialSshKeyFile(sshKeyFile string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.SshKeyFile = sshKeyFile
-		return nil
-	}
-}
-
-// Initial sets the BackupMount for the generated configuration
-func InitialBackupMount(backupMount string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.BackupMount = backupMount
-		return nil
-	}
-}
-
-// Initial sets the AutomateInstanceCount for the generated configuration
-func InitialAutomateInstanceCount(automateInstanceCount string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AutomateInstanceCount = automateInstanceCount
-		return nil
-	}
-}
-
-// Initial sets the AutomateConfigFile for the generated configuration
-func InitialAutomateConfigFile(automateConfigFile string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AutomateConfigFile = automateConfigFile
-		return nil
-	}
-}
-
-// Initial sets the ChefServerInstanceCount for the generated configuration
-func InitialChefServerInstanceCount(chefServerInstanceCount string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.ChefServerInstanceCount = chefServerInstanceCount
-		return nil
-	}
-}
-
-// Initial sets the ElasticSearchInstanceCount for the generated configuration
-func InitialElasticSearchInstanceCount(elasticSearchInstanceCount string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.ElasticSearchInstanceCount = elasticSearchInstanceCount
-		return nil
-	}
-}
-
-// Initial sets the AutomateConfigFile for the generated configuration
-func InitialPostgresqlInstanceCount(postgresqlInstanceCount string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.PostgresqlInstanceCount = postgresqlInstanceCount
-		return nil
-	}
-}
-
-// Initial sets the AwsProfile for the generated configuration
-func InitialAwsProfile(awsProfile string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsProfile = awsProfile
-		return nil
-	}
-}
-
-// Initial sets the AwsRegion for the generated configuration
-func InitialAwsRegion(awsRegion string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsRegion = awsRegion
-		return nil
-	}
-}
-
-// Initial sets the AwsSshKeyPairName for the generated configuration
-func InitialAwsSshKeyPairName(awsSshKeyPairName string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsSshKeyPairName = awsSshKeyPairName
-		return nil
-	}
-}
-
-// Initial sets the AwsAutomateServerInstaceType for the generated configuration
-func InitialAwsAutomateServerInstaceType(awsAutomateServerInstaceType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsAutomateServerInstaceType = awsAutomateServerInstaceType
-		return nil
-	}
-}
-
-// Initial sets the AwsChefServerInstanceType for the generated configuration
-func InitialAwsChefServerInstanceType(awsChefServerInstanceType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsChefServerInstanceType = awsChefServerInstanceType
-		return nil
-	}
-}
-
-// Initial sets the AwsElasticSearchServerInstaceType for the generated configuration
-func InitialAwsElasticSearchServerInstaceType(awsElasticSearchServerInstaceType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsElasticSearchServerInstaceType = awsElasticSearchServerInstaceType
-		return nil
-	}
-}
-
-// Initial sets the AwsPostgresqlServerInstanceType for the generated configuration
-func InitialAwsPostgresqlServerInstanceType(awsPostgresqlServerInstanceType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsPostgresqlServerInstanceType = awsPostgresqlServerInstanceType
-		return nil
-	}
-}
-
-// Initial sets the AwsAutomateLBCertificateARN for the generated configuration
-func InitialAwsAutomateLBCertificateARN(awsAutomateLBCertificateARN string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsAutomateLBCertificateARN = awsAutomateLBCertificateARN
-		return nil
-	}
-}
-
-// Initial sets the AwsChefServerLBCertificateARN for the generated configuration
-func InitialAwsChefServerLBCertificateARN(awsChefServerLBCertificateARN string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsChefServerLBCertificateARN = awsChefServerLBCertificateARN
-		return nil
-	}
-}
-
-// Initial sets the AwsAutomateEbsVolumeIops for the generated configuration
-func InitialAwsAutomateEbsVolumeIops(awsAutomateEbsVolumeIops string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsAutomateEbsVolumeIops = awsAutomateEbsVolumeIops
-		return nil
-	}
-}
-
-// Initial sets the AwsAutomateEbsVolumeSize for the generated configuration
-func InitialAwsAutomateEbsVolumeSize(awsAutomateEbsVolumeSize string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsAutomateEbsVolumeSize = awsAutomateEbsVolumeSize
-		return nil
-	}
-}
-
-// Initial sets the AwsAutomateEbsVolumeType for the generated configuration
-func InitialAwsAutomateEbsVolumeType(awsAutomateEbsVolumeType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsAutomateEbsVolumeType = awsAutomateEbsVolumeType
-		return nil
-	}
-}
-
-// Initial sets the AwsChefEbsVolumeIops for the generated configuration
-func InitialAwsChefEbsVolumeIops(awsChefEbsVolumeIops string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsChefEbsVolumeIops = awsChefEbsVolumeIops
-		return nil
-	}
-}
-
-// Initial sets the AwsChefEbsVolumeSize for the generated configuration
-func InitialAwsChefEbsVolumeSize(awsChefEbsVolumeSize string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsChefEbsVolumeSize = awsChefEbsVolumeSize
-		return nil
-	}
-}
-
-// Initial sets the AwsChefEbsVolumeType for the generated configuration
-func InitialAwsChefEbsVolumeType(awsChefEbsVolumeType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsChefEbsVolumeType = awsChefEbsVolumeType
-		return nil
-	}
-}
-
-// Initial sets the AwsEsEbsVolumeSize for the generated configuration
-func InitialAwsEsEbsVolumeSize(awsEsEbsVolumeSize string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsEsEbsVolumeSize = awsEsEbsVolumeSize
-		return nil
-	}
-}
-
-// Initial sets the AwsEsEbsVolumeType for the generated configuration
-func InitialAwsEsEbsVolumeType(awsEsEbsVolumeType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsEsEbsVolumeType = awsEsEbsVolumeType
-		return nil
-	}
-}
-
-// Initial sets the AwsPgsEbsVolumeIops for the generated configuration
-func InitialAwsPgsEbsVolumeIops(awsPgsEbsVolumeIops string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsPgsEbsVolumeIops = awsPgsEbsVolumeIops
-		return nil
-	}
-}
-
-// Initial sets the AwsPgsEbsVolumeSize for the generated configuration
-func InitialAwsPgsEbsVolumeSize(awsPgsEbsVolumeSize string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsPgsEbsVolumeSize = awsPgsEbsVolumeSize
-		return nil
-	}
-}
-
-// Initial sets the AwsPgsEbsVolumeIops for the generated configuration
-func InitialAwsPgsEbsVolumeType(awsPgsEbsVolumeType string) InitConfigHAOpt {
-	return func(c *InitConfigHA) error {
-		c.AwsPgsEbsVolumeType = awsPgsEbsVolumeType
-		return nil
-	}
-}
 
 // GenerateInitHAConfig constructions an InitConfig for HA mode, generating values
 // not passed by the caller if possible.
