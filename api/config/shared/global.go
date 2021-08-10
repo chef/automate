@@ -45,7 +45,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 				TextColor:       w.String("#FFFFFF"), // White
 			},
 			SessionSettings: &SessionSettings{
-				EnableIdleTimeout: w.Bool(false),
+				EnableIdleTimeout:  w.Bool(false),
 				IdleTimeoutMinutes: w.Int32(30),
 			},
 		},
