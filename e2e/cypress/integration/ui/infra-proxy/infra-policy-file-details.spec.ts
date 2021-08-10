@@ -216,7 +216,6 @@ describe('infra policy details', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=dependency-rule]').contains('Dependencies Rules').click();
           cy.get('[data-cy=close-cookbook-button]').click();
-
         }
       });
     });
