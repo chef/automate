@@ -108,7 +108,7 @@ describe('infra policy groups', () => {
   // tslint:disable-next-line:no-shadowed-variable
   function filterPolicyGroup(policies: any) {
     const policyGroups: any = [];
-    const key = 'policy_group';;
+    const key = 'policy_group';
     policies.forEach((x: any) => {
       if (policyGroups.some((val: any) => val[key] === x[key])) {
         policyGroups.forEach((k: any) => {
