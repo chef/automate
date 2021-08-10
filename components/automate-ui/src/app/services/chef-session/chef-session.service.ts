@@ -136,7 +136,7 @@ export class ChefSessionService implements CanActivate {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
 
-    console.log(this.appConfigService.isIdleTimeoutEnabled, "this.appConfigService.isIdleTimeoutEnabled")
+    console.log(this.appConfigService.isIdleTimeoutEnabled, 'this.appConfigService.isIdleTimeoutEnabled');
 
     if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       this.idleLogout(this.idleTimeout); // Time in minutes
@@ -260,7 +260,7 @@ export class ChefSessionService implements CanActivate {
     function resetTimer() {
       // this is for testing multi tabs
       if (idleTime > 0) {
-        console.log('called broadcast message on different tab')
+        console.log('called broadcast message on different tab');
         broadcastChannel.postMessage('resetTimer');
       }
       idleTime = 0;
