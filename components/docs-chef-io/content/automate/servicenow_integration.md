@@ -12,11 +12,11 @@ gh_repo = "automate"
     weight = 50
 +++
 
-[ServiceNow](https://www.servicenow.com/) provides cloud-based services that automate enterprise IT operations. ServiceNow specializes in IT service management (ITSM) applications and provides forms-based workflow application development. It supports third-party application and data integrations. The most common integrations are for configuration management database (CMDB), incident management, problem management, change management, user administration, and single sign-on authentication.
+[ServiceNow](https://www.servicenow.com/) provides cloud-based services that automate enterprise IT operations. ServiceNow specializes in IT service management (ITSM) applications and provides forms-based workflow application development. It supports third-party application and data integrations. The most common integrations are for configuration management, incident management, problem management, change management, user administration, and single sign-on authentication.
 
-The Chef Automate Integration App for ServiceNow enables the integration of Chef Automate in the ServiceNow. The Chef Automate integration is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. The Chef Automate Integration App enables Chef Automate to create and update client node records to the configuration management database (CMDB) tables of ServiceNow. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time. 
+The Chef Automate Integration App for ServiceNow integrates Chef Automate with ServiceNow. This app is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time.
 
-{{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram">}}
+{{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram" >}}
 
 ## Installation
 
@@ -46,7 +46,7 @@ Install following ServiceNow plugins:
 
 Locate the **System Import Sets**, **CMDB 1.1**, and **Configuration Management for Scoped App** plugins by navigating to the **System Applications** > **All Available Applications** > **All** section in the ServiceNow application.
 
-{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins">}}
+{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins" >}}
 
 ### Install the Chef Automate Integration App
 
@@ -68,9 +68,9 @@ The ServiceNow users must have the `x_chef_automate.api` role to set up the Serv
 
 The Chef Automate Integration App has three default roles:
 
-- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role_x_chef_automate.admin" >}})
-- [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role_x_chef_automate.user" >}})
-- [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role_x_chef_automate.api" >}})
+- [Role x_chef_automate.admin]({{< relref "servicenow_integration_reference#role-x_chef_automateadmin" >}})
+- [Role x_chef_automate.user]({{< relref "servicenow_integration_reference#role-x_chef_automateuser" >}})
+- [Role x_chef_automate.api]({{< relref "servicenow_integration_reference#role-x_chef_automateapi" >}})
 
 You can assign these roles to the existing or new ServiceNow users. These roles are part of the package. If there is a need for further restrictions, you can create the required roles and controls. Also, you can associate a single user with more than one role.
 
@@ -80,6 +80,12 @@ Refer to the following pages on how to create users and assign roles in ServiceN
 
 - [Creating Users in ServiceNow](https://docs.servicenow.com/csh?topicname=t_CreateAUser.html)
 - [Assigning Roles in ServiceNow](https://docs.servicenow.com/csh?topicname=t_AssignARoleToAUser.html)
+
+### Discovery Source
+
+The Chef Automate Integration App provides a unique ID that distinguishes between discovered Configuration Items (CIs) and imported CIs. CIs discovered by the Integration App take a value of **Chef Automate** by default in the **Discovery Source** field part of the `cmdb_servers` table.
+
+{{< figure src="/images/automate/snow_integration_discovery.png" alt="Discovery Source">}}
 
 ## Configuration
 
@@ -239,7 +245,7 @@ The typical production instance of ServiceNow can have between 8-12K nodes, and 
 | 2000          | 1h15m                          | 45m                               |
 | 10,000        | 5h40m                          | 3h3m                              |
 
-## Uninstalling
+## Uninstallation
 
 To uninstall the Chef Automate Integration App:
 

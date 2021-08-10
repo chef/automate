@@ -83,7 +83,7 @@ You can navigate to the **Script Includes** section by selecting **Chef Automate
 
 ### Scripted REST API
 
-The **Scripted Rest API** feature aids in establishing a connection between ServiceNow and the Chef Automate application with authentication. You can navigate this section by selecting **Chef Automate** > **Script Rest API** from ServiceNow.
+The **Scripted Rest API** feature aids in establishing a connection between ServiceNow and the Chef Automate application with authentication. You can navigate to this section by selecting **Chef Automate** > **Script Rest API** from ServiceNow.
 
 {{< figure src="/images/automate/snow_integration_scripted_restapi_1.png" alt="Scripted REST Service">}}
 
@@ -145,11 +145,41 @@ The **Field Maps** establishes a relationship between a field in an import set t
 
 {{< figure src="/images/automate/snow_integration_transform_map_scripts1.png" alt="Transform Map Scripts">}}
 
+## Discovery
+
+[ServiceNow's](https://www.servicenow.com/) Discovery feature finds applications and devices on your network, and then updates the Configuration Management Database (CMDB) with the information it finds. It discovers both physical and logical components, including virtual machines, servers, storage, databases, applications, and more.
+
+Refer to ServiceNow's [Discovery](https://docs.servicenow.com/bundle/paris-it-operations-management/page/product/discovery/reference/r-discovery.html) page for information on Discovery and its types.
+
+### Identification and Reconciliation
+
+The Identification and Reconciliation rules maintain the integrity of the CMDB by managing duplicate CIs and controlling updates to CIs when multiple data sources are used to create and update CI records. These rules help prevent duplication of CI records, reconcile CI attributes, reclassify CIs, and allow authoritative data sources to update CI records in the CMDB.
+
+Identification rules identify new CIs and existing CIs. Identification rules apply to a CI class and consist of a single CI identifier with one or more entries that match CIs based on related attributes or by tables of related CIs.
+
+Reconciliation is the synchronization of two or more matching database segments to ensure consistency across them. Reconciliation rules specify which discovery sources can update a table or a set of table attributes, and the precedence order among these discovery sources. You can define these rules at the parent or at the child class level. Without reconciliation rules, discovery sources may be overwritten by updates to attribute from other discovery sources.
+
+Refer to ServiceNow's [CMDB Identification and Reconciliation](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/concept/c_CMDBIdentifyandReconcile.html) page for detailed information on these rules.
+
+You can view the reconciliation rules by selecting **CI Class Manager** > **Hierarchy** > **CI Classes** > **Reconciliation Rules** from ServiceNow.
+
+{{< figure src="/images/automate/snow_integration_reconcile.png" alt="Reconciliation Rules">}}
+
+Refer to ServiceNow's [Create a CI reconciliation rule](https://docs.servicenow.com/bundle/quebec-servicenow-platform/page/product/configuration-management/task/t_CreateCIReconciliationRule.html) page on how to set a reconciliation rule.
+
+{{< figure src="/images/automate/snow_integration_reconcile1.png" alt="Create Reconcile Rule">}}
+
+{{< note >}}
+
+The Chef Automate Integration App does not provide any reconciliation rules.
+
+{{< /note >}}
+
 ## Roles
 
 You can associate a single user with more than one roles.
 
-### Role `x_chef_automate.admin`
+### Role x_chef_automate.admin
 
 You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow another user to manage the application properties and logs.
 
@@ -172,7 +202,7 @@ The **Admin** role grants user access to the:
 - Transform maps
 - Chef Infra Servers
 
-### Role `x_chef_automate.user`
+### Role x_chef_automate.user
 
 The `x_chef_automate.user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
 
@@ -193,7 +223,7 @@ The `x_chef_automate.user` role is suitable for those users who require applicat
 For integration with CMDB data, you need to assign the _OOB ITIL_ role.role for integration with CMDB data in ServiceNow.
 {{< /note >}}
 
-### Role `x_chef_automate.api`
+### Role x_chef_automate.api
 
 The `x_chef_automate.api` role is suitable for users responsible for integrating the Chef Automate data into ServiceNow. We recommend creating a new user specifically for this role. The Chef Automate Integration App requires the API role to set up communication with Chef Automate.
 
