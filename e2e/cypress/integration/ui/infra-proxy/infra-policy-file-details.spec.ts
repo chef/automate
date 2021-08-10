@@ -202,6 +202,25 @@ describe('infra policy details', () => {
       }
     });
 
+    describe('cookbook dependencies page', () => {
+      it('can click cookboook button', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=cookbook-dependencies-button]')
+          .contains('Cookbook Dependencies').click();
+          cy.get('[data-cy=cookbook-dependencies-heading]')
+          .contains('Cookbook Dependencies');
+        }
+      });
+
+      it('can open dependency rule accordion', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=dependency-rule]').contains('Dependencies Rules').click();
+          cy.get('[data-cy=close-cookbook-button]').click();
+
+        }
+      });
+    });
+
     describe('included policyfiles details page', () => {
       it('can check if included policy have data or not', () => {
         if (policyFileName !== '') {
