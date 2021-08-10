@@ -46,7 +46,6 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
-    "chef/automate-cluster-ctl",
     "core/rsync"
   ],
 
@@ -152,8 +151,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
-        "chef/user-settings-service",
-        "chef/automate-cluster-ctl"
+        "chef/user-settings-service"
       ]
     },
     {
