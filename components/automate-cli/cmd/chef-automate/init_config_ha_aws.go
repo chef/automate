@@ -10,46 +10,13 @@ import (
 )
 
 func runInitConfigAwsHACmd() error {
-	initConfigHAPath := initConfigHAFlags.path
+	initConfigHAPath := initConfigHAPathFlags.path
 	if _, err := os.Stat(initConfigHAPath); err == nil {
 		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigHAPath)
 		return nil
 	}
 
-	cfg, err := deployment.GenerateInitHAConfig(
-		deployment.InitialSecretsKeyFile(initConfigHAFlags.SecretsKeyFile),
-		deployment.InitialSecretsStoreFile(initConfigHAFlags.SecretsStoreFile),
-		deployment.InitialArchitecture(initConfigHAFlags.Architecture),
-		deployment.InitialWorkspacePath(initConfigHAFlags.WorkspacePath),
-		deployment.InitialSshUser(initConfigHAFlags.SshUser),
-		deployment.InitialSshKeyFile(initConfigHAFlags.SshKeyFile),
-		deployment.InitialBackupMount(initConfigHAFlags.BackupMount),
-		deployment.InitialAutomateInstanceCount(initConfigHAFlags.AutomateInstanceCount),
-		deployment.InitialAutomateConfigFile(initConfigHAFlags.AutomateConfigFile),
-		deployment.InitialChefServerInstanceCount(initConfigHAFlags.ChefServerInstanceCount),
-		deployment.InitialElasticSearchInstanceCount(initConfigHAFlags.ElasticSearchInstanceCount),
-		deployment.InitialPostgresqlInstanceCount(initConfigHAFlags.PostgresqlInstanceCount),
-		deployment.InitialAwsProfile(initConfigHAFlags.AwsProfile),
-		deployment.InitialAwsRegion(initConfigHAFlags.AwsRegion),
-		deployment.InitialAwsSshKeyPairName(initConfigHAFlags.AwsSshKeyPairName),
-		deployment.InitialAwsAutomateServerInstaceType(initConfigHAFlags.AwsAutomateServerInstaceType),
-		deployment.InitialAwsChefServerInstanceType(initConfigHAFlags.AwsChefServerInstanceType),
-		deployment.InitialAwsElasticSearchServerInstaceType(initConfigHAFlags.AwsElasticSearchServerInstaceType),
-		deployment.InitialAwsPostgresqlServerInstanceType(initConfigHAFlags.AwsPostgresqlServerInstanceType),
-		deployment.InitialAwsAutomateLBCertificateARN(initConfigHAFlags.AwsAutomateLBCertificateARN),
-		deployment.InitialAwsChefServerLBCertificateARN(initConfigHAFlags.AwsChefServerLBCertificateARN),
-		deployment.InitialAwsAutomateEbsVolumeIops(initConfigHAFlags.AwsAutomateEbsVolumeIops),
-		deployment.InitialAwsAutomateEbsVolumeSize(initConfigHAFlags.AwsAutomateEbsVolumeSize),
-		deployment.InitialAwsAutomateEbsVolumeType(initConfigHAFlags.AwsAutomateEbsVolumeType),
-		deployment.InitialAwsChefEbsVolumeIops(initConfigHAFlags.AwsChefEbsVolumeIops),
-		deployment.InitialAwsChefEbsVolumeSize(initConfigHAFlags.AwsChefEbsVolumeSize),
-		deployment.InitialAwsChefEbsVolumeType(initConfigHAFlags.AwsEsEbsVolumeIops),
-		deployment.InitialAwsEsEbsVolumeSize(initConfigHAFlags.AwsEsEbsVolumeSize),
-		deployment.InitialAwsEsEbsVolumeType(initConfigHAFlags.AwsEsEbsVolumeType),
-		deployment.InitialAwsPgsEbsVolumeIops(initConfigHAFlags.AwsPgsEbsVolumeIops),
-		deployment.InitialAwsPgsEbsVolumeSize(initConfigHAFlags.AwsPgsEbsVolumeSize),
-		deployment.InitialAwsPgsEbsVolumeType(initConfigHAFlags.AwsPgsEbsVolumeType),
-	)
+	cfg, err := deployment.GenerateInitHAConfig()
 
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Generating initial configuration failed")
