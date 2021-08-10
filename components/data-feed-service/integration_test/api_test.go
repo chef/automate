@@ -347,6 +347,14 @@ func updateDestination(t *testing.T, destinationId string, data []byte, expected
 	assert.True(t, isValid, "Update destination response body was not valid, got %v", responseBody)
 	assert.Equal(t, destinationId, updateDestinationId, "Expected UpdateDestination ID to be %s, got %s", destinationId, updateDestinationId)
 }
+func enableDestinationSuccess(t *testing.T, destinationId string, data []byte, expectedValues []string) {
+	response := enableDestinationRequest(t, destinationId, data, 200)
+	responseBody, err := parseResponse(response.Body)
+	assert.Nil(t, err, "Error parsing response body %v", err)
+	isValid, updateDestinationId := validateResponseBody(t, responseBody, expectedValues)
+	assert.True(t, isValid, "Update destination response body was not valid, got %v", responseBody)
+	assert.Equal(t, destinationId, updateDestinationId, "Expected UpdateDestination ID to be %s, got %s", destinationId, updateDestinationId)
+}
 
 func deleteDestinationRequest(destinationId string, statusCode int) (*http.Response, error) {
 	delete, err := http.NewRequest("DELETE", "https://127.0.0.1/api/v0/datafeed/destination/"+destinationId, nil)
