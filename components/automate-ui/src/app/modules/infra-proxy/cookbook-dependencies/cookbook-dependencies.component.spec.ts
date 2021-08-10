@@ -88,14 +88,14 @@ describe('CookbookDependenciesComponent', () => {
     const emptyCookbookDependency: CookbookRuleList[] = [];
 
     it('render the dependency list', () => {
-      component.slidePanel(availableCookbookRule, availableCookbookDependency)
+      component.slidePanel(availableCookbookRule, availableCookbookDependency);
       expect(component.cookbookRules.length).not.toBeNull();
       expect(component.cookbookDependencies.length).not.toBeNull();
       expect(component.isSlideOpen).toBe(true);
     });
 
     it('show no preview image', () => {
-      component.slidePanel(emptyCookbookRule, emptyCookbookDependency)
+      component.slidePanel(emptyCookbookRule, emptyCookbookDependency);
       expect(component.cookbookRules.length).toBe(0);
       expect(component.cookbookDependencies.length).toBe(0);
       expect(component.isSlideOpen).toBe(true);
