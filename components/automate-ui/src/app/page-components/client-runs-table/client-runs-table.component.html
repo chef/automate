@@ -34,7 +34,7 @@
         Policy Group<i class="sort-icon {{sortIcon('policy_group')}}"></i>
       </chef-th>
       <chef-th scope="col"  class="sort" (click)="onToggleSort('chef_version')" [hidden]="!columns.chef_version">
-        Client Version<i class="sort-icon {{sortIcon('chef_version')}}"></i>
+        Infra Client Version<i class="sort-icon {{sortIcon('chef_version')}}"></i>
       </chef-th>
       <chef-th scope="col"  class="sort" (click)="onToggleSort('deprecations_count')" [hidden]="!columns.deprecations_count">
         Deprecations<i class="sort-icon {{sortIcon('deprecations_count')}}"></i>
@@ -61,7 +61,7 @@
               (change)="updateColumnVisibility('policy_group')"> Policy Group
             </chef-checkbox>
             <chef-checkbox [checked]="columns.chef_version"
-              (change)="updateColumnVisibility('chef_version')"> Client Version
+              (change)="updateColumnVisibility('chef_version')"> Infra Client Version
             </chef-checkbox>
             <chef-checkbox [checked]="columns.deprecations_count"
               (change)="updateColumnVisibility('deprecations_count')"> Deprecations
