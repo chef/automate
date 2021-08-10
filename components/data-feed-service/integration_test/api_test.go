@@ -77,6 +77,8 @@ func NewClient() *http.Client {
 
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %s", automateApiToken)
+	t.Log("automateAwsAccessKey", automateAwsAccessKey)
+	t.Log("automateAwsSecretAccessKey", automateAwsSecretAccessKey)
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
