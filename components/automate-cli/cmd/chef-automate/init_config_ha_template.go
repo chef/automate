@@ -117,11 +117,3 @@ elasticsearch_private_ips = []
 postgresql_ips = []
 postgresql_private_ips = []
 `
-
-func GetHaAwsConfigTemplate() string {
-	return haAwsConfigTemplate
-}
-
-func GetHaExistingNodesConfigTemplate() string {
-	return haExistingNodesConfigTemplate
-}
