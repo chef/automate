@@ -145,6 +145,7 @@ lint:
       - interservice/deployment/certificate_authority.proto
       - interservice/es_sidecar/service.proto
       - interservice/event_feed/event_feed.proto
+      - interservice/id_token/id_token.proto
       - interservice/infra_proxy/service/infra_proxy.proto
       - interservice/ingest/automate_event.proto
       - interservice/ingest/chef.proto
