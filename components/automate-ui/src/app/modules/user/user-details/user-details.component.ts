@@ -34,6 +34,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { UpdateUserPreferences } from 'app/services/user-preferences/user-preferences.actions';
+import { userPreferencesStatus } from 'app/services/user-preferences/user-preferences.selector';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 export type UserTabName = 'password' | 'details';
@@ -398,6 +399,14 @@ class UserProfileDetails extends UserDetails {
             this.resetForms();
           }
       });
+
+      store.select(userPreferencesStatus).pipe(
+        filter(status => this.saveInProgress && !loading(status)),
+        takeUntil(isDestroyed)
+      ).subscribe(() => {
+          this.saveInProgress = false;
+      });
+
   }
 
   protected createUpdatePasswordUserAction(password: string): Action {
