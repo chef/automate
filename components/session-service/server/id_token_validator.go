@@ -17,11 +17,11 @@ const (
 )
 
 func (s *IdTokenValidator) ValidateIdToken(ctx context.Context,
-	req *id_token.IdTokenReq) (*id_token.IdTokenResp, error) {
+	req *id_token.ValidateIdTokenRequest) (*id_token.ValidateIdTokenResponse, error) {
 
 	// This is for tests which runs InMemory
 	if s.pgDB == nil {
-		return &id_token.IdTokenResp{Exist: false}, nil
+		return &id_token.ValidateIdTokenResponse{Exist: false}, nil
 	}
 
 	idToken := s.pgDB.QueryRow(getIdTokenKey, req.Token)
@@ -34,7 +34,7 @@ func (s *IdTokenValidator) ValidateIdToken(ctx context.Context,
 	}
 
 	if token == req.Token {
-		return &id_token.IdTokenResp{Exist: true}, nil
+		return &id_token.ValidateIdTokenResponse{Exist: true}, nil
 	}
-	return &id_token.IdTokenResp{Exist: false}, nil
+	return &id_token.ValidateIdTokenResponse{Exist: false}, nil
 }

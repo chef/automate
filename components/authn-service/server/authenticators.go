@@ -64,7 +64,7 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
-	sessionResp, err := s.sessionClient.ValidateIdToken(ctx, &id_token.IdTokenReq{Token: idToken})
+	sessionResp, err := s.sessionClient.ValidateIdToken(ctx, &id_token.ValidateIdTokenRequest{Token: idToken})
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
