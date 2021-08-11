@@ -11,6 +11,7 @@ import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
+import { UserPreferencesService } from '../user-preferences/user-preferences.service';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -23,6 +24,7 @@ export interface ChefSessionUser {
   telemetry_enabled?: boolean;
   uuid: string;
   id_token: string;
+  connector?: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -44,7 +46,9 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>,
+     handler: HttpBackend,
+     private userPrefService: UserPreferencesService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     this.tokenProvider = new ReplaySubject(1);
@@ -159,6 +163,7 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
+    this.initializeUserPreference(this.user);
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -178,6 +183,7 @@ export class ChefSessionService implements CanActivate {
       isLocalUser
     };
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.initializeUserPreference(this.user);
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -245,6 +251,10 @@ export class ChefSessionService implements CanActivate {
     return;
   }
 
+  get connector(): string {
+    return this.user.connector;
+  }
+
   get token_provider(): ReplaySubject<string> {
     return this.tokenProvider;
   }
@@ -292,5 +302,13 @@ export class ChefSessionService implements CanActivate {
   isLocalUserFromId(id: IDToken): boolean {
     return id.federated_claims &&
       id.federated_claims.connector_id === 'local';
+  }
+
+  initializeUserPreference(user) {
+    const id: IDToken = Jwt.parseIDToken(user.id_token);
+    if (id && id.federated_claims) {
+      user.connector = id.federated_claims.connector_id;
+      this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
+    }
   }
 }

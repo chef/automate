@@ -34,7 +34,7 @@
                 <table>
                   <tr>
                     <th>Last Scan</th>
-                    <td>{{ activeReport.end_time | datetime: RFC2822 }}</td>
+                    <td><app-time [time]='activeReport.end_time'></app-time></td>
                   </tr>
                 </table>
               </div>
@@ -298,7 +298,7 @@
                 <chef-icon class="status-icon list-item-icon" [ngClass]="report.status">{{ statusIcon(report.status) }}</chef-icon>
                 <div class="list-item-text">
                   <p class="node-name">
-                    <strong>{{ report.end_time | datetime: RFC2822 }}</strong>
+                    <strong><app-time [time]='report.end_time'></app-time></strong>
                   </p>
                   <p>{{formatDaysAgo(report.end_time)}}</p>
                 </div>
