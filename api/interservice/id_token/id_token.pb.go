@@ -29,7 +29,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type IdTokenReq struct {
+type ValidateIdTokenRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -38,8 +38,8 @@ type IdTokenReq struct {
 	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" toml:"token,omitempty" mapstructure:"token,omitempty"`
 }
 
-func (x *IdTokenReq) Reset() {
-	*x = IdTokenReq{}
+func (x *ValidateIdTokenRequest) Reset() {
+	*x = ValidateIdTokenRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_interservice_id_token_id_token_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -47,13 +47,13 @@ func (x *IdTokenReq) Reset() {
 	}
 }
 
-func (x *IdTokenReq) String() string {
+func (x *ValidateIdTokenRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IdTokenReq) ProtoMessage() {}
+func (*ValidateIdTokenRequest) ProtoMessage() {}
 
-func (x *IdTokenReq) ProtoReflect() protoreflect.Message {
+func (x *ValidateIdTokenRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_interservice_id_token_id_token_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -65,19 +65,19 @@ func (x *IdTokenReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IdTokenReq.ProtoReflect.Descriptor instead.
-func (*IdTokenReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ValidateIdTokenRequest.ProtoReflect.Descriptor instead.
+func (*ValidateIdTokenRequest) Descriptor() ([]byte, []int) {
 	return file_interservice_id_token_id_token_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *IdTokenReq) GetToken() string {
+func (x *ValidateIdTokenRequest) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-type IdTokenResp struct {
+type ValidateIdTokenResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -85,8 +85,8 @@ type IdTokenResp struct {
 	Exist bool `protobuf:"varint,1,opt,name=exist,proto3" json:"exist,omitempty" toml:"exist,omitempty" mapstructure:"exist,omitempty"`
 }
 
-func (x *IdTokenResp) Reset() {
-	*x = IdTokenResp{}
+func (x *ValidateIdTokenResponse) Reset() {
+	*x = ValidateIdTokenResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_interservice_id_token_id_token_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -94,13 +94,13 @@ func (x *IdTokenResp) Reset() {
 	}
 }
 
-func (x *IdTokenResp) String() string {
+func (x *ValidateIdTokenResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IdTokenResp) ProtoMessage() {}
+func (*ValidateIdTokenResponse) ProtoMessage() {}
 
-func (x *IdTokenResp) ProtoReflect() protoreflect.Message {
+func (x *ValidateIdTokenResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_interservice_id_token_id_token_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -112,12 +112,12 @@ func (x *IdTokenResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IdTokenResp.ProtoReflect.Descriptor instead.
-func (*IdTokenResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use ValidateIdTokenResponse.ProtoReflect.Descriptor instead.
+func (*ValidateIdTokenResponse) Descriptor() ([]byte, []int) {
 	return file_interservice_id_token_id_token_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *IdTokenResp) GetExist() bool {
+func (x *ValidateIdTokenResponse) GetExist() bool {
 	if x != nil {
 		return x.Exist
 	}
@@ -131,24 +131,27 @@ var file_interservice_id_token_id_token_proto_rawDesc = []byte{
 	0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2f, 0x69, 0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x1d, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74,
 	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x64, 0x5f,
-	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x22, 0x0a, 0x0a, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
-	0x52, 0x65, 0x71, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x23, 0x0a, 0x0b, 0x49, 0x64, 0x54,
-	0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x78, 0x69, 0x73,
-	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x65, 0x78, 0x69, 0x73, 0x74, 0x32, 0x84,
-	0x01, 0x0a, 0x16, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b,
-	0x65, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x6a, 0x0a, 0x0f, 0x56, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x29, 0x2e, 0x63,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x2e, 0x0a, 0x16, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
+	0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x2f, 0x0a, 0x17, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
+	0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x14, 0x0a, 0x05, 0x65, 0x78, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x05, 0x65, 0x78, 0x69, 0x73, 0x74, 0x32, 0x9d, 0x01, 0x0a, 0x16, 0x56, 0x61, 0x6c, 0x69, 0x64,
+	0x61, 0x74, 0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x12, 0x82, 0x01, 0x0a, 0x0f, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x64,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x35, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74,
+	0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69, 0x64, 0x5f,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x64,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x36, 0x2e, 0x63,
 	0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d,
-	0x61, 0x69, 0x6e, 0x2e, 0x69, 0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x49, 0x64, 0x54,
-	0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x2a, 0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61,
-	0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x69,
-	0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
-	0x65, 0x73, 0x70, 0x22, 0x00, 0x42, 0x34, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74,
-	0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2f, 0x69, 0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x61, 0x69, 0x6e, 0x2e, 0x69, 0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x2e, 0x56, 0x61, 0x6c,
+	0x69, 0x64, 0x61, 0x74, 0x65, 0x49, 0x64, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x34, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61,
+	0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x2f, 0x69, 0x64, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -165,12 +168,12 @@ func file_interservice_id_token_id_token_proto_rawDescGZIP() []byte {
 
 var file_interservice_id_token_id_token_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_interservice_id_token_id_token_proto_goTypes = []interface{}{
-	(*IdTokenReq)(nil),  // 0: chef.automate.domain.id_token.IdTokenReq
-	(*IdTokenResp)(nil), // 1: chef.automate.domain.id_token.IdTokenResp
+	(*ValidateIdTokenRequest)(nil),  // 0: chef.automate.domain.id_token.ValidateIdTokenRequest
+	(*ValidateIdTokenResponse)(nil), // 1: chef.automate.domain.id_token.ValidateIdTokenResponse
 }
 var file_interservice_id_token_id_token_proto_depIdxs = []int32{
-	0, // 0: chef.automate.domain.id_token.ValidateIdTokenService.ValidateIdToken:input_type -> chef.automate.domain.id_token.IdTokenReq
-	1, // 1: chef.automate.domain.id_token.ValidateIdTokenService.ValidateIdToken:output_type -> chef.automate.domain.id_token.IdTokenResp
+	0, // 0: chef.automate.domain.id_token.ValidateIdTokenService.ValidateIdToken:input_type -> chef.automate.domain.id_token.ValidateIdTokenRequest
+	1, // 1: chef.automate.domain.id_token.ValidateIdTokenService.ValidateIdToken:output_type -> chef.automate.domain.id_token.ValidateIdTokenResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -185,7 +188,7 @@ func file_interservice_id_token_id_token_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_interservice_id_token_id_token_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*IdTokenReq); i {
+			switch v := v.(*ValidateIdTokenRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -197,7 +200,7 @@ func file_interservice_id_token_id_token_proto_init() {
 			}
 		}
 		file_interservice_id_token_id_token_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*IdTokenResp); i {
+			switch v := v.(*ValidateIdTokenResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -241,7 +244,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ValidateIdTokenServiceClient interface {
-	ValidateIdToken(ctx context.Context, in *IdTokenReq, opts ...grpc.CallOption) (*IdTokenResp, error)
+	ValidateIdToken(ctx context.Context, in *ValidateIdTokenRequest, opts ...grpc.CallOption) (*ValidateIdTokenResponse, error)
 }
 
 type validateIdTokenServiceClient struct {
@@ -252,8 +255,8 @@ func NewValidateIdTokenServiceClient(cc grpc.ClientConnInterface) ValidateIdToke
 	return &validateIdTokenServiceClient{cc}
 }
 
-func (c *validateIdTokenServiceClient) ValidateIdToken(ctx context.Context, in *IdTokenReq, opts ...grpc.CallOption) (*IdTokenResp, error) {
-	out := new(IdTokenResp)
+func (c *validateIdTokenServiceClient) ValidateIdToken(ctx context.Context, in *ValidateIdTokenRequest, opts ...grpc.CallOption) (*ValidateIdTokenResponse, error) {
+	out := new(ValidateIdTokenResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.id_token.ValidateIdTokenService/ValidateIdToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -263,14 +266,14 @@ func (c *validateIdTokenServiceClient) ValidateIdToken(ctx context.Context, in *
 
 // ValidateIdTokenServiceServer is the server API for ValidateIdTokenService service.
 type ValidateIdTokenServiceServer interface {
-	ValidateIdToken(context.Context, *IdTokenReq) (*IdTokenResp, error)
+	ValidateIdToken(context.Context, *ValidateIdTokenRequest) (*ValidateIdTokenResponse, error)
 }
 
 // UnimplementedValidateIdTokenServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedValidateIdTokenServiceServer struct {
 }
 
-func (*UnimplementedValidateIdTokenServiceServer) ValidateIdToken(context.Context, *IdTokenReq) (*IdTokenResp, error) {
+func (*UnimplementedValidateIdTokenServiceServer) ValidateIdToken(context.Context, *ValidateIdTokenRequest) (*ValidateIdTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateIdToken not implemented")
 }
 
@@ -279,7 +282,7 @@ func RegisterValidateIdTokenServiceServer(s *grpc.Server, srv ValidateIdTokenSer
 }
 
 func _ValidateIdTokenService_ValidateIdToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IdTokenReq)
+	in := new(ValidateIdTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -291,7 +294,7 @@ func _ValidateIdTokenService_ValidateIdToken_Handler(srv interface{}, ctx contex
 		FullMethod: "/chef.automate.domain.id_token.ValidateIdTokenService/ValidateIdToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ValidateIdTokenServiceServer).ValidateIdToken(ctx, req.(*IdTokenReq))
+		return srv.(ValidateIdTokenServiceServer).ValidateIdToken(ctx, req.(*ValidateIdTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
