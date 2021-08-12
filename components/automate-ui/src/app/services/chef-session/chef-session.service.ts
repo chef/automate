@@ -3,8 +3,8 @@ import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angula
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Observable, ReplaySubject, timer } from 'rxjs';
-import { map, mergeMap, filter } from 'rxjs/operators';
+import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
+import { map, mergeMap, filter, retryWhen, delay } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
 import { environment } from 'environments/environment';
@@ -71,12 +71,18 @@ export class ChefSessionService implements CanActivate {
       // and components/session-service and chef-session-service -- it would
       // make sense to try to refresh the session if we get a 401 from the API,
       // before giving up and calling logout().
+
       timer(0, minute).pipe(
         filter(() => !this.isRefreshing),
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
-        })
+        }),
+        retryWhen(error =>
+          error.pipe(
+            delay(1000)  // retry in 1000ms if errored
+          )
+        )
       ).subscribe(
         token => {
           this.ingestIDToken(token);
@@ -89,9 +95,11 @@ export class ChefSessionService implements CanActivate {
               this.logout();
             } else {
               console.log(`Session refresh failed: ${error.statusText}`);
+              return throwError(error);
             }
           } else {
-            console.log(error);
+            console.log(error, 'retried after 1sec on error');
+            return throwError(error);
           }
         }
       );
@@ -99,6 +107,10 @@ export class ChefSessionService implements CanActivate {
   }
 
   private refresh(): Observable<string> {
+    if (!this.id_token) {
+      this.isRefreshing = false;
+      return throwError('id_token is yet to be retrieved');
+    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -113,6 +125,9 @@ export class ChefSessionService implements CanActivate {
   }
 
   ingestIDToken(idToken: string): void {
+    if (!idToken) {
+      return;
+    }
     const id = Jwt.parseIDToken(idToken);
     if (id === null) {
       return;
@@ -231,7 +246,10 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    return this.user.id_token;
+    if (this.user) {
+      return this.user.id_token;
+    }
+    return;
   }
 
   get connector(): string {

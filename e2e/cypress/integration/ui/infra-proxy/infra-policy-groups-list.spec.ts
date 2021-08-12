@@ -10,6 +10,7 @@ describe('infra policy groups', () => {
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const policyGroupName = `${cypressPrefix}-policyGroup-${now}-1`;
   let policies: any;
 
   before(() => {
@@ -104,6 +105,27 @@ describe('infra policy groups', () => {
     }
   }
 
+  // tslint:disable-next-line:no-shadowed-variable
+  function filterPolicyGroup(policies: any) {
+    const policyGroups: any = [];
+    const key = 'policy_group';
+    policies.forEach((x: any) => {
+      if (policyGroups.some((val: any) => val[key] === x[key])) {
+        policyGroups.forEach((k: any) => {
+          if (k[key] === x[key]) {
+            k['occurrence']++;
+          }
+        });
+      } else {
+        const a: any = [];
+        a[key] = x[key];
+        a['occurrence'] = 1;
+        policyGroups.push(a);
+      }
+    });
+    return policyGroups;
+  }
+
   describe('infra policy group list page', () => {
     it('displays org details', () => {
       cy.get('.page-title').contains(orgName);
@@ -117,6 +139,40 @@ describe('infra policy groups', () => {
     it('can check if policy group has list or not', () => {
       getPolicyGroups().then((response) => {
         checkResponse(response);
+      });
+    });
+
+    context('can search and change page in policyfile', () => {
+      it('can search a Policyfile and check if empty or not', () => {
+        getPolicyGroups().then((response) => {
+          if (checkResponse(response)) {
+            cy.get('[data-cy=search-filter]').type(policyGroupName);
+            cy.get('[data-cy=search-entity]').click();
+            cy.get('[data-cy=policy-group-table-container]').then(body => {
+              if (body.text().includes(policyGroupName)) {
+                cy.get('[data-cy=policy-group-table-container]')
+                .contains(policyGroupName).should('exist');
+              }
+            });
+
+            cy.get('[data-cy=search-filter]').clear();
+            cy.get('[data-cy=search-entity]').click();
+          }
+        });
+      });
+    });
+
+    context('can change page in policy file', () => {
+      it('can change page and load data according to page', () => {
+        getPolicyGroups().then((response) => {
+          if (checkResponse(response)) {
+            const groupCount = filterPolicyGroup(policies);
+            if (groupCount > 9 &&
+              cy.get('.policy-group-list-paging .page-picker-item').contains('3')) {
+              cy.get('.policy-file-paging .page-picker-item').contains('3').click();
+            }
+          }
+        });
       });
     });
   });

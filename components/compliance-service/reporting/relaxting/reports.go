@@ -447,6 +447,7 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 
 					dependsHash := make(map[string]*ESInSpecReportDepends, len(esInSpecReportProfileMin.Depends))
 					for _, esInSpecProfileDependency := range esInSpecReportProfileMin.Depends {
+
 						depCopy := esInSpecProfileDependency // to prevent https://github.com/golang/go/issues/20725
 						dependsHash[esInSpecProfileDependency.Name] = &depCopy
 					}
@@ -471,11 +472,16 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 					convertedControls := make([]*reportingapi.Control, 0)
 					// Enrich min report controls with profile metadata
 					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
-						reportControlMin.Tags = profileControlsMap[reportControlMin.ID].Tags
-						// store controls to returned report
-						convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
-						if convertedControl != nil {
-							convertedControls = append(convertedControls, convertedControl)
+						if controlFromMap, ok := profileControlsMap[reportControlMin.ID]; ok {
+							reportControlMin.Tags = controlFromMap.Tags
+							// store controls to returned report
+							convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
+							if convertedControl != nil {
+								convertedControls = append(convertedControls, convertedControl)
+							}
+						} else {
+							logrus.Warnf("GetReport: %s was not found in the profile control map",
+								reportControlMin.ID)
 						}
 					}
 

@@ -80,7 +80,7 @@
         (runlistUpdated)="updateRunlist()">
       </app-edit-infra-node-modal>
 
-      <app-edit-infra-node-attribute-modal 
+      <app-edit-infra-node-attribute-modal
         [jsonText]="jsonText"
         [openEvent]="openAttributeModal"
         [orgId]="orgId" [node]="InfraNode"
@@ -252,11 +252,11 @@
               </div>
               <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
-                <p>Run list details are not available for the environment.</p>
+                <p>No run list is set for the node.</p>
               </div>
               <div *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
-                <p>Cannot load environment - <strong> {{InfraNode?.environment}}</strong></p>
+                <p>Cannot load run_list!</p>
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@
                     <chef-icon>remove_circle</chef-icon>
                     <span>Collapse All</span>
                   </chef-button>
-                  <chef-button tertiary class="right-button-box" 
+                  <chef-button tertiary class="right-button-box"
                     [disabled]="conflictError"
                     (click)="openEditAttrModal(InfraNode.normal_attributes)"
                     data-cy="node-edit-attributes">
@@ -298,14 +298,14 @@
                 <hr class="divider-constraints" />
                 <div class="json-container">
                   <div class="scroll">
-                    <app-json-tree-table class="json-tree-container" 
-                    [hidden]="hasattributes? false : true" 
+                    <app-json-tree-table class="json-tree-container"
+                    [hidden]="hasattributes? false : true"
                     #tree
                     [json]="attributes">
                     </app-json-tree-table>
                     <div *ngIf="!hasattributes" class="img-section">
                       <img alt="No preview" src="/assets/img/no_preview.gif" />
-                      <p>There are no items for Display.</p>
+                      <p>There are no items to display.</p>
                     </div>
                   </div>
                 </div>
