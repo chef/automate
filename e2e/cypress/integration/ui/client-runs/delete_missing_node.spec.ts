@@ -51,14 +51,14 @@ describe('delete missing node from UI', () => {
   it('from client runs page delete nodes', () => {
     cy.adminLogin('/infrastructure/client-runs').then(() => {
       cy.get('app-welcome-modal').invoke('hide');
-      cy.url()
-        .should('include', '/dex/auth/')
-        .should('include', '/dex/auth/local');
     });
 
     // Check the check box to delete all missing nodes
     cy.get('chef-checkbox.header').click();
 
+    cy.url()
+      .should('include', '/dex/auth/')
+      .should('include', '/dex/auth/local');
 
     // Click the delete all button
     cy.get('chef-button.delete-button').click();
