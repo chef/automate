@@ -24,7 +24,7 @@ if (Cypress.env('SKIP_SSO')) {
         cy.contains('Sign in as a local user').click({ force: true }).then(() => {
           cy.url()
             .should('include', '/dex/auth/')
-            .should('include', '/dex/auth/local')
+            .should('include', '/dex/auth/local');
           cy.contains('Username');
           cy.contains('Password');
           cy.contains('Sign In');
