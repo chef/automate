@@ -115,3 +115,17 @@ func (a *Datafeed) EnableDestination(ctx context.Context, in *data_feed.UpdateDe
 	}
 	return out, nil
 }
+
+//config
+func (a *Datafeed) DestinationConfig(ctx context.Context, in *data_feed.ConfigRequest) (*data_feed.ConfigResponse, error) {
+	inDomain := &data_feed.ConfigRequest{}
+	out := &data_feed.ConfigResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.DestinationConfig(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}

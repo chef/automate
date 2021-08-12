@@ -85,4 +85,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/DestinationConfig", "datafeed:destination", "datafeed:destination:get", "GET", "/api/v0/datafeed/config", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
