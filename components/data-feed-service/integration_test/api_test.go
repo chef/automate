@@ -16,7 +16,7 @@ import (
 
 var (
 	automateApiToken           = os.Getenv("AUTOMATE_API_TOKEN")
-	automateAwsRegion          = os.Getenv("AWS_REGION")
+	automateAwsRegion          = "us-west-2"
 	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
 	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	automateAwsBucket          = "a2-data-feed-s3-integration-test"
@@ -76,8 +76,8 @@ func NewClient() *http.Client {
 }
 
 func TestDataFeedAPI(t *testing.T) {
-	fmt.Println("AWS_ACCESS_KEY_ID",len(automateAwsAccessKey))
-	fmt.Println("AWS_SECRET_ACCESS_KEY",len(automateAwsSecretAccessKey))
+	fmt.Println("AWS_ACCESS_KEY_ID", len(automateAwsAccessKey))
+	fmt.Println("AWS_SECRET_ACCESS_KEY", len(automateAwsSecretAccessKey))
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
@@ -155,7 +155,7 @@ func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
 	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
 	testDestinationAwsRequestSuccess(t, testSuccessAwsData)
-	testDestinationMinioRequestSuccess(t, testSuccessMinioData)
+	// testDestinationMinioRequestSuccess(t, testSuccessMinioData)
 
 }
 
@@ -163,7 +163,7 @@ func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
 	testDestinationAwsRequestFail(t, testFailsAwsData)
-	testDestinationMinioRequestFail(t, testFailsMinioData)
+	// testDestinationMinioRequestFail(t, testFailsMinioData)
 }
 
 func TestDestinationWithSecret(t *testing.T) {
