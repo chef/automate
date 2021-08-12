@@ -14,6 +14,28 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/datafeed/config": {
+      "get": {
+        "operationId": "DatafeedService_DestinationConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.ConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
     "/api/v0/datafeed/destination": {
       "post": {
         "operationId": "DatafeedService_AddDestination",
@@ -340,6 +362,36 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        }
+      }
+    },
+    "chef.automate.api.datafeed.ConfigResponse": {
+      "type": "object",
+      "properties": {
+        "feed_interval": {
+          "type": "string"
+        },
+        "node_batch_size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_nodes_only": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "disable_cidr_filter": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "cidr_filter": {
+          "type": "string"
+        },
+        "accepted_status_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       }

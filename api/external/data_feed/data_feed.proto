@@ -79,6 +79,26 @@ service DatafeedService {
 			action: "datafeed:destinations:update"
 		};
 	}
+	rpc DestinationConfig(ConfigRequest) returns (ConfigResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/datafeed/config"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destination"
+			action: "datafeed:destination:get"
+		};
+	}
+}
+
+message ConfigRequest{
+}
+message ConfigResponse{ 
+	string feed_interval=1;
+	int64 node_batch_size=2;
+	bool updated_nodes_only=3;
+	bool disable_cidr_filter = 4;
+	string cidr_filter =5;
+	repeated int32 accepted_status_codes =6;
 }
 
 message AddDestinationRequest {	
@@ -211,3 +231,4 @@ message URLValidationRequest {
 message TestDestinationResponse {
   bool success = 1;
 }
+

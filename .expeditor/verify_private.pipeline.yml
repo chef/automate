@@ -179,18 +179,18 @@ steps:
       automatic:
         limit: 1
     expeditor:
-        secrets:
+      secrets:
         HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
           account: aws/chef-cd
           field: access_key_id
         HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
           account: aws/chef-cd
           field: secret_access_key
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
+      docker:
+        privileged: true
+        environment:
+          - HAB_STUDIO_SUP=false
+          - HAB_NONINTERACTIVE=true
 
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.

@@ -19,7 +19,7 @@ var (
 	automateAwsRegion          = os.Getenv("AWS_REGION")
 	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
 	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	automateAwsBucket          = "s3awsintegrationtest"
+	automateAwsBucket          = "a2-data-feed-s3-integration-test"
 	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
 	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
 	emptyAddData               = []byte(`{}`)
@@ -76,9 +76,8 @@ func NewClient() *http.Client {
 }
 
 func TestDataFeedAPI(t *testing.T) {
-	t.Logf("API TOKEN: %s", automateApiToken)
-	t.Log("automateAwsAccessKey", automateAwsAccessKey)
-	t.Log("automateAwsSecretAccessKey", automateAwsSecretAccessKey)
+	fmt.Println("AWS_ACCESS_KEY_ID",len(automateAwsAccessKey))
+	fmt.Println("AWS_SECRET_ACCESS_KEY",len(automateAwsSecretAccessKey))
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination

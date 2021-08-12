@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	//"github.com/pkg/errors"
@@ -33,6 +34,7 @@ type DatafeedServer struct {
 	health              *health.Service
 	secrets             secrets.SecretsServiceClient
 	acceptedStatusCodes []int32
+	config              *config.DataFeedConfig
 }
 
 // New creates a new DatafeedServer instance.
@@ -47,6 +49,7 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 		health:              health.NewService(),
 		secrets:             secrets.NewSecretsServiceClient(secretsConn),
 		acceptedStatusCodes: config.ServiceConfig.AcceptedStatusCodes,
+		config:              config,
 	}, nil
 }
 
@@ -257,6 +260,19 @@ func (datafeedServer *DatafeedServer) EnableDestination(ctx context.Context, des
 	// Id, _ = strconv.ParseInt(destination.Id, 10, 64)
 	res, err := datafeedServer.GetDestination(ctx, GetdestinationRequest)
 	return res, nil
+}
+func (datafeedServer *DatafeedServer) DestinationConfig(ctx context.Context, destination *datafeed.ConfigRequest) (*datafeed.ConfigResponse, error) {
+	log.Infof("DestinationConfig %s", destination)
+	data, _ := config.Configure()
+	config := &datafeed.ConfigResponse{}
+	config.FeedInterval = fmt.Sprintf("%f", data.ServiceConfig.FeedInterval.Hours())
+	config.NodeBatchSize = int64(data.ServiceConfig.NodeBatchSize)
+	config.UpdatedNodesOnly = data.ServiceConfig.UpdatedNodesOnly
+	config.DisableCidrFilter = data.ServiceConfig.DisableCIDRFilter
+	config.CidrFilter = data.ServiceConfig.CIDRFilter
+	config.AcceptedStatusCodes = data.ServiceConfig.AcceptedStatusCodes
+
+	return config, nil
 }
 
 // Health returns the servers embedded health check service
