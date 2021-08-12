@@ -10,6 +10,7 @@ secrets_key_file = "secrets.json"
 secrets_store_file = "/etc/chef-automate/secrets.key"
 architecture = "aws"
 workspace_path = "/src"
+# ssh user name for ssh login to instance like default user for centos will centos or for red-hat will be ec2-user
 ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
@@ -25,6 +26,7 @@ backup_mount = "/mnt/automate_backups"
 
 [automate.config]
 # admin_password = ""
+# automate load balancer fqdn IP or path
 # fqdn = ""
 instance_count = "1"
 # teams_port = ""
@@ -34,10 +36,10 @@ config_file = "configs/automate.toml"
 instance_count = "1"
 
 [elasticsearch.config]
-instance_count = "1"
+instance_count = "3"
 
 [postgresql.config]
-instance_count = "1"
+instance_count = "3"
 
 [aws.config]
 profile = "default"
@@ -96,6 +98,7 @@ backup_mount = "/mnt/automate_backups"
 
 [automate.config]
 # admin_password = ""
+# automate load balancer fqdn IP or path
 # fqdn = ""
 instance_count = "1"
 # teams_port = ""
@@ -105,10 +108,10 @@ config_file = "configs/automate.toml"
 instance_count = "1"
 
 [elasticsearch.config]
-instance_count = "1"
+instance_count = "3"
 
 [postgresql.config]
-instance_count = "1"
+instance_count = "3"
 
 [existing_nodes.config]
 automate_ips = []
