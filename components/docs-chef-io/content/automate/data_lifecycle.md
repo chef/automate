@@ -62,6 +62,16 @@ To see the data lifecycle job statuses, configure jobs, or run jobs requires an 
 
 To see the combined status and configuration for all data lifecycle jobs, you can use the global status endpoint:
 
+These examples use the Unix/Linux [`curl` command](https://man7.org/linux/man-pages/man1/curl.1.html) with the options:
+
+| Short Option | Long Option  | Definition                                                                                                |
+|--------------|--------------|-----------------------------------------------------------------------------------------------------------|
+| -s           | --silent     | Silent or quiet mode, does not show progress meter or error messages.                                     |
+| -S           | --show-error | When used with -s, --silent, it makes curl show an error message if it fails.                             |
+| -k           | --insecure   | This option allows curl to proceed and operate even for server connections otherwise considered insecure. |
+| -H           | --header     | Sends a header with the request. In this case, the header is your API token.                              |
+
+
 ```bash
 curl -s -S -k -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
