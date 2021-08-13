@@ -1,4 +1,5 @@
-#External Dependecies
+# External Dependecies
+## Below list is for the automate deps 
 
 1. Elastic search
    * automate-elasticsearch
@@ -86,8 +87,40 @@
 21. Third party UI dependencies: [Package json link](https://github.com/chef/automate/blob/master/components/automate-ui/package.json)
     
 
+## Below deps is for A2HA backend 
 
+1. postgresql
+    * automate-backend-postgresql
+      * Version: core/postgresql11/11.2/20210813070814
 
+2. haproxy
+    * automate-backend-haproxy
+      * Version: core/haproxy/2.2.2/20200923113708
 
+3. elasticsearch
+    * automate-backend-elasticsearch
+      * Version: chef/elasticsearch-odfe/0.10.1.2/20210812193038
 
+4. journalbeat
+    * automate-backend-journalbeat
+      * Version: chef/journalbeat/6.8.6/20210812193038
 
+5. metricbeat
+    * automate-backend-metricbeat
+      * Version: chef/metricbeat/6.8.6/20210812193038
+
+6. kibana
+    * automate-backend-kibana
+      * Version: chef/kibana-odfe/0.10.0.4/20210812193038
+
+7. terraform
+    * automate-backend-deployment
+      * Version: core/terraform/0.12.26/20200922233119      
+
+8. aws-cli
+    * automate-backend-deployment
+      * Version: core/aws-cli/1.18.145/20200924113212
+
+9. ruby
+    * automate-cluster-ctl
+      * Version: core/ruby26
