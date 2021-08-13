@@ -26,7 +26,7 @@ func init() {
 var initConfigHACmd = &cobra.Command{
 	Use:   "init-config-ha",
 	Short: "Initialize default config for HA",
-	Long:  "Initializd default configuration for HA and save it to a file.",
+	Long:  "Initialized default configuration for HA and save it to a file.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
@@ -37,11 +37,11 @@ func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		msg := "one argument expected as any of deplyment mode like aws or existing_node. "
 		writer.Printf(msg)
-		return status.Wrap(errors.New(msg), status.ConfigError, msg)
+		return nil
 	} else if args[0] == "aws" {
 		writer.Printf("Generating initial automate high availability configuration for AWS deployment")
 		return runInitConfigAwsHACmd()
-	} else if args[0] == "existing_node" {
+	} else if args[0] == "bare_metal" {
 		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment")
 		return runInitConfigExistingNodeHACmd()
 	} else {

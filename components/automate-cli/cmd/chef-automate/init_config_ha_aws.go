@@ -18,6 +18,6 @@ func runInitConfigAwsHACmd() error {
 	if err != nil {
 		return status.Wrap(err, status.FileAccessError, "Writing initial configuration failed")
 	}
-	writer.Println("file generated " + initConfigHAPath)
+	writer.Printf("\nconfig initializatized in a generated file : %s", initConfigHAPath)
 	return nil
 }
