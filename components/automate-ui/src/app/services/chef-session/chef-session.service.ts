@@ -4,7 +4,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, retryWhen, delay } from 'rxjs/operators';
+import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
 import { environment } from 'environments/environment';
@@ -77,11 +77,10 @@ export class ChefSessionService implements CanActivate {
           this.isRefreshing = true;
           return this.refresh();
         }),
-        retryWhen(error =>
-          error.pipe(
-            delay(1000)  // retry in 1000ms if errored
-          )
-        )
+        retryWhen(error => {
+          this.isRefreshing = false;
+          return error.pipe(delay(500));  // retry in 500ms if errored
+        })
       ).subscribe(
         token => {
           this.ingestIDToken(token);
@@ -89,17 +88,8 @@ export class ChefSessionService implements CanActivate {
         },
         error => {
           this.isRefreshing = false;
-          if (error instanceof HttpErrorResponse) {
-            if (error.status === HTTP_STATUS_UNAUTHORIZED) {
-              this.logout();
-            } else {
-              console.log(`Session refresh failed: ${error.statusText}`);
-              return throwError(error);
-            }
-          } else {
-            console.log(error, 'retried after 1sec on error');
-            return throwError(error);
-          }
+          console.log(`Retried after 500ms on error: ${error}`);
+          return throwError(`Retried after 500ms on error: ${error}`);
         }
       );
     }
@@ -108,6 +98,7 @@ export class ChefSessionService implements CanActivate {
   private refresh(): Observable<string> {
     if (!this.id_token) {
       this.isRefreshing = false;
+      console.log('id_token is yet to be retrieved');
       return throwError('id_token is yet to be retrieved');
     }
     const httpOptions = {
@@ -119,6 +110,20 @@ export class ChefSessionService implements CanActivate {
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
+      }),
+      catchError(error => {
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === HTTP_STATUS_UNAUTHORIZED) {
+            this.logout();
+            return throwError(`Unauthorized: ${error.status}`);
+          } else {
+            console.log(`Session refresh failed: ${error.statusText}`);
+            return throwError(`Session refresh failed: ${error.statusText}`);
+          }
+        } else {
+          console.log(`Error calling /refresh ${error}`);
+          return throwError(`Error calling /refresh ${error}`);
+        }
       })
     );
   }
