@@ -76,8 +76,9 @@ func NewClient() *http.Client {
 }
 
 func TestDataFeedAPI(t *testing.T) {
-	fmt.Println("AWS_ACCESS_KEY_ID", len(automateAwsAccessKey))
-	fmt.Println("AWS_SECRET_ACCESS_KEY", len(automateAwsSecretAccessKey))
+	t.Logf("API TOKEN: %d", len(automateApiToken))
+	t.Logf("AWS_ACCESS_KEY_ID %d", len(automateAwsAccessKey))
+	t.Logf("AWS_SECRET_ACCESS_KEY %d", len(automateAwsSecretAccessKey))
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
