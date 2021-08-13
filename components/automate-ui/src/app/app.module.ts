@@ -374,6 +374,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
+    UserPreferencesRequests,
     UserRequests
   ],
   bootstrap: [ AppComponent ],
