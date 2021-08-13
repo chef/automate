@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 	"net"
 	"net/http"
 	"net/url"
@@ -46,20 +47,21 @@ type BldrClient struct {
 
 // Server holds the server state
 type Server struct {
-	mux               http.Handler
-	log               logger.Logger
-	pgDB              *sql.DB
-	mgr               *scs.Manager
-	client            oidc.Client
-	bldrClient        *BldrClient
-	signInURL         *url.URL
-	remainingDuration time.Duration
-	serviceCerts      *certs.ServiceCerts
-	connFactory       *secureconn.Factory
-	grpcServer        *grpc.Server
-	httpServer        *http.Server
-	errC              chan error
-	sigC              chan os.Signal
+	mux                http.Handler
+	log                logger.Logger
+	pgDB               *sql.DB
+	mgr                *scs.Manager
+	client             oidc.Client
+	bldrClient         *BldrClient
+	signInURL          *url.URL
+	remainingDuration  time.Duration
+	serviceCerts       *certs.ServiceCerts
+	connFactory        *secureconn.Factory
+	grpcServer         *grpc.Server
+	httpServer         *http.Server
+	errC               chan error
+	sigC               chan os.Signal
+	idTokenBlackLister IdTokenBlackLister.IdTokenBlackLister
 }
 
 const (
@@ -129,11 +131,12 @@ func New(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr:          scsManager,
-		serviceCerts: serviceCerts,
-		connFactory:  factory,
-		errC:         make(chan error, 5),
-		sigC:         make(chan os.Signal, 2),
+		mgr:                scsManager,
+		serviceCerts:       serviceCerts,
+		connFactory:        factory,
+		errC:               make(chan error, 5),
+		sigC:               make(chan os.Signal, 2),
+		idTokenBlackLister: IdTokenBlackLister.NewPgBlackLister(pgDB),
 	}
 	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
 
@@ -167,7 +170,8 @@ func NewInMemory(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr: scsManager,
+		mgr:                scsManager,
+		idTokenBlackLister: IdTokenBlackLister.NewInMemoryBlackLister(),
 	}
 	s.initHandlers()
 
@@ -233,7 +237,7 @@ func (s *Server) StartGRPCServer(addr string) error {
 	s.log.Debugf("listening (grpc) on %s", addr)
 	s.grpcServer = s.connFactory.NewServer()
 
-	id_token.RegisterValidateIdTokenServiceServer(s.grpcServer, &IdTokenValidator{pgDB: s.pgDB})
+	id_token.RegisterValidateIdTokenServiceServer(s.grpcServer, &IdTokenValidator{pgDB: s.pgDB, idTokenBlackLister: s.idTokenBlackLister})
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -261,13 +265,11 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
-	sqlStatement := `
-		INSERT INTO blacklisted_id_tokens (token)
-		VALUES ($1)`
-
-	_, err = s.pgDB.Exec(sqlStatement, idToken) // Dump id_token in blacklisted_id_tokens
+	err = s.idTokenBlackLister.InsertToBlackListedStore(idToken)
 	if err != nil {
-		panic(err)
+		s.log.Debug("Failed to blacklist token:")
+		httpError(w, http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(http.StatusOK)
 }

@@ -124,15 +124,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		version.GitSHA,
 	))
 
-	authenticators := make(map[string]authenticator.Authenticator)
-	for authnID, authnCfg := range c.Authenticators {
-		authn, err := authnCfg.Open(c.Upstream, c.ServiceCerts, c.Logger)
-		if err != nil {
-			return nil, errors.Wrapf(err, "initialize authenticator %s", authnID)
-		}
-		authenticators[authnID] = authn
-	}
-
 	teamsConn, err := factory.Dial("teams-service", c.TeamsAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
@@ -159,6 +150,15 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		}
 	} else {
 		c.Logger.Debug("no tokens adapter defined")
+	}
+
+	authenticators := make(map[string]authenticator.Authenticator)
+	for authnID, authnCfg := range c.Authenticators {
+		authn, err := authnCfg.Open(c.Upstream, c.ServiceCerts, c.Logger, sessionClient)
+		if err != nil {
+			return nil, errors.Wrapf(err, "initialize authenticator %s", authnID)
+		}
+		authenticators[authnID] = authn
 	}
 
 	s := &Server{

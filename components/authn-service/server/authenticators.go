@@ -26,7 +26,7 @@ import (
 
 // AuthenticatorConfig is a configuration that can open an authenticator.
 type AuthenticatorConfig interface {
-	Open(*url.URL, *certs.ServiceCerts, *zap.Logger) (authenticator.Authenticator, error)
+	Open(*url.URL, *certs.ServiceCerts, *zap.Logger, id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error)
 }
 
 // AuthenticatorsConfig variable provides an easy way to return a config struct
