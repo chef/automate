@@ -32,6 +32,7 @@ describe('delete missing node from UI', () => {
 
     // wait for nodes to be marked missing
     cy.waitUntilNodeIsMissing(clientRunsNodeId);
+    cy.restoreStorage();
   });
 
   after(() => {
@@ -46,6 +47,14 @@ describe('delete missing node from UI', () => {
         every: '15m'
       }
     });
+  });
+
+  beforeEach(() => {
+    cy.restoreStorage();
+  });
+
+  afterEach(() => {
+    cy.saveStorage();
   });
 
   it('from client runs page delete nodes', () => {

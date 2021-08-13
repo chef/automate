@@ -10,6 +10,14 @@ if (Cypress.env('SKIP_SSO')) {
         cy.visit('/');
       });
 
+      beforeEach(() => {
+        cy.restoreStorage();
+      });
+    
+      afterEach(() => {
+        cy.saveStorage();
+      });
+
       it('greets with SSO page', () => {
         cy.url()
           .should('include', '/dex/auth?')
