@@ -5,7 +5,11 @@ import {
   Output,
   HostBinding
 } from '@angular/core';
-import { CookbookRuleList, CookbookDependencyList } from '../policy-file-details/policy-file-details.component';
+import {
+  CookbookRuleList,
+  CookbookDependencyList,
+  CookbookList
+} from '../policy-file-details/policy-file-details.component';
 
 @Component({
   selector: 'app-cookbook-dependencies',
@@ -24,6 +28,7 @@ export class CookbookDependenciesComponent {
   public activeCookbooks: string;
   public showDependenciesRules = false;
   public showCookbooks = false;
+  public cookbooks: CookbookList[] = [];
   public cookbookRules: CookbookRuleList[] = [];
   public cookbookDependencies: CookbookDependencyList[] = [];
 
@@ -37,7 +42,8 @@ export class CookbookDependenciesComponent {
     this.isSlideOpen = !this.isSlideOpen;
   }
 
-  slidePanel(cookbookRuleList, cookbookDependencyList) {
+  slidePanel(cookbookRuleList, cookbookDependencyList, cookbookList) {
+    this.cookbooks = cookbookList;
     this.cookbookRules = cookbookRuleList;
     this.cookbookDependencies = cookbookDependencyList;
     this.isSlideOpen = true;

@@ -67,7 +67,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('environments')) {
           this.resetTabs();
           this.environmentsTab = true;
-        } else if (path.includes('policyFiles')) {
+        } else if (path.includes('policyfiles')) {
           this.resetTabs();
           this.policyFilesTab = true;
         } else if (path.includes('data-bags')) {
@@ -153,7 +153,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.nodesTab = true;
         break;
       case 6:
-        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyFiles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyfiles');
         this.resetTabs();
         this.policyFilesTab = true;
         break;
