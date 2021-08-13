@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { PolicyFile } from './policy-file.model';
+import { PolicyFile, IncludedPolicyLocks } from './policy-file.model';
 
 export enum PolicyFileActionTypes {
   GET_ALL            = 'POLICYFILES::GET_ALL',
@@ -26,7 +26,7 @@ export interface PolicyFilesSuccessPayload {
 
 export interface PolicyGroupSuccessPayload {
   name: string;
-  policies: [];
+  policies: IncludedPolicyLocks[];
   uri: string;
 }
 
