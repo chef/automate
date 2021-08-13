@@ -19,7 +19,7 @@ var (
 	automateAwsRegion          = "us-west-2"
 	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
 	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	automateAwsBucket          = "a2-data-feed-s3-integration-test"
+	automateAwsBucket          = "a2-backup-restore-test"
 	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
 	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
 	emptyAddData               = []byte(`{}`)
