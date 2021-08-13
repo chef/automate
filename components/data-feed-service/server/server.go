@@ -159,7 +159,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		sess := service.ConnectAWS(cred, url, serviceType)
 		_, err := service.FileUploadInAws(sess, cred, messageBytes, "TestConnection")
 		if err != nil {
-			log.Error("Error creating Sending data to", serviceType)
+			log.Error("Error creating Sending data to ", serviceType)
 			return response, err
 		} else {
 			response.Success = true
