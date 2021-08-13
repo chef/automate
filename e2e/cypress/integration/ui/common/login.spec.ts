@@ -13,7 +13,7 @@ if (Cypress.env('SKIP_SSO')) {
       beforeEach(() => {
         cy.restoreStorage();
       });
-    
+
       afterEach(() => {
         cy.saveStorage();
       });
