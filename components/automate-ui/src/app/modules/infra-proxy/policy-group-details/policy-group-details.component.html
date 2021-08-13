@@ -1,0 +1,42 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy Groups
+        </chef-breadcrumb>
+        {{policyGroup?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <div class="header">
+          <chef-heading data-cy="policy-group-head">{{policyGroup?.name}}</chef-heading>
+        </div>
+        <div class="meta-box">
+          <div class="summary-body">
+            <h3 class="meta-head">Policy Group Information</h3>
+            <ul>
+              <li id="revision-id" class="revision-id">
+                <span class="heading">No. of Policyfiles</span>
+                <span>{{policyCount}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="summary-body">
+            <h3 class="meta-head">Metadata</h3>
+            <ul>
+              <li id="chef-server">
+                <span class="heading">Chef Server</span>
+                <span data-cy="policy-group-server">{{serverId}}</span>
+              </li>
+              <li>
+                <span class="heading" id="chef-organization">Chef Organization</span>
+                <span data-cy="policy-group-org">{{orgId}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </chef-page-header>
+    </main>
+  </div>
+</div>

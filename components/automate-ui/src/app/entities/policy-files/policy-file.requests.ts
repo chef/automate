@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { PolicyFilesSuccessPayload } from './policy-file.action';
+import { PolicyFilesSuccessPayload, PolicyGroupSuccessPayload } from './policy-file.action';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 import { PolicyFile } from './policy-file.model';
 
@@ -28,5 +28,11 @@ export class PolicyFileRequests {
   Observable<PolicyFile> {
     return this.http.get<PolicyFile>(
       `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/policyfiles/${name}?revision_id=${revision}`, {headers});
+  }
+
+  public getPolicyGroup(server_id: string, org_id: string, name: string):
+    Observable<PolicyGroupSuccessPayload> {
+    return this.http.get<PolicyGroupSuccessPayload>(
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/policygroups/${name}`, {headers});
   }
 }
