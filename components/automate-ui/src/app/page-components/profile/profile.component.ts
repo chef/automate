@@ -49,11 +49,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     public userPrefsService: UserPreferencesService
   ) {
     this.isLocalUser = chefSessionService.isLocalUser;
-    this.isProfileMenuVisible = userPrefsService.uiSettings.isProfileMenu;
   }
 
   ngOnInit() {
     this.displayName = this.chefSessionService.fullname;
+    this.isProfileMenuVisible = this.userPrefsService.uiSettings.isProfileMenu;
 
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
