@@ -49,17 +49,10 @@ describe('delete missing node from UI', () => {
     });
   });
 
-  beforeEach(() => {
-    cy.restoreStorage();
-  });
-
-  afterEach(() => {
-    cy.saveStorage();
-  });
-
   it('from client runs page delete nodes', () => {
     cy.adminLogin('/infrastructure/client-runs').then(() => {
       cy.get('app-welcome-modal').invoke('hide');
+      cy.restoreStorage();
     });
 
     // Check the check box to delete all missing nodes
