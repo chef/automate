@@ -89,7 +89,7 @@ export class ChefSessionService implements CanActivate {
         error => {
           this.isRefreshing = false;
           console.log(`Retried after 500ms on error: ${error}`);
-          return throwError('error');
+          return throwError(`Retried after 500ms on error: ${error}`);
         }
       );
     }
@@ -99,7 +99,7 @@ export class ChefSessionService implements CanActivate {
     if (!this.id_token) {
       this.isRefreshing = false;
       console.log('id_token is yet to be retrieved');
-      return throwError('error');
+      return throwError('id_token is yet to be retrieved');
     }
     const httpOptions = {
       headers: new HttpHeaders({
@@ -115,13 +115,14 @@ export class ChefSessionService implements CanActivate {
         if (error instanceof HttpErrorResponse) {
           if (error.status === HTTP_STATUS_UNAUTHORIZED) {
             this.logout();
+            return throwError(`Unauthorized: ${error.status}`);
           } else {
             console.log(`Session refresh failed: ${error.statusText}`);
-            return throwError('error');
+            return throwError(`Session refresh failed: ${error.statusText}`);
           }
         } else {
           console.log(`Error calling /refresh ${error}`);
-          return throwError('error');
+          return throwError(`Error calling /refresh ${error}`);
         }
       })
     );
