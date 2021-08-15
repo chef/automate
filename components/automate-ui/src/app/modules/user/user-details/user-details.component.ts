@@ -54,6 +54,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public timeformatControl = {
     isTimeformatDirty: false
   };
+  public isResetPwdTab = true;
+  public userType = 'local';
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
@@ -110,6 +113,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       const [, fragment] = url.split('#');
       this.tabValue = (fragment === 'password') ? 'password' : 'details';
     });
+
+    if (this.userPrefsService.uiSettings) {
+      this.isResetPwdTab = this.userPrefsService.uiSettings.isResetPasswordTabVisible;
+      this.userType = this.userPrefsService.uiSettings.userType;
+    }
   }
 
   ngOnDestroy(): void {
