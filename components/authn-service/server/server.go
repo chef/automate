@@ -58,7 +58,6 @@ type Server struct {
 	policiesClient authz.PoliciesServiceClient
 	authzClient    authz.AuthorizationServiceClient
 	health         *health.Service
-	sessionClient  id_token.ValidateIdTokenServiceClient
 }
 
 // NewServer constructs a server from the provided config.
