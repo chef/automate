@@ -98,7 +98,9 @@ var a2Config = config{
 
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
-
+                
+		// A2HA Component sample keys and certificates
+		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
 		// Test data from workflow
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},
