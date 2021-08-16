@@ -48,6 +48,7 @@ import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';
 import { UserSelfEffects } from './entities/users/userself.effects';
 import { UserPermEffects } from './entities/userperms/userperms.effects';
+import { UserPreferencesEffects } from './services/user-preferences/user-preferences.effects';
 
 @NgModule({
   imports: [
@@ -96,7 +97,8 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       TeamEffects,
       UserEffects,
       UserSelfEffects,
-      UserPermEffects
+      UserPermEffects,
+      UserPreferencesEffects
     ])
   ],
   exports: [

@@ -9,6 +9,7 @@ import (
 	chef "github.com/go-chef/chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strings"
 )
 
 // GetPolicyfiles gets a list of all policy files
@@ -75,7 +76,65 @@ func (s *Server) GetPolicyfile(ctx context.Context, req *request.Policyfile) (*r
 		CookbookLocks:       fromAPICookbookLocks(policy.CookbookLocks),
 		DefaultAttributes:   string(defaultAttrs),
 		OverrideAttributes:  string(overrideAttrs),
+		SolutionDependecies: FromAPIIncludedSolutionDependencies(policy.SolutionDependencies),
 	}, nil
+
+}
+
+func FromAPIIncludedSolutionDependencies(sp chef.SolutionDep) []*response.SolutionDependencies {
+	dData := make([]*response.SolutionDependencies, 0)
+	for _, p := range sp.PolicyFile {
+		if len(p) == 0 {
+			continue
+		}
+		dependencies := make([]*response.DepedenciesData, 0)
+		name := strings.TrimSpace(p[0])
+		ver := "0.0.0"
+		if len(p) == 2 {
+			ver = strings.TrimSpace(p[1])
+		}
+
+		value, ok := sp.Dependencies.(map[string]interface{})
+		// Check for type conversion failure
+		if ok {
+			for key, v := range value {
+				val, ok := v.([]interface{})
+				if !ok {
+					continue
+				}
+				cookBookName := strings.Split(key, " ")[0]
+				if cookBookName == name {
+					for _, value := range val {
+						cookDeps := value.([]interface{})
+						if len(cookDeps) == 0 {
+							continue
+						}
+						dependencyName, ok := cookDeps[0].(string)
+						if !ok {
+							continue
+						}
+						dependencyVersion := "0.0.0"
+						if len(cookDeps) > 1 {
+							dependencyVersion = cookDeps[1].(string)
+						}
+						item1 := &response.DepedenciesData{
+							Name:    dependencyName,
+							Version: dependencyVersion,
+						}
+						dependencies = append(dependencies, item1)
+					}
+				}
+			}
+
+		}
+		solDep := &response.SolutionDependencies{
+			Name:         name,
+			Version:      ver,
+			Dependencies: dependencies,
+		}
+		dData = append(dData, solDep)
+	}
+	return dData
 
 }
 

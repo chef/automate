@@ -2,7 +2,6 @@ package infra_proxy
 
 import (
 	"context"
-
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
@@ -47,7 +46,30 @@ func (a *InfraProxyServer) GetPolicyfile(ctx context.Context, r *gwreq.Policyfil
 		CookbookLocks:       fromUpstreamCookbookLocks(res.GetCookbookLocks()),
 		DefaultAttributes:   res.GetDefaultAttributes(),
 		OverrideAttributes:  res.GetOverrideAttributes(),
+		SolutionDependecies: FromUpstreamIncludeSolutionDependecies(res.SolutionDependecies),
 	}, nil
+}
+
+func FromUpstreamIncludeSolutionDependecies(sp []*infra_res.SolutionDependencies) []*gwres.SolutionDependencies {
+	sol_d_data := make([]*gwres.SolutionDependencies, 0)
+	for _, cb := range sp {
+		d_data := make([]*gwres.DepedenciesData, 0)
+		for _, cbb := range cb.Dependencies {
+			data1 := &gwres.DepedenciesData{
+				Name:    cbb.Name,
+				Version: cbb.Version,
+			}
+			d_data = append(d_data, data1)
+		}
+		data2 := &gwres.SolutionDependencies{
+			Name:         cb.GetName(),
+			Version:      cb.GetVersion(),
+			Dependencies: d_data,
+		}
+		sol_d_data = append(sol_d_data, data2)
+	}
+
+	return sol_d_data
 }
 
 func fromUpstreamPolicyfiles(policies []*infra_res.PolicyfileListItem) []*gwres.PolicyfileListItem {

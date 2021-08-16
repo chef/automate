@@ -301,3 +301,10 @@ chef-ci ALL=(ALL) NOPASSWD:ALL
 EOH
 sudo mv /tmp/chef-ci-sudoer /etc/sudoers.d/10-chef-ci
 sudo chmod 0440 /etc/sudoers.d/10-chef-ci
+
+# Add chef-ci to sshd_config in hardened image
+if [[ "${hardened_security}" == "true" ]]; then
+    sudo sed  -i -r "s/^AllowUsers (.*)/AllowUsers \\1 chef-ci/" /etc/ssh/sshd_config
+    sudo chmod 0644  /etc/ssh/sshd_config
+    sudo systemctl restart sshd.service
+fi

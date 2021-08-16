@@ -4,13 +4,14 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, retryWhen, delay } from 'rxjs/operators';
+import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 
 import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
 
+import { UserPreferencesService } from '../user-preferences/user-preferences.service';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -23,6 +24,7 @@ export interface ChefSessionUser {
   telemetry_enabled?: boolean;
   uuid: string;
   id_token: string;
+  connector?: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -44,7 +46,9 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>,
+     handler: HttpBackend,
+     private userPrefService: UserPreferencesService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     this.tokenProvider = new ReplaySubject(1);
@@ -73,11 +77,10 @@ export class ChefSessionService implements CanActivate {
           this.isRefreshing = true;
           return this.refresh();
         }),
-        retryWhen(error =>
-          error.pipe(
-            delay(1000)  // retry in 1000ms if errored
-          )
-        )
+        retryWhen(error => {
+          this.isRefreshing = false;
+          return error.pipe(delay(500));  // retry in 500ms if errored
+        })
       ).subscribe(
         token => {
           this.ingestIDToken(token);
@@ -85,17 +88,8 @@ export class ChefSessionService implements CanActivate {
         },
         error => {
           this.isRefreshing = false;
-          if (error instanceof HttpErrorResponse) {
-            if (error.status === HTTP_STATUS_UNAUTHORIZED) {
-              this.logout();
-            } else {
-              console.log(`Session refresh failed: ${error.statusText}`);
-              return throwError(error);
-            }
-          } else {
-            console.log(error, 'retried after 1sec on error');
-            return throwError(error);
-          }
+          console.log(`Retried after 500ms on error: ${error}`);
+          return throwError(`Retried after 500ms on error: ${error}`);
         }
       );
     }
@@ -104,6 +98,7 @@ export class ChefSessionService implements CanActivate {
   private refresh(): Observable<string> {
     if (!this.id_token) {
       this.isRefreshing = false;
+      console.log('id_token is yet to be retrieved');
       return throwError('id_token is yet to be retrieved');
     }
     const httpOptions = {
@@ -115,6 +110,20 @@ export class ChefSessionService implements CanActivate {
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
+      }),
+      catchError(error => {
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === HTTP_STATUS_UNAUTHORIZED) {
+            this.logout();
+            return throwError(`Unauthorized: ${error.status}`);
+          } else {
+            console.log(`Session refresh failed: ${error.statusText}`);
+            return throwError(`Session refresh failed: ${error.statusText}`);
+          }
+        } else {
+          console.log(`Error calling /refresh ${error}`);
+          return throwError(`Error calling /refresh ${error}`);
+        }
       })
     );
   }
@@ -159,6 +168,7 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
+    this.initializeUserPreference(this.user);
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -178,6 +188,7 @@ export class ChefSessionService implements CanActivate {
       isLocalUser
     };
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.initializeUserPreference(this.user);
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -245,6 +256,10 @@ export class ChefSessionService implements CanActivate {
     return;
   }
 
+  get connector(): string {
+    return this.user.connector;
+  }
+
   get token_provider(): ReplaySubject<string> {
     return this.tokenProvider;
   }
@@ -292,5 +307,13 @@ export class ChefSessionService implements CanActivate {
   isLocalUserFromId(id: IDToken): boolean {
     return id.federated_claims &&
       id.federated_claims.connector_id === 'local';
+  }
+
+  initializeUserPreference(user) {
+    const id: IDToken = Jwt.parseIDToken(user.id_token);
+    if (id && id.federated_claims) {
+      user.connector = id.federated_claims.connector_id;
+      this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
+    }
   }
 }

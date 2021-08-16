@@ -32,6 +32,9 @@ import {
 } from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { UpdateUserPreferences } from 'app/services/user-preferences/user-preferences.actions';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 export type UserTabName = 'password' | 'details';
 
@@ -46,13 +49,18 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public tabValue: UserTabName = 'details';
   private url: string;
   public userDetails: UserDetails;
-
+  public timeformat: string;
+  public timeformatControl = {
+    isTimeformatDirty: false
+  };
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    public userPrefsService: UserPreferencesService,
+    private chefSessionService: ChefSessionService
   ) { }
 
   ngOnInit(): void {
@@ -64,7 +72,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       if (data.isNonAdmin) {
         this.layoutFacade.showSidebar(Sidebar.Settings);
         this.userDetails = new UserProfileDetails(
-          this.store, this.layoutFacade, this.isDestroyed, this.fb);
+          this.store, this.layoutFacade, this.isDestroyed, this.fb,
+          this.userPrefsService, this.chefSessionService);
         this.loading = false;
       } else {
         this.layoutFacade.showSidebar(Sidebar.Profile);
@@ -81,10 +90,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         ]).subscribe(([routeId, currentUserId]: [string, string]) => {
           if (routeId === currentUserId) {
             this.userDetails = new UserAdminSelfDetails(
-              this.store, this.layoutFacade, this.isDestroyed, this.fb);
+              this.store, this.layoutFacade, this.isDestroyed, this.fb,
+              this.userPrefsService, this.chefSessionService);
           } else {
             this.userDetails = new UserAdminDetails(routeId,
-              this.store, this.layoutFacade, this.isDestroyed, this.fb);
+              this.store, this.layoutFacade, this.isDestroyed, this.fb,
+              this.userPrefsService, this.chefSessionService);
           }
           this.loading = false;
         });
@@ -114,6 +125,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public handlePasswordInput(): void {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
   }
+
+  public handleTimeFormatChange(): void {
+    this.timeformatControl.isTimeformatDirty = true;
+  }
 }
 
 abstract class UserDetails {
@@ -126,7 +141,9 @@ abstract class UserDetails {
   abstract showBreadcrumbs: boolean;
   abstract showPreviousPassword: boolean;
 
-  constructor(private store: Store<NgrxStateAtom>) {}
+  constructor(private store: Store<NgrxStateAtom>,
+     private userPrefsService: UserPreferencesService,
+     private chefSessionService: ChefSessionService) {}
 
   public savePassword(): void {
     this.saveSuccessful = false;
@@ -135,11 +152,25 @@ abstract class UserDetails {
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
   }
 
-  public saveDisplayName(): void {
+  public saveUserPreference(timeformat, timeformatControl): void {
+    const payload = {
+      user: {
+         name: this.chefSessionService.username,
+         connector: this.chefSessionService.connector
+      },
+      settings: {
+       date_format: {
+         value: timeformat.value
+       }
+      }
+     };
     this.saveSuccessful = false;
     this.saveInProgress = true;
     const name = this.displayNameForm.get('displayName').value.trim();
     this.store.dispatch(this.createUpdateNameUserAction(name));
+    this.store.dispatch(new UpdateUserPreferences(payload));
+    this.userPrefsService.setUserTimeformatInternal(timeformat.value);
+    timeformatControl.isTimeformatDirty = false;
   }
 
   protected abstract createPasswordForm(fb: FormBuilder): FormGroup;
@@ -174,8 +205,11 @@ class UserAdminDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService
+    ) {
+      super(store, userPrefsService, chefSessionService);
 
       store.dispatch(new GetUser({ id: userId }));
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -242,8 +276,10 @@ class UserAdminSelfDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService) {
+      super(store, userPrefsService, chefSessionService);
 
       store.dispatch(new GetUserSelf());
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -321,8 +357,10 @@ class UserProfileDetails extends UserDetails {
     store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
-    fb: FormBuilder) {
-      super(store);
+    fb: FormBuilder,
+    userPrefsService: UserPreferencesService,
+    chefSessionService: ChefSessionService) {
+      super(store, userPrefsService, chefSessionService);
 
       store.dispatch(new GetUserSelf());
       layoutFacade.showSidebar(Sidebar.Profile);

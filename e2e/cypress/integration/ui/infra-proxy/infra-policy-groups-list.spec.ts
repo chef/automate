@@ -105,6 +105,27 @@ describe('infra policy groups', () => {
     }
   }
 
+  // tslint:disable-next-line:no-shadowed-variable
+  function filterPolicyGroup(policies: any) {
+    const policyGroups: any = [];
+    const key = 'policy_group';
+    policies.forEach((x: any) => {
+      if (policyGroups.some((val: any) => val[key] === x[key])) {
+        policyGroups.forEach((k: any) => {
+          if (k[key] === x[key]) {
+            k['occurrence']++;
+          }
+        });
+      } else {
+        const a: any = [];
+        a[key] = x[key];
+        a['occurrence'] = 1;
+        policyGroups.push(a);
+      }
+    });
+    return policyGroups;
+  }
+
   describe('infra policy group list page', () => {
     it('displays org details', () => {
       cy.get('.page-title').contains(orgName);
@@ -136,6 +157,20 @@ describe('infra policy groups', () => {
 
             cy.get('[data-cy=search-filter]').clear();
             cy.get('[data-cy=search-entity]').click();
+          }
+        });
+      });
+    });
+
+    context('can change page in policy file', () => {
+      it('can change page and load data according to page', () => {
+        getPolicyGroups().then((response) => {
+          if (checkResponse(response)) {
+            const groupCount = filterPolicyGroup(policies);
+            if (groupCount > 9 &&
+              cy.get('.policy-group-list-paging .page-picker-item').contains('3')) {
+              cy.get('.policy-file-paging .page-picker-item').contains('3').click();
+            }
           }
         });
       });

@@ -12,6 +12,7 @@ import { ClientDetailsComponent } from './client-details/client-details.componen
 import { CreateClientModalComponent } from './create-client-modal/create-client-modal.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
+import { CookbookDependenciesComponent } from './cookbook-dependencies/cookbook-dependencies.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateEnvironmentModalComponent } from './create-environment-modal/create-environment-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
@@ -67,6 +68,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ClientDetailsComponent,
     CookbooksComponent,
     CookbookDetailsComponent,
+    CookbookDependenciesComponent,
     CreateChefServerModalComponent,
     CreateEnvironmentModalComponent,
     CreateOrgModalComponent,
