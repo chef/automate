@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"go.uber.org/zap"
 
 	tokenmock "github.com/chef/automate/components/authn-service/tokens/mock"
@@ -99,7 +100,8 @@ func TestTokenAuthWithBackend(t *testing.T) {
 					},
 				},
 			}
-			authn, err := cfg.Open(u, nil, logger)
+			var idTokenValidatorClient id_token.ValidateIdTokenServiceClient
+			authn, err := cfg.Open(u, nil, logger, idTokenValidatorClient)
 			if err != nil {
 				t.Fatal(err)
 			}

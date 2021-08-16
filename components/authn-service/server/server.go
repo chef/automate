@@ -170,7 +170,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		connFactory:    factory,
 		teamsClient:    teams.NewTeamsServiceClient(teamsConn),
 		health:         health.NewService(),
-		sessionClient:  sessionClient,
 	}
 
 	// make grpc-go log through zap
