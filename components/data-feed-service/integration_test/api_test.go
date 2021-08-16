@@ -11,29 +11,36 @@ import (
 	"os"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	s3 "github.com/aws/aws-sdk-go/service/s3"
+	dataFeedService "github.com/chef/automate/components/data-feed-service/service"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	automateApiToken           = os.Getenv("AUTOMATE_API_TOKEN")
-	automateAwsRegion          = "us-west-2"
-	automateAwsAccessKey       = os.Getenv("AWS_ACCESS_KEY_ID")
-	automateAwsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	automateAwsBucket          = "a2-backup-restore-test"
-	addData                    = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
-	addDataValues              = []string{"test", "https://test.com", "secret", "custom", "webhook"}
-	emptyAddData               = []byte(`{}`)
-	updateDataValues           = []string{"test update", "https://update.test.com", "updated secret"}
-	testSuccessData            = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
-	testFailsData              = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
-	testSuccessHeaderData      = []byte(`{"url":"http://localhost:38080/success", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
-	testFailsHeaderData        = []byte(`{"url":"http://localhost:38080/fails", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
-	testSuccessAwsData         = []byte(`{"url":"null", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
-	testFailsAwsData           = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"automateAwsBucket","region":"` + automateAwsRegion + `"}}`)
-	testSuccessMinioData       = []byte(`{"url":"http://ec2-13-233-122-5.ap-south-1.compute.amazonaws.com:9000", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
-	testFailsMinioData         = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
-	secretData                 = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
-	updateData                 = []byte(`{"name":"test update",
+	automateApiToken             = os.Getenv("AUTOMATE_API_TOKEN")
+	automateAwsRegion            = "us-west-2"
+	automateAwsAccessKey         = os.Getenv("AWS_ACCESS_KEY_ID")
+	automateAwsSecretAccessKey   = os.Getenv("AWS_SECRET_ACCESS_KEY")
+	automateAwsBucket            = "a2-backup-restore-test"
+	addData                      = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
+	addDataValues                = []string{"test", "https://test.com", "secret", "custom", "webhook"}
+	emptyAddData                 = []byte(`{}`)
+	updateDataValues             = []string{"test update", "https://update.test.com", "updated secret"}
+	testSuccessData              = []byte(`{"url":"http://localhost:38080/success", "username_password": {"username":"user", "password":"password"}}`)
+	testFailsData                = []byte(`{"url":"http://localhost:38080/fails", "username_password": {"username":"user", "password":"password"}}`)
+	testSuccessHeaderData        = []byte(`{"url":"http://localhost:38080/success", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
+	testFailsHeaderData          = []byte(`{"url":"http://localhost:38080/fails", "header": {"value":"{\"Authorization\":\"Splunk 6f01b869-c181-4fb2-a74c-b619e6197a85\"}"}}`)
+	testSuccessAwsData           = []byte(`{"url":"null", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"` + automateAwsBucket + `","region":"` + automateAwsRegion + `"}}`)
+	testFailsAwsData             = []byte(`{"url":"http://localhost:38080/fails", "aws": {"access_key":"` + automateAwsAccessKey + `","secret_access_key":"` + automateAwsSecretAccessKey + `","bucket":"automateAwsBucket","region":"` + automateAwsRegion + `"}}`)
+	testFailsMinioData           = []byte(`{"url":"http://127.0.0.1:9000", "aws": {"access_key":"minioadmin","secret_access_key":"minioadmin","bucket":"newtest","region":"` + automateAwsRegion + `"}}`)
+	automateMinioUrl             = "http://localhost:9000"
+	automateMinioAccessKey       = "minioadmin"
+	automateMinioSecretAccessKey = "minioadmin"
+	automateMinioBucket          = "minio-storage-test-connection"
+	secretData                   = []byte(`{"name":"integration test secret","type":"data_feed","data":[{"key":"username","value":"user"},{"key":"password","value":"password"}]}`)
+	updateData                   = []byte(`{"name":"test update",
 										  	"url":"https://update.test.com", 
 										  	"secret":"updated secret",
 										  	"services": "S3",
@@ -74,7 +81,35 @@ func NewClient() *http.Client {
 	}
 	return &http.Client{Transport: transport}
 }
+func CreateMinioBucket(t *testing.T) ([]byte, error) {
+	cred := dataFeedService.NewS3Credentials(automateMinioAccessKey, automateMinioSecretAccessKey, "us-east-2", "null")
+	sess := dataFeedService.ConnectAWS(cred, automateMinioUrl, dataFeedService.Minio)
+	svc := s3.New(sess)
+	input := &s3.CreateBucketInput{
+		Bucket: aws.String(automateMinioBucket),
+	}
+	var testSuccessMinioData []byte
+	_, err := svc.CreateBucket(input)
+	if err != nil {
+		if awserr, ok := err.(awserr.Error); ok {
+			switch awserr.Code() {
+			case s3.ErrCodeBucketAlreadyExists:
+				t.Log(awserr.Error())
+			case s3.ErrCodeBucketAlreadyOwnedByYou:
+				t.Log(awserr.Error())
+			default:
+				return nil, awserr
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			return nil, err
+		}
+	}
+	testSuccessMinioData = []byte(`{"url":"` + automateMinioUrl + `", "aws": {"access_key":"` + automateMinioAccessKey + `","secret_access_key":"` + automateMinioSecretAccessKey + `","bucket":"` + automateMinioBucket + `","region":"us-east-2"}}`)
 
+	return testSuccessMinioData, nil
+}
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %d", len(automateApiToken))
 	t.Logf("AWS_ACCESS_KEY_ID %s", automateAwsAccessKey)
@@ -155,16 +190,21 @@ func TestDeleteNonExistent(t *testing.T) {
 func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
 	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
-	testDestinationAwsRequestSuccess(t, testSuccessAwsData)
-	// testDestinationMinioRequestSuccess(t, testSuccessMinioData)
+	// testDestinationAwsRequestSuccess(t, testSuccessAwsData)
+	testSuccessMinioData, error := CreateMinioBucket(t)
+	if error != nil {
+		t.Log(error, "got while creating minio bucket")
+		t.Fail()
+	}
+	testDestinationMinioRequestSuccess(t, testSuccessMinioData)
 
 }
 
 func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
-	testDestinationAwsRequestFail(t, testFailsAwsData)
-	// testDestinationMinioRequestFail(t, testFailsMinioData)
+	// testDestinationAwsRequestFail(t, testFailsAwsData)
+	testDestinationMinioRequestFail(t, testFailsMinioData)
 }
 
 func TestDestinationWithSecret(t *testing.T) {
@@ -489,7 +529,7 @@ func testDestinationMinioRequestFail(t *testing.T, data []byte) {
 		if assert.Equal(t, 500, response.StatusCode, "Expected 500, got %d", response.StatusCode) {
 			responseBody, err := parseResponse(response.Body)
 			assert.Nil(t, err, "Error parsing response %v", err)
-			assert.Equal(t, "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"], "NotFound: Not Found\n\tstatus code: 404, request id: , host id: ", responseBody["error"])
+			assert.Contains(t, responseBody["error"], "NoSuchBucket: The specified bucket does not exist\n\tstatus code: 404")
 		}
 	}
 }
