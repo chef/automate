@@ -30,3 +30,9 @@ export interface Dependencies {
   name: string;
   version: string;
 }
+
+export interface PolicyGroup {
+  name: string;
+  policies: IncludedPolicyLocks[];
+  uri: string;
+}

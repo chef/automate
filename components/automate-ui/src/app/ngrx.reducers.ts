@@ -46,7 +46,8 @@ import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as policyFileEntity from './entities/policy-files/policy-file.reducer';
 import * as policyFileDetailsEntity from './entities/policy-files/policy-file-details.reducer';
-import * as PolicyGroupEntity from './entities/policy-files/policy-group.reducer';
+import * as policyGroupEntity from './entities/policy-files/policy-group.reducer';
+import * as policyGroupDetailsEntity from './entities/policy-files/policy-group-details.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as recipeEntity from './entities/recipes/recipe.reducer';
@@ -121,7 +122,8 @@ export interface NgrxStateAtom {
   policies: policyEntity.PolicyEntityState;
   policyFiles: policyFileEntity.PolicyFileEntityState;
   policyFileDetails: policyFileDetailsEntity.PolicyFileDetailsEntityState;
-  policyGroups: PolicyGroupEntity.PolicyGroupEntityState;
+  policyGroups: policyGroupEntity.PolicyGroupEntityState;
+  policyGroupDetails: policyGroupDetailsEntity.PolicyGroupDetailsEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
   recipes: recipeEntity.RecipeEntityState;
@@ -255,7 +257,8 @@ export const defaultInitialState = {
   policies: policyEntity.PolicyEntityInitialState,
   policyFiles: policyFileEntity.PolicyFileEntityInitialState,
   policyFileDetails: policyFileDetailsEntity.PolicyFileEntityInitialState,
-  policyGroups: PolicyGroupEntity.PolicyFileEntityInitialState,
+  policyGroups: policyGroupEntity.PolicyFileEntityInitialState,
+  policyGroupDetails: policyGroupDetailsEntity.PolicyFileEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
   recipes: recipeEntity.RecipeEntityInitialState,
@@ -327,7 +330,8 @@ export const ngrxReducers = {
   policies: policyEntity.policyEntityReducer,
   policyFiles: policyFileEntity.policyFileEntityReducer,
   policyFileDetails: policyFileDetailsEntity.policyFileDetailsEntityReducer,
-  policyGroups: PolicyGroupEntity.policyGroupsEntityReducer,
+  policyGroups: policyGroupEntity.policyGroupsEntityReducer,
+  policyGroupDetails: policyGroupDetailsEntity.policyGroupDetailsEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
   recipes: recipeEntity.recipeEntityReducer,
