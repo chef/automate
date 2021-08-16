@@ -12,6 +12,7 @@ import (
 	"errors"
 	"net/url"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"go.uber.org/zap"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
@@ -34,6 +35,6 @@ type HeaderTokenConfig struct { // "mock-header-token"
 	*mock
 }
 
-func (*mock) Open(_ *url.URL, _ *certs.ServiceCerts, _ *zap.Logger) (authenticator.Authenticator, error) {
+func (*mock) Open(_ *url.URL, _ *certs.ServiceCerts, _ *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 	return nil, mockErr
 }
