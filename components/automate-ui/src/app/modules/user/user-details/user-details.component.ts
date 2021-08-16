@@ -56,6 +56,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   };
   public isResetPwdTab = true;
   public userType = 'local';
+  public isDisplayNameEditable = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -117,6 +118,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     if (this.userPrefsService.uiSettings) {
       this.isResetPwdTab = this.userPrefsService.uiSettings.isResetPasswordTabVisible;
       this.userType = this.userPrefsService.uiSettings.userType;
+      this.isDisplayNameEditable = this.userPrefsService.uiSettings.isDisplayNameEditable;
     }
   }
 
