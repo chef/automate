@@ -72,5 +72,43 @@
         </div>
       </li>
     </ul>
+    <ul id="cookbook-accordion" class="accordion" >
+      <li class="items" [class.active]="showCookbooks">
+        <div class="menu" (click)="handleCookbooks()">
+          <div class="cookbook-name"  data-cy="cookbook">
+            Cookbooks
+          </div>
+          <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+        </div>
+        <div class="submenu" [ngClass]="showCookbooks ? activeCookbooks : ''">
+          <div class="item-details">
+            <div data-cy="empty-list" class="empty-section" *ngIf="!cookbooks.length">
+              <img alt="No preview" src="/assets/img/no_preview.gif" />
+              <p>No Cookbooks available</p>
+            </div>
+            <div id="cookbook-table-container" data-cy="cookbook-table-container" *ngIf="cookbooks.length">
+              <chef-table>
+                <chef-thead>
+                  <chef-tr class="no_border_tr">
+                    <chef-th class="no_border_th">Cookbooks</chef-th>
+                    <chef-th class="no_border_th">Current Version</chef-th>
+                    <chef-th class="no_border_th">Source</chef-th>
+                    <chef-th class="no_border_th three-dot-column"></chef-th>
+                  </chef-tr>
+                </chef-thead>
+                <chef-tbody>
+                  <chef-tr *ngFor="let cookbook of cookbooks">
+                    <chef-td>{{cookbook.name}}</chef-td>
+                    <chef-td>{{cookbook.version}}</chef-td>
+                    <chef-td>{{cookbook.source === '' ? '--' : cookbook.source}}</chef-td>
+                    <chef-td class="three-dot-column"></chef-td>
+                  </chef-tr>
+                </chef-tbody>
+              </chef-table>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </div>
