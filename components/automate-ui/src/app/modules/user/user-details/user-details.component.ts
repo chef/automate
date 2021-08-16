@@ -177,7 +177,7 @@ abstract class UserDetails {
      };
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    if (this.userPrefsService.uiSettings.isDisplayNameEditable) {
+    if (this.userPrefsService.uiSettings && this.userPrefsService.uiSettings.isDisplayNameEditable) {
       const name = this.displayNameForm.get('displayName').value.trim();
       this.store.dispatch(this.createUpdateNameUserAction(name));
     }
