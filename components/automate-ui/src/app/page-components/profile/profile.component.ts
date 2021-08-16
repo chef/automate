@@ -53,7 +53,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.displayName = this.chefSessionService.fullname;
-    this.isProfileMenuVisible = this.userPrefsService.uiSettings.isProfileMenu;
+    if (this.userPrefsService.uiSettings) {
+      this.isProfileMenuVisible = this.userPrefsService.uiSettings.isProfileMenu;
+    }
 
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
