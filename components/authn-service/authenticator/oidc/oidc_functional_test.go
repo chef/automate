@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
@@ -38,11 +39,12 @@ func TestNewAuthenticatorRedirectsOIDCRequestsAtUpstream(t *testing.T) {
 
 		clientID := "invisibility"
 		upstream, _ := url.Parse(up.URL)
+		var idTokenValidatorClient id_token.ValidateIdTokenServiceClient
 
 		// If this doesn't break, we've gotten discovery doc from upstream instead of
 		// from the issuer (which would have failed)
 		serviceCerts := helpers.LoadDevCerts(t, "authn-service")
-		_, err := NewAuthenticator(issuer, clientID, upstream, false, 0, serviceCerts, logger)
+		_, err := NewAuthenticator(issuer, clientID, upstream, false, 0, serviceCerts, logger, idTokenValidatorClient)
 		if err != nil {
 			t.Fatalf("create authenticator: %v", err)
 		}
@@ -164,7 +166,8 @@ func authenticate(t *testing.T, issuer, keys, token string) (authenticator.Reque
 	upstream, _ := url.Parse(up.URL)
 	skipExpiry := true
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
-	authn, err := NewAuthenticator(issuer, clientID, upstream, skipExpiry, 0, serviceCerts, logger)
+	var idTokenValidatorClient id_token.ValidateIdTokenServiceClient
+	authn, err := NewAuthenticator(issuer, clientID, upstream, skipExpiry, 0, serviceCerts, logger, idTokenValidatorClient)
 	if err != nil {
 		t.Fatal(err)
 	}
