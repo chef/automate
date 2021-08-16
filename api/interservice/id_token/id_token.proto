@@ -9,7 +9,7 @@ message ValidateIdTokenRequest {
 }
 
 message ValidateIdTokenResponse {
-    bool exist = 1;
+    bool is_valid = 1;
 }
 
 service ValidateIdTokenService {

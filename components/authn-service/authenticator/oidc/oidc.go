@@ -186,7 +186,7 @@ func (a *Authenticator) Authenticate(r *http.Request) (authenticator.Requestor, 
 		return nil, errors.Wrap(err, "oidc: Failed to call ValidateToken Client")
 	}
 
-	if validateTokenResponse.Exist {
+	if validateTokenResponse.IsValid {
 		return nil, errors.Wrap(nil, "Unauthorized access")
 	}
 

@@ -20,7 +20,6 @@ import (
 	"github.com/chef/automate/components/authn-service/authenticator/oidc"
 	"github.com/chef/automate/components/authn-service/authenticator/tokens"
 
-	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -57,18 +56,6 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 	}
 	requestor, err := s.authenticate(req)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-	idToken, err := util.ExtractBearerToken(req)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	sessionResp, err := s.sessionClient.ValidateIdToken(ctx, &id_token.ValidateIdTokenRequest{Token: idToken})
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-	if sessionResp.Exist {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
