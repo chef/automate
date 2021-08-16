@@ -63,6 +63,7 @@ if (Cypress.env('SKIP_SSO')) {
     describe('can login/logout as admin', () => {
       before(() => {
         cy.visit('/');
+        cy.wait(500)
       });
 
       it('can login and welcome modal appears', () => {
