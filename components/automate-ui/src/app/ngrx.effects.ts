@@ -36,6 +36,7 @@ import { ProfileEffects } from './entities/profiles/profile.effects';
 import { ProjectEffects } from './entities/projects/project.effects';
 import { ProjectsFilterEffects } from './services/projects-filter/projects-filter.effects';
 import { RecipeEffects } from './entities/recipes/recipe.effects';
+import { RevisionEffects } from './entities/revisions/revision.effects';
 import { RoleEnvironmentEffects } from './entities/role-environments/role-environments.effects';
 import { RoleEffects } from './entities/roles/role.effects';
 import { RuleEffects } from './entities/rules/rule.effects';
@@ -84,6 +85,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ProjectEffects,
       ProjectsFilterEffects,
       RecipeEffects,
+      RevisionEffects,
       RoleEnvironmentEffects,
       RoleEffects,
       RuleEffects,

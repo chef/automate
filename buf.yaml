@@ -439,3 +439,5 @@ breaking:
     - external/infra_proxy/infra_proxy.proto
     - external/infra_proxy/request/roles.proto
     - external/infra_proxy/response/roles.proto
+    - external/compliance/reporting/reporting.proto
+

@@ -1357,22 +1357,7 @@ func (t *LocalTarget) installHabViaInstallScript(ctx context.Context, requiredVe
 		return err
 	}
 
-	// TODO(ssd) 2019-12-03: HACK until we remove the use of install.sh
-	lastBintrayVersion := "0.89.0"
-	targetVersion, err := habpkg.ParseSemverishVersion(requiredVersion.Version())
-	if err != nil {
-		return err
-	}
-
-	switchoverVersion, err := habpkg.ParseSemverishVersion(lastBintrayVersion)
-	if err != nil {
-		return err
-	}
-
 	version := requiredVersion.Version()
-	if habpkg.CompareSemverish(targetVersion, switchoverVersion) != habpkg.SemverishGreater {
-		version = habpkg.VersionString(requiredVersion)
-	}
 
 	output, execErr := t.Executor.CombinedOutput(
 		"bash",

@@ -6,6 +6,7 @@ set -e
 export HAB_NONINTERACTIVE="true"
 export HAB_NOCOLORING="true"
 export HAB_LICENSE=accept-no-persist
+export PATH="/usr/local/bin:$PATH"
 
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
@@ -277,3 +278,26 @@ if [[ "${enable_workflow}" == "true" ]]; then
         workflow-ctl create-enterprise "${workflow_enterprise}" --ssh-pub-key-file=/root/builder_key.pub
     fi
 fi
+
+# Create the chef-ci user (if missing)
+if ! getent passwd chef-ci &> /dev/null; then
+  sudo useradd chef-ci --create-home
+fi
+
+# Add chef-ci's public key to authorized list
+sudo mkdir -p /home/chef-ci/.ssh
+sudo chown 0700 /home/chef-ci/.ssh
+cat << EOH > /tmp/.ssh-chef-ci
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8cKl0sNhpxdOVm2T/3wfwmSExaaDUCNSKJ15D146Y2tQygRdxGY5eHkOrFET8ssnetBFrSB9B+uQYPD9+KpLkupXtL2Sx4EtyuVnUUyoEXgAC7Sr6bxwo+FqfBAkrW1vNakss/WknmaXIDYsHhI16wYTr7nIE41oGPIbcdRDAXp4u56m3tQ2kfiTkg104D2TL50z2YT6I7B1h8CUpz9aAOtd+BYGueX5rdmOATIrPydcLdvWmqrO3GXZKV3zCHG2S/Se+ULC+EhbBMZkICYo3Jre7fedkCIIGhla71h9wg7q6b3eBWowfRWCCKskJ+rkO72zSZsL9EhY/9bcg7leP8hzwmWApeddVVlumqjkPpMkGfU26TKi52gevHW6fsyxCqDR9qhjBOGxSgiqNBQuOEg/9PVLlWBcsrgNhNxsysQEZTi0jv9FdONY3c1zQ+AXHH9HtxjBnx1xD59uzEYG1hUF1MsRwpWswH3Thnd/zbSxKKOdGRqoqy52Icaf7Z96D9XKAOpDQj4pTW0fS3uJP8AL16CNSkHUZSn0vxZCS9lJS+dDxwkDk1NInQqmpJ1NPwoTPlhMEsggqPuzyh+9R38NTE6cIAddq4gqJvbRLvc4jtARoz1D123QuLPTN1Ie41xhHvSI5I2gROz20rfKp57DOuLov5nzlvbb5mH/Z6Q== chef-ci-2021-07-01
+EOH
+sudo mv /tmp/.ssh-chef-ci /home/chef-ci/.ssh/authorized_keys
+sudo chown 0600 /home/chef-ci/.ssh/authorized_keys
+sudo chown -R "chef-ci:" /home/chef-ci
+
+# Add chef-ci to sudoers
+cat << EOH > /tmp/chef-ci-sudoer
+# The chef-ci user is used by InSpec to validate the system
+chef-ci ALL=(ALL) NOPASSWD:ALL
+EOH
+sudo mv /tmp/chef-ci-sudoer /etc/sudoers.d/10-chef-ci
+sudo chmod 0440 /etc/sudoers.d/10-chef-ci

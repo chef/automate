@@ -192,7 +192,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Reports"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne"
             }
           },
           "default": {
@@ -399,10 +399,7 @@ func init() {
           "description": "External supporting documents for the control."
         },
         "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
+          "type": "string",
           "description": "Metadata defined on the control in key-value format."
         },
         "waived_str": {
@@ -1214,6 +1211,40 @@ func init() {
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "A unique report identifier."
+        },
+        "node_id": {
+          "type": "string",
+          "description": "The reporting node's unique ID."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "The reporting node name."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time that the report was completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the run the report was made from."
+        },
+        "controls": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
+          "description": "Intentionally blank."
+        },
+        "ipaddress": {
+          "type": "string",
+          "description": "The reporting node IP address."
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.Reports": {
       "type": "object",
       "properties": {
@@ -1230,6 +1261,24 @@ func init() {
           "description": "Total number of reports matching the filters."
         }
       }
+    },
+    "chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne"
+          },
+          "description": "Paginated results of summary level reports matching the filters."
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of reports matching the filters."
+        }
+      },
+      "title": "ReportsSummaryLevelOne used for ListReports call"
     },
     "chef.automate.api.compliance.reporting.v1.Result": {
       "type": "object",

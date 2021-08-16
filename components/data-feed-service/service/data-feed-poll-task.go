@@ -301,7 +301,7 @@ func (d *DataFeedPollTask) listReports(ctx context.Context, pageSize int32, feed
 	}
 }
 
-func resolveResourceId(report *reporting.Report) string {
+func resolveResourceId(report *reporting.ReportSummaryLevelOne) string {
 	resourceId := report.Ipaddress
 	log.Debugf("report has ipaddress %v", resourceId)
 	if resourceId == "" {

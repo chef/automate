@@ -11,6 +11,12 @@ import {
   GetPolicyFilesSuccess,
   PolicyFilesSuccessPayload,
   GetPolicyFilesFailure,
+  DeletePolicyFile,
+  DeletePolicyFileSuccess,
+  DeletePolicyFileFailure,
+  GetPolicyFile,
+  GetPolicyFileSuccess,
+  GetPolicyFileFailure,
   PolicyFileActionTypes
 } from './policy-file.action';
 
@@ -42,5 +48,55 @@ export class PolicyFileEffects {
           message: `Could not get policy files: ${msg || payload.error}`
         });
       })));
+
+  deletePolicyFile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE),
+      mergeMap(({ payload: { server_id, org_id, name } }: DeletePolicyFile) =>
+        this.requests.deletePolicyFiles(server_id, org_id, name).pipe(
+          map(() => new DeletePolicyFileSuccess({ name })),
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new DeletePolicyFileFailure(error)))))));
+
+  deletePolicyFileSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE_SUCCESS),
+      map(({ payload: { name } }: DeletePolicyFileSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Successfully deleted policy file: ${name}.`
+        });
+    })));
+
+  deletePolicyFileFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.DELETE_FAILURE),
+      map(({ payload: { error } }: DeletePolicyFileFailure) => {
+        const msg = error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not delete policy file: ${msg || error}`
+        });
+    })));
+
+  getPolicyFile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.GET),
+      mergeMap(({ payload: { server_id, org_id, name, revision } }: GetPolicyFile) =>
+        this.requests.getPolicyFile(server_id, org_id, name, revision).pipe(
+          map((resp) => new GetPolicyFileSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+          observableOf(new GetPolicyFileFailure(error)))))));
+
+  getPolicyFileFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.GET_FAILURE),
+      map(({ payload }: GetPolicyFileFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get policy file: ${msg || payload.error}`
+        });
+    })));
 
 }

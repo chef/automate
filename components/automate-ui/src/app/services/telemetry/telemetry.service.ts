@@ -97,11 +97,11 @@ export class TelemetryService {
   }
 
   engageTelemetry(trackingOperations: ReplaySubject<TelemetryData>) {
-    // We must retrieve the segment write key before we can load analytics.js
+        if (analytics.initialized) {
+          return;
+        }
+        // We must retrieve the segment write key before we can load analytics.js
         this.retrieveSegmentWriteKey().subscribe(result => {
-          if (analytics.initialized) {
-            return;
-          }
           this.segmentWriteKey = result['write_key'];
           // This loads analytics.js javascript from segment, based on the
           // configured write key. analytics global is initialized by the segment
