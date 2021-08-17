@@ -83,7 +83,7 @@ const (
 	// Expired blacklistedIdTokens cleanup interval
 	blacklistedIdTokensCleanupInterval = "@every 3m"
 
-	// IdTokens inserted_at comparision time
+	// IdTokens inserted_at comparison time
 	insertedAtComparisionMinutes = 3
 
 	// This duration drives the refresh process: if the token expires within the
