@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 	"net"
 	"net/http"
 	"net/url"
@@ -17,6 +16,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 
 	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/lib/version"
@@ -28,6 +29,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
+	"gopkg.in/robfig/cron.v2"
 
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
@@ -77,6 +79,9 @@ const (
 	// already expired are dropped.
 	// Note 2017/12/07 (sr): 12hrs here is completely arbitrary.
 	dbCleanupInterval = 12 * time.Hour
+
+	// Expired blacklistedIdTokens cleanup interval
+	blacklistedIdTokensCleanupInterval = "@every 1m"
 
 	// This duration drives the refresh process: if the token expires within the
 	// next minute, we'll refresh. This is a first guess and might need tweaking.
@@ -141,6 +146,13 @@ func New(
 	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
 
 	s.initHandlers()
+
+	// Clear psql blackListIdTokens table rows
+	c := cron.New()
+	c.AddFunc(blacklistedIdTokensCleanupInterval, func() {
+		ClearExpiredTokens(pgDB)
+	})
+	c.Start()
 
 	return &s, nil
 }
@@ -256,6 +268,22 @@ func (s *Server) StartGRPCServer(addr string) error {
 
 func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
 	httpError(w, http.StatusUnauthorized)
+}
+
+func ClearExpiredTokens(pgDB *sql.DB) {
+	const (
+		deleteExpiredIdTokens = `DELETE FROM blacklisted_id_tokens 
+		where inserted_at > date_sub(now(), INTERVAL 1 MINUTE);`
+	)
+	res, err := pgDB.Exec(deleteExpiredIdTokens)
+	if err != nil {
+		panic(err)
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("rows deleted:", count)
 }
 
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
