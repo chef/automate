@@ -44,6 +44,10 @@ func DefaultGlobalConfig() *GlobalConfig {
 				BackgroundColor: w.String("#3864f2"), // Chef Success blue
 				TextColor:       w.String("#FFFFFF"), // White
 			},
+			SessionSettings: &SessionSettings{
+				EnableIdleTimeout:  w.Bool(false),
+				IdleTimeoutMinutes: w.Int32(30),
+			},
 		},
 	}
 }
