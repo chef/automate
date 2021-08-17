@@ -76,12 +76,12 @@ type ConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FeedInterval        string  `protobuf:"bytes,1,opt,name=feed_interval,json=feedInterval,proto3" json:"feed_interval,omitempty"`
-	NodeBatchSize       int64   `protobuf:"varint,2,opt,name=node_batch_size,json=nodeBatchSize,proto3" json:"node_batch_size,omitempty"`
-	UpdatedNodesOnly    bool    `protobuf:"varint,3,opt,name=updated_nodes_only,json=updatedNodesOnly,proto3" json:"updated_nodes_only,omitempty"`
-	DisableCidrFilter   bool    `protobuf:"varint,4,opt,name=disable_cidr_filter,json=disableCidrFilter,proto3" json:"disable_cidr_filter,omitempty"`
-	CidrFilter          string  `protobuf:"bytes,5,opt,name=cidr_filter,json=cidrFilter,proto3" json:"cidr_filter,omitempty"`
-	AcceptedStatusCodes []int32 `protobuf:"varint,6,rep,packed,name=accepted_status_codes,json=acceptedStatusCodes,proto3" json:"accepted_status_codes,omitempty"`
+	FeedInterval        string   `protobuf:"bytes,1,opt,name=feed_interval,json=feedInterval,proto3" json:"feed_interval,omitempty"`
+	NodeBatchSize       int64    `protobuf:"varint,2,opt,name=node_batch_size,json=nodeBatchSize,proto3" json:"node_batch_size,omitempty"`
+	UpdatedNodesOnly    bool     `protobuf:"varint,3,opt,name=updated_nodes_only,json=updatedNodesOnly,proto3" json:"updated_nodes_only,omitempty"`
+	DisableCidrFilter   bool     `protobuf:"varint,4,opt,name=disable_cidr_filter,json=disableCidrFilter,proto3" json:"disable_cidr_filter,omitempty"`
+	CidrFilter          []string `protobuf:"bytes,5,rep,name=cidr_filter,json=cidrFilter,proto3" json:"cidr_filter,omitempty"`
+	AcceptedStatusCodes []int32  `protobuf:"varint,6,rep,packed,name=accepted_status_codes,json=acceptedStatusCodes,proto3" json:"accepted_status_codes,omitempty"`
 }
 
 func (x *ConfigResponse) Reset() {
@@ -144,11 +144,11 @@ func (x *ConfigResponse) GetDisableCidrFilter() bool {
 	return false
 }
 
-func (x *ConfigResponse) GetCidrFilter() string {
+func (x *ConfigResponse) GetCidrFilter() []string {
 	if x != nil {
 		return x.CidrFilter
 	}
-	return ""
+	return nil
 }
 
 func (x *ConfigResponse) GetAcceptedStatusCodes() []int32 {
@@ -1571,7 +1571,7 @@ var file_external_data_feed_data_feed_proto_rawDesc = []byte{
 	0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x11, 0x64, 0x69,
 	0x73, 0x61, 0x62, 0x6c, 0x65, 0x43, 0x69, 0x64, 0x72, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12,
 	0x1f, 0x0a, 0x0b, 0x63, 0x69, 0x64, 0x72, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x05,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x69, 0x64, 0x72, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x69, 0x64, 0x72, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72,
 	0x12, 0x32, 0x0a, 0x15, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x5f, 0x73, 0x74, 0x61,
 	0x74, 0x75, 0x73, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x05, 0x52,
 	0x13, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43,

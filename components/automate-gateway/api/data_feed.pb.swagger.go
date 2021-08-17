@@ -385,7 +385,10 @@ func init() {
           "format": "boolean"
         },
         "cidr_filter": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "accepted_status_codes": {
           "type": "array",
