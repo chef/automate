@@ -174,7 +174,7 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - source integration/helpers/setup_minio.sh && start_minio_background
-      - TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live && hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
+      -  source integration/helpers/setup_minio.sh && TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live && hab studio run "source scripts/verify_studio_init.sh && datafeed_init_integration_tests && datafeed_run_integration_tests"
     timeout_in_minutes: 20
     retry:
       automatic:
