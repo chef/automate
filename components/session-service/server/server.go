@@ -149,9 +149,13 @@ func New(
 
 	// Clear psql blackListIdTokens table rows
 	c := cron.New()
-	c.AddFunc(blacklistedIdTokensCleanupInterval, func() {
+	cron_id, err := c.AddFunc(blacklistedIdTokensCleanupInterval, func() {
 		ClearExpiredTokens(pgDB)
 	})
+	if err != nil {
+		s.log.Debug(err, cron_id)
+		return nil, errors.Wrap(err, "cron scheduler")
+	}
 	c.Start()
 
 	return &s, nil
