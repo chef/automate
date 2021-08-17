@@ -81,10 +81,10 @@ const (
 	dbCleanupInterval = 12 * time.Hour
 
 	// Expired blacklistedIdTokens cleanup interval
-	blacklistedIdTokensCleanupInterval = "@every 4m"
+	blacklistedIdTokensCleanupInterval = "@every 3m"
 
 	// IdTokens inserted_at comparision time
-	insertedAtComparisionMinutes = 4
+	insertedAtComparisionMinutes = 3
 
 	// This duration drives the refresh process: if the token expires within the
 	// next minute, we'll refresh. This is a first guess and might need tweaking.
