@@ -4,7 +4,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { Router } from '@angular/router';
 import { policyGoupFromRoute } from 'app/entities/policy-files/policy-group-details.selectors';
@@ -56,7 +56,8 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([server_id, org_id, name]: string[]) => {
+    ).pipe(take(1))
+    .subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
       this.name = name;

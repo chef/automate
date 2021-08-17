@@ -7,12 +7,12 @@ describe('infra policy group details', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  // const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   let policies: any;
   let policyGroupName = '';
   let policyFilesCount: number;
-
-  const adminKey = 'Dummy--admin--key';
+  let policyFileName: string;
+  let policyFileRevision: number;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -124,6 +124,8 @@ describe('infra policy group details', () => {
       cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Policy Files');
       cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Revision ID');
       policyFilesCount = response.body.policies.length;
+      policyFileName =  response.body.policies[0].name;
+      policyFileRevision =  response.body.policies[0].revision_id;
       return true;
     }
   }
@@ -158,6 +160,20 @@ describe('infra policy group details', () => {
         cy.get('.page-title').contains(policyGroupName);
         cy.get('[data-cy=policy-group-server]').contains(serverID);
         cy.get('[data-cy=policy-group-org]').contains(orgID);
+      }
+    });
+
+    it('can go to policyfile detail page by click on policyfile name', () => {
+      if (policyGroupName !== '') {
+        getPolicyGroupDetails(policyGroupName).then((response) => {
+          checkPolicyGroupDetailsResponse(response);
+        });
+        cy.get('[data-cy=policy-group-details-table-container] chef-td')
+          .contains(policyFileName).click();
+          cy.on('url:changed', (newUrl) => { expect(newUrl).to
+            .contain('policyfiles/' + policyFileName + '/revision/' + policyFileRevision);
+          });
+        cy.get('[data-cy=policy-file-head]').contains(policyFileName);
       }
     });
   });
