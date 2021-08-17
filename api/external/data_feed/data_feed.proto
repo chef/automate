@@ -97,7 +97,7 @@ message ConfigResponse{
 	int64 node_batch_size=2;
 	bool updated_nodes_only=3;
 	bool disable_cidr_filter = 4;
-	string cidr_filter =5;
+	repeated string cidr_filter =5;
 	repeated int32 accepted_status_codes =6;
 }
 

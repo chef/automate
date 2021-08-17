@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	//"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -269,7 +270,7 @@ func (datafeedServer *DatafeedServer) DestinationConfig(ctx context.Context, des
 	config.NodeBatchSize = int64(data.ServiceConfig.NodeBatchSize)
 	config.UpdatedNodesOnly = data.ServiceConfig.UpdatedNodesOnly
 	config.DisableCidrFilter = data.ServiceConfig.DisableCIDRFilter
-	config.CidrFilter = data.ServiceConfig.CIDRFilter
+	config.CidrFilter = strings.Split(data.ServiceConfig.CIDRFilter, ",")
 	config.AcceptedStatusCodes = data.ServiceConfig.AcceptedStatusCodes
 
 	return config, nil
