@@ -27,7 +27,8 @@
             <ul>
               <li id="chef-server">
                 <span class="heading">Chef Infra Server</span>
-                <span data-cy="policy-group-server">{{serverId}}</span>
+                <span data-cy="policy-group-server">{{serverId}}
+                  {{policies.length}}</span>
               </li>
               <li>
                 <span class="heading" id="chef-organization">Chef Infra Organization</span>
@@ -36,7 +37,39 @@
             </ul>
           </div>
         </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='policyfiles' data-cy="policyfiles-tab">Policyfiles</chef-option>
+        </chef-tab-selector>
       </chef-page-header>
+      
+      <section class="page-body" *ngIf="tabValue === 'policyfiles'">
+        <chef-loading-spinner class="top-spinner" *ngIf="policyGroupDetailsLoading" size="50"></chef-loading-spinner>
+        <div class="policyfiles-tab" *ngIf="!policyGroupDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div data-cy="empty-list" class="empty-section" *ngIf="!true">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p>No policy files available</p>
+          </div>
+          <ng-container *ngIf="!policyGroupDetailsLoading">
+            <chef-table data-cy=policy-group-details-table-container>
+              <chef-thead>
+                <chef-tr class="no_border_tr">
+                  <chef-th class="no_border_th">Policy Files</chef-th>
+                  <chef-th class="no_border_th">Revision ID</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let policyFlie of policies">
+                  <chef-td>{{policyFlie.name}}</chef-td>
+                  <chef-td>{{policyFlie.revision_id}}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>            
+          </ng-container>
+        </div>
+      </section>
     </main>
   </div>
 </div>

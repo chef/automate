@@ -47,9 +47,30 @@ chef-page-header {
       }
     }
 
-    &:first-child {
+    .summary-body:first-child {
       border-right: 1px solid $chef-grey;
     }
   }
+}
+
+chef-tab-selector chef-option {
+  width: 130px;
+}
+
+.policyfiles-tab {
+  chef-table {
+    chef-th:first-child, chef-td:first-child {
+      width: 40%;
+    }
+  }
+}
+
+::ng-deep chef-table chef-th.no_border_th,
+.no_border_tr,
+.no_border_tr:first-child,
+.no_border_tr:last-child {
+  border: none;
+  border-left: none;
+  font-size: 12px;
 }
  

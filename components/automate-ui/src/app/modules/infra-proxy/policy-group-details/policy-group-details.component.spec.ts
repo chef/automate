@@ -39,6 +39,17 @@ describe('PolicyGroupDetailsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'chef-page-header' }),
+        MockComponent({ selector: 'chef-breadcrumb' }),
+        MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'chef-tab-selector',
+          inputs: ['value', 'routerLink', 'fragment']
+        }),
         PolicyGroupDetailsComponent
       ],
       providers: [

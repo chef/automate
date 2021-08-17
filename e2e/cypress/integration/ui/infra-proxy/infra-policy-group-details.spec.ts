@@ -7,10 +7,12 @@ describe('infra policy group details', () => {
   const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
   const serverIP = '34.219.25.251';
   const adminUser = 'chefadmin';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
+  // const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   let policies: any;
   let policyGroupName = '';
   let policyFilesCount: number;
+
+  const adminKey = 'Dummy--admin--key';
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -116,7 +118,11 @@ describe('infra policy group details', () => {
   }
 
   function checkPolicyGroupDetailsResponse(response: any) {
-    if (response.body.name !== '') {
+    if (response.body.name === '') {
+      cy.get('[data-cy=empty-list]').should('be.visible');
+    } else {
+      cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Policy Files');
+      cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Revision ID');
       policyFilesCount = response.body.policies.length;
       return true;
     }
