@@ -23,7 +23,7 @@ var (
 	automateAwsRegion            = "us-west-2"
 	automateAwsAccessKey         = os.Getenv("AWS_ACCESS_KEY_ID")
 	automateAwsSecretAccessKey   = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	automateAwsBucket            = "a2-backup-restore-test"
+	automateAwsBucket            = "a2-s3-datafeed-integration-test"
 	addData                      = []byte(`{"name":"test", "url":"https://test.com", "secret":"secret", "services":"ServiceNow", "integration_types": "Webhook"}`)
 	addDataValues                = []string{"test", "https://test.com", "secret", "custom", "webhook"}
 	emptyAddData                 = []byte(`{}`)
@@ -43,30 +43,27 @@ var (
 	updateData                   = []byte(`{"name":"test update",
 										  	"url":"https://update.test.com", 
 										  	"secret":"updated secret",
-										  	"services": "S3",
+										  	"services": "Minio",
 										  	"integration_types":"Storage",
 												"enable": true,
 												"meta_data":[
 													{
 														"key":"bucket",
 														"value":"s3.to.elastic.search"
-													},{
-														"key":"region",
-														"value":"us-east-2"
 													}
 												]
 											}}`)
-	secretDataS3 = []byte(`{
+	secretDataMinio = []byte(`{
 		"name": "s3val",
 		"type": "data_feed",
 		"data":[
 			 {
 				  "key":"access_key",
-				  "value":"` + automateAwsAccessKey + `"
+				  "value":"` + automateMinioAccessKey + `"
 			 },
 			 {
 				  "key":"secret_access_key",
-				  "value":"` + automateAwsSecretAccessKey + `"
+				  "value":"` + automateMinioSecretAccessKey + `"
 			 }
 		 ]
 	
@@ -112,8 +109,6 @@ func CreateMinioBucket(t *testing.T) ([]byte, error) {
 }
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %d", len(automateApiToken))
-	t.Logf("AWS_ACCESS_KEY_ID %s", automateAwsAccessKey)
-	t.Logf("AWS_SECRET_ACCESS_KEY %s", automateAwsSecretAccessKey)
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
@@ -225,22 +220,19 @@ func TestDestinationWithSecretError(t *testing.T) {
 	assert.Nil(t, err, "%v", err)
 }
 func TestDestinationWithSecretAddon(t *testing.T) {
-	secretId, err := addSecretRequest(secretDataS3, 200)
+	secretId, err := addSecretRequest(secretDataMinio, 200)
 	assert.Nil(t, err, "%v", err)
 	dataWithSecret := []byte(`{
-		"url":"null", 
+		"url":"http://127.0.0.1:9000", 
 		"secret_id_with_addon": {
 			"id":"` + secretId + `",
-		"services":"S3",
+		"services":"Minio",
 		"integration_types":"Storage",
 		"enable":true,
 		"meta_data":[
 			{
 				 "key":"bucket",
-				  "value":"` + automateAwsBucket + `"
-			},{
-				"key":"region",
-				"value":"` + automateAwsRegion + `"
+				  "value":"` + automateMinioBucket + `"
 			}
 	   ]
 		}}`)
@@ -250,22 +242,19 @@ func TestDestinationWithSecretAddon(t *testing.T) {
 }
 
 func TestDestinationWithSecretAddonFail(t *testing.T) {
-	secretId, err := addSecretRequest(secretDataS3, 200)
+	secretId, err := addSecretRequest(secretDataMinio, 200)
 	assert.Nil(t, err, "%v", err)
 	dataWithSecret := []byte(`{
-		"url":"http://localhost:38080/fails",
+		"url":"http://127.0.0.1:9000",
 		"secret_id_with_addon": {
 			"id":"` + secretId + `",
-		"services":"S3",
+		"services":"Minio",
 		"integration_types":"Storage",
 		"enable":true,
 		"meta_data":[
 			{
 				 "key":"bucket",
 				  "value":"automateAwsBucket"
-			},{
-				"key":"region",
-				"value":"` + automateAwsRegion + `"
 			}
 	   ]
 		}}`)
