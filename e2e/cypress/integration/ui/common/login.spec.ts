@@ -63,7 +63,6 @@ if (Cypress.env('SKIP_SSO')) {
     describe('can login/logout as admin', () => {
       before(() => {
         cy.visit('/');
-        cy.wait(500);
       });
 
       it('can login and welcome modal appears', () => {
@@ -73,7 +72,10 @@ if (Cypress.env('SKIP_SSO')) {
 
           cy.get('[type=submit]').click().then(() => {
             cy.get('[data-cy=welcome-title]').should('exist');
-            cy.url().should('include', '/event-feed'); // default landing page
+            cy.wait(1000);
+            cy.url()
+              .should('include', '/event-feed') // default landing page
+              .should('include', '/dex/auth/local');
             cy.contains('Local Administrator'); // current user name
             // cy.screenshot()
           });
