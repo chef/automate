@@ -13,6 +13,12 @@ import { policyFileFromRoute } from 'app/entities/policy-files/policy-file-detai
 import { JsonTreeTableComponent as JsonTreeTable } from './../json-tree-table/json-tree-table.component';
 
 export type PolicyFileTabName = 'details' | 'runList' | 'attributes';
+export class CookbookList {
+  name: string;
+  version: string;
+  source: string;
+}
+
 export class CookbookRuleList {
   name: string;
   operator: string;
@@ -52,6 +58,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
   public showIncludedPolicies = false;
   public cookbook_locks: CookbookLocks[] = [];
   public included_policy_locks: IncludedPolicyLocks[] = [];
+  public cookbookList: CookbookList[] = [];
   public cookbookRuleList: CookbookRuleList[] = [];
   public cookbookDependencyList: CookbookDependencyList[] = [];
   public defaultAttributes = [];
@@ -112,8 +119,11 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
       this.PolicyFile = policyFile;
       this.cookbook_locks = policyFile.cookbook_locks;
       this.included_policy_locks = policyFile.included_policy_locks;
-      this.loadDependenciesRule(policyFile.solution_dependecies);
       this.policyFileDetailsLoading = false;
+      if (policyFile.solution_dependecies) {
+        this.loadDependenciesRules(policyFile.solution_dependecies);
+        this.loadCookbooks(policyFile.solution_dependecies);
+      }
       // load attributes
       this.defaultAttributes = (policyFile.default_attributes
         && JSON.parse(policyFile.default_attributes)) || {};
@@ -157,7 +167,7 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadDependenciesRule(solution_dependecies: SolutionDependencies[]) {
+  loadDependenciesRules(solution_dependecies: SolutionDependencies[]) {
     const cookbook_dependent = [];
     for (let i = 0; i < solution_dependecies.length; i++) {
       const version = solution_dependecies[i].version.split(' ');
@@ -171,6 +181,10 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
         cookbook_dependent.push(solution_dependecies[i]);
       }
     }
+    this.loadCookbookDependent(cookbook_dependent);
+  }
+
+  loadCookbookDependent(cookbook_dependent: SolutionDependencies[]) {
     for (let i = 0; i < cookbook_dependent.length; i++) {
       const name = cookbook_dependent[i].name;
       const cookbook_version = cookbook_dependent[i].version.split(' ');
@@ -189,5 +203,20 @@ export class PolicyFileDetailsComponent implements OnInit, OnDestroy {
         });
       }
     }
+  }
+
+  loadCookbooks(solution_dependecies: SolutionDependencies[]) {
+    solution_dependecies.forEach((avail) => {
+      this.cookbook_locks.forEach(elm => {
+        if (avail.name === elm.name) {
+          const version = avail.version.split(' ');
+          this.cookbookList.push({
+            name: avail.name,
+            version: version[1],
+            source: elm.source
+          });
+        }
+      });
+    });
   }
 }

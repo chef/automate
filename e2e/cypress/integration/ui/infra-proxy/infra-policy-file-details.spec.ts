@@ -215,6 +215,12 @@ describe('infra policy details', () => {
       it('can open dependency rule accordion', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=dependency-rule]').contains('Dependencies Rules').click();
+        }
+      });
+
+      it('can cookbook accordion', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=cookbook]').contains('Cookbook').click();
           cy.get('[data-cy=close-cookbook-button]').click();
         }
       });

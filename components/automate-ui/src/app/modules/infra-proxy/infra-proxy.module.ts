@@ -47,6 +47,7 @@ import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { PolicyFileDetailsComponent } from './policy-file-details/policy-file-details.component';
 import { PolicyGroupsComponent } from './policy-groups/policy-groups.component';
 import { PolicyGroupsListComponent } from './policy-groups-list/policy-groups-list.component';
+import { PolicyGroupDetailsComponent } from './policy-group-details/policy-group-details.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
@@ -104,6 +105,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     PolicyFileDetailsComponent,
     PolicyGroupsComponent,
     PolicyGroupsListComponent,
+    PolicyGroupDetailsComponent,
     ResetAdminKeyComponent,
     ResetClientKeyComponent,
     ResetNodeKeyComponent,

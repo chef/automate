@@ -9,6 +9,8 @@ import {
   templateUrl: './policy-groups-list.component.html'
 })
 export class PolicyGroupsListComponent implements OnChanges {
+  @Input() serverId: string;
+  @Input() orgId: string;
   @Input() policyGroups: [];
   @Input() pageOfItems: [];
 
