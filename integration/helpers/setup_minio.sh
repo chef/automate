@@ -23,11 +23,7 @@ wait_for_success() {
 
   until "$@" &> /dev/null; do
     sleep 1
-
-    echo "Waiting for '$*' to succeed. ("$COUNTER of $SECONDS_WAITING")"
-
     if [[ $COUNTER -ge "$SECONDS_WAITING" ]]; then
-      echo "Command '$*' never succeeded in  "$SECONDS_WAITING" seconds."
       return 1
     fi
     (( COUNTER=COUNTER+1 ))

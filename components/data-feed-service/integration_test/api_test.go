@@ -185,7 +185,7 @@ func TestDeleteNonExistent(t *testing.T) {
 func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
 	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
-	// testDestinationAwsRequestSuccess(t, testSuccessAwsData)
+	testDestinationAwsRequestSuccess(t, testSuccessAwsData)
 	testSuccessMinioData, error := CreateMinioBucket(t)
 	if error != nil {
 		t.Log(error, "got while creating minio bucket")
@@ -198,7 +198,7 @@ func TestTestDestination(t *testing.T) {
 func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
-	// testDestinationAwsRequestFail(t, testFailsAwsData)
+	testDestinationAwsRequestFail(t, testFailsAwsData)
 	testDestinationMinioRequestFail(t, testFailsMinioData)
 }
 

@@ -60,9 +60,6 @@ func CheckForCreds(credsType string) bool {
 			return false
 		}
 	}
-	if credsType == "aws"{
-		fmt.Println("nodemanager ACCESS_KEY", os.Getenv("AWS_ACCESS_KEY_ID"))
-	}
 	return true
 }
 
