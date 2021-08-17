@@ -35,18 +35,18 @@ var initConfigHACmd = &cobra.Command{
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		msg := "one argument expected as any of deplyment mode like aws or existing_node. "
-		writer.Printf(msg)
+		msg := "one argument expected as any of deplyment mode like aws or existing_infra. "
+		writer.Printf("%s\n", msg)
 		return nil
 	} else if args[0] == "aws" {
-		writer.Printf("Generating initial automate high availability configuration for AWS deployment")
+		writer.Printf("Generating initial automate high availability configuration for AWS deployment\n")
 		return runInitConfigAwsHACmd()
-	} else if args[0] == "bare_metal" {
-		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment")
+	} else if args[0] == "existing_infra" {
+		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment\n")
 		return runInitConfigExistingNodeHACmd()
 	} else {
-		msg := "Incorrect argument expected is any of deplyment mode like aws or existing_node. "
-		writer.Printf(msg)
+		msg := "Incorrect argument expected is any of deplyment mode like aws or existing_infra. "
+		writer.Printf("%s\n", msg)
 		return status.Wrap(errors.New(msg), status.ConfigError, msg)
 	}
 }
