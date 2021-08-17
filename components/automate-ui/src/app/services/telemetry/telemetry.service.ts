@@ -233,10 +233,20 @@ export class TelemetryService {
     );
   }
 
-  private emitToPipeline(operation: String, payload: Object) {
+  private emitToPipeline(operation: String, payload: any) {
     const headers = new HttpHeaders({
       'Content-Type' :  'application/json'
     });
+
+    if (operation === 'page' && payload && payload.properties) {
+      let properties = payload.properties;
+      if (properties.referrer) {
+        properties.referrer = this.sanitizeDomainURL(properties.referrer);
+      }
+      if (properties.url) {
+        properties.url = this.sanitizeDomainURL(properties.url);
+      }
+    }
 
     // JSON SCHEMA:
     // https://github.com/chef/es-telemetry-pipeline/blob/master/schema/event.schema.json
@@ -272,5 +282,21 @@ export class TelemetryService {
   // ISO 8601 formatted date time
   private getCurrentDateTime() {
     return (new Date).toISOString();
+  }
+
+  private sanitizeDomainURL(url) {
+    let restByDot: any;
+    let firstByDot: string;
+    [firstByDot, ...restByDot] = url.split('.');
+    restByDot = restByDot.join('.');
+    if (restByDot.indexOf('/') > -1) {
+      let [firstBySlash, ...restBySlash] = restByDot.split('/');
+      restBySlash = restBySlash.join('/');
+      firstBySlash = '***';
+      return firstByDot + '.' + firstBySlash + '/' + restBySlash;
+    } else {
+      restByDot = '***';
+      return firstByDot + '.' + restByDot;
+    }
   }
 }
