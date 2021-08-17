@@ -83,8 +83,8 @@ const (
 	// Expired blacklistedIdTokens cleanup interval
 	blacklistedIdTokensCleanupInterval = "@every 4m"
 
-	// IdTokens inserted_after comparision time
-	insertedAfterComparisionMinutes = 4
+	// IdTokens inserted_at comparision time
+	insertedAtComparisionMinutes = 4
 
 	// This duration drives the refresh process: if the token expires within the
 	// next minute, we'll refresh. This is a first guess and might need tweaking.
@@ -281,7 +281,7 @@ func ClearExpiredTokens(pgDB *sql.DB) {
 	const (
 		deleteExpiredIdTokens = `DELETE FROM blacklisted_id_tokens where inserted_at < now() - ($1 || ' minutes')::interval`
 	)
-	res, err := pgDB.Exec(deleteExpiredIdTokens, insertedAfterComparisionMinutes)
+	res, err := pgDB.Exec(deleteExpiredIdTokens, insertedAtComparisionMinutes)
 	if err != nil {
 		panic(err)
 	}
