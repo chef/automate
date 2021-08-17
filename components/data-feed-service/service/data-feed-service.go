@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -370,12 +371,13 @@ func FileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte, Fo
 	hr := t.Hour()
 	min := t.Minute()
 	sec := t.Second()
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	filePathAndName := "automate/" + FolderName + "/" +
 		strconv.Itoa(year) + "/" +
 		strconv.Itoa(month) + "/" +
 		strconv.Itoa(day) + "/" +
-		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + ".json"
+		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + "_" + strconv.Itoa(rand.Intn(1000)) + ".json"
 
 	uploader := s3manager.NewUploader(sess)
 
