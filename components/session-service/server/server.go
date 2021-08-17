@@ -277,10 +277,9 @@ func (s *Server) catchAllElseHandler(w http.ResponseWriter, _ *http.Request) {
 func ClearExpiredTokens(pgDB *sql.DB) {
 	// 1 minute interval is for testing
 	const (
-		deleteExpiredIdTokens = `DELETE FROM blacklisted_id_tokens 
-		where inserted_at > date_sub(now(), INTERVAL 1 MINUTE);`
+		deleteExpiredIdTokens = `DELETE FROM blacklisted_id_tokens where inserted_at < now() - ($1 || ' minutes')::interval`
 	)
-	res, err := pgDB.Exec(deleteExpiredIdTokens)
+	res, err := pgDB.Exec(deleteExpiredIdTokens, 1)
 	if err != nil {
 		panic(err)
 	}
