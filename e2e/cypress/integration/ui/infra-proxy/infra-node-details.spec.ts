@@ -122,10 +122,7 @@ describe('infra node detail', () => {
 
       cy.visit(`/infrastructure/chef-servers/${serverID}/organizations/${orgID}/nodes/${nodeName}`);
       cy.get('app-welcome-modal').invoke('hide');
-      cy.url()
-      .should('include', '/dex/auth/')
-      .should('include', '/dex/auth/local');
-
+      cy.url().should('include', '/dex/auth/');
     });
     cy.restoreStorage();
   });

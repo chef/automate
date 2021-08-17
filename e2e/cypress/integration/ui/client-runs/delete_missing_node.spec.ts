@@ -50,7 +50,7 @@ describe('delete missing node from UI', () => {
 
   it('from client runs page delete nodes', () => {
     cy.adminLogin('/infrastructure/client-runs').then(() => {
-      cy.url().should('include', '/dex/auth/local');
+      cy.wait(1000);
       cy.get('app-welcome-modal').invoke('hide');
     });
 

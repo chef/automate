@@ -12,8 +12,8 @@ if (Cypress.env('SKIP_SSO')) {
 
       it('greets with SSO page', () => {
         cy.url()
-          .should('include', '/dex/auth/local?')
           .should('include', '/dex/auth?')
+          .should('include', '/dex/auth/local?')
           .should('include', 'client_id=automate-session')
           .should('include', 'redirect_uri');
         cy.contains('Sign in as a local user');
@@ -72,10 +72,7 @@ if (Cypress.env('SKIP_SSO')) {
 
           cy.get('[type=submit]').click().then(() => {
             cy.get('[data-cy=welcome-title]').should('exist');
-            cy.wait(1000);
-            cy.url()
-              .should('include', '/event-feed') // default landing page
-              .should('include', '/dex/auth/local');
+            cy.url().should('include', '/event-feed'); // default landing page
             cy.contains('Local Administrator'); // current user name
             // cy.screenshot()
           });
