@@ -34,6 +34,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { UpdateUserPreferences } from 'app/services/user-preferences/user-preferences.actions';
+import { userPreferencesStatus } from 'app/services/user-preferences/user-preferences.selector';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 export type UserTabName = 'password' | 'details';
@@ -53,6 +54,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public timeformatControl = {
     isTimeformatDirty: false
   };
+  public isResetPwdTab = true;
+  public userType = 'local';
+  public isDisplayNameEditable = true;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
@@ -109,6 +114,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       const [, fragment] = url.split('#');
       this.tabValue = (fragment === 'password') ? 'password' : 'details';
     });
+
+    if (this.userPrefsService.uiSettings) {
+      this.isResetPwdTab = this.userPrefsService.uiSettings.isResetPasswordTabVisible;
+      this.userType = this.userPrefsService.uiSettings.userType;
+      this.isDisplayNameEditable = this.userPrefsService.uiSettings.isDisplayNameEditable;
+    }
   }
 
   ngOnDestroy(): void {
@@ -166,8 +177,11 @@ abstract class UserDetails {
      };
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const name = this.displayNameForm.get('displayName').value.trim();
-    this.store.dispatch(this.createUpdateNameUserAction(name));
+    if (this.userPrefsService.uiSettings &&
+        this.userPrefsService.uiSettings.isDisplayNameEditable) {
+      const name = this.displayNameForm.get('displayName').value.trim();
+      this.store.dispatch(this.createUpdateNameUserAction(name));
+    }
     this.store.dispatch(new UpdateUserPreferences(payload));
     this.userPrefsService.setUserTimeformatInternal(timeformat.value);
     timeformatControl.isTimeformatDirty = false;
@@ -362,7 +376,9 @@ class UserProfileDetails extends UserDetails {
     chefSessionService: ChefSessionService) {
       super(store, userPrefsService, chefSessionService);
 
-      store.dispatch(new GetUserSelf());
+      if (userPrefsService.uiSettings.userType === 'local') {
+        store.dispatch(new GetUserSelf());
+      }
       layoutFacade.showSidebar(Sidebar.Profile);
 
       this.createForms(fb);
@@ -394,6 +410,14 @@ class UserProfileDetails extends UserDetails {
             this.resetForms();
           }
       });
+
+      store.select(userPreferencesStatus).pipe(
+        filter(status => this.saveInProgress && !loading(status)),
+        takeUntil(isDestroyed)
+      ).subscribe(() => {
+          this.saveInProgress = false;
+      });
+
   }
 
   protected createUpdatePasswordUserAction(password: string): Action {
