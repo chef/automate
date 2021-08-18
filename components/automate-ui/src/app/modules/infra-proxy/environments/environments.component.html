@@ -14,14 +14,14 @@
     [environmentsList]="environments"
     [serverId]="serverId"
     [orgId]="orgId"
-    [currentPage]="current_page">    
+    [currentPage]="current_page">
   </app-create-environment-modal>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments"></app-infra-search-bar>
+      <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments by name..."></app-infra-search-bar>
       <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
     </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>   
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
     <div *ngIf="!authFailure">
       <div class="empty-section" *ngIf="!searching && !environments.length && current_page === 1">
         <img alt="No preview" src="/assets/img/no_preview.gif" />
