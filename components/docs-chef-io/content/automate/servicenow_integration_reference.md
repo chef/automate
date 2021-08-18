@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef Automate Integration App Reference"
-    parent = "automate/reference"
-    identifier = "automate/reference/servicenow_integration_addendum.md ServiceNow Integration Reference"
-    weight = 60
+    parent = "automate/integrations/servicenow"
+    identifier = "automate/integrations/servicenow/servicenow_integration_reference.md ServiceNow Integration Reference"
+    weight = 30
 +++
 
 This page details information on the topics that will aid you while installing and configuring the Chef Automate Integration App in the  ServiceNow ecosystem.
