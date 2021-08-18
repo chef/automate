@@ -10,7 +10,7 @@ var stubCmd = &cobra.Command{
 	// use getClient in the command implementation
 }
 var argsAws = []string{"aws"}
-var argsExistingNodes = []string{"existing_node"}
+var argsExistingNodes = []string{"existing_infra"}
 var argsSomeThingElse = []string{"something_else"}
 var argsEmpty = []string{}
 
@@ -28,7 +28,7 @@ func Test_runInitConfigHACmd(t *testing.T) {
 		// TODO: Add test cases.
 		{"aws mode of deployment", stubCmd, argsAws, false},
 		{"existing node mode of deployment", stubCmd, argsExistingNodes, false},
-		{"Invalid mode of deployment", stubCmd, argsSomeThingElse, false},
+		{"Invalid mode of deployment", stubCmd, argsSomeThingElse, true},
 		{"No args passed", stubCmd, argsEmpty, false},
 	}
 	for _, tt := range tests {
