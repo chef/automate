@@ -69,9 +69,15 @@ func generateAWSA2HARBFile(config *ptoml.Tree, architectureAws interface{}) {
 	initConfigHAFlags.SshKeyFile = architectureAwsData.Get("sudo_password").(string)
 	initConfigHAFlags.BackupMount = architectureAwsData.Get("backup_mount").(string)
 	automateConfig := config.Get("automate.config").(*ptoml.Tree)
-	//initConfigHAFlags.AutomateAdminPassword = automateConfig.Get("admin_password").(string)
-	//initConfigHAFlags.AutomateFQDN = automateConfig.Get("fqdn").(string)
-	//initConfigHAFlags.AutomateTeamsPort = automateConfig.Get("AutomateTeamsPort").(string)
+	if automateConfig.Get("admin_password") != nil {
+		initConfigHAFlags.AutomateAdminPassword = automateConfig.Get("admin_password").(string)
+	}
+	if automateConfig.Get("fqdn") != nil {
+		initConfigHAFlags.AutomateFQDN = automateConfig.Get("fqdn").(string)
+	}
+	if automateConfig.Get("AutomateTeamsPort") != nil {
+		initConfigHAFlags.AutomateTeamsPort = automateConfig.Get("AutomateTeamsPort").(string)
+	}
 	initConfigHAFlags.AutomateInstanceCount = automateConfig.Get("instance_count").(string)
 	initConfigHAFlags.AutomateConfigFile = automateConfig.Get("config_file").(string)
 	initConfigHAFlags.AutomateInstanceCount = config.Get("chef_server.config.instance_count").(string)
@@ -104,7 +110,6 @@ func generateAWSA2HARBFile(config *ptoml.Tree, architectureAws interface{}) {
 	initConfigHAFlags.AwsTagDept = awsConfig.Get("X-Dept").(string)
 	initConfigHAFlags.AwsTagProject = awsConfig.Get("X-Project").(string)
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, initConfigHAFlags)
-	fmt.Println(finalTemplate)
 	writeToA2HARBFile(finalTemplate, "a2ha.rb")
 }
 
@@ -119,9 +124,15 @@ func generateExistingInfraA2HARBFile(config *ptoml.Tree) {
 	initConfigHAExistingNodesFlags.SshKeyFile = architectureExistingNodes.Get("sudo_password").(string)
 	initConfigHAExistingNodesFlags.BackupMount = architectureExistingNodes.Get("backup_mount").(string)
 	automateConfig := config.Get("automate.config").(*ptoml.Tree)
-	//initConfigHAExistingNodesFlags.AutomateAdminPassword = automateConfig.Get("admin_password").(string)
-	//initConfigHAExistingNodesFlags.AutomateFQDN = automateConfig.Get("fqdn").(string)
-	//initConfigHAExistingNodesFlags.AutomateTeamsPort = automateConfig.Get("AutomateTeamsPort").(string)
+	if automateConfig.Get("admin_password") != nil {
+		initConfigHAExistingNodesFlags.AutomateAdminPassword = automateConfig.Get("admin_password").(string)
+	}
+	if automateConfig.Get("fqdn") != nil {
+		initConfigHAExistingNodesFlags.AutomateFQDN = automateConfig.Get("fqdn").(string)
+	}
+	if automateConfig.Get("AutomateTeamsPort") != nil {
+		initConfigHAExistingNodesFlags.AutomateTeamsPort = automateConfig.Get("AutomateTeamsPort").(string)
+	}
 	initConfigHAExistingNodesFlags.AutomateInstanceCount = automateConfig.Get("instance_count").(string)
 	initConfigHAExistingNodesFlags.AutomateConfigFile = automateConfig.Get("config_file").(string)
 	initConfigHAExistingNodesFlags.AutomateInstanceCount = config.Get("chef_server.config.instance_count").(string)
@@ -137,6 +148,5 @@ func generateExistingInfraA2HARBFile(config *ptoml.Tree) {
 	initConfigHAExistingNodesFlags.ExistingNodesPostgresqlIPs = convertStructArrayToStringArray(existingNodesConfig.Get("postgresql_ips").([]interface{}))
 	initConfigHAExistingNodesFlags.ExistingNodesPostgresqlPrivateIps = convertStructArrayToStringArray(existingNodesConfig.Get("postgresql_private_ips").([]interface{}))
 	finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, initConfigHAExistingNodesFlags)
-	fmt.Println(finalTemplate)
 	writeToA2HARBFile(finalTemplate, "a2ha.rb")
 }
