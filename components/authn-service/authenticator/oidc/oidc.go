@@ -68,11 +68,11 @@ type Config struct {
 
 // Authenticator is used for configuring oidc authenticators
 type Authenticator struct {
-	ctx                   context.Context
-	cancel                context.CancelFunc
-	verifier              IDTokenVerifier
-	logger                *zap.Logger
-	idTokeValidatorClient id_token.ValidateIdTokenServiceClient
+	ctx                    context.Context
+	cancel                 context.CancelFunc
+	verifier               IDTokenVerifier
+	logger                 *zap.Logger
+	idTokenValidatorClient id_token.ValidateIdTokenServiceClient
 }
 
 // NewAuthenticator returns an oidc authenticator that does full ID token
@@ -110,11 +110,11 @@ func NewAuthenticator(
 	}
 	logger.Info("success connecting to issuer")
 	return &Authenticator{
-		verifier:              newVerifier(provider, clientID, skipExpiry),
-		ctx:                   ctx,
-		cancel:                cancel,
-		logger:                logger,
-		idTokeValidatorClient: idTokenValidatorClient,
+		verifier:               newVerifier(provider, clientID, skipExpiry),
+		ctx:                    ctx,
+		cancel:                 cancel,
+		logger:                 logger,
+		idTokenValidatorClient: idTokenValidatorClient,
 	}, nil
 }
 
@@ -181,7 +181,7 @@ func (a *Authenticator) Authenticate(r *http.Request) (authenticator.Requestor, 
 		return nil, errors.Wrap(err, "oidc: failed to extract bearer token")
 	}
 
-	validateTokenResponse, err := a.idTokeValidatorClient.ValidateIdToken(r.Context(), &id_token.ValidateIdTokenRequest{Token: rawIDToken})
+	validateTokenResponse, err := a.idTokenValidatorClient.ValidateIdToken(r.Context(), &id_token.ValidateIdTokenRequest{Token: rawIDToken})
 	if err != nil {
 		return nil, errors.Wrap(err, "oidc: Failed to call ValidateToken Client")
 	}
