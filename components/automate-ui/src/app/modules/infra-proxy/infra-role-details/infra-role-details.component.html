@@ -124,7 +124,7 @@
             </div>
             <div data-cy="empty-runlist" *ngIf="!hasRun_List && !runListLoading && !conflictError" class="empty-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
-              <p>Run list details are not available for the <b>{{env_id}}</b> environment.</p>
+              <p>Run list details are not available for the <b>{{role?.name}}</b> role.</p>
             </div>
             <div *ngIf="!hasRun_List && !runListLoading && conflictError" class="empty-section">
               <img alt="No preview" src="/assets/img/no_preview.gif" />
