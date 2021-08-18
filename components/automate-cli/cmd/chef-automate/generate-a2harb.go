@@ -44,7 +44,7 @@ func renderSettingsToA2HARBFile(templateName string, data interface{}) string {
 	var buf bytes.Buffer
 	err := temp.Execute(&buf, data)
 	if err != nil {
-		writer.Printf("some error occured while rendering template \n %s", err)
+		writer.Printf("some error occurred while rendering template \n %s", err)
 	}
 	finalTemplate := buf.String()
 	return finalTemplate
