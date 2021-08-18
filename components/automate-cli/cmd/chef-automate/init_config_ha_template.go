@@ -78,12 +78,12 @@ const haExistingNodesConfigTemplate = `
 # 'chef-automate deploy' with this config file and it should
 # successfully create a new Chef Automate HA instances with default settings.
 
-[architecture.existing_nodes]
+[architecture.existing_infra]
 secrets_key_file = "/etc/chef-automate/secrets.key"
 secrets_store_file = "secrets.json"
 architecture = "aws"
 workspace_path = "/src"
-ssh_user = "existing_nodes"
+ssh_user = "existing_infra"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 sudo_password = ""
@@ -113,7 +113,7 @@ instance_count = "3"
 [postgresql.config]
 instance_count = "3"
 
-[existing_nodes.config]
+[existing_infra.config]
 automate_ips = []
 automate_private_ips = []
 chef_server_ips = []
@@ -122,4 +122,23 @@ elasticsearch_ips = []
 elasticsearch_private_ips = []
 postgresql_ips = []
 postgresql_private_ips = []
+`
+
+var UsageTemplate string = `
+
+Usage:
+  chef-automate init-config-ha [arg] or [flag]
+
+Flags:
+      --file string               File path to write the config (default "config.toml")
+  -h, --help                      help for init-config-ha
+
+Args: 
+  aws				Generate initial automate high availability configuration for AWS deployment
+  existing_infra		Generate initial automate high availability configuration for existing infra nodes deployment
+
+Global Flags:
+  -d, --debug                Enable debug output
+      --no-check-version     Disable version check
+      --result-json string   Write command result as JSON to PATH	  
 `

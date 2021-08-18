@@ -1,13 +1,13 @@
 package main
 
 const existingNodesA2harbTemplate = `
-secrets_key_file "{{ .SecretsKeyFile }}"
-secrets_store_file "{{ .SecretsStoreFile }}"
-architecture "{{ .Architecture }}"
-workspace_path "{{ .WorkspacePath }}"
-ssh_user "{{ .SshUser }}"
-ssh_key_file "{{ .SshKeyFile }}"
-# sudo_password "{{ .SudoPassword }}"
+secrets_key_file "{{ .ArchitectureCommons.SecretsKeyFile }}"
+secrets_store_file "{{ .ArchitectureCommons.SecretsStoreFile }}"
+architecture "{{ .ArchitectureCommons.Architecture }}"
+workspace_path "{{ .ArchitectureCommons.WorkspacePath }}"
+ssh_user "{{ .ArchitectureCommons.SshUser }}"
+ssh_key_file "{{ .ArchitectureCommons.SshKeyFile }}"
+# sudo_password "{{ .ArchitectureCommons.SudoPassword }}"
 # logging_monitoring_management "true"
 # ew_elk "false"
 # existing_elk "false"
@@ -16,20 +16,20 @@ ssh_key_file "{{ .SshKeyFile }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
-backup_mount "{{ .BackupMount }}"
+backup_mount "{{ .ArchitectureCommons.BackupMount }}"
 # habitat_uid_gid ""
 ###############################################################
 ### Automate frontend node related settings                 ###
 ###############################################################
 automate do
-  # admin_password "{{ .AutomateAdminPassword }}"
+  # admin_password "{{ .AutomateConfig.AutomateAdminPassword }}"
   ### Leave commented out if using AWS infrastructure
-  # fqdn "{{ .AutomateFQDN }}"
-  instance_count {{ .AutomateInstanceCount }}
+  # fqdn "{{ .AutomateConfig.AutomateFQDN }}"
+  instance_count {{ .AutomateConfig.AutomateInstanceCount }}
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
-  # teams_port "{{ .AutomateTeamsPort }}"
-  config_file "{{ .AutomateConfigFile }}"
+  # teams_port "{{ .AutomateConfig.AutomateTeamsPort }}"
+  config_file "{{ .AutomateConfig.AutomateConfigFile }}"
 end
 
 ###############################################################
@@ -57,28 +57,28 @@ end
 ### Only applies when using an existing node architecture   ###
 ###############################################################
 existing_nodes do
-  automate_ips {{ .ExistingNodesAutomateIPs }}
-  automate_private_ips {{ .ExistingNodesAutomatePrivateIPs }}
-  chef_server_ips {{ .ExistingNodesChefServerIPs }}
-  chef_server_private_ips {{ .ExistingNodesChefServerPrivateIPs }}
-  elasticsearch_ips {{ .ExistingNodesElasticsearchIPs }}
-  elasticsearch_private_ips {{ .ExistingNodesElasticsearchPrivateIPs }}
-  postgresql_ips {{ .ExistingNodesPostgresqlIPs }}
-  postgresql_private_ips {{ .ExistingNodesPostgresqlPrivateIps }}
+  automate_ips {{ .ExistingInfraAutomateIPs }}
+  automate_private_ips {{ .ExistingInfraAutomatePrivateIPs }}
+  chef_server_ips {{ .ExistingInfraChefServerIPs }}
+  chef_server_private_ips {{ .ExistingInfraChefServerPrivateIPs }}
+  elasticsearch_ips {{ .ExistingInfraElasticsearchIPs }}
+  elasticsearch_private_ips {{ .ExistingInfraElasticsearchPrivateIPs }}
+  postgresql_ips {{ .ExistingInfraPostgresqlIPs }}
+  postgresql_private_ips {{ .ExistingInfraPostgresqlPrivateIps }}
 end
 `
 
 const awsA2harbTemplate = `
-secrets_key_file "{{ .SecretsKeyFile }}"
-secrets_store_file "{{ .SecretsStoreFile }}"
-architecture "{{ .Architecture }}"
-workspace_path "{{ .WorkspacePath }}"
-ssh_user "{{ .SshUser }}"
-ssh_key_file "{{ .SshKeyFile }}"
+secrets_key_file "{{ .ArchitectureCommons.SecretsKeyFile }}"
+secrets_store_file "{{ .ArchitectureCommons.SecretsStoreFile }}"
+architecture "{{ .ArchitectureCommons.Architecture }}"
+workspace_path "{{ .ArchitectureCommons.WorkspacePath }}"
+ssh_user "{{ .ArchitectureCommons.SshUser }}"
+ssh_key_file "{{ .ArchitectureCommons.SshKeyFile }}"
 # logging_monitoring_management "true"
 # new_elk "false"
 # existing_elk "false"
-backup_mount "{{ .BackupMount }}"
+backup_mount "{{ .ArchitectureCommons.BackupMount }}"
 # sudo_password ""
 # existing_elk_instance_ip ""
 # existing_elk_port ""
@@ -90,35 +90,35 @@ backup_mount "{{ .BackupMount }}"
 ### Automate frontend node related settings                 ###
 ###############################################################
 automate do
-  instance_count 1
-  config_file "/src/configs/automate.toml"
-  # admin_password "{{ .AutomateAdminPassword }}"
+  instance_count {{ .AutomateConfig.AutomateInstanceCount }}
+  config_file "{{ .AutomateConfig.AutomateConfigFile }}"
+  # admin_password "{{ .AutomateConfig.AutomateAdminPassword }}"
   ### Leave commented out if using AWS infrastructure
-  # fqdn "{{ .AutomateFQDN }}"
+  # fqdn "{{ .AutomateConfig.AutomateFQDN }}"
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.
-  # teams_port ""
+  # teams_port "{{ .AutomateConfig.AutomateTeamsPort }}"
 end
 
 ###############################################################
 ### Chef Server frontend node related settings              ###
 ###############################################################
 chef_server do
-  instance_count 1
+  instance_count {{ .ChefServerInstanceCount }}
 end
 
 ###############################################################
 ### Elasticsearch related settings                          ###
 ###############################################################
 elasticsearch do
-  instance_count 3
+  instance_count {{ .ElasticSearchInstanceCount }}
 end
 
 ###############################################################
 ### PostgreSQL related settings                             ###
 ###############################################################
 postgresql do
-  instance_count 3
+  instance_count {{ .PostgresqlInstanceCount }}
 end
 
 ###############################################################
@@ -130,13 +130,13 @@ aws do
   region "{{ .AwsRegion }}"
   # ssh_key_pair_name "{{ .AwsSshKeyPairName }}"
   ### Filter settings default to CentOS if left blank
-  # ami_filter_name ""
+  # ami_filter_name "{{ .AmiFilterName }}"
   ### Filter settings default to CentOS if left blank
-  # ami_filter_virt_type ""
+  # ami_filter_virt_type "{{ .AmiFilterVirtType }}"
   ### Filter settings default to CentOS if left blank
-  # ami_filter_owner ""
+  # ami_filter_owner "{{ .AmiFilterOwner }}"
   ### Overrides ami filter search features
-  # ami_id ""
+  # ami_id "{{ .AmiId }}"
   ### EC2 instance type to use for Automate frontends, minimum >2G of RAM for test, 8G for prod
   automate_server_instance_type "{{ .AwsAutomateServerInstaceType }}"
   ### EC2 instance type to use for Chef Server frontends, minimum >2G of RAM for test, 8G for prod

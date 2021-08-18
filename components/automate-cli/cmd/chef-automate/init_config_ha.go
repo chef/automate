@@ -13,25 +13,37 @@ var initConfigHAPathFlags = struct {
 	path string
 }{}
 
-var initConfigHAFlags = struct {
-	SecretsKeyFile                    string `toml:"architecture.aws.secrets_key_file"`
-	SecretsStoreFile                  string `toml:"architecture.aws.secrets_store_file"`
-	Architecture                      string `toml:"architecture.aws.architecture"`
-	WorkspacePath                     string `toml:"architecture.aws.workspace_path"`
-	SshUser                           string `toml:"architecture.aws.ssh_user"`
-	SshKeyFile                        string `toml:"architecture.aws.ssh_key_file"`
-	SudoPassword                      string `toml:"architecture.aws.sudo_password"`
-	BackupMount                       string `toml:"architecture.aws.backup_mount"`
-	AutomateAdminPassword             string `toml:"automate.config.admin_password"`
-	AutomateFQDN                      string `toml:"automate.config.fqdn"`
-	AutomateTeamsPort                 string `toml:"automate.config.AutomateTeamsPort"`
-	AutomateInstanceCount             string `toml:"automate.config.instance_count"`
-	AutomateConfigFile                string `toml:"automate.config.config_file"`
+type Commons struct {
+	SecretsKeyFile   string
+	SecretsStoreFile string
+	Architecture     string
+	WorkspacePath    string
+	SshUser          string
+	SshKeyFile       string
+	SudoPassword     string
+	BackupMount      string
+}
+
+type Automate struct {
+	AutomateAdminPassword string
+	AutomateFQDN          string
+	AutomateTeamsPort     string
+	AutomateInstanceCount string
+	AutomateConfigFile    string
+}
+
+type InitConfigHAFlags struct {
+	ArchitectureCommons               *Commons
+	AutomateConfig                    *Automate
 	ChefServerInstanceCount           string `toml:"chef_server.config.instance_count"`
 	ElasticSearchInstanceCount        string `toml:"elasticsearch.config.instance_count"`
 	PostgresqlInstanceCount           string `toml:"postgresql.config.instance_count"`
 	AwsProfile                        string `toml:"aws.config.profile"`
 	AwsRegion                         string `toml:"aws.config.region"`
+	AmiFilterName                     string `toml:"ami_filter_name"`
+	AmiFilterVirtType                 string `toml:"ami_filter_virt_type"`
+	AmiFilterOwner                    string `toml:"ami_filter_owner"`
+	AmiId                             string `toml:"ami_id"`
 	AwsSshKeyPairName                 string `toml:"aws.config.ssh_key_pair_name"`
 	AwsAutomateServerInstaceType      string `toml:"aws.config.automate_server_instance_type"`
 	AwsChefServerInstanceType         string `toml:"aws.config.chef_server_instance_type"`
@@ -54,34 +66,23 @@ var initConfigHAFlags = struct {
 	AwsTagContact                     string `toml:"aws.config.X-Contact"`
 	AwsTagDept                        string `toml:"aws.config.X-Dept"`
 	AwsTagProject                     string `toml:"aws.config.X-Project"`
-}{}
+}
 
-var initConfigHAExistingNodesFlags = struct {
-	SecretsKeyFile                       string   `toml:"architecture.existing_nodes.secrets_key_file"`
-	SecretsStoreFile                     string   `toml:"architecture.existing_nodes.secrets_store_file"`
-	Architecture                         string   `toml:"architecture.existing_nodes.architecture"`
-	WorkspacePath                        string   `toml:"architecture.existing_nodes.workspace_path"`
-	SshUser                              string   `toml:"architecture.existing_nodes.ssh_user"`
-	SshKeyFile                           string   `toml:"architecture.existing_nodes.ssh_key_file"`
-	SudoPassword                         string   `toml:"architecture.existing_nodes.sudo_password"`
-	BackupMount                          string   `toml:"architecture.existing_nodes.backup_mount"`
-	AutomateAdminPassword                string   `toml:"automate.config.admin_password"`
-	AutomateFQDN                         string   `toml:"automate.config.fqdn"`
-	AutomateTeamsPort                    string   `toml:"automate.config.AutomateTeamsPort"`
-	AutomateInstanceCount                string   `toml:"automate.config.instance_count"`
-	AutomateConfigFile                   string   `toml:"automate.config.config_file"`
+type InitConfigHAExistingInfraFlags struct {
+	ArchitectureCommons                  *Commons
+	AutomateConfig                       *Automate
 	ChefServerInstanceCount              string   `toml:"chef_server.config.instance_count"`
 	ElasticSearchInstanceCount           string   `toml:"elasticsearch.config.instance_count"`
 	PostgresqlInstanceCount              string   `toml:"postgresql.config.instance_count"`
-	ExistingNodesAutomateIPs             []string `toml:"existing_nodes.config.automate_ips"`
-	ExistingNodesAutomatePrivateIPs      []string `toml:"existing_nodes.config.chef_server_ips"`
-	ExistingNodesChefServerIPs           []string `toml:"existing_nodes.config.chef_server_ips"`
-	ExistingNodesChefServerPrivateIPs    []string `toml:"existing_nodes.config.chef_server_private_ips"`
-	ExistingNodesElasticsearchIPs        []string `toml:"existing_nodes.config.elasticsearch_ips"`
-	ExistingNodesElasticsearchPrivateIPs []string `toml:"existing_nodes.config.elasticsearch_private_ips"`
-	ExistingNodesPostgresqlIPs           []string `toml:"existing_nodes.config.postgresql_ips"`
-	ExistingNodesPostgresqlPrivateIps    []string `toml:"existing_nodes.config.postgresql_private_ips"`
-}{}
+	ExistingInfraAutomateIPs             []string `toml:"existing_infra.config.automate_ips"`
+	ExistingInfraAutomatePrivateIPs      []string `toml:"existing_infra.config.chef_server_ips"`
+	ExistingInfraChefServerIPs           []string `toml:"existing_infra.config.chef_server_ips"`
+	ExistingInfraChefServerPrivateIPs    []string `toml:"existing_infra.config.chef_server_private_ips"`
+	ExistingInfraElasticsearchIPs        []string `toml:"existing_infra.config.elasticsearch_ips"`
+	ExistingInfraElasticsearchPrivateIPs []string `toml:"existing_infra.config.elasticsearch_private_ips"`
+	ExistingInfraPostgresqlIPs           []string `toml:"existing_infra.config.postgresql_ips"`
+	ExistingInfraPostgresqlPrivateIps    []string `toml:"existing_infra.config.postgresql_private_ips"`
+}
 
 func init() {
 	initConfigHACmd.PersistentFlags().StringVar(
@@ -89,7 +90,7 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
-
+	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 	RootCmd.AddCommand(initConfigHACmd)
 }
 
@@ -105,20 +106,19 @@ var initConfigHACmd = &cobra.Command{
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		msg := "one argument expected as any of deplyment mode like aws or existing_node. "
-		writer.Printf(msg)
+		msg := "one argument expected, please refer help doc."
+		writer.Printf("%s\n\n%s\n", msg, UsageTemplate)
 		return nil
 	} else if args[0] == "aws" {
-		writer.Printf("Generating initial automate high availability configuration for AWS deployment")
+		writer.Printf("Generating initial automate high availability configuration for AWS deployment\n")
 		return runInitConfigAwsHACmd()
-	} else if args[0] == "bare_metal" {
-		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment")
-		return runInitConfigExistingNodeHACmd()
 	} else if args[0] == "deploy" {
 		return readConfigAndWriteToFile()
+	} else if args[0] == "existing_infra" {
+		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment\n")
+		return runInitConfigExistingNodeHACmd()
 	} else {
-		msg := "Incorrect argument expected is any of deplyment mode like aws or existing_node. "
-		writer.Printf(msg)
-		return status.Wrap(errors.New(msg), status.ConfigError, msg)
+		msg := "Incorrect argument, please refer help doc."
+		return status.Wrap(errors.New(msg), status.ConfigError, UsageTemplate)
 	}
 }
