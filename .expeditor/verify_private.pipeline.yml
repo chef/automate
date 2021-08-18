@@ -183,12 +183,15 @@ steps:
       accounts:
         - aws/chef-cd
       secrets:
-        AWS_ACCESS_KEY_ID:
+        HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
           account: aws/chef-cd
           field: access_key_id
-        AWS_SECRET_ACCESS_KEY:
+        HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
           account: aws/chef-cd
           field: secret_access_key
+        HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
       executor:
         docker:
           privileged: true

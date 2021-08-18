@@ -109,6 +109,8 @@ func CreateMinioBucket(t *testing.T) ([]byte, error) {
 }
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %d", len(automateApiToken))
+	t.Logf("automateAwsAccessKey: %s", automateAwsAccessKey)
+	t.Logf("automateAwsSecretAccessKey: %s", automateAwsSecretAccessKey)
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
