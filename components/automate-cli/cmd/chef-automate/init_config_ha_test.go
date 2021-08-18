@@ -10,7 +10,7 @@ var stubCmd = &cobra.Command{
 	// use getClient in the command implementation
 }
 var argsAws = []string{"aws"}
-var argsExistingNodes = []string{"existing_node"}
+var argsExistingNodes = []string{"existing_infra"}
 var argsSomeThingElse = []string{"something_else"}
 var argsEmpty = []string{}
 
