@@ -123,3 +123,22 @@ elasticsearch_private_ips = []
 postgresql_ips = []
 postgresql_private_ips = []
 `
+
+var UsageTemplate string = `
+
+Usage:
+  chef-automate init-config-ha [arg] or [flag]
+
+Flags:
+      --file string               File path to write the config (default "config.toml")
+  -h, --help                      help for init-config-ha
+
+Args: 
+  aws				Generate initial automate high availability configuration for AWS deployment
+  existing_infra		Generate initial automate high availability configuration for existing infra nodes deployment
+
+Global Flags:
+  -d, --debug                Enable debug output
+      --no-check-version     Disable version check
+      --result-json string   Write command result as JSON to PATH	  
+`

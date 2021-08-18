@@ -19,7 +19,7 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
-
+	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 	RootCmd.AddCommand(initConfigHACmd)
 }
 
@@ -35,8 +35,8 @@ var initConfigHACmd = &cobra.Command{
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		msg := "one argument expected as any of deplyment mode like aws or existing_infra. "
-		writer.Printf("%s\n", msg)
+		msg := "one argument expected, please refer help doc."
+		writer.Printf("%s\n\n%s\n", msg, UsageTemplate)
 		return nil
 	} else if args[0] == "aws" {
 		writer.Printf("Generating initial automate high availability configuration for AWS deployment\n")
@@ -45,8 +45,7 @@ func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment\n")
 		return runInitConfigExistingNodeHACmd()
 	} else {
-		msg := "Incorrect argument expected is any of deplyment mode like aws or existing_infra. "
-		writer.Printf("%s\n", msg)
-		return status.Wrap(errors.New(msg), status.ConfigError, msg)
+		msg := "Incorrect argument, please refer help doc."
+		return status.Wrap(errors.New(msg), status.ConfigError, UsageTemplate)
 	}
 }
