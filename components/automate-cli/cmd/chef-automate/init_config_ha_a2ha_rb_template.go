@@ -57,14 +57,14 @@ end
 ### Only applies when using an existing node architecture   ###
 ###############################################################
 existing_nodes do
-  automate_ips []
-  automate_private_ips []
-  chef_server_ips []
-  chef_server_private_ips []
-  elasticsearch_ips []
-  elasticsearch_private_ips []
-  postgresql_ips []
-  postgresql_private_ips []
+  automate_ips {{ .ExistingNodesAutomateIPs }}
+  automate_private_ips {{ .ExistingNodesAutomatePrivateIPs }}
+  chef_server_ips {{ .ExistingNodesChefServerIPs }}
+  chef_server_private_ips {{ .ExistingNodesChefServerPrivateIPs }}
+  elasticsearch_ips {{ .ExistingNodesElasticsearchIPs }}
+  elasticsearch_private_ips {{ .ExistingNodesElasticsearchPrivateIPs }}
+  postgresql_ips {{ .ExistingNodesPostgresqlIPs }}
+  postgresql_private_ips {{ .ExistingNodesPostgresqlPrivateIps }}
 end
 `
 
