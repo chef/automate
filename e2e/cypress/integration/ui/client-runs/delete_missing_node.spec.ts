@@ -30,6 +30,15 @@ describe('delete missing node from UI', () => {
       }
     });
 
+    it('sends the cookie when using cy.request', () => {
+      // https://on.cypress.io/request
+      // the endpoint /print-cookies returns the sent cookies
+      // back to use so we can validate
+      cy.request('/print-cookies')
+        .its('body')
+        .should('deep.equal', { mycookie: 'testcookie' });
+    });
+
     // wait for nodes to be marked missing
     cy.waitUntilNodeIsMissing(clientRunsNodeId);
   });
@@ -50,7 +59,6 @@ describe('delete missing node from UI', () => {
 
   it('from client runs page delete nodes', () => {
     cy.adminLogin('/infrastructure/client-runs').then(() => {
-      cy.wait(1000);
       cy.get('app-welcome-modal').invoke('hide');
     });
 
