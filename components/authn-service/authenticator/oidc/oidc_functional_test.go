@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -30,7 +31,7 @@ func (s *IdTokenValidator) ValidateIdToken(
 	_ context.Context,
 	_ *id_token.ValidateIdTokenRequest) (*id_token.ValidateIdTokenResponse, error) {
 
-	return &id_token.ValidateIdTokenResponse{IsValid: true}, nil
+	return &id_token.ValidateIdTokenResponse{IsInvalid: false}, nil
 }
 
 // This test covers the "local development" feature of the oidc authenticator:

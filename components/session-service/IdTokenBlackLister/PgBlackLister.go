@@ -1,6 +1,8 @@
 package IdTokenBlackLister
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type PgBlackLister struct {
 	pgConn *sql.DB
