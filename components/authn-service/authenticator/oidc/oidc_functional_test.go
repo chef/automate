@@ -1,7 +1,10 @@
 package oidc
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -17,6 +20,18 @@ import (
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
+
+type IdTokenValidator struct {
+	pgDB               *sql.DB
+	idTokenBlackLister IdTokenBlackLister.IdTokenBlackLister
+}
+
+func (s *IdTokenValidator) ValidateIdToken(
+	_ context.Context,
+	_ *id_token.ValidateIdTokenRequest) (*id_token.ValidateIdTokenResponse, error) {
+
+	return &id_token.ValidateIdTokenResponse{IsValid: true}, nil
+}
 
 // This test covers the "local development" feature of the oidc authenticator:
 // When the configured issuer contains "localhost", outgoing requests of the
@@ -180,7 +195,11 @@ func authenticate(t *testing.T, issuer, keys, token string) (authenticator.Reque
 	sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
 	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
 	grpcSession := sessionConnFactory.NewServer()
+	id_token.RegisterValidateIdTokenServiceServer(grpcSession, &IdTokenValidator{nil, nil})
+
 	sessionServer := grpctest.NewServer(grpcSession)
+	defer sessionServer.Close()
+
 	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
 	require.NoError(t, err)
 

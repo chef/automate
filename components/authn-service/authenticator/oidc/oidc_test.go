@@ -96,6 +96,8 @@ func TestAuthenticateExtractsIDTokenAndCallsVerifier(t *testing.T) {
 	sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
 	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
 	grpcSession := sessionConnFactory.NewServer()
+	id_token.RegisterValidateIdTokenServiceServer(grpcSession, &IdTokenValidator{nil, nil})
+
 	sessionServer := grpctest.NewServer(grpcSession)
 	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
 	require.NoError(t, err)
@@ -164,6 +166,8 @@ func TestAuthenticateWhenEverythingSucceedsReturnsSubject(t *testing.T) {
 	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
 	grpcSession := sessionConnFactory.NewServer()
 	sessionServer := grpctest.NewServer(grpcSession)
+	id_token.RegisterValidateIdTokenServiceServer(grpcSession, &IdTokenValidator{nil, nil})
+
 	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
 	require.NoError(t, err)
 
