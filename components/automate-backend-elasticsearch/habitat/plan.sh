@@ -41,7 +41,8 @@ do_build() {
 }
 
 do_install() {
-  $(pkg_path_for core/bash)/bin/bash components/automate-backend-elasticsearch/habitat/cert.sh 
+  $(pkg_path_for core/bash)/bin/pwd 
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh 
 }
 
 do_end() {
