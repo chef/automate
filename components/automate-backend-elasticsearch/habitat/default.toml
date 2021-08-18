@@ -91,3 +91,7 @@
   admin_password = "admin"
   dashboard_username = "kibana"
   dashboard_password = "kibana"
+
+# Fill these in in your user.toml to override automatic SSL Cert generation
+[opendistro_ssl]
+

@@ -12,6 +12,7 @@ pkg_deps=(
   chef/mlsa
   core/bash
   core/procps-ng
+  core/openssl
   "${UPSTREAM_PKG_IDENT}"
 )
 
@@ -40,7 +41,7 @@ do_build() {
 }
 
 do_install() {
-  return 0
+  /bin/bash cert.sh 
 }
 
 do_end() {
