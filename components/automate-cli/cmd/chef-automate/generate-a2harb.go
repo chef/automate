@@ -108,22 +108,7 @@ func setAutomateConfig(data *ptoml.Tree) *Automate {
 	return initFlags
 }
 
-func generateAWSA2HARBFile(config *ptoml.Tree, architectureAws interface{}) {
-	var initConfigHAFlags *InitConfigHAFlags = &InitConfigHAFlags{}
-	architectureAwsData := architectureAws.(*ptoml.Tree)
-	initConfigHAFlags.ArchitectureCommons = setCommons(architectureAwsData)
-	automateConfig := config.Get("automate.config").(*ptoml.Tree)
-	initConfigHAFlags.AutomateConfig = setAutomateConfig(automateConfig)
-	if config.Get("chef_server.config.instance_count") != nil {
-		initConfigHAFlags.ChefServerInstanceCount = config.Get("chef_server.config.instance_count").(string)
-	}
-	if config.Get("elasticsearch.config.instance_count") != nil {
-		initConfigHAFlags.ElasticSearchInstanceCount = config.Get("elasticsearch.config.instance_count").(string)
-	}
-	if config.Get("postgresql.config.instance_count") != nil {
-		initConfigHAFlags.PostgresqlInstanceCount = config.Get("postgresql.config.instance_count").(string)
-	}
-	awsConfig := config.Get("aws.config").(*ptoml.Tree)
+func setAwsConfig(awsConfig *ptoml.Tree, initConfigHAFlags *InitConfigHAFlags) {
 	if awsConfig.Get("profile") != nil {
 		initConfigHAFlags.AwsProfile = awsConfig.Get("profile").(string)
 	}
@@ -208,6 +193,25 @@ func generateAWSA2HARBFile(config *ptoml.Tree, architectureAws interface{}) {
 	if awsConfig.Get("X-Project") != nil {
 		initConfigHAFlags.AwsTagProject = awsConfig.Get("X-Project").(string)
 	}
+}
+
+func generateAWSA2HARBFile(config *ptoml.Tree, architectureAws interface{}) {
+	var initConfigHAFlags *InitConfigHAFlags = &InitConfigHAFlags{}
+	architectureAwsData := architectureAws.(*ptoml.Tree)
+	initConfigHAFlags.ArchitectureCommons = setCommons(architectureAwsData)
+	automateConfig := config.Get("automate.config").(*ptoml.Tree)
+	initConfigHAFlags.AutomateConfig = setAutomateConfig(automateConfig)
+	if config.Get("chef_server.config.instance_count") != nil {
+		initConfigHAFlags.ChefServerInstanceCount = config.Get("chef_server.config.instance_count").(string)
+	}
+	if config.Get("elasticsearch.config.instance_count") != nil {
+		initConfigHAFlags.ElasticSearchInstanceCount = config.Get("elasticsearch.config.instance_count").(string)
+	}
+	if config.Get("postgresql.config.instance_count") != nil {
+		initConfigHAFlags.PostgresqlInstanceCount = config.Get("postgresql.config.instance_count").(string)
+	}
+	awsConfig := config.Get("aws.config").(*ptoml.Tree)
+	setAwsConfig(awsConfig, initConfigHAFlags)
 	finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, initConfigHAFlags)
 	writeToA2HARBFile(finalTemplate, "a2ha.rb")
 }
