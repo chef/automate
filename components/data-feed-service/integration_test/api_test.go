@@ -442,6 +442,9 @@ func testDestinationHeaderRequestSuccess(t *testing.T, data []byte) {
 
 func testDestinationAwsRequestSuccess(t *testing.T, data []byte) {
 	response, err := testDestinationRequest(t, data)
+	if response.StatusCode != 200 {
+		fmt.Println(response)
+	}
 	assert.Nil(t, err, "Error: %v", err)
 	if assert.NotNil(t, response, "expected a response got nil") {
 		if assert.Equal(t, 200, response.StatusCode, "Expected 200, got %d", response.StatusCode) {
