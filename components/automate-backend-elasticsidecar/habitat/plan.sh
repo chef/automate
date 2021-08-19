@@ -35,7 +35,7 @@ do_build() {
 }
 
 do_install() {
-  pushd automate-backend-elasticsidecar
+  pushd habitat/automate-backend-elasticsidecar/
     bundle config set --local path "${pkg_prefix}/lib/gems"
     bundle install
   popd
