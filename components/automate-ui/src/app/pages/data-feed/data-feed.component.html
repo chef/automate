@@ -31,7 +31,7 @@
           <p>No Data Feeds Preview Available</p>
         </div>
         <div [ngClass]="(sortedDestinations$ | async)?.length === 0 ? 'empty-state' : ''">
-          <chef-button primary (click)="openCreateModal()"><img class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
+          <chef-button primary (click)="openCreateModal()"><img alt="" class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
         </div>
 
         <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
