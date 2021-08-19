@@ -262,10 +262,10 @@ func (datafeedServer *DatafeedServer) EnableDestination(ctx context.Context, des
 	res, err := datafeedServer.GetDestination(ctx, GetdestinationRequest)
 	return res, nil
 }
-func (datafeedServer *DatafeedServer) DestinationConfig(ctx context.Context, destination *datafeed.ConfigRequest) (*datafeed.ConfigResponse, error) {
+func (datafeedServer *DatafeedServer) GlobalDataFeedConfig(ctx context.Context, destination *datafeed.GlobalDataFeedConfigRequest) (*datafeed.GlobalDataFeedConfigResponse, error) {
 	log.Infof("DestinationConfig %s", destination)
 	data, _ := config.Configure()
-	config := &datafeed.ConfigResponse{}
+	config := &datafeed.GlobalDataFeedConfigResponse{}
 	config.FeedInterval = fmt.Sprintf("%f", data.ServiceConfig.FeedInterval.Hours())
 	config.NodeBatchSize = int64(data.ServiceConfig.NodeBatchSize)
 	config.UpdatedNodesOnly = data.ServiceConfig.UpdatedNodesOnly

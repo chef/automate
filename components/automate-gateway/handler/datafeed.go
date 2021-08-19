@@ -117,11 +117,11 @@ func (a *Datafeed) EnableDestination(ctx context.Context, in *data_feed.UpdateDe
 }
 
 //config
-func (a *Datafeed) DestinationConfig(ctx context.Context, in *data_feed.ConfigRequest) (*data_feed.ConfigResponse, error) {
-	inDomain := &data_feed.ConfigRequest{}
-	out := &data_feed.ConfigResponse{}
+func (a *Datafeed) GlobalDataFeedConfig(ctx context.Context, in *data_feed.GlobalDataFeedConfigRequest) (*data_feed.GlobalDataFeedConfigResponse, error) {
+	inDomain := &data_feed.GlobalDataFeedConfigRequest{}
+	out := &data_feed.GlobalDataFeedConfigResponse{}
 	f := func() (proto.Message, error) {
-		return a.client.DestinationConfig(ctx, inDomain)
+		return a.client.GlobalDataFeedConfig(ctx, inDomain)
 	}
 	err := protobuf.CallDomainService(in, inDomain, f, out)
 	if err != nil {

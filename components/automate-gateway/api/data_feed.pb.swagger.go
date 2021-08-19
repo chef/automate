@@ -16,12 +16,12 @@ func init() {
   "paths": {
     "/api/v0/datafeed/config": {
       "get": {
-        "operationId": "DatafeedService_DestinationConfig",
+        "operationId": "DatafeedService_GlobalDataFeedConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.datafeed.ConfigResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.GlobalDataFeedConfigResponse"
             }
           },
           "default": {
@@ -366,39 +366,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.datafeed.ConfigResponse": {
-      "type": "object",
-      "properties": {
-        "feed_interval": {
-          "type": "string"
-        },
-        "node_batch_size": {
-          "type": "string",
-          "format": "int64"
-        },
-        "updated_nodes_only": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "disable_cidr_filter": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "cidr_filter": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "accepted_status_codes": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      }
-    },
     "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
@@ -463,6 +430,39 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        }
+      }
+    },
+    "chef.automate.api.datafeed.GlobalDataFeedConfigResponse": {
+      "type": "object",
+      "properties": {
+        "feed_interval": {
+          "type": "string"
+        },
+        "node_batch_size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_nodes_only": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "disable_cidr_filter": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "cidr_filter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accepted_status_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       }
