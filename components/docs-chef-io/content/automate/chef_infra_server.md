@@ -489,7 +489,7 @@ You can **Expand** and **Collapse** the *default* and *override* attributes by s
 
 ##### Cookbook Dependencies
 
-Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile. The slider tab also contains the `Operator` and `Version` of the cookbooks.
+Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. The slider tab also contains the `Operator` and `Version` of the cookbooks.
 
 Image
 
