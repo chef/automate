@@ -467,7 +467,7 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, and **Revision ID** of that Policyfile.
+Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Revision ID**, and **Cookbook Dependencies** of that Policyfile.
 
 {{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
@@ -486,6 +486,12 @@ The **Attributes** tab displays the *default* and the *override* attributes of a
 {{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
 You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
+
+##### Cookbook Dependencies
+
+Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile. The slider tab also contains the `Operator` and `Version` of the cookbooks.
+
+Image
 
 {{< note >}}
 You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
