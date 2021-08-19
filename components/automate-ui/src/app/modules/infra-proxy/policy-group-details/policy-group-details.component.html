@@ -46,15 +46,15 @@
           <div class="spinner">
             <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
           </div>
-          <div data-cy="empty-list" class="empty-section" *ngIf="policyCount === 0">
+          <div data-cy="empty-list" class="empty-section" *ngIf="true">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
-            <p>No policy files available</p>
+            <p>No policyfiles available</p>
           </div>
           <div *ngIf="!policyGroupDetailsLoading || policyCount > 0">
             <chef-table data-cy="policy-group-details-table-container">
               <chef-thead>
                 <chef-tr class="no_border_tr">
-                  <chef-th class="no_border_th">Policy Files</chef-th>
+                  <chef-th class="no_border_th">Policyfiles</chef-th>
                   <chef-th class="no_border_th">Revision ID</chef-th>
                 </chef-tr>
               </chef-thead>

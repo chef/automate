@@ -8,7 +8,7 @@ import { filter, pluck, takeUntil, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { Router } from '@angular/router';
 import { policyGoupFromRoute } from 'app/entities/policy-files/policy-group-details.selectors';
-import { PolicyGroup } from 'app/entities/policy-files/policy-file.model';
+import { PolicyGroup, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroup } from 'app/entities/policy-files/policy-file.action';
 
 export type PolicyGroupTabName = 'policyfiles';
@@ -25,7 +25,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public name: string;
   public show = false;
   public policyCount: number;
-  public policies: Array<any>;
+  public policies: IncludedPolicyLocks[];
   public policyGroupDetailsLoading = true;
   public tabValue: PolicyGroupTabName = 'policyfiles';
   public url: string;
