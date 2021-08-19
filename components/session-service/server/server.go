@@ -81,10 +81,10 @@ const (
 	dbCleanupInterval = 12 * time.Hour
 
 	// Expired blacklistedIdTokens cleanup interval
-	blacklistedIdTokensCleanupInterval = "@every 3m"
+	blacklistedIdTokensCleanupInterval = "@every 4m"
 
 	// IdTokens inserted_at comparison time
-	insertedAtComparisionMinutes = 3
+	insertedAtComparisionMinutes = 4
 
 	// This duration drives the refresh process: if the token expires within the
 	// next minute, we'll refresh. This is a first guess and might need tweaking.
@@ -579,6 +579,17 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	idToken, err := util.ExtractBearerToken(r)
 	if err != nil {
 		s.log.Debug("no bearer token")
+		httpError(w, http.StatusUnauthorized)
+		return
+	}
+
+	isBlacklisted, err := s.idTokenBlackLister.IsIdTokenBlacklisted(idToken)
+	if err != nil {
+		httpError(w, http.StatusInternalServerError)
+		return
+	}
+	if isBlacklisted {
+		s.log.Debug("bearer token blacklisted")
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
