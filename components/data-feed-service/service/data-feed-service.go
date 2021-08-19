@@ -6,7 +6,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,15 +25,22 @@ import (
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 
 	"github.com/chef/automate/lib/grpc/secureconn"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 const version = "1"
 
 type datafeedNotification struct {
-	credentials Credentials
-	url         string
-	data        bytes.Buffer
-	contentType string
+	credentials      Credentials
+	url              string
+	data             bytes.Buffer
+	contentType      string
+	services         string
+	integrationTypes string
 }
 
 type DataClient struct {
@@ -139,6 +148,26 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
 
+func AddCustomHeader(credentials Credentials, header http.Header) {
+	if credentials.GetAuthType() == HEADER_AUTH {
+		headerString := credentials.GetValues().HeaderJSONString
+		var headerMap map[string]string
+		err := json.Unmarshal([]byte(headerString), &headerMap)
+		if err != nil {
+			log.Warnf("Error parsing headers %v", err)
+		}
+		for key, value := range headerMap {
+			header.Set(key, value)
+		}
+	} else {
+		authHeader := credentials.GetValues().AuthorizationHeader
+		tokenValue := authHeader[strings.LastIndex(authHeader, " ")+1:]
+		if tokenValue != "" {
+			header.Add("Authorization", authHeader)
+		}
+	}
+}
+
 func (client DataClient) sendNotification(notification datafeedNotification) error {
 
 	log.Debugf("sendNotification bytes length %v", notification.data.Len())
@@ -153,30 +182,40 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		return err
 	}
 
-	request, err := http.NewRequest("POST", notification.url, &contentBuffer)
-	if err != nil {
-		log.Error("Error creating request")
-		return err
-	}
-	request.Header.Add("Authorization", notification.credentials.GetAuthorizationHeaderValue())
-	request.Header.Add("Content-Type", notification.contentType)
-	request.Header.Add("Content-Encoding", "gzip")
-	request.Header.Add("Accept", notification.contentType)
-	request.Header.Add("Chef-Data-Feed-Message-Version", version)
+	if notification.services == S3 || notification.services == Minio {
+		cred := notification.credentials.GetValues().AwsCreds
+		sess := ConnectAWS(cred, notification.url, notification.services)
+		FileUploadInAws(sess, cred, notification.data.Bytes(), "Prod")
 
-	response, err := client.client.Do(request)
-	if err != nil {
-		log.Errorf("Error sending message %v", err)
-		return err
 	} else {
-		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
-	}
-	if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
-		return errors.New(response.Status)
-	}
-	err = response.Body.Close()
-	if err != nil {
-		log.Warnf("Error closing response body %v", err)
+		request, err := http.NewRequest("POST", notification.url, &contentBuffer)
+		if err != nil {
+			log.Error("Error creating request")
+			return err
+		}
+
+		request.Header.Add("Content-Type", notification.contentType)
+		request.Header.Add("Content-Encoding", "gzip")
+		request.Header.Add("Accept", notification.contentType)
+		request.Header.Add("Chef-Data-Feed-Message-Version", version)
+		AddCustomHeader(notification.credentials, request.Header)
+
+		//notification.addCustomHeader(request.Header)
+
+		response, err := client.client.Do(request)
+		if err != nil {
+			log.Errorf("Error sending message %v", err)
+			return err
+		} else {
+			log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
+		}
+		if !config.IsAcceptedStatusCode(int32(response.StatusCode), client.acceptedStatusCodes) {
+			return errors.New(response.Status)
+		}
+		err = response.Body.Close()
+		if err != nil {
+			log.Warnf("Error closing response body %v", err)
+		}
 	}
 	return nil
 }
@@ -297,4 +336,56 @@ func getHostAttributes(attributesJson map[string]interface{}) (string, string, s
 	hostname, _ := attributesJson["hostname"].(string)
 
 	return ipAddress, macAddress, hostname
+}
+func ConnectAWS(cred AwsCredentials, url string, service string) *session.Session {
+	var config *aws.Config
+	if service == "Minio" {
+		config = &aws.Config{
+			Endpoint:         aws.String(url),
+			Region:           aws.String("us-east-2"),
+			DisableSSL:       aws.Bool(true),
+			S3ForcePathStyle: aws.Bool(true),
+			Credentials:      credentials.NewStaticCredentials(string(cred.GetValues().AwsCreds.accesskey), string(cred.GetValues().AwsCreds.secretAccessKey), ""),
+		}
+	} else {
+		config = &aws.Config{
+			Region:      aws.String(cred.GetValues().AwsCreds.region),
+			Credentials: credentials.NewStaticCredentials(string(cred.GetValues().AwsCreds.accesskey), string(cred.GetValues().AwsCreds.secretAccessKey), ""),
+		}
+	}
+	sess, err := session.NewSession(config)
+	if err != nil {
+		panic(err)
+	}
+	return sess
+}
+
+func FileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte, FolderName string) (*s3manager.UploadOutput, error) {
+	t := time.Now().UTC()
+	year := t.Year()
+	month := int(t.Month())
+	day := t.Day()
+	hr := t.Hour()
+	min := t.Minute()
+	sec := t.Second()
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	filePathAndName := "automate/" + FolderName + "/" +
+		strconv.Itoa(year) + "/" +
+		strconv.Itoa(month) + "/" +
+		strconv.Itoa(day) + "/" +
+		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + "_" + strconv.Itoa(rand.Intn(1000)) + ".json"
+
+	uploader := s3manager.NewUploader(sess)
+
+	res, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(cred.bucket),     // Bucket to be used
+		Key:    aws.String(filePathAndName), // Name of the file to be saved
+		Body:   bytes.NewReader(data),       // File
+	})
+	if err != nil {
+		// Do your error handling here
+		return nil, err
+	}
+	return res, nil
 }

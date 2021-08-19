@@ -7,6 +7,9 @@ import "google/api/annotations.proto";
 
 import "external/annotations/iam/annotations.proto";
 
+import "google/protobuf/struct.proto";
+import "external/common/query/parameters.proto";
+
 service DatafeedService {
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
@@ -66,6 +69,36 @@ service DatafeedService {
 			action: "datafeed:destinations:test"
 		};
 	}
+	rpc EnableDestination(UpdateDestinationEnableRequest) returns (GetDestinationResponse) {
+		option (google.api.http) = {
+			patch: "/api/v0/datafeed/destination/enable/{id}"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destinations:{id}"
+			action: "datafeed:destinations:update"
+		};
+	}
+	rpc DestinationConfig(ConfigRequest) returns (ConfigResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/datafeed/config"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "datafeed:destination"
+			action: "datafeed:destination:get"
+		};
+	}
+}
+
+message ConfigRequest{
+}
+message ConfigResponse{ 
+	string feed_interval=1;
+	int64 node_batch_size=2;
+	bool updated_nodes_only=3;
+	bool disable_cidr_filter = 4;
+	repeated string cidr_filter =5;
+	repeated int32 accepted_status_codes =6;
 }
 
 message AddDestinationRequest {	
@@ -73,6 +106,10 @@ message AddDestinationRequest {
   string name    = 2;
   string url     = 3;
   string secret  = 4;
+  string services = 5;
+  string integration_types = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message AddDestinationResponse {
@@ -80,6 +117,10 @@ message AddDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message GetDestinationRequest {
@@ -91,6 +132,10 @@ message GetDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message DeleteDestinationRequest {
@@ -102,6 +147,10 @@ message DeleteDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
 
 message UpdateDestinationRequest {	
@@ -109,14 +158,30 @@ message UpdateDestinationRequest {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services  = 5;
+  string integration_types  = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
-
+message AWSMetaData {
+	string bucket = 1;
+	string region = 2;
+}
 message UpdateDestinationResponse {
   int64 id = 1;
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  bool enable = 7;
+  repeated chef.automate.api.common.query.Kv meta_data =8;
 }
+
+message UpdateDestinationEnableRequest {
+	string id = 1;
+	bool enable = 3;
+  }
 
 message ListDestinationRequest {}
 
@@ -132,15 +197,38 @@ message UsernamePassword {
 message SecretId {
   string id = 1;
 }
+message SecretIdWithExtraPrams {
+	string id = 1;
+	string services = 2;
+    string integration_types = 3;
+	bool enable = 4;
+	repeated chef.automate.api.common.query.Kv meta_data =5;
+  }
+
+
+message Header {
+	string value = 1;
+}
+
+message AWS {
+	string access_key = 1;
+	string secret_access_key = 2;
+	string bucket = 3;
+	string region = 4;
+}
 
 message URLValidationRequest {
   string url = 1;
   oneof credentials {
     UsernamePassword username_password = 2;
     SecretId secret_id = 3;
-  }
+	SecretIdWithExtraPrams secret_id_with_addon = 4;
+	Header header = 5;
+	AWS aws = 6;
+   }
 }
 
 message TestDestinationResponse {
   bool success = 1;
 }
+

@@ -11,7 +11,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-
 	if err := suite.GlobalSetup(); err != nil {
 		fmt.Printf("Test suite setup failed: %s\n", err)
 		os.Exit(99)
