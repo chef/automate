@@ -477,7 +477,7 @@ The **Content** tab contains the list of all the *Included Policies* and *Run Li
 
 Image
 
-In the above image, the slider tab shows the *Details* and the *Revision ID* of the selected policyfile.
+In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
 
 ##### Attributes Tab
 
