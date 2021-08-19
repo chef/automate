@@ -2,9 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strconv"
+	"strings"
 
 	//"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	"bytes"
@@ -32,6 +35,7 @@ type DatafeedServer struct {
 	health              *health.Service
 	secrets             secrets.SecretsServiceClient
 	acceptedStatusCodes []int32
+	config              *config.DataFeedConfig
 }
 
 // New creates a new DatafeedServer instance.
@@ -46,13 +50,14 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 		health:              health.NewService(),
 		secrets:             secrets.NewSecretsServiceClient(secretsConn),
 		acceptedStatusCodes: config.ServiceConfig.AcceptedStatusCodes,
+		config:              config,
 	}, nil
 }
 
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData}
+	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData, Enable: destination.Enable}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -75,39 +80,61 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	region := ""
 	bucket := ""
 	serviceType := ""
-
+	integrationType := ""
 	var err error
 	var credentials service.Credentials
 	url := request.Url
+
 	switch request.Credentials.(type) {
 	case *datafeed.URLValidationRequest_UsernamePassword:
 		username = request.GetUsernamePassword().GetUsername()
 		password = request.GetUsernamePassword().GetPassword()
 		credentials = service.NewBasicAuthCredentials(username, password)
-		serviceType = service.Webhook
+		integrationType = service.Webhook
 	case *datafeed.URLValidationRequest_Header:
 		headers = request.GetHeader().GetValue()
 		credentials = service.NewCustomHeaderCredentials(headers)
-		serviceType = service.Webhook
+		integrationType = service.Webhook
 	case *datafeed.URLValidationRequest_Aws:
 		accesskey = request.GetAws().GetAccessKey()
 		secretAccessKey = request.GetAws().GetSecretAccessKey()
 		region = request.GetAws().GetRegion()
 		bucket = request.GetAws().GetBucket()
 		credentials = service.NewS3Credentials(accesskey, secretAccessKey, region, bucket)
-		if request.GetUrl() == "null" {
-			serviceType = service.S3
+		if url == "null" {
+			serviceType = "S3"
 		} else {
-			serviceType = service.Minio
+			serviceType = "Minio"
 		}
+		integrationType = service.Storage
 	case *datafeed.URLValidationRequest_SecretId:
 		secretId := request.GetSecretId().GetId()
 		// call secrets api
-		
-		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, service.Customs, service.Webhook, "")
+		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, "", service.Webhook, "{}")
 		if err != nil {
 			return response, err
 		}
+	case *datafeed.URLValidationRequest_SecretIdWithAddon:
+		secretId := request.GetSecretIdWithAddon().GetId()
+		// call secrets api
+		serviceType = request.GetSecretIdWithAddon().Services
+		integrationType = request.GetSecretIdWithAddon().IntegrationTypes
+
+		zaMap := make(map[string]string, 0)
+		for _, kv := range request.GetSecretIdWithAddon().MetaData {
+			zaMap[kv.Key] = kv.Value
+		}
+		jsonMap, err := json.Marshal(zaMap)
+		if err != nil {
+			logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+		}
+		metaData := string(jsonMap)
+
+		credentials, err = service.GetCredentials(context.Background(), datafeedServer.secrets, secretId, serviceType, integrationType, metaData)
+		if err != nil {
+			return response, err
+		}
+
 	}
 
 	messageBytes, err := json.Marshal(map[string]string{
@@ -133,7 +160,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		sess := service.ConnectAWS(cred, url, serviceType)
 		_, err := service.FileUploadInAws(sess, cred, messageBytes, "TestConnection")
 		if err != nil {
-			log.Error("Error creating Sending data to", serviceType)
+			log.Error("Error creating Sending data to ", serviceType)
 			return response, err
 		} else {
 			response.Success = true
@@ -149,7 +176,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		httpRequest.Header.Add("Content-Encoding", "gzip")
 		httpRequest.Header.Add("Accept", "application/json")
 
-		service.AddCustomHeader(credentials, httpRequest.Header, service.Webhook)
+		service.AddCustomHeader(credentials, httpRequest.Header)
 
 		client := http.Client{}
 		httpResponse, err := client.Do(httpRequest)
@@ -221,6 +248,32 @@ func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, des
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return response, nil
+}
+func (datafeedServer *DatafeedServer) EnableDestination(ctx context.Context, destination *datafeed.UpdateDestinationEnableRequest) (*datafeed.GetDestinationResponse, error) {
+	log.Infof("UpdateDestination %s", destination)
+	GetdestinationRequest := &datafeed.GetDestinationRequest{}
+	err := datafeedServer.db.EnableDestination(ctx, destination)
+
+	GetdestinationRequest.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	// Id, _ = strconv.ParseInt(destination.Id, 10, 64)
+	res, err := datafeedServer.GetDestination(ctx, GetdestinationRequest)
+	return res, nil
+}
+func (datafeedServer *DatafeedServer) DestinationConfig(ctx context.Context, destination *datafeed.ConfigRequest) (*datafeed.ConfigResponse, error) {
+	log.Infof("DestinationConfig %s", destination)
+	data, _ := config.Configure()
+	config := &datafeed.ConfigResponse{}
+	config.FeedInterval = fmt.Sprintf("%f", data.ServiceConfig.FeedInterval.Hours())
+	config.NodeBatchSize = int64(data.ServiceConfig.NodeBatchSize)
+	config.UpdatedNodesOnly = data.ServiceConfig.UpdatedNodesOnly
+	config.DisableCidrFilter = data.ServiceConfig.DisableCIDRFilter
+	config.CidrFilter = strings.Split(data.ServiceConfig.CIDRFilter, ",")
+	config.AcceptedStatusCodes = data.ServiceConfig.AcceptedStatusCodes
+
+	return config, nil
 }
 
 // Health returns the servers embedded health check service

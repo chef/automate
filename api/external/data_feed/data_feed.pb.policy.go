@@ -72,4 +72,20 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/EnableDestination", "datafeed:destinations:{id}", "datafeed:destinations:update", "PATCH", "/api/v0/datafeed/destination/enable/{id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*UpdateDestinationEnableRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/DestinationConfig", "datafeed:destination", "datafeed:destination:get", "GET", "/api/v0/datafeed/config", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }

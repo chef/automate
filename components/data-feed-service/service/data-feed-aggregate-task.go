@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"time"
 
@@ -93,19 +92,20 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 			"integration_types": destinations[destination].IntegrationTypes,
 			"MetaData":          destinations[destination].MetaData,
 		}).Debug("Destination")
-		fmt.Println("destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData", destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData)
-		credentials, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret, destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData)
+		if destinations[destination].Enable {
+			credentials, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret, destinations[destination].Services, destinations[destination].IntegrationTypes, destinations[destination].MetaData)
 
-		if err != nil {
-			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-		} else {
-			// build and send notification for this rule
-			notification := datafeedNotification{credentials: credentials, url: destinations[destination].URL, data: buffer, contentType: d.contentType, services: destinations[destination].Services, integrationTypes: destinations[destination].IntegrationTypes}
-
-			client := NewDataClient(d.acceptedStatusCodes)
-			err = send(client, notification)
 			if err != nil {
-				handleSendErr(notification, params.FeedStart, params.FeedEnd, err)
+				log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
+			} else {
+				// build and send notification for this rule
+				notification := datafeedNotification{credentials: credentials, url: destinations[destination].URL, data: buffer, contentType: d.contentType, services: destinations[destination].Services, integrationTypes: destinations[destination].IntegrationTypes}
+
+				client := NewDataClient(d.acceptedStatusCodes)
+				err = send(client, notification)
+				if err != nil {
+					handleSendErr(notification, params.FeedStart, params.FeedEnd, err)
+				}
 			}
 		}
 	}

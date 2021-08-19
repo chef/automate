@@ -14,6 +14,28 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/api/v0/datafeed/config": {
+      "get": {
+        "operationId": "DatafeedService_DestinationConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.ConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
     "/api/v0/datafeed/destination": {
       "post": {
         "operationId": "DatafeedService_AddDestination",
@@ -38,6 +60,44 @@ func init() {
             "required": true,
             "schema": {
               "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DatafeedService"
+        ]
+      }
+    },
+    "/api/v0/datafeed/destination/enable/{id}": {
+      "patch": {
+        "operationId": "DatafeedService_EnableDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationEnableRequest"
             }
           }
         ],
@@ -260,6 +320,10 @@ func init() {
         "integration_types": {
           "type": "string"
         },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "meta_data": {
           "type": "array",
           "items": {
@@ -290,10 +354,47 @@ func init() {
         "integration_types": {
           "type": "string"
         },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
         "meta_data": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        }
+      }
+    },
+    "chef.automate.api.datafeed.ConfigResponse": {
+      "type": "object",
+      "properties": {
+        "feed_interval": {
+          "type": "string"
+        },
+        "node_batch_size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "updated_nodes_only": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "disable_cidr_filter": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "cidr_filter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accepted_status_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       }
@@ -319,6 +420,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -349,6 +454,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -388,6 +497,30 @@ func init() {
         }
       }
     },
+    "chef.automate.api.datafeed.SecretIdWithExtraPrams": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "integration_types": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "meta_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        }
+      }
+    },
     "chef.automate.api.datafeed.TestDestinationResponse": {
       "type": "object",
       "properties": {
@@ -409,11 +542,26 @@ func init() {
         "secret_id": {
           "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
         },
+        "secret_id_with_addon": {
+          "$ref": "#/definitions/chef.automate.api.datafeed.SecretIdWithExtraPrams"
+        },
         "header": {
           "$ref": "#/definitions/chef.automate.api.datafeed.Header"
         },
         "aws": {
           "$ref": "#/definitions/chef.automate.api.datafeed.AWS"
+        }
+      }
+    },
+    "chef.automate.api.datafeed.UpdateDestinationEnableRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -437,6 +585,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",
@@ -467,6 +619,10 @@ func init() {
         },
         "integration_types": {
           "type": "string"
+        },
+        "enable": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "meta_data": {
           "type": "array",

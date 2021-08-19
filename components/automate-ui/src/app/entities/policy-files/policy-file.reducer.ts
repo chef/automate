@@ -10,7 +10,7 @@ export interface PolicyFileEntityState extends EntityState<PolicyFile> {
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
-const DELETE_STATUS = 'deleteStatus';
+const DELETE_STATUS  = 'deleteStatus';
 
 export const policyFileEntityAdapter: EntityAdapter<PolicyFile> =
   createEntityAdapter<PolicyFile>({
@@ -27,7 +27,7 @@ export function policyFileEntityReducer(
   state: PolicyFileEntityState = PolicyFileEntityInitialState,
   action: PolicyFileActions): PolicyFileEntityState {
 
-    switch (action.type) {
+  switch (action.type) {
     case PolicyFileActionTypes.GET_ALL:
       return set(GET_ALL_STATUS, EntityStatus.loading, policyFileEntityAdapter.removeAll(state));
 

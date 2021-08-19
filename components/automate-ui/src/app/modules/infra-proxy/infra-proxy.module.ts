@@ -29,6 +29,7 @@ import { EditInfraNodeAttributeModalComponent } from './edit-infra-node-attribut
 import { EmptyStateComponent } from './empty-state/empty-state.component';
 import { EnvironmentsComponent } from './environments/environments.component';
 import { EnvironmentDetailsComponent } from './environment-details/environment-details.component';
+import { IncludedPoliciesDetailsComponent } from './included-policies-details/included-policies-details.component';
 import { InfraEnvironmentConstraintComponent } from './infra-environment-constraint/infra-environment-constraint.component';
 import { InfraNodesComponent } from './infra-nodes/infra-nodes.component';
 import { InfraNodeDetailsComponent } from './infra-node-details/infra-node-details.component';
@@ -43,6 +44,8 @@ import { OrgEditComponent } from './org-edit/org-edit.component';
 import { PaginationComponent } from './pagination/components/pagination.component';
 import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { PolicyFileDetailsComponent } from './policy-file-details/policy-file-details.component';
+import { PolicyGroupsComponent } from './policy-groups/policy-groups.component';
+import { PolicyGroupsListComponent } from './policy-groups-list/policy-groups-list.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
@@ -83,6 +86,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     EnvironmentsComponent,
     EnvironmentDetailsComponent,
     JsonTreeTableComponent,
+    IncludedPoliciesDetailsComponent,
     InfraEnvironmentConstraintComponent,
     InfraNodesComponent,
     InfraNodeDetailsComponent,
@@ -96,6 +100,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     PaginationComponent,
     PolicyFilesComponent,
     PolicyFileDetailsComponent,
+    PolicyGroupsComponent,
+    PolicyGroupsListComponent,
     ResetAdminKeyComponent,
     ResetClientKeyComponent,
     ResetNodeKeyComponent,

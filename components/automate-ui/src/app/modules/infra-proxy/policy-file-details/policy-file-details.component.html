@@ -10,7 +10,7 @@
       <chef-page-header>
         <div class="header">
           <chef-heading data-cy="policy-file-head">{{PolicyFile?.name}}</chef-heading>
-          <chef-button secondary (click)="slide.toggleSlide()" data-cy="revisions">
+          <chef-button secondary (click)="slide.slidePanel(name)" data-cy="revisions">
             Revisions
           </chef-button>
         </div>
@@ -74,7 +74,7 @@
                   </div>
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
-                <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''"> 
+                <div class="submenu" [ngClass]="showIncludedPolicies ? activeIncludedPolicies : ''">
                   <div class="item-details">
                     <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
                       <img alt="No preview" src="/assets/img/no_preview.gif" />
@@ -84,7 +84,7 @@
                       <chef-table>
                         <chef-thead>
                           <chef-tr class="no_border_tr">
-                            <chef-th class="no_border_th">Policy Files</chef-th>
+                            <chef-th class="no_border_th">Policyfiles</chef-th>
                             <chef-th class="no_border_th">Revision ID</chef-th>
                             <chef-th class="no_border_th"></chef-th>
                             <chef-th class="no_border_th three-dot-column"></chef-th>
@@ -93,7 +93,11 @@
                         <chef-tbody>
                           <chef-tr *ngFor="let included_policy_lock of included_policy_locks">
                             <chef-td>
-                              {{included_policy_lock.name}}
+                              <a
+                                (click)="policyfile.slidePanel(included_policy_lock.name, included_policy_lock.revision_id)"
+                                class="included-policy-link">
+                                {{included_policy_lock.name}}
+                              </a>
                             </chef-td>
                             <chef-td>{{included_policy_lock.revision_id}}</chef-td>
                             <chef-td></chef-td>
@@ -102,7 +106,7 @@
                         </chef-tbody>
                       </chef-table>
                     </div>
-                  </div>  
+                  </div>
                 </div>
               </li>
             </ul>
@@ -114,7 +118,7 @@
                   </div>
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
-                <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''"> 
+                <div class="submenu" [ngClass]="showRunList ? activeRunlist : ''">
                   <div class="item-details">
                     <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
                       <img alt="No preview" src="/assets/img/no_preview.gif" />
@@ -142,7 +146,7 @@
                         </chef-tbody>
                       </chef-table>
                     </div>
-                  </div>  
+                  </div>
                 </div>
               </li>
             </ul>
@@ -165,7 +169,7 @@
                 <chef-icon>add_circle</chef-icon>
                 <span>Expand All</span>
               </chef-button>
-              <chef-button tertiary class="action" 
+              <chef-button tertiary class="action"
                 [disabled]= !hasDefaultattributes
                 (click)="tree.collapse()"
                 data-cy="collapse-default-attribute">
@@ -177,7 +181,7 @@
             <div class="json-container">
               <div class="scroll">
                 <app-json-tree-table
-                  class="json-tree-container" 
+                  class="json-tree-container"
                   [hidden]="hasDefaultattributes? false : true"
                   #tree
                   [json]="defaultAttributes">
@@ -228,15 +232,19 @@
                 </div>
               </div>
             </div>
-          </div>    
+          </div>
         </div>
       </section>
       <app-revision-id
         #slide
         [serverId]="serverId"
-        [orgId]="orgId"
-        [policyfileName]="name">
+        [orgId]="orgId">
       </app-revision-id>
+      <app-included-policies-details
+        #policyfile
+        [serverId]="serverId"
+        [orgId]="orgId">
+      </app-included-policies-details>
     </main>
   </div>
 </div>

@@ -313,3 +313,8 @@ chef-tab-selector chef-option {
     background-color: $chef-white;
   }
 }
+
+.included-policy-link {
+  cursor: pointer;
+  text-decoration: underline;
+}

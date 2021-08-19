@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -147,8 +148,8 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 	return sender.sendNotification(notification)
 }
 
-func AddCustomHeader(credentials Credentials, header http.Header, service string) {
-	if service == Webhook {
+func AddCustomHeader(credentials Credentials, header http.Header) {
+	if credentials.GetAuthType() == HEADER_AUTH {
 		headerString := credentials.GetValues().HeaderJSONString
 		var headerMap map[string]string
 		err := json.Unmarshal([]byte(headerString), &headerMap)
@@ -181,7 +182,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		return err
 	}
 
-	if notification.services == "S3" || notification.services == "Minio" {
+	if notification.services == S3 || notification.services == Minio {
 		cred := notification.credentials.GetValues().AwsCreds
 		sess := ConnectAWS(cred, notification.url, notification.services)
 		FileUploadInAws(sess, cred, notification.data.Bytes(), "Prod")
@@ -193,7 +194,11 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 			return err
 		}
 
-		AddCustomHeader(notification.credentials, request.Header, notification.services)
+		request.Header.Add("Content-Type", notification.contentType)
+		request.Header.Add("Content-Encoding", "gzip")
+		request.Header.Add("Accept", notification.contentType)
+		request.Header.Add("Chef-Data-Feed-Message-Version", version)
+		AddCustomHeader(notification.credentials, request.Header)
 
 		//notification.addCustomHeader(request.Header)
 
@@ -366,12 +371,13 @@ func FileUploadInAws(sess *session.Session, cred AwsCredentials, data []byte, Fo
 	hr := t.Hour()
 	min := t.Minute()
 	sec := t.Second()
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	filePathAndName := "automate/" + FolderName + "/" +
 		strconv.Itoa(year) + "/" +
 		strconv.Itoa(month) + "/" +
 		strconv.Itoa(day) + "/" +
-		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + ".json"
+		strconv.Itoa(hr) + "_" + strconv.Itoa(min) + "_" + strconv.Itoa(sec) + "_" + strconv.Itoa(rand.Intn(1000)) + ".json"
 
 	uploader := s3manager.NewUploader(sess)
 

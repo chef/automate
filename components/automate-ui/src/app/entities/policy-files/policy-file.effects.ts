@@ -17,6 +17,9 @@ import {
   GetPolicyFile,
   GetPolicyFileSuccess,
   GetPolicyFileFailure,
+  GetPolicyGroups,
+  GetPolicyGroupsSuccess,
+  GetPolicyGroupsFailure,
   PolicyFileActionTypes
 } from './policy-file.action';
 
@@ -99,4 +102,23 @@ export class PolicyFileEffects {
         });
     })));
 
+  getPolicyGroups$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.GET_GROUPS),
+      mergeMap(({ payload: { server_id, org_id } }: GetPolicyGroups) =>
+        this.requests.getPolicyFiles(server_id, org_id).pipe(
+          map((resp: PolicyFilesSuccessPayload) => new GetPolicyGroupsSuccess(resp)),
+          catchError((error: HttpErrorResponse) =>
+          observableOf(new GetPolicyGroupsFailure(error)))))));
+
+  getPolicyGroupsFailure$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PolicyFileActionTypes.GET_GROUPS_FAILURE),
+      map(({ payload }: GetPolicyGroupsFailure) => {
+        const msg = payload.error.error;
+        return new CreateNotification({
+          type: Type.error,
+          message: `Could not get policy groups: ${msg || payload.error}`
+        });
+    })));
 }

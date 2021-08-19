@@ -102,3 +102,30 @@ func (a *Datafeed) ListDestinations(ctx context.Context, in *data_feed.ListDesti
 	}
 	return out, nil
 }
+
+func (a *Datafeed) EnableDestination(ctx context.Context, in *data_feed.UpdateDestinationEnableRequest) (*data_feed.GetDestinationResponse, error) {
+	inDomain := &data_feed.UpdateDestinationEnableRequest{}
+	out := &data_feed.GetDestinationResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.EnableDestination(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+//config
+func (a *Datafeed) DestinationConfig(ctx context.Context, in *data_feed.ConfigRequest) (*data_feed.ConfigResponse, error) {
+	inDomain := &data_feed.ConfigRequest{}
+	out := &data_feed.ConfigResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.DestinationConfig(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
