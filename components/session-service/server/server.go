@@ -590,6 +590,7 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if isBlacklisted {
 		s.log.Debug("bearer token blacklisted")
+		sess.Destroy(w)
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
