@@ -471,7 +471,17 @@ Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, and *
 
 {{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
-The **Content** tab contains the list of all the *included policies* and *run lists*, whereas the **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
+##### Content Tab
+
+The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific policyfile from the *Included Policies* to view the details.
+
+Image
+
+In the above image, the slider tab shows the *Details* and the *Revision ID* of the selected policyfile.
+
+##### Attributes Tab
+
+The **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
 
 {{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
