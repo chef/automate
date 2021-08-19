@@ -9,16 +9,21 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 )
 
 func readConfigAndWriteToFile() error {
 	fmt.Printf("reading configs from toml file")
 	initConfigHAPath := initConfigHAPathFlags.path
 	templateBytes, err := ioutil.ReadFile(initConfigHAPath)
+	if err != nil {
+		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
+	}
 	config, err := ptoml.LoadFile(initConfigHAPath)
 	if err != nil {
-		fmt.Println(err.Error())
+		return status.Wrap(err, status.FileAccessError, "error in reading config toml file")
 	}
 	architectureAws := config.Get("architecture.aws")
 	if architectureAws != nil {
@@ -32,7 +37,8 @@ func readConfigAndWriteToFile() error {
 		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, ExitiingInfraConfig)
 		writeToA2HARBFile(finalTemplate, "a2ha.rb")
 	} else {
-		writer.Printf("Invalid toml configuration")
+		msg := "Invalid toml configuration"
+		return status.Wrap(errors.New(msg), status.ConfigError, msg)
 	}
 	return nil
 }
