@@ -4,7 +4,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, catchError } from 'rxjs/operators';
+import { map, mergeMap, filter, catchError, retryWhen, delay } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 import { BroadcastChannel } from 'broadcast-channel';
 
@@ -85,6 +85,10 @@ export class ChefSessionService implements CanActivate {
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
+        }),
+        retryWhen(error => {
+          this.isRefreshing = false;
+          return error.pipe(delay(500));  // retry in 500ms if errored
         })
       ).subscribe(
         token => {
@@ -312,7 +316,10 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    return this.user.id_token;
+    if (this.user) {
+      return this.user.id_token;
+    }
+    return null;
   }
 
   get connector(): string {
