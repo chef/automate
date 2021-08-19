@@ -35,13 +35,10 @@ do_build() {
 }
 
 do_install() {
-  gem update --system
-  gem install bcrypt --no-document --install-dir "${pkg_prefix}/lib/gems"
-  gem install http --no-document --install-dir "${pkg_prefix}/lib/gems"
-  gem install json --no-document --install-dir "${pkg_prefix}/lib/gems"
-  gem install toml-rb --no-document --install-dir "${pkg_prefix}/lib/gems"
-  gem install mixlib-shellout --no-document --install-dir "${pkg_prefix}/lib/gems"
-  gem install pry --no-document --install-dir "${pkg_prefix}/lib/gems"
+  pushd automate-backend-elasticsidecar
+    bundle config set --local path "${pkg_prefix}/lib/gems"
+    bundle install
+  popd
   mkdir "${pkg_prefix}/bin"
   install "$PLAN_CONTEXT/bin/elastic_sidecar.rb" "${pkg_prefix}/bin/elastic_sidecar.rb"
   mkdir "${pkg_prefix}/data"
