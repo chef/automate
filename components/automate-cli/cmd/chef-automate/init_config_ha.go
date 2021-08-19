@@ -13,75 +13,142 @@ var initConfigHAPathFlags = struct {
 	path string
 }{}
 
-type Commons struct {
-	SecretsKeyFile   string
-	SecretsStoreFile string
-	Architecture     string
-	WorkspacePath    string
-	SshUser          string
-	SshKeyFile       string
-	SudoPassword     string
-	BackupMount      string
+type AwsConfigToml struct {
+	Architecture struct {
+		Aws struct {
+			SecretsKeyFile              string `toml:"secrets_key_file"`
+			SecretsStoreFile            string `toml:"secrets_store_file"`
+			Architecture                string `toml:"architecture"`
+			WorkspacePath               string `toml:"workspace_path"`
+			SSHUser                     string `toml:"ssh_user"`
+			SSHKeyFile                  string `toml:"ssh_key_file"`
+			SudoPassword                string `toml:"sudo_password"`
+			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
+			NewElk                      string `toml:"new_elk"`
+			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip"`
+			ExistingElkPort             string `toml:"existing_elk_port"`
+			ExistingElkCert             string `toml:"existing_elk_cert"`
+			ExistingElkUsername         string `toml:"existing_elk_username"`
+			ExistingElkPassword         string `toml:"existing_elk_password"`
+			BackupMount                 string `toml:"backup_mount"`
+			HabitatUIDGid               string `toml:"habitat_uid_gid"`
+		} `toml:"aws"`
+	} `toml:"architecture"`
+	Automate struct {
+		Config struct {
+			AdminPassword string `toml:"admin_password"`
+			Fqdn          string `toml:"fqdn"`
+			InstanceCount string `toml:"instance_count"`
+			TeamsPort     string `toml:"teams_port"`
+			ConfigFile    string `toml:"config_file"`
+		} `toml:"config"`
+	} `toml:"automate"`
+	ChefServer struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"chef_server"`
+	Elasticsearch struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"elasticsearch"`
+	Postgresql struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"postgresql"`
+	Aws struct {
+		Config struct {
+			Profile                         string `toml:"profile"`
+			Region                          string `toml:"region"`
+			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
+			AmiFilterName                   string `toml:"ami_filter_name"`
+			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
+			AmiFilterOwner                  string `toml:"ami_filter_owner"`
+			AmiID                           string `toml:"ami_id"`
+			AutomateServerInstanceType      string `toml:"automate_server_instance_type"`
+			ChefServerInstanceType          string `toml:"chef_server_instance_type"`
+			ElasticsearchServerInstanceType string `toml:"elasticsearch_server_instance_type"`
+			PostgresqlServerInstanceType    string `toml:"postgresql_server_instance_type"`
+			AutomateLbCertificateArn        string `toml:"automate_lb_certificate_arn"`
+			ChefServerLbCertificateArn      string `toml:"chef_server_lb_certificate_arn"`
+			AutomateEbsVolumeIops           string `toml:"automate_ebs_volume_iops"`
+			AutomateEbsVolumeSize           string `toml:"automate_ebs_volume_size"`
+			AutomateEbsVolumeType           string `toml:"automate_ebs_volume_type"`
+			ChefEbsVolumeIops               string `toml:"chef_ebs_volume_iops"`
+			ChefEbsVolumeSize               string `toml:"chef_ebs_volume_size"`
+			ChefEbsVolumeType               string `toml:"chef_ebs_volume_type"`
+			ElasticsearchEbsVolumeIops      string `toml:"elasticsearch_ebs_volume_iops"`
+			ElasticsearchEbsVolumeSize      string `toml:"elasticsearch_ebs_volume_size"`
+			ElasticsearchEbsVolumeType      string `toml:"elasticsearch_ebs_volume_type"`
+			PostgresqlEbsVolumeIops         string `toml:"postgresql_ebs_volume_iops"`
+			PostgresqlEbsVolumeSize         string `toml:"postgresql_ebs_volume_size"`
+			PostgresqlEbsVolumeType         string `toml:"postgresql_ebs_volume_type"`
+			XContact                        string `toml:"X-Contact"`
+			XDept                           string `toml:"X-Dept"`
+			XProject                        string `toml:"X-Project"`
+		} `toml:"config"`
+	} `toml:"aws"`
 }
 
-type Automate struct {
-	AutomateAdminPassword string
-	AutomateFQDN          string
-	AutomateTeamsPort     string
-	AutomateInstanceCount string
-	AutomateConfigFile    string
-}
-
-type InitConfigHAFlags struct {
-	ArchitectureCommons               *Commons
-	AutomateConfig                    *Automate
-	ChefServerInstanceCount           string `toml:"chef_server.config.instance_count"`
-	ElasticSearchInstanceCount        string `toml:"elasticsearch.config.instance_count"`
-	PostgresqlInstanceCount           string `toml:"postgresql.config.instance_count"`
-	AwsProfile                        string `toml:"aws.config.profile"`
-	AwsRegion                         string `toml:"aws.config.region"`
-	AmiFilterName                     string `toml:"ami_filter_name"`
-	AmiFilterVirtType                 string `toml:"ami_filter_virt_type"`
-	AmiFilterOwner                    string `toml:"ami_filter_owner"`
-	AmiId                             string `toml:"ami_id"`
-	AwsSshKeyPairName                 string `toml:"aws.config.ssh_key_pair_name"`
-	AwsAutomateServerInstaceType      string `toml:"aws.config.automate_server_instance_type"`
-	AwsChefServerInstanceType         string `toml:"aws.config.chef_server_instance_type"`
-	AwsElasticSearchServerInstaceType string `toml:"aws.config.elasticsearch_server_instance_type"`
-	AwsPostgresqlServerInstanceType   string `toml:"aws.config.postgresql_server_instance_type"`
-	AwsAutomateLBCertificateARN       string `toml:"aws.config.automate_lb_certificate_arn"`
-	AwsChefServerLBCertificateARN     string `toml:"aws.config.chef_server_lb_certificate_arn"`
-	AwsAutomateEbsVolumeIops          string `toml:"aws.config.automate_ebs_volume_iops"`
-	AwsAutomateEbsVolumeSize          string `toml:"aws.config.automate_ebs_volume_size"`
-	AwsAutomateEbsVolumeType          string `toml:"aws.config.automate_ebs_volume_type"`
-	AwsChefEbsVolumeIops              string `toml:"aws.config.chef_ebs_volume_iops"`
-	AwsChefEbsVolumeSize              string `toml:"aws.config.chef_ebs_volume_size"`
-	AwsChefEbsVolumeType              string `toml:"aws.config.chef_ebs_volume_type"`
-	AwsEsEbsVolumeIops                string `toml:"aws.config.elasticsearch_ebs_volume_iops"`
-	AwsEsEbsVolumeSize                string `toml:"aws.config.elasticsearch_ebs_volume_size"`
-	AwsEsEbsVolumeType                string `toml:"aws.config.elasticsearch_ebs_volume_type"`
-	AwsPgsEbsVolumeIops               string `toml:"aws.config.postgresql_ebs_volume_iops"`
-	AwsPgsEbsVolumeSize               string `toml:"aws.config.postgresql_ebs_volume_size"`
-	AwsPgsEbsVolumeType               string `toml:"aws.config.postgresql_ebs_volume_type"`
-	AwsTagContact                     string `toml:"aws.config.X-Contact"`
-	AwsTagDept                        string `toml:"aws.config.X-Dept"`
-	AwsTagProject                     string `toml:"aws.config.X-Project"`
-}
-
-type InitConfigHAExistingInfraFlags struct {
-	ArchitectureCommons                  *Commons
-	AutomateConfig                       *Automate
-	ChefServerInstanceCount              string   `toml:"chef_server.config.instance_count"`
-	ElasticSearchInstanceCount           string   `toml:"elasticsearch.config.instance_count"`
-	PostgresqlInstanceCount              string   `toml:"postgresql.config.instance_count"`
-	ExistingInfraAutomateIPs             []string `toml:"existing_infra.config.automate_ips"`
-	ExistingInfraAutomatePrivateIPs      []string `toml:"existing_infra.config.chef_server_ips"`
-	ExistingInfraChefServerIPs           []string `toml:"existing_infra.config.chef_server_ips"`
-	ExistingInfraChefServerPrivateIPs    []string `toml:"existing_infra.config.chef_server_private_ips"`
-	ExistingInfraElasticsearchIPs        []string `toml:"existing_infra.config.elasticsearch_ips"`
-	ExistingInfraElasticsearchPrivateIPs []string `toml:"existing_infra.config.elasticsearch_private_ips"`
-	ExistingInfraPostgresqlIPs           []string `toml:"existing_infra.config.postgresql_ips"`
-	ExistingInfraPostgresqlPrivateIps    []string `toml:"existing_infra.config.postgresql_private_ips"`
+type ExistingInfraConfigToml struct {
+	Architecture struct {
+		ExistingInfra struct {
+			SecretsKeyFile              string `toml:"secrets_key_file"`
+			SecretsStoreFile            string `toml:"secrets_store_file"`
+			Architecture                string `toml:"architecture"`
+			WorkspacePath               string `toml:"workspace_path"`
+			SSHUser                     string `toml:"ssh_user"`
+			SSHKeyFile                  string `toml:"ssh_key_file"`
+			SudoPassword                string `toml:"sudo_password"`
+			LoggingMonitoringManagement string `toml:"logging_monitoring_management"`
+			NewElk                      string `toml:"new_elk"`
+			ExistingElkInstanceIP       string `toml:"existing_elk_instance_ip"`
+			ExistingElkPort             string `toml:"existing_elk_port"`
+			ExistingElkCert             string `toml:"existing_elk_cert"`
+			ExistingElkUsername         string `toml:"existing_elk_username"`
+			ExistingElkPassword         string `toml:"existing_elk_password"`
+			BackupMount                 string `toml:"backup_mount"`
+			HabitatUIDGid               string `toml:"habitat_uid_gid"`
+		} `toml:"existing_infra"`
+	} `toml:"architecture"`
+	Automate struct {
+		Config struct {
+			AdminPassword string `toml:"admin_password"`
+			Fqdn          string `toml:"fqdn"`
+			InstanceCount string `toml:"instance_count"`
+			TeamsPort     string `toml:"teams_port"`
+			ConfigFile    string `toml:"config_file"`
+		} `toml:"config"`
+	} `toml:"automate"`
+	ChefServer struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"chef_server"`
+	Elasticsearch struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"elasticsearch"`
+	Postgresql struct {
+		Config struct {
+			InstanceCount string `toml:"instance_count"`
+		} `toml:"config"`
+	} `toml:"postgresql"`
+	ExistingInfra struct {
+		Config struct {
+			AutomateIps             []interface{} `toml:"automate_ips"`
+			AutomatePrivateIps      []interface{} `toml:"automate_private_ips"`
+			ChefServerIps           []interface{} `toml:"chef_server_ips"`
+			ChefServerPrivateIps    []interface{} `toml:"chef_server_private_ips"`
+			ElasticsearchIps        []interface{} `toml:"elasticsearch_ips"`
+			ElasticsearchPrivateIps []interface{} `toml:"elasticsearch_private_ips"`
+			PostgresqlIps           []interface{} `toml:"postgresql_ips"`
+			PostgresqlPrivateIps    []interface{} `toml:"postgresql_private_ips"`
+		} `toml:"config"`
+	} `toml:"existing_infra"`
 }
 
 func init() {
