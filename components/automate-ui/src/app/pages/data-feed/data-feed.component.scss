@@ -7,15 +7,20 @@
 
 .filter-button chef-button {
   margin-left: 0;
+
+  
 }
 
 chef-button:first-child {
-  margin-top: 0;
-  margin-left: 0;
+  display: flex;
+  float: right;
+  align-items: center;
+  margin-top: -360px;
 }
 
 chef-icon#sort-desc {
   color: $chef-primary-dark;
+
 
   &::after {
     color: $chef-dark-grey;
@@ -24,6 +29,7 @@ chef-icon#sort-desc {
 
 chef-icon#sort-asc {
   color: $chef-dark-grey;
+  text-align: center;
 
   &::after {
     color: $chef-primary-dark;
@@ -34,9 +40,9 @@ chef-icon#sort-asc {
   padding: 8px 1em;
 
   chef-button[icon] {
-    min-height: 32px;
     font-size: 18px;
     line-height: 32px;
+    
 
     chef-icon {
       vertical-align: -3px;
@@ -44,12 +50,19 @@ chef-icon#sort-asc {
   }
 }
 
-.empty-state {
-  text-align: center;
+.svg-inline--fa{
+  width: 20px;
+}
 
-  p {
-    font-size: 18px;
-    font-weight: 400;
-    margin-top: 42px;
-  }
+chef-subheading {
+  max-width: 610px;
+}
+
+.empty-state {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
 }

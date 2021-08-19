@@ -3,7 +3,8 @@
     <main>
       <chef-page-header>
         <chef-heading>Data Feeds</chef-heading>
-        <chef-subheading>Data Feed for bulk client data and compliance reports.</chef-subheading>
+        <chef-subheading><b>Disclaimer Text</b>: We suggest no more than 5 Feeds, depending on your fleet size. Please check the
+          reference matrix on recommended feed counts.</chef-subheading>
         <app-create-data-feed-modal
           [visible]="createModalVisible"
           [creating]="creatingDataFeed"
@@ -26,7 +27,8 @@
       </chef-page-header>
       <div class="page-body">
         <div *ngIf="(sortedDestinations$ | async)?.length === 0" class="empty-state">
-          <p>Create a data feed to get started!</p>
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p>No Data Feeds Preview Available</p>
         </div>
         <div [ngClass]="(sortedDestinations$ | async)?.length === 0 ? 'empty-state' : ''">
           <!-- <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button> -->
