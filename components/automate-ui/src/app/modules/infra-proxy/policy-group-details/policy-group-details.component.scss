@@ -30,6 +30,7 @@ chef-page-header {
       padding: 0;
 
       li {
+        display: flex;
         margin-bottom: 5px;
 
         span {
@@ -40,16 +41,51 @@ chef-page-header {
           &.heading {
             display: inline-block;
             font-weight: bold;
-            width: 45%;
+            width: 50%;
           }
 
         }
       }
     }
 
-    &:first-child {
+    .summary-body:first-child {
       border-right: 1px solid $chef-grey;
     }
   }
 }
- 
+
+chef-tab-selector chef-option {
+  width: 130px;
+}
+
+.policyfiles-tab {
+  chef-table {
+    chef-th:first-child, chef-td:first-child {
+      width: 40%;
+    }
+
+    chef-th:first-child, chef-th:last-child {
+      border-left: none;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+.page-body .no_border_th,
+.no_border_tr,
+.no_border_th:first-child,
+.no_border_th:last-child {
+  border: none;
+  border-left: none;
+  font-size: 12px;
+}
+
+.empty-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
