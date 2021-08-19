@@ -5,35 +5,11 @@
   margin-top: 80px;
 }
 
-.filter-button chef-button {
-  margin-left: 0;
-
-  
-}
-
 chef-button:first-child {
   display: flex;
   float: right;
   align-items: center;
   margin-top: -360px;
-}
-
-chef-icon#sort-desc {
-  color: $chef-primary-dark;
-
-
-  &::after {
-    color: $chef-dark-grey;
-  }
-}
-
-chef-icon#sort-asc {
-  color: $chef-dark-grey;
-  text-align: center;
-
-  &::after {
-    color: $chef-primary-dark;
-  }
 }
 
 .actions {
@@ -51,6 +27,7 @@ chef-icon#sort-asc {
 }
 
 .svg-inline--fa{
+  color:$chef-white;
   width: 20px;
 }
 
