@@ -4,7 +4,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angul
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
-import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
+import { map, mergeMap, filter, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
 import { BroadcastChannel } from 'broadcast-channel';
 
@@ -14,7 +14,6 @@ import { SetUserSelfID } from 'app/entities/users/userself.actions';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 import { UserPreferencesService } from '../user-preferences/user-preferences.service';
-import { UISettings } from '../user-preferences/signin-ui-settings';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -86,10 +85,6 @@ export class ChefSessionService implements CanActivate {
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
-        }),
-        retryWhen(error => {
-          this.isRefreshing = false;
-          return error.pipe(delay(500));  // retry in 500ms if errored
         })
       ).subscribe(
         token => {
@@ -106,11 +101,6 @@ export class ChefSessionService implements CanActivate {
   }
 
   private refresh(): Observable<string> {
-    if (!this.id_token) {
-      this.isRefreshing = false;
-      console.log('id_token is yet to be retrieved');
-      return throwError('id_token is yet to be retrieved');
-    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -141,8 +131,6 @@ export class ChefSessionService implements CanActivate {
   callIdleTimeout(): void {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
-
-    console.log(this.appConfigService.isIdleTimeoutEnabled, 'this.appConfigService.isIdleTimeoutEnabled');
 
     if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       this.idleLogout(this.idleTimeout); // Time in minutes
@@ -287,7 +275,6 @@ export class ChefSessionService implements CanActivate {
     function resetTimer() {
       // this is for testing multi tabs
       if (idleTime > 0) {
-        console.log('called broadcast message on different tab');
         broadcastChannel.postMessage('resetTimer');
       }
       idleTime = 0;
@@ -389,10 +376,6 @@ export class ChefSessionService implements CanActivate {
     if (id && id.federated_claims) {
       user.connector = id.federated_claims.connector_id;
       this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
-      if (!this.userPrefService.uiSettings) {
-        const uiSettings = new UISettings();
-        this.userPrefService.uiSettings = uiSettings[this.user.connector];
-      }
     }
   }
 }
