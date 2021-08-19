@@ -109,8 +109,6 @@ func CreateMinioBucket(t *testing.T) ([]byte, error) {
 }
 func TestDataFeedAPI(t *testing.T) {
 	t.Logf("API TOKEN: %d", len(automateApiToken))
-	t.Logf("automateAwsAccessKey: %s", automateAwsAccessKey)
-	t.Logf("automateAwsSecretAccessKey: %s", automateAwsSecretAccessKey)
 	// Add destination
 	destinationId := addDestination(t, addData, addDataValues)
 	// Get destination
@@ -187,7 +185,7 @@ func TestDeleteNonExistent(t *testing.T) {
 func TestTestDestination(t *testing.T) {
 	testDestinationRequestSuccess(t, testSuccessData)
 	testDestinationHeaderRequestSuccess(t, testSuccessHeaderData)
-	testDestinationAwsRequestSuccess(t, testSuccessAwsData)
+	// testDestinationAwsRequestSuccess(t, testSuccessAwsData)
 	testSuccessMinioData, error := CreateMinioBucket(t)
 	if error != nil {
 		t.Log(error, "got while creating minio bucket")
@@ -200,7 +198,7 @@ func TestTestDestination(t *testing.T) {
 func TestTestDestinationError(t *testing.T) {
 	testDestinationRequestFail(t, testFailsData)
 	testDestinationHeaderRequestFail(t, testFailsHeaderData)
-	testDestinationAwsRequestFail(t, testFailsAwsData)
+	// testDestinationAwsRequestFail(t, testFailsAwsData)
 	testDestinationMinioRequestFail(t, testFailsMinioData)
 }
 
