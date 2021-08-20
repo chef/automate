@@ -93,12 +93,12 @@ service DatafeedService {
 message GlobalDataFeedConfigRequest{
 }
 message GlobalDataFeedConfigResponse{ 
-	string feed_interval = 1;
-	int64 node_batch_size = 2;
-	bool updated_nodes_only = 3;
-	bool disable_cidr_filter = 4;
-	repeated string cidr_filter = 5;
-	repeated int32 accepted_status_codes = 6;
+  string feed_interval = 1;
+  int64 node_batch_size = 2;
+  bool updated_nodes_only = 3;
+  bool disable_cidr_filter = 4;
+  repeated string cidr_filter = 5;
+  repeated int32 accepted_status_codes = 6;
 }
 
 message AddDestinationRequest {	
@@ -207,7 +207,7 @@ message SecretIdWithExtraPrams {
 
 
 message Header {
-	string value = 1;
+  string value = 1;
 }
 
 message AWS {
@@ -225,7 +225,7 @@ message URLValidationRequest {
 	SecretIdWithExtraPrams secret_id_with_addon = 4;
 	Header header = 5;
 	AWS aws = 6;
-   }
+  }
 }
 
 message TestDestinationResponse {
