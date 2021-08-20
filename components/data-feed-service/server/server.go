@@ -258,7 +258,6 @@ func (datafeedServer *DatafeedServer) EnableDestination(ctx context.Context, des
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
-	// Id, _ = strconv.ParseInt(destination.Id, 10, 64)
 	res, err := datafeedServer.GetDestination(ctx, GetdestinationRequest)
 	return res, nil
 }

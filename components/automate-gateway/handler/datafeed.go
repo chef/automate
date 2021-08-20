@@ -116,7 +116,6 @@ func (a *Datafeed) EnableDestination(ctx context.Context, in *data_feed.UpdateDe
 	return out, nil
 }
 
-//config
 func (a *Datafeed) GlobalDataFeedConfig(ctx context.Context, in *data_feed.GlobalDataFeedConfigRequest) (*data_feed.GlobalDataFeedConfigResponse, error) {
 	inDomain := &data_feed.GlobalDataFeedConfigRequest{}
 	out := &data_feed.GlobalDataFeedConfigResponse{}
