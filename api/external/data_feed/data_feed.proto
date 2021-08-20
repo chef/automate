@@ -11,79 +11,79 @@ import "google/protobuf/struct.proto";
 import "external/common/query/parameters.proto";
 
 service DatafeedService {
-  rpc AddDestination(AddDestinationRequest) returns(AddDestinationResponse) {
-    option(google.api.http) = {
+  rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse) {
+    option (google.api.http) = {
       post: "/api/v0/datafeed/destination"
       body: "*"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destination"
       action: "datafeed:destination:add"
     };
   };
   rpc GetDestination(GetDestinationRequest) returns(GetDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       get: "/api/v0/datafeed/destination/{id}"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destination:{id}"
       action: "datafeed:destination:get"
     };
   };
   rpc DeleteDestination(DeleteDestinationRequest) returns(DeleteDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       delete: "/api/v0/datafeed/destination/{id}"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "destination:destination:{id}"
       action: "destination:destination:delete"
     };
   };
   rpc UpdateDestination(UpdateDestinationRequest) returns(UpdateDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       patch: "/api/v0/datafeed/destination/{id}"
       body: "*"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destination:{id}"
       action: "datafeed:destination:update"
     };
   };
   rpc ListDestinations(ListDestinationRequest) returns(ListDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/api/v0/datafeed/destinations"
       body: "*"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destinations"
       action: "datafeed:destinations:list"
     };
   };
   rpc TestDestination(URLValidationRequest) returns(TestDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       post: "/api/v0/datafeed/destinations/test"
       body: "*"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destinations:test"
       action: "datafeed:destinations:test"
     };
   }
   rpc EnableDestination(UpdateDestinationEnableRequest) returns(GetDestinationResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       patch: "/api/v0/datafeed/destination/enable/{id}"
       body: "*"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destinations:{id}"
       action: "datafeed:destinations:update"
     };
   }
   rpc GlobalDataFeedConfig(GlobalDataFeedConfigRequest) returns(GlobalDataFeedConfigResponse) {
-    option(google.api.http) = {
+    option (google.api.http) = {
       get: "/api/v0/datafeed/config"
     };
-    option(chef.automate.api.iam.policy) = {
+    option (chef.automate.api.iam.policy) = {
       resource: "datafeed:destination"
       action: "datafeed:destination:get"
     };
