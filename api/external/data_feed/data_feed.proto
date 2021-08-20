@@ -164,8 +164,8 @@ message UpdateDestinationRequest {
   repeated chef.automate.api.common.query.Kv meta_data = 8;
 }
 message AWSMetaData {
-	string bucket = 1;
-	string region = 2;
+  string bucket = 1;
+  string region = 2;
 }
 message UpdateDestinationResponse {
   int64 id = 1;
@@ -179,9 +179,9 @@ message UpdateDestinationResponse {
 }
 
 message UpdateDestinationEnableRequest {
-	string id = 1;
-	bool enable = 2;
-  }
+  string id = 1;
+  bool enable = 2;
+}
 
 message ListDestinationRequest {}
 
@@ -198,12 +198,12 @@ message SecretId {
   string id = 1;
 }
 message SecretIdWithExtraPrams {
-	string id = 1;
-	string services = 2;
-    string integration_types = 3;
-	bool enable = 4;
-	repeated chef.automate.api.common.query.Kv meta_data = 5;
-  }
+  string id = 1;
+  string services = 2;
+  string integration_types = 3;
+  bool enable = 4;
+  repeated chef.automate.api.common.query.Kv meta_data = 5;
+}
 
 
 message Header {
@@ -211,10 +211,10 @@ message Header {
 }
 
 message AWS {
-	string access_key = 1;
-	string secret_access_key = 2;
-	string bucket = 3;
-	string region = 4;
+  string access_key = 1;
+  string secret_access_key = 2;
+  string bucket = 3;
+  string region = 4;
 }
 
 message URLValidationRequest {
