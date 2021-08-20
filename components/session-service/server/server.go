@@ -590,7 +590,13 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if isBlacklisted {
 		s.log.Debug("bearer token blacklisted")
-		sess.Destroy(w)
+		// In this flow, we don't need to keep a session -- there's no refresh yet.
+		err = sess.Destroy(w)
+		if err != nil {
+			s.log.Debugf("failed to destroy session: %v", err)
+			http.Error(w, "failed to destroy session", http.StatusInternalServerError)
+			return
+		}
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
