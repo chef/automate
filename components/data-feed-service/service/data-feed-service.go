@@ -355,7 +355,8 @@ func ConnectAWS(cred AwsCredentials, url string, service string) *session.Sessio
 	}
 	sess, err := session.NewSession(config)
 	if err != nil {
-		panic(err)
+		log.Errorf("Error while getting  NewSession: %v", err)
+
 	}
 	return sess
 }
