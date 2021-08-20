@@ -230,3 +230,4 @@ message URLValidationRequest {
 message TestDestinationResponse {
   bool success = 1;
 }
+
