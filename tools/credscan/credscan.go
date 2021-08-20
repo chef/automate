@@ -97,7 +97,9 @@ var a2Config = config{
 		{regex: `lib/grpc/secureconn/testdata/.*\.key`},
 
 		// Backend-elasticsidecar certificates folder, which has only placeholders. Actual files are coming from elasticsearch binds
-		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/*`},
+		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.pem`},
+		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.key`},
+
 
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
