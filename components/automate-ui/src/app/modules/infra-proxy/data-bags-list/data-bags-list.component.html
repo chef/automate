@@ -9,7 +9,7 @@
     objectAction="Delete"
     class="delete-modal">
   </app-delete-infra-object-modal>
-  <app-create-data-bag-modal 
+  <app-create-data-bag-modal
     [openEvent]="openDataBagModal"
     [server_Id]="serverId"
     [org_Id]="orgId">
@@ -17,11 +17,11 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="data bags" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!dataBagsListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchDataBags($event)" placeHolder="data bags">
+      <app-infra-search-bar (searchButtonClick)="searchDataBags($event)" placeHolder="data bags by name...">
       </app-infra-search-bar>
       <chef-button data-cy="create-databag-button" primary (click)="openCreateModal()">Create Data Bag</chef-button>
-    </div>   
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner> 
+    </div>
+    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
     <chef-table *ngIf="dataBags.length" id="databags-table-container" data-cy="databags-table-container">
       <chef-thead *ngIf="!searchFlag || serachArr.length">
         <chef-tr class="no_border_tr">

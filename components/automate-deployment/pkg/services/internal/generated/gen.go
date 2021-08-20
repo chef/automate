@@ -534,7 +534,8 @@ var ProductMetadataJSON = `
       "type": "base",
       "services": [
         "chef/automate-gateway",
-        "chef/automate-ui"
+        "chef/automate-ui",
+        "chef/user-settings-service"
       ],
       "packages": null,
       "dependencies": [

@@ -5,7 +5,7 @@
     [orgId]="orgId"
     [currentPage]="current_page">
   </app-create-client-modal>
-  
+
   <chef-loading-spinner *ngIf="clientsListLoading" size="50"></chef-loading-spinner>
   <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
@@ -19,7 +19,7 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="clients" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!clientsListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="Clients">
+      <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="clients by name...">
       </app-infra-search-bar>
       <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>

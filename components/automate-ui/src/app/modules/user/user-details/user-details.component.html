@@ -16,26 +16,45 @@
         </div>
         <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
           <chef-option value='details'>Details</chef-option>
-          <chef-option value='password'>Reset Password</chef-option>
+          <chef-option value='password' *ngIf="isResetPwdTab">Reset Password</chef-option>
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="userDetails.displayNameForm">
-          <chef-form-field>
+          <!-- displayname is shown for saml & ldap users in future -->
+          <chef-form-field *ngIf="userType === 'local'">
             <label for="displayName">Display Name <span aria-hidden="true">*</span></label>
             <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
-              data-cy="user-details-name-input">
+              data-cy="user-details-name-input" [readonly]="!isDisplayNameEditable">
             <chef-error
               *ngIf="(userDetails.displayNameForm.get('displayName').hasError('required') || userDetails.displayNameForm.get('displayName').hasError('pattern')) && userDetails.displayNameForm.get('displayName').dirty">
               Display Name is required.
             </chef-error>
           </chef-form-field>
+          <chef-form-field class="timezone-field">
+            <label for="timeformat">Time Format</label>
+            <chef-select 
+              #timeformat 
+              [value]="(userPrefsService.timeformat$ | async)?.value" 
+              (change)="handleTimeFormatChange()" 
+              data-cy="timeformat-dropdown">
+                <chef-option value="ddd, DD MMM">ddd, DD MMM</chef-option>
+                <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
+                <chef-option value="DD MMM YYYY">DD MMM YYYY</chef-option>
+                <chef-option value="ddd, DD MMM YYYY HH:mm:ss [UTC]">ddd, DD MMM YYYY HH:mm:ss [UTC]</chef-option>
+                <chef-option value="YYYY-M-D">YYYY-M-D</chef-option>
+                <chef-option value="YYYY-MM-DD">YYYY-MM-DD</chef-option>
+            </chef-select>
+          </chef-form-field>
         </form>
-        <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline
-          (click)="userDetails.saveDisplayName()" data-cy="user-details-submit-button">
-          <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
-          <span *ngIf="userDetails.saveInProgress">Saving...</span>
-          <span *ngIf="!userDetails.saveInProgress">Save</span>
+        <chef-button 
+          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !timeformatControl.isTimeformatDirty" 
+          primary inline 
+          (click)="userDetails.saveUserPreference(timeformat, timeformatControl)" 
+          data-cy="user-details-submit-button">
+            <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
+            <span *ngIf="userDetails.saveInProgress">Saving...</span>
+            <span *ngIf="!userDetails.saveInProgress">Save</span>
         </chef-button>
         <span id="saved-note" *ngIf="userDetails.saveSuccessful && !userDetails.displayNameForm.dirty">All changes saved.</span>
       </section>
