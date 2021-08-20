@@ -82,8 +82,8 @@ func New(cfg Config, retrySec int, certs *certs.ServiceCerts, l OIDCLogger) (Cli
 	verifier := provider.Verifier(&oidc.Config{
 		// we want to allow for expired tokens => they'll just trigger a refresh
 		// anyways.
-		SkipExpiryCheck:   false,
-		SkipClientIDCheck: true, // we don't care
+		SkipExpiryCheck:   false, // todo, should we make it true?
+		SkipClientIDCheck: true,  // we don't care
 	})
 
 	return &client{
