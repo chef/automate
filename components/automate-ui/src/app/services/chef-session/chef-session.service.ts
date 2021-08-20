@@ -3,14 +3,18 @@ import { HttpHeaders, HttpClient, HttpBackend, HttpErrorResponse } from '@angula
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Observable, ReplaySubject, timer } from 'rxjs';
-import { map, mergeMap, filter } from 'rxjs/operators';
+import { Observable, ReplaySubject, timer, throwError } from 'rxjs';
+import { map, mergeMap, filter, retryWhen, delay, catchError } from 'rxjs/operators';
 import { isNull, isNil } from 'lodash';
+import { BroadcastChannel } from 'broadcast-channel';
 
 import { environment } from 'environments/environment';
 import { Jwt, IDToken } from 'app/helpers/jwt/jwt';
 import { SetUserSelfID } from 'app/entities/users/userself.actions';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
+import { UserPreferencesService } from '../user-preferences/user-preferences.service';
+import { UISettings } from '../user-preferences/signin-ui-settings';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -23,6 +27,7 @@ export interface ChefSessionUser {
   telemetry_enabled?: boolean;
   uuid: string;
   id_token: string;
+  connector?: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -38,15 +43,24 @@ export class ChefSessionService implements CanActivate {
   private isRefreshing: boolean;
   private tokenProvider: ReplaySubject<string>;
 
+  isIdleTimeoutEnabled = false; // default it's false
+  idleTimeout = 30; // 30mins default
+
   // Session state keys - We use session storage to save state here because
   // the application can be reinitialized multiple time during a single session.
   //// Flag to store whether or not the modal has been displayed this session.
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor(private store: Store<NgrxStateAtom>, handler: HttpBackend) {
+  constructor(private store: Store<NgrxStateAtom>,
+     handler: HttpBackend,
+     private userPrefService: UserPreferencesService,
+     private appConfigService: AppConfigService) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
+    setTimeout(() => this.callIdleTimeout(), 30 * 1000);
+    // callIdleTimeout will get excuted after 30 sec.
+
     this.tokenProvider = new ReplaySubject(1);
     if (USE_DEFAULT_SESSION) {
       this.setDefaultSession();
@@ -66,11 +80,16 @@ export class ChefSessionService implements CanActivate {
       // and components/session-service and chef-session-service -- it would
       // make sense to try to refresh the session if we get a 401 from the API,
       // before giving up and calling logout().
+
       timer(0, minute).pipe(
         filter(() => !this.isRefreshing),
         mergeMap(() => {
           this.isRefreshing = true;
           return this.refresh();
+        }),
+        retryWhen(error => {
+          this.isRefreshing = false;
+          return error.pipe(delay(500));  // retry in 500ms if errored
         })
       ).subscribe(
         token => {
@@ -79,21 +98,19 @@ export class ChefSessionService implements CanActivate {
         },
         error => {
           this.isRefreshing = false;
-          if (error instanceof HttpErrorResponse) {
-            if (error.status === HTTP_STATUS_UNAUTHORIZED) {
-              this.logout();
-            } else {
-              console.log(`Session refresh failed: ${error.statusText}`);
-            }
-          } else {
-            console.log(error);
-          }
+          console.log(`Retried after 500ms on error: ${error}`);
+          return throwError(`Retried after 500ms on error: ${error}`);
         }
       );
     }
   }
 
   private refresh(): Observable<string> {
+    if (!this.id_token) {
+      this.isRefreshing = false;
+      console.log('id_token is yet to be retrieved');
+      return throwError('id_token is yet to be retrieved');
+    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -103,11 +120,39 @@ export class ChefSessionService implements CanActivate {
     return this.httpHandler.get('/session/refresh', httpOptions).pipe(
       map(obj => {
         return obj['id_token'];
+      }),
+      catchError(error => {
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === HTTP_STATUS_UNAUTHORIZED) {
+            this.logout();
+            return throwError(`Unauthorized: ${error.status}`);
+          } else {
+            console.log(`Session refresh failed: ${error.statusText}`);
+            return throwError(`Session refresh failed: ${error.statusText}`);
+          }
+        } else {
+          console.log(`Error calling /refresh ${error}`);
+          return throwError(`Error calling /refresh ${error}`);
+        }
       })
     );
   }
 
+  callIdleTimeout(): void {
+    this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
+    this.idleTimeout = this.appConfigService.idleTimeout;
+
+    console.log(this.appConfigService.isIdleTimeoutEnabled, 'this.appConfigService.isIdleTimeoutEnabled');
+
+    if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
+      this.idleLogout(this.idleTimeout); // Time in minutes
+    }
+  }
+
   ingestIDToken(idToken: string): void {
+    if (!idToken) {
+      return;
+    }
     const id = Jwt.parseIDToken(idToken);
     if (id === null) {
       return;
@@ -144,6 +189,7 @@ export class ChefSessionService implements CanActivate {
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
     this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
+    this.initializeUserPreference(this.user);
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
@@ -163,6 +209,7 @@ export class ChefSessionService implements CanActivate {
       isLocalUser
     };
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.initializeUserPreference(this.user);
     this.tokenProvider.next(id_token);
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -200,6 +247,39 @@ export class ChefSessionService implements CanActivate {
     }
   }
 
+  idleLogout(idleTimeout: number): void {
+    let idleTime = 0;
+    const broadcastChannel = new BroadcastChannel('tabsCheckForIdleTimeout');
+
+    // Increment the idle time counter after every minute.
+    setInterval(timerIncrement.bind(this), 60 * 1000);
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer;  // catches touchscreen presses as well
+    window.ontouchstart = resetTimer; // catches touchscreen swipes as well
+    window.onclick = resetTimer;      // catches touchpad clicks as well
+    window.onkeydown = resetTimer;
+    window.addEventListener('scroll', resetTimer, true);
+    broadcastChannel.onmessage = resetTimer;
+    // catches different tabs/window of same browser activity
+
+    function resetTimer() {
+      // this is for testing multi tabs
+      if (idleTime > 0) {
+        console.log('called broadcast message on different tab');
+        broadcastChannel.postMessage('resetTimer');
+      }
+      idleTime = 0;
+    }
+
+    function timerIncrement() {
+      idleTime = idleTime + 1;
+      if (idleTime === idleTimeout + 1) {
+          this.logout();
+      }
+    }
+  }
+
   // TODO(sr) 2019/08/26: I don't think we should use these global variables.
   // Instead, we should take the information about the currently-viewed page
   // from the ngrx store.
@@ -224,7 +304,14 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    return this.user.id_token;
+    if (this.user) {
+      return this.user.id_token;
+    }
+    return;
+  }
+
+  get connector(): string {
+    return this.user.connector;
   }
 
   get token_provider(): ReplaySubject<string> {
@@ -274,5 +361,17 @@ export class ChefSessionService implements CanActivate {
   isLocalUserFromId(id: IDToken): boolean {
     return id.federated_claims &&
       id.federated_claims.connector_id === 'local';
+  }
+
+  initializeUserPreference(user) {
+    const id: IDToken = Jwt.parseIDToken(user.id_token);
+    if (id && id.federated_claims) {
+      user.connector = id.federated_claims.connector_id;
+      this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
+      if (!this.userPrefService.uiSettings) {
+        const uiSettings = new UISettings();
+        this.userPrefService.uiSettings = uiSettings[this.user.connector];
+      }
+    }
   }
 }

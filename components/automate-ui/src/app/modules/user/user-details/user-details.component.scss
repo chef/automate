@@ -109,3 +109,11 @@ section {
     }
   }
 }
+
+.timezone-field {
+  margin-top: 25px;
+
+  chef-select {
+    width: 100%;
+  }
+}

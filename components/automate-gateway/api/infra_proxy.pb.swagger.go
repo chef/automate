@@ -3572,6 +3572,19 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DepedenciesData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "cookbook name."
+        },
+        "version": {
+          "type": "string",
+          "description": "cookbook version."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.Environment": {
       "type": "object",
       "properties": {
@@ -3982,6 +3995,13 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
           },
           "description": "Expanded run-list associated with the policy."
+        },
+        "solution_dependecies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.SolutionDependencies"
+          },
+          "description": "Solution Dependencies versions."
         }
       }
     },
@@ -4262,6 +4282,26 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Chef organizations count associated with Chef Infra Server."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.SolutionDependencies": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "cookbook name."
+        },
+        "version": {
+          "type": "string",
+          "description": "cookbook version."
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DepedenciesData"
+          },
+          "title": "cookbook dependencies"
         }
       }
     },

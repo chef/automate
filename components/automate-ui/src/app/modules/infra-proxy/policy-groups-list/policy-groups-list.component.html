@@ -1,0 +1,17 @@
+<chef-table>
+  <chef-thead *ngIf="policyGroups.length">
+    <chef-tr class="no_border_tr">
+      <chef-th class="no_border_th">Policy Group</chef-th>
+      <chef-th class="no_border_th">Number of Policyfiles</chef-th>
+    </chef-tr>
+  </chef-thead>
+  <chef-tbody>
+    <chef-tr *ngFor="let policyGroup of policyGroups">
+      <chef-td>
+        <a [routerLink]="['/infrastructure','chef-servers', serverId,
+          'organizations', orgId, 'policyGroups', policyGroup.policy_group]">{{policyGroup.policy_group}}</a>
+      </chef-td>
+      <chef-td>{{policyGroup.occurrence}}</chef-td>
+    </chef-tr>
+  </chef-tbody>
+</chef-table>

@@ -5,14 +5,14 @@
 
   <div class="right-box">
     <div class="left-align">
-      <div class="title-text">Deleting {{objectNoun | titlecase}}?</div>
+      <div class="title-text">Delete {{objectNoun | titlecase}}?</div>
       <p class="object-name"> {{objectName}}</p>
       <ng-container *ngIf="custom === false">
         <div class="action-text">This action is irreversible.</div>
         <div *ngIf="validator" class="client-message">
-          <span>you are about to delete a validate client.</span><br>
-          <span>Without a validate client, you may have</span><br> 
-          <span>difficulties creating new nodes.</span>
+          <span>You are about to delete a validation client.</span><br>
+          <span>Without a validation client, you may have</span><br>
+          <span>difficulties bootstrapping new nodes.</span>
         </div>
         <div *ngIf="objectNoun === 'node'" class="node-message">
           <span>Any associated clients will also be deleted.</span>

@@ -84,7 +84,9 @@
                   Report Date
                   <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
                 </th>
-                <td>{{ endDate$ | async | datetime: ChefDateTime }}</td>
+                <td>
+                  <app-time [time]="(endDate$ | async)"></app-time>
+                </td>
               </tr>
               <tr>
                 <th>

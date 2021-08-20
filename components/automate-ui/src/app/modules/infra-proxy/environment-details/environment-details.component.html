@@ -82,7 +82,7 @@
               <chef-icon>add_circle</chef-icon>
               <span>Expand All</span>
             </chef-button>
-            <chef-button tertiary class="action" 
+            <chef-button tertiary class="action"
               [disabled]= !hasDefaultJson
               (click)="tree.collapse()">
               <chef-icon>remove_circle</chef-icon>
@@ -100,14 +100,14 @@
           <div class="json-container">
             <div class="scroll">
               <app-json-tree-table
-                class="json-tree-container" 
+                class="json-tree-container"
                 [hidden]="hasDefaultJson? false : true"
                 #tree
                 [json]="selectedAttrs?.default_attributes">
               </app-json-tree-table>
               <div *ngIf="!hasDefaultJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
-                <p>There are no items for Display.</p>
+                <p>There are no items to display.</p>
               </div>
             </div>
           </div>
@@ -131,7 +131,7 @@
             </chef-button>
             <chef-button
               tertiary
-              class="right-button-box" 
+              class="right-button-box"
               (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
               <span class="material-icons edit-item">mode_edit</span>
               <span class="edit-text">Edit</span>
@@ -148,7 +148,7 @@
               </app-json-tree-table>
               <div *ngIf="!hasOverrideJson" class="img-section">
                 <img alt="No preview" src="/assets/img/no_preview.gif" />
-                <p>There are no items for Display.</p>
+                <p>There are no items to display.</p>
               </div>
             </div>
           </div>

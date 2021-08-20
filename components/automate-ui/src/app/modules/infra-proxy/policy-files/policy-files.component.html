@@ -11,7 +11,7 @@
   <app-empty-state *ngIf="authFailure" moduleTitle="policyfiles" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
   <ng-container *ngIf="!policyFilesListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policyfiles">
+      <app-infra-search-bar (searchButtonClick)="searchPolicyFiles($event)" placeHolder="Policyfiles by name...">
       </app-infra-search-bar>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0) ">
@@ -40,14 +40,14 @@
             <chef-td></chef-td>
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu">
-                <mat-option 
+                <mat-option
                   data-cy="revision-id"
                   class="primary"
                   (click)="slide.slidePanel(policyFile.name)">
                   Revisions
                   <chef-icon aria-hidden="true" class="primary">add</chef-icon>
                 </mat-option>
-                <mat-option 
+                <mat-option
                   data-cy="delete"
                   class="secondary"
                   (onSelectionChange)="startpolicyFilesDelete(policyFile)">

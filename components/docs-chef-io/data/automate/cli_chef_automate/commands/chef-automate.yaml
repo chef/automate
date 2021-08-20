@@ -31,6 +31,7 @@ see_also:
 - iam - Chef Automate iam commands
 - infrastructure - Chef Automate infrastructure
 - init-config - Initialize default config
+- init-config-ha - Initialize default config for HA
 - internal-ca - Manage Chef Automate's internal certificate authority
 - license - Chef Automate license management
 - maintenance - Put Chef Automate into or out of maintenance mode

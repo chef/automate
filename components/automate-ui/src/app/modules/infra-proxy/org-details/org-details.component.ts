@@ -38,6 +38,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
   public dataBagsTab = false;
   public clientsTab = false;
   public policyFilesTab = false;
+  public policyGroupsTab = false;
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -66,7 +67,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('environments')) {
           this.resetTabs();
           this.environmentsTab = true;
-        } else if (path.includes('policyFiles')) {
+        } else if (path.includes('policyfiles')) {
           this.resetTabs();
           this.policyFilesTab = true;
         } else if (path.includes('data-bags')) {
@@ -84,6 +85,9 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         } else if (path.includes('clients')) {
           this.resetTabs();
           this.clientsTab = true;
+        } else if (path.includes('policyGroups')) {
+          this.resetTabs();
+          this.policyGroupsTab = true;
         }
       });
 
@@ -149,14 +153,19 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
         this.nodesTab = true;
         break;
       case 6:
-        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyFiles');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyfiles');
         this.resetTabs();
         this.policyFilesTab = true;
         break;
       case 7:
-        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'policyGroups');
+        this.resetTabs();
+        this.policyGroupsTab = true;
         break;
       case 8:
+        this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'orgEdit');
+        break;
+      case 9:
         this.telemetryService.track(ORG_DETAILS_TAB_NAME, 'resetkey');
         break;
     }
@@ -178,6 +187,7 @@ export class OrgDetailsComponent implements OnInit, OnDestroy {
     this.resetKeyTab = false;
     this.clientsTab = false;
     this.nodesTab = false;
+    this.policyGroupsTab = false;
   }
 
   ngOnDestroy(): void {
