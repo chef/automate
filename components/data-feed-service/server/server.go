@@ -265,7 +265,7 @@ func (datafeedServer *DatafeedServer) GlobalDataFeedConfig(ctx context.Context, 
 	log.Infof("DestinationConfig %s", destination)
 	data, _ := config.Configure()
 	config := &datafeed.GlobalDataFeedConfigResponse{}
-	config.FeedInterval = fmt.Sprintf("%f", data.ServiceConfig.FeedInterval.Hours())
+	config.FeedInterval = fmt.Sprint(data.ServiceConfig.FeedInterval)
 	config.NodeBatchSize = int64(data.ServiceConfig.NodeBatchSize)
 	config.UpdatedNodesOnly = data.ServiceConfig.UpdatedNodesOnly
 	config.DisableCidrFilter = data.ServiceConfig.DisableCIDRFilter
