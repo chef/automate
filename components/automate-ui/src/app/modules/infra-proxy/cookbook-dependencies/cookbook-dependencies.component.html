@@ -16,7 +16,7 @@
           <div class="cookbook-name" data-cy="dependency-rule">
             Dependencies Rules
           </div>
-          <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+          <chef-icon class="arrows" data-cy="dependency-rule-arrow">keyboard_arrow_down</chef-icon>
         </div>
         <div class="submenu" [ngClass]="showDependenciesRules ? activeDependenciesRules : ''">
           <div data-cy="empty-list" class="empty-section" *ngIf="!cookbookRules.length && !cookbookDependencies.length">
@@ -98,7 +98,13 @@
                 </chef-thead>
                 <chef-tbody>
                   <chef-tr *ngFor="let cookbook of cookbooks">
-                    <chef-td>{{cookbook.name}}</chef-td>
+                    <chef-td>
+                      <a
+                      (click)="cookbooksDetails.slidePanel(cookbook.name, cookbook.version)"
+                      class="included-policy-link">
+                      {{cookbook.name}}
+                      </a>
+                    </chef-td>
                     <chef-td>{{cookbook.version}}</chef-td>
                     <chef-td>{{cookbook.source === '' ? '--' : cookbook.source}}</chef-td>
                     <chef-td class="three-dot-column"></chef-td>
@@ -110,5 +116,10 @@
         </div>
       </li>
     </ul>
+    <app-cookbook-dependencies-details
+      #cookbooksDetails
+      [serverId]="serverId"
+      [orgId]="orgId">
+    </app-cookbook-dependencies-details>
   </div>
 </div>
