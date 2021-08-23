@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"strings"
@@ -15,7 +14,7 @@ import (
 )
 
 func readConfigAndWriteToFile() error {
-	fmt.Printf("reading configs from toml file")
+	writer.Printf("reading configs from toml file")
 	initConfigHAPath := initConfigHAPathFlags.path
 	templateBytes, err := ioutil.ReadFile(initConfigHAPath)
 	if err != nil {
