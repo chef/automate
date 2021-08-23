@@ -57,7 +57,17 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 // Add a new destination
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.AddDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData, Enable: destination.Enable}
+	// The new connection is always set as true
+	destination.Enable = true
+	response := &datafeed.AddDestinationResponse{
+		Name:             destination.Name,
+		Url:              destination.Url,
+		Secret:           destination.Secret,
+		Services:         destination.Services,
+		IntegrationTypes: destination.IntegrationTypes,
+		MetaData:         destination.MetaData,
+		Enable:           destination.Enable,
+	}
 	id, err := datafeedServer.db.AddDestination(destination)
 	response.Id = id
 	if err != nil {
@@ -208,7 +218,16 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	if err != nil {
 		log.Warnf("Could not get destination details for delete response id: %d,  err: %s", destination.Id, err)
 	} else {
-		response = &datafeed.DeleteDestinationResponse{Id: fullDestination.Id, Name: fullDestination.Name, Url: fullDestination.Url, Secret: fullDestination.Secret, Services: fullDestination.Services, IntegrationTypes: fullDestination.IntegrationTypes, MetaData: fullDestination.MetaData}
+		response = &datafeed.DeleteDestinationResponse{
+			Id:               fullDestination.Id,
+			Name:             fullDestination.Name,
+			Url:              fullDestination.Url,
+			Secret:           fullDestination.Secret,
+			Services:         fullDestination.Services,
+			IntegrationTypes: fullDestination.IntegrationTypes,
+			Enable:           fullDestination.Enable,
+			MetaData:         fullDestination.MetaData,
+		}
 	}
 
 	err = datafeedServer.db.DeleteDestination(destination)
@@ -240,10 +259,19 @@ func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, dest
 
 func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
 	log.Infof("UpdateDestination %s", destination)
-	response := &datafeed.UpdateDestinationResponse{Name: destination.Name, Url: destination.Url, Secret: destination.Secret, Services: destination.Services, IntegrationTypes: destination.IntegrationTypes, MetaData: destination.MetaData}
-	err := datafeedServer.db.UpdateDestination(destination)
-
-	response.Id, _ = strconv.ParseInt(destination.Id, 10, 64)
+	destinationID, _ := strconv.ParseInt(destination.Id, 10, 64)
+	getDestinationResponse, err := datafeedServer.db.GetDestination(&datafeed.GetDestinationRequest{Id: destinationID})
+	response := &datafeed.UpdateDestinationResponse{
+		Id:               destinationID,
+		Name:             destination.Name,
+		Url:              destination.Url,
+		Secret:           destination.Secret,
+		Services:         destination.Services,
+		IntegrationTypes: destination.IntegrationTypes,
+		Enable:           getDestinationResponse.Enable,
+		MetaData:         destination.MetaData,
+	}
+	err = datafeedServer.db.UpdateDestination(destination)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}

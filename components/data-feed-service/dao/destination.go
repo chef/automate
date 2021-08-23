@@ -36,8 +36,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) (*Destina
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
-	// The new connection is always set as true
-	newDestination.Enable = true
+	newDestination.Enable = inDestination.Enable
 	if len(inDestination.MetaData) > 0 {
 		zaMap := make(map[string]string, 0)
 		for _, kv := range inDestination.MetaData {
@@ -55,7 +54,7 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) (*Destina
 	return &newDestination, nil
 }
 
-func updateToDBDestination(db *DB, inDestination *datafeed.UpdateDestinationRequest) (*Destination, error) {
+func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) (*Destination, error) {
 	newDestination := Destination{}
 	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10, 64)
 	newDestination.Name = inDestination.Name
@@ -63,12 +62,7 @@ func updateToDBDestination(db *DB, inDestination *datafeed.UpdateDestinationRequ
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
-	getDestValue, err := db.GetDestination(&datafeed.GetDestinationRequest{Id: newDestination.ID})
-	if err != nil {
-		logrus.Errorln(errors.Wrap(err, "not able to get destination"))
-		return nil, err
-	}
-	newDestination.Enable = getDestValue.Enable
+	newDestination.Enable = inDestination.Enable
 	if len(inDestination.MetaData) > 0 {
 		zaMap := make(map[string]string, 0)
 		for _, kv := range inDestination.MetaData {
@@ -164,7 +158,7 @@ func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) error
 
 func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) error {
 	var err error
-	dbDestination, err := updateToDBDestination(db, destination)
+	dbDestination, err := updateToDBDestination(destination)
 	if err != nil {
 		return err
 	}
