@@ -1,11 +1,4 @@
 describe('chef datafeed', () => {
-  const now  = Cypress.moment().format('MMDDYYhhmmss');
-  const cypressPrefix = 'infra';
-  const serverName = `${cypressPrefix} server ${now}`;
-  const generatedServerID = serverName.split(' ').join('-');
-  const customServerID = `${cypressPrefix}-custom-id-${now}`;
-  const serverFQDN = 'chef-server-1617089723092818000.com';
-  const serverIP = '176.119.50.159';
 
   before(() => {
     cy.adminLogin('/settings/notifications').then(() => {
