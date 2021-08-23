@@ -12,6 +12,7 @@ pkg_svc_user="root"
 pkg_deps=(
   chef/mlsa
   core/bash
+  core/openssl
   "${UPSTREAM_PKG_IDENT}"
 )
 
@@ -33,5 +34,5 @@ do_build() {
 }
 
 do_install() {
-  return 0
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh 
 }
