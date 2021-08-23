@@ -137,6 +137,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 		jsonMap, err := json.Marshal(zaMap)
 		if err != nil {
 			logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+			return response, err
 		}
 		metaData := string(jsonMap)
 
