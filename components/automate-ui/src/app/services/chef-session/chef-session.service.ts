@@ -316,10 +316,7 @@ export class ChefSessionService implements CanActivate {
   }
 
   get id_token(): string {
-    if (this.user) {
-      return this.user.id_token;
-    }
-    return null;
+    return this.user.id_token;
   }
 
   get connector(): string {
