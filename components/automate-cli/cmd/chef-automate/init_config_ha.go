@@ -179,8 +179,6 @@ func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	} else if args[0] == "aws" {
 		writer.Printf("Generating initial automate high availability configuration for AWS deployment\n")
 		return runInitConfigAwsHACmd()
-	} else if args[0] == "deploy" {
-		return readConfigAndWriteToFile()
 	} else if args[0] == "existing_infra" {
 		writer.Printf("Generating initial automate high availability configuration for existing infra nodes deployment\n")
 		return runInitConfigExistingNodeHACmd()
