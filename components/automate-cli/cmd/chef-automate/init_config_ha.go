@@ -15,7 +15,7 @@ var initConfigHAPathFlags = struct {
 
 type AwsConfigToml struct {
 	Architecture struct {
-		Aws struct {
+		ConfigInitials struct {
 			SecretsKeyFile              string `toml:"secrets_key_file"`
 			SecretsStoreFile            string `toml:"secrets_store_file"`
 			Architecture                string `toml:"architecture"`
@@ -94,7 +94,7 @@ type AwsConfigToml struct {
 
 type ExistingInfraConfigToml struct {
 	Architecture struct {
-		ExistingInfra struct {
+		ConfigInitials struct {
 			SecretsKeyFile              string `toml:"secrets_key_file"`
 			SecretsStoreFile            string `toml:"secrets_store_file"`
 			Architecture                string `toml:"architecture"`

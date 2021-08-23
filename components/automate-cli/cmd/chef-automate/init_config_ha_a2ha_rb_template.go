@@ -1,13 +1,13 @@
 package main
 
 const existingNodesA2harbTemplate = `
-secrets_key_file "{{ .Architecture.ExistingInfra.SecretsKeyFile }}"
-secrets_store_file "{{ .Architecture.ExistingInfra.SecretsStoreFile }}"
-architecture "{{ .Architecture.ExistingInfra.Architecture }}"
-workspace_path "{{ .Architecture.ExistingInfra.WorkspacePath }}"
-ssh_user "{{ .Architecture.ExistingInfra.SSHUser }}"
-ssh_key_file "{{ .Architecture.ExistingInfra.SSHKeyFile }}"
-# sudo_password "{{ .Architecture.ExistingInfra.SudoPassword }}"
+secrets_key_file "{{ .Architecture.ConfigInitials.SecretsKeyFile }}"
+secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
+architecture "{{ .Architecture.ConfigInitials.Architecture }}"
+workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
+ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
+ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
+# sudo_password "{{ .Architecture.ConfigInitials.SudoPassword }}"
 # logging_monitoring_management "true"
 # ew_elk "false"
 # existing_elk "false"
@@ -16,7 +16,7 @@ ssh_key_file "{{ .Architecture.ExistingInfra.SSHKeyFile }}"
 # existing_elk_cert ""
 # existing_elk_username ""
 # existing_elk_password ""
-backup_mount "{{ .Architecture.ExistingInfra.BackupMount }}"
+backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 # habitat_uid_gid ""
 ###############################################################
 ### Automate frontend node related settings                 ###
@@ -69,16 +69,16 @@ end
 `
 
 const awsA2harbTemplate = `
-secrets_key_file "{{ .Architecture.Aws.SecretsKeyFile }}"
-secrets_store_file "{{ .Architecture.Aws.SecretsStoreFile }}"
-architecture "{{ .Architecture.Aws.Architecture }}"
-workspace_path "{{ .Architecture.Aws.WorkspacePath }}"
-ssh_user "{{ .Architecture.Aws.SSHUser }}"
-ssh_key_file "{{ .Architecture.Aws.SSHKeyFile }}"
+secrets_key_file "{{ .Architecture.ConfigInitials.SecretsKeyFile }}"
+secrets_store_file "{{ .Architecture.ConfigInitials.SecretsStoreFile }}"
+architecture "{{ .Architecture.ConfigInitials.Architecture }}"
+workspace_path "{{ .Architecture.ConfigInitials.WorkspacePath }}"
+ssh_user "{{ .Architecture.ConfigInitials.SSHUser }}"
+ssh_key_file "{{ .Architecture.ConfigInitials.SSHKeyFile }}"
 # logging_monitoring_management "true"
 # new_elk "false"
 # existing_elk "false"
-backup_mount "{{ .Architecture.Aws.BackupMount }}"
+backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 # sudo_password ""
 # existing_elk_instance_ip ""
 # existing_elk_port ""
