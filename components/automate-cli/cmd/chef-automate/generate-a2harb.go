@@ -64,11 +64,3 @@ func renderSettingsToA2HARBFile(templateName string, data interface{}) string {
 	finalTemplate := buf.String()
 	return finalTemplate
 }
-
-func convertStructArrayToStringArray(data []interface{}) []string {
-	dataArray := make([]string, len(data))
-	for i := range dataArray {
-		dataArray[i] = data[i].(string)
-	}
-	return dataArray
-}
