@@ -1,15 +1,10 @@
 <div ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
     <h1 slot="title" data-cy="policyfile-heading">{{cookbookName}}
-      <span class="details-link" data-cy="policyfile-details" *ngIf="!error">
+      <span data-cy="policyfile-details" [ngClass]="error ? 'details-link disabled-link' : 'details-link'">
         <a
           [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'cookbooks', cookbookName]"
           >
-          Go to Cookbook Details &gt;
-        </a>
-      </span>
-      <span class="details-link" data-cy="policyfile-details" *ngIf="error">
-        <a class="disabled-link">
           Go to Cookbook Details &gt;
         </a>
       </span>
