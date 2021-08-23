@@ -314,6 +314,9 @@ export class TelemetryService {
         page.url = analytics.sanitizeDomainURL(page.url);
         console.log(page.url);
       }
+      if (payload.obj.context.ip) {
+        payload.obj.context.ip = '';
+      }
     }
     next(payload);
   }
