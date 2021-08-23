@@ -11,6 +11,7 @@ import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Regex } from 'app/helpers/auth/regex';
+import { Destination } from 'app/entities/destinations/destination.model';
 // import { By } from '@angular/platform-browser';
 // import { Revision } from 'app/entities/revisions/revision.model';
 // import { GetRevisionsSuccess } from 'app/entities/revisions/revision.action';
@@ -85,12 +86,14 @@ describe('RevisionIdComponent', () => {
   });
 
   describe('revision id list', () => {
-    // let store: Store<NgrxStateAtom>;
-    // const availableRevisions: Revision[] = [{
-    //     revision_id: '2.3.12'
-    //   }
-    // ];
-    // const emptyRevisions: Revision[] = [];
+    const tokenType = 'Bearer';
+    const token = 'test123';
+    const destination = <Destination> {
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
+    };
 
     beforeEach(() => {
       // store = TestBed.inject(Store);
@@ -109,24 +112,37 @@ describe('RevisionIdComponent', () => {
 
     it('should be valid when all fields are filled out', () => {
       component.integrationSelected = true;
-      component.selectChangeHandlers('Access Token')
-      component.createForm.controls['name'].setValue("name");
-      component.createForm.controls['url'].setValue("http://zyz.com");
-      component.createForm.controls['tokenType'].setValue("Bearer");
-      component.createForm.controls['token'].setValue("ejwbkrbekrb");
+      component.selectChangeHandlers('Access Token');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue(token);
       expect(component.validateForm()).toBeTruthy();
     });
 
-    it('opening create modal resets name, url, username and password to empty string', () => {
+    it('slider resets name, url, username and password to empty string for servicenow', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['url'].setValue('any');
-      component.createForm.controls['tokenType'].setValue('Bearer');
+      component.createForm.controls['tokenType'].setValue(tokenType);
       component.createForm.controls['token'].setValue('any');
       component.slidePanel();
-      component.selectIntegration("ServiceNow")
+      component.selectIntegration('ServiceNow');
       expect(component.createForm.controls['name'].value).toBe(null);
       expect(component.createForm.controls['url'].value).toBe(null);
-      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
+      expect(component.createForm.controls['tokenType'].value).toBe(tokenType);
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
+
+    it('slider resets name, url, username and password to empty string for splunk', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue('any');
+      component.slidePanel();
+      component.selectIntegration('Splunk');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe(tokenType);
       expect(component.createForm.controls['token'].value).toBe(null);
     });
   });
@@ -135,8 +151,7 @@ describe('RevisionIdComponent', () => {
 
     it('- url field validity', () => {
       component.integrationSelected = true;
-      component.selectIntegration('ServiceNow')
-      // component.selectChangeHandlers('Access Token')
+      component.selectIntegration('ServiceNow');
       expect(component.createForm.controls['url'].value).toBe(null);
 
       let errors = {};

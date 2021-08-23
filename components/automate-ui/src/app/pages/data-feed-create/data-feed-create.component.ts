@@ -5,7 +5,7 @@ import {
   Output,
   HostBinding,
   ViewChild,
-  ElementRef,
+  ElementRef
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
@@ -53,21 +53,21 @@ export class DataFeedCreateComponent {
 
   private saveInProgress = false;
   private testInProgress = false;
-  private testSuccess:boolean = null;
-  private testError:boolean = null;
+  private testSuccess: boolean = null;
+  private testError: boolean = null;
 
   public integrations = {
     webhook: [
-      {name: WebhookIntegrationTypes.SERVICENOW, asset: "servicenow"},
-      {name: WebhookIntegrationTypes.SPLUNK, asset: "splunk"},
-      {name: WebhookIntegrationTypes.ELK_KIBANA, asset: "elk"},
-      {name: WebhookIntegrationTypes.CUSTOM, asset: "custom"}
+      {name: WebhookIntegrationTypes.SERVICENOW, asset: 'servicenow'},
+      {name: WebhookIntegrationTypes.SPLUNK, asset: 'splunk'},
+      {name: WebhookIntegrationTypes.ELK_KIBANA, asset: 'elk'},
+      {name: WebhookIntegrationTypes.CUSTOM, asset: 'custom'}
     ],
     storage: [
-      {name: StorageIntegrationTypes.MINIO, asset: "minio"},
-      {name: StorageIntegrationTypes.AMAZON_S3, asset: "s3"}
+      {name: StorageIntegrationTypes.MINIO, asset: 'minio'},
+      {name: StorageIntegrationTypes.AMAZON_S3, asset: 's3'}
     ]
-  }
+  };
 
   set saveDone(done: boolean) {
     this.saveInProgress = done;
@@ -117,69 +117,75 @@ export class DataFeedCreateComponent {
     this.integrationSelected = false;
   }
 
-  public selectIntegration(integration: string){
-    if(integration === WebhookIntegrationTypes.SERVICENOW) {
+  public selectIntegration(integration: string) {
+    if (integration === WebhookIntegrationTypes.SERVICENOW) {
       this.createForm.reset();
-      this.createForm.controls['tokenType'].setValue("Bearer");
-      this.integrationSelected = true
+      this.createForm.controls['tokenType'].setValue('Bearer');
+      this.integrationSelected = true;
       this.integTitle = integration;
-      setTimeout(()=>{
-        this.name.nativeElement.focus()
+      setTimeout(() => {
+        this.name.nativeElement.focus();
       });
-    }else if(integration === WebhookIntegrationTypes.SPLUNK) {
+    } else if (integration === WebhookIntegrationTypes.SPLUNK) {
       this.createForm.reset();
-      this.createForm.controls['tokenType'].setValue("Splunk");
-      this.integrationSelected = true
+      this.createForm.controls['tokenType'].setValue('Splunk');
+      this.integrationSelected = true;
       this.integTitle = integration;
-      setTimeout(()=>{
-        this.name.nativeElement.focus()
+      setTimeout(() => {
+        this.name.nativeElement.focus();
       });
     }
   }
-  public returnToMenu(){
+  public returnToMenu() {
     this.integrationSelected = false;
   }
 
-  public toggleTokenType(){
-    this.tokenToggle = !this.tokenToggle
+  public toggleTokenType() {
+    this.tokenToggle = !this.tokenToggle;
   }
 
-  public selectChangeHandlers(type: string){
+  public selectChangeHandlers(type: string) {
     this.authSelected = type;
   }
 
-  public testConnection(){
-    this.testInProgress = true
+  public testConnection() {
+    this.testInProgress = true;
     this.testDestinationEvent.emit({
       name: this.integTitle,
       auth: this.authSelected
-    })
+    });
   }
 
-  public validateForm(){
-    if(this.authSelected===AuthTypes.ACCESSTOKEN) {
-      if(this.createForm.get('name').valid && this.createForm.get('url').valid && this.createForm.get('tokenType').valid && this.createForm.get('token').valid){
-        return true
+  public validateForm() {
+    if (this.authSelected === AuthTypes.ACCESSTOKEN) {
+      if (this.createForm.get('name').valid &&
+        this.createForm.get('url').valid &&
+        this.createForm.get('tokenType').valid &&
+        this.createForm.get('token').valid) {
+        return true;
       }
-    }else if(this.authSelected===AuthTypes.USERNAMEANDPASSWORD) {
-      if(this.createForm.get('name').valid && this.createForm.get('url').valid && this.createForm.get('username').valid && this.createForm.get('password').valid){
-        return true
+    } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
+      if (this.createForm.get('name').valid &&
+        this.createForm.get('url').valid &&
+        this.createForm.get('username').valid &&
+        this.createForm.get('password').valid) {
+        return true;
       }
     }
-    return false
+    return false;
   }
 
-  public saveDestination(){
+  public saveDestination() {
     this.saveInProgress = true;
     this.saveDestinationEvent.emit({
       name: this.integTitle,
       auth: this.authSelected
-    })
+    });
   }
 
-  public dismissNotification(){
-    this.testSuccess = false
-    this.testError = false
+  public dismissNotification() {
+    this.testSuccess = false;
+    this.testError = false;
   }
 
 }

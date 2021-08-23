@@ -19,10 +19,10 @@
 
 .sidenav-header {
   display: flex;
+  margin: 15px 32px 0 32px;
   flex-direction: row;
   border-bottom: 0.5px solid $chef-key-tab;
   line-height: 3;
-  margin: 15px 32px 0 32px;
 
   h1 {
     flex-grow: 2;

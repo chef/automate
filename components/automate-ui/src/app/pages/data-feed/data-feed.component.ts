@@ -38,7 +38,7 @@ enum UrlTestState {
 @Component({
   selector: 'app-data-feed',
   templateUrl: './data-feed.component.html',
-  styleUrls: ['./data-feed.component.scss'],
+  styleUrls: ['./data-feed.component.scss']
 })
 
 export class DataFeedComponent implements OnInit, OnDestroy {
@@ -114,8 +114,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public closeSlider(){
-    this.createChild.closeCreateSlider()
+  public closeSlider() {
+    this.createChild.closeCreateSlider();
     this.createChild.saveDone = false;
     this.createModalVisible = false;
     this.conflictErrorEvent.emit(false);
@@ -145,7 +145,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   public sendTestForDataFeed(event: any): void {
     this.sendingDataFeed = true;
-    if(event.auth==="Username and Password") {
+    if (event.auth === 'Username and Password') {
       const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
       const targetUsername: string = this.createDataFeedForm.controls['username'].value;
       const targetPassword: string = this.createDataFeedForm.controls['password'].value;
@@ -162,13 +162,13 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             () => this.revealUrlStatus(UrlTestState.Failure)
           );
       }
-    }else if(event.auth==="Access Token"){
+    } else if (event.auth === 'Access Token') {
       const targetUrl: string = this.createDataFeedForm.controls['url'].value;
       const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
       const token: string = this.createDataFeedForm.controls['token'].value;
-      let value = JSON.stringify({
-        Authorization: tokenType + " " + token
-      })
+      const value = JSON.stringify({
+        Authorization: tokenType + ' ' + token
+      });
       this.datafeedRequests.testDestinationWithHeaders(targetUrl,
         value).subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
@@ -180,46 +180,46 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   private revealUrlStatus(status: UrlTestState) {
     this.createChild.testDoneSetter = false;
-    if(status == UrlTestState.Success){
+    if (status === UrlTestState.Success) {
       this.createChild.testSuccessSetter = true;
-    }else{
+    } else {
       this.createChild.testErrorSetter = true;
     }
   }
 
-  public slidePanel(): void{
+  public slidePanel(): void {
     this.createModalVisible = true;
     this.createChild.slidePanel();
   }
 
-  public saveDestination(event: any){
+  public saveDestination(event: any) {
     this.creatingDataFeed = true;
-    if(event.auth==="Access Token"){
+    if (event.auth === 'Access Token') {
       const destinationObj = {
         name: this.createDataFeedForm.controls['name'].value.trim(),
         url: this.createDataFeedForm.controls['url'].value.trim(),
-        integration_types: "Webhook",
+        integration_types: 'Webhook',
         services: event.name
       };
       const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
       const token: string = this.createDataFeedForm.controls['token'].value.trim();
-      let headers = JSON.stringify({
-        Authorization: tokenType + " " + token
-      })
+      const headers = JSON.stringify({
+        Authorization: tokenType + ' ' + token
+      });
       this.store.dispatch(new CreateDestination(destinationObj, headers));
 
-    }else if(event.auth==="Username and Password"){
+    } else if (event.auth === 'Username and Password') {
       const destinationObj = {
         name: this.createDataFeedForm.controls['name'].value.trim(),
         url: this.createDataFeedForm.controls['url'].value.trim(),
-        integration_types: "Webhook",
+        integration_types: 'Webhook',
         services: event.name
       };
       const username: string = this.createDataFeedForm.controls['username'].value.trim();
       const password: string = this.createDataFeedForm.controls['password'].value.trim();
-      let headers = JSON.stringify({
-        Authorization: "Basic " + btoa(username + ":" + password)
-      })
+      const headers = JSON.stringify({
+        Authorization: 'Basic ' + btoa(username + ':' + password)
+      });
 
       this.store.dispatch(new CreateDestination(destinationObj, headers));
     }

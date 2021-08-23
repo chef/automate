@@ -83,6 +83,7 @@ describe('DataFeedComponent', () => {
     let store: Store<NgrxStateAtom>;
     const username = 'test';
     const password = 'test123';
+    const token = 'test123';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -120,7 +121,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: "Username and Password", name: "Service Now"});
+      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
 
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
@@ -134,9 +135,9 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
-      component.createDataFeedForm.controls['token'].setValue("jdskbfk454");
+      component.createDataFeedForm.controls['token'].setValue(token);
 
-      component.saveDestination({auth: "Access Token", name: "Service Now"});
+      component.saveDestination({auth: 'Access Token', name: 'Service Now'});
 
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
@@ -154,7 +155,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: "Username and Password", name: "Service Now"});
+      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
 
       const conflict = <HttpErrorResponse>{
         status: HttpStatus.CONFLICT,
@@ -176,7 +177,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: "Username and Password", name: "Service Now"});
+      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
