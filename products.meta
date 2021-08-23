@@ -46,7 +46,6 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
-    "chef/automate-backend-kibana",
     "core/rsync"
   ],
 
@@ -152,8 +151,7 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
-        "chef/user-settings-service",
-        "chef/automate-backend-kibana"
+        "chef/user-settings-service"
       ]
     },
     {

@@ -1137,6 +1137,8 @@ paths = [
 plan_path = "components/automate-backend-haproxy"
 paths = [
   "components/automate-backend-haproxy/*"
+]
+
 [automate-backend-kibana]
 plan_path = "components/automate-backend-kibana"
 paths = [
