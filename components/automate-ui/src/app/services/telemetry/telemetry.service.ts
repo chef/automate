@@ -243,7 +243,7 @@ export class TelemetryService {
     });
 
     if (operation === 'page' && payload && payload.properties) {
-      let properties = payload.properties;
+      const properties = payload.properties;
       if (properties.referrer) {
         properties.referrer = this.sanitizeDomainURL(properties.referrer);
       }
@@ -306,7 +306,7 @@ export class TelemetryService {
 
   middleware({ payload, next }) {
     if (payload && payload.obj && payload.obj.context && payload.obj.context.page) {
-      let page = payload.obj.context.page;
+      const page = payload.obj.context.page;
       if (page.referrer) {
         page.referrer = analytics.sanitizeDomainURL(page.referrer);
       }
@@ -316,6 +316,6 @@ export class TelemetryService {
       }
     }
     next(payload);
-  };
+  }
 
 }
