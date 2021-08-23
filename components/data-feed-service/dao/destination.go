@@ -28,7 +28,7 @@ type Destination struct {
 	Enable           bool   `db:"enable"`
 }
 
-func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
+func addToDBDestination(inDestination *datafeed.AddDestinationRequest) (*Destination, error) {
 	newDestination := Destination{}
 	newDestination.ID = inDestination.Id
 	newDestination.Name = inDestination.Name
@@ -36,21 +36,26 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
-	newDestination.Enable = inDestination.Enable
-	zaMap := make(map[string]string, 0)
-	for _, kv := range inDestination.MetaData {
-		zaMap[kv.Key] = kv.Value
+	// The new connection is always set as true
+	newDestination.Enable = true
+	if len(inDestination.MetaData) > 0 {
+		zaMap := make(map[string]string, 0)
+		for _, kv := range inDestination.MetaData {
+			zaMap[kv.Key] = kv.Value
+		}
+		jsonMap, err := json.Marshal(zaMap)
+		if err != nil {
+			logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+			return nil, err
+		}
+		newDestination.MetaData = string(jsonMap)
+	} else {
+		newDestination.MetaData = ""
 	}
-	jsonMap, err := json.Marshal(zaMap)
-	if err != nil {
-		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
-		return nil
-	}
-	newDestination.MetaData = string(jsonMap)
-	return &newDestination
+	return &newDestination, nil
 }
 
-func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *Destination {
+func updateToDBDestination(db *DB, inDestination *datafeed.UpdateDestinationRequest) (*Destination, error) {
 	newDestination := Destination{}
 	newDestination.ID, _ = strconv.ParseInt(inDestination.Id, 10, 64)
 	newDestination.Name = inDestination.Name
@@ -58,19 +63,28 @@ func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *De
 	newDestination.Secret = inDestination.Secret
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
-	newDestination.Enable = inDestination.Enable
-	zaMap := make(map[string]string, 0)
-	for _, kv := range inDestination.MetaData {
-		zaMap[kv.Key] = kv.Value
-	}
-	jsonMap, err := json.Marshal(zaMap)
+	getDestValue, err := db.GetDestination(&datafeed.GetDestinationRequest{Id: newDestination.ID})
 	if err != nil {
-		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
-		return nil
+		logrus.Errorln(errors.Wrap(err, "not able to get destination"))
+		return nil, err
 	}
-	newDestination.MetaData = string(jsonMap)
+	newDestination.Enable = getDestValue.Enable
+	if len(inDestination.MetaData) > 0 {
+		zaMap := make(map[string]string, 0)
+		for _, kv := range inDestination.MetaData {
+			zaMap[kv.Key] = kv.Value
+		}
+		jsonMap, err := json.Marshal(zaMap)
+		if err != nil {
+			logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+			return nil, err
+		}
+		newDestination.MetaData = string(jsonMap)
+	} else {
+		newDestination.MetaData = ""
+	}
 
-	return &newDestination
+	return &newDestination, nil
 }
 func updateToDBDestinationEnable(inDestination *datafeed.UpdateDestinationEnableRequest) *Destination {
 	newDestination := Destination{}
@@ -79,7 +93,7 @@ func updateToDBDestinationEnable(inDestination *datafeed.UpdateDestinationEnable
 	return &newDestination
 }
 
-func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestinationResponse {
+func dbToGetDestinationResponse(inDestination *Destination) (*datafeed.GetDestinationResponse, error) {
 	newDestination := datafeed.GetDestinationResponse{}
 	newDestination.Id = inDestination.ID
 	newDestination.Name = inDestination.Name
@@ -88,24 +102,32 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Services = inDestination.Services
 	newDestination.IntegrationTypes = inDestination.IntegrationTypes
 	newDestination.Enable = inDestination.Enable
-	var zaMap map[string]string
-	err := json.Unmarshal([]byte(inDestination.MetaData), &zaMap)
-	if err != nil {
-		logrus.Println(errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map"))
-		return nil
+	if inDestination.MetaData != "" {
+		var zaMap map[string]string
+		err := json.Unmarshal([]byte(inDestination.MetaData), &zaMap)
+		if err != nil {
+			logrus.Println(errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map"))
+			return nil, err
+		}
+
+		zaArray := make([]*query.Kv, 0, len(zaMap))
+		for k, v := range zaMap {
+			zaArray = append(zaArray, &query.Kv{Key: k, Value: v})
+		}
+		newDestination.MetaData = zaArray
+	} else {
+		newDestination.MetaData = []*query.Kv{}
 	}
 
-	zaArray := make([]*query.Kv, 0, len(zaMap))
-	for k, v := range zaMap {
-		zaArray = append(zaArray, &query.Kv{Key: k, Value: v})
-	}
-	newDestination.MetaData = zaArray
-	return &newDestination
+	return &newDestination, nil
 }
 
 func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (int64, error) {
-	dbDestination := addToDBDestination(destination)
-	err := Transact(db, func(tx *DBTrans) error {
+	dbDestination, err := addToDBDestination(destination)
+	if err != nil {
+		return -1, err
+	}
+	err = Transact(db, func(tx *DBTrans) error {
 		if err := tx.Insert(dbDestination); err != nil {
 			pgErr, ok := err.(*pq.Error)
 			if ok && pgErr.Code == uniqueViolation {
@@ -141,8 +163,11 @@ func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) error
 }
 
 func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) error {
-	dbDestination := updateToDBDestination(destination)
 	var err error
+	dbDestination, err := updateToDBDestination(db, destination)
+	if err != nil {
+		return err
+	}
 	var count int64 = 0
 	err = Transact(db, func(tx *DBTrans) error {
 		if count, err = tx.Update(dbDestination); err != nil {
@@ -177,9 +202,12 @@ func (db *DB) GetDestination(get *datafeed.GetDestinationRequest) (*datafeed.Get
 		}
 		return err
 	})
-	result := dbToGetDestinationResponse(dest)
 	if err != nil {
-		return result, err
+		return nil, err
+	}
+	result, err := dbToGetDestinationResponse(dest)
+	if err != nil {
+		return nil, err
 	}
 	return result, err
 }
@@ -200,7 +228,11 @@ func (db *DB) ListDestinations() (*datafeed.ListDestinationResponse, error) {
 	}
 	listOfDestinations := make([]*datafeed.GetDestinationResponse, 0)
 	for _, d := range destinations {
-		listOfDestinations = append(listOfDestinations, dbToGetDestinationResponse(&d))
+		result, err := dbToGetDestinationResponse(&d)
+		if err != nil {
+			return nil, err
+		}
+		listOfDestinations = append(listOfDestinations, result)
 	}
 	return &datafeed.ListDestinationResponse{Destinations: listOfDestinations}, err
 }

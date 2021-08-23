@@ -56,7 +56,7 @@ func NewCredentialsFactory(data map[string]string) *CredentialsFactory {
 }
 
 func (c *CredentialsFactory) NewCredentials(data DBData) (Credentials, error) {
-	if data.IntegrationType == Webhook {
+	if data.IntegrationType == Webhook || data.IntegrationType == "" {
 		if username, ok := c.data["username"]; ok {
 			// assume Basic Auth
 			return NewBasicAuthCredentials(username, c.data["password"]), nil
