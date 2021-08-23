@@ -146,6 +146,8 @@ export class TelemetryService {
             });
           });
 
+          analytics.sanitizeDomainURL = this.sanitizeDomainURL;
+          analytics.addSourceMiddleware(this.middleware);
           // First we want to get the build version so we can send it with the
           // metadata to the telemetry pipeline
           this.metadataService
@@ -190,6 +192,8 @@ export class TelemetryService {
   }
 
   page(pageName?: string, properties?: any) {
+    properties.url = '';
+    properties.referrer = '';
     this.trackingOperations.next({
       operation: 'page',
       identifier: pageName,
@@ -284,7 +288,7 @@ export class TelemetryService {
     return (new Date).toISOString();
   }
 
-  private sanitizeDomainURL(url) {
+  sanitizeDomainURL(url) {
     let restByDot: any;
     let firstByDot: string;
     [firstByDot, ...restByDot] = url.split('.');
@@ -299,4 +303,19 @@ export class TelemetryService {
       return firstByDot + '.' + restByDot;
     }
   }
+
+  middleware({ payload, next }) {
+    if (payload && payload.obj && payload.obj.context && payload.obj.context.page) {
+      let page = payload.obj.context.page;
+      if (page.referrer) {
+        page.referrer = analytics.sanitizeDomainURL(page.referrer);
+      }
+      if (page.url) {
+        page.url = analytics.sanitizeDomainURL(page.url);
+        console.log(page.url);
+      }
+    }
+    next(payload);
+  };
+
 }
