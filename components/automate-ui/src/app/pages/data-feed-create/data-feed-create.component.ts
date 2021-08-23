@@ -50,7 +50,7 @@ export class DataFeedCreateComponent {
   public tokenToggle = true;
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
-  public showSelect: boolean = false;
+  public showSelect = false;
 
   private saveInProgress = false;
   private testInProgress = false;
@@ -75,12 +75,12 @@ export class DataFeedCreateComponent {
   }
 
   set testSuccessSetter(val: boolean) {
-    this.dismissNotification()
+    this.dismissNotification();
     this.testSuccess = val;
   }
 
   set testErrorSetter(val: boolean) {
-    this.dismissNotification()
+    this.dismissNotification();
     this.testError = val;
   }
 
