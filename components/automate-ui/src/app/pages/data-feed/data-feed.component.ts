@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatOptionSelectionChange } from '@angular/material/core/option';
 import { Store, select } from '@ngrx/store';
@@ -26,6 +26,7 @@ import {
 } from 'app/entities/destinations/destination.actions';
 
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
+import { DataFeedCreateComponent } from '../data-feed-create/data-feed-create.component';
 
 enum UrlTestState {
   Inactive,
@@ -37,7 +38,7 @@ enum UrlTestState {
 @Component({
   selector: 'app-data-feed',
   templateUrl: './data-feed.component.html',
-  styleUrls: ['./data-feed.component.scss']
+  styleUrls: ['./data-feed.component.scss'],
 })
 
 export class DataFeedComponent implements OnInit, OnDestroy {
@@ -50,8 +51,9 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   public dataFeedToDelete: Destination;
   public deleteModalVisible = false;
   public sendingDataFeed = false;
-  public hookStatus = UrlTestState.Inactive;
   private isDestroyed = new Subject<boolean>();
+
+  @ViewChild(DataFeedCreateComponent) createChild: DataFeedCreateComponent;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -67,7 +69,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
-      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
+      ruleType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      tokenType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      token: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
@@ -83,8 +88,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       .subscribe(state => {
         this.creatingDataFeed = false;
         if (state === EntityStatus.loadingSuccess) {
-          this.closeCreateModal();
-          this.hookStatus = UrlTestState.Inactive;
+          this.closeSlider();
         }
       });
 
@@ -99,9 +103,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
         } else {
-          // Close the modal on any error other than conflict and display in banner.
-          this.closeCreateModal();
-          this.hookStatus = UrlTestState.Inactive;
+          // Close the slider on any error other than conflict and display in banner.
+          this.closeSlider();
         }
       });
   }
@@ -111,31 +114,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public openCreateModal(): void {
-    this.createModalVisible = true;
-    this.resetCreateModal();
-  }
-
-  public closeCreateModal(): void {
+  public closeSlider(){
+    this.createChild.closeCreateSlider()
+    this.createChild.saveDone = false;
     this.createModalVisible = false;
-    this.resetCreateModal();
-  }
-
-  public createDataFeed(): void {
-    this.creatingDataFeed = true;
-    const destinationObj = {
-      name: this.createDataFeedForm.controls['name'].value.trim(),
-      url: this.createDataFeedForm.controls['url'].value.trim()
-    };
-    const username: string = this.createDataFeedForm.controls['username'].value.trim();
-    const password: string = this.createDataFeedForm.controls['password'].value.trim();
-    this.store.dispatch(new CreateDestination(destinationObj, username, password));
-  }
-
-  private resetCreateModal(): void {
-    this.hookStatus = UrlTestState.Inactive;
-    this.creatingDataFeed = false;
-    this.createDataFeedForm.reset();
     this.conflictErrorEvent.emit(false);
   }
 
@@ -161,21 +143,34 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public sendTestForDataFeed(): void {
+  public sendTestForDataFeed(event: any): void {
     this.sendingDataFeed = true;
-    this.hookStatus = UrlTestState.Loading;
-    const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
-    const targetUsername: string = this.createDataFeedForm.controls['username'].value;
-    const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-    if (targetUrl && targetUsername && targetPassword) {
-      this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
-        targetUsername, targetPassword).subscribe(
-          () => this.revealUrlStatus(UrlTestState.Success),
-          () => this.revealUrlStatus(UrlTestState.Failure)
-        );
-    } else {
-      this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
-        .subscribe(
+    if(event.auth==="Username and Password") {
+      const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
+      const targetUsername: string = this.createDataFeedForm.controls['username'].value;
+      const targetPassword: string = this.createDataFeedForm.controls['password'].value;
+      if (targetUrl && targetUsername && targetPassword) {
+        this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
+          targetUsername, targetPassword).subscribe(
+            () => this.revealUrlStatus(UrlTestState.Success),
+            () => this.revealUrlStatus(UrlTestState.Failure)
+          );
+      } else {
+        this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
+          .subscribe(
+            () => this.revealUrlStatus(UrlTestState.Success),
+            () => this.revealUrlStatus(UrlTestState.Failure)
+          );
+      }
+    }else if(event.auth==="Access Token"){
+      const targetUrl: string = this.createDataFeedForm.controls['url'].value;
+      const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
+      const token: string = this.createDataFeedForm.controls['token'].value;
+      let value = JSON.stringify({
+        Authorization: tokenType + " " + token
+      })
+      this.datafeedRequests.testDestinationWithHeaders(targetUrl,
+        value).subscribe(
           () => this.revealUrlStatus(UrlTestState.Success),
           () => this.revealUrlStatus(UrlTestState.Failure)
         );
@@ -184,6 +179,49 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   }
 
   private revealUrlStatus(status: UrlTestState) {
-    this.hookStatus = status;
+    this.createChild.testDoneSetter = false;
+    if(status == UrlTestState.Success){
+      this.createChild.testSuccessSetter = true;
+    }else{
+      this.createChild.testErrorSetter = true;
+    }
+  }
+
+  public slidePanel(): void{
+    this.createModalVisible = true;
+    this.createChild.slidePanel();
+  }
+
+  public saveDestination(event: any){
+    this.creatingDataFeed = true;
+    if(event.auth==="Access Token"){
+      const destinationObj = {
+        name: this.createDataFeedForm.controls['name'].value.trim(),
+        url: this.createDataFeedForm.controls['url'].value.trim(),
+        integration_types: "Webhook",
+        services: event.name
+      };
+      const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
+      const token: string = this.createDataFeedForm.controls['token'].value.trim();
+      let headers = JSON.stringify({
+        Authorization: tokenType + " " + token
+      })
+      this.store.dispatch(new CreateDestination(destinationObj, headers));
+
+    }else if(event.auth==="Username and Password"){
+      const destinationObj = {
+        name: this.createDataFeedForm.controls['name'].value.trim(),
+        url: this.createDataFeedForm.controls['url'].value.trim(),
+        integration_types: "Webhook",
+        services: event.name
+      };
+      const username: string = this.createDataFeedForm.controls['username'].value.trim();
+      const password: string = this.createDataFeedForm.controls['password'].value.trim();
+      let headers = JSON.stringify({
+        Authorization: "Basic " + btoa(username + ":" + password)
+      })
+
+      this.store.dispatch(new CreateDestination(destinationObj, headers));
+    }
   }
 }

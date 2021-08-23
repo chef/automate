@@ -86,8 +86,8 @@ export class DestinationEffects {
   createDestination$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE),
-      mergeMap(({ payload, username, password }: CreateDestination) =>
-      this.requests.createDestination( payload, username, password ).pipe(
+      mergeMap(({ payload, headers }: CreateDestination) =>
+      this.requests.createDestination( payload, headers ).pipe(
         map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDestinationFailure(error)))))));

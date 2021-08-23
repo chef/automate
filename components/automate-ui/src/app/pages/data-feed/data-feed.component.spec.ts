@@ -13,6 +13,7 @@ import { Destination } from 'app/entities/destinations/destination.model';
 import { CreateDestinationSuccess, CreateDestinationFailure } from 'app/entities/destinations/destination.actions';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { DataFeedCreateComponent } from '../data-feed-create/data-feed-create.component';
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
@@ -21,6 +22,7 @@ describe('DataFeedComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
+        DataFeedCreateComponent,
         DataFeedComponent,
         MockComponent({
         selector: 'app-create-data-feed-modal',
@@ -93,45 +95,66 @@ describe('DataFeedComponent', () => {
     });
 
     it('openCreateModal opens modal', () => {
+      spyOn(component.createChild, 'slidePanel');
       expect(component.createModalVisible).toBe(false);
-      component.openCreateModal();
+      component.slidePanel();
       expect(component.createModalVisible).toBe(true);
     });
 
     it('opening create modal resets name, url, username and password to empty string', () => {
       component.createDataFeedForm.controls['name'].setValue('any');
       component.createDataFeedForm.controls['url'].setValue('any');
-      component.createDataFeedForm.controls['username'].setValue('any');
-      component.createDataFeedForm.controls['password'].setValue('any');
-      component.openCreateModal();
+      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
+      component.createDataFeedForm.controls['token'].setValue('any');
+      component.slidePanel();
       expect(component.createDataFeedForm.controls['name'].value).toBe(null);
       expect(component.createDataFeedForm.controls['url'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['username'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['password'].value).toBe(null);
+      expect(component.createDataFeedForm.controls['tokenType'].value).toBe(null);
+      expect(component.createDataFeedForm.controls['token'].value).toBe(null);
     });
 
     it('on success, closes modal and adds new data feed', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.createDataFeed();
+      component.saveDestination({auth: "Username and Password", name: "Service Now"});
 
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
-        component.closeCreateModal();
+        expect(destinations).toContain(destination);
+      });
+    });
+
+    it('on success, closes modal and adds new data feed access token', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
+      component.createDataFeedForm.controls['token'].setValue("jdskbfk454");
+
+      component.saveDestination({auth: "Access Token", name: "Service Now"});
+
+      store.dispatch(new CreateDestinationSuccess(destination));
+      component.sortedDestinations$.subscribe(destinations => {
         expect(destinations).toContain(destination);
       });
     });
 
     it('on conflict error, modal is open with conflict error', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
       spyOn(component.conflictErrorEvent, 'emit');
-      component.openCreateModal();
+      spyOn(component.createChild, 'slidePanel');
+
+      component.slidePanel();
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.createDataFeed();
+      component.saveDestination({auth: "Username and Password", name: "Service Now"});
 
       const conflict = <HttpErrorResponse>{
         status: HttpStatus.CONFLICT,
@@ -144,13 +167,16 @@ describe('DataFeedComponent', () => {
     });
 
     it('on create error, modal is closed with failure banner', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
       spyOn(component.conflictErrorEvent, 'emit');
-      component.openCreateModal();
+      spyOn(component.createChild, 'slidePanel');
+
+      component.slidePanel();
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.createDataFeed();
+      component.saveDestination({auth: "Username and Password", name: "Service Now"});
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -164,33 +190,4 @@ describe('DataFeedComponent', () => {
 
   });
 
-  describe('create data feed form validation', () => {
-
-    it('- url field validity', () => {
-      component.openCreateModal();
-
-      let errors = {};
-      const url = component.createDataFeedForm.controls['url'];
-      expect(url.valid).toBeFalsy();
-
-      // url field is required
-      errors = url.errors || {};
-      expect(errors['required']).toBeTruthy();
-
-      url.setValue('');
-      errors = url.errors || {};
-      expect(errors['required']).toBeTruthy();
-
-      // Set url to invalid inputs
-      url.setValue('  ');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
-      expect(errors['required']).toBeFalsy();
-
-      // Set url to valid inputs
-      url.setValue('any');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeFalsy();
-    });
-  });
 });
