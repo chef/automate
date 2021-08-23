@@ -114,9 +114,7 @@ var a2Config = config{
 		{regex: `components/automate-dex/habitat/config/ldap-ca.pem`},
 		{regex: `components/automate-dex/habitat/config/saml-ca.pem`},
 		{regex: `components/automate-postgresql/habitat/config/server.key`},
-		{regex: `components/automate-backend-kibana/habitat/config/certificates/CA.pem`},
-		{regex: `components/automate-backend-kibana/habitat/config/certificates/kibana.pem`},
-		{regex: `components/automate-backend-kibana/habitat/config/certificates/kibana.key`},
+		{regex: `components/automate-backend-kibana/habitat/config/certificates/*`},
 
 		// It's an example in the readme of a crypto lib
 		{regex: `vendor/github.com/nats-io/nkeys/README.md`},
