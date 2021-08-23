@@ -5,19 +5,18 @@ describe('chef datafeed', () => {
     });
       cy.restoreStorage();
   });
-  
+
   beforeEach(() => {
     cy.restoreStorage();
   });
-  
+
   afterEach(() => {
     cy.saveStorage();
   });
-  
+
   describe ('chef data feed page', () => {
 
     it('show data feed', () => {
-        //to get the feature flag   
       cy.get('body').type('feat');
       cy.get('.title').contains('Chef Automate Data Feed').parent().parent()
         .find('.onoffswitch').click();
