@@ -148,10 +148,8 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 		json.Unmarshal(byteRefs, &refs) // nolint: errcheck
 		esControl.Refs = refs
 
-		var tags string
 		bytetags, _ := json.Marshal(control.Tags)
-		json.Unmarshal(bytetags, &tags) // nolint: errcheck
-		esControl.Tags = tags
+		esControl.Tags = string(bytetags)
 
 		esprofile.Controls = append(esprofile.Controls, esControl)
 	}

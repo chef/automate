@@ -1,0 +1,77 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'organizations', orgId]">Policy Groups
+        </chef-breadcrumb>
+        {{policyGroup?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <div class="header">
+          <chef-heading data-cy="policy-group-head">{{policyGroup?.name}}</chef-heading>
+        </div>
+        <div class="meta-box">
+          <div class="summary-body">
+            <h3 class="meta-head">Policy Group Information</h3>
+            <ul>
+              <li id="revision-id" class="revision-id">
+                <span class="heading">No. of Policyfiles</span>
+                <span>{{policyCount}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="summary-body">
+            <h3 class="meta-head">Metadata</h3>
+            <ul>
+              <li id="chef-server">
+                <span class="heading">Chef Infra Server</span>
+                <span data-cy="policy-group-server">{{serverId}}</span>
+              </li>
+              <li>
+                <span class="heading" id="chef-organization">Chef Infra Organization</span>
+                <span data-cy="policy-group-org">{{orgId}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='policyfiles' data-cy="policyfiles-tab">Policyfiles</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      
+      <section class="page-body" *ngIf="tabValue === 'policyfiles'">
+        <div class="policyfiles-tab" *ngIf="!policyGroupDetailsLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div data-cy="empty-list" class="empty-section" *ngIf="true">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p>No policyfiles available</p>
+          </div>
+          <div *ngIf="!policyGroupDetailsLoading || policyCount > 0">
+            <chef-table data-cy="policy-group-details-table-container">
+              <chef-thead>
+                <chef-tr class="no_border_tr">
+                  <chef-th class="no_border_th">Policyfiles</chef-th>
+                  <chef-th class="no_border_th">Revision ID</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let policyFile of policies">
+                  <chef-td>
+                    <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                      'organizations', orgId, 'policyfiles', policyFile.name,
+                      'revision',policyFile.revision_id]">{{ policyFile.name }}</a>
+                  </chef-td>
+                  <chef-td>{{policyFile.revision_id}}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>            
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

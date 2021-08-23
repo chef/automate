@@ -10,7 +10,7 @@ import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { PolicyFileRequests } from 'app/entities/policy-files/policy-file.requests';
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { CookbookRuleList, CookbookDependencyList } from '../policy-file-details/policy-file-details.component';
+import { CookbookRuleList, CookbookDependencyList, CookbookList } from '../policy-file-details/policy-file-details.component';
 
 describe('CookbookDependenciesComponent', () => {
   let component: CookbookDependenciesComponent;
@@ -87,17 +87,27 @@ describe('CookbookDependenciesComponent', () => {
     ];
     const emptyCookbookDependency: CookbookRuleList[] = [];
 
+    const availableCookbooks: CookbookList[] = [{
+      name: 'test',
+      version: '1.3.8',
+      source: '../test'
+      }
+    ];
+    const emptyCookbook: CookbookRuleList[] = [];
+
     it('render the dependency list', () => {
-      component.slidePanel(availableCookbookRule, availableCookbookDependency);
+      component.slidePanel(availableCookbookRule, availableCookbookDependency, availableCookbooks);
       expect(component.cookbookRules.length).not.toBeNull();
       expect(component.cookbookDependencies.length).not.toBeNull();
+      expect(component.cookbooks.length).not.toBeNull();
       expect(component.isSlideOpen).toBe(true);
     });
 
     it('show no preview image', () => {
-      component.slidePanel(emptyCookbookRule, emptyCookbookDependency);
+      component.slidePanel(emptyCookbookRule, emptyCookbookDependency, emptyCookbook);
       expect(component.cookbookRules.length).toBe(0);
       expect(component.cookbookDependencies.length).toBe(0);
+      expect(component.cookbooks.length).toBe(0);
       expect(component.isSlideOpen).toBe(true);
     });
   });

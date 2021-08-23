@@ -31,6 +31,12 @@ import { UserDetailsComponent } from './user-details.component';
 import { EntityStatus } from 'app/entities/entities';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { SigninUiSetting, UISettings } from 'app/services/user-preferences/signin-ui-settings';
+
+class MockUserPreferencesService {
+  public uiSettings: SigninUiSetting = new UISettings()['local'];
+}
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -100,7 +106,8 @@ describe('UserDetailsComponent', () => {
         providers: [
           FeatureFlagsService,
           { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
-          { provide: ChefSessionService, useClass: MockChefSessionService }
+          { provide: ChefSessionService, useClass: MockChefSessionService },
+          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
         ]
       });
       store = TestBed.inject(Store);
