@@ -1,5 +1,4 @@
 describe('chef datafeed', () => {
-
   before(() => {
     cy.adminLogin('/settings/notifications').then(() => {
         const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
