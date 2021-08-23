@@ -70,7 +70,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
       url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
-      ruleType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      authType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       tokenType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       token: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],

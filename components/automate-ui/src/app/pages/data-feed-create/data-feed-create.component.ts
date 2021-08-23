@@ -50,6 +50,7 @@ export class DataFeedCreateComponent {
   public tokenToggle = true;
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
+  public showSelect: boolean = false;
 
   private saveInProgress = false;
   private testInProgress = false;
@@ -74,10 +75,12 @@ export class DataFeedCreateComponent {
   }
 
   set testSuccessSetter(val: boolean) {
+    this.dismissNotification()
     this.testSuccess = val;
   }
 
   set testErrorSetter(val: boolean) {
+    this.dismissNotification()
     this.testError = val;
   }
 
@@ -118,20 +121,25 @@ export class DataFeedCreateComponent {
   }
 
   public selectIntegration(integration: string) {
+    this.showSelect = false;
     if (integration === WebhookIntegrationTypes.SERVICENOW) {
       this.createForm.reset();
+      this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
       this.createForm.controls['tokenType'].setValue('Bearer');
       this.integrationSelected = true;
       this.integTitle = integration;
       setTimeout(() => {
+        this.showSelect = true;
         this.name.nativeElement.focus();
       });
     } else if (integration === WebhookIntegrationTypes.SPLUNK) {
       this.createForm.reset();
+      this.authSelected = AuthTypes.ACCESSTOKEN;
       this.createForm.controls['tokenType'].setValue('Splunk');
       this.integrationSelected = true;
       this.integTitle = integration;
       setTimeout(() => {
+        this.showSelect = true;
         this.name.nativeElement.focus();
       });
     }

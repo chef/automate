@@ -17,7 +17,8 @@
     type="error"
     timeout="5"
     (dismissed)="dismissNotification()">
-    Unable to connect: check URL, username and password.
+    <span *ngIf="authSelected=='Username and Password'">Unable to connect: check URL, username and password.</span>
+    <span *ngIf="authSelected=='Access Token'">Unable to connect: check Token Type (Prefix) and token.</span>
   </app-notification>
   <app-notification
     *ngIf="testSuccessGetter"
@@ -32,7 +33,7 @@
         <h2 class="bolder-font">Webhook Integration</h2>
         <div class="flex-child">
           <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.webhook" [attr.data-cy]="item.name">
-            <img src="/assets/img/{{item.asset}}.png" alt="Avatar" style="width:100%">
+            <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
@@ -43,7 +44,7 @@
         <h2 class="bolder-font">Storage Integration </h2>
         <div class="flex-child">
           <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.storage">
-            <img src="/assets/img/{{item.asset}}.png" alt="Avatar" style="width:100%">
+            <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
@@ -98,7 +99,7 @@
           </chef-form-field>
         </div>
 
-        <div class="input-margin">
+        <div class="input-margin" *ngIf="showSelect">
           <div class="name-margin">
             <label for="version">Authentication</label>
             <div class="version-dropdown">
@@ -207,7 +208,7 @@
         </div>
         
         <div class="input-margin">
-          <div id="button-bar">
+          <div class="button-bar">
             <chef-button data-cy="test-button" id="testConnection" (click)="testConnection()" primary [disabled]="!validateForm()">
               <span *ngIf="!testDoneGetter">Test Connection</span>
               <chef-loading-spinner *ngIf="testDoneGetter"></chef-loading-spinner>
@@ -216,7 +217,7 @@
           </div>
         </div>
         <hr>
-        <div id="button-bar">
+        <div class="button-bar">
           <chef-button id="cancel-server-popup" (click)="returnToMenu()" tertiary>Cancel</chef-button>
           <chef-button [disabled]="!validateForm()"
             primary
