@@ -28,12 +28,18 @@ func readConfigAndWriteToFile() error {
 	architectureAws := config.Get("architecture.aws")
 	if architectureAws != nil {
 		AwsConfig := AwsConfigToml{}
-		ptoml.Unmarshal(templateBytes, &AwsConfig)
+		err := ptoml.Unmarshal(templateBytes, &AwsConfig)
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+		}
 		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, AwsConfig)
 		writeToA2HARBFile(finalTemplate, "a2ha.rb")
 	} else if config.Get("architecture.existing_infra") != nil {
 		ExitiingInfraConfig := ExistingInfraConfigToml{}
-		ptoml.Unmarshal(templateBytes, &ExitiingInfraConfig)
+		err := ptoml.Unmarshal(templateBytes, &ExitiingInfraConfig)
+		if err != nil {
+			return status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
+		}
 		finalTemplate := renderSettingsToA2HARBFile(existingNodesA2harbTemplate, ExitiingInfraConfig)
 		writeToA2HARBFile(finalTemplate, "a2ha.rb")
 	} else {
