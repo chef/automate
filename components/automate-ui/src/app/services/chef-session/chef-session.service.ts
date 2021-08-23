@@ -123,7 +123,7 @@ export class ChefSessionService implements CanActivate {
       catchError(error => {
         if (error instanceof HttpErrorResponse) {
           if (error.status === HTTP_STATUS_UNAUTHORIZED) {
-            this.unauthorizedLogout();
+            this.logout();
             return throwError(`Unauthorized: ${error.status}`);
           } else {
             console.log(`Session refresh failed: ${error.statusText}`);
@@ -258,11 +258,6 @@ export class ChefSessionService implements CanActivate {
         signinURL = `/session/new?state=${url}`;
       }
       window.location.href = signinURL;
-  }
-
-  unauthorizedLogout() {
-    this.deleteSession();
-    window.location.href = '/';
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
