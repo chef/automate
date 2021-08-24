@@ -89,7 +89,8 @@ main {
             font-size: 12px;
 
             ::ng-deep .selected-value {
-              padding: 0.7em 3.5em 0.7em 1em;
+              padding: 0.5em 3.5em 0.5em 1em;
+              font-size: 14px;
 
               chef-icon {
                 color: $chef-primary-bright;
