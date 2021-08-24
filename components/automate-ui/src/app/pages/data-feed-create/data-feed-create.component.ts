@@ -107,7 +107,6 @@ export class DataFeedCreateComponent {
   public closeCreateSlider() {
     this.toggleSlide();
     this.createForm.reset();
-    // this.integrationSelected = false;
   }
 
   public toggleSlide() {
