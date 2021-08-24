@@ -45,7 +45,7 @@
 
       <section class="page-body" *ngIf="tabValue === 'details'">
         <div class="search-create-container">
-          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items">
+          <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items by name...">
           </app-infra-search-bar>
           <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
@@ -65,7 +65,7 @@
                   </div>
                   <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
                 </div>
-                <div class="submenu" [ngClass]="item.active ? activeClassName : ''"> 
+                <div class="submenu" [ngClass]="item.active ? activeClassName : ''">
                   <div class="item-details">
                     <chef-loading-spinner *ngIf="item.active && dataBagsItemDetailsLoading" size="50" fixed></chef-loading-spinner>
                     <div *ngIf="!dataBagsItemDetailsLoading && selectedItemDetails">
@@ -87,15 +87,15 @@
                           <span>Edit</span>
                         </chef-button>
                       </div>
-                      
+
                       <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
                     </div>
-                  </div>  
+                  </div>
                 </div>
               </li>
             </ul>
           </div>
-          <app-edit-data-bag-item-modal 
+          <app-edit-data-bag-item-modal
             [openEvent]="openEditDataBagItemModal"
             [serverId]="serverId"
             [orgId]="orgId"

@@ -4,6 +4,7 @@ package mock
 
 import (
 	"errors"
+	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
 
@@ -53,7 +54,7 @@ func NewHeaderTokenAuthenticator(
 
 // Open returns an header token authenticator
 func (c *HeaderTokenConfig) Open(u *url.URL, _ *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	return NewHeaderTokenAuthenticator(c.Header, c.Tokens, logger), nil
 }

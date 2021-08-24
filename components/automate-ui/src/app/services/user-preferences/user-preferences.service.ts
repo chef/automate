@@ -9,10 +9,13 @@ import {
   UpdateUserPreferences,
   SetUserTimeformatInternal
 } from './user-preferences.actions';
+import { SigninUiSetting } from './signin-ui-settings';
 
 @Injectable({ providedIn: 'root'})
 export class UserPreferencesService {
   public apiEndpoint: string;
+  public uiSettings: SigninUiSetting;
+
   constructor(
     private store: Store<NgrxStateAtom>
   ) {}

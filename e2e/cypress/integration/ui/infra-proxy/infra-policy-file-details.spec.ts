@@ -136,7 +136,7 @@ describe('infra policy details', () => {
       cy.get('[data-cy=close-policy-button]').click();
     } else {
       cy.get('[data-cy=policyfile-heading]').contains(includedPolicyFileName);
-      cy.get('[data-cy=policyfile-info]').contains('POLICY FILE INFORMATION');
+      cy.get('[data-cy=policyfile-info]').contains('POLICYFILE INFORMATION');
       cy.get('[data-cy=policyfile-meta-info]').contains('METADATA');
       return true;
     }
@@ -212,15 +212,23 @@ describe('infra policy details', () => {
         }
       });
 
-      it('can open dependency rule accordion', () => {
+      it('can open & close dependency rule accordion', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=dependency-rule]').contains('Dependencies Rules').click();
+          cy.get('[data-cy=dependency-rule-arrow]').click();
         }
       });
 
-      it('can cookbook accordion', () => {
+      it('can open cookbook accordion', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=cookbook]').contains('Cookbook').click();
+        }
+      });
+
+      it('can open cookbook details page', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=cookbook-table-container] chef-td a').contains(policyFileName).click();
+          cy.get('[data-cy=close-cookbook-detail-button]').click();
           cy.get('[data-cy=close-cookbook-button]').click();
         }
       });

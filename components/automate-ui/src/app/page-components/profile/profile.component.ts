@@ -17,6 +17,7 @@ import { userSelf, getStatus } from 'app/entities/users/userself.selectors';
 import {
   GetUserSelf
  } from 'app/entities/users/userself.actions';
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 
 @Component({
   selector: 'app-profile',
@@ -28,6 +29,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   buildVersion: string;
   displayName: string;
   isLocalUser: boolean;
+  isProfileMenuVisible = true;
   public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
 
@@ -43,13 +45,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
   constructor(
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    public userPrefsService: UserPreferencesService
   ) {
     this.isLocalUser = chefSessionService.isLocalUser;
   }
 
   ngOnInit() {
     this.displayName = this.chefSessionService.fullname;
+    if (this.userPrefsService.uiSettings) {
+      this.isProfileMenuVisible = this.userPrefsService.uiSettings.isProfileMenu;
+    }
 
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
@@ -84,7 +90,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.chefSessionService.logout('/', true /* don't skip signin method selection */);
+    this.chefSessionService.logout('/', true, true /* don't skip signin method selection */);
   }
 
   showWelcomeModal() {
