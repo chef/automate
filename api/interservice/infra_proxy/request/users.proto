@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.request;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/request";
+
+message OrgUsers {
+    // Chef Organization ID.
+    string org_id = 1;
+    // Chef Infra Server ID.
+    string server_id = 2;
+}
