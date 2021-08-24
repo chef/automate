@@ -5,16 +5,11 @@ import { DataFeedCreateComponent } from './data-feed-create.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
-// import { Store, StoreModule } from '@ngrx/store';
-// import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { StoreModule } from '@ngrx/store';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Regex } from 'app/helpers/auth/regex';
 import { Destination } from 'app/entities/destinations/destination.model';
-// import { By } from '@angular/platform-browser';
-// import { Revision } from 'app/entities/revisions/revision.model';
-// import { GetRevisionsSuccess } from 'app/entities/revisions/revision.action';
 
 describe('RevisionIdComponent', () => {
   let component: DataFeedCreateComponent;
@@ -66,7 +61,6 @@ describe('RevisionIdComponent', () => {
     component = fixture.componentInstance;
     component = fixture.componentInstance;
     component.createForm = new FormBuilder().group({
-      // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
       url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
@@ -77,7 +71,6 @@ describe('RevisionIdComponent', () => {
       password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     createForm = component.createForm;
-    // element = fixture.debugElement;
     fixture.detectChanges();
   });
 
@@ -95,20 +88,9 @@ describe('RevisionIdComponent', () => {
       url: 'http://foo.com'
     };
 
-    beforeEach(() => {
-      // store = TestBed.inject(Store);
-    });
-
-    // it('render the policyfile list', () => {
-    //   store.dispatch(new GetRevisionsSuccess({revisions: availableRevisions}));
-    //   expect(component.revisions.length).not.toBeNull();
-    //   expect(element.query(By.css('.empty-section'))).toBeNull();
-    // });
-
     it('should be invalid when no fields are filled out', () => {
       expect(createForm.valid).toBeFalsy();
     });
-
 
     it('should be valid when all fields are filled out', () => {
       component.integrationSelected = true;

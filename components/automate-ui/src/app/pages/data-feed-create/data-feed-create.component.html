@@ -27,7 +27,6 @@
     (dismissed)="dismissNotification()">
     Notification test connected successfully!
   </app-notification>
-  <!-- <chef-loading-spinner *ngIf="revisionsListLoading" size="50"></chef-loading-spinner> -->
   <main *ngIf="!integrationSelected" data-cy="interation-menu">
     <div class="flex-container">
         <h2 class="bolder-font">Webhook Integration</h2>
@@ -73,7 +72,6 @@
             Name is required.
           </chef-error>
           </chef-form-field>
-          <!-- <span class="detail light">Don't worry, server names can be changed later.</span> -->
         </div>
         <hr class="divider">
         <div class="input-margin">
@@ -103,11 +101,9 @@
           <div class="name-margin">
             <label for="version">Authentication</label>
             <div class="version-dropdown">
-              <!-- <chef-select #ty [value]="passwordSelected" (change)="selectChangeHandlers(ty.value)" > -->
-              <chef-select #ty [value]="authSelected" (change)="selectChangeHandlers(ty.value)">
-                <!-- <chef-option *ngFor="let type of types" [value]="type">{{ type }}</chef-option> -->
-                <chef-option value="Access Token">Access Token</chef-option>
-                <chef-option value="Username and Password">Username and Password</chef-option>
+              <chef-select #ty [value]="authSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-auth-type">
+                <chef-option value="Access Token" data-cy="select-access-token">Access Token</chef-option>
+                <chef-option value="Username and Password" data-cy="select-username-password">Username and Password</chef-option>
               </chef-select>
             </div>
           </div>
@@ -225,11 +221,9 @@
             id="create-button-object-modal"
             (click)="saveDestination()"
             >
-            <!-- <chef-loading-spinner *ngIf="creating"></chef-loading-spinner> -->
             <chef-loading-spinner *ngIf="saveDoneGetter"></chef-loading-spinner>
             <span *ngIf="saveDoneGetter">Saving...</span>
             <span *ngIf="!saveDoneGetter">Save</span>
-            <!-- <span >Adding Chef Infra Server ...</span> -->
           </chef-button>
         </div>
       </form>

@@ -95,14 +95,14 @@ describe('DataFeedComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('openCreateModal opens modal', () => {
+    it('slidePanel opens slider', () => {
       spyOn(component.createChild, 'slidePanel');
       expect(component.createModalVisible).toBe(false);
       component.slidePanel();
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create modal resets name, url, username and password to empty string', () => {
+    it('opening create slider resets name, url, token to empty string', () => {
       component.createDataFeedForm.controls['name'].setValue('any');
       component.createDataFeedForm.controls['url'].setValue('any');
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
@@ -114,7 +114,7 @@ describe('DataFeedComponent', () => {
       expect(component.createDataFeedForm.controls['token'].value).toBe(null);
     });
 
-    it('on success, closes modal and adds new data feed', () => {
+    it('on success, closes slider and adds new data feed', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
       component.createDataFeedForm.controls['name'].setValue(destination.name);
@@ -129,7 +129,7 @@ describe('DataFeedComponent', () => {
       });
     });
 
-    it('on success, closes modal and adds new data feed access token', () => {
+    it('on success, closes slider and adds new data feed access token', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
       component.createDataFeedForm.controls['name'].setValue(destination.name);
@@ -145,7 +145,7 @@ describe('DataFeedComponent', () => {
       });
     });
 
-    it('on conflict error, modal is open with conflict error', () => {
+    it('on conflict error, slider is open with conflict error', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
       spyOn(component.conflictErrorEvent, 'emit');
       spyOn(component.createChild, 'slidePanel');
@@ -167,7 +167,7 @@ describe('DataFeedComponent', () => {
       expect(component.conflictErrorEvent.emit).toHaveBeenCalled();
     });
 
-    it('on create error, modal is closed with failure banner', () => {
+    it('on create error, slider is closed with failure banner', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
       spyOn(component.conflictErrorEvent, 'emit');
       spyOn(component.createChild, 'slidePanel');
