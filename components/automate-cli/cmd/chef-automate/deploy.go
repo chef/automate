@@ -185,6 +185,8 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
+	//writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath
+	//bootstrap.FullBootstrapHA(context.Background())
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -273,12 +275,17 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
 
-	err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
+	// err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
+	// if err != nil && !status.IsStatusError(err) {
+	// 	return status.Annotate(err, status.DeployError)
+	// }
+
+	err = client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
-
 	return err
+
 }
 
 func generatedConfig() (*dc.AutomateConfig, error) {

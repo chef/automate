@@ -275,6 +275,22 @@ func Deploy(writer cli.FormatWriter,
 	return d.err
 }
 
+func DeployHA(writer cli.FormatWriter,
+	overrideConfig *dc.AutomateConfig,
+	manifestProvider manifest.ReleaseManifestProvider,
+	cliVersion string,
+	airgap bool,
+	bootstrapBundlePath string) error {
+	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
+	m, err := d.manifestProvider.GetCurrentManifest(d.ctx, d.mergedCfg.Deployment.V1.Svc.Channel.GetValue())
+	if err != nil {
+		logrus.Debug("Failed")
+	}
+	b := bootstrap.NewCompatBootstrapper(d.target)
+	bootstrap.FullBootstrapHA(context.Background(), b, m, d.mergedCfg.Deployment, d.bootstrapBundlePath, d.writer)
+	return d.err
+}
+
 func Destroy(writer cli.FormatWriter, opts UninstallOpts) error {
 	d := newUnDeployer(writer, opts)
 	d.destroy()
