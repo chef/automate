@@ -101,10 +101,6 @@ export class ChefSessionService implements CanActivate {
   }
 
   private refresh(): Observable<string> {
-    if (!this.user) {
-      this.isRefreshing = false;
-      return throwError('User is not set');
-    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
