@@ -11,7 +11,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { Regex } from 'app/helpers/auth/regex';
 import { Destination } from 'app/entities/destinations/destination.model';
 
-describe('RevisionIdComponent', () => {
+describe('DataFeedCreateComponent', () => {
   let component: DataFeedCreateComponent;
   let fixture: ComponentFixture<DataFeedCreateComponent>;
   // let element;
@@ -78,7 +78,7 @@ describe('RevisionIdComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('revision id list', () => {
+  describe('Data Feed Create', () => {
     const tokenType = 'Bearer';
     const token = 'test123';
     const destination = <Destination> {
@@ -108,6 +108,8 @@ describe('RevisionIdComponent', () => {
       component.createForm.controls['tokenType'].setValue(tokenType);
       component.createForm.controls['token'].setValue('any');
       component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
       component.selectIntegration('ServiceNow');
       expect(component.createForm.controls['name'].value).toBe(null);
       expect(component.createForm.controls['url'].value).toBe(null);
@@ -121,10 +123,12 @@ describe('RevisionIdComponent', () => {
       component.createForm.controls['tokenType'].setValue(tokenType);
       component.createForm.controls['token'].setValue('any');
       component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
       component.selectIntegration('Splunk');
       expect(component.createForm.controls['name'].value).toBe(null);
       expect(component.createForm.controls['url'].value).toBe(null);
-      expect(component.createForm.controls['tokenType'].value).toBe(tokenType);
+      expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
   });
@@ -133,6 +137,8 @@ describe('RevisionIdComponent', () => {
 
     it('- url field validity', () => {
       component.integrationSelected = true;
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
       component.selectIntegration('ServiceNow');
       expect(component.createForm.controls['url'].value).toBe(null);
 
