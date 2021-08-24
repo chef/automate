@@ -16,10 +16,8 @@ service UserSettingsService {
 	// GetUserSettings returns all of the preferences for a given user
 	rpc GetUserSettings(GetUserSettingsRequest) returns (GetUserSettingsResponse) {
 		option (google.api.http).get = "/api/v0/user-settings/{user.name}/{user.connector}";
-		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings:{user.name}:{user.connector}"
-			action: "global:userSettings:get"
-		};
+		option (chef.automate.api.iam.policy).resource = "iam:introspect";
+		option (chef.automate.api.iam.policy).action = "iam:introspect:getAll";
 	};
 
 	// PutUserSettings upserts all of the preferences for a given user
@@ -28,10 +26,8 @@ service UserSettingsService {
 			put: "/api/v0/user-settings/{user.name}/{user.connector}"
 			body: "*"
 		};
-		option (chef.automate.api.iam.policy) = {
-			resource: "global:userSettings:{user.name}:{user.connector}"
-			action: "global:userSettings:update"
-		};
+		option (chef.automate.api.iam.policy).resource = "iam:introspect";
+		option (chef.automate.api.iam.policy).action = "iam:introspect:update";
 	};
 
 	// DeleteUserSettings deletes all settings for a given user

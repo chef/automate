@@ -15,6 +15,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/chef/automate/api/interservice/teams"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -41,6 +42,7 @@ type Config struct {
 	TeamsAddress             string // "ip:port"
 	AuthzAddress             string
 	LegacyDataCollectorToken string
+	SessionAddress           string
 }
 
 // Server is the top level object.
@@ -121,19 +123,16 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		version.GitSHA,
 	))
 
-	authenticators := make(map[string]authenticator.Authenticator)
-	for authnID, authnCfg := range c.Authenticators {
-		authn, err := authnCfg.Open(c.Upstream, c.ServiceCerts, c.Logger)
-		if err != nil {
-			return nil, errors.Wrapf(err, "initialize authenticator %s", authnID)
-		}
-		authenticators[authnID] = authn
-	}
-
 	teamsConn, err := factory.Dial("teams-service", c.TeamsAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
 	}
+
+	sessionConn, err := factory.Dial("session-service", c.SessionAddress)
+	if err != nil {
+		return nil, errors.Wrapf(err, "dial session-service (%s)", c.SessionAddress)
+	}
+	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
 
 	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
 	if err != nil {
@@ -150,6 +149,15 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		}
 	} else {
 		c.Logger.Debug("no tokens adapter defined")
+	}
+
+	authenticators := make(map[string]authenticator.Authenticator)
+	for authnID, authnCfg := range c.Authenticators {
+		authn, err := authnCfg.Open(c.Upstream, c.ServiceCerts, c.Logger, sessionClient)
+		if err != nil {
+			return nil, errors.Wrapf(err, "initialize authenticator %s", authnID)
+		}
+		authenticators[authnID] = authn
 	}
 
 	s := &Server{

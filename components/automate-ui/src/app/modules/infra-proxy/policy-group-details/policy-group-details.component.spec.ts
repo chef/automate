@@ -10,6 +10,9 @@ import {
   defaultRouterRouterState
 } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { PolicyGroupDetailsComponent } from './policy-group-details.component';
 import { PolicyGroup } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroupSuccess } from 'app/entities/policy-files/policy-file.action';
@@ -18,6 +21,7 @@ describe('PolicyGroupDetailsComponent', () => {
   let component: PolicyGroupDetailsComponent;
   let fixture: ComponentFixture<PolicyGroupDetailsComponent>;
   let store: Store<NgrxStateAtom>;
+  let router: Router;
 
   const server_id = 'chef-server-dev-test';
   const org_id = 'chef-org-dev';
@@ -39,12 +43,26 @@ describe('PolicyGroupDetailsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'chef-page-header' }),
+        MockComponent({ selector: 'chef-breadcrumb' }),
+        MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'chef-table' }),
+        MockComponent({ selector: 'chef-thead' }),
+        MockComponent({ selector: 'chef-tbody' }),
+        MockComponent({ selector: 'chef-tr' }),
+        MockComponent({ selector: 'chef-th' }),
+        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'chef-tab-selector',
+          inputs: ['value', 'routerLink', 'fragment']
+        }),
+        MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         PolicyGroupDetailsComponent
       ],
       providers: [
         FeatureFlagsService
       ],
       imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ]
     })
@@ -53,6 +71,8 @@ describe('PolicyGroupDetailsComponent', () => {
 
   beforeEach(() => {
     store = TestBed.inject(Store);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.stub();
 
     fixture = TestBed.createComponent(PolicyGroupDetailsComponent);
     component = fixture.componentInstance;

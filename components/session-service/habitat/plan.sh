@@ -16,9 +16,11 @@ pkg_deps=(
 )
 pkg_exports=(
   [port]=service.port # default service is http
+  [grpc-port]=service.grpc_port
 )
 pkg_exposes=(
   port
+  grpc-port
 )
 pkg_binds=(
   [automate-dex]="port"

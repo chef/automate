@@ -6,12 +6,12 @@
     <div class="search-create-container">
       <app-infra-search-bar
         (searchButtonClick)="searchPolicyFiles($event)"
-        placeHolder="Policy group by name...">
+        placeHolder="policy group by name...">
       </app-infra-search-bar>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!groupList.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />  
-      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>    
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
       <p *ngIf="searchValue === ''">No policy groups available</p>
     </div>
 

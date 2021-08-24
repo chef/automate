@@ -32,6 +32,7 @@ func main() {
 	cmd.PersistentFlags().StringP("log-format", "f", "text", "log format")
 	cmd.PersistentFlags().String("http-listen", "127.0.0.1", "listen interface")
 	cmd.PersistentFlags().Int("http-port", 7777, "listen port")
+	cmd.PersistentFlags().Int("grpc-port", 10108, "GRPC listen port")
 	cmd.PersistentFlags().String("issuer-url", "", "issuer URL")
 	cmd.PersistentFlags().String("client-id", "automate-session", "client ID")
 	cmd.PersistentFlags().String("client-secret", "", "client secret")
@@ -58,6 +59,7 @@ type config struct {
 	LogLevel         string `mapstructure:"log-level"`
 	HTTPListen       string `mapstructure:"http-listen"`
 	HTTPPort         uint   `mapstructure:"http-port"`
+	GrpcPort         uint   `mapstructure:"grpc-port"`
 	DexURL           string `mapstructure:"dex-url"`
 	IssuerURL        string `mapstructure:"issuer-url"`
 	ClientID         string `mapstructure:"client-id"`
@@ -121,6 +123,8 @@ func serve(_ *cobra.Command, args []string) {
 	}
 
 	bind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.HTTPPort)
+	grpcBind := fmt.Sprintf("%s:%d", cfg.HTTPListen, cfg.GrpcPort)
+
 	signInURL := mustParseURL(cfg.SignInURL)
 
 	redirectURL := mustParseURL(cfg.RedirectURL)
@@ -157,9 +161,19 @@ func serve(_ *cobra.Command, args []string) {
 	if err != nil {
 		fail(errors.Wrap(err, "init server"))
 	}
+
 	if err := srv.ListenAndServe(bind); err != nil {
 		fail(errors.Wrap(err, "listen/bind"))
 	}
+
+	if err = srv.StartGRPCServer(grpcBind); err != nil {
+		fail(errors.Wrap(err, "starting grpc server"))
+	}
+
+	if err = srv.StartSignalHandler(); err != nil {
+		fail(errors.Wrap(err, "starting signal handler"))
+	}
+
 }
 
 // fail outputs the error and exits with a non-zero code

@@ -16,7 +16,8 @@ import { MetadataService } from 'app/services/metadata/metadata.service';
 
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { ProfileComponent } from './profile.component';
-
+import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { SigninUiSetting, UISettings } from 'app/services/user-preferences/signin-ui-settings';
 class MockMetadataService {
   getBuildVersion(): Observable<string> {
     return observableOf('');
@@ -25,6 +26,10 @@ class MockMetadataService {
 
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void { }
+}
+
+class MockUserPreferencesService {
+  public uiSettings: SigninUiSetting = new UISettings()['local'];
 }
 
 describe('ProfileComponent', () => {
@@ -51,7 +56,8 @@ describe('ProfileComponent', () => {
         providers: [
           { provide: TelemetryService, useClass: MockTelemetryService },
           { provide: MetadataService, useClass: MockMetadataService },
-          { provide: ChefSessionService, useClass: MockChefSessionService }
+          { provide: ChefSessionService, useClass: MockChefSessionService },
+          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       });
@@ -161,7 +167,7 @@ describe('ProfileComponent', () => {
 
         const link = element.query(By.css('button.logout'));
         link.triggerEventHandler('click', {});
-        expect(chefSessionService.logout).toHaveBeenCalledWith('/', true);
+        expect(chefSessionService.logout).toHaveBeenCalledWith('/', true, true);
       });
     });
 
@@ -245,7 +251,8 @@ describe('ProfileComponent', () => {
         providers: [
           { provide: TelemetryService, useClass: MockTelemetryService },
           { provide: MetadataService, useClass: MockMetadataService },
-          { provide: ChefSessionService, useValue: nonLocalChefSessionService }
+          { provide: ChefSessionService, useValue: nonLocalChefSessionService },
+          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       });
@@ -265,7 +272,7 @@ describe('ProfileComponent', () => {
       fixture.detectChanges();
 
       const link = element.nativeElement.querySelector('a.profile');
-      expect(link).toBeFalsy();
+      expect(link).toBeTruthy();
     });
   });
 });
