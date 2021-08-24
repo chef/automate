@@ -68,9 +68,9 @@
                 autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
-            Name is required.
-          </chef-error>
+              *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
+              Name is required.
+            </chef-error>
           </chef-form-field>
         </div>
         <hr class="divider">
@@ -87,12 +87,12 @@
                 autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
-            URL is required.
+              *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
+              URL is required.
             </chef-error>
             <chef-error
-            *ngIf="createForm.get('url').hasError('pattern')">
-            URL is invalid.
+              *ngIf="createForm.get('url').hasError('pattern')">
+              URL is invalid.
             </chef-error>
           </chef-form-field>
         </div>
