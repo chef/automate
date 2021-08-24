@@ -63,7 +63,7 @@ artifact_channels:
 
 staging_areas:
   - post_merge:
-      workload: pull_request_merged:chef/automate:master:*
+      workload: pull_request_merged:chef/automate:main:*
 
 subscriptions:
   # dev -> acceptance promotion
@@ -92,7 +92,7 @@ subscriptions:
         post_commit: true
 
   # These actions are taken, in order they are specified, anytime a Pull Request is merged.
-  - workload: staged_workload_released:chef/automate:master:post_merge:*
+  - workload: staged_workload_released:chef/automate:main:post_merge:*
     actions:
       - bash:.expeditor/generate-automate-cli-docs.sh:
           post_commit: false
@@ -158,7 +158,7 @@ subscriptions:
       - bash:.expeditor/update_habitat.sh:
           post_commit: false
   # Trigger various pipelines every night
-  - workload: schedule_triggered:chef/automate:master:nightly_tests:*
+  - workload: schedule_triggered:chef/automate:main:nightly_tests:*
     actions:
       - trigger_pipeline:nightly
       - trigger_pipeline:test-license-usage/dev
