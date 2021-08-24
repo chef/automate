@@ -6,10 +6,14 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/chef/automate/api/interservice/id_token"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"go.uber.org/zap"
 
 	tokenmock "github.com/chef/automate/components/authn-service/tokens/mock"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
+	"github.com/chef/automate/lib/tls/test/helpers"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -99,7 +103,17 @@ func TestTokenAuthWithBackend(t *testing.T) {
 					},
 				},
 			}
-			authn, err := cfg.Open(u, nil, logger)
+			sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
+			sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
+			grpcSession := sessionConnFactory.NewServer()
+			sessionServer := grpctest.NewServer(grpcSession)
+			sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
+			authn, err := cfg.Open(u, nil, logger, sessionClient)
 			if err != nil {
 				t.Fatal(err)
 			}

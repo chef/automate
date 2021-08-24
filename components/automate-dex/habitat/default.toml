@@ -23,7 +23,7 @@ port = 5557
 
 [expiry]
 signing_keys = "6h"
-id_tokens = "3m"
+id_tokens = "24h"
 
 # TODO long-term we need to take another look
 # at how we bootstrap the initial admin.

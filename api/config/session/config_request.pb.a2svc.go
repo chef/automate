@@ -31,6 +31,21 @@ func (m *ConfigRequest) BindPort(name string, value uint16) error {
 		}
 		v3 := &(*v2).Port
 		*v3 = &wrappers.Int32Value{Value: int32(value)}
+	case "grpcservice":
+		v0 := &m.V1
+		if *v0 == nil {
+			*v0 = &ConfigRequest_V1{}
+		}
+		v1 := &(*v0).Sys
+		if *v1 == nil {
+			*v1 = &ConfigRequest_V1_System{}
+		}
+		v2 := &(*v1).Service
+		if *v2 == nil {
+			*v2 = &ConfigRequest_V1_System_Service{}
+		}
+		v3 := &(*v2).GrpcPort
+		*v3 = &wrappers.Int32Value{Value: int32(value)}
 	default:
 		return a2conf.ErrPortNotFound
 	}
@@ -43,6 +58,10 @@ func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
 		Default:  uint16(int32(10115)),
 		Name:     "service",
 		Protocol: "https",
+	}, a2conf.PortInfo{
+		Default:  uint16(int32(10108)),
+		Name:     "grpcservice",
+		Protocol: "grpc",
 	}}
 }
 
@@ -63,6 +82,21 @@ func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 			return 0, nil
 		}
 		v3 := v2.Port
+		return uint16(v3.GetValue()), nil
+	case "grpcservice":
+		v0 := m.V1
+		if v0 == nil {
+			return 0, nil
+		}
+		v1 := v0.Sys
+		if v1 == nil {
+			return 0, nil
+		}
+		v2 := v1.Service
+		if v2 == nil {
+			return 0, nil
+		}
+		v3 := v2.GrpcPort
 		return uint16(v3.GetValue()), nil
 	default:
 		return 0, a2conf.ErrPortNotFound
