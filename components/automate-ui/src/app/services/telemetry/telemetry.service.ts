@@ -115,6 +115,14 @@ export class TelemetryService {
           // integration and leverage analytics.js emitters to send the
           // data.
           analytics.on('page', (_category, name, properties, _options) => {
+            if (properties) {
+              if (properties.referrer) {
+                properties.referrer = this.sanitizeDomainURL(properties.referrer);
+              }
+              if (properties.url) {
+                properties.url = this.sanitizeDomainURL(properties.url);
+              }
+            }
             this.emitToPipeline('page', {
               name: name,
               anonymousId: this.anonymousId,
@@ -237,20 +245,10 @@ export class TelemetryService {
     );
   }
 
-  private emitToPipeline(operation: String, payload: any) {
+  private emitToPipeline(operation: String, payload: Object) {
     const headers = new HttpHeaders({
       'Content-Type' :  'application/json'
     });
-
-    if (operation === 'page' && payload && payload.properties) {
-      const properties = payload.properties;
-      if (properties.referrer) {
-        properties.referrer = this.sanitizeDomainURL(properties.referrer);
-      }
-      if (properties.url) {
-        properties.url = this.sanitizeDomainURL(properties.url);
-      }
-    }
 
     // JSON SCHEMA:
     // https://github.com/chef/es-telemetry-pipeline/blob/master/schema/event.schema.json
@@ -312,10 +310,6 @@ export class TelemetryService {
       }
       if (page.url) {
         page.url = analytics.sanitizeDomainURL(page.url);
-        console.log(page.url);
-      }
-      if (payload.obj.context.ip) {
-        payload.obj.context.ip = '';
       }
     }
     next(payload);
