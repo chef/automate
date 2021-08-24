@@ -286,19 +286,22 @@ export class TelemetryService {
     return (new Date).toISOString();
   }
 
-  sanitizeDomainURL(url) {
-    let restByDot: any;
-    let firstByDot: string;
-    [firstByDot, ...restByDot] = url.split('.');
-    restByDot = restByDot.join('.');
-    if (restByDot.indexOf('/') > -1) {
-      let [firstBySlash, ...restBySlash] = restByDot.split('/');
-      restBySlash = restBySlash.join('/');
-      firstBySlash = '***';
-      return firstByDot + '.' + firstBySlash + '/' + restBySlash;
+  sanitizeDomainURL(url: string) {
+    let combineByDot: string;
+    const [firstByDot, ...restByDot] = url.split('.');
+    combineByDot = restByDot.join('.');
+    if (combineByDot.indexOf('/') > -1) {
+      let combineBySlash = '';
+      const masked = '***';
+      const restBySlash = combineByDot.split('/');
+      if (restBySlash.length > 0) {
+        restBySlash.shift();
+        combineBySlash = restBySlash.join('/');
+      }
+      return firstByDot + '.' + masked + '/' + combineBySlash;
     } else {
-      restByDot = '***';
-      return firstByDot + '.' + restByDot;
+      combineByDot = '***';
+      return firstByDot + '.' + combineByDot;
     }
   }
 
