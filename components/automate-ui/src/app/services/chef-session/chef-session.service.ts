@@ -108,7 +108,6 @@ export class ChefSessionService implements CanActivate {
   private refresh(): Observable<string> {
     if (!this.id_token) {
       this.isRefreshing = false;
-      console.log('id_token is yet to be retrieved');
       return throwError('id_token is yet to be retrieved');
     }
     const httpOptions = {
@@ -141,8 +140,6 @@ export class ChefSessionService implements CanActivate {
   callIdleTimeout(): void {
     this.isIdleTimeoutEnabled = this.appConfigService.isIdleTimeoutEnabled;
     this.idleTimeout = this.appConfigService.idleTimeout;
-
-    console.log(this.appConfigService.isIdleTimeoutEnabled, 'this.appConfigService.isIdleTimeoutEnabled');
 
     if (this.isIdleTimeoutEnabled && this.idleTimeout > 0) {
       this.idleLogout(this.idleTimeout); // Time in minutes
@@ -223,8 +220,7 @@ export class ChefSessionService implements CanActivate {
       })
     };
     this.httpHandler.get('/session/logout', httpOptions).subscribe(
-      (res) => {
-        console.log('response', res);
+      () => {
         return;
       },
       (e) => {
@@ -287,7 +283,6 @@ export class ChefSessionService implements CanActivate {
     function resetTimer() {
       // this is for testing multi tabs
       if (idleTime > 0) {
-        console.log('called broadcast message on different tab');
         broadcastChannel.postMessage('resetTimer');
       }
       idleTime = 0;
