@@ -185,8 +185,6 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	//writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath
-	//bootstrap.FullBootstrapHA(context.Background())
 	// if !deployCmdFlags.acceptMLSA {
 	// 	agree, err := writer.Confirm(promptMLSA)
 	// 	if err != nil {
