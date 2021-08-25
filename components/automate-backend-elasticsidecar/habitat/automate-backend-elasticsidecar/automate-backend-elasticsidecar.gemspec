@@ -13,12 +13,8 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.4.0"
-  spec.add_development_dependency "bundler"
-   
-  spec.add_runtime_dependency 'bcrypt'
-  spec.add_runtime_dependency 'http'
-  spec.add_runtime_dependency 'json'
+  spec.required_ruby_version = ">= 2.6.0"
+  
   spec.add_runtime_dependency 'toml-rb'
   spec.add_runtime_dependency 'mixlib-shellout'
   spec.add_runtime_dependency 'pry'
