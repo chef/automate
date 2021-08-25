@@ -185,105 +185,118 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	// if !deployCmdFlags.acceptMLSA {
-	// 	agree, err := writer.Confirm(promptMLSA)
-	// 	if err != nil {
-	// 		return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
-	// 	}
-
-	// 	if !agree {
-	// 		return status.New(status.InvalidCommandArgsError, errMLSA)
-	// 	}
-	// }
-
-	// if deployCmdFlags.keyPath != "" && deployCmdFlags.certPath == "" {
-	// 	msg := "Cannot provide --private-key without also providing --certificate."
-	// 	return status.New(status.InvalidCommandArgsError, msg)
-	// }
-
-	// if deployCmdFlags.certPath != "" && deployCmdFlags.keyPath == "" {
-	// 	msg := "cannot provide --certificate without also providing --private-key."
-	// 	return status.New(status.InvalidCommandArgsError, msg)
-	// }
-
-	conf := new(dc.AutomateConfig)
-	var err error
-	if len(args) == 0 {
-		// Use default configuration if no configuration file was provided
-		conf, err = generatedConfig()
-		if err != nil {
-			return status.Annotate(err, status.ConfigError)
+	if isA2HADeployment(args[0]) {
+		conf := new(dc.AutomateConfig)
+		manifestProvider := manifest.NewLocalHartManifestProvider(
+			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
+			conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
+			conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
+		err := client.DeployHA(writer, manifestProvider)
+		if err != nil && !status.IsStatusError(err) {
+			return status.Annotate(err, status.DeployError)
 		}
-	} else {
-		conf, err = dc.LoadUserOverrideConfigFile(args[0])
+		err = readConfigAndWriteToFile(args[0])
 		if err != nil {
-			return status.Wrapf(
+			return status.Annotate(err, status.DeployError)
+		}
+		//TODO full fetch implementation of deploy command with a2ha command's mapping
+		err = deployA2HA()
+		return err
+	} else {
+		if !deployCmdFlags.acceptMLSA {
+			agree, err := writer.Confirm(promptMLSA)
+			if err != nil {
+				return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+			}
+
+			if !agree {
+				return status.New(status.InvalidCommandArgsError, errMLSA)
+			}
+		}
+
+		if deployCmdFlags.keyPath != "" && deployCmdFlags.certPath == "" {
+			msg := "Cannot provide --private-key without also providing --certificate."
+			return status.New(status.InvalidCommandArgsError, msg)
+		}
+
+		if deployCmdFlags.certPath != "" && deployCmdFlags.keyPath == "" {
+			msg := "cannot provide --certificate without also providing --private-key."
+			return status.New(status.InvalidCommandArgsError, msg)
+		}
+
+		conf := new(dc.AutomateConfig)
+		var err error
+		if len(args) == 0 {
+			// Use default configuration if no configuration file was provided
+			conf, err = generatedConfig()
+			if err != nil {
+				return status.Annotate(err, status.ConfigError)
+			}
+		} else {
+			conf, err = dc.LoadUserOverrideConfigFile(args[0])
+			if err != nil {
+				return status.Wrapf(
+					err,
+					status.ConfigError,
+					"Loading configuration file %s failed",
+					args[0],
+				)
+			}
+		}
+
+		if err = mergeFlagOverrides(conf); err != nil {
+			return status.Wrap(
 				err,
 				status.ConfigError,
-				"Loading configuration file %s failed",
-				args[0],
+				"Merging command flag overrides into Chef Automate config failed",
 			)
 		}
-	}
 
-	if err = mergeFlagOverrides(conf); err != nil {
-		return status.Wrap(
-			err,
-			status.ConfigError,
-			"Merging command flag overrides into Chef Automate config failed",
-		)
-	}
-
-	adminPassword := deployCmdFlags.adminPassword
-	if adminPassword == "" {
-		adminPassword, err = dc.GeneratePassword()
-		if err != nil {
-			return status.Wrap(err, status.ConfigError, "Generating the admin user password failed")
+		adminPassword := deployCmdFlags.adminPassword
+		if adminPassword == "" {
+			adminPassword, err = dc.GeneratePassword()
+			if err != nil {
+				return status.Wrap(err, status.ConfigError, "Generating the admin user password failed")
+			}
 		}
-	}
-	err = conf.AddCredentials("Local Administrator", "admin", adminPassword)
-	if err != nil {
-		return status.Wrap(err, status.ConfigError, "Applying the admin user password to configuration failed")
-	}
-
-	offlineMode := deployCmdFlags.airgap != ""
-	manifestPath := ""
-	if offlineMode {
-		writer.Title("Installing artifact")
-		metadata, err := airgap.Unpack(deployCmdFlags.airgap)
+		err = conf.AddCredentials("Local Administrator", "admin", adminPassword)
 		if err != nil {
-			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+			return status.Wrap(err, status.ConfigError, "Applying the admin user password to configuration failed")
 		}
-		manifestPath = api.AirgapManifestPath
 
-		// We need to set the path for the hab binary so that the deployer does not
-		// try to go to the internet to get it
-		pathEnv := os.Getenv("PATH")
+		offlineMode := deployCmdFlags.airgap != ""
+		manifestPath := ""
+		if offlineMode {
+			writer.Title("Installing artifact")
+			metadata, err := airgap.Unpack(deployCmdFlags.airgap)
+			if err != nil {
+				return status.Annotate(err, status.AirgapUnpackInstallBundleError)
+			}
+			manifestPath = api.AirgapManifestPath
 
-		err = os.Setenv("PATH", fmt.Sprintf("%s:%s", path.Dir(metadata.HabBinPath), pathEnv))
-		if err != nil {
-			return err
+			// We need to set the path for the hab binary so that the deployer does not
+			// try to go to the internet to get it
+			pathEnv := os.Getenv("PATH")
+
+			err = os.Setenv("PATH", fmt.Sprintf("%s:%s", path.Dir(metadata.HabBinPath), pathEnv))
+			if err != nil {
+				return err
+			}
+		} else {
+			manifestPath = conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()
 		}
-	} else {
-		manifestPath = conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()
+
+		manifestProvider := manifest.NewLocalHartManifestProvider(
+			mc.NewDefaultClient(manifestPath),
+			conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
+			conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
+
+		err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
+		if err != nil && !status.IsStatusError(err) {
+			return status.Annotate(err, status.DeployError)
+		}
+		return err
 	}
-
-	manifestProvider := manifest.NewLocalHartManifestProvider(
-		mc.NewDefaultClient(manifestPath),
-		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
-		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
-
-	// err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
-	// if err != nil && !status.IsStatusError(err) {
-	// 	return status.Annotate(err, status.DeployError)
-	// }
-
-	err = client.DeployHA(writer, conf, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
-	if err != nil && !status.IsStatusError(err) {
-		return status.Annotate(err, status.DeployError)
-	}
-	return err
-
 }
 
 func generatedConfig() (*dc.AutomateConfig, error) {
