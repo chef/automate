@@ -185,7 +185,7 @@ describe('DataFeedComponent', () => {
       };
       store.dispatch(new CreateDestinationFailure(error));
 
-      expect(component.createModalVisible).toBe(false);
+      expect(component.createModalVisible).toBe(true);
       expect(component.conflictErrorEvent.emit).toHaveBeenCalledWith(false);
     });
 

@@ -102,8 +102,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
         } else {
+          this.createChild.conflictErrorSetter = `Could not create data feed: ${error?.error?.error || error}.`;
+          this.conflictErrorEvent.emit(false);
           // Close the slider on any error other than conflict and display in banner.
-          this.closeSlider();
+          // this.closeSlider();
         }
       });
   }

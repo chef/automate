@@ -21,6 +21,13 @@
     <span *ngIf="authSelected=='Access Token'">Unable to connect: check Token Type (Prefix) and token.</span>
   </app-notification>
   <app-notification
+    *ngIf="conflictErrorGetter"
+    type="error"
+    timeout="5"
+    (dismissed)="dismissNotification()">
+    <span>{{conflictErrorGetter}}</span>
+  </app-notification>
+  <app-notification
     *ngIf="testSuccessGetter"
     type="info"
     timeout="5"

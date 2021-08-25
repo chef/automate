@@ -56,6 +56,7 @@ export class DataFeedCreateComponent {
   private testInProgress = false;
   private testSuccess: boolean = null;
   private testError: boolean = null;
+  private conflictError: string = null;
 
   public integrations = {
     webhook: [
@@ -84,6 +85,12 @@ export class DataFeedCreateComponent {
     this.testError = val;
   }
 
+  set conflictErrorSetter(val: string) {
+    this.saveDone = false;
+    this.dismissNotification();
+    this.conflictError = val;
+  }
+
   set testDoneSetter(done: boolean) {
     this.testInProgress = done;
   }
@@ -98,6 +105,10 @@ export class DataFeedCreateComponent {
 
   get testErrorGetter() {
     return this.testError;
+  }
+
+  get conflictErrorGetter() {
+    return this.conflictError;
   }
 
   get testDoneGetter() {
@@ -193,6 +204,7 @@ export class DataFeedCreateComponent {
   public dismissNotification() {
     this.testSuccess = false;
     this.testError = false;
+    this.conflictError = null;
   }
 
 }
