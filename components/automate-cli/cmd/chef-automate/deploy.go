@@ -187,26 +187,26 @@ func newDeployCmd() *cobra.Command {
 func runDeployCmd(cmd *cobra.Command, args []string) error {
 	//writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath
 	//bootstrap.FullBootstrapHA(context.Background())
-	if !deployCmdFlags.acceptMLSA {
-		agree, err := writer.Confirm(promptMLSA)
-		if err != nil {
-			return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
-		}
+	// if !deployCmdFlags.acceptMLSA {
+	// 	agree, err := writer.Confirm(promptMLSA)
+	// 	if err != nil {
+	// 		return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+	// 	}
 
-		if !agree {
-			return status.New(status.InvalidCommandArgsError, errMLSA)
-		}
-	}
+	// 	if !agree {
+	// 		return status.New(status.InvalidCommandArgsError, errMLSA)
+	// 	}
+	// }
 
-	if deployCmdFlags.keyPath != "" && deployCmdFlags.certPath == "" {
-		msg := "Cannot provide --private-key without also providing --certificate."
-		return status.New(status.InvalidCommandArgsError, msg)
-	}
+	// if deployCmdFlags.keyPath != "" && deployCmdFlags.certPath == "" {
+	// 	msg := "Cannot provide --private-key without also providing --certificate."
+	// 	return status.New(status.InvalidCommandArgsError, msg)
+	// }
 
-	if deployCmdFlags.certPath != "" && deployCmdFlags.keyPath == "" {
-		msg := "cannot provide --certificate without also providing --private-key."
-		return status.New(status.InvalidCommandArgsError, msg)
-	}
+	// if deployCmdFlags.certPath != "" && deployCmdFlags.keyPath == "" {
+	// 	msg := "cannot provide --certificate without also providing --private-key."
+	// 	return status.New(status.InvalidCommandArgsError, msg)
+	// }
 
 	conf := new(dc.AutomateConfig)
 	var err error

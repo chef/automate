@@ -13,12 +13,23 @@ var initConfigHAPathFlags = struct {
 	path string
 }{}
 
+var initConfigHabA2HAPathFlag = struct {
+	a2haDirPath string
+}{}
+
 func init() {
 	initConfigHACmd.PersistentFlags().StringVar(
 		&initConfigHAPathFlags.path,
 		"file",
 		"config.toml",
 		"File path to write the config")
+	initConfigHACmd.SetUsageTemplate(UsageTemplate)
+
+	initConfigHACmd.PersistentFlags().StringVar(
+		&initConfigHabA2HAPathFlag.a2haDirPath,
+		"path",
+		"/hab/a2_deploy_workspace",
+		"a2ha hab workspace dir path")
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 	RootCmd.AddCommand(initConfigHACmd)
 }

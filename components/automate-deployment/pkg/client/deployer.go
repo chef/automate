@@ -282,12 +282,13 @@ func DeployHA(writer cli.FormatWriter,
 	airgap bool,
 	bootstrapBundlePath string) error {
 	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
-	m, err := d.manifestProvider.GetCurrentManifest(d.ctx, d.mergedCfg.Deployment.V1.Svc.Channel.GetValue())
+	ctx := d.ctx
+	m, err := d.manifestProvider.GetCurrentManifest(ctx, "current")
 	if err != nil {
 		logrus.Debug("Failed")
 	}
 	b := bootstrap.NewCompatBootstrapper(d.target)
-	bootstrap.FullBootstrapHA(context.Background(), b, m, d.mergedCfg.Deployment, d.bootstrapBundlePath, d.writer)
+	bootstrap.FullBootstrapHA(context.Background(), b, m, d.bootstrapBundlePath, d.writer)
 	return d.err
 }
 
