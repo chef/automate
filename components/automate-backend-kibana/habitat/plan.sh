@@ -17,7 +17,7 @@ pkg_deps=(
 )
 
 pkg_binds=(
-  [elasticsearch]="http-port root-ca admin_username admin_password"
+  [elasticsearch]="http-port root-ca admin-key admin-pem admin_username admin_password"
 )
 
 
@@ -34,5 +34,5 @@ do_build() {
 }
 
 do_install() {
-  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/cert.sh 
+  return 0 
 }
