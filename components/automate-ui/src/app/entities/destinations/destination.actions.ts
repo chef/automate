@@ -71,6 +71,10 @@ export interface CreateDestinationPayload {
   name: string;
   url: string;
   secret?: string;
+  enable?: boolean;
+  integration_type?: string;
+  meta_data?: string;
+  services?: string;
 }
 
 export class CreateDestination implements Action {
