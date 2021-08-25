@@ -475,7 +475,7 @@ Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Rev
 
 The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific policyfile from the *Included Policies* to view the details.
 
-Image  content-scroller-tab-for-policyfiles
+{{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
 In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
 
@@ -491,7 +491,7 @@ You can **Expand** and **Collapse** the *default* and *override* attributes by s
 
 Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. The slider tab also contains the `Operator` and `Version` of the cookbooks.
 
-Image    cookbook-dependencies-from-policyfiles
+{{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
 {{< note >}}
 You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
@@ -519,13 +519,13 @@ The Chef Infra Server integration lets you:
 
 Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) to find a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
 
-IMAGE
+{{< figure src="/images/automate/search-for-a-policygroup.png" alt="Search for a Policy Group">}}
 
 #### View the details of a Policy Group
 
 Select a Policy Group to view the Policy Group Information and METADATA of that Policy Group.
 
-IMAGE
+{{< figure src="/images/automate/details-of-the-policygroup.png" alt="Details of a Policy Group">}}
 
 ## Troubleshoot
 
