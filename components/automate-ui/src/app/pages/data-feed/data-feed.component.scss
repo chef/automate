@@ -18,7 +18,7 @@ chef-button:first-child {
   chef-button[icon] {
     font-size: 18px;
     line-height: 32px;
-
+    
     chef-icon {
       vertical-align: -3px;
     }
@@ -27,13 +27,18 @@ chef-button:first-child {
 
 .svg-inline--fa {
   width: 20px;
-  font-size: 14px;
-  line-height: 21px;
 }
-
 
 chef-subheading {
   max-width: 610px;
+  font-size: 14px;
+  line-height: 21px;
+  margin-bottom: 20px;
+  font-style: Mulish;
+}
+
+.header-class {
+  margin-top: 30px;
 }
 
 .empty-state {
