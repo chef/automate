@@ -29,7 +29,7 @@ pipelines:
   - habitat/build:
       description: Build the Habitat packages for Chef Automate
   - nightly:
-      description: Nightly tests against master
+      description: Nightly tests against main
       definition: .expeditor/nightly.pipeline.yml
   - post-promote:
       description: Generate and upload release artifacts
@@ -153,7 +153,7 @@ subscriptions:
       - bash:.expeditor/update-inspec-version.sh:
           post_commit: false
   # Update Habitat when it is released
-  - workload: habitat-sh/habitat:master_completed:project_promoted:habitat-sh/habitat:master:current:*
+  - workload: habitat-sh/habitat:main_completed:project_promoted:habitat-sh/habitat:main:current:*
     actions:
       - bash:.expeditor/update_habitat.sh:
           post_commit: false
