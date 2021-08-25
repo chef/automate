@@ -1,11 +1,11 @@
-# Automate-Backend-Kibana
+#  Automate-Backend-Kibana
 
 This is a wrapper package of core/kibana for Chef Automate Backend.
 
-## Maintainers
+##  Maintainers
 
 The Habitat Maintainers humans@habitat.sh
 
-## Type of Package
+##  Type of Package
 
 This is a service package.
