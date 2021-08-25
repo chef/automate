@@ -473,7 +473,7 @@ Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Rev
 
 ##### Content Tab
 
-The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific policyfile from the *Included Policies* to view the details.
+The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific Policyfile from the *Included Policies* to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
