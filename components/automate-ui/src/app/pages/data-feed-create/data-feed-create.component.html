@@ -8,7 +8,7 @@
     
     <h1 slot="title" class="bolder-font" *ngIf="!integrationSelected">Choose a Data Feed Integration</h1>
     <h1 slot="title" class="bolder-font" data-cy="title-integration" *ngIf="integrationSelected">{{integTitle}}</h1>
-    <chef-button class="close" secondary (click)="closeCreateSlider()" data-cy="close-revision-id-button">
+    <chef-button class="close" secondary (click)="closeCreateSlider()" data-cy="close-feed-button">
       <chef-icon>close</chef-icon>
     </chef-button>
   </div>

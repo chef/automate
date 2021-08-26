@@ -38,12 +38,14 @@ describe('chef datafeed', () => {
       it('check if clicking on new integration button opens up the slider', () => {
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=interation-menu]').should('be.visible');
+        cy.get('[data-cy=close-feed-button]').click();
       });
 
       it('check if clicking on a interation opens the form', () => {
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=ServiceNow]').click();
         cy.get('[data-cy=data-feed-create-form]').should('be.visible');
+        cy.get('[data-cy=close-feed-button]').click();
       });
 
       it('create data feed service now', () => {
@@ -59,6 +61,7 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-button]').click();
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
+        cy.contains('Data Feeds').click();
         cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
       });
 
@@ -71,6 +74,7 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-button]').click();
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
+        cy.contains('Data Feeds').click();
         cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
       });
 
@@ -81,8 +85,10 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-url]').type(url);
         cy.get('[data-cy=add-token]').type(token);
         cy.get('[data-cy=add-button]').click();
+        cy.get('app-data-feed-create').scrollTo('top');
         cy.get('app-notification.error').should('be.visible');
         cy.get('app-notification.error chef-icon').click();
+        cy.get('[data-cy=close-feed-button]').click();
       });
 
       it('create data feed with changed token type', () => {
@@ -98,6 +104,7 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-button]').click();
         cy.get('app-notification.info').should('be.visible');
         cy.get('app-notification.info chef-icon').click();
+        cy.contains('Data Feeds').click();
         cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
       });
 
