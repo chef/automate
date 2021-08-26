@@ -1520,3 +1520,17 @@ func (t *LocalTarget) IPs() []net.IP {
 func (t *LocalTarget) HabCache() depot.HabCache {
 	return depot.FromLocalCache()
 }
+
+func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context) error {
+	var pkg habpkg.HabPkg = habpkg.New("chef", "automate-backend-deployment")
+	output, err := t.InstallPackage(ctx, &pkg, "stable")
+	if err != nil {
+		logrus.WithError(err).WithFields(logrus.Fields{
+			"package": pkg.InstallIdent(),
+			"output":  output,
+		}).Error("install failed")
+		return errors.Wrapf(err, "msg=\"failed to install\" package=%s output=%s", pkg.InstallIdent(), output)
+	}
+	logrus.Info("Chef Automate backend deployment Installed")
+	return nil
+}

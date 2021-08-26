@@ -55,6 +55,8 @@ type Bootstrapper interface {
 	// further Habitat interactions use the correct version of hab
 	// and hab-sup. This should be called after SetupSupervisor.
 	SetHabitatEnvironment(manifest.ReleaseManifest) error
+
+	InstallAutomateBackendDeployment(ctx context.Context) error
 }
 
 // NOTE(ssd) 2018-10-08: This is mostly the HabCmd interface
