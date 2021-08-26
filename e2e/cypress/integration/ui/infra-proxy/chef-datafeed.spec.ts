@@ -24,7 +24,7 @@ describe('chef datafeed', () => {
       cy.reload();
       cy.contains('know').click();
       cy.contains('Data Feeds').click();
-      cy.get('[data-cy=new-integration]').should('exist');
+      cy.get('[data-cy=create-data-feed]').should('exist');
     });
   });
 });

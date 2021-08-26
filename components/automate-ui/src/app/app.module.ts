@@ -208,6 +208,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
 // Warning Banner
 import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
 
 @NgModule({
   declarations: [
@@ -222,6 +223,7 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     CreateDataFeedModalComponent,
     CreateNotificationModalComponent,
     DataFeedComponent,
+    DataFeedCreateComponent,
     DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
