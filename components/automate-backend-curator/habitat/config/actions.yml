@@ -1,0 +1,38 @@
+---
+actions:
+  1:
+    action: delete_indices
+    description: >-
+      Clean up JournalBeat indices.
+    options:
+      ignore_empty_list: True
+      continue_if_exception: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: journalbeat-
+      exclude:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: {{cfg.journalbeat_max_age}}
+  2:
+    action: delete_indices
+    description: >-
+      Clean up MetricBeat indices.
+    options:
+      ignore_empty_list: True
+      continue_if_exception: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: metricbeat-
+      exclude:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: {{cfg.metricbeat_max_age}}
