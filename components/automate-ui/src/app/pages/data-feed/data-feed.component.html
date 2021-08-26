@@ -2,19 +2,10 @@
   <div class="container">
     <main>
       <chef-page-header>
-        <chef-heading>Data Feeds</chef-heading>
-        <chef-subheading>Data Feed for bulk client data and compliance reports.</chef-subheading>
-        <app-create-data-feed-modal
-          [visible]="createModalVisible"
-          [creating]="creatingDataFeed"
-          [sending]="sendingDataFeed"
-          [hookStatus]="hookStatus"
-          [createForm]="createDataFeedForm"
-          (close)="closeCreateModal()"
-          [conflictErrorEvent]="conflictErrorEvent"
-          (createClicked)="createDataFeed()"
-          (sendTestClicked)="sendTestForDataFeed()">
-        </app-create-data-feed-modal>
+        <div class="header-class">
+        <chef-heading>Data Feeds</chef-heading></div>
+        <chef-subheading><strong>Disclaimer Text</strong>: We suggest no more than 5 Feeds, depending on your fleet size. Please check the
+          reference matrix on recommended feed counts.</chef-subheading>
         <app-delete-object-modal
           [visible]="deleteModalVisible"
           objectNoun="data feed"
@@ -25,12 +16,10 @@
         </app-delete-object-modal>
       </chef-page-header>
       <div class="page-body">
+        <chef-button primary (click)="slidePanel()" data-cy="create-data-feed"><img alt="" class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
         <div *ngIf="(sortedDestinations$ | async)?.length === 0" class="empty-state">
-          <p>Create a data feed to get started!</p>
-        </div>
-        <div [ngClass]="(sortedDestinations$ | async)?.length === 0 ? 'empty-state' : ''">
-          <!-- <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button> -->
-          <chef-button primary (click)="openCreateModal()">Create Data Feed</chef-button>
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p>No Data Feeds Preview Available</p>
         </div>
 
         <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
@@ -55,6 +44,11 @@
           </chef-tbody>
         </chef-table>
       </div>
+      <app-data-feed-create
+        [createForm]="createDataFeedForm"
+        (saveDestinationEvent)="saveDestination($event)"
+        (testDestinationEvent)="sendTestForDataFeed($event)">
+      </app-data-feed-create>
     </main>
   </div>
 </div>
