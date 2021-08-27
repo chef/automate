@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Clean up any elasticsearch temp dirs remaining from previous attempts to start.
+# 
+rmdir /tmp/elasticsearch.* > /dev/null 2>&1
