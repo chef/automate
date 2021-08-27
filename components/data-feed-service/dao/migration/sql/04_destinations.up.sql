@@ -1,0 +1,1 @@
+ALTER TABLE destinations ADD COLUMN meta_data TEXT NOT NULL DEFAULT '';

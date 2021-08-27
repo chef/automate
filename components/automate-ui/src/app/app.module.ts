@@ -105,7 +105,6 @@ import { PolicyFileRequests } from './entities/policy-files/policy-file.requests
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
-import { UserPreferencesRequests } from './services/user-preferences/user-preferences.requests';
 import { UserRequests } from './entities/users/user.requests';
 import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
 
@@ -299,17 +298,6 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
       : StoreDevtoolsModule.instrument({ maxAge: 25 /* states */, actionSanitizer, stateSanitizer })
   ],
   providers: [
-    // Initilization for warning banner component
-    {
-      provide: APP_INITIALIZER,
-      multi: true,
-      deps: [AppConfigService],
-      useFactory: (appConfigService: AppConfigService) => {
-        return () => {
-          return appConfigService.loadAppConfig();
-        };
-      }
-    },
     AdminKeyRequests,
     ApiTokenRequests,
     AttributesService,
@@ -374,8 +362,18 @@ import { AppConfigService } from 'app/services/app-config/app-config.service';
     TeamRequests,
     TelemetryService,
     UserPermsRequests,
-    UserPreferencesRequests,
-    UserRequests
+    UserRequests,
+    // Initilization for warning banner component
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AppConfigService],
+      useFactory: (appConfigService: AppConfigService) => {
+        return () => {
+          return appConfigService.loadAppConfig();
+        };
+      }
+    }
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

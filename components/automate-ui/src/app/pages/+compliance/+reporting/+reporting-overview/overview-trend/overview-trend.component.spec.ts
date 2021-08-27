@@ -1,9 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { OverviewTrendComponent } from './overview-trend.component';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { StoreModule } from '@ngrx/store';
-import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 
 describe('OverviewTrendComponent', () => {
   let fixture: ComponentFixture<OverviewTrendComponent>;
@@ -12,13 +9,11 @@ describe('OverviewTrendComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         OverviewTrendComponent
       ],
       providers: [
-        UserPreferencesService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

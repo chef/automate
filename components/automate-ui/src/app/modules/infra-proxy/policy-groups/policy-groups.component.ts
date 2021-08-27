@@ -33,12 +33,6 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public policyFiles: PolicyFile[] = [];
   public policyGroupsListLoading = true;
   public authFailure = false;
-  public searching = false;
-  public searchValue = '';
-  public groupList = [];
-  public pageOfItems: Array<any>;
-  public searchFlag: boolean;
-  public policyGroups: Array<any>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -57,9 +51,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
     .subscribe(([ getPolicyFilesSt, policyFilesState]) => {
       if (getPolicyFilesSt === EntityStatus.loadingSuccess && !isNil(policyFilesState)) {
         this.policyFiles = policyFilesState;
-        this.groupList = this.policyFiles;
         this.policyGroupsListLoading = false;
-        this.filterDataGroupWise();
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;
         this.authFailure = true;
@@ -82,55 +74,5 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       org_id: this.orgId
     };
     this.store.dispatch(new GetPolicyGroups(payload));
-  }
-
-  filterDataGroupWise() {
-    const key = 'policy_group';
-    this.policyGroups = [];
-    if (this.groupList.length > 0) {
-      this.groupList.forEach((x) => {
-        // Checking if there is any object in this.policyGroupsList
-        // which contains the key value
-        if (this.policyGroups.some((val) => val[key] === x[key])) {
-          // If yes! then increase the occurrence by 1
-          this.policyGroups.forEach((k) => {
-            if (k[key] === x[key]) {
-              k['occurrence']++;
-            }
-          });
-        } else {
-          // If not! Then create a new object initialize
-          // it with the present iteration key's value and set the occurrence to 1
-          const listArr = {};
-          listArr[key] = x[key];
-          listArr['occurrence'] = 1;
-          this.policyGroups.push(listArr);
-        }
-      });
-    } else {
-      this.policyGroups = [];
-    }
-  }
-
-  searchPolicyFiles(searchText: string): void {
-    this.searching = true;
-    this.searchValue = searchText;
-    if (!this.policyGroups || !searchText) {
-      this.groupList = this.policyGroups;
-      this.searchFlag = false;
-    } else {
-      const list = this.policyGroups.filter((key) => {
-        this.searchFlag = true;
-        if (key) {
-          return key.policy_group.includes(this.searchValue);
-        }
-      });
-      this.groupList = list;
-    }
-    this.searching = false;
-  }
-
-  onChangePage(pageOfItems: Array<any>) {
-    this.pageOfItems = pageOfItems;
   }
 }

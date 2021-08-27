@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AppConfigService } from './app-config.service';
 
-const EXPECTED_URL = '/custom_settings.js';
+const EXPECTED_URL = '/banner.js';
 
 describe('AppConfigService', () => {
   let service: AppConfigService;

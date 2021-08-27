@@ -7,6 +7,9 @@ import "google/api/annotations.proto";
 
 import "external/annotations/iam/annotations.proto";
 
+import "google/protobuf/struct.proto";
+import "external/common/query/parameters.proto";
+
 service DatafeedService {
   rpc AddDestination(AddDestinationRequest) returns (AddDestinationResponse){
 	  option (google.api.http) = {
@@ -73,6 +76,9 @@ message AddDestinationRequest {
   string name    = 2;
   string url     = 3;
   string secret  = 4;
+  string services = 5;
+  string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message AddDestinationResponse {
@@ -80,6 +86,9 @@ message AddDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message GetDestinationRequest {
@@ -91,6 +100,9 @@ message GetDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message DeleteDestinationRequest {
@@ -102,6 +114,9 @@ message DeleteDestinationResponse {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message UpdateDestinationRequest {	
@@ -109,13 +124,22 @@ message UpdateDestinationRequest {
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services  = 5;
+  string integration_types  = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
-
+message AWSMetaData {
+	string bucket = 1;
+	string region = 2;
+}
 message UpdateDestinationResponse {
   int64 id = 1;
   string name   = 2;
   string url    = 3;
   string secret = 4;
+  string services = 5;
+  string integration_types = 6;
+  repeated chef.automate.api.common.query.Kv meta_data =7;
 }
 
 message ListDestinationRequest {}
@@ -129,16 +153,30 @@ message UsernamePassword {
   string password = 2;
 }
 
-message SecretId {
-  string id = 1;
+message SecretAndDestinationId {
+  string secret = 1;
+  string destination = 2;
+}
+
+message Header {
+	string value = 1;
+}
+
+message AWS {
+	string access_key = 1;
+	string secret_access_key = 2;
+	string bucket = 3;
+	string region = 4;
 }
 
 message URLValidationRequest {
   string url = 1;
   oneof credentials {
     UsernamePassword username_password = 2;
-    SecretId secret_id = 3;
-  }
+    SecretAndDestinationId secret_and_destination_id = 3;
+	Header header = 4;
+	AWS aws = 5;
+   }
 }
 
 message TestDestinationResponse {

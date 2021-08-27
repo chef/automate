@@ -17,8 +17,3 @@ export const policyFile = createSelector(
   policyFileState,
   (state) => state.policyFile
 );
-
-export const infraPolicyGroupFromRoute = createSelector(
-  policyFileState,
-  (state) => state.policyFile
-);

@@ -16,8 +16,7 @@ import { MetadataService } from 'app/services/metadata/metadata.service';
 
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { ProfileComponent } from './profile.component';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { SigninUiSetting, UISettings } from 'app/services/user-preferences/signin-ui-settings';
+
 class MockMetadataService {
   getBuildVersion(): Observable<string> {
     return observableOf('');
@@ -26,10 +25,6 @@ class MockMetadataService {
 
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void { }
-}
-
-class MockUserPreferencesService {
-  public uiSettings: SigninUiSetting = new UISettings()['local'];
 }
 
 describe('ProfileComponent', () => {
@@ -56,8 +51,7 @@ describe('ProfileComponent', () => {
         providers: [
           { provide: TelemetryService, useClass: MockTelemetryService },
           { provide: MetadataService, useClass: MockMetadataService },
-          { provide: ChefSessionService, useClass: MockChefSessionService },
-          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
+          { provide: ChefSessionService, useClass: MockChefSessionService }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       });
@@ -251,8 +245,7 @@ describe('ProfileComponent', () => {
         providers: [
           { provide: TelemetryService, useClass: MockTelemetryService },
           { provide: MetadataService, useClass: MockMetadataService },
-          { provide: ChefSessionService, useValue: nonLocalChefSessionService },
-          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
+          { provide: ChefSessionService, useValue: nonLocalChefSessionService }
         ],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       });
@@ -272,7 +265,7 @@ describe('ProfileComponent', () => {
       fixture.detectChanges();
 
       const link = element.nativeElement.querySelector('a.profile');
-      expect(link).toBeTruthy();
+      expect(link).toBeFalsy();
     });
   });
 });

@@ -16,6 +16,10 @@ func init() {
 					return m.Url
 				case "secret":
 					return m.Secret
+				case "services":
+					return m.Services
+				case "integration_types":
+					return m.IntegrationTypes
 				default:
 					return ""
 				}
@@ -41,6 +45,10 @@ func init() {
 					return m.Url
 				case "secret":
 					return m.Secret
+				case "services":
+					return m.Services
+				case "integration_types":
+					return m.IntegrationTypes
 				default:
 					return ""
 				}

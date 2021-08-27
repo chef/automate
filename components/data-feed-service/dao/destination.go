@@ -2,10 +2,14 @@ package dao
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/common/query"
 	datafeed "github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/pkg/errors"
@@ -14,10 +18,13 @@ import (
 const uniqueViolation = "23505"
 
 type Destination struct {
-	ID     int64  `db:"id"`
-	Name   string `db:"name"`
-	URL    string `db:"url"`
-	Secret string `db:"secret"`
+	ID               int64  `db:"id"`
+	Name             string `db:"name"`
+	URL              string `db:"url"`
+	Secret           string `db:"secret"`
+	Services         string `db:"services"`
+	IntegrationTypes string `db:"integration_types"`
+	MetaData         string `db:"meta_data"`
 }
 
 func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
@@ -26,7 +33,18 @@ func addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destinat
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
-
+	newDestination.Services = inDestination.Services
+	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	zaMap := make(map[string]string, 0)
+	for _, kv := range inDestination.MetaData {
+		zaMap[kv.Key] = kv.Value
+	}
+	jsonMap, err := json.Marshal(zaMap)
+	if err != nil {
+		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+		return nil
+	}
+	newDestination.MetaData = string(jsonMap)
 	return &newDestination
 }
 
@@ -36,6 +54,18 @@ func updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *De
 	newDestination.Name = inDestination.Name
 	newDestination.URL = inDestination.Url
 	newDestination.Secret = inDestination.Secret
+	newDestination.Services = inDestination.Services
+	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	zaMap := make(map[string]string, 0)
+	for _, kv := range inDestination.MetaData {
+		zaMap[kv.Key] = kv.Value
+	}
+	jsonMap, err := json.Marshal(zaMap)
+	if err != nil {
+		logrus.Println(errors.Wrap(err, "keyValueToRawMap unable to marshal map"))
+		return nil
+	}
+	newDestination.MetaData = string(jsonMap)
 
 	return &newDestination
 }
@@ -46,7 +76,21 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	newDestination.Name = inDestination.Name
 	newDestination.Url = inDestination.URL
 	newDestination.Secret = inDestination.Secret
+	newDestination.Services = inDestination.Services
+	newDestination.IntegrationTypes = inDestination.IntegrationTypes
+	fmt.Println("inDestination.MetaData", inDestination.MetaData)
+	var zaMap map[string]string
+	err := json.Unmarshal([]byte(inDestination.MetaData), &zaMap)
+	if err != nil {
+		logrus.Println(errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map"))
+		return nil
+	}
 
+	zaArray := make([]*query.Kv, 0, len(zaMap))
+	for k, v := range zaMap {
+		zaArray = append(zaArray, &query.Kv{Key: k, Value: v})
+	}
+	newDestination.MetaData = zaArray
 	return &newDestination
 }
 
@@ -147,6 +191,7 @@ func (db *DB) ListDestinations() (*datafeed.ListDestinationResponse, error) {
 	}
 	listOfDestinations := make([]*datafeed.GetDestinationResponse, 0)
 	for _, d := range destinations {
+		fmt.Println("list data", dbToGetDestinationResponse(&d))
 		listOfDestinations = append(listOfDestinations, dbToGetDestinationResponse(&d))
 	}
 	return &datafeed.ListDestinationResponse{Destinations: listOfDestinations}, err

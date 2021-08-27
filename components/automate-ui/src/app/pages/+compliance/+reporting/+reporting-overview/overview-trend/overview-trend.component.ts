@@ -7,15 +7,12 @@ import {
   Output,
   OnChanges,
   OnDestroy,
-  ViewChild,
-  OnInit
+  ViewChild
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
-import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { Subscription } from 'rxjs';
 
 export interface TrendData {
   report_time: Date;
@@ -30,12 +27,11 @@ export interface TrendData {
   templateUrl: './overview-trend.component.html',
   styleUrls: ['./overview-trend.component.scss']
 })
-export class OverviewTrendComponent implements OnChanges, OnDestroy, OnInit  {
+export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   constructor(
     private el: ElementRef,
-    @Inject(DOCUMENT) private document: Document,
-    private userPrefsService: UserPreferencesService
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   @Input() data = [];
@@ -51,8 +47,6 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy, OnInit  {
   @ViewChild('svg', { static: true }) svg;
 
   trendDataCache = [];
-  private timeFormatValue: string = DateTime.CHEF_DATE_TIME;
-  private userPreferenceSubscription: Subscription;
 
   get viewBox() {
     return `0 0 ${this.vbWidth} ${this.vbHeight}`;
@@ -145,17 +139,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy, OnInit  {
     this.draw();
   }
 
-  ngOnInit() {
-    this.userPreferenceSubscription = this.userPrefsService.timeformat$.subscribe((timeFormat) => {
-      this.timeFormatValue = timeFormat.value;
-    });
-  }
-
   ngOnDestroy() {
     this.clear();
-    if (this.userPreferenceSubscription) {
-      this.userPreferenceSubscription.unsubscribe();
-    }
   }
 
   onResize() {
@@ -186,9 +171,9 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy, OnInit  {
       .attr('y', this.vbHeight - 3)
       .text(() => {
         return [
-          moment.utc(this.domainX[0]).format(this.timeFormatValue),
-          moment.utc(this.domainX[1]).format(this.timeFormatValue)
-        ].join(' - ');
+          moment.utc(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
+          moment.utc(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
+        ].join(' - ') + ' (UTC)';
       });
 
     this.axisXSelection.select('.domain')

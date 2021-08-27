@@ -57,7 +57,6 @@ import { TableCellComponent } from './table/table-cell/table-cell.component';
 import { TableRowComponent } from './table/table-row/table-row.component';
 import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
 import { TableHeaderComponent } from './table/table-header/table-header.component';
-import { TimeComponent } from './time/time.component';
 
 @NgModule({
   imports: [
@@ -117,7 +116,6 @@ import { TimeComponent } from './time/time.component';
     TableRowComponent,
     TableHeaderCellComponent,
     TableHeaderComponent,
-    TimeComponent,
 
     // Directives
     ErrorDirective,
@@ -162,8 +160,7 @@ import { TimeComponent } from './time/time.component';
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
-    TableHeaderComponent,
-    TimeComponent
+    TableHeaderComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

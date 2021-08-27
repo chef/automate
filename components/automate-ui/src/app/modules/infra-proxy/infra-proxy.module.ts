@@ -12,7 +12,6 @@ import { ClientDetailsComponent } from './client-details/client-details.componen
 import { CreateClientModalComponent } from './create-client-modal/create-client-modal.component';
 import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
-import { CookbookDependenciesComponent } from './cookbook-dependencies/cookbook-dependencies.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateEnvironmentModalComponent } from './create-environment-modal/create-environment-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
@@ -47,7 +46,6 @@ import { PolicyFilesComponent } from './policy-files/policy-files.component';
 import { PolicyFileDetailsComponent } from './policy-file-details/policy-file-details.component';
 import { PolicyGroupsComponent } from './policy-groups/policy-groups.component';
 import { PolicyGroupsListComponent } from './policy-groups-list/policy-groups-list.component';
-import { PolicyGroupDetailsComponent } from './policy-group-details/policy-group-details.component';
 import { ResetAdminKeyComponent } from './reset-admin-key/reset-admin-key.component';
 import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.component';
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
@@ -69,7 +67,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ClientDetailsComponent,
     CookbooksComponent,
     CookbookDetailsComponent,
-    CookbookDependenciesComponent,
     CreateChefServerModalComponent,
     CreateEnvironmentModalComponent,
     CreateOrgModalComponent,
@@ -105,7 +102,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
     PolicyFileDetailsComponent,
     PolicyGroupsComponent,
     PolicyGroupsListComponent,
-    PolicyGroupDetailsComponent,
     ResetAdminKeyComponent,
     ResetClientKeyComponent,
     ResetNodeKeyComponent,

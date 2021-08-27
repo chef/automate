@@ -11,7 +11,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { CreateTokenSuccess, CreateTokenFailure } from 'app/entities/api-tokens/api-token.actions';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ApiTokenListComponent } from './api-token-list.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ApiTokenListComponent', () => {
   let component: ApiTokenListComponent;
@@ -25,8 +24,7 @@ describe('ApiTokenListComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         ChefPipesModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
-        BrowserAnimationsModule
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

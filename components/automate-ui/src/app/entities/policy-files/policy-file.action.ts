@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { PolicyFile, IncludedPolicyLocks } from './policy-file.model';
+import { PolicyFile } from './policy-file.model';
 
 export enum PolicyFileActionTypes {
   GET_ALL            = 'POLICYFILES::GET_ALL',
@@ -14,20 +14,11 @@ export enum PolicyFileActionTypes {
   GET_FAILURE        = 'POLICYFILES::GET::FAILURE',
   GET_GROUPS         = 'POLICYFILES::GET_GROUPS',
   GET_GROUPS_SUCCESS = 'POLICYFILES::GET_GROUPS::SUCCESS',
-  GET_GROUPS_FAILURE = 'POLICYFILES::GET_GROUPS::FAILURE',
-  GET_GROUP          = 'POLICYFILES::GET_GROUP',
-  GET_GROUP_SUCCESS  = 'POLICYFILES::GET_GROUP::SUCCESS',
-  GET_GROUP_FAILURE  = 'POLICYFILES::GET_GROUP::FAILURE'
+  GET_GROUPS_FAILURE = 'POLICYFILES::GET_GROUPS::FAILURE'
 }
 
 export interface PolicyFilesSuccessPayload {
   policies: PolicyFile[];
-}
-
-export interface PolicyGroupSuccessPayload {
-  name: string;
-  policies: IncludedPolicyLocks[];
-  uri: string;
 }
 
 export class GetPolicyFiles implements Action {
@@ -91,21 +82,6 @@ export class GetPolicyGroupsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class GetPolicyGroup implements Action {
-  readonly type = PolicyFileActionTypes.GET_GROUP;
-  constructor(public payload: { server_id: string, org_id: string, name: string }) { }
-}
-
-export class GetPolicyGroupSuccess implements Action {
-  readonly type = PolicyFileActionTypes.GET_GROUP_SUCCESS;
-  constructor(public payload: PolicyGroupSuccessPayload) { }
-}
-
-export class GetPolicyGroupFailure implements Action {
-  readonly type = PolicyFileActionTypes.GET_GROUP_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
-}
-
 export type PolicyFileActions =
   | GetPolicyFiles
   | GetPolicyFilesSuccess
@@ -118,7 +94,4 @@ export type PolicyFileActions =
   | GetPolicyFileFailure
   | GetPolicyGroups
   | GetPolicyGroupsSuccess
-  | GetPolicyGroupsFailure
-  | GetPolicyGroup
-  | GetPolicyGroupSuccess
-  | GetPolicyGroupFailure;
+  | GetPolicyGroupsFailure;
