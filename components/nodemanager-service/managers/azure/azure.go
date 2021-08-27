@@ -251,7 +251,7 @@ func (creds *Creds) handleVMFilters(ctx context.Context, sub *manager.ManagerNod
 			resourcesList[key] = append(resourcesList[key], resources)
 		}
 	}
-	resourceListVals := make(map[string][]resources.GenericResource)
+	resourceListVals := make(map[string][]resources.GenericResourceExpanded)
 	if len(excludedTagFilterStrings) > 0 {
 		for _, excludedTagFilterString := range excludedTagFilterStrings {
 			logrus.Debugf("exclusion filter string used to call list on azure resources: %s", excludedTagFilterString)
@@ -276,7 +276,7 @@ func (creds *Creds) handleVMFilters(ctx context.Context, sub *manager.ManagerNod
 	return handleResources(resourceListVals, filters)
 }
 
-func handleExcludedResources(resourcesList []resources.GenericResource, excludedResourcesList []resources.GenericResource) []resources.GenericResource {
+func handleExcludedResources(resourcesList []resources.GenericResourceExpanded, excludedResourcesList []resources.GenericResourceExpanded) []resources.GenericResourceExpanded {
 	filteredList := resourcesList
 	for _, excludedResource := range excludedResourcesList {
 		filteredList = removeMatchingResource(filteredList, excludedResource)
@@ -284,8 +284,8 @@ func handleExcludedResources(resourcesList []resources.GenericResource, excluded
 	return filteredList
 }
 
-func removeMatchingResource(list []resources.GenericResource, matcher resources.GenericResource) []resources.GenericResource {
-	newResourcesList := make([]resources.GenericResource, 0)
+func removeMatchingResource(list []resources.GenericResourceExpanded, matcher resources.GenericResourceExpanded) []resources.GenericResourceExpanded {
+	newResourcesList := make([]resources.GenericResourceExpanded, 0)
 	for _, resource := range list {
 		if resource.ID != matcher.ID {
 			newResourcesList = append(newResourcesList, resource)
@@ -294,7 +294,7 @@ func removeMatchingResource(list []resources.GenericResource, matcher resources.
 	return newResourcesList
 }
 
-func handleResources(vals map[string][]resources.GenericResource, filters []*common.Filter) ([]string, error) {
+func handleResources(vals map[string][]resources.GenericResourceExpanded, filters []*common.Filter) ([]string, error) {
 	resourceGroupNames := make(map[string][]string, 0)
 	// we go through each entry in the map and get a map entry of resource group names
 	var aKey string
