@@ -22,7 +22,7 @@ func FullBootstrapHA(ctx context.Context,
 	writer.Body("Installing the Chef Automate backend deployment")
 	err = b.InstallAutomateBackendDeployment(ctx)
 	if err != nil {
-		writer.Printf("Some error occured %s\n", err.Error())
+		writer.Printf("Some error occurred %s\n", err.Error())
 		return err
 	}
 	return nil
