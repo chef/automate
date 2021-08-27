@@ -88,7 +88,7 @@ export class DestinationRequests {
       type: 'data_feed',
       data: Array<KVData>(
         {key: 'headers', value: headers},
-        {key: 'auth_type', value: 'Custom'})
+        {key: 'auth_type', value: 'header_auth'})
     };
   }
 
