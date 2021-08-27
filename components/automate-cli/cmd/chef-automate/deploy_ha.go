@@ -3,10 +3,10 @@
 package main
 
 import (
-	"log"
 	"os/exec"
 	"strings"
 
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
 )
 
@@ -33,7 +33,7 @@ func deployA2HA() error {
 	cmd.Stdout = b
 	err := cmd.Start()
 	if err != nil {
-		log.Fatal(err)
+		return status.Annotate(err, status.CommandExecutionError)
 	}
 	writer.Print(b.String())
 	writer.Printf("A2HA deployment done. %d, exiting\n", cmd.Process.Pid)
