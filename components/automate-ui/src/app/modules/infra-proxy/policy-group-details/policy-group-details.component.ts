@@ -99,7 +99,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
           this.policyGroupNodesLoading = false;
         } else if (getAllSt === EntityStatus.loadingFailure) {
           this.policyGroupNodesLoading = false;
-          this.authFailure = true;
+          this.isNodesAvailable = false;
         }
     });
   }
