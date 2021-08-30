@@ -17,8 +17,7 @@
     type="error"
     timeout="5"
     (dismissed)="dismissNotification()">
-    <span *ngIf="authSelected=='Username and Password'">Unable to connect: check URL, username and password.</span>
-    <span *ngIf="authSelected=='Access Token'">Unable to connect: check Token Type (Prefix) and token.</span>
+    <span>{{errorString}}</span>
   </app-notification>
   <app-notification
     *ngIf="conflictErrorGetter"
@@ -57,7 +56,7 @@
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
-            <div class="overlay">
+            <div class="overlay" *ngIf="item.name!='Minio'">
               <div class="text">Coming Soon</div>
             </div>
           </div>
@@ -67,7 +66,7 @@
   <main [class.hide]="!integrationSelected">
     <div class="flex-container2">
       <form [formGroup]="createForm" data-cy="data-feed-create-form">
-        <div class="input-margin">
+        <div class="input-margin" [class.hide]="!showFields.name">
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
@@ -86,8 +85,30 @@
             </chef-error>
           </chef-form-field>
         </div>
+        <div class="input-margin" *ngIf="showFields.endpoint">
+          <chef-form-field>
+            <label>
+              <span class="label">Endpoint <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="endpoint"
+                data-cy="add-endpoint"
+                type="text"
+                id="endpoint-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="(createForm.get('endpoint').hasError('required') || createForm.get('endpoint').hasError('pattern')) && createForm.get('endpoint').dirty">
+              Endpoint is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('url').hasError('pattern')">
+              Endpoint is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
         <hr class="divider">
-        <div class="input-margin">
+        <div class="input-margin" *ngIf="showFields.url">
           <chef-form-field>
             <label>
               <span class="label">URL<span aria-hidden="true">*</span></span>
@@ -110,7 +131,7 @@
           </chef-form-field>
         </div>
 
-        <div class="input-margin" *ngIf="showSelect">
+        <div class="input-margin" *ngIf="showFields.authSelector && showSelect">
           <div class="name-margin">
             <label for="version">Authentication</label>
             <div class="version-dropdown">
@@ -122,7 +143,7 @@
           </div>
         </div>
 
-        <div class="input-margin" *ngIf="authSelected=='Access Token'">
+        <div class="input-margin" *ngIf="showFields.tokenType && authSelected=='Access Token'">
           <chef-form-field>
             <label>
               <span class="label">Token Type (Prefix)<span aria-hidden="true">*</span></span>
@@ -144,7 +165,7 @@
           </chef-form-field>
         </div>
 
-        <div class="input-margin" *ngIf="authSelected=='Access Token'">
+        <div class="input-margin" *ngIf="showFields.token && authSelected=='Access Token'">
           <chef-form-field>
             <label>
               <span class="label">Token <span aria-hidden="true">*</span></span>
@@ -168,7 +189,7 @@
           </chef-form-field>
         </div>
 
-        <div class="input-margin" *ngIf="authSelected=='Username and Password'">
+        <div class="input-margin" *ngIf="showFields.username && authSelected=='Username and Password'">
           <chef-form-field>
             <label>
               <span class="label">Username <span aria-hidden="true">*</span></span>
@@ -192,7 +213,7 @@
           </chef-form-field>
         </div>
 
-        <div class="input-margin" *ngIf="authSelected=='Username and Password'">
+        <div class="input-margin" *ngIf="showFields.password && authSelected=='Username and Password'">
           <chef-form-field>
             <label>
               <span class="label">Password <span aria-hidden="true">*</span></span>
@@ -212,6 +233,71 @@
             <chef-error
               *ngIf="createForm.get('password').hasError('pattern')">
               Password is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.bucketName">
+          <chef-form-field>
+            <label>
+              <span class="label">Bucket Name <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="bucketName"
+                data-cy="add-bucketName"
+                type="text"
+                id="bucketName-input"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+              *ngIf="(createForm.get('bucketName').hasError('required') || createForm.get('bucketName').hasError('pattern')) && createForm.get('bucketName').dirty">
+              Bucket Name is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+
+        <div class="input-margin" *ngIf="showFields.accessKey">
+          <chef-form-field>
+            <label>
+              <span class="label">Access Key <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="accessKey" 
+                type="password"
+                data-cy="add-accessKey"
+                id="accessKey-input"
+                autocomplete="off"
+              />
+            </label>
+            <chef-error
+              *ngIf="createForm.get('accessKey').hasError('required') && createForm.get('accessKey').dirty">
+              Access Key is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('accessKey').hasError('pattern')">
+              Access Key is invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div class="input-margin" *ngIf="showFields.secretKey">
+          <chef-form-field>
+            <label>
+              <span class="label">Secret Key <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                formControlName="secretKey" 
+                type="password"
+                data-cy="add-secretKey"
+                id="secretKey-input"
+                autocomplete="off"
+              />
+            </label>
+            <chef-error
+              *ngIf="createForm.get('secretKey').hasError('required') && createForm.get('secretKey').dirty">
+              Secret Key is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('secretKey').hasError('pattern')">
+              Secret Key is invalid.
             </chef-error>
           </chef-form-field>
         </div>

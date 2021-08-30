@@ -4,7 +4,7 @@ export interface Destination {
   url: string;
   secret: string;
   enable?: boolean;
-  integration_type?: string;
+  integration_types?: string;
   meta_data?: string;
   services?: string;
 }
