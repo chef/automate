@@ -37,6 +37,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public per_page = 9;
   public nodes: {items: InfraNode[], total: number};
   public policyGroupNodesLoading = true;
+  public isNodesAvailable = false;
   public authFailure = false;
   private isDestroyed = new Subject<boolean>();
   private timeFromNowPipe = new TimeFromNowPipe();
@@ -53,7 +54,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'policyfiles') ? 'policyfiles' : 'nodes';
+      this.tabValue = (fragment === 'nodes') ? 'nodes' : 'policyfiles';
     });
 
     // load policy Group details
@@ -94,6 +95,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       ).subscribe(([getAllSt, nodeList]) => {
         if (getAllSt === EntityStatus.loadingSuccess && !isNil(nodeList)) {
           this.nodes = nodeList;
+          this.isNodesAvailable = (this.nodes.total > 0) ? true : false;
           this.policyGroupNodesLoading = false;
         } else if (getAllSt === EntityStatus.loadingFailure) {
           this.policyGroupNodesLoading = false;

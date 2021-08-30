@@ -38,7 +38,7 @@
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='policyfiles' data-cy="policyfiles-tab">Policyfiles</chef-option>
-          <chef-option value='nodes' data-cy="nodes-tab" (click)="loadNodes()">Nodes</chef-option>
+          <chef-option value='nodes' data-cy="nodes-tab">Nodes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
       
@@ -79,11 +79,11 @@
           <div class="spinner">
             <chef-loading-spinner *ngIf="policyGroupNodesLoading" size="50" fixed></chef-loading-spinner>
           </div>
-          <div data-cy="empty-list" class="empty-section" *ngIf="nodes.total < 1">
+          <div data-cy="empty-list" class="empty-section" *ngIf="!isNodesAvailable">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p data-cy="no-nodes">No nodes available.</p>
           </div>
-          <div id="nodes-table-container" data-cy="nodes-table-container">
+          <div id="nodes-table-container" data-cy="nodes-table-container" *ngIf="isNodesAvailable">
             <chef-table>
               <chef-thead>
                 <chef-tr class="no_border_tr">
@@ -98,7 +98,10 @@
               </chef-thead>
               <chef-tbody>
                 <chef-tr *ngFor="let node of nodes.items">
-                  <chef-td>{{node.name === '' ? '--' : node.name}}</chef-td>
+                  <chef-td>
+                    <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                    'organizations', orgId, 'nodes', node.name]">{{node.name === '' ? '--' : node.name}}</a>
+                  </chef-td>
                   <chef-td>{{node.platform === '' ? '--' : node.platform}}</chef-td>
                   <chef-td>{{node.fqdn === '' ? '--' : node.fqdn}}</chef-td>
                   <chef-td>{{node.ip_address === '' ? '--' : node.ip_address}}</chef-td>
