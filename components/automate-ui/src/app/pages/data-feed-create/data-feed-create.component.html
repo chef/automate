@@ -1,7 +1,7 @@
 <div ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header-data-feed">
     <div *ngIf="integrationSelected">
-      <chef-button class="arrow-btn" secondary (click)="returnToMenu()" data-cy="close-revision-id-button">
+      <chef-button class="arrow-btn" secondary (click)="returnToMenu()" data-cy="close-data-feed-button">
         <chef-icon>arrow_back</chef-icon>
       </chef-button>
     </div>
@@ -51,7 +51,7 @@
     <div class="flex-container">
         <h2 class="bolder-font">Storage Integration </h2>
         <div class="flex-child">
-          <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.storage">
+          <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.storage" [attr.data-cy]="item.name">
             <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
