@@ -14,28 +14,6 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/_status": {
-      "get": {
-        "operationId": "InfraProxy_GetServerStatus",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
     "/api/v0/infra/servers": {
       "get": {
         "operationId": "InfraProxy_GetServers",
@@ -81,6 +59,37 @@ func init() {
             "schema": {
               "$ref": "#/definitions/chef.automate.api.infra_proxy.request.CreateServer"
             }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/api/v0/infra/servers/server_status": {
+      "get": {
+        "operationId": "InfraProxy_GetServerStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fqdn",
+            "description": "Server FQDN.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

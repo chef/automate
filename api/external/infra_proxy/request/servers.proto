@@ -37,4 +37,7 @@ message GetServer {
     string id = 1;
 }
 
-message GetServerStatus {}
+message GetServerStatus {
+    // Server FQDN
+    string fqdn = 1;
+}

@@ -50,9 +50,20 @@ func local_request_InfraProxy_GetServers_0(ctx context.Context, marshaler runtim
 
 }
 
+var (
+	filter_InfraProxy_GetServerStatus_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_InfraProxy_GetServerStatus_0(ctx context.Context, marshaler runtime.Marshaler, client InfraProxyClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetServerStatus
 	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InfraProxy_GetServerStatus_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := client.GetServerStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -62,6 +73,13 @@ func request_InfraProxy_GetServerStatus_0(ctx context.Context, marshaler runtime
 func local_request_InfraProxy_GetServerStatus_0(ctx context.Context, marshaler runtime.Marshaler, server InfraProxyServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.GetServerStatus
 	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InfraProxy_GetServerStatus_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
 
 	msg, err := server.GetServerStatus(ctx, &protoReq)
 	return msg, metadata, err
@@ -7678,7 +7696,7 @@ func RegisterInfraProxyHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 var (
 	pattern_InfraProxy_GetServers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v0", "infra", "servers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_InfraProxy_GetServerStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"_status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_InfraProxy_GetServerStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "infra", "servers", "server_status"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_InfraProxy_GetServer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v0", "infra", "servers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 

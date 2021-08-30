@@ -37,7 +37,7 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
   };
   rpc GetServerStatus (infra_proxy.request.GetServerStatus) returns (infra_proxy.response.GetServerStatus) {
-    option (google.api.http).get = "/_status";
+    option (google.api.http).get = "/api/v0/infra/servers/server_status";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };

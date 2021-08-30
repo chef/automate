@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
