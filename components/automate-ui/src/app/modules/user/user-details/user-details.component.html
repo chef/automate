@@ -22,7 +22,7 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="userDetails.displayNameForm">
           <!-- displayname is shown for saml & ldap users in future -->
-          <chef-form-field *ngIf="userType === 'local'">
+          <chef-form-field class="chef-form-field" *ngIf="userType === 'local'">
             <label for="displayName">Display Name <span aria-hidden="true">*</span></label>
             <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input" [readonly]="!isDisplayNameEditable">
@@ -31,7 +31,7 @@
               Display Name is required.
             </chef-error>
           </chef-form-field>
-          <chef-form-field class="timezone-field">
+          <chef-form-field class="timezone-field chef-form-field">
             <label for="timeformat">Time Format</label>
             <chef-select 
               #timeformat 
@@ -45,6 +45,9 @@
                 <chef-option value="YYYY-M-D">YYYY-M-D</chef-option>
                 <chef-option value="YYYY-MM-DD">YYYY-MM-DD</chef-option>
             </chef-select>
+          </chef-form-field>
+          <chef-form-field class="telemetry-checkbox-field">
+            <app-telemetry-checkbox></app-telemetry-checkbox>
           </chef-form-field>
         </form>
         <chef-button 
@@ -60,7 +63,7 @@
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="userDetails.passwordForm">
-          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password">
+          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password chef-form-field">
             <label>
               <span class="label">Previous Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="previousPassword" type="password"/>
@@ -74,7 +77,7 @@
               Previous Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
-          <chef-form-field class="password">
+          <chef-form-field class="password chef-form-field">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput()" />
@@ -92,7 +95,7 @@
             Must be a minimum of 8 total characters with at least 3 distinct characters. <br/>
             May include both upper and lower case letters, punctuation marks, and symbols.
           </p>
-          <chef-form-field class="password">
+          <chef-form-field class="password chef-form-field">
             <label>
               <span class="label">Confirm New Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="confirmPassword" type="password"/>

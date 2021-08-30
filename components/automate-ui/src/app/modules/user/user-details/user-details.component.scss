@@ -86,7 +86,7 @@ section {
     font-size: 12px;
   }
 
-  chef-form-field {
+  .chef-form-field {
     width: 310px;
   }
 
@@ -116,4 +116,9 @@ section {
   chef-select {
     width: 100%;
   }
+}
+
+.telemetry-checkbox-field {
+  margin-top: 25px;
+  width: 500px;
 }
