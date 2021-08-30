@@ -131,10 +131,10 @@ describe('infra policy group details', () => {
     }
   }
 
-  function getPolicyGroupNodes(policyGroupName: string, page: number, per_page = 9) {
+  function getPolicyGroupNodes(policyGroup: string, page: number, per_page = 9) {
     const wildCardSearch = '*';
-    const target = policyGroupName !== '' ?
-    'policy_group:' + wildCardSearch + policyGroupName : wildCardSearch + ':';
+    const target = policyGroup !== '' ?
+    'policy_group:' + wildCardSearch + policyGroup : wildCardSearch + ':';
     const nameTarget = target + wildCardSearch;
     const currentPage = page - 1;
     // Add asterisk to do wildcard search
