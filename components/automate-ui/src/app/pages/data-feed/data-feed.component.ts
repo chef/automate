@@ -153,7 +153,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.sendingDataFeed = true;
     if (event.name === WebhookIntegrationTypes.SERVICENOW ||
       event.name === WebhookIntegrationTypes.SPLUNK ||
-      event.name === WebhookIntegrationTypes.ELK_KIBANA){
+      event.name === WebhookIntegrationTypes.ELK_KIBANA) {
       if (event.auth === AuthTypes.ACCESSTOKEN) {
         const targetUrl: string = this.createDataFeedForm.controls['url'].value;
         const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
@@ -198,10 +198,9 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         aws: {
           access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
           secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
-          bucket: this.createDataFeedForm.controls['bucketName'].value.trim(),
-          region: "us-west-2"
+          bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
         }
-      }
+      };
 
       this.datafeedRequests.testDestinationForMinio(data)
         .subscribe(
@@ -250,12 +249,12 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     //       this.createForm.get('secretKey').valid) {
     //       return true;
     //     }
-    // } 
+    // }
 
     this.creatingDataFeed = true;
     if (event.name === WebhookIntegrationTypes.SERVICENOW ||
       event.name === WebhookIntegrationTypes.SPLUNK ||
-      event.name === WebhookIntegrationTypes.ELK_KIBANA){
+      event.name === WebhookIntegrationTypes.ELK_KIBANA) {
       if (event.auth === AuthTypes.ACCESSTOKEN) {
         const destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
@@ -285,7 +284,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
         this.store.dispatch(new CreateDestination(destinationObj, headers, null));
       }
-    }else if (event.name === WebhookIntegrationTypes.CUSTOM) {
+    } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
 
     } else if (event.name === StorageIntegrationTypes.MINIO) {
         // if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
@@ -298,9 +297,9 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           url: this.createDataFeedForm.controls['endpoint'].value.trim(),
           integration_types: 'Storage',
           services: event.name,
-          meta_data:[
+          meta_data: [
             {
-              key:"bucket",
+              key: 'bucket',
               value: this.createDataFeedForm.controls['bucketName'].value.trim()
             }
           ]

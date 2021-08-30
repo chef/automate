@@ -86,7 +86,7 @@ export class DataFeedCreateComponent {
     bucketName: false,
     accessKey: false,
     secretKey: false
-  }
+  };
 
   set saveDone(done: boolean) {
     this.saveInProgress = done;
@@ -98,11 +98,11 @@ export class DataFeedCreateComponent {
   }
 
   set testErrorSetter(val: boolean) {
-    if (this.integTitle=='Minio'){
+    if (this.integTitle === 'Minio') {
       this.errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
-    } else if (this.authSelected=='Username and Password'){
+    } else if (this.authSelected === 'Username and Password') {
       this.errorString = 'Unable to connect: check URL, username and password.';
-    } else if (this.authSelected=='Access Token') {
+    } else if (this.authSelected === 'Access Token') {
       this.errorString = 'Unable to connect: check Token Type (Prefix) and token.';
     }
     this.dismissNotification();
@@ -155,7 +155,7 @@ export class DataFeedCreateComponent {
   }
 
   showFieldWebhook() {
-    Object.keys(this.showFields).forEach(v => this.showFields[v] = false)
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
     this.showFields = {...this.showFields, ...{
       name: true,
       url: true,
@@ -163,12 +163,12 @@ export class DataFeedCreateComponent {
       tokenType: true,
       token: true,
       username: true,
-      password: true,
-    }}
+      password: true
+    }};
   }
 
   showFieldStorage() {
-    Object.keys(this.showFields).forEach(v => this.showFields[v] = false)
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
     this.showFields = {...this.showFields, ...{
       name: true,
       endpoint: true,
@@ -176,7 +176,7 @@ export class DataFeedCreateComponent {
       bucketName: true,
       accessKey: true,
       secretKey: true
-    }}
+    }};
   }
 
   public selectIntegration(integration: string) {
@@ -216,14 +216,14 @@ export class DataFeedCreateComponent {
     //   this.authSelected = AuthTypes.ACCESSTOKEN;
     //   this.createForm.controls['tokenType'].setValue('Bearer');
 
-    // } 
+    // }
     // else if (integration === WebhookIntegrationTypes.CUSTOM) {
     //   this.showFieldWebhook();
     //   this.showFields.headers = true;
     //   this.authSelected = AuthTypes.ACCESSTOKEN;
     //   this.createForm.controls['tokenType'].setValue('Bearer');
 
-    // } 
+    // }
     // else if (integration === StorageIntegrationTypes.AMAZON_S3) {
     //   this.showFieldStorage();
     //   this.showFields.endpoint = false;
@@ -253,7 +253,7 @@ export class DataFeedCreateComponent {
   public validateForm() {
     if (this.integTitle === WebhookIntegrationTypes.SERVICENOW ||
       this.integTitle === WebhookIntegrationTypes.SPLUNK ||
-      this.integTitle === WebhookIntegrationTypes.ELK_KIBANA){
+      this.integTitle === WebhookIntegrationTypes.ELK_KIBANA) {
       if (this.authSelected === AuthTypes.ACCESSTOKEN) {
         if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
           this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
@@ -273,7 +273,7 @@ export class DataFeedCreateComponent {
           this.createForm.get('secretKey').valid) {
           return true;
         }
-    } 
+    }
     return false;
 
     // else if (this.integTitle === StorageIntegrationTypes.AMAZON_S3) {
