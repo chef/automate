@@ -130,6 +130,38 @@ describe('infra policy group details', () => {
     }
   }
 
+  function getPolicyGroupNodes(policyGroupName: string, page: number, per_page = 9) {
+    const wildCardSearch = '*';
+    const target = policyGroupName !== '' ?
+    'policy_group:' + wildCardSearch + policyGroupName : wildCardSearch + ':';
+    const nameTarget = target + wildCardSearch;
+    const currentPage = page - 1;
+    // Add asterisk to do wildcard search
+    const params =
+  `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${per_page}`;
+    return cy.request({
+      auth: { bearer: adminIdToken },
+      failOnStatusCode: false,
+      method: 'GET',
+      url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/nodes?${params}`
+    });
+  }
+
+  function checkNodesResponse(response: any) {
+    if (response.body.nodes.length === 0) {
+      cy.get('[data-cy=empty-list]').should('be.visible');
+    } else {
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Node');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Platform');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('FQDN');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('IP Address');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Uptime');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Last Check-In');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Environment');
+      return true;
+    }
+  }
+
   describe('infra policy groups list page', () => {
     it('displays org details', () => {
       cy.get('.page-title').contains(orgName);
@@ -174,6 +206,20 @@ describe('infra policy group details', () => {
             .contain('policyfiles/' + policyFileName + '/revision/' + policyFileRevision);
           });
         cy.get('[data-cy=policy-file-head]').contains(policyFileName);
+      }
+    });
+
+    it('can can switch to nodes tab', () => {
+      if (policyGroupName !== '') {
+        cy.get('[data-cy=nodes-tab]').contains('Nodes').click();
+      }
+    });
+
+    it('displays policy group nodes', () => {
+      if (policyGroupName !== '') {
+        getPolicyGroupNodes(policyGroupName, 1, 9).then((response) => {
+          checkNodesResponse(response);
+        });
       }
     });
   });

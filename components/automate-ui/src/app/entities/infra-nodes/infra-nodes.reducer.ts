@@ -22,7 +22,7 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodeEnvironment: string;
   node: InfraNode;
   nodeAttributes: string[];
-  getAllByNodesStatus: EntityStatus;
+  getAllNodesStatus: EntityStatus;
   policyGroupNodeList: {
     items: InfraNode[],
     total: number

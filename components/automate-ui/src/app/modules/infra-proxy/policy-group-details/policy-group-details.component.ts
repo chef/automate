@@ -11,7 +11,7 @@ import { policyGoupFromRoute } from 'app/entities/policy-files/policy-group-deta
 import { PolicyGroup, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroup } from 'app/entities/policy-files/policy-file.action';
 import { GetPolicyGroupNodes } from 'app/entities/infra-nodes/infra-nodes.actions';
-import { getAllByNodesStatus, policyGroupNodeList } from 'app/entities/infra-nodes/infra-nodes.selectors';
+import { getAllNodesStatus, policyGroupNodeList } from 'app/entities/infra-nodes/infra-nodes.selectors';
 import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
 import { EntityStatus } from 'app/entities/entities';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
@@ -35,7 +35,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public url: string;
   public currentPage = 1;
   public per_page = 9;
-  public nodes: {items:InfraNode[], total: number};
+  public nodes: {items: InfraNode[], total: number};
   public policyGroupNodesLoading = true;
   public authFailure = false;
   private isDestroyed = new Subject<boolean>();
@@ -85,7 +85,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
-      this.store.select(getAllByNodesStatus),
+      this.store.select(getAllNodesStatus),
       this.store.select(policyGroupNodeList)
     ]).
     pipe(
