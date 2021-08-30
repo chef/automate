@@ -5,13 +5,18 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil, take } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 import { Router } from '@angular/router';
 import { policyGoupFromRoute } from 'app/entities/policy-files/policy-group-details.selectors';
 import { PolicyGroup, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroup } from 'app/entities/policy-files/policy-file.action';
+import { GetPolicyGroupNodes } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { getAllByNodesStatus, policyGroupNodeList } from 'app/entities/infra-nodes/infra-nodes.selectors';
+import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
+import { EntityStatus } from 'app/entities/entities';
+import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
 
-export type PolicyGroupTabName = 'policyfiles';
+export type PolicyGroupTabName = 'policyfiles' | 'nodes';
 
 @Component({
   selector: 'app-policy-group-details',
@@ -23,13 +28,18 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public serverId: string;
   public orgId: string;
   public name: string;
-  public show = false;
   public policyCount: number;
   public policies: IncludedPolicyLocks[];
   public policyGroupDetailsLoading = true;
   public tabValue: PolicyGroupTabName = 'policyfiles';
   public url: string;
+  public currentPage = 1;
+  public per_page = 9;
+  public nodes: {items:InfraNode[], total: number};
+  public policyGroupNodesLoading = true;
+  public authFailure = false;
   private isDestroyed = new Subject<boolean>();
+  private timeFromNowPipe = new TimeFromNowPipe();
 
   constructor(
     private router: Router,
@@ -43,12 +53,9 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
-      switch (fragment) {
-        case 'policyfiles':
-          this.tabValue = 'policyfiles';
-          break;
-      }
+      this.tabValue = (fragment === 'policyfiles') ? 'policyfiles' : 'nodes';
     });
+
     // load policy Group details
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -64,17 +71,34 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetPolicyGroup({
         server_id: server_id, org_id: org_id, name: name
       }));
+      this.loadNodes();
     });
 
     this.store.select(policyGoupFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(policyGroup => {
-      this.show = true;
       this.policyGroup = policyGroup;
       this.policyCount = policyGroup.policies.length;
       this.policies =  policyGroup.policies;
       this.policyGroupDetailsLoading = false;
+    });
+
+    combineLatest([
+      this.store.select(getAllByNodesStatus),
+      this.store.select(policyGroupNodeList)
+    ]).
+    pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+      ).subscribe(([getAllSt, nodeList]) => {
+        if (getAllSt === EntityStatus.loadingSuccess && !isNil(nodeList)) {
+          this.nodes = nodeList;
+          this.policyGroupNodesLoading = false;
+        } else if (getAllSt === EntityStatus.loadingFailure) {
+          this.policyGroupNodesLoading = false;
+          this.authFailure = true;
+        }
     });
   }
 
@@ -86,5 +110,21 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   onSelectedTab(event: { target: { value: PolicyGroupTabName } }) {
     this.tabValue = event.target.value;
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  loadNodes() {
+    this.store.dispatch(new GetPolicyGroupNodes({
+      server_id: this.serverId,
+      org_id: this.orgId,
+      policyGroupName: this.name,
+      page: this.currentPage,
+      per_page: this.per_page
+    }));
+  }
+
+  timeFromNow(epochFormat: string) {
+    const epchoTime = Number(epochFormat);
+    const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
+    return fromNowValue === '-' ? '--' : fromNowValue;
   }
 }

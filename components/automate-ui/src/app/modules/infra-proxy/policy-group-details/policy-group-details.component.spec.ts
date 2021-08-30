@@ -16,6 +16,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PolicyGroupDetailsComponent } from './policy-group-details.component';
 import { PolicyGroup } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroupSuccess } from 'app/entities/policy-files/policy-file.action';
+import { GetPolicyGroupNodesSuccess } from 'app/entities/infra-nodes/infra-nodes.actions';
 
 describe('PolicyGroupDetailsComponent', () => {
   let component: PolicyGroupDetailsComponent;
@@ -88,6 +89,30 @@ describe('PolicyGroupDetailsComponent', () => {
     uri: 'https://a2-dev.test/organizations/test/policy_groups/test_policy_group'
   };
 
+  const nodes = {
+    nodes: [{
+      id: '',
+      server_id: '',
+      org_id: '',
+      name: '',
+      fqdn: '',
+      ip_address: '',
+      check_in: '',
+      uptime: '',
+      platform: '',
+      environment: '',
+      policy_group: '',
+      policy_name: '',
+      default_attributes: '',
+      override_attributes: '',
+      normal_attributes: '',
+      automatic_attributes: '',
+      run_list: [],
+      tags: []
+    }],
+    total: 2
+  };
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -95,5 +120,10 @@ describe('PolicyGroupDetailsComponent', () => {
   it('load policy group details', () => {
     store.dispatch(new GetPolicyGroupSuccess(policyGroup));
     expect(component.policyGroup).not.toBeNull();
+  });
+
+  it('load policy group nodes', () => {
+    store.dispatch(new GetPolicyGroupNodesSuccess(nodes));
+    expect(component.nodes).not.toBeNull();
   });
 });

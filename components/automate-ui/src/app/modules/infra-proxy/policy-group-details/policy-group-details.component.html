@@ -38,6 +38,7 @@
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='policyfiles' data-cy="policyfiles-tab">Policyfiles</chef-option>
+          <chef-option value='nodes' data-cy="nodes-tab" (click)="loadNodes()">Nodes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
       
@@ -69,6 +70,44 @@
                 </chef-tr>
               </chef-tbody>
             </chef-table>            
+          </div>
+        </div>
+      </section>
+
+      <section class="page-body" *ngIf="tabValue === 'nodes'">
+        <div class="nodes-tab" *ngIf="!policyGroupNodesLoading">
+          <div class="spinner">
+            <chef-loading-spinner *ngIf="policyGroupNodesLoading" size="50" fixed></chef-loading-spinner>
+          </div>
+          <div data-cy="empty-list" class="empty-section" *ngIf="nodes.total < 1">
+            <img alt="No preview" src="/assets/img/no_preview.gif" />
+            <p data-cy="no-nodes">No nodes available.</p>
+          </div>
+          <div id="nodes-table-container" data-cy="nodes-table-container">
+            <chef-table>
+              <chef-thead>
+                <chef-tr class="no_border_tr">
+                  <chef-th class="no_border_th">Node</chef-th>
+                  <chef-th class="no_border_th">Platform</chef-th>
+                  <chef-th class="no_border_th">FQDN</chef-th>
+                  <chef-th class="no_border_th">IP Address</chef-th>
+                  <chef-th class="no_border_th">Uptime</chef-th>
+                  <chef-th class="no_border_th">Last Check-In</chef-th>
+                  <chef-th class="no_border_th">Environment</chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let node of nodes.items">
+                  <chef-td>{{node.name === '' ? '--' : node.name}}</chef-td>
+                  <chef-td>{{node.platform === '' ? '--' : node.platform}}</chef-td>
+                  <chef-td>{{node.fqdn === '' ? '--' : node.fqdn}}</chef-td>
+                  <chef-td>{{node.ip_address === '' ? '--' : node.ip_address}}</chef-td>
+                  <chef-td>{{node.uptime}}</chef-td>
+                  <chef-td>{{timeFromNow(node.check_in)}}</chef-td>
+                  <chef-td>{{node.environment === '' ? '--' : node.environment}}</chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
           </div>
         </div>
       </section>
