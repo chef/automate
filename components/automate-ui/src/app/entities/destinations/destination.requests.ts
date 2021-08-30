@@ -50,14 +50,25 @@ export class DestinationRequests {
   }
 
   public createDestination(destinationData: CreateDestinationPayload,
-    headers: string):
+    headers: string, storage: {accessKey: string; secretKey: string;}):
     Observable<DestinationResponse> {
-    return this.createSecret(destinationData, headers)
-      .pipe(mergeMap((secretId: string) => {
-        destinationData.secret = secretId;
-        return this.http.post<DestinationResponse>(
-          this.joinToDataFeedUrl(['destination']), destinationData);
-      }));
+    if (headers != null) {
+      return this.createSecretHeaders(destinationData, headers)
+        .pipe(mergeMap((secretId: string) => {
+          destinationData.secret = secretId;
+          return this.http.post<DestinationResponse>(
+            this.joinToDataFeedUrl(['destination']), destinationData);
+        }));
+    }
+    if (storage != null) {
+      return this.createSecretStorage(destinationData, storage)
+          .pipe(mergeMap((secretId: string) => {
+            destinationData.secret = secretId;
+            return this.http.post<DestinationResponse>(
+              this.joinToDataFeedUrl(['destination']), destinationData);
+          }));
+    }
+    return observableOf(<DestinationResponse>{});
   }
 
   public updateDestination(destination: Destination): Observable<DestinationResponse> {
@@ -70,9 +81,20 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destination', id.toString()])));
   }
 
-  private createSecret(destination: CreateDestinationPayload, headers: string): Observable<string> {
+  private createSecretHeaders(destination: CreateDestinationPayload, headers: string): Observable<string> {
     if ( headers.length > 0 ) {
       const secret = this.newSecret('', destination.name, headers);
+
+      return this.http.post<SecretId>(`${SECRETS_URL}`, secret)
+        .pipe(map(secretId => secretId.id));
+    } else {
+      return observableOf('');
+    }
+  }
+
+  private createSecretStorage(destination: CreateDestinationPayload, storage: {accessKey: string; secretKey: string;}): Observable<string> {
+    if ( storage.accessKey && storage.secretKey ) {
+      const secret = this.newStorageSecret('', destination.name, storage);
 
       return this.http.post<SecretId>(`${SECRETS_URL}`, secret)
         .pipe(map(secretId => secretId.id));
@@ -92,9 +114,24 @@ export class DestinationRequests {
     };
   }
 
+  private newStorageSecret(id: string, name: string, storage: {accessKey: string; secretKey: string;}): Secret {
+    return {
+      id: id,
+      name: name,
+      type: 'data_feed',
+      data: Array<KVData>(
+        {key: 'access_key', value: storage.accessKey},
+        {key: 'secret_access_key', value: storage.secretKey})
+    };
+  }
+
   public testDestination(destination: Destination): Observable<Object> {
     if (destination.secret) {
-      return this.testDestinationWithSecretId(destination.url, destination.secret);
+      if (destination.services == 'Minio'){
+        return this.testDestinationWithSecretIdMinio(destination.url, destination.secret, destination.services, destination.integration_types, destination.enable, destination.meta_data);
+      } else {
+        return this.testDestinationWithSecretId(destination.url, destination.secret);
+      }
     }
   }
 
@@ -112,9 +149,20 @@ export class DestinationRequests {
       { url, 'header': {value} });
   }
 
+  public testDestinationForMinio(data: any): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])),
+      { ...data });
+  }
+
   public testDestinationWithSecretId(url: string, secretId: string): Observable<Object> {
     return this.http.post(encodeURI(
       this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id': { 'id': secretId } });
+  }
+
+  public testDestinationWithSecretIdMinio(url: string, secretId: string, services: string, integration_types: string, enable: boolean, meta_data: any): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id_with_addon': { 'id': secretId, services, integration_types, enable, meta_data  } });
   }
 
   public testDestinationWithNoCreds(url: string): Observable<Object> {

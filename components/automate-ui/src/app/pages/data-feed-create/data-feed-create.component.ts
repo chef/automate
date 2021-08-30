@@ -10,19 +10,19 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
 
-enum WebhookIntegrationTypes {
+export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
   SPLUNK = 'Splunk',
   ELK_KIBANA = 'ELK/Kibana',
   CUSTOM = 'Custom'
 }
 
-enum StorageIntegrationTypes {
+export enum StorageIntegrationTypes {
   MINIO = 'Minio',
   AMAZON_S3 = 'Amazon S3'
 }
 
-enum AuthTypes {
+export enum AuthTypes {
   ACCESSTOKEN = 'Access Token',
   USERNAMEANDPASSWORD = 'Username and Password'
 }
@@ -51,6 +51,7 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
+  public errorString: string;
 
   private saveInProgress = false;
   private testInProgress = false;
@@ -71,6 +72,22 @@ export class DataFeedCreateComponent {
     ]
   };
 
+  public showFields = {
+    name: false,
+    endpoint: false,
+    region: false,
+    url: false,
+    authSelector: false,
+    tokenType: false,
+    token: false,
+    username: false,
+    password: false,
+    headers: false,
+    bucketName: false,
+    accessKey: false,
+    secretKey: false
+  }
+
   set saveDone(done: boolean) {
     this.saveInProgress = done;
   }
@@ -81,6 +98,13 @@ export class DataFeedCreateComponent {
   }
 
   set testErrorSetter(val: boolean) {
+    if (this.integTitle=='Minio'){
+      this.errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
+    } else if (this.authSelected=='Username and Password'){
+      this.errorString = 'Unable to connect: check URL, username and password.';
+    } else if (this.authSelected=='Access Token') {
+      this.errorString = 'Unable to connect: check Token Type (Prefix) and token.';
+    }
     this.dismissNotification();
     this.testError = val;
   }
@@ -130,29 +154,81 @@ export class DataFeedCreateComponent {
     this.integrationSelected = false;
   }
 
+  showFieldWebhook() {
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false)
+    this.showFields = {...this.showFields, ...{
+      name: true,
+      url: true,
+      authSelector: true,
+      tokenType: true,
+      token: true,
+      username: true,
+      password: true,
+    }}
+  }
+
+  showFieldStorage() {
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false)
+    this.showFields = {...this.showFields, ...{
+      name: true,
+      endpoint: true,
+      region: true,
+      bucketName: true,
+      accessKey: true,
+      secretKey: true
+    }}
+  }
+
   public selectIntegration(integration: string) {
     this.showSelect = false;
+    this.showFields.headers = false;
+    this.integTitle = integration;
+    this.createForm.reset();
+
     if (integration === WebhookIntegrationTypes.SERVICENOW) {
-      this.createForm.reset();
+      this.showFieldWebhook();
       this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
       this.createForm.controls['tokenType'].setValue('Bearer');
       this.integrationSelected = true;
-      this.integTitle = integration;
-      setTimeout(() => {
-        this.showSelect = true;
-        this.name.nativeElement.focus();
-      });
+
     } else if (integration === WebhookIntegrationTypes.SPLUNK) {
+      this.showFieldWebhook();
       this.createForm.reset();
       this.authSelected = AuthTypes.ACCESSTOKEN;
       this.createForm.controls['tokenType'].setValue('Splunk');
       this.integrationSelected = true;
-      this.integTitle = integration;
-      setTimeout(() => {
-        this.showSelect = true;
-        this.name.nativeElement.focus();
-      });
+
+    } else if (integration === StorageIntegrationTypes.MINIO) {
+      this.showFieldStorage();
+      this.showFields.region = false;
+      this.createForm.reset();
+      this.integrationSelected = true;
+
     }
+
+    setTimeout(() => {
+      this.showSelect = true;
+      this.name.nativeElement.focus();
+    });
+
+    // else if (integration === WebhookIntegrationTypes.ELK_KIBANA) {
+    //   this.showFieldWebhook();
+    //   this.authSelected = AuthTypes.ACCESSTOKEN;
+    //   this.createForm.controls['tokenType'].setValue('Bearer');
+
+    // } 
+    // else if (integration === WebhookIntegrationTypes.CUSTOM) {
+    //   this.showFieldWebhook();
+    //   this.showFields.headers = true;
+    //   this.authSelected = AuthTypes.ACCESSTOKEN;
+    //   this.createForm.controls['tokenType'].setValue('Bearer');
+
+    // } 
+    // else if (integration === StorageIntegrationTypes.AMAZON_S3) {
+    //   this.showFieldStorage();
+    //   this.showFields.endpoint = false;
+    //   this.createForm.reset();
+    // }
   }
   public returnToMenu() {
     this.integrationSelected = false;
@@ -175,22 +251,38 @@ export class DataFeedCreateComponent {
   }
 
   public validateForm() {
-    if (this.authSelected === AuthTypes.ACCESSTOKEN) {
-      if (this.createForm.get('name').valid &&
-        this.createForm.get('url').valid &&
-        this.createForm.get('tokenType').valid &&
-        this.createForm.get('token').valid) {
-        return true;
+    if (this.integTitle === WebhookIntegrationTypes.SERVICENOW ||
+      this.integTitle === WebhookIntegrationTypes.SPLUNK ||
+      this.integTitle === WebhookIntegrationTypes.ELK_KIBANA){
+      if (this.authSelected === AuthTypes.ACCESSTOKEN) {
+        if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+          this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+          return true;
+        }
+      } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
+        if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+          this.createForm.get('username').valid && this.createForm.get('password').valid) {
+          return true;
+        }
       }
-    } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
-      if (this.createForm.get('name').valid &&
-        this.createForm.get('url').valid &&
-        this.createForm.get('username').valid &&
-        this.createForm.get('password').valid) {
-        return true;
-      }
-    }
+    } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM) {
+
+    } else if (this.integTitle === StorageIntegrationTypes.MINIO) {
+        if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
+          this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
+          this.createForm.get('secretKey').valid) {
+          return true;
+        }
+    } 
     return false;
+
+    // else if (this.integTitle === StorageIntegrationTypes.AMAZON_S3) {
+    //     if (this.createForm.get('name').valid && this.createForm.get('region').valid &&
+    //       this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
+    //       this.createForm.get('secretKey').valid) {
+    //       return true;
+    //     }
+    // }
   }
 
   public saveDestination() {
