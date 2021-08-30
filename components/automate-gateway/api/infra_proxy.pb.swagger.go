@@ -3846,7 +3846,7 @@ func init() {
           "type": "string",
           "title": "Chef Server Status"
         },
-        "upstream": {
+        "upstreams": {
           "type": "object",
           "additionalProperties": {
             "type": "string"

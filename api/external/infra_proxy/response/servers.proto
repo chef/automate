@@ -45,7 +45,7 @@ message GetServerStatus {
     // Chef Server Status
     string status = 1;
     // Chef Server Upstream
-    map<string, string> upstream = 2;
+    map<string, string> upstreams = 2;
     // Chef Server Keygem
     map<string, int32> keygen = 3;
 }
