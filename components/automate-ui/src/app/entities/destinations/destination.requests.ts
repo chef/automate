@@ -50,7 +50,7 @@ export class DestinationRequests {
   }
 
   public createDestination(destinationData: CreateDestinationPayload,
-    headers: string, storage: {accessKey: string; secretKey: string;}):
+    headers: string, storage: { accessKey: string; secretKey: string }):
     Observable<DestinationResponse> {
     if (headers != null) {
       return this.createSecretHeaders(destinationData, headers)
@@ -81,7 +81,10 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destination', id.toString()])));
   }
 
-  private createSecretHeaders(destination: CreateDestinationPayload, headers: string): Observable<string> {
+  private createSecretHeaders(
+    destination: CreateDestinationPayload,
+    headers: string
+  ): Observable<string> {
     if ( headers.length > 0 ) {
       const secret = this.newSecret('', destination.name, headers);
 
@@ -92,7 +95,10 @@ export class DestinationRequests {
     }
   }
 
-  private createSecretStorage(destination: CreateDestinationPayload, storage: {accessKey: string; secretKey: string;}): Observable<string> {
+  private createSecretStorage(
+    destination: CreateDestinationPayload,
+    storage: { accessKey: string; secretKey: string }
+  ): Observable<string> {
     if ( storage.accessKey && storage.secretKey ) {
       const secret = this.newStorageSecret('', destination.name, storage);
 
@@ -114,7 +120,10 @@ export class DestinationRequests {
     };
   }
 
-  private newStorageSecret(id: string, name: string, storage: {accessKey: string; secretKey: string;}): Secret {
+  private newStorageSecret(
+    id: string, name: string,
+    storage: { accessKey: string; secretKey: string }
+  ): Secret {
     return {
       id: id,
       name: name,
@@ -127,8 +136,15 @@ export class DestinationRequests {
 
   public testDestination(destination: Destination): Observable<Object> {
     if (destination.secret) {
-      if (destination.services == 'Minio'){
-        return this.testDestinationWithSecretIdMinio(destination.url, destination.secret, destination.services, destination.integration_types, destination.enable, destination.meta_data);
+      if (destination.services === 'Minio') {
+        return this.testDestinationWithSecretIdMinio(
+          destination.url,
+          destination.secret,
+          destination.services,
+          destination.integration_types,
+          destination.enable,
+          destination.meta_data
+        );
       } else {
         return this.testDestinationWithSecretId(destination.url, destination.secret);
       }
@@ -160,9 +176,26 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id': { 'id': secretId } });
   }
 
-  public testDestinationWithSecretIdMinio(url: string, secretId: string, services: string, integration_types: string, enable: boolean, meta_data: any): Observable<Object> {
+  public testDestinationWithSecretIdMinio(
+    url: string,
+    secretId: string,
+    services: string,
+    integration_types: string,
+    enable: boolean,
+    meta_data: any
+  ): Observable<Object> {
     return this.http.post(encodeURI(
-      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id_with_addon': { 'id': secretId, services, integration_types, enable, meta_data  } });
+      this.joinToDataFeedUrl(['destinations', 'test'])), {
+        url,
+        'secret_id_with_addon': {
+          'id': secretId,
+          services,
+          integration_types,
+          enable,
+          meta_data
+        }
+      }
+    );
   }
 
   public testDestinationWithNoCreds(url: string): Observable<Object> {
