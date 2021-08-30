@@ -31,6 +31,7 @@ service InfraProxyService {
     rpc UpdateServer    (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
     rpc GetServers      (chef.automate.domain.infra_proxy.request.GetServers) returns (chef.automate.domain.infra_proxy.response.GetServers) {};
     rpc GetServer       (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
+    rpc GetServerStatus       (chef.automate.domain.infra_proxy.request.GetServerStatus) returns (chef.automate.domain.infra_proxy.response.GetServerStatus) {};
 
     rpc CreateOrg    (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
     rpc DeleteOrg    (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};

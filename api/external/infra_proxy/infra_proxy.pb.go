@@ -1393,7 +1393,6 @@ type InfraProxyClient interface {
 	GetPolicyfileRevisions(ctx context.Context, in *request.PolicyfileRevisions, opts ...grpc.CallOption) (*response.PolicyfileRevisions, error)
 	GetPolicygroup(ctx context.Context, in *request.Policygroup, opts ...grpc.CallOption) (*response.Policygroup, error)
 	GetOrgUsersList(ctx context.Context, in *request.OrgUsers, opts ...grpc.CallOption) (*response.OrgUsers, error)
-	GetServerUsersList(ctx context.Context, in *request.ServerUsers, opts ...grpc.CallOption) (*response.ServerUsers, error)
 }
 
 type infraProxyClient struct {
@@ -1899,15 +1898,6 @@ func (c *infraProxyClient) GetOrgUsersList(ctx context.Context, in *request.OrgU
 	return out, nil
 }
 
-func (c *infraProxyClient) GetServerUsersList(ctx context.Context, in *request.ServerUsers, opts ...grpc.CallOption) (*response.ServerUsers, error) {
-	out := new(response.ServerUsers)
-	err := c.cc.Invoke(ctx, "/chef.automate.api.infra_proxy.InfraProxy/GetServerUsersList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // InfraProxyServer is the server API for InfraProxy service.
 type InfraProxyServer interface {
 	GetServers(context.Context, *request.GetServers) (*response.GetServers, error)
@@ -1965,7 +1955,6 @@ type InfraProxyServer interface {
 	GetPolicyfileRevisions(context.Context, *request.PolicyfileRevisions) (*response.PolicyfileRevisions, error)
 	GetPolicygroup(context.Context, *request.Policygroup) (*response.Policygroup, error)
 	GetOrgUsersList(context.Context, *request.OrgUsers) (*response.OrgUsers, error)
-	GetServerUsersList(context.Context, *request.ServerUsers) (*response.ServerUsers, error)
 }
 
 // UnimplementedInfraProxyServer can be embedded to have forward compatible implementations.
@@ -2136,9 +2125,6 @@ func (*UnimplementedInfraProxyServer) GetPolicygroup(context.Context, *request.P
 }
 func (*UnimplementedInfraProxyServer) GetOrgUsersList(context.Context, *request.OrgUsers) (*response.OrgUsers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgUsersList not implemented")
-}
-func (*UnimplementedInfraProxyServer) GetServerUsersList(context.Context, *request.ServerUsers) (*response.ServerUsers, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServerUsersList not implemented")
 }
 
 func RegisterInfraProxyServer(s *grpc.Server, srv InfraProxyServer) {
@@ -3135,24 +3121,6 @@ func _InfraProxy_GetOrgUsersList_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _InfraProxy_GetServerUsersList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(request.ServerUsers)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(InfraProxyServer).GetServerUsersList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/chef.automate.api.infra_proxy.InfraProxy/GetServerUsersList",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InfraProxyServer).GetServerUsersList(ctx, req.(*request.ServerUsers))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.api.infra_proxy.InfraProxy",
 	HandlerType: (*InfraProxyServer)(nil),
@@ -3376,10 +3344,6 @@ var _InfraProxy_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrgUsersList",
 			Handler:    _InfraProxy_GetOrgUsersList_Handler,
-		},
-		{
-			MethodName: "GetServerUsersList",
-			Handler:    _InfraProxy_GetServerUsersList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

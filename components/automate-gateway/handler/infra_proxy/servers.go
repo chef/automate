@@ -85,6 +85,18 @@ func (a *InfraProxyServer) DeleteServer(ctx context.Context, r *gwreq.DeleteServ
 	}, nil
 }
 
+// GetServerStatus get status of server
+func (a *InfraProxyServer) GetServerStatus(ctx context.Context, _ *gwreq.GetServerStatus) (*gwres.GetServerStatus, error) {
+	req := &infra_req.GetServerStatus{}
+	res, err := a.client.GetServerStatus(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.GetServerStatus{
+		Status: res.Status,
+	}, nil
+}
+
 func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 	return &gwres.Server{
 		Id:        t.GetId(),

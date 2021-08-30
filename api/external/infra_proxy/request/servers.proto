@@ -36,3 +36,5 @@ message GetServer {
     // Chef Infra Server ID.
     string id = 1;
 }
+
+message GetServerStatus {}

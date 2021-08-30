@@ -40,3 +40,12 @@ message Server {
     // Chef organizations count associated with Chef Infra Server.
     int32 orgs_count = 6;
 }
+
+message GetServerStatus {
+    // Chef Server Status
+    string status = 1;
+    // Chef Server Upstream
+    map<string, string> upstream = 2;
+    // Chef Server Keygem
+    map<string, int32> keygen = 3;
+}

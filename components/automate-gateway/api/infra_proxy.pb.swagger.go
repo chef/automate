@@ -14,6 +14,28 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/_status": {
+      "get": {
+        "operationId": "InfraProxy_GetServerStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers": {
       "get": {
         "operationId": "InfraProxy_GetServers",
@@ -3805,6 +3827,30 @@ func init() {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
           "description": "Chef Infra Server."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.GetServerStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "title": "Chef Server Status"
+        },
+        "upstream": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Chef Server Upstream"
+        },
+        "keygen": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "Chef Server Keygem"
         }
       }
     },

@@ -145,6 +145,19 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 	}, nil
 }
 
+// GetServerStatus get the status of server
+func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStatus) (*response.GetServerStatus, error) {
+
+	status, err := s.GetServerStatus(ctx, req)
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
+	}
+
+	return &response.GetServerStatus{
+		Status: status.Status,
+	}, nil
+}
+
 // Create a response.Server from a storage.Server
 func fromStorageServer(s storage.Server) *response.Server {
 	return &response.Server{
