@@ -38,7 +38,6 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public nodes: {items: InfraNode[], total: number};
   public policyGroupNodesLoading = true;
   public isNodesAvailable = false;
-  public authFailure = false;
   private isDestroyed = new Subject<boolean>();
   private timeFromNowPipe = new TimeFromNowPipe();
 
