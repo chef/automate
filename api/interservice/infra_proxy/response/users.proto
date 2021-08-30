@@ -13,3 +13,8 @@ message UsersListItem {
     // User username
     string username =1;
 }
+
+message ServerUsers {
+    // Users list
+    repeated UsersListItem users=1;
+}

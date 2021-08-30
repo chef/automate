@@ -2,6 +2,7 @@ package infra_proxy
 
 import (
 	"context"
+	"fmt"
 
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 
@@ -22,6 +23,24 @@ func (c *InfraProxyServer) GetOrgUsersList(ctx context.Context, r *gwreq.OrgUser
 	}
 
 	return &gwres.OrgUsers{
+		Users: fromUpstreamOrgUsers(res.Users),
+	}, nil
+}
+
+func (c *InfraProxyServer) GetServerUsersList(ctx context.Context, r *gwreq.ServerUsers) (*gwres.ServerUsers, error) {
+	req := &infra_req.ServerUsers{
+		ServerId:  r.ServerId,
+		AdminName: r.GetAdminName(),
+		AdminKey:  r.GetAdminKey(),
+	}
+	fmt.Println("#############req.Adminnamebody##################", req.AdminName)
+	fmt.Println("#############req.AdminKey###################", req.AdminKey)
+	res, err := c.client.GetServerUsersList(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ServerUsers{
 		Users: fromUpstreamOrgUsers(res.Users),
 	}, nil
 }

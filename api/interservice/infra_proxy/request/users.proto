@@ -9,3 +9,12 @@ message OrgUsers {
     // Chef Infra Server ID.
     string server_id = 2;
 }
+
+message ServerUsers {
+    // Chef Infra Server ID.
+    string server_id = 1;
+    // Chef Infra server admin name.
+    string admin_name =2;
+    // Chef Infra server admin key.
+    string admin_key =3;
+}

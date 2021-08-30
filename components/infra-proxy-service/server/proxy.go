@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -118,7 +119,8 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
-
+	fmt.Println("####################name############", org.AdminUser)
+	fmt.Println("####################key#############", GetOrgAdminKeyFrom(secret))
 	client, err := NewChefClient(&ChefConfig{
 		Name:    org.AdminUser,
 		Key:     GetOrgAdminKeyFrom(secret),
@@ -135,7 +137,7 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 	if path == "" {
 		path = IPAddress
 	}
-	path = path + "/organizations/" + orgName + "/"
+	path = path + "/"
 
 	baseURL, err := url.Parse(path)
 	if err != nil {
@@ -197,4 +199,55 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 	err = json.Unmarshal(json.RawMessage(jsonStr), &v)
 
 	return v, err
+}
+
+func (s *Server) createChefClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	server, err := s.service.Storage.GetServer(ctx, serverID)
+	if err != nil {
+		return nil, service.ParseStorageError(err, serverID, "server")
+	}
+
+	// org, err := s.service.Storage.GetOrg(ctx, orgID, serverID)
+	// if err != nil {
+	// 	return nil, service.ParseStorageError(err, orgID, "org")
+	// }
+
+	// secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.ID})
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	baseURL, err := targetServerURL(server.Fqdn, server.IPAddress)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+	}
+
+	client, err := NewChefClient(&ChefConfig{
+		Name:    adminName,
+		Key:     adminkey,
+		SkipSSL: true,
+		BaseURL: baseURL,
+	})
+
+	return client, err
+}
+
+// targetURL is constructing the base URL based on fqdn|ipAddress value
+func targetServerURL(fqdn string, IPAddress string) (string, error) {
+	path := fqdn
+	if path == "" {
+		path = IPAddress
+	}
+	path = path + "/"
+
+	baseURL, err := url.Parse(path)
+	if err != nil {
+		return "", errors.Wrap(err, err.Error())
+	}
+	baseURL.Scheme = "https"
+
+	return baseURL.String(), nil
 }

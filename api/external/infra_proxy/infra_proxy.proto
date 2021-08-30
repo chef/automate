@@ -337,4 +337,11 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
+
+  rpc GetServerUsersList (infra_proxy.request.ServerUsers) returns (infra_proxy.response.ServerUsers) {
+    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/users";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:users";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
 }
