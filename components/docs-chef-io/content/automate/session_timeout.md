@@ -13,14 +13,14 @@ gh_repo = "automate"
     weight = 70
 +++
 
-Set your Chef Automate session timeout to enable the idle timeout of your session. Session timeout is set by checking your activites like, mouse movement, click, keyboard key press, scrolling touchpad, etc. If there is no such activity upto the specified time (using session timeout), you get logged out from the Chef Automate Inferface.
+Chef Automate has an optional session timeout configuration for signing out idle workstations. Chef Automate measure session activity as any interaction from a workstation, from a mouse, keyboard, or touchpad. With session timeout enabled, Chef Automate signs out idle workstations after a set number of minutes.
 
-To add the session timeout to Chef Automate:
+To enable session_timeout in Chef Automate:
 
 - Set the value of `enable_idle_timeout` property to **true** in *config.toml* file.
 - Set the value of `idle_time_minutes` property to your desired time in minutes(for example **30**). (Setting the value of this property to **30** will set the session timeout time to 30 minutes).
 
-Your configuration in the *.toml* file looks like:
+This example sets the session timeout to 30 minutes, which means that Chef Automate signs out any connected workstation after 30 minutes of inactivity:
 
 ```toml
 [global.v1]
@@ -28,5 +28,3 @@ Your configuration in the *.toml* file looks like:
     enable_idle_timeout = true
     idle_timeout_minutes = 30
 ```
-
-In the above snippet the session timeout has been set to 30 minutes. So, if you are inactive on the Chef Automate interface for 30 minutes, you will be logged out automatically.
