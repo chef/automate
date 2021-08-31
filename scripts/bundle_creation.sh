@@ -76,7 +76,7 @@ is_linux() {
 clean_up() {
   rm -f "${TEMP_BUNDLE_FILE}"
   rm -f "${TEMP_TAR_FILE}"
-  exit ${1:-0}
+  exit "${1:-0}"
 }
 trap clean_up SIGHUP SIGINT SIGTERM ERR
 airgap_bundle_create() {
@@ -160,15 +160,15 @@ exec_linux() {
 
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
-    echo "pgleaderchk_pkg_ident =`grep "automate-backend-pgleaderchk" ${MANIFEST_PATH}`" | sed 's/,*$//g' > ${MANIFEST_TFVARS}
-    echo "postgresql_pkg_ident =`grep "automate-backend-postgresql" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "proxy_pkg_ident = `grep "automate-backend-haproxy" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "journalbeat_pkg_ident = `grep "automate-backend-journalbeat" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "metricbeat_pkg_ident = `grep "automate-backend-metricbeat" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "kibana_pkg_ident = `grep "automate-backend-kibana" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "elasticsearch_pkg_ident = `grep "automate-backend-elasticsearch" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "elasticsidecar_pkg_ident = `grep "automate-backend-elasticsidecar" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
-    echo "curator_pkg_ident = `grep "automate-backend-curator" ${MANIFEST_PATH}`" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "pgleaderchk_pkg_ident =$(grep "automate-backend-pgleaderchk" ${MANIFEST_PATH})" | sed 's/,*$//g' > ${MANIFEST_TFVARS}
+    echo "postgresql_pkg_ident =$(grep "automate-backend-postgresql" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "proxy_pkg_ident = $(grep "automate-backend-haproxy" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "journalbeat_pkg_ident = $(grep "automate-backend-journalbeat" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "metricbeat_pkg_ident = $(grep "automate-backend-metricbeat" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "kibana_pkg_ident = $(grep "automate-backend-kibana" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "elasticsearch_pkg_ident = $(grep "automate-backend-elasticsearch" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "elasticsidecar_pkg_ident = $(grep "automate-backend-elasticsidecar" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
+    echo "curator_pkg_ident = $(grep "automate-backend-curator" ${MANIFEST_PATH})" | sed 's/,*$//g' >> ${MANIFEST_TFVARS}
 }
 
 hardcode_manifest_auto_tfvars(){

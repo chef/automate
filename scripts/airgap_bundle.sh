@@ -92,7 +92,7 @@ is_linux() {
 clean_up() {
   rm -f "${TEMP_BUNDLE_FILE}"
   rm -f "${TEMP_TAR_FILE}"
-  exit ${1:-0}
+  exit "${1:-0}"
 }
 
 trap clean_up SIGHUP SIGINT SIGTERM ERR
@@ -227,7 +227,7 @@ if [[ ! -z ${CHANNEL} && ! -z ${MANIFEST_PATH} ]]; then
   echo "ERROR: options -m and -c are mutually exclusive!"
   usage
 fi
-if [[ ! -z ${MANIFEST_PATH} && ! -f "${MANIFEST_PATH}" ]]; then
+if [[ -n ${MANIFEST_PATH} && ! -f "${MANIFEST_PATH}" ]]; then
   echo "ERROR: Manifest does not exist: ${MANIFEST_PATH}"
   exit 1
 fi
