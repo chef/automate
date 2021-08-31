@@ -100,7 +100,7 @@ describe('infra policy group details', () => {
       cy.get('[data-cy=empty-list]').should('be.visible');
     } else {
       policies = response.body.policies;
-      policyGroupName = response.body.policies[0].policy_group;
+      policyGroupName = policies[0].policy_group;
       cy.get('[data-cy=policy-group-table-container] chef-th').contains('Policy Group');
       cy.get('[data-cy=policy-group-table-container] chef-th').contains('Number of Policyfiles');
       return true;
@@ -121,11 +121,44 @@ describe('infra policy group details', () => {
     if (response.body.name === '') {
       cy.get('[data-cy=empty-list]').should('be.visible');
     } else {
-      cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Policy Files');
+      cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Policyfiles');
       cy.get('[data-cy=policy-group-details-table-container] chef-th').contains('Revision ID');
+      policies = response.body.policies;
       policyFilesCount = response.body.policies.length;
       policyFileName =  response.body.policies[0].name;
       policyFileRevision =  response.body.policies[0].revision_id;
+      return true;
+    }
+  }
+
+  function getPolicyGroupNodes(policyGroup: string, page: number, per_page = 9) {
+    const wildCardSearch = '*';
+    const target = policyGroup !== '' ?
+    'policy_group:' + wildCardSearch + policyGroup : wildCardSearch + ':';
+    const nameTarget = target + wildCardSearch;
+    const currentPage = page - 1;
+    // Add asterisk to do wildcard search
+    const params =
+  `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${per_page}`;
+    return cy.request({
+      auth: { bearer: adminIdToken },
+      failOnStatusCode: false,
+      method: 'GET',
+      url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/nodes?${params}`
+    });
+  }
+
+  function checkNodesResponse(response: any) {
+    if (response.body.nodes.length === 0) {
+      cy.get('[data-cy=empty-list]').should('be.visible');
+    } else {
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Node');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Platform');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('FQDN');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('IP Address');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Uptime');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Last Check-In');
+      cy.get('[data-cy=nodes-table-container] chef-th').contains('Environment');
       return true;
     }
   }
@@ -174,6 +207,21 @@ describe('infra policy group details', () => {
             .contain('policyfiles/' + policyFileName + '/revision/' + policyFileRevision);
           });
         cy.get('[data-cy=policy-file-head]').contains(policyFileName);
+      }
+    });
+
+    it('can switch to nodes tab', () => {
+      cy.go('back');
+      if (policyGroupName !== '') {
+        cy.get('[data-cy=nodes-tab]').contains('Nodes').click();
+      }
+    });
+
+    it('displays policy group nodes', () => {
+      if (policyGroupName !== '') {
+        getPolicyGroupNodes(policyGroupName, 1, 9).then((response) => {
+          checkNodesResponse(response);
+        });
       }
     });
   });
