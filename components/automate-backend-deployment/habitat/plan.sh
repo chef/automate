@@ -66,7 +66,7 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/
   
   build_line "Copying terraform"
-  rsync -a --exclude=test-environments --exclude=test-license-usage --exclude=.editorconfig --exclude=\*.hart --exclude=\*.aib --exclude=.terraform --exclude=.git --exclude=backups --exclude=vendor --exclude=terraform.tfstate --exclude=terraform.tfstate.backup --exclude=*.swp $PLAN_CONTEXT/../../../terraform/a2ha-terraform $pkg_prefix/workspace/terraform
+  rsync -a --exclude=test-environments --exclude=test-license-usage --exclude=.editorconfig --exclude=\*.hart --exclude=\*.aib --exclude=.terraform --exclude=.git --exclude=backups --exclude=vendor --exclude=terraform.tfstate --exclude=terraform.tfstate.backup --exclude=*.swp $PLAN_CONTEXT/../../../terraform/a2ha-terraform/ $pkg_prefix/workspace/terraform
 
   # make sure no pre-built aibs get bundled into the package
   rm -f $pkg_prefix/workspace/terraform/transfer_files/*.aib
