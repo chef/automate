@@ -62,9 +62,9 @@ func fromUpstreamServerUsers(users []*infra_res.ServerUserListItem) []*gwres.Ser
 	for i, user := range users {
 		us[i] = &gwres.ServerUserListItem{
 			Username:  user.GetUsername(),
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
+			FirstName: user.GetFirstName(),
+			LastName:  user.GetLastName(),
+			Email:     user.GetEmail(),
 		}
 	}
 
