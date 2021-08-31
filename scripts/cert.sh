@@ -32,10 +32,6 @@ CERT
   description = "Issuer of the TLS cert used for the HTTP gateway in PEM format."
 }
 
-EOF
- 
-# certificate used for hab_sup_http_gateway_pub_cert
-cat <<EOF >> ../terraform/a2ha-terraform/variables_common.tf
 variable "hab_sup_http_gateway_ca_cert" {
   default = <<CERT
 $(cat admin.pem)
@@ -44,10 +40,6 @@ CERT
 
   description = "Issuer of the TLS cert used for the HTTP gateway in PEM format."
 }
-EOF
- 
-# Certificate used for hab_sup_http_gateway_priv_key
-cat <<EOF >> ../terraform/a2ha-terraform/variables_common.tf
 
 variable "hab_sup_http_gateway_ca_cert" {
   default = <<CERT
@@ -59,5 +51,5 @@ CERT
 }
 
 EOF
-
+ 
 rm MyRootCA.key MyRootCA.pem MyRootCA.srl admin-pkcs12.key admin.csr admin.key admin.pem
