@@ -1,0 +1,11 @@
+name: automate-frontend-chef-server-smoke
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: success@chef.io
+license: All Rights Reserved
+summary: An InSpec Compliance Profile for testing Chef Automate Chef Server frontends
+version: 0.1.0
+depends:
+  - name: automate-backend-resources
+    path: ../automate-backend-resources
