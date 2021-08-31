@@ -1,0 +1,91 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+hab pkg binlink chef/inspec -f
+hab pkg binlink core/terraform -f
+hab pkg binlink core/jq-static -f
+hab pkg binlink chef/automate-cluster-ctl -f
+
+NEW_WORKSPACE="{{pkg.path}}/workspace"
+
+display_upgrade_help() {
+  cat <<-EOHELP
+
+Deploying changes to the Automate cluster is now managed through the "automate-cluster-ctl" command.
+You will need to update your existing config to make use of this new command.
+
+To update your configs use the following steps:
+------------------------------------------------
+cd /hab/a2_deploy_workspace
+automate-cluster-ctl config init -a ${1:-existing_nodes}
+vim a2ha.rb # copy any settings previously configured in terraform/terraform.tfvars into the new config
+
+automate-cluster-ctl secrets init
+# follow the printed instructions for creating the secrests key file.
+# this file is used to access the saved secrets and should not be shared.
+
+# To setup the automate admin password
+automate-cluster-ctl secrets set automate_admin_password
+# You will be prompted to enter the password
+
+# If a sudo password is required add it using
+automate-cluster-ctl secrets set sudo_password
+# You will be prompted to enter the password.
+
+# If you need separate sudo passwords for FE and BE nodes
+automate-cluster-ctl secrets set fe_sudo_password
+# You will be prompted to enter the password.
+automate-cluster-ctl secrets set be_sudo_password
+# You will be prompted to enter the password.
+EOHELP
+}
+
+# renames old workspace using the version info from its symlink destination for easy access
+if [ -L /hab/a2_deploy_workspace ]; then
+  OLD_WORKSPACE=`readlink -f /hab/a2_deploy_workspace`
+
+  if [ $NEW_WORKSPACE == $OLD_WORKSPACE ]; then
+    echo "/hab/a2_deploy_workspace is up to date." && exit 0
+  fi
+
+  echo "Copying files from previous workspace"
+
+  NEW_SYMLINK=/hab/`readlink -f /hab/a2_deploy_workspace | awk -F "/" '{ print $(NF) "_" $(NF-2) "-" $(NF-1) }'`
+  ln -s $OLD_WORKSPACE $NEW_SYMLINK
+  rm /hab/a2_deploy_workspace
+  # copy over tfvars from old workspace if any exist
+  find $OLD_WORKSPACE/terraform -name \*.tfvars -exec cp {} $NEW_WORKSPACE/terraform \;
+  # copy over tfstate from old workspace if any exist
+  find $OLD_WORKSPACE/terraform -name \*.tfstate -exec cp {} $NEW_WORKSPACE/terraform \;
+  # copy .abb files from old workspace if any exist
+  find $OLD_WORKSPACE/terraform -name \*.abb -exec cp {} $NEW_WORKSPACE/terraform \;
+  # copy over configs from old workspace if any exist
+  mkdir -p $NEW_WORKSPACE/configs
+  find $OLD_WORKSPACE/configs -name \* -exec cp {} $NEW_WORKSPACE/configs \;
+
+  # move the old aib files to the new location
+  mkdir -p $NEW_WORKSPACE/terraform/transfer_files
+  find $OLD_WORKSPACE/terraform/transfer_files -name \*.aib\* -exec mv {} $NEW_WORKSPACE/terraform/transfer_files/ \;
+
+  if [[ -f $OLD_WORKSPACE/terraform/.tf_arch ]]; then
+    TF_ARCH=$(cat $OLD_WORKSPACE/terraform/.tf_arch)
+    TF_ARCH_DIR="$NEW_WORKSPACE/terraform/reference_architectures/$TF_ARCH"
+    if [[ -d $TF_ARCH_DIR ]]; then
+      # copy all files including the hidden .tf_arch
+      cp -r $TF_ARCH_DIR/. $NEW_WORKSPACE/terraform/
+    else
+      echo "No TF_ARCH_DIR found"
+    fi
+  fi
+
+  # copy over the automate-cluster-ctl configs
+  if [[ -f $OLD_WORKSPACE/a2ha.rb ]]; then
+    echo "Copying previous 'automate-cluster-ctl' config and secrets to new workspace"
+    cp $OLD_WORKSPACE/a2ha.rb $NEW_WORKSPACE/a2ha.rb
+    cp $OLD_WORKSPACE/secrets.json $NEW_WORKSPACE/secrets.json
+  else
+    display_upgrade_help $(cat $OLD_WORKSPACE/terraform/.tf_arch)
+  fi
+fi
+
+# shellcheck disable=SC1083
+ln -nsf $NEW_WORKSPACE /hab/a2_deploy_workspace
