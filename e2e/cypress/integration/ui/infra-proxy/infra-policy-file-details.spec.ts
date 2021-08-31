@@ -269,13 +269,22 @@ describe('infra policy details', () => {
       });
     });
 
-    it('can check if run list have data or not', () => {
-      if (policyFileName !== '') {
-        cy.get('[data-cy=run-list]').contains('Run List').click();
-        getPolicyFileDetails(policyFileName, revision).then(response => {
-          checkRunlistResponse(response);
-        });
-      }
+    describe('run list accordion', () => {
+      it('can check if run list have data or not', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=run-list]').contains('Run List').click();
+          getPolicyFileDetails(policyFileName, revision).then(response => {
+            checkRunlistResponse(response);
+          });
+        }
+      });
+
+      it('can open runlist details slider', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=run-list-table-container] chef-td a').contains(policyFileName).click();
+          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click();
+        }
+      });
     });
 
     it('can show revision id of policyfile', () => {
