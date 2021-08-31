@@ -7,7 +7,8 @@ import {
   NodesSuccessPayload,
   UpdateNodeEnvPayload,
   UpdateNodeTagPayload,
-  UpdateNodeAttrPayload
+  UpdateNodeAttrPayload,
+  PolicyGroupNodesPayload
 } from './infra-nodes.actions';
 import { InterceptorSkipHeader } from 'app/services/http/http-client-auth.interceptor';
 import {
@@ -66,5 +67,18 @@ export class InfraNodeRequests {
     return this.http.put<UpdateNodeAttrPayload>(
     `${env.infra_proxy_url}/servers/${node.server_id}/orgs/${node.org_id}/nodes/${node.name}/attributes`,
       node);
+  }
+
+  public getPolicyGroupNodes(payload: PolicyGroupNodesPayload): Observable<NodesSuccessPayload> {
+    const wildCardSearch = '*';
+    const target = payload.policyGroupName !== '' ?
+     'policy_group:' + wildCardSearch + payload.policyGroupName : wildCardSearch + ':';
+    const nameTarget = target + wildCardSearch;
+    const currentPage = payload.page - 1;
+    // Add asterisk to do wildcard search
+    const params = `search_query.q=${nameTarget}&search_query.page=${currentPage}&search_query.per_page=${payload.per_page}`;
+    const url = `${env.infra_proxy_url}/servers/${payload.server_id}/orgs/${payload.org_id}/nodes?${params}`;
+
+    return this.http.get<NodesSuccessPayload>(url, {headers});
   }
 }

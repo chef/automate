@@ -24,7 +24,10 @@ export enum NodeActionTypes {
   DELETE_FAILURE              = 'NODES::DELETE::FAILURE',
   UPDATE_ATTRIBUTES           = 'NODES::ATTRIBUTES::UPDATE',
   UPDATE_ATTRIBUTES_SUCCESS   = 'NODES::ATTRIBUTES::UPDATE::SUCCESS',
-  UPDATE_ATTRIBUTES_FAILURE   = 'NODES::ATTRIBUTES::UPDATE::FAILURE'
+  UPDATE_ATTRIBUTES_FAILURE   = 'NODES::ATTRIBUTES::UPDATE::FAILURE',
+  GET_ALL_NODES               = 'NODES::GET_ALL_NODES',
+  GET_ALL_NODES_SUCCESS       = 'NODES::GET_ALL_NODES::SUCCESS',
+  GET_ALL_NODES_FAILURE       = 'NODES::GET_ALL_NODES::FAILURE'
 }
 
 export interface NodesSuccessPayload {
@@ -60,6 +63,14 @@ export interface UpdateNodeAttrPayload {
   org_id: string;
   name: string;
   attributes: string[];
+}
+
+export interface PolicyGroupNodesPayload {
+  policyGroupName: string;
+  server_id: string;
+  org_id: string;
+  page: number;
+  per_page: number;
 }
 
 export class GetNodes implements Action {
@@ -165,6 +176,19 @@ export class UpdateNodeAttributesFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetPolicyGroupNodes implements Action {
+  readonly type = NodeActionTypes.GET_ALL_NODES;
+  constructor(public payload: PolicyGroupNodesPayload) { }
+}
+export class GetPolicyGroupNodesSuccess implements Action {
+  readonly type = NodeActionTypes.GET_ALL_NODES_SUCCESS;
+  constructor(public payload: NodesSuccessPayload) { }
+}
+export class GetPolicyGroupNodesFailure implements Action {
+  readonly type = NodeActionTypes.GET_ALL_NODES_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type NodeActions =
   | GetNodes
   | GetNodesSuccess
@@ -186,4 +210,7 @@ export type NodeActions =
   | UpdateNodeTagsFailure
   | UpdateNodeAttributes
   | UpdateNodeAttributesSuccess
-  | UpdateNodeAttributesFailure;
+  | UpdateNodeAttributesFailure
+  | GetPolicyGroupNodes
+  | GetPolicyGroupNodesSuccess
+  | GetPolicyGroupNodesFailure;
