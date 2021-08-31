@@ -105,7 +105,7 @@
                   <chef-td>{{node.platform === '' ? '--' : node.platform}}</chef-td>
                   <chef-td>{{node.fqdn === '' ? '--' : node.fqdn}}</chef-td>
                   <chef-td>{{node.ip_address === '' ? '--' : node.ip_address}}</chef-td>
-                  <chef-td>{{node.uptime}}</chef-td>
+                  <chef-td>{{node.uptime === '' ? '--' : node.uptime}}</chef-td>
                   <chef-td>{{timeFromNow(node.check_in)}}</chef-td>
                   <chef-td>{{node.environment === '' ? '--' : node.environment}}</chef-td>
                 </chef-tr>
