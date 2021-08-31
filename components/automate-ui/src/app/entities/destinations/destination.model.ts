@@ -8,3 +8,13 @@ export interface Destination {
   meta_data?: string;
   services?: string;
 }
+export interface Metadata {
+  key?: string;
+  value?: string;
+}
+
+
+export interface EnableDestination {
+  id: string;
+  enable: boolean;
+} 

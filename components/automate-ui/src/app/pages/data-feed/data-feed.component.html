@@ -22,7 +22,7 @@
           <p>No Data Feeds Preview Available</p>
         </div>
 
-        <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
+        <!-- <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
           <chef-thead>
             <chef-tr>
               <chef-th>Name</chef-th>
@@ -42,7 +42,13 @@
               </chef-td>
             </chef-tr>
           </chef-tbody>
-        </chef-table>
+        </chef-table> -->
+        {{sortedDestinations$ | async | json}}
+        <app-data-feed-table [destinations]="sortedDestinations$ | async"
+        [selectedFieldDirection]="fieldDirection$ | async"
+        [selectedSortField]="sortField$ | async"
+        >
+        </app-data-feed-table>
       </div>
       <app-data-feed-create
         [createForm]="createDataFeedForm"
