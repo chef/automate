@@ -223,7 +223,7 @@ if [[ -z ${TARBALL_PATH} ]]; then
   echo "ERROR: required option -o not specified!"
   usage
 fi
-if [[ ! -z ${CHANNEL} && ! -z ${MANIFEST_PATH} ]]; then
+if [[ -n ${CHANNEL} && -n ${MANIFEST_PATH} ]]; then
   echo "ERROR: options -m and -c are mutually exclusive!"
   usage
 fi

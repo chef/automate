@@ -17,12 +17,12 @@ function usage() {
   echo "}"
 }
 
-if [ ! -f $1 ]; then
+if [ ! -f "$1" ]; then
   usage && exit 1
 else
-  automate_url=`awk -F '"' 'NR==1 {print $2}' automate-credentials.toml`
-  user=`awk -F '"' 'NR==2 {print $2}' automate-credentials.toml`
-  password=`awk -F '"' 'NR==3 {print $2}' automate-credentials.toml`
+  automate_url=$(awk -F '"' 'NR==1 {print $2}' automate-credentials.toml)
+  user=$(awk -F '"' 'NR==2 {print $2}' automate-credentials.toml)
+  password=$(awk -F '"' 'NR==3 {print $2}' automate-credentials.toml)
 fi
 
 [ "$automate_url" == null ] && echo "Can't parse automate_url" && exit 1
@@ -55,5 +55,4 @@ mkdir -p /hab/svc/chef-load
 chown hab:root /hab/svc/chef-load
 mkdir -p /hab/user/chef-load/config/
 echo "Writing chef-load user.toml"
-echo """data_collector_token = \"$token\"
-data_collector.host = \"$automate_url\"""" > /hab/user/chef-load/config/user.toml
+echo """data_collector_token = \"$token\" data_collector.host = \"$automate_url\"""" > /hab/user/chef-load/config/user.toml
