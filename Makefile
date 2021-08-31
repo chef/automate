@@ -14,7 +14,6 @@ FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
 FRONTENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_fe.auto.tfvars
 TMPFILE := $(shell mktemp)
 VARFILES := $(shell find $(TERRAFORM_PATH) -name variables.tf -o -name inputs.tf)
-COMPONENTS := $(shell find components -maxdepth 1 -type d -name automate-backend-\* | awk -F/ '{print $2}')
 HABITAT_TFVARS = $(shell pwd)/terraform/a2ha_habitat.auto.tfvars
 SEMGREP_CONTAINER := returntocorp/semgrep-action:v1
 SEMGREP_COMMON_PARAMS := -m semgrep_agent --publish-token ${SEMGREP_TOKEN} --publish-deployment ${SEMGREP_ID}

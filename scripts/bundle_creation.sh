@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Set -x to enable debugging
 set -eEuo pipefail
 export AUTOMATE_BIN_URL="https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip"
