@@ -51,9 +51,9 @@
           </chef-form-field>
         </form>
         <chef-button 
-          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !timeformatControl.isTimeformatDirty" 
+          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !userDetailsFormControl.isTimeformatDirty && !userDetailsFormControl.isTelemetryCheckboxDirty" 
           primary inline 
-          (click)="userDetails.saveUserPreference(timeformat, timeformatControl)" 
+          (click)="userDetails.saveUserPreference(timeformat, userDetailsFormControl)" 
           data-cy="user-details-submit-button">
             <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
             <span *ngIf="userDetails.saveInProgress">Saving...</span>

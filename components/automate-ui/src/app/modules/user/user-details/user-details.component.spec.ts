@@ -33,9 +33,16 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
 import { SigninUiSetting, UISettings } from 'app/services/user-preferences/signin-ui-settings';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 class MockUserPreferencesService {
   public uiSettings: SigninUiSetting = new UISettings()['local'];
+}
+
+class MockTelemetryService {
+  getTelemetryCheckboxObservable() {
+    return new Subject<boolean>();
+  }
 }
 
 describe('UserDetailsComponent', () => {
@@ -107,7 +114,8 @@ describe('UserDetailsComponent', () => {
           FeatureFlagsService,
           { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
           { provide: ChefSessionService, useClass: MockChefSessionService },
-          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
+          { provide: UserPreferencesService, useClass: MockUserPreferencesService },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ]
       });
       store = TestBed.inject(Store);
@@ -269,7 +277,8 @@ describe('UserDetailsComponent', () => {
         providers: [
           FeatureFlagsService,
           { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
-          { provide: ChefSessionService, useClass: MockChefSessionService }
+          { provide: ChefSessionService, useClass: MockChefSessionService },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ]
       });
       store = TestBed.inject(Store);

@@ -33,9 +33,10 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
-import { UpdateUserPreferences } from 'app/services/user-preferences/user-preferences.actions';
+import { UpdateUserPreferences, UpdateUserPreferencesSuccess } from 'app/services/user-preferences/user-preferences.actions';
 import { userPreferencesStatus } from 'app/services/user-preferences/user-preferences.selector';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export type UserTabName = 'password' | 'details';
 
@@ -51,8 +52,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private url: string;
   public userDetails: UserDetails;
   public timeformat: string;
-  public timeformatControl = {
-    isTimeformatDirty: false
+  public userDetailsFormControl = {
+    isTimeformatDirty: false,
+    isTelemetryCheckboxDirty: false,
+    isTelemetryCheckboxEnabled: false
   };
   public isResetPwdTab = true;
   public userType = 'local';
@@ -65,7 +68,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
     public userPrefsService: UserPreferencesService,
-    private chefSessionService: ChefSessionService
+    private chefSessionService: ChefSessionService,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit(): void {
@@ -78,7 +82,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.layoutFacade.showSidebar(Sidebar.Settings);
         this.userDetails = new UserProfileDetails(
           this.store, this.layoutFacade, this.isDestroyed, this.fb,
-          this.userPrefsService, this.chefSessionService);
+          this.userPrefsService, this.chefSessionService, this.telemetryService);
         this.loading = false;
       } else {
         this.layoutFacade.showSidebar(Sidebar.Profile);
@@ -96,11 +100,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           if (routeId === currentUserId) {
             this.userDetails = new UserAdminSelfDetails(
               this.store, this.layoutFacade, this.isDestroyed, this.fb,
-              this.userPrefsService, this.chefSessionService);
+              this.userPrefsService, this.chefSessionService, this.telemetryService);
           } else {
             this.userDetails = new UserAdminDetails(routeId,
               this.store, this.layoutFacade, this.isDestroyed, this.fb,
-              this.userPrefsService, this.chefSessionService);
+              this.userPrefsService, this.chefSessionService, this.telemetryService);
           }
           this.loading = false;
         });
@@ -120,6 +124,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.userType = this.userPrefsService.uiSettings.userType;
       this.isDisplayNameEditable = this.userPrefsService.uiSettings.isDisplayNameEditable;
     }
+    this.telemetryService.getTelemetryCheckboxObservable().subscribe((telemetryChecked) => {
+      this.userDetailsFormControl.isTelemetryCheckboxEnabled = telemetryChecked;
+      if (!this.userDetailsFormControl.isTelemetryCheckboxDirty) {
+        this.userDetailsFormControl.isTelemetryCheckboxDirty = true;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -138,7 +148,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public handleTimeFormatChange(): void {
-    this.timeformatControl.isTimeformatDirty = true;
+    this.userDetailsFormControl.isTimeformatDirty = true;
   }
 }
 
@@ -154,7 +164,8 @@ abstract class UserDetails {
 
   constructor(private store: Store<NgrxStateAtom>,
      private userPrefsService: UserPreferencesService,
-     private chefSessionService: ChefSessionService) {}
+     private chefSessionService: ChefSessionService,
+     private telemetryService: TelemetryService) {}
 
   public savePassword(): void {
     this.saveSuccessful = false;
@@ -163,7 +174,7 @@ abstract class UserDetails {
     this.store.dispatch(this.createUpdatePasswordUserAction(password));
   }
 
-  public saveUserPreference(timeformat, timeformatControl): void {
+  public saveUserPreference(timeformat, userDetailsFormControl): void {
     const payload = {
       user: {
          name: this.chefSessionService.username,
@@ -182,9 +193,19 @@ abstract class UserDetails {
       const name = this.displayNameForm.get('displayName').value.trim();
       this.store.dispatch(this.createUpdateNameUserAction(name));
     }
-    this.store.dispatch(new UpdateUserPreferences(payload));
-    this.userPrefsService.setUserTimeformatInternal(timeformat.value);
-    timeformatControl.isTimeformatDirty = false;
+    if (userDetailsFormControl.isTimeformatDirty) {
+      this.store.dispatch(new UpdateUserPreferences(payload));
+      this.userPrefsService.setUserTimeformatInternal(timeformat.value);
+    }
+    if (userDetailsFormControl.isTelemetryCheckboxDirty) {
+      this.telemetryService
+        .setUserTelemetryPreference(userDetailsFormControl.isTelemetryCheckboxEnabled);
+      if (!userDetailsFormControl.isTelemetryCheckboxEnabled) {
+        this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
+      }
+    }
+    userDetailsFormControl.isTimeformatDirty = false;
+    userDetailsFormControl.isTelemetryCheckboxDirty = false;
   }
 
   protected abstract createPasswordForm(fb: FormBuilder): FormGroup;
@@ -221,9 +242,10 @@ class UserAdminDetails extends UserDetails {
     isDestroyed: Subject<boolean>,
     fb: FormBuilder,
     userPrefsService: UserPreferencesService,
-    chefSessionService: ChefSessionService
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService
     ) {
-      super(store, userPrefsService, chefSessionService);
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
       store.dispatch(new GetUser({ id: userId }));
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -292,8 +314,9 @@ class UserAdminSelfDetails extends UserDetails {
     isDestroyed: Subject<boolean>,
     fb: FormBuilder,
     userPrefsService: UserPreferencesService,
-    chefSessionService: ChefSessionService) {
-      super(store, userPrefsService, chefSessionService);
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService) {
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
       store.dispatch(new GetUserSelf());
       layoutFacade.showSidebar(Sidebar.Settings);
@@ -373,8 +396,9 @@ class UserProfileDetails extends UserDetails {
     isDestroyed: Subject<boolean>,
     fb: FormBuilder,
     userPrefsService: UserPreferencesService,
-    chefSessionService: ChefSessionService) {
-      super(store, userPrefsService, chefSessionService);
+    chefSessionService: ChefSessionService,
+    telemetryService: TelemetryService) {
+      super(store, userPrefsService, chefSessionService, telemetryService);
 
       if (userPrefsService.uiSettings.userType === 'local') {
         store.dispatch(new GetUserSelf());

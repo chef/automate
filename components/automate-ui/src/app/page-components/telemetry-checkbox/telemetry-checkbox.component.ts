@@ -32,9 +32,9 @@ export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.isTelemetryServiceEnabled) {
+    /*if (this.isTelemetryServiceEnabled) {
       this.telemetryService.setUserTelemetryPreference(this.telemetryPersonalPref);
-    }
+    }*/
 
     // Ends the subscription if needed
     if (this.telemetryServiceSubscription) {
@@ -66,6 +66,6 @@ export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
 
   togglePersonalTelemetryCollection(): void {
     this.telemetryPersonalPref = !this.telemetryPersonalPref;
-    this.telemetryService.setUserTelemetryPreference(this.telemetryPersonalPref);
+    this.telemetryService.updateTelemetryCheckbox(this.telemetryPersonalPref);
   }
 }

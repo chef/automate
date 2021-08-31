@@ -9,6 +9,10 @@ import { ChefSessionService } from '../chef-session/chef-session.service';
 import { ConfigService } from '../config/config.service';
 import { CookieService } from 'ngx-cookie';
 import { MetadataService } from '../metadata/metadata.service';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Store } from '@ngrx/store';
+
+import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/services/user-preferences/user-preferences.actions';
 
 declare let analytics: any;
 
@@ -46,13 +50,16 @@ export class TelemetryService {
   private buildVersion;
   private previousUrl: string;
   private currentUrl: string;
+  private  telemetryCheckboxObservable = new Subject<boolean>();
+  private isSkipNotification = false;
 
   constructor(private httpClient: HttpClient,
     private configService: ConfigService,
     router: Router,
     private cookieService: CookieService,
     private chefSessionService: ChefSessionService,
-    private metadataService: MetadataService) {
+    private metadataService: MetadataService,
+    private store: Store<NgrxStateAtom>) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -80,6 +87,7 @@ export class TelemetryService {
       }))
       .subscribe((trackingOperations) => {
         if (this.chefSessionService.telemetry_enabled) {
+          this.isSkipNotification = true;
           this.engageTelemetry(trackingOperations);
         }
       });
@@ -184,10 +192,16 @@ export class TelemetryService {
             });
             this.trackInitialData();
            });
+           if (!this.isSkipNotification) {
+            this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
+           }
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
           console.log(`Error retrieving Segment API key: ${status}/${message}`);
+          if (!this.isSkipNotification) {
+            this.store.dispatch(new UpdateUserPreferencesFailure(message));
+          }
         });
   }
 
@@ -313,6 +327,14 @@ export class TelemetryService {
       }
     }
     next(payload);
+  }
+
+  getTelemetryCheckboxObservable() {
+    return this.telemetryCheckboxObservable;
+  }
+
+  updateTelemetryCheckbox(telemetryPref: boolean) {
+    this.telemetryCheckboxObservable.next(telemetryPref);
   }
 
 }
