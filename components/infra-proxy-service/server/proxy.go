@@ -118,6 +118,7 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
+
 	client, err := NewChefClient(&ChefConfig{
 		Name:    org.AdminUser,
 		Key:     GetOrgAdminKeyFrom(secret),
@@ -134,7 +135,7 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 	if path == "" {
 		path = IPAddress
 	}
-	path = path + "/"
+	path = path + "/organizations/" + orgName + "/"
 
 	baseURL, err := url.Parse(path)
 	if err != nil {

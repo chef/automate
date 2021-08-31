@@ -11,7 +11,6 @@ message OrgUsers {
 message UsersListItem {
     // User username
     string username =1;
-    // User First
 }
 
 message ServerUsers {
