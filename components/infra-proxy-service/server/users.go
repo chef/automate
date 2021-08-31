@@ -52,11 +52,14 @@ func fromAPIToListOrgUsers(list []chef.OrgUserListEntry) []*response.UsersListIt
 	return users
 }
 
-func fromAPIToListServerUsers(list map[string]chef.UserVerboseResult) []*response.UsersListItem {
-	users := make([]*response.UsersListItem, 0)
-	for key := range list {
-		item := &response.UsersListItem{
-			Username: key,
+func fromAPIToListServerUsers(list map[string]chef.UserVerboseResult) []*response.ServerUserListItem {
+	users := make([]*response.ServerUserListItem, 0)
+	for key, val := range list {
+		item := &response.ServerUserListItem{
+			Username:  key,
+			FirstName: val.FirstName,
+			LastName:  val.LastName,
+			Email:     val.Email,
 		}
 		users = append(users, item)
 	}

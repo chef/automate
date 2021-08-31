@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -119,8 +118,6 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
 	}
-	fmt.Println("####################name############", org.AdminUser)
-	fmt.Println("####################key#############", GetOrgAdminKeyFrom(secret))
 	client, err := NewChefClient(&ChefConfig{
 		Name:    org.AdminUser,
 		Key:     GetOrgAdminKeyFrom(secret),

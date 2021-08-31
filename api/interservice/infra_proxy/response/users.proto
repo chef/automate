@@ -16,5 +16,16 @@ message UsersListItem {
 
 message ServerUsers {
     // Users list
-    repeated UsersListItem users=1;
+    repeated ServerUserListItem users=1;
+}
+
+message ServerUserListItem {
+    // User username
+    string username =1;
+    // User first name
+    string first_name=2;
+    // User Last name
+    string last_name=3;
+    // User email
+    string email=4;
 }
