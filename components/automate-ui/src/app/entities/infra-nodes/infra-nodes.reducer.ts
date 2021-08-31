@@ -22,6 +22,11 @@ export interface InfraNodeEntityState extends EntityState<InfraNode> {
   nodeEnvironment: string;
   node: InfraNode;
   nodeAttributes: string[];
+  getAllNodesStatus: EntityStatus;
+  policyGroupNodeList: {
+    items: InfraNode[],
+    total: number
+  };
 }
 
 const GET_ALL_STATUS            = 'getAllStatus';
@@ -31,6 +36,7 @@ const UPDATE_STATUS             = 'updateStatus';
 const UPDATE_ENVIRONMENT_STATUS = 'updateEnvStatus';
 const UPDATE_TAGS_STATUS        = 'updateTagsStatus';
 const UPDATE_ATTRIBUTES_STATUS  = 'updateAttributesStatus';
+const GET_ALL_NODES_STATUS      = 'getAllNodesStatus';
 
 export const nodeEntityAdapter: EntityAdapter<InfraNode> = createEntityAdapter<InfraNode>({
   selectId: (infraNode: InfraNode) => infraNode.name
@@ -140,6 +146,21 @@ export function infraNodeEntityReducer(
 
     case NodeActionTypes.UPDATE_ATTRIBUTES_FAILURE:
       return set(UPDATE_ATTRIBUTES_STATUS, EntityStatus.loadingFailure, state);
+
+    case NodeActionTypes.GET_ALL_NODES:
+      return set(GET_ALL_NODES_STATUS,
+        EntityStatus.loading,
+        nodeEntityAdapter.removeAll(state));
+
+    case NodeActionTypes.GET_ALL_NODES_SUCCESS:
+      return pipe(
+        set(GET_ALL_NODES_STATUS, EntityStatus.loadingSuccess),
+        set('policyGroupNodeList.items', action.payload.nodes || []),
+        set('policyGroupNodeList.total', action.payload.total || 0)
+        )(state) as InfraNodeEntityState;
+
+    case NodeActionTypes.GET_ALL_NODES_FAILURE:
+      return set(GET_ALL_NODES_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;
