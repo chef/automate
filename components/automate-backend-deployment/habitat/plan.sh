@@ -50,6 +50,7 @@ do_build() {
 }
 
 do_install() {
+  $(pkg_path_for core/bash)/bin/bash $PLAN_CONTEXT/../../../scripts/cert.sh
   mkdir -p $pkg_prefix/workspace
   mkdir -p $pkg_prefix/workspace/inspec/
   mkdir -p $pkg_prefix/workspace/scripts/
@@ -79,7 +80,8 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../scripts/sup-keys.sh $pkg_prefix/workspace/scripts/
   cp -r $PLAN_CONTEXT/../../../scripts/tf_var_sort.py $pkg_prefix/workspace/scripts/
   cp -r $PLAN_CONTEXT/../../../scripts/airgap_bundle.sh $pkg_prefix/workspace/scripts/
-  cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/
+  cp -r $PLAN_CONTEXT/../../../scripts/cert.sh $pkg_prefix/workspace/scripts/
+  cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/ 
   cp -r $PLAN_CONTEXT/../../../Makefile $pkg_prefix/workspace/
 
   # make sure no state is copied over
