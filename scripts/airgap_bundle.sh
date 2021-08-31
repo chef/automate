@@ -259,4 +259,4 @@ REPO_PATH=$(dirname "$(dirname "${ABSOLUTE_PATH}")")
 export REPO_PATH
 
 do_tasks
-clean_up
+clean_up "$@"
