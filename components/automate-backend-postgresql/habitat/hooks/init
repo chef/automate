@@ -1,0 +1,37 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -Exeuo pipefail
+
+exec 2>&1
+
+source {{pkg.svc_config_path}}/functions.sh
+
+chmod 0600 {{pkg.svc_config_path}}/server.key \
+  {{pkg.svc_config_path}}/server.crt \
+  {{pkg.svc_config_path}}/.pgpass
+
+# this read operation will re-awaken any flaky NFS connections
+# before attempting the mkdir write operation
+stat {{cfg.wal_archive.path}} {{cfg.pg_dump.path}} || true
+
+mkdir -p {{pkg.svc_config_path}}/conf.d \
+ {{pkg.svc_var_path}}/pg_stat_tmp \
+ {{pkg.svc_data_path}}/pgdata \
+ {{cfg.wal_archive.path}} \
+ {{cfg.pg_dump.path}}
+
+ensure_dir_ownership
+check_pgdata_upgrade_needed
+
+# shellcheck disable=SC1054
+{{#unless svc.me.follower ~}}
+if [[ ! -f "{{pkg.svc_data_path}}/pgdata/PG_VERSION" ]]; then
+  echo " Database does not exist, creating with 'initdb'"
+    initdb -U {{cfg.superuser.name}} \
+    -E utf8 \
+    -D {{pkg.svc_data_path}}/pgdata \
+    --pwfile {{pkg.svc_config_path}}/pwfile \
+    --locale POSIX \
+    --data-checksums
+fi
+{{~/unless}}
