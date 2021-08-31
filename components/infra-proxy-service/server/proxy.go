@@ -201,6 +201,7 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 	return v, err
 }
 
+//createChefClient: Creates a client with only server details
 func (s *Server) createChefClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -209,16 +210,6 @@ func (s *Server) createChefClient(ctx context.Context, serverID string, adminkey
 	if err != nil {
 		return nil, service.ParseStorageError(err, serverID, "server")
 	}
-
-	// org, err := s.service.Storage.GetOrg(ctx, orgID, serverID)
-	// if err != nil {
-	// 	return nil, service.ParseStorageError(err, orgID, "org")
-	// }
-
-	// secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.ID})
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	baseURL, err := targetServerURL(server.Fqdn, server.IPAddress)
 	if err != nil {
@@ -235,7 +226,7 @@ func (s *Server) createChefClient(ctx context.Context, serverID string, adminkey
 	return client, err
 }
 
-// targetURL is constructing the base URL based on fqdn|ipAddress value
+// targetServerURL:  constructing the base URL based on fqdn|ipAddress value for only server
 func targetServerURL(fqdn string, IPAddress string) (string, error) {
 	path := fqdn
 	if path == "" {

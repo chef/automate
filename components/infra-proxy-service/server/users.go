@@ -25,6 +25,7 @@ func (s *Server) GetOrgUsersList(ctx context.Context, req *request.OrgUsers) (*r
 
 }
 
+//GetServerUsersList: Get a list of all users in server
 func (s *Server) GetServerUsersList(ctx context.Context, req *request.ServerUsers) (*response.ServerUsers, error) {
 	c, err := s.createChefClient(ctx, req.ServerId, req.AdminKey, req.AdminName)
 	if err != nil {
