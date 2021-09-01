@@ -63,14 +63,12 @@ func TestServers(t *testing.T) {
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			}
 			resp, err := cl.CreateServer(ctx, req)
 			assert.Nil(t, resp)
 			assert.Error(t, err, "Invalid server FQDN or IP")
-
-			cleanupServer(ctx, t, cl, resp.Server.Id)
 		})
 
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
