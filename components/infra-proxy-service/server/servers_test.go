@@ -133,8 +133,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server IP address is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
+				Name:      "Chef infra server",
 				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server IP address")
