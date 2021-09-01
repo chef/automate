@@ -149,6 +149,16 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 		return nil, errors.New("FQDN or IP required to update the server.")
 	}
 
+	statusReqObj := &request.GetServerStatus{
+		Fqdn: req.Fqdn,
+	}
+
+	_, err = s.GetServerStatus(ctx, statusReqObj)
+
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
+	}
+
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
