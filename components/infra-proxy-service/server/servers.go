@@ -3,8 +3,13 @@ package server
 import (
 	"context"
 
+	"crypto/tls"
+	"encoding/json"
+	"errors"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
@@ -32,6 +37,16 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	if req.Fqdn == "" && req.IpAddress == "" {
 		return nil, errors.New("FQDN or IP required to add the server.")
+	}
+
+	statusReqObj := &request.GetServerStatus{
+		Fqdn: req.Fqdn,
+	}
+
+	_, err = s.GetServerStatus(ctx, statusReqObj)
+
+	if err != nil {
+		return nil, service.ParseStorageError(err, *req, "server")
 	}
 
 	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
@@ -148,9 +163,28 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStatus) (*response.GetServerStatus, error) {
 
 	status, err := s.GetServerStatus(ctx, req)
+	// make http request to get the status
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	}
+	client := &http.Client{Transport: transCfg}
+
+	res, err := client.Get("https://" + req.GetFqdn() + "/_status")
+
+	if res.StatusCode != 200 {
+		return nil, errors.New("Invalid server FQDN or IP")
+	}
+
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
+	// read all response body
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	// close response body
+	_ = res.Body.Close()
 
 	return &response.GetServerStatus{
 		Status: status.Status,
