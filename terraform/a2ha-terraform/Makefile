@@ -125,6 +125,9 @@ $(HABITAT_TFVARS):
 ## Create a frontend .aib
 fe-bundle: $(FRONTENDAIB)
 
+## Create Airgap bundles
+airgap: fe-bundle
+
 .PHONY: clean help
 
 ## Clean up any old manifest and airgap bundles
