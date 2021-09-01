@@ -50,7 +50,7 @@ func executeSecretCommand(args []string) error {
 		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, "please refer \n"+secretsHelpDocs)
 	}
-	writer.Print(string(out.String()))
+	writer.Print(out.String())
 	writer.Printf("A2HA new secret set. %d, exiting\n", c.Process.Pid)
 	return err
 }
