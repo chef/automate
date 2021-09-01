@@ -1,0 +1,22 @@
+[output]
+[output.elasticsearch]
+username = "admin"
+password = "admin"
+hosts = ["https://localhost:9200"]
+[output.elasticsearch.ssl]
+verification_mode = "none"
+
+[logging]
+to_files = true
+redirect_stderr = true
+level = "info"
+
+[[logging.files]]
+name = "stdout"
+path = "current"
+
+[paranoid]
+enabled = false
+
+[extended_stats.elasticsearch]
+node_stats = false
