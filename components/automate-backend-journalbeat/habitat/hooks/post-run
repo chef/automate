@@ -1,0 +1,7 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+{{#if cfg.paranoid.enabled }}
+exec 2>&1
+
+rm -f "{{pkg.svc_config_path}}/journalbeat.yml"
+{{/if}}

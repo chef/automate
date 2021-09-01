@@ -1,0 +1,24 @@
+maxconn = 500
+httpchk = "GET /"
+
+[server]
+maxconn = 350
+
+[front-end]
+listen = "*"
+port = 7432
+mode = "tcp"
+
+[status]
+enabled = false
+listen = "*"
+port = 9000
+user = "admin"
+password = "password"
+uri = "/haproxy-stats"
+
+[pg]
+port = 5432
+
+[pgleaderchk]
+port = 6432

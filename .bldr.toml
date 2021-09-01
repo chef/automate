@@ -1120,6 +1120,24 @@ plan_path = "components/automate-backend-elasticsearch"
 paths = [
   "components/automate-backend-elasticsearch/*"
 ]
+
+[automate-backend-metricbeat]
+plan_path = "components/automate-backend-metricbeat"
+paths = [
+  "components/automate-backend-metricbeat/*"
+]
+
+[automate-backend-journalbeat]
+plan_path = "components/automate-backend-journalbeat"
+paths = [
+  "components/automate-backend-journalbeat/*"
+]
+
+[automate-backend-haproxy]
+plan_path = "components/automate-backend-haproxy"
+paths = [
+  "components/automate-backend-haproxy/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
