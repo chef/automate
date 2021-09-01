@@ -1,0 +1,34 @@
+#!/bin/sh
+
+#This section makes sure that the admin key exists. This is used to setup other authentication in odfe.
+
+{{#unless cfg.opendistro_ssl.rootCA}}
+  RANDFILE={{pkg.svc_config_path}}/certificates/.rnd
+
+  mkdir -p {{pkg.svc_config_path}}
+  #First, create a private key for the CA:
+  openssl genrsa -out {{pkg.svc_config_path}}/certificates/MyRootCA.key 2048
+
+  #Create the CA and enter the Organization details:
+  openssl req -x509 -new -key {{pkg.svc_config_path}}/certificates/MyRootCA.key -sha256 -out {{pkg.svc_config_path}}/certificates/MyRootCA.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
+
+  #the rsa keys
+  openssl genrsa -out {{pkg.svc_config_path}}/certificates/odfe-node-pkcs12.key 2048
+  openssl genrsa -out {{pkg.svc_config_path}}/certificates/odfe-admin-pkcs12.key 2048
+
+  #IMPORTANT: Convert these to PKCS#5 v1.5 to work correctly with the JDK.
+  openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "{{pkg.svc_config_path}}/certificates/odfe-node-pkcs12.key" -topk8 -out "{{pkg.svc_config_path}}/certificates/odfe-node.key" -nocrypt
+  openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "{{pkg.svc_config_path}}/certificates/odfe-admin-pkcs12.key" -topk8 -out "{{pkg.svc_config_path}}/certificates/odfe-admin.key" -nocrypt
+
+  #Create the CSR and enter the organization and server details for the node key
+  openssl req -new -key {{pkg.svc_config_path}}/certificates/odfe-node.key -out {{pkg.svc_config_path}}/certificates/odfe-node.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode'
+
+  #Create the CSR and enter the organization and server details for the admin key
+  openssl req -new -key {{pkg.svc_config_path}}/certificates/odfe-admin.key -out {{pkg.svc_config_path}}/certificates/odfe-admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
+
+  #Use the CSR to generate the signed node Certificate:
+  openssl x509 -req -in {{pkg.svc_config_path}}/certificates/odfe-node.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-node.pem -sha256
+
+  #Use the CSR to generate the signed admin Certificate:
+  openssl x509 -req -in {{pkg.svc_config_path}}/certificates/odfe-admin.csr -CA {{pkg.svc_config_path}}/certificates/MyRootCA.pem -CAkey {{pkg.svc_config_path}}/certificates/MyRootCA.key -CAcreateserial -out {{pkg.svc_config_path}}/certificates/odfe-admin.pem -sha256
+{{/unless}}

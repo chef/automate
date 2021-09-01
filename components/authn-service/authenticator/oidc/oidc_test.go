@@ -11,12 +11,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/test/helpers"
+
+	"github.com/chef/automate/api/interservice/id_token"
 	"go.uber.org/zap"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
-	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
 var logger *zap.Logger
@@ -30,15 +35,17 @@ func init() {
 func NewTestAuthenticator(
 	issuer, clientID string,
 	verifier IDTokenVerifier,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger,
+	idTokenValidatorClient id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &Authenticator{
-		verifier: verifier,
-		ctx:      ctx,
-		cancel:   cancel,
-		logger:   logger,
+		verifier:               verifier,
+		ctx:                    ctx,
+		cancel:                 cancel,
+		logger:                 logger,
+		idTokenValidatorClient: idTokenValidatorClient,
 	}, nil
 }
 
@@ -85,7 +92,19 @@ func TestAuthenticateExtractsIDTokenAndCallsVerifier(t *testing.T) {
 	clientID := "client-id"
 	verifierErr := errors.New("something went wrong")
 	verifier := newFailingVerifier(verifierErr)
-	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger)
+
+	sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
+	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
+	grpcSession := sessionConnFactory.NewServer()
+	id_token.RegisterValidateIdTokenServiceServer(grpcSession, &IdTokenValidator{nil, nil})
+
+	sessionServer := grpctest.NewServer(grpcSession)
+	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
+	require.NoError(t, err)
+
+	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
+
+	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger, sessionClient)
 	if err != nil {
 		t.Fatalf("failed to setup test authenticator: %v", err)
 	}
@@ -109,7 +128,16 @@ func TestAuthenticateWhenTokenExtractionFailsReturnsError(t *testing.T) {
 	// failing one
 	verifier := newFailingVerifier(errors.New("something went wrong"))
 	expectedErr := "failed to extract bearer token"
-	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger)
+
+	sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
+	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
+	grpcSession := sessionConnFactory.NewServer()
+	sessionServer := grpctest.NewServer(grpcSession)
+	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
+	require.NoError(t, err)
+
+	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
+	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger, sessionClient)
 	if err != nil {
 		t.Fatalf("failed to setup test authenticator: %v", err)
 	}
@@ -133,7 +161,18 @@ func TestAuthenticateWhenEverythingSucceedsReturnsSubject(t *testing.T) {
 		sub:    "alice",
 		connID: "mock-connector",
 		userID: "mock-user-id"})
-	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger)
+
+	sessionServiceCerts := helpers.LoadDevCerts(t, "session-service")
+	sessionConnFactory := secureconn.NewFactory(*sessionServiceCerts)
+	grpcSession := sessionConnFactory.NewServer()
+	sessionServer := grpctest.NewServer(grpcSession)
+	id_token.RegisterValidateIdTokenServiceServer(grpcSession, &IdTokenValidator{nil, nil})
+
+	sessionConn, err := sessionConnFactory.Dial("session-service", sessionServer.URL)
+	require.NoError(t, err)
+
+	sessionClient := id_token.NewValidateIdTokenServiceClient(sessionConn)
+	authn, err := NewTestAuthenticator(issuer, clientID, verifier, logger, sessionClient)
 	if err != nil {
 		t.Fatalf("failed to setup test authenticator: %v", err)
 	}

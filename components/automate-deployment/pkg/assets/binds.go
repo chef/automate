@@ -4,10 +4,11 @@ package assets
 const BindData = `applications-load-gen BINDING_MODE strict
 applications-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service
 applications-service BINDING_MODE strict
-authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service teams-service
+authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service session-service teams-service
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
+automate-backend-elasticsearch BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api

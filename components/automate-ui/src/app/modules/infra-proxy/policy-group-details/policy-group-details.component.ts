@@ -3,12 +3,20 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { routeParams } from 'app/route.selectors';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { routeParams, routeURL } from 'app/route.selectors';
+import { filter, pluck, takeUntil, take } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
+import { Router } from '@angular/router';
 import { policyGoupFromRoute } from 'app/entities/policy-files/policy-group-details.selectors';
-import { PolicyGroup } from 'app/entities/policy-files/policy-file.model';
+import { PolicyGroup, IncludedPolicyLocks } from 'app/entities/policy-files/policy-file.model';
 import { GetPolicyGroup } from 'app/entities/policy-files/policy-file.action';
+import { GetPolicyGroupNodes } from 'app/entities/infra-nodes/infra-nodes.actions';
+import { getAllNodesStatus, policyGroupNodeList } from 'app/entities/infra-nodes/infra-nodes.selectors';
+import { InfraNode } from 'app/entities/infra-nodes/infra-nodes.model';
+import { EntityStatus } from 'app/entities/entities';
+import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+
+export type PolicyGroupTabName = 'policyfiles' | 'nodes';
 
 @Component({
   selector: 'app-policy-group-details',
@@ -20,18 +28,33 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public serverId: string;
   public orgId: string;
   public name: string;
-  public show = false;
   public policyCount: number;
+  public policies: IncludedPolicyLocks[];
   public policyGroupDetailsLoading = true;
+  public tabValue: PolicyGroupTabName = 'policyfiles';
+  public url: string;
+  public currentPage = 1;
+  public per_page = 9;
+  public nodes: {items: InfraNode[], total: number};
+  public policyGroupNodesLoading = true;
+  public isNodesAvailable = false;
   private isDestroyed = new Subject<boolean>();
+  private timeFromNowPipe = new TimeFromNowPipe();
 
   constructor(
+    private router: Router,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
     ) { }
 
   ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+    .subscribe((url: string) => {
+      this.url = url;
+      const [, fragment] = url.split('#');
+      this.tabValue = (fragment === 'nodes') ? 'nodes' : 'policyfiles';
+    });
 
     // load policy Group details
     combineLatest([
@@ -40,28 +63,69 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([server_id, org_id, name]: string[]) => {
+    ).pipe(take(1))
+    .subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
       this.name = name;
       this.store.dispatch(new GetPolicyGroup({
         server_id: server_id, org_id: org_id, name: name
       }));
+      this.loadNodes();
     });
 
     this.store.select(policyGoupFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(policyGroup => {
-      this.show = true;
       this.policyGroup = policyGroup;
       this.policyCount = policyGroup.policies.length;
+      this.policies =  policyGroup.policies;
       this.policyGroupDetailsLoading = false;
+    });
+
+    combineLatest([
+      this.store.select(getAllNodesStatus),
+      this.store.select(policyGroupNodeList)
+    ]).
+    pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+      ).subscribe(([getAllSt, nodeList]) => {
+        if (getAllSt === EntityStatus.loadingSuccess && !isNil(nodeList)) {
+          this.nodes = nodeList;
+          this.isNodesAvailable = (this.nodes.total > 0) ? true : false;
+          this.policyGroupNodesLoading = false;
+        } else if (getAllSt === EntityStatus.loadingFailure) {
+          this.policyGroupNodesLoading = false;
+          this.isNodesAvailable = false;
+        }
     });
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  onSelectedTab(event: { target: { value: PolicyGroupTabName } }) {
+    this.tabValue = event.target.value;
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  loadNodes() {
+    this.store.dispatch(new GetPolicyGroupNodes({
+      server_id: this.serverId,
+      org_id: this.orgId,
+      policyGroupName: this.name,
+      page: this.currentPage,
+      per_page: this.per_page
+    }));
+  }
+
+  timeFromNow(epochFormat: string) {
+    const epchoTime = Number(epochFormat);
+    const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
+    return fromNowValue === '-' ? '--' : fromNowValue;
   }
 }

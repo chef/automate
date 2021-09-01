@@ -50,9 +50,9 @@ export class DestinationRequests {
   }
 
   public createDestination(destinationData: CreateDestinationPayload,
-    targetUsername: string, targetPassword: string):
+    headers: string):
     Observable<DestinationResponse> {
-    return this.createSecret(destinationData, targetUsername, targetPassword)
+    return this.createSecret(destinationData, headers)
       .pipe(mergeMap((secretId: string) => {
         destinationData.secret = secretId;
         return this.http.post<DestinationResponse>(
@@ -70,10 +70,9 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destination', id.toString()])));
   }
 
-  private createSecret(destination: CreateDestinationPayload, targetUsername: string,
-    targetPassword: string): Observable<string> {
-    if ( targetUsername.length > 0 || targetPassword.length > 0 ) {
-      const secret = this.newSecret('', destination.name, targetUsername, targetPassword);
+  private createSecret(destination: CreateDestinationPayload, headers: string): Observable<string> {
+    if ( headers.length > 0 ) {
+      const secret = this.newSecret('', destination.name, headers);
 
       return this.http.post<SecretId>(`${SECRETS_URL}`, secret)
         .pipe(map(secretId => secretId.id));
@@ -82,15 +81,14 @@ export class DestinationRequests {
     }
   }
 
-  private newSecret(id: string, name: string, username: string,
-    password: string): Secret {
+  private newSecret(id: string, name: string, headers: string): Secret {
     return {
       id: id,
       name: name,
       type: 'data_feed',
       data: Array<KVData>(
-        {key: 'username', value: username},
-        {key: 'password', value: password})
+        {key: 'headers', value: headers},
+        {key: 'auth_type', value: 'header_auth'})
     };
   }
 
@@ -105,6 +103,13 @@ export class DestinationRequests {
     return this.http.post(encodeURI(
       this.joinToDataFeedUrl(['destinations', 'test'])),
       { url, 'username_password': {username, password} });
+  }
+
+  public testDestinationWithHeaders(url: string,
+    value: string): Observable<Object> {
+    return this.http.post(encodeURI(
+      this.joinToDataFeedUrl(['destinations', 'test'])),
+      { url, 'header': {value} });
   }
 
   public testDestinationWithSecretId(url: string, secretId: string): Observable<Object> {

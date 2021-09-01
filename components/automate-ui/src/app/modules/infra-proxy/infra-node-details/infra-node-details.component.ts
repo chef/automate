@@ -7,7 +7,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -154,7 +154,8 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([server_id, org_id, name]: string[]) => {
+    ).pipe(take(1))
+    .subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.orgId = org_id;
       this.name = name;

@@ -27,10 +27,13 @@ import {
   DeleteNodeSuccess,
   DeleteNodeFailure,
   NodesSuccessPayload,
-  NodeActionTypes,
   UpdateNodeAttributes,
   UpdateNodeAttributesSuccess,
-  UpdateNodeAttributesFailure
+  UpdateNodeAttributesFailure,
+  GetPolicyGroupNodes,
+  GetPolicyGroupNodesSuccess,
+  GetPolicyGroupNodesFailure,
+  NodeActionTypes
 } from './infra-nodes.actions';
 
 import {
@@ -218,4 +221,24 @@ export class InfraNodeEffects {
         type: Type.error,
         message: `Could not update node attibutes: ${payload.error.error || payload}.`
       }))));
+
+  GetPolicyGroupNodes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NodeActionTypes.GET_ALL_NODES),
+      mergeMap(({payload}: GetPolicyGroupNodes) =>
+      this.requests.getPolicyGroupNodes(payload).pipe(
+        map((resp: NodesSuccessPayload) => new  GetPolicyGroupNodesSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetPolicyGroupNodesFailure(error)))))));
+
+  GetPolicyGroupNodesFailure$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(NodeActionTypes.GET_ALL_NODES_FAILURE),
+    map(({ payload }: GetPolicyGroupNodesFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get nodes: ${msg || payload.error}`
+      });
+    })));
 }

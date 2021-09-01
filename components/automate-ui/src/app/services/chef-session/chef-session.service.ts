@@ -214,6 +214,25 @@ export class ChefSessionService implements CanActivate {
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
 
+  // blacklistIdToken call /logout endpoint in session-service
+  blacklistIdToken(idToken: string): void {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      })
+    };
+    this.httpHandler.get('/session/logout', httpOptions).subscribe(
+      (res) => {
+        console.log('response', res);
+        return;
+      },
+      (e) => {
+        console.log('error', e);
+        return;
+      });
+  }
+
   // deleteSession removes the session information from localStorage
   deleteSession(): void {
     localStorage.removeItem(sessionKey);
@@ -226,18 +245,20 @@ export class ChefSessionService implements CanActivate {
 
   // url: UI route to go back to when the (next) signin process has succeeded
   // noHint: for the sign in, don't try to skip the method selection
-  logout(url?: string, noHint?: boolean): void {
-    this.deleteSession();
-    url = url || this.currentPath();
-    // note: url will end up url-encoded in this string (magic)
-    let signinURL: string;
-    if (!noHint && this.user && this.user.id_token) {
-      signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
-    } else {
-      signinURL = `/session/new?state=${url}`;
-    }
-
-    window.location.href = signinURL;
+  logout(url?: string, noHint?: boolean, ui_signout?: boolean): void {
+      if (ui_signout) {
+        this.blacklistIdToken(this.id_token);
+      }
+      this.deleteSession();
+      url = url || this.currentPath();
+      // note: url will end up url-encoded in this string (magic)
+      let signinURL: string;
+      if (!noHint && this.user && this.user.id_token) {
+        signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
+      } else {
+        signinURL = `/session/new?state=${url}`;
+      }
+      window.location.href = signinURL;
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
@@ -275,7 +296,7 @@ export class ChefSessionService implements CanActivate {
     function timerIncrement() {
       idleTime = idleTime + 1;
       if (idleTime === idleTimeout + 1) {
-          this.logout();
+          this.logout('/', true);
       }
     }
   }
@@ -307,7 +328,7 @@ export class ChefSessionService implements CanActivate {
     if (this.user) {
       return this.user.id_token;
     }
-    return;
+    return null;
   }
 
   get connector(): string {

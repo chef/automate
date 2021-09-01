@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
 	"os"
@@ -63,7 +64,7 @@ func NewHeaderTokenAuthenticator(headers []string, ts types.Storage, logger *zap
 
 // Open returns an storage-adapter-based header token authenticator
 func (c *HeaderTokenConfig) Open(u *url.URL, serviceCerts *certs.ServiceCerts,
-	logger *zap.Logger) (authenticator.Authenticator, error) {
+	logger *zap.Logger, _ id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error) {
 
 	ts, err := c.Storage.Config.Open(serviceCerts, logger, nil)
 	if err != nil {

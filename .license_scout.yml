@@ -108,6 +108,15 @@ fallbacks:
     - name: github.com/ghodss/yaml
       license_id: MIT
       license_content: https://raw.githubusercontent.com/ghodss/yaml/master/LICENSE
+    - name: golang.org/x/net
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: golang.org/x/sys
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: golang.org/x/text
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
     - name: github.com/golang/protobuf
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE

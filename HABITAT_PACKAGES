@@ -78,3 +78,4 @@ automate-builder-api components/automate-builder-api
 automate-builder-api-proxy components/automate-builder-api-proxy
 sample-data-service components/sample-data-service
 user-settings-service components/user-settings-service
+automate-backend-elasticsearch components/automate-backend-elasticsearch

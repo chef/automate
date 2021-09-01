@@ -71,12 +71,16 @@ export interface CreateDestinationPayload {
   name: string;
   url: string;
   secret?: string;
+  enable?: boolean;
+  integration_type?: string;
+  meta_data?: string;
+  services?: string;
 }
 
 export class CreateDestination implements Action {
   readonly type = DestinationActionTypes.CREATE;
   constructor(public payload: CreateDestinationPayload,
-    public username: string, public password: string ) { }
+    public headers: string ) { }
 }
 
 export class CreateDestinationSuccess implements Action {

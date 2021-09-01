@@ -15,6 +15,7 @@ import (
 
 	"github.com/alexedwards/scs"
 	"github.com/alexedwards/scs/stores/memstore"
+	"github.com/chef/automate/components/session-service/IdTokenBlackLister"
 	go_oidc "github.com/coreos/go-oidc"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -1099,11 +1100,12 @@ func newTestServer(t *testing.T, store scs.Store, persistent bool) (*Server, htt
 	scsManager := createSCSManager(store, persistent)
 
 	s := &Server{
-		log:        l,
-		mgr:        scsManager,
-		signInURL:  u,
-		bldrClient: getBldrStruct(t),
-		client:     &testOAuth2Config{token: &oauth2.Token{}},
+		log:                l,
+		mgr:                scsManager,
+		signInURL:          u,
+		bldrClient:         getBldrStruct(t),
+		client:             &testOAuth2Config{token: &oauth2.Token{}},
+		idTokenBlackLister: IdTokenBlackLister.NewInMemoryBlackLister(),
 	}
 	s.initHandlers()
 
