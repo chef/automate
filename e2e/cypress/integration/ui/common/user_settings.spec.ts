@@ -104,7 +104,7 @@ describe('login the app', () => {
     });
 
     it('change and save telemetry-checkbox', function () {
-      cy.get('[data-cy=telemetry-checkbox]').then((checkbox) => {
+      cy.get('[data-cy=telemetry-checkbox]').then(() => {
         cy.get('[data-cy=telemetry-checkbox]').click().then(() => {
           cy.get('[data-cy=user-details-submit-button]').click();
         });
