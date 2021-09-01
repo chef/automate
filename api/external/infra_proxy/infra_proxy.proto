@@ -14,6 +14,7 @@ import "external/infra_proxy/request/databags.proto";
 import "external/infra_proxy/request/environments.proto";
 import "external/infra_proxy/request/nodes.proto";
 import "external/infra_proxy/request/policyfiles.proto";
+import "external/infra_proxy/request/users.proto";
 
 import "external/infra_proxy/response/orgs.proto";
 import "external/infra_proxy/response/servers.proto";
@@ -24,6 +25,7 @@ import "external/infra_proxy/response/databags.proto";
 import "external/infra_proxy/response/environments.proto";
 import "external/infra_proxy/response/nodes.proto";
 import "external/infra_proxy/response/policyfiles.proto";
+import "external/infra_proxy/response/users.proto";
 
 import "external/annotations/iam/annotations.proto";
 
@@ -327,6 +329,12 @@ service InfraProxy {
   rpc GetPolicygroup (infra_proxy.request.Policygroup) returns (infra_proxy.response.Policygroup) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policygroups";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+
+  rpc GetOrgUsersList (infra_proxy.request.OrgUsers) returns (infra_proxy.response.OrgUsers) {
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 }

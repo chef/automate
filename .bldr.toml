@@ -80,6 +80,7 @@ paths = [
   "api/interservice/authn/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
+  "api/interservice/id_token/*",
   "api/interservice/teams/*",
   "lib/authz/*",
   "lib/cereal/*",
@@ -814,6 +815,7 @@ paths = [
   "api/config/shared/*",
   "api/external/annotations/*",
   "api/external/iam/*",
+  "api/interservice/id_token/*",
   "lib/db/*",
   "lib/grpc/*",
   "lib/httputils/*",
@@ -1111,6 +1113,12 @@ paths = [
   "lib/tracing/*",
   "lib/user/*",
   "lib/version/*"
+]
+
+[automate-backend-elasticsearch]
+plan_path = "components/automate-backend-elasticsearch"
+paths = [
+  "components/automate-backend-elasticsearch/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

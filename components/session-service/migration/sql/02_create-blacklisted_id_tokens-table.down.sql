@@ -1,0 +1,1 @@
+DROP TABLE blacklisted_id_tokens;

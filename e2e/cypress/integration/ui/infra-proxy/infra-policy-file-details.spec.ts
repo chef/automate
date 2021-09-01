@@ -212,15 +212,23 @@ describe('infra policy details', () => {
         }
       });
 
-      it('can open dependency rule accordion', () => {
+      it('can open & close dependency rule accordion', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=dependency-rule]').contains('Dependencies Rules').click();
+          cy.get('[data-cy=dependency-rule-arrow]').click();
         }
       });
 
-      it('can cookbook accordion', () => {
+      it('can open cookbook accordion', () => {
         if (policyFileName !== '') {
           cy.get('[data-cy=cookbook]').contains('Cookbook').click();
+        }
+      });
+
+      it('can open cookbook details page', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=cookbook-table-container] chef-td a').contains(policyFileName).click();
+          cy.get('[data-cy=close-cookbook-detail-button]').click();
           cy.get('[data-cy=close-cookbook-button]').click();
         }
       });
@@ -261,13 +269,22 @@ describe('infra policy details', () => {
       });
     });
 
-    it('can check if run list have data or not', () => {
-      if (policyFileName !== '') {
-        cy.get('[data-cy=run-list]').contains('Run List').click();
-        getPolicyFileDetails(policyFileName, revision).then(response => {
-          checkRunlistResponse(response);
-        });
-      }
+    describe('run list accordion', () => {
+      it('can check if run list have data or not', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=run-list]').contains('Run List').click();
+          getPolicyFileDetails(policyFileName, revision).then(response => {
+            checkRunlistResponse(response);
+          });
+        }
+      });
+
+      it('can open runlist details slider', () => {
+        if (policyFileName !== '') {
+          cy.get('[data-cy=run-list-table-container] chef-td a').contains(policyFileName).click();
+          cy.get('[data-cy=close-cookbook-detail-button] chef-icon').click();
+        }
+      });
     });
 
     it('can show revision id of policyfile', () => {

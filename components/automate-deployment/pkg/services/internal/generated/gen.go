@@ -125,6 +125,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/session-service",
+      "metadata": {
+        "name": "chef/session-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/authn-service",
       "metadata": {
         "name": "chef/authn-service",
@@ -203,16 +213,6 @@ var ProductMetadataJSON = `
     {
       "name": "chef/local-user-service",
       "metadata": null
-    },
-    {
-      "name": "chef/session-service",
-      "metadata": {
-        "name": "chef/session-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
     },
     {
       "name": "chef/config-mgmt-service",

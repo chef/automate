@@ -185,6 +185,11 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
+	if isA2HADeployment() {
+		//TODO need to implement full a2ha deplopyment steps
+		//generation of a2ha.rb file based on config.toml
+		return readConfigAndWriteToFile()
+	}
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {

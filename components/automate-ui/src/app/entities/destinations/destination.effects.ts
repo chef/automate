@@ -35,11 +35,13 @@ import {
   DestinationRequests
 } from './destination.requests';
 import { Destination } from './destination.model';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class DestinationEffects {
   constructor(
     private actions$: Actions,
+    private router: Router,
     private requests: DestinationRequests
   ) { }
 
@@ -86,8 +88,8 @@ export class DestinationEffects {
   createDestination$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE),
-      mergeMap(({ payload, username, password }: CreateDestination) =>
-      this.requests.createDestination( payload, username, password ).pipe(
+      mergeMap(({ payload, headers }: CreateDestination) =>
+      this.requests.createDestination( payload, headers ).pipe(
         map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDestinationFailure(error)))))));
@@ -95,19 +97,20 @@ export class DestinationEffects {
   createDestinationSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE_SUCCESS),
-      map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
-      type: Type.info,
-      message: `Created data feed ${payload.name}.`
-    }))));
+      map(({ payload }: CreateDestinationSuccess) => {
+        this.router.navigate(['/settings/data-feeds/', payload.id]);
+        return new CreateNotification({
+          type: Type.info,
+          message: `Created data feed ${payload.name}.`
+        });
+      })
+    ));
 
   createDestinationFailure$ = createEffect(() =>
     this.actions$.pipe(
     ofType(DestinationActionTypes.CREATE_FAILURE),
-    filter(({ payload }: CreateDestinationFailure) => payload.status !== HttpStatus.CONFLICT),
-    map(({ payload }: CreateDestinationFailure) => new CreateNotification({
-        type: Type.error,
-        message: `Could not create data feed: ${payload.error.error || payload}.`
-      }))));
+    filter(({ payload }: CreateDestinationFailure) => payload.status !== HttpStatus.CONFLICT)),
+    { dispatch: false });
 
   updateDestination$ = createEffect(() =>
     this.actions$.pipe(

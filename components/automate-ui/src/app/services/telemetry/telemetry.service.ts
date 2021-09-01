@@ -115,6 +115,14 @@ export class TelemetryService {
           // integration and leverage analytics.js emitters to send the
           // data.
           analytics.on('page', (_category, name, properties, _options) => {
+            if (properties) {
+              if (properties.referrer) {
+                properties.referrer = this.sanitizeDomainURL(properties.referrer);
+              }
+              if (properties.url) {
+                properties.url = this.sanitizeDomainURL(properties.url);
+              }
+            }
             this.emitToPipeline('page', {
               name: name,
               anonymousId: this.anonymousId,
@@ -146,6 +154,8 @@ export class TelemetryService {
             });
           });
 
+          analytics.sanitizeDomainURL = this.sanitizeDomainURL;
+          analytics.addSourceMiddleware(this.middleware);
           // First we want to get the build version so we can send it with the
           // metadata to the telemetry pipeline
           this.metadataService
@@ -190,6 +200,8 @@ export class TelemetryService {
   }
 
   page(pageName?: string, properties?: any) {
+    properties.url = '';
+    properties.referrer = '';
     this.trackingOperations.next({
       operation: 'page',
       identifier: pageName,
@@ -273,4 +285,34 @@ export class TelemetryService {
   private getCurrentDateTime() {
     return (new Date).toISOString();
   }
+
+  sanitizeDomainURL(url) {
+    let restByDot: any;
+    let firstByDot: string;
+    [firstByDot, ...restByDot] = url.split('.');
+    restByDot = restByDot.join('.');
+    if (restByDot.indexOf('/') > -1) {
+      let [firstBySlash, ...restBySlash] = restByDot.split('/');
+      restBySlash = restBySlash.join('/');
+      firstBySlash = '***';
+      return firstByDot + '.' + firstBySlash + '/' + restBySlash;
+    } else {
+      restByDot = '***';
+      return firstByDot + '.' + restByDot;
+    }
+  }
+
+  middleware({ payload, next }) {
+    if (payload && payload.obj && payload.obj.context && payload.obj.context.page) {
+      const page = payload.obj.context.page;
+      if (page.referrer) {
+        page.referrer = analytics.sanitizeDomainURL(page.referrer);
+      }
+      if (page.url) {
+        page.url = analytics.sanitizeDomainURL(page.url);
+      }
+    }
+    next(payload);
+  }
+
 }

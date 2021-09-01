@@ -31,7 +31,7 @@
     [runlistError]="runlistError"
     (closeRunlist)="closeRunlistModal()">
   </app-edit-infra-node-modal>
-  <app-edit-infra-node-attribute-modal 
+  <app-edit-infra-node-attribute-modal
     [jsonText]="jsonText"
     [openEvent]="openAttributeModal"
     [orgId]="orgId"
@@ -42,7 +42,7 @@
   </app-empty-state>
   <ng-container *ngIf="!nodesListLoading && !authFailure">
     <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name....">
+      <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name...">
       </app-infra-search-bar>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading || deleting" size="50" fixed></chef-loading-spinner>
@@ -107,7 +107,7 @@
                   Reset Key
                   <chef-icon aria-hidden="true" class="primary">add</chef-icon>
                 </mat-option>
-                <mat-option 
+                <mat-option
                   data-cy="delete"
                   class="secondary"
                   (onSelectionChange)="startNodeDelete(node)">

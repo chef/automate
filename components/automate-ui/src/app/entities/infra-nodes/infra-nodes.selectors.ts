@@ -67,3 +67,13 @@ export const updateAttributesStatus = createSelector(
   infraNodeState,
   (state) => state.updateAttributesStatus
 );
+
+export const getAllNodesStatus = createSelector(
+  infraNodeState,
+  (state) => state.getAllNodesStatus
+);
+
+export const policyGroupNodeList = createSelector(
+  infraNodeState,
+  (state) => state.policyGroupNodeList
+);

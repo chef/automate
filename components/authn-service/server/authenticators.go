@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chef/automate/api/interservice/id_token"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -18,12 +19,13 @@ import (
 	"github.com/chef/automate/components/authn-service/authenticator/mock"
 	"github.com/chef/automate/components/authn-service/authenticator/oidc"
 	"github.com/chef/automate/components/authn-service/authenticator/tokens"
+
 	"github.com/chef/automate/lib/tls/certs"
 )
 
 // AuthenticatorConfig is a configuration that can open an authenticator.
 type AuthenticatorConfig interface {
-	Open(*url.URL, *certs.ServiceCerts, *zap.Logger) (authenticator.Authenticator, error)
+	Open(*url.URL, *certs.ServiceCerts, *zap.Logger, id_token.ValidateIdTokenServiceClient) (authenticator.Authenticator, error)
 }
 
 // AuthenticatorsConfig variable provides an easy way to return a config struct
