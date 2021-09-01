@@ -3,7 +3,7 @@ pkg_description="A wrapper package for setting up a deployment workstation for t
 pkg_origin=chef
 pkg_version="1.0.28"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
-pkg_license=("Apache-2.0")
+pkg_license=("Chef-MLSA")
 pkg_deps=(
   core/ruby26
   core/aws-cli
