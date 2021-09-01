@@ -9,6 +9,8 @@ authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-backend-elasticsearch BINDING_MODE strict
+automate-backend-journalbeat REQUIRED elasticsearch
+automate-backend-journalbeat BINDING_MODE strict
 automate-backend-metricbeat REQUIRED elasticsearch
 automate-backend-metricbeat OPTIONAL database
 automate-backend-metricbeat BINDING_MODE strict
