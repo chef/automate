@@ -199,8 +199,8 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 	return v, err
 }
 
-//createChefClient: Creates a client with only server details
-func (s *Server) createChefClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
+//createChefServerClient: Creates a client with only server details
+func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

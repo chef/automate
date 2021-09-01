@@ -22,7 +22,7 @@ func (c *InfraProxyServer) GetOrgUsersList(ctx context.Context, r *gwreq.OrgUser
 	}
 
 	return &gwres.OrgUsers{
-		Users: fromUpstreamOrgUsers(res.Users),
+		Users: fromUpstreamUsers(res.Users),
 	}, nil
 }
 
@@ -40,27 +40,15 @@ func (c *InfraProxyServer) GetServerUsersList(ctx context.Context, r *gwreq.Serv
 	}
 
 	return &gwres.ServerUsers{
-		Users: fromUpstreamServerUsers(res.Users),
+		Users: fromUpstreamUsers(res.Users),
 	}, nil
 }
 
-func fromUpstreamOrgUsers(users []*infra_res.UsersListItem) []*gwres.UsersListItem {
+func fromUpstreamUsers(users []*infra_res.UsersListItem) []*gwres.UsersListItem {
 	us := make([]*gwres.UsersListItem, len(users))
 
 	for i, user := range users {
 		us[i] = &gwres.UsersListItem{
-			Username: user.GetUsername(),
-		}
-	}
-
-	return us
-}
-
-func fromUpstreamServerUsers(users []*infra_res.ServerUserListItem) []*gwres.ServerUserListItem {
-	us := make([]*gwres.ServerUserListItem, len(users))
-
-	for i, user := range users {
-		us[i] = &gwres.ServerUserListItem{
 			Username:  user.GetUsername(),
 			FirstName: user.GetFirstName(),
 			LastName:  user.GetLastName(),

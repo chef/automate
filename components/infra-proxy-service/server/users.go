@@ -27,7 +27,7 @@ func (s *Server) GetOrgUsersList(ctx context.Context, req *request.OrgUsers) (*r
 
 //GetServerUsersList: Get a list of all users in server
 func (s *Server) GetServerUsersList(ctx context.Context, req *request.ServerUsers) (*response.ServerUsers, error) {
-	c, err := s.createChefClient(ctx, req.ServerId, req.AdminKey, req.AdminName)
+	c, err := s.createChefServerClient(ctx, req.ServerId, req.AdminKey, req.AdminName)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +52,10 @@ func fromAPIToListOrgUsers(list []chef.OrgUserListEntry) []*response.UsersListIt
 	return users
 }
 
-func fromAPIToListServerUsers(list map[string]chef.UserVerboseResult) []*response.ServerUserListItem {
-	users := make([]*response.ServerUserListItem, 0)
+func fromAPIToListServerUsers(list map[string]chef.UserVerboseResult) []*response.UsersListItem {
+	users := make([]*response.UsersListItem, 0)
 	for key, val := range list {
-		item := &response.ServerUserListItem{
+		item := &response.UsersListItem{
 			Username:  key,
 			FirstName: val.FirstName,
 			LastName:  val.LastName,

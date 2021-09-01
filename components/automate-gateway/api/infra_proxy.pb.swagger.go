@@ -4391,34 +4391,13 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.ServerUserListItem": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string",
-          "title": "User username"
-        },
-        "first_name": {
-          "type": "string",
-          "title": "User first name"
-        },
-        "last_name": {
-          "type": "string",
-          "title": "User Last name"
-        },
-        "email": {
-          "type": "string",
-          "title": "User email"
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.ServerUsers": {
       "type": "object",
       "properties": {
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ServerUserListItem"
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UsersListItem"
           },
           "title": "Users list"
         }
@@ -4528,6 +4507,18 @@ func init() {
         "username": {
           "type": "string",
           "title": "User username"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User Last name"
+        },
+        "email": {
+          "type": "string",
+          "title": "User email"
         }
       }
     },
