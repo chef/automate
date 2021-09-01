@@ -8,6 +8,7 @@ describe('login the app', () => {
     let attrSelector = '';
     const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
     let selectTimeformat = '';
+    let telemetryEnabled = false;
     before(() => {
       cy.adminLogin('/').then(() => {
         const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
@@ -22,6 +23,17 @@ describe('login the app', () => {
         }).then((resp) => {
           if (resp.status === 200 && resp.statusText === 'OK') {
             timeformat = resp.body.settings.date_format.value;
+            return;
+          }
+        });
+        cy.request({
+          auth: { bearer: adminIdToken },
+          failOnStatusCode: false,
+          method: 'GET',
+          url: 'api/v0/telemetry/config'
+        }).then((resp) => {
+          if (resp.status === 200 && resp.statusText === 'OK') {
+            telemetryEnabled = resp.body.telemetry_enabled;
             return;
           }
         });
@@ -43,6 +55,14 @@ describe('login the app', () => {
               .contains(timeformat);
           });
 
+      });
+    });
+
+    it('telemetry-checkbox updated in user details form', function () {
+      cy.get('app-user-details').should('exist').then(() =>  {
+          cy.get('[data-cy=telemetry-checkbox]').should('exist');
+          cy.get('[data-cy=telemetry-checkbox] chef-icon').contains('check');
+          expect(telemetryEnabled).to.equal(true);
       });
     });
 
@@ -79,6 +99,14 @@ describe('login the app', () => {
                 });
             });
           });
+        });
+      });
+    });
+
+    it('change and save telemetry-checkbox', function () {
+      cy.get('[data-cy=telemetry-checkbox]').then((checkbox) => {
+        cy.get('[data-cy=telemetry-checkbox]').click().then(() => {
+          cy.get('[data-cy=user-details-submit-button]').click();
         });
       });
     });
