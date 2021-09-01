@@ -12,7 +12,6 @@ FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
 FRONTENDAIB_TFVARS = $(shell pwd)/a2ha_aib_fe.auto.tfvars
 TMPFILE := $(shell mktemp)
 VARFILES := $(shell find $(TERRAFORM_PATH) -name variables.tf -o -name inputs.tf)
-COMPONENTS := $(shell find components -maxdepth 1 -type d -name automate-backend-\* | awk -F/ '{print $2}')
 HABITAT_TFVARS = $(shell pwd)/a2ha_habitat.auto.tfvars
 
 # Help menu colors
