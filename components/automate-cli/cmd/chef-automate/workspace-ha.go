@@ -50,7 +50,7 @@ func executeWorkspaceCommand(args []string) error {
 		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, "please refer \n"+workspaceCommandHelpDocs)
 	}
-	writer.Print(string(out.String()))
+	writer.Print(out.String())
 	writer.Printf("workspace cluster setup done. %d, exiting\n", c.Process.Pid)
 	return err
 }
