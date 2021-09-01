@@ -1,3 +1,3 @@
 # Example InSpec Profile
 
-This example shows the implementation of an InSpec profile. A2ha elasticsearch, postgres, chef-server and automate's inspec depend on this inspec.
+A2ha's elasticsearch, postgres, chef-server and frontend's inspec depend on this inspec. This inspec will make sure that postgresql or any dependent service for frontends and backends are running or not.

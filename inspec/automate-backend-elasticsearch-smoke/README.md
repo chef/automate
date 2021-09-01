@@ -1,3 +1,7 @@
-# Example InSpec Profile
+# A2ha Elaticserch InSpec Profile
 
-This example shows the implementation of an InSpec profile. A2ha elasticsearch inspec is written.
+This test will check below services are installed and up or not  on elasticsearch node and also check certificate validity for kibana and elasticsearch.
+    - chef/automate-backend-elasticsearch
+    - chef/automate-backend-kibana
+    - chef/automate-backend-metricbeat
+    - chef/automate-backend-journalbeat
