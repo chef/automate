@@ -13,6 +13,8 @@ automate-backend-haproxy OPTIONAL database pgleaderchk
 automate-backend-haproxy BINDING_MODE strict
 automate-backend-journalbeat REQUIRED elasticsearch
 automate-backend-journalbeat BINDING_MODE strict
+automate-backend-kibana REQUIRED elasticsearch
+automate-backend-kibana BINDING_MODE strict
 automate-backend-metricbeat REQUIRED elasticsearch
 automate-backend-metricbeat OPTIONAL database
 automate-backend-metricbeat BINDING_MODE strict

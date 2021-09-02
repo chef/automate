@@ -1138,6 +1138,12 @@ plan_path = "components/automate-backend-haproxy"
 paths = [
   "components/automate-backend-haproxy/*"
 ]
+
+[automate-backend-kibana]
+plan_path = "components/automate-backend-kibana"
+paths = [
+  "components/automate-backend-kibana/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
