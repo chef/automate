@@ -84,6 +84,11 @@ module AutomateCluster
         check_aib_tfvars(config_file, :frontend_aib_local_file)
       end
 
+      def tf_aib_valid?
+        config_file = File.join(terraform_path, "a2ha_aib_fe.auto.tfvars")
+        check_aib_tfvars(config_file, :frontend_aib_local_file)
+      end
+
       def tf_ready?
         File.exists?(tfarch_file) && File.exists?(tfinit_file)
       end

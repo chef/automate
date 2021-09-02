@@ -1,9 +1,9 @@
 pkg_name=automate-cluster-ctl
 pkg_description="A package for automate-cluster-ctl for the A2 HA Backend."
 pkg_origin=chef
-pkg_version="1.0.28"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Apache-2.0")
+pkg_version="1.0.28"
 pkg_deps=(
   core/ruby26
   chef/inspec
@@ -29,7 +29,6 @@ pkg_build_deps=(
 )
 
 pkg_bin_dirs=(bin)
-
 
 do_before() {
   update_pkg_version
@@ -74,7 +73,11 @@ do_install() {
   pushd "$HAB_CACHE_SRC_PATH/$pkg_dirname/"
     cp -r lib $pkg_prefix/
     cp -r libexec $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/workspace/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/workspace/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/workspace/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/
     cp -r templates $pkg_prefix/
     cp -r vendor $pkg_prefix/
   popd

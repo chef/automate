@@ -26,12 +26,20 @@ class AutomateClusterSetup < AutomateCluster::Command
   option ["-s", "--skip-deploy"], :flag, "Skip the deploy step, this this if you only want to update terraform plans or airgap bundles."
   option ["-t", "--timeout"], 'MINUTES', "Set timeout value for commands to finish running", default: 10
 
+  def valid_bundle?
+    tf_aib_valid?
+  end
+
   def valid_fe_bundle?
     tf_manifest_exist? && tf_fe_aib_valid?
   end
 
   def valid_be_bundle?
     tf_manifest_exist? && tf_be_aib_valid?
+  end
+
+  def new_bundle?
+    !valid_bundle? || upgrade_frontends? || upgrade_airgap_bundles?
   end
 
   def need_fe_bundle?
@@ -45,6 +53,23 @@ class AutomateClusterSetup < AutomateCluster::Command
   def command_opts(opts = {})
     # convert timeout to seconds
     { timeout: timeout.to_i * 60 }.merge(opts)
+  end
+  
+  def generate_bundle
+    wait_while 'Generating FE airgap bundle', true do |spin|
+      status = run_make_cmd('fe-bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating FE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate FE airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_bundle?
+ 
   end
 
   def generate_airgap_bundle
@@ -95,6 +120,11 @@ class AutomateClusterSetup < AutomateCluster::Command
   end
 
   def execute
+    if AutomateCluster::Config.architecture == "aws"
+      logger.info "Architecture does not match with requested one. If you want to provision cluster then you have to first run provision command. After that you can run this command."
+      exit
+    end
+    
     AutomateCluster.terraform.setup.run(config.architecture)
 
     unless predeploy_checks?
@@ -102,7 +132,7 @@ class AutomateClusterSetup < AutomateCluster::Command
       exit 1
     end
 
-    generate_airgap_bundle
+    generate_bundle
 
     wait_while 'Logging into AWS using okta_aws' do |spinner|
       so = login_with_okta
@@ -146,6 +176,7 @@ class AutomateClusterSetup < AutomateCluster::Command
     else
       logger.info "No changes detected, infrastructure up-to-date"
     end
+      
   end
 
   def terraform_secret_envs
