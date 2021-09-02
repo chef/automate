@@ -47,11 +47,11 @@
           <div class="spinner">
             <chef-loading-spinner *ngIf="policyGroupDetailsLoading" size="50" fixed></chef-loading-spinner>
           </div>
-          <div data-cy="empty-list" class="empty-section" *ngIf="true">
+          <div data-cy="empty-list" class="empty-section" *ngIf="!isPolicyfileAvailable">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p>No policyfiles available</p>
           </div>
-          <div *ngIf="!policyGroupDetailsLoading || policyCount > 0">
+          <div *ngIf="!policyGroupDetailsLoading || isPolicyfileAvailable">
             <chef-table data-cy="policy-group-details-table-container">
               <chef-thead>
                 <chef-tr class="no_border_tr">
@@ -69,7 +69,7 @@
                   <chef-td>{{policyFile.revision_id}}</chef-td>
                 </chef-tr>
               </chef-tbody>
-            </chef-table>            
+            </chef-table>
           </div>
         </div>
       </section>
@@ -111,6 +111,13 @@
                 </chef-tr>
               </chef-tbody>
             </chef-table>
+            <app-page-picker
+              class="nodes-list-paging"
+              [total]="total"
+              [perPage]="per_page"
+              [page]="current_page"
+              (pageChanged)="onPageChange($event)">
+            </app-page-picker>
           </div>
         </div>
       </section>
