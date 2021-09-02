@@ -83,3 +83,4 @@ automate-backend-metricbeat components/automate-backend-metricbeat
 automate-backend-journalbeat components/automate-backend-journalbeat
 automate-backend-haproxy components/automate-backend-haproxy
 automate-backend-kibana components/automate-backend-kibana
+automate-backend-elasticsidecar components/automate-backend-elasticsidecar
