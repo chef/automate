@@ -1,0 +1,16 @@
+admin_username = "{{bind.elasticsearch.first.cfg.admin_username}}"
+admin_password = "{{bind.elasticsearch.first.cfg.admin_password}}"
+dashboard_username = "{{bind.elasticsearch.first.cfg.dashboard_username}}"
+dashboard_password = "{{bind.elasticsearch.first.cfg.dashboard_password}}"
+ssl_verify = {{cfg.ssl_verify}}
+log_debug = {{cfg.log_debug}}
+elasticsearch_ca = "/hab/svc/automate-backend-elasticsidecar/config/certificates/MyRootCA.pem"
+admin_key = "/hab/svc/automate-backend-elasticsidecar/config/certificates/odfe-admin.key"
+admin_cert = "/hab/svc/automate-backend-elasticsidecar/config/certificates/odfe-admin.pem"
+securityconfig_path = "/hab/svc/automate-backend-elasticsidecar/data/securityconfig"
+elasticsearch_ip = "{{cfg.elasticsearch_ip}}"
+elasticsearch_port = {{cfg.elasticsearch_port}}
+wait_period = {{cfg.wait_period}}
+java_home = "{{pkgPathFor "core/openjdk11"}}"
+tool_path = "{{pkgPathFor "chef/elasticsearch-odfe"}}/plugins/opendistro_security/tools/"
+dashboard_directory = "{{cfg.dashboard_directory}}"
