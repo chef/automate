@@ -467,15 +467,31 @@ Use the search bar on the Policyfile tab (**Chef Infra Server > Policyfile**) to
 
 #### Details of Policyfiles
 
-Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, and **Revision ID** of that Policyfile.
+Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Revision ID**, and **Cookbook Dependencies** of that Policyfile.
 
 {{< figure src="/images/automate/details-of-policyfiles.png" alt="Details of Policyfiles">}}
 
-The **Content** tab contains the list of all the *included policies* and *run lists*, whereas the **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
+##### Content Tab
+
+The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific Policyfile from the *Included Policies* to view the details.
+
+{{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
+
+In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
+
+##### Attributes Tab
+
+The **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
 
 {{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
 You can **Expand** and **Collapse** the *default* and *override* attributes by selecting the option.
+
+##### Cookbook Dependencies
+
+Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. The slider tab also contains the `Operator` and `Version` of the cookbooks.
+
+{{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
 {{< note >}}
 You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
@@ -488,6 +504,26 @@ You can find the **Revision ID** window directly by selecting the ellipses icon 
 Delete individual Policyfiles by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Delete**:
 
 {{< figure src="/images/automate/delete-policyfiles.png" alt="Delete Policyfiles">}}
+
+### Policy Group
+
+The Chef Infra Server integration lets you:
+
+- Search for a Policy Group
+- View all the Policy Groups
+- View the details of a Policy Group
+
+#### Search for a Policy Group
+
+Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) to find a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
+
+{{< figure src="/images/automate/search-for-a-policygroup.png" alt="Search for a Policy Group">}}
+
+#### View the details of a Policy Group
+
+Select a Policy Group to view the Policy Group Information and METADATA of that Policy Group.
+
+{{< figure src="/images/automate/details-of-the-policygroup.png" alt="Details of a Policy Group">}}
 
 ## Troubleshoot
 
