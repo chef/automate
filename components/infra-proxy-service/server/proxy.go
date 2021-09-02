@@ -198,3 +198,45 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 
 	return v, err
 }
+
+//createChefServerClient: Creates a client with only server details
+func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	server, err := s.service.Storage.GetServer(ctx, serverID)
+	if err != nil {
+		return nil, service.ParseStorageError(err, serverID, "server")
+	}
+
+	baseURL, err := targetServerURL(server.Fqdn, server.IPAddress)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server url: %s", baseURL)
+	}
+
+	client, err := NewChefClient(&ChefConfig{
+		Name:    adminName,
+		Key:     adminkey,
+		SkipSSL: true,
+		BaseURL: baseURL,
+	})
+
+	return client, err
+}
+
+// targetServerURL:  constructing the base URL based on fqdn|ipAddress value for only server
+func targetServerURL(fqdn string, IPAddress string) (string, error) {
+	path := fqdn
+	if path == "" {
+		path = IPAddress
+	}
+	path = path + "/"
+
+	baseURL, err := url.Parse(path)
+	if err != nil {
+		return "", errors.Wrap(err, err.Error())
+	}
+	baseURL.Scheme = "https"
+
+	return baseURL.String(), nil
+}

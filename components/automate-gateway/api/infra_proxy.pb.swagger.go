@@ -2542,6 +2542,45 @@ func init() {
           "InfraProxy"
         ]
       }
+    },
+    "/api/v0/infra/servers/{server_id}/users": {
+      "post": {
+        "operationId": "InfraProxy_GetServerUsersList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ServerUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Chef Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ServerUsers"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
     }
   },
   "definitions": {
@@ -2868,6 +2907,23 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each page."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.request.ServerUsers": {
+      "type": "object",
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "admin_name": {
+          "type": "string",
+          "description": "Chef Infra server admin name."
+        },
+        "admin_key": {
+          "type": "string",
+          "description": "Chef Infra server admin key."
         }
       }
     },
@@ -4335,6 +4391,18 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.ServerUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.UsersListItem"
+          },
+          "title": "Users list"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.SolutionDependencies": {
       "type": "object",
       "properties": {
@@ -4439,6 +4507,18 @@ func init() {
         "username": {
           "type": "string",
           "title": "User username"
+        },
+        "first_name": {
+          "type": "string",
+          "title": "User first name"
+        },
+        "last_name": {
+          "type": "string",
+          "title": "User Last name"
+        },
+        "email": {
+          "type": "string",
+          "title": "User email"
         }
       }
     },
