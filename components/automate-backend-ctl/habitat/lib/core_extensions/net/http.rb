@@ -71,7 +71,7 @@ module Net
           s.session = @ssl_session
         end
         ssl_socket_connect(s, @open_timeout)
-        if @ssl_context.verify_mode != OpenSSL::SSL::VERIFY_NONE
+        if @ssl_context.verify_mode != OpenSSL::SSL::VERIFY_PEER
           s.post_connection_check(@address)
         end
         D "SSL established"
