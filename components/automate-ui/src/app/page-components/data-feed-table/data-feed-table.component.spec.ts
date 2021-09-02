@@ -1,13 +1,10 @@
 import { waitForAsync, TestBed } from '@angular/core/testing';
 import {
-  CUSTOM_ELEMENTS_SCHEMA,
- // Component,
-  //Input
+  CUSTOM_ELEMENTS_SCHEMA
 } from '@angular/core';
 import { MockComponent } from 'ng2-mock-component';
 import { ngrxReducers,runtimeChecks} from 'app/ngrx.reducers';
 import { DataFeedTableComponent } from './data-feed-table.component';
-import { Destination } from 'app/entities/destinations/destination.model';
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 import { StoreModule } from '@ngrx/store';
 
@@ -51,15 +48,9 @@ describe('DataFeedTableComponent', () => {
         MockComponent({ selector: 'a', inputs: ['routerLink'] })
       ],
       providers: [
-        // FeatureFlagsService,
-         DestinationRequests,
-        // HttpClient,
-        // HttpHandler
+         DestinationRequests
       ],
       imports: [
-        // FormsModule,
-        // ReactiveFormsModule,
-        // RouterTestingModule,
          StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
@@ -86,17 +77,6 @@ describe('DataFeedTableComponent', () => {
   });
 
 
-
-  // describe('initialization', () => {
-  //   it('should render a table', () => {
-  //     fixture.detectChanges();
-  //     expect(
-  //       element.nativeElement.querySelector('chef-table > chef-thead')).not.toBe(null);
-  //     expect(
-  //       element.nativeElement.querySelector('chef-table > chef-tbody')).not.toBe(null);
-  //   });
-  // });
-
   it('it should toggle Column Dropdown', () => {
     expect(component.columnDropdownVisible).toBeFalsy();
     component.toggleColumnDropdown();
@@ -109,11 +89,15 @@ describe('DataFeedTableComponent', () => {
     expect(component.columnDropdownVisible).toBeFalsy();
   });
 
-  // it('it should sort the destinations', () => {
-  //   component.onToggleSort('ASC');
-  //   expect(component.sortVal).toEqual('DESC');
-  //   //expect(destinations).toEqual()
-  // });
+  it('it should sort the destinations ASC', () => {
+    component.onToggleSort('ASC');
+    expect(component.sortval).toEqual('DESC');
+  });
+
+  it('it should sort the destinations DESC', () => {
+    component.onToggleSort('DESC');
+    expect(component.sortval).toEqual('ASC');
+  });
 
 
 

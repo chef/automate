@@ -5,7 +5,7 @@ export interface Destination {
   secret: string;
   enable?: boolean;
   integration_types?: string;
-  meta_data?: string;
+  meta_data?: [];
   services?: string;
 }
 export interface Metadata {
@@ -17,4 +17,4 @@ export interface Metadata {
 export interface EnableDestination {
   id: string;
   enable: boolean;
-} 
+}

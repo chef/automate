@@ -17,33 +17,6 @@
       </chef-page-header>
       <div class="page-body">
         <chef-button primary (click)="slidePanel()" data-cy="create-data-feed"><img alt="" class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
-        <div *ngIf="(sortedDestinations$ | async)?.length === 0" class="empty-state">
-          <img alt="No preview" src="/assets/img/no_preview.gif" />
-          <p>No Data Feeds Preview Available</p>
-        </div>
-
-        <!-- <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
-          <chef-thead>
-            <chef-tr>
-              <chef-th>Name</chef-th>
-              <chef-th class="three-dot-column"></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor= "let destination of sortedDestinations$ | async">
-              <chef-td>
-                <a [routerLink]="['/settings/data-feeds/', destination.id]">{{ destination.name }}</a>
-              </chef-td>
-              <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}">
-                  <mat-option (onSelectionChange)="startDataFeedSendTest($event, destination)" data-cy="test-data-feed">Test Data Feed</mat-option>
-                  <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed">Delete Data Feed</mat-option>
-                </mat-select>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table> -->
-        {{sortedDestinations$ | async | json}}
         <app-data-feed-table [destinations]="sortedDestinations$ | async"
         [selectedFieldDirection]="fieldDirection$ | async"
         [selectedSortField]="sortField$ | async"

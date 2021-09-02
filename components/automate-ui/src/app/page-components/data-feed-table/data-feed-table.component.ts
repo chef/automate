@@ -4,7 +4,7 @@ import {
   OnChanges,
   Input} from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core';
-import { DeleteDestination, EnableDisableDestination, TestDestination } from 'app/entities/destinations/destination.actions';
+import { DeleteDestination, EnableDisableDestination} from 'app/entities/destinations/destination.actions';
 import { Destination } from 'app/entities/destinations/destination.model';
 import { Observable, Subject } from 'rxjs';
 import { select, Store } from '@ngrx/store';
@@ -28,15 +28,14 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
   public deleteModalVisible = false;
   public sendingDataFeed = false;
   @Input()  destinations: Destination[];
+  public selectedSortField: string;
   columnDropdownVisible = false;
-  selectedSortField: string;
-  serviceShow: true;
   public enable = false;
-  public sortval:string = 'ASC';
+  public sortval:string = 'DESC';
   selectedFieldDirection: string = 'DESC';
   private isDestroyed = new Subject<boolean>();
   integration_typeShow: boolean = true;
-
+  serviceShow: boolean = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -72,12 +71,6 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
     }
   }
 
-  public startDataFeedSendTest($event: MatOptionSelectionChange, destination: Destination) {
-    if ($event.isUserInput) {
-      this.store.dispatch(new TestDestination({destination}));
-    }
-  }
-
   public deleteDataFeed(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteDestination(this.dataFeedToDelete));
@@ -87,33 +80,30 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
     this.deleteModalVisible = false;
   }
 
-  sortIcon(): string {
-    if (this.sortval === 'ASC' || 'DESC') {
+  sortIcon(field: string): string {
+    //console.log('sortfeed',this.selectedSortField)
+    if (field === this.selectedSortField && (this.sortval === 'ASC' || 'DESC')) {
+      console.log('print',field,this.selectedSortField)
       return 'sort-' + this.sortval.toLowerCase();
     } else {
+      console.log('print else part',field,this.selectedSortField)
       return 'sort';
+      
     }
   }
 
   onToggleSort(field: string) {
-    // if (this.selectedSortField === field) {
-    //   const fieldDirection = this.selectedFieldDirection === 'ASC' ? 'DESC' : 'ASC';
-    //   this.updateSort.emit({field: field, fieldDirection: fieldDirection});
-    // } else {
-    //   this.updateSort.emit({field: field, fieldDirection: this.defaultFieldDirection[field]});
-    // }
-    console.log(this.destinations[0]['name']);
-
-    
     const fieldDirection = this.sortval
+    this.selectedSortField=field;
     console.log(fieldDirection);
-    if(fieldDirection=='ASC')
-    {
-       this.destinations.sort((a,b) =>  (a[field] > b[field] ? 1 : -1));
-       this.sortval='DESC'
+    console.log('field',field,this.destinations[0].integration_types)
+    this.sortval=this.sortval==='ASC'? 'DESC' : 'ASC';
+    if(this.sortval==='ASC'){
+      console.log('under if asc ')
+       this.destinations = this.destinations.sort((a,b) =>  (a[field] > b[field] ? 1 : -1));
     } else {
-      this.destinations.sort((a,b) => (a[field] > b[field] ? -1 : 1))
-      this.sortval='ASC'
+      console.log('under if dsc ')
+      this.destinations=this.destinations.sort((a,b) => (a[field] > b[field] ? -1 : 1))
     }
   }
 

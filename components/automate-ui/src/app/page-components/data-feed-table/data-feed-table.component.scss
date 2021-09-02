@@ -255,3 +255,54 @@ a, a:visited {
 .pointer-none{
   pointer-events: none;
 } 
+
+.button_css{
+    background: white;
+    color: black;
+}
+
+.eyeIcon {
+  width: 1em;
+  float: right;
+  height: auto;
+  padding: 1em 0em 0em 0em;
+}
+
+.binIcon {
+  width: 1em;
+  float: right;
+  height: auto;
+  padding: 1em 0em 0em 0em;
+}
+
+
+.chef-control-menu{
+  width: 8.5em
+}
+
+::ng-deep .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
+  background: #3864F2;
+}
+
+::ng-deep .mat-option {
+  width: 171px;
+}
+
+.eyeChange:hover{
+  img{
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(31deg) brightness(103%) contrast(101%);
+  }
+}
+
+.border_enable{
+  border: solid 1px;
+  border-color: #CFD2D2;
+  border-radius: 5px 5px 0 0;
+}
+
+.border_delete{
+  border: solid 1px;
+  border-color: #CFD2D2;
+  border-radius: 0 0 5px 5px;
+
+}
