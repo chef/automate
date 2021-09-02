@@ -281,7 +281,11 @@ func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*resp
 	err := validation.New(validation.Options{
 		Target:          "role",
 		Request:         *req,
-		RequiredDefault: true,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
 	}).Validate()
 
 	if err != nil {
