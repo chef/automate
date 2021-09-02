@@ -31,10 +31,12 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
   public policyCount: number;
   public policies: IncludedPolicyLocks[];
   public policyGroupDetailsLoading = true;
+  public isPolicyfileAvailable = false;
   public tabValue: PolicyGroupTabName = 'policyfiles';
   public url: string;
-  public currentPage = 1;
+  public current_page = 1;
   public per_page = 9;
+  public total: number;
   public nodes: {items: InfraNode[], total: number};
   public policyGroupNodesLoading = true;
   public isNodesAvailable = false;
@@ -82,6 +84,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       this.policyCount = policyGroup.policies.length;
       this.policies =  policyGroup.policies;
       this.policyGroupDetailsLoading = false;
+      this.isPolicyfileAvailable = this.policyCount > 0 ? true : false;
     });
 
     combineLatest([
@@ -95,6 +98,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
         if (getAllSt === EntityStatus.loadingSuccess && !isNil(nodeList)) {
           this.nodes = nodeList;
           this.isNodesAvailable = (this.nodes.total > 0) ? true : false;
+          this.total = this.nodes.total;
           this.policyGroupNodesLoading = false;
         } else if (getAllSt === EntityStatus.loadingFailure) {
           this.policyGroupNodesLoading = false;
@@ -118,7 +122,7 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
       server_id: this.serverId,
       org_id: this.orgId,
       policyGroupName: this.name,
-      page: this.currentPage,
+      page: this.current_page,
       per_page: this.per_page
     }));
   }
@@ -127,5 +131,10 @@ export class PolicyGroupDetailsComponent implements OnInit, OnDestroy {
     const epchoTime = Number(epochFormat);
     const fromNowValue = this.timeFromNowPipe.transform(epchoTime);
     return fromNowValue === '-' ? '--' : fromNowValue;
+  }
+
+  onPageChange(event: number): void {
+    this.current_page = event;
+    this.loadNodes();
   }
 }
