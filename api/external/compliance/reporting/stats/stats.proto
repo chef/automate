@@ -185,6 +185,8 @@ message Query {
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
+  // Flag instructing the api on whether or not to include non-filtered stats as part of response
+	bool include_unfiltered = 26;
 }
 
 message Summary {
@@ -251,14 +253,16 @@ message Stats {
 
 // Statistics on the overall compliance reports.
 message ReportSummary {
-	// Intentionally blank.
-	Stats stats = 4;
 	// Overall aggregated status for all the reports.
 	string status = 1;
 	// Not used.
 	double duration = 2;
 	// Not used.
 	string start_date = 3;
+	// Intentionally blank.
+	Stats stats = 4;
+	// Total stats counts for a given day, unfiltered.
+	Stats unfiltered_stats = 5;
 }
 
 message Trend {

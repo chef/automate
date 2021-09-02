@@ -550,6 +550,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each paginated request page."
+        },
+        "include_unfiltered": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Flag instructing the api on whether or not to include non-filtered stats as part of response"
         }
       }
     },
@@ -565,10 +570,6 @@ func init() {
     "chef.automate.api.compliance.reporting.stats.v1.ReportSummary": {
       "type": "object",
       "properties": {
-        "stats": {
-          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
-          "description": "Intentionally blank."
-        },
         "status": {
           "type": "string",
           "description": "Overall aggregated status for all the reports."
@@ -581,6 +582,14 @@ func init() {
         "start_date": {
           "type": "string",
           "description": "Not used."
+        },
+        "stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
+          "description": "Intentionally blank."
+        },
+        "unfiltered_stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
+          "description": "Total stats counts for a given day, unfiltered."
         }
       },
       "description": "Statistics on the overall compliance reports."
