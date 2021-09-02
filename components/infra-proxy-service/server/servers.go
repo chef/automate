@@ -119,13 +119,20 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 
 	// Validate all request fields are required
 	err := validation.New(validation.Options{
-		Target:          "server",
-		Request:         *req,
-		RequiredDefault: true,
+		Target:  "server",
+		Request: *req,
+		Rules: validation.Rules{
+			"Id":   []string{"required"},
+			"Name": []string{"required"},
+		},
 	}).Validate()
 
 	if err != nil {
 		return nil, err
+	}
+
+	if req.Fqdn == "" && req.IpAddress == "" {
+		return nil, errors.New("FQDN or IP required to update the server.")
 	}
 
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
