@@ -507,8 +507,6 @@ Delete individual Policyfiles by selecting the ellipses icon {{< fontawesome cla
 
 ### Policy Group
 
-[Policy Group]({{< relref "/policygroup" >}})
-
 The Chef Infra Server integration lets you:
 
 - Search for a Policy Group
