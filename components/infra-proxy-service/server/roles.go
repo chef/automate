@@ -279,9 +279,13 @@ func (s *Server) DeleteRole(ctx context.Context, req *request.Role) (*response.R
 // UpdateRole updates the role
 func (s *Server) UpdateRole(ctx context.Context, req *request.UpdateRole) (*response.Role, error) {
 	err := validation.New(validation.Options{
-		Target:          "role",
-		Request:         *req,
-		RequiredDefault: true,
+		Target:  "role",
+		Request: *req,
+		Rules: validation.Rules{
+			"OrgId":    []string{"required"},
+			"ServerId": []string{"required"},
+			"Name":     []string{"required"},
+		},
 	}).Validate()
 
 	if err != nil {
