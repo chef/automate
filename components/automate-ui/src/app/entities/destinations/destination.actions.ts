@@ -73,7 +73,7 @@ export interface CreateDestinationPayload {
   url: string;
   secret?: string;
   enable?: boolean;
-  integration_type?: string;
+  integration_types?: string;
   meta_data?: Array<KVData>;
   services?: string;
 }

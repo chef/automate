@@ -22,7 +22,8 @@ import {
   CreateDestination,
   GetDestinations,
   DeleteDestination,
-  TestDestination
+  TestDestination,
+  CreateDestinationPayload
 } from 'app/entities/destinations/destination.actions';
 
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
@@ -227,36 +228,16 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   public saveDestination(event: any) {
 
-    // if (this.integTitle === WebhookIntegrationTypes.SERVICENOW ||
-    //   this.integTitle === WebhookIntegrationTypes.SPLUNK ||
-    //   this.integTitle === WebhookIntegrationTypes.ELK_KIBANA){
-    //   if (this.authSelected === AuthTypes.ACCESSTOKEN) {
-    //     if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-    //       this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-    //       return true;
-    //     }
-    //   } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
-    //     if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-    //       this.createForm.get('username').valid && this.createForm.get('password').valid) {
-    //       return true;
-    //     }
-    //   }
-    // } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM) {
-
-    // } else if (this.integTitle === StorageIntegrationTypes.MINIO) {
-    //     if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
-    //       this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
-    //       this.createForm.get('secretKey').valid) {
-    //       return true;
-    //     }
-    // }
+    let destinationObj: CreateDestinationPayload,
+        headers: string,
+        storage: any;
 
     this.creatingDataFeed = true;
     if (event.name === WebhookIntegrationTypes.SERVICENOW ||
       event.name === WebhookIntegrationTypes.SPLUNK ||
       event.name === WebhookIntegrationTypes.ELK_KIBANA) {
       if (event.auth === AuthTypes.ACCESSTOKEN) {
-        const destinationObj = {
+        destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
           url: this.createDataFeedForm.controls['url'].value.trim(),
           integration_types: 'Webhook',
@@ -264,13 +245,13 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         };
         const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
         const token: string = this.createDataFeedForm.controls['token'].value.trim();
-        const headers = JSON.stringify({
+        headers = JSON.stringify({
           Authorization: tokenType + ' ' + token
         });
-        this.store.dispatch(new CreateDestination(destinationObj, headers, null));
+        storage = null;
 
       } else if (event.auth === 'Username and Password') {
-        const destinationObj = {
+        destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
           url: this.createDataFeedForm.controls['url'].value.trim(),
           integration_types: 'Webhook',
@@ -278,11 +259,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         };
         const username: string = this.createDataFeedForm.controls['username'].value.trim();
         const password: string = this.createDataFeedForm.controls['password'].value.trim();
-        const headers = JSON.stringify({
+        headers = JSON.stringify({
           Authorization: 'Basic ' + btoa(username + ':' + password)
         });
-
-        this.store.dispatch(new CreateDestination(destinationObj, headers, null));
+        storage = null;
       }
     } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
 
@@ -292,7 +272,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         //   this.createForm.get('secretKey').valid) {
         //   return true;
         // }
-        const destinationObj = {
+        destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
           url: this.createDataFeedForm.controls['endpoint'].value.trim(),
           integration_types: 'Storage',
@@ -306,9 +286,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         };
         const accessKey: string = this.createDataFeedForm.controls['accessKey'].value.trim();
         const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
-        const storage = {accessKey, secretKey};
-
-        this.store.dispatch(new CreateDestination(destinationObj, null, storage));
+        storage = {accessKey, secretKey};
+        headers = null;
     }
+
+    this.store.dispatch(new CreateDestination(destinationObj, headers, storage));
   }
 }
