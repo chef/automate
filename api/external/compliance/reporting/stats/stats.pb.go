@@ -2352,6 +2352,19 @@ type StatsServiceClient interface {
 	//}
 	//```
 	//
+	//Example: Report Summary with unfiltered_stats included
+	//```
+	//{
+	//"type":"",
+	//"include_unfiltered":true,
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
+	//
 	//Authorization Action:
 	//```
 	//compliance:reportSummary:get
@@ -2492,6 +2505,19 @@ type StatsServiceServer interface {
 	//```
 	//{
 	//"type":"nodes",
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
+	//
+	//Example: Report Summary with unfiltered_stats included
+	//```
+	//{
+	//"type":"",
+	//"include_unfiltered":true,
 	//"filters":[
 	//{"type":"environment","values":["dev*"]},
 	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
