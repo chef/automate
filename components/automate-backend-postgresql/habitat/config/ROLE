@@ -1,0 +1,6 @@
+{{#if svc.me.follower }}
+FOLLOWER
+{{/if}}
+{{#if svc.me.leader }}
+LEADER
+{{/if}}
