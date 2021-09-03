@@ -184,6 +184,10 @@ export class DataFeedCreateComponent {
     this.showFields.headers = false;
     this.integTitle = integration;
     this.createForm.reset();
+    setTimeout(() => {
+      this.showSelect = true;
+      this.name.nativeElement.focus();
+    });
 
     if (integration === WebhookIntegrationTypes.SERVICENOW) {
       this.showFieldWebhook();
@@ -193,7 +197,6 @@ export class DataFeedCreateComponent {
 
     } else if (integration === WebhookIntegrationTypes.SPLUNK) {
       this.showFieldWebhook();
-      this.createForm.reset();
       this.authSelected = AuthTypes.ACCESSTOKEN;
       this.createForm.controls['tokenType'].setValue('Splunk');
       this.integrationSelected = true;
@@ -201,15 +204,9 @@ export class DataFeedCreateComponent {
     } else if (integration === StorageIntegrationTypes.MINIO) {
       this.showFieldStorage();
       this.showFields.region = false;
-      this.createForm.reset();
       this.integrationSelected = true;
 
     }
-
-    setTimeout(() => {
-      this.showSelect = true;
-      this.name.nativeElement.focus();
-    });
 
     // else if (integration === WebhookIntegrationTypes.ELK_KIBANA) {
     //   this.showFieldWebhook();
