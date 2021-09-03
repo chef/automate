@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 
@@ -39,8 +40,12 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, errors.New("FQDN or IP required to add the server.")
 	}
 
+	serverHost := req.GetFqdn()
+	if serverHost == "" {
+		serverHost = req.GetIpAddress()
+	}
 	statusReqObj := &request.GetServerStatus{
-		Fqdn: req.Fqdn,
+		Fqdn: serverHost,
 	}
 
 	_, err = s.GetServerStatus(ctx, statusReqObj)
@@ -149,8 +154,12 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 		return nil, errors.New("FQDN or IP required to update the server.")
 	}
 
+	serverHost := req.GetFqdn()
+	if serverHost == "" {
+		serverHost = req.GetIpAddress()
+	}
 	statusReqObj := &request.GetServerStatus{
-		Fqdn: req.Fqdn,
+		Fqdn: serverHost,
 	}
 
 	_, err = s.GetServerStatus(ctx, statusReqObj)
@@ -175,18 +184,22 @@ func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStat
 	status, err := s.GetServerStatus(ctx, req)
 	// make http request to get the status
 	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+			MinVersion:         tls.VersionTLS12,
+		}, // ignore expired SSL certificates
 	}
 	client := &http.Client{Transport: transCfg}
 
 	res, err := client.Get("https://" + req.GetFqdn() + "/_status")
 
-	if res.StatusCode != 200 {
-		return nil, errors.New("Invalid server FQDN or IP")
+	if err != nil {
+		log.Warnf("Failed to connect to host %s: %s", req.GetFqdn(), err.Error())
+		return nil, errors.New("Not able to connect to the server")
 	}
 
-	if err != nil {
-		return nil, service.ParseStorageError(err, *req, "server")
+	if res.StatusCode != 200 {
+		return nil, errors.New("Not able to connect to the server")
 	}
 	// read all response body
 	data, err := ioutil.ReadAll(res.Body)
