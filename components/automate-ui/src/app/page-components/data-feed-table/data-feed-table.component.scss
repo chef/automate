@@ -219,11 +219,11 @@ chef-loading-spinner {
   left: 200px;
 }
 
-.header-background{
-    background-color: unset;
+.header-background {
+  background-color: unset;
 }
 
-.remove_overlap{
+.remove_overlap {
   z-index: 1;
 }
 
@@ -237,28 +237,29 @@ img {
 }
 
 a, a:visited {
-  color: #3864f2;
+  color: #3864F2;
   cursor: pointer;
   text-decoration: underline;
   background-color: transparent;
 }
 
-.btn-data-feed{
-  font-size: 14px;
+.btn-data-feed {
   margin: -0.4em 2em 0em 0em;
+  font-size: 14px;
 }
 
 .disable-main-body {
   opacity:  0.6;
   transition: .5s;
 }
-.pointer-none{
-  pointer-events: none;
-} 
 
-.button_css{
-    background: white;
-    color: black;
+.pointer-none {
+  pointer-events: none;
+}
+
+.button_css {
+  background: white;
+  color: black;
 }
 
 .eyeIcon {
@@ -276,8 +277,8 @@ a, a:visited {
 }
 
 
-.chef-control-menu{
-  width: 8.5em
+.chef-control-menu {
+  width: 8.5em;
 }
 
 ::ng-deep .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
@@ -288,19 +289,19 @@ a, a:visited {
   width: 171px;
 }
 
-.eyeChange:hover{
-  img{
+.eyeChange:hover {
+  img {
     filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(31deg) brightness(103%) contrast(101%);
   }
 }
 
-.border_enable{
+.border_enable {
   border: solid 1px;
   border-color: #CFD2D2;
   border-radius: 5px 5px 0 0;
 }
 
-.border_delete{
+.border_delete {
   border: solid 1px;
   border-color: #CFD2D2;
   border-radius: 0 0 5px 5px;

@@ -34,7 +34,7 @@ describe('chef datafeed', () => {
 
     describe ('chef data feed page', () => {
       const reusableDate = Date.now();
-      let delete_name:string;
+      let delete_name: string;
       it('check if clicking on new integration button opens up the slider', () => {
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=interation-menu]').should('be.visible');
@@ -45,7 +45,7 @@ describe('chef datafeed', () => {
         const date = Date.now();
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=ServiceNow]').click();
-        delete_name = name+date;
+        delete_name = name + date;
         cy.get('[data-cy=add-name]').type(delete_name);
         cy.get('[data-cy=add-url]').type(url);
         cy.get('[data-cy=select-auth-type]').click();
@@ -60,40 +60,38 @@ describe('chef datafeed', () => {
       });
 
       it('check if clicking on disable', () => {
-        cy.get('chef-tr').contains(delete_name).parent().parent().find('.mat-select-trigger').click();
+        cy.get('chef-tr').contains(delete_name).parent().parent().
+        find('.mat-select-trigger').click();
         cy.get('[data-cy=disable-btn]').click();
         cy.get('app-notification.info').should('be.visible');
-        cy.get('app-notification.info p').contains("Disabled").should('exist');
+        cy.get('app-notification.info p').contains('Disabled').should('exist');
         cy.get('app-notification.info chef-icon').click();
-    })
+    });
 
     it('check if clicking on enable', () => {
-        cy.get('chef-tr').contains(delete_name).parent().parent().find('.mat-select-trigger').click();
+        cy.get('chef-tr').contains(delete_name).parent().parent()
+        .find('.mat-select-trigger').click();
         cy.get('[data-cy=enable-btn]').click();
         cy.get('app-notification.info').should('be.visible');
-        cy.get('app-notification.info p').contains("Enabled").should('exist');
+        cy.get('app-notification.info p').contains('Enabled').should('exist');
         cy.get('app-notification.info chef-icon').click();
-    })
+    });
 
 
       it('check if clicking on Cancel works', () => {
-        cy.get('chef-tr').contains(delete_name).parent().parent().find('.mat-select-trigger').click();
+        cy.get('chef-tr').contains(delete_name).parent().parent()
+        .find('.mat-select-trigger').click();
         cy.get('[data-cy=remove-data-feed]').click();
         cy.get('app-data-feed-table chef-modal').find('chef-button').contains('Cancel').click();
     });
 
       it('check if clicking on Delete works', () => {
-        cy.get('chef-tr').contains(delete_name).parent().parent().find('.mat-select-trigger').click();
+        cy.get('chef-tr').contains(delete_name).parent().parent()
+        .find('.mat-select-trigger').click();
         cy.get('[data-cy=remove-data-feed]').click();
         cy.get('app-data-feed-table chef-modal').find('chef-button').contains('Delete').click();
         cy.get('chef-tr').contains(delete_name).should('not.exist');
     });
-
-    
-
-    
-
-
 
     });
   });

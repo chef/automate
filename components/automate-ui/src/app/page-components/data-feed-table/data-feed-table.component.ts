@@ -2,15 +2,15 @@ import {
   Component,
   OnInit,
   OnChanges,
-  Input} from '@angular/core';
+  Input } from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core';
-import { DeleteDestination, EnableDisableDestination} from 'app/entities/destinations/destination.actions';
+import { DeleteDestination, EnableDisableDestination } from 'app/entities/destinations/destination.actions';
 import { Destination } from 'app/entities/destinations/destination.model';
 import { Observable, Subject } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { filter, takeUntil } from 'rxjs/operators';
-import { EntityStatus,pending} from 'app/entities/entities';
+import { EntityStatus, pending } from 'app/entities/entities';
 import { destinationEnableStatus } from 'app/entities/destinations/destination.selectors';
 
 @Component({
@@ -18,7 +18,7 @@ import { destinationEnableStatus } from 'app/entities/destinations/destination.s
   templateUrl: './data-feed-table.component.html',
   styleUrls: ['./data-feed-table.component.scss']
 })
-export class DataFeedTableComponent implements OnInit, OnChanges{
+export class DataFeedTableComponent implements OnInit, OnChanges {
 
   public loading$: Observable<boolean>;
   public sortedDestinations$: Observable<Destination[]>;
@@ -31,20 +31,20 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
   public selectedSortField: string;
   columnDropdownVisible = false;
   public enable = false;
-  public sortval:string = 'DESC';
-  selectedFieldDirection: string = 'DESC';
+  public sortval = 'DESC';
+  selectedFieldDirection = 'DESC';
   private isDestroyed = new Subject<boolean>();
-  integration_typeShow: boolean = true;
-  serviceShow: boolean = true;
+  integration_typeShow = true;
+  serviceShow = true;
 
   constructor(
-    private store: Store<NgrxStateAtom>,
+    private store: Store<NgrxStateAtom>
   ) {}
 
   ngOnInit() {
   }
 
-  ngOnChanges(){
+  ngOnChanges() {
 
   }
 
@@ -56,12 +56,12 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
     this.columnDropdownVisible = false;
   }
 
-  checkValue(e:any, val:string){
-    if(val=='serviceShow') {
-      this.serviceShow=e.target.checked
-      console.log(e)
-    } else if (val=='integration_typeShow'){
-      this.integration_typeShow =e.target.checked
+  checkValue(e: any, val: string) {
+    if (val === 'serviceShow') {
+      this.serviceShow = e.target.checked;
+      console.log(e);
+    } else if (val === 'integration_typeShow') {
+      this.integration_typeShow = e.target.checked;
     }
   }
   public startDataFeedDelete($event: MatOptionSelectionChange, destination: Destination): void {
@@ -81,37 +81,30 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
   }
 
   sortIcon(field: string): string {
-    //console.log('sortfeed',this.selectedSortField)
     if (field === this.selectedSortField && (this.sortval === 'ASC' || 'DESC')) {
-      console.log('print',field,this.selectedSortField)
       return 'sort-' + this.sortval.toLowerCase();
     } else {
-      console.log('print else part',field,this.selectedSortField)
       return 'sort';
-      
     }
   }
 
   onToggleSort(field: string) {
-    const fieldDirection = this.sortval
-    this.selectedSortField=field;
+    const fieldDirection = this.sortval;
+    this.selectedSortField = field;
     console.log(fieldDirection);
-    console.log('field',field,this.destinations[0].integration_types)
-    this.sortval=this.sortval==='ASC'? 'DESC' : 'ASC';
-    if(this.sortval==='ASC'){
-      console.log('under if asc ')
-       this.destinations = this.destinations.sort((a,b) =>  (a[field] > b[field] ? 1 : -1));
+    this.sortval = this.sortval === 'ASC' ? 'DESC' : 'ASC';
+    if (this.sortval === 'ASC') {
+       this.destinations = this.destinations.sort((a, b) =>  (a[field] > b[field] ? 1 : -1));
     } else {
-      console.log('under if dsc ')
-      this.destinations=this.destinations.sort((a,b) => (a[field] > b[field] ? -1 : 1))
+      this.destinations = this.destinations.sort((a, b) => (a[field] > b[field] ? -1 : 1));
     }
   }
 
-  enableDestination(val:boolean,id: string){
+  enableDestination(val: boolean, id: string) {
     const destinationEnableObj = {
       id: id,
       enable: val
-    }
+    };
     this.store.dispatch(new EnableDisableDestination({enableDisable: destinationEnableObj}));
     this.store.pipe(
       select(destinationEnableStatus),
@@ -119,7 +112,7 @@ export class DataFeedTableComponent implements OnInit, OnChanges{
       filter(state => !pending(state)))
       .subscribe(state => {
         if (state === EntityStatus.loadingSuccess) {
-          console.log("state",state)
+          console.log('state', state);
         }
       });
   }

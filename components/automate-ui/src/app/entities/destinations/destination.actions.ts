@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import { KVData } from '../node-credentials/node-credential.model';
 
-import { Destination,EnableDestination} from './destination.model';
+import { Destination, EnableDestination } from './destination.model';
 
 export enum DestinationActionTypes {
   GET_ALL                        = 'DESTINATION::GET_ALL',
@@ -185,6 +185,6 @@ export type DestinationActions =
   | TestDestination
   | TestDestinationSuccess
   | TestDestinationFailure
-  |EnableDisableDestination
+  | EnableDisableDestination
   | EnableDisableDestinationSuccess
   | EnableDisableDestinationFailure;

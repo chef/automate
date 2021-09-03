@@ -3,7 +3,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA
 } from '@angular/core';
 import { MockComponent } from 'ng2-mock-component';
-import { ngrxReducers,runtimeChecks} from 'app/ngrx.reducers';
+import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { DataFeedTableComponent } from './data-feed-table.component';
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 import { StoreModule } from '@ngrx/store';
@@ -12,8 +12,7 @@ import { StoreModule } from '@ngrx/store';
 
 describe('DataFeedTableComponent', () => {
   let component: DataFeedTableComponent;
-  //let fixture: ComponentFixture<DataFeedTableComponent>;
-   let fixture
+  let fixture;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -98,10 +97,4 @@ describe('DataFeedTableComponent', () => {
     component.onToggleSort('DESC');
     expect(component.sortval).toEqual('ASC');
   });
-
-
-
-
-
-
 });

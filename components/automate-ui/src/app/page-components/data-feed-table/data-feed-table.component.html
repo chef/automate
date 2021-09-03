@@ -8,13 +8,13 @@
                   <chef-checkbox class="delete-checkbox row"> </chef-checkbox>
                 </chef-th>
                 <chef-th scope="col" class="node-name sort"  (click)="onToggleSort('name')">
-                  Data Feed Name<i class="sort-icon {{sortIcon('name')}}"></i>
+                  Data Feed Name<em class="sort-icon {{sortIcon('name')}}"></em>
                 </chef-th>
                 <chef-th scope="col" class="node-name sort" *ngIf="serviceShow" (click)="onToggleSort('services')">
-                  Service <i class="sort-icon {{sortIcon('services')}}"></i>
+                  Service <em class="sort-icon {{sortIcon('services')}}"></em>
                 </chef-th>
                 <chef-th scope="col" class="node-name sort" *ngIf="integration_typeShow" (click)="onToggleSort('integration_types')" >
-                  Integration Type <i class="sort-icon {{sortIcon('integration_types')}}"></i>
+                  Integration Type <em class="sort-icon {{sortIcon('integration_types')}}"></em>
                 </chef-th>
                 <chef-th class="view-more column-dropdown">
                 <chef-button tertiary class="column-dropdown-toggle" (click)="toggleColumnDropdown()">
@@ -52,11 +52,11 @@
             <chef-td class="three-dot-column">
               <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}" class="test_icon">
                 <mat-option (click)="enableDestination(!destination.enable,destination.id)" class="button_css border_css eyeChange border_enable" >
-                    <span *ngIf="destination.enable"><span data-cy=disable-btn >Disable</span><img src="assets/img/eye.svg"class="eyeIcon"></span>
-                    <span *ngIf="!destination.enable"><span data-cy=enable-btn>Enable</span><img src="assets/img/eye.svg"class="eyeIcon"></span>
+                    <span *ngIf="destination.enable"><span data-cy=disable-btn >Disable</span><img src="assets/img/eye.svg" alt= "" class="eyeIcon"></span>
+                    <span *ngIf="!destination.enable"><span data-cy=enable-btn>Enable</span><img src="assets/img/eye.svg" alt="" class="eyeIcon"></span>
                 </mat-option>
                 <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed" class="eyeChange border_delete">Delete
-                  <img src="assets/img/bin.svg"class="binIcon">
+                  <img src="assets/img/bin.svg" alt="" class="binIcon">
                 </mat-option>
               </mat-select>
             </chef-td>
@@ -76,4 +76,4 @@
     (close)="closeDeleteModal()"
     (deleteClicked)="deleteDataFeed()"
     objectAction="Delete">
-  </app-delete-object-modal> 
+  </app-delete-object-modal>

@@ -207,7 +207,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
 import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
-import { DataFeedTableComponent } from './page-components/data-feed-table/data-feed-table.component';
+import { DataFeedTableComponent
+} from './page-components/data-feed-table/data-feed-table.component';
 
 @NgModule({
   declarations: [

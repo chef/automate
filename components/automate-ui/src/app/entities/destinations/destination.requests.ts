@@ -4,7 +4,7 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-import { Destination,EnableDestination} from './destination.model';
+import { Destination, EnableDestination } from './destination.model';
 import { CreateDestinationPayload } from './destination.actions';
 
 export interface DestinationsResponse {
@@ -210,8 +210,9 @@ export class DestinationRequests {
     return compact(concat([DATA_FEED_URL], words)).join('/');
   }
 
-  public enableDisableDestinations(destination: EnableDestination): Observable<DestinationResponse> {
+  public enableDisableDestinations(destination: EnableDestination):
+  Observable<DestinationResponse> {
     return this.http.patch<DestinationResponse>(encodeURI(
-      this.joinToDataFeedUrl(['destination','enable',destination.id.toString()])), destination);
+      this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
   }
 }

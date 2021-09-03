@@ -222,7 +222,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.ENABLE_DISABLE_SUCCESS),
       map(({ payload  }: EnableDisableDestinationSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Destination is ${payload.enable?'Enabled':'Disabled'}.`
+      message: `Destination is ${ payload.enable ? 'Enabled' : 'Disabled' }.`
     }))));
 
 }
