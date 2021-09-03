@@ -105,27 +105,6 @@ func TestServers(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the server fqdn is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				IpAddress: "0.0.0.0",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server fqdn")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server IP address is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:   "chef-infra-server",
-				Name: "Chef infra server",
-				Fqdn: "domain.com",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server IP address")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
 	})
 
 	t.Run("GetServers", func(t *testing.T) {
@@ -440,28 +419,6 @@ func TestServers(t *testing.T) {
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server name")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server fqdn for the server to update is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				IpAddress: "0.0.0.0",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server fqdn")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server IP address for the server to update is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
-				Id:   "chef-infra-server",
-				Name: "Chef infra server",
-				Fqdn: "domain.com",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server IP address")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
