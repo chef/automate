@@ -8,6 +8,8 @@ authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-ser
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
+automate-backend-curator REQUIRED elasticsearch
+automate-backend-curator BINDING_MODE strict
 automate-backend-elasticsearch BINDING_MODE strict
 automate-backend-elasticsidecar REQUIRED elasticsearch
 automate-backend-elasticsidecar BINDING_MODE strict
