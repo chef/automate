@@ -126,7 +126,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
     this.telemetryService.getTelemetryCheckboxObservable().subscribe((telemetryChecked) => {
       this.userDetailsFormControl.isTelemetryCheckboxEnabled = telemetryChecked;
-      if (!this.userDetailsFormControl.isTelemetryCheckboxDirty) {
+      if (this.userDetailsFormControl.isTelemetryCheckboxDirty) {
+        this.userDetailsFormControl.isTelemetryCheckboxDirty = false;
+      } else if (!this.userDetailsFormControl.isTelemetryCheckboxDirty) {
         this.userDetailsFormControl.isTelemetryCheckboxDirty = true;
       }
     });
