@@ -17,6 +17,14 @@ setup_minio(){
     ./minio server --console-address ":9565" /data
 }
 
+setup_minio_bucket(){
+    rm -f mc
+    wget https://dl.min.io/client/mc/release/linux-amd64/mc
+    chmod +x mc
+    ./mc alias set minio http://127.0.0.1:9000 minioadmin minioadmin
+    ./mc mb minio/mybucket
+}
+
 wait_for_success() {
   local SECONDS_WAITING=${TIMEOUT:-60}
   local COUNTER=0

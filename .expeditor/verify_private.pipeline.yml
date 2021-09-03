@@ -467,6 +467,9 @@ steps:
   #
   - label: "cypress :cypress:"
     command:
+     - . scripts/verify_setup.sh
+      - source integration/helpers/setup_minio.sh && start_minio_background
+      - source integration/helpers/setup_minio.sh && TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live && setup_minio_bucket
       - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 45
     retry:

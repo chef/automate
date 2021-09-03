@@ -5,7 +5,16 @@ describe('chef datafeed', () => {
           username = 'admin',
           password = 'password',
           tokenType = 'TestType',
-          token = 'behwveh3238238=';
+          token = 'behwveh3238238=',
+          endpoint = 'https://test.com',
+          bucketName = 'bucket',
+          accessKey = 'access_key',
+          secretKey = 'secret_key';
+
+    const minioBucket = 'mybucket',
+          minioSecret = 'minioadmin',
+          minioAccess = 'minioadmin',
+          minioUrl = 'http://127.0.0.1:9000';
 
 
     before(() => {
@@ -119,6 +128,55 @@ describe('chef datafeed', () => {
         cy.get('app-data-feed-create').scrollTo('top');
         cy.get('app-notification.error').should('be.visible');
         cy.get('app-notification.error chef-icon').click();
+        cy.get('[data-cy=close-feed-button]').click();
+      });
+
+      it('create data feed minio', () => {
+        const date = Date.now();
+        cy.get('[data-cy=create-data-feed]').click();
+        cy.get('[data-cy=Minio]').click();
+        cy.get('[data-cy=add-name]').type(name + date);
+        cy.get('[data-cy=add-endpoint]').type(endpoint);
+        cy.get('[data-cy=add-bucketName]').type(bucketName);
+        cy.get('[data-cy=add-accessKey]').type(accessKey);
+        cy.get('[data-cy=add-secretKey]').type(secretKey);
+        cy.get('[data-cy=add-button]').click();
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
+        cy.contains('Data Feeds').click();
+        cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
+      });
+
+      it('test error in data feed minio failure', () => {
+        const date = Date.now();
+        cy.get('[data-cy=create-data-feed]').click();
+        cy.get('[data-cy=Minio]').click();
+        cy.get('[data-cy=add-name]').type(name + date);
+        cy.get('[data-cy=add-endpoint]').type(endpoint);
+        cy.get('[data-cy=add-bucketName]').type(bucketName);
+        cy.get('[data-cy=add-accessKey]').type(accessKey);
+        cy.get('[data-cy=add-secretKey]').type(secretKey);
+        cy.get('[data-cy=test-button]').click();
+        cy.get('app-data-feed-create').scrollTo('top');
+        cy.get('app-notification.error').should('be.visible');
+        cy.get('app-notification.error chef-icon').click();
+        cy.get('[data-cy=close-feed-button]').click();
+      });
+
+      it('test error in data feed minio success', () => {
+        const date = Date.now();
+        cy.get('[data-cy=create-data-feed]').click();
+        cy.get('[data-cy=Minio]').click();
+        cy.get('[data-cy=add-name]').type(name + date);
+        cy.get('[data-cy=add-endpoint]').type(minioUrl);
+        cy.get('[data-cy=add-bucketName]').type(minioBucket);
+        cy.get('[data-cy=add-accessKey]').type(minioAccess);
+        cy.get('[data-cy=add-secretKey]').type(minioSecret);
+        cy.get('[data-cy=test-button]').click();
+        cy.get('app-data-feed-create').scrollTo('top');
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=close-feed-button]').click();
       });
     });
   });
