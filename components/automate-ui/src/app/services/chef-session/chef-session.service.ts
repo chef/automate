@@ -14,6 +14,7 @@ import { SetUserSelfID } from 'app/entities/users/userself.actions';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 import { UserPreferencesService } from '../user-preferences/user-preferences.service';
+import { UISettings } from '../user-preferences/signin-ui-settings';
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
 const USE_DEFAULT_SESSION = environment.use_default_session;
@@ -373,6 +374,10 @@ export class ChefSessionService implements CanActivate {
     if (id && id.federated_claims) {
       user.connector = id.federated_claims.connector_id;
       this.userPrefService.apiEndpoint = '/' + user.username + '/' + user.connector;
+      if (!this.userPrefService.uiSettings) {
+        const uiSettings = new UISettings();
+        this.userPrefService.uiSettings = uiSettings[this.user.connector];
+      }
     }
   }
 }
