@@ -1162,6 +1162,12 @@ plan_path = "components/automate-backend-postgresql"
 paths = [
   "components/automate-backend-postgresql/*"
 ]
+
+[automate-backend-ctl]
+plan_path = "components/automate-backend-ctl"
+paths = [
+  "components/automate-backend-ctl/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
