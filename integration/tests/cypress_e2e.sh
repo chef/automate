@@ -28,6 +28,11 @@ do_deploy() {
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
+
+    source "${source_dir}/helpers/setup_minio.sh"
+    start_minio_background
+    TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live
+    setup_minio_bucket
 }
 
 do_test_deploy() {
