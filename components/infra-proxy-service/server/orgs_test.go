@@ -46,8 +46,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -217,8 +217,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -516,8 +516,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -624,8 +624,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -978,8 +978,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "Chef infra server",
 			Name:      "Chef infra server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)
@@ -1128,8 +1128,8 @@ func TestOrgs(t *testing.T) {
 		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 			Id:        "chef-infra-server",
 			Name:      "Chef Infra Server",
-			Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-			IpAddress: "18.220.106.25",
+			Fqdn:      "domain.com",
+			IpAddress: "",
 		})
 		require.NoError(t, err)
 		require.NotNil(t, serverRes)

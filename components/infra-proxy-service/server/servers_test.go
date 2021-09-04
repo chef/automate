@@ -20,7 +20,7 @@ import (
 
 func TestServers(t *testing.T) {
 	ctx := context.Background()
-	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
+	mockServer, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 
 	defer close()
@@ -60,6 +60,7 @@ func TestServers(t *testing.T) {
 		})
 
 		t.Run("when a invalid server is submitted, raise invalid FQDN error", func(t *testing.T) {
+			test.SetMockStatusChecker(mockServer, test.MockStatusFailedChecker{})
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
@@ -68,10 +69,11 @@ func TestServers(t *testing.T) {
 			}
 			resp, err := cl.CreateServer(ctx, req)
 			assert.Nil(t, resp)
-			assert.Error(t, err, "Invalid server FQDN or IP")
+			assert.Error(t, err, "Not able to connect to the server")
 		})
 
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
+
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
@@ -164,7 +166,7 @@ func TestServers(t *testing.T) {
 				Id:        "chef-infra-server2",
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
-				IpAddress: "54.152.12.89",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
@@ -312,7 +314,7 @@ func TestServers(t *testing.T) {
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
-				IpAddress: "54.152.12.89",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -340,7 +342,7 @@ func TestServers(t *testing.T) {
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
-				IpAddress: "54.152.12.89",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)

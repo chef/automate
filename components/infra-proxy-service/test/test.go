@@ -37,6 +37,16 @@ func (s MockStatusChecker) GetInfraServerStatus(_ string) (*http.Response, error
 	}, nil
 }
 
+type MockStatusFailedChecker struct{}
+
+func (s MockStatusFailedChecker) GetInfraServerStatus(_ string) (*http.Response, error) {
+	return nil, errors.New("Not able to connect to the server")
+}
+
+func SetMockStatusChecker(mockInfraServer *server.Server, checker server.StatusChecker) {
+	mockInfraServer.SetAuthenticator(checker)
+}
+
 // migrationConfigIfPGTestsToBeRun either returns the pg migration config
 // if PG_URL is set or we are in CI system, otherwise it returns nil, indicating
 // postgres based tests shouldn't be run.
