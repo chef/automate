@@ -2,20 +2,20 @@ package server
 
 import (
 	"context"
-
-	"crypto/tls"
 	"encoding/json"
-	"errors"
+	"io/ioutil"
+
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
-	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"net/http"
-
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/validation"
+	"github.com/pkg/errors"
 )
+
+func (s *Server) SetAuthenticator(statusChecker StatusChecker) {
+	s.infraServerStatusChecker = statusChecker
+}
 
 // CreateServer creates a new server
 func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*response.CreateServer, error) {
@@ -37,21 +37,17 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 	}
 
 	if req.Fqdn == "" && req.IpAddress == "" {
-		return nil, errors.New("FQDN or IP required to add the server.")
+		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
 	}
 
 	serverHost := req.GetFqdn()
 	if serverHost == "" {
 		serverHost = req.GetIpAddress()
 	}
-	statusReqObj := &request.GetServerStatus{
-		Fqdn: serverHost,
-	}
 
-	_, err = s.GetServerStatus(ctx, statusReqObj)
-
+	_, err = s.infraServerStatusChecker.GetInfraServerStatus(serverHost)
 	if err != nil {
-		return nil, service.ParseStorageError(err, *req, "server")
+		return nil, err
 	}
 
 	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
@@ -158,14 +154,10 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 	if serverHost == "" {
 		serverHost = req.GetIpAddress()
 	}
-	statusReqObj := &request.GetServerStatus{
-		Fqdn: serverHost,
-	}
 
-	_, err = s.GetServerStatus(ctx, statusReqObj)
-
+	_, err = s.infraServerStatusChecker.GetInfraServerStatus(serverHost)
 	if err != nil {
-		return nil, service.ParseStorageError(err, *req, "server")
+		return nil, err
 	}
 
 	server, err := s.service.Storage.EditServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
@@ -180,27 +172,37 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 
 // GetServerStatus get the status of server
 func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStatus) (*response.GetServerStatus, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
-	status, err := s.GetServerStatus(ctx, req)
-	// make http request to get the status
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-			MinVersion:         tls.VersionTLS12,
-		}, // ignore expired SSL certificates
-	}
-	client := &http.Client{Transport: transCfg}
-
-	res, err := client.Get("https://" + req.GetFqdn() + "/_status")
+	// Validate all request fields are required
+	err := validation.New(validation.Options{
+		Target:  "server",
+		Request: *req,
+		Rules: validation.Rules{
+			"Id":   []string{"required"},
+			"Name": []string{"required"},
+		},
+	}).Validate()
 
 	if err != nil {
-		log.Warnf("Failed to connect to host %s: %s", req.GetFqdn(), err.Error())
-		return nil, errors.New("Not able to connect to the server")
+		return nil, err
 	}
 
-	if res.StatusCode != 200 {
-		return nil, errors.New("Not able to connect to the server")
+	if req.Fqdn == "" && req.IpAddress == "" {
+		return nil, errors.New("FQDN or IP required to update the server.")
 	}
+
+	serverHost := req.GetFqdn()
+	if serverHost == "" {
+		serverHost = req.GetIpAddress()
+	}
+
+	res, err := s.infraServerStatusChecker.GetInfraServerStatus(serverHost)
+	if err != nil {
+		return nil, err
+	}
+
 	// read all response body
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -209,9 +211,13 @@ func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStat
 	// close response body
 	_ = res.Body.Close()
 
-	return &response.GetServerStatus{
-		Status: status.Status,
-	}, nil
+	statusRes := &response.GetServerStatus{}
+	err = json.Unmarshal(data, statusRes)
+	if err != nil {
+		return nil, err
+	}
+
+	return statusRes, nil
 }
 
 // Create a response.Server from a storage.Server

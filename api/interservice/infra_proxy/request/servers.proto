@@ -38,6 +38,8 @@ message GetServer {
 }
 
 message GetServerStatus {
-    // Server FQDN
+    // Chef Infra Server FQDN
     string fqdn = 1;
+    // Chef Infra Server IP Address.
+    string ip_address = 2;
 }

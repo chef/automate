@@ -2,28 +2,74 @@ package server
 
 import (
 	"context"
-	"net"
-
+	"crypto/tls"
+	"fmt"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+	"net"
+	"net/http"
 
 	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
+
+	log "github.com/sirupsen/logrus"
 )
+
+//StatusChecker should have all the functions required to check the status of Chef Infra Server
+type StatusChecker interface {
+	GetInfraServerStatus(string) (*http.Response, error)
+}
+
+//InfraServerStatusChecker implements StatusChecker
+type InfraServerStatusChecker struct {
+}
+
+//GetInfraServerStatus gets the status of the Chef Infra Server
+// from https://<server>/_status route
+func (s *InfraServerStatusChecker) GetInfraServerStatus(serverHost string) (*http.Response, error) {
+
+	// make http request to get the status
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+			MinVersion:         tls.VersionTLS12,
+		}, // ignore expired SSL certificates
+	}
+	client := &http.Client{Transport: transCfg}
+
+	res, err := client.Get("https://" + serverHost + "/_status")
+
+	if err != nil {
+		log.Warnf("Failed to connect to host %s: %s", serverHost, err.Error())
+		return nil, errors.Wrap(err, "Not able to connect to the server")
+	}
+
+	if res.StatusCode != 200 {
+		return nil, errors.Wrap(fmt.Errorf("response status is not 200"), "Not able to connect to the server")
+	}
+
+	return res, err
+}
 
 // Server is an infra-proxy server
 type Server struct {
-	service *service.Service
+	service                  *service.Service
+	infraServerStatusChecker StatusChecker
 }
 
 // NewServer returns an infra-proxy server
 func NewServer(service *service.Service) *Server {
-	return &Server{service: service}
+	var st StatusChecker = &InfraServerStatusChecker{}
+	return &Server{
+		service:                  service,
+		infraServerStatusChecker: st,
+	}
 }
 
 // NewGRPCServer creates a grpc server that serves all infra-proxy-service GRPC APIs

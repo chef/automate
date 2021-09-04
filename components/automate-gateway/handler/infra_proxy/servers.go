@@ -2,11 +2,11 @@ package infra_proxy
 
 import (
 	"context"
-
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
+	log "github.com/sirupsen/logrus"
 )
 
 // GetServers fetches an array of existing servers
@@ -47,6 +47,7 @@ func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServ
 	}
 	res, err := a.client.CreateServer(ctx, req)
 	if err != nil {
+		log.Warnf("Create server error:: %s", err.Error())
 		return nil, err
 	}
 	return &gwres.CreateServer{
