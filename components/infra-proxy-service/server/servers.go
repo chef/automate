@@ -172,7 +172,7 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 
 // GetServerStatus get the status of server
 func (s *Server) GetServerStatus(ctx context.Context, req *request.GetServerStatus) (*response.GetServerStatus, error) {
-	ctx, cancel := context.WithCancel(ctx)
+	_, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	// Validate all request fields are required

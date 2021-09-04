@@ -45,8 +45,8 @@ func TestServers(t *testing.T) {
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			}
 			resp, err := cl.CreateServer(ctx, req)
 			require.NoError(t, err)
@@ -74,8 +74,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server ID")
@@ -86,8 +86,8 @@ func TestServers(t *testing.T) {
 			req1 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			}
 			resp1, err := cl.CreateServer(ctx, req1)
 			require.NoError(t, err)
@@ -97,8 +97,8 @@ func TestServers(t *testing.T) {
 			req2 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "New chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			}
 			resp2, err := cl.CreateServer(ctx, req2)
 			assert.Nil(t, resp2)
@@ -109,8 +109,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server name")
@@ -120,8 +120,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server fqdn is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server fqdn")
@@ -130,9 +130,9 @@ func TestServers(t *testing.T) {
 
 		t.Run("when the server IP address is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
+				Id:   "chef-infra-server",
+				Name: "Chef infra server",
+				Fqdn: "example.com",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server IP address")
@@ -154,8 +154,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -188,8 +188,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -243,8 +243,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -271,8 +271,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -400,8 +400,8 @@ func TestServers(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp)
@@ -409,8 +409,8 @@ func TestServers(t *testing.T) {
 			updateReq := &request.UpdateServer{
 				Id:        resp.Server.Id,
 				Name:      "new-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			}
 
 			updatedSerResp, err := cl.UpdateServer(ctx, updateReq)
@@ -425,8 +425,8 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "",
 				Name:      "new-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server ID")
@@ -436,8 +436,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server ID for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Name:      "chef-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server ID")
@@ -447,8 +447,8 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server name")
@@ -459,7 +459,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				IpAddress: "18.220.106.25",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server fqdn")
@@ -470,7 +470,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:   "chef-infra-server",
 				Name: "Chef infra server",
-				Fqdn: "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
+				Fqdn: "example.com",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server IP address")
@@ -481,8 +481,8 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "no-chef-infra-server-id",
 				Name:      "chef-infra-server",
-				Fqdn:      "ec2-18-220-106-25.us-east-2.compute.amazonaws.com",
-				IpAddress: "18.220.106.25",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
