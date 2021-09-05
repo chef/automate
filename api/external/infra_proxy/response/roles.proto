@@ -25,18 +25,14 @@ message RoleListItem {
 message Role {
     // Name of the role.
     string name = 1;
-    // Type of the chef object.
-    string chef_type = 2;
     // Descrption of the role.
-    string description = 3;
+    string description = 2;
     // Role default attributes JSON.
-    string default_attributes = 4;
+    string default_attributes = 3;
     // Role override attributes JSON.
-    string override_attributes = 5;
-    // Json class name.
-    string json_class = 6;
+    string override_attributes = 4;
     // Run list for the role.
-    repeated string run_list  = 7;
+    repeated string run_list  = 5;
 }
 
 message ExpandedRunList {

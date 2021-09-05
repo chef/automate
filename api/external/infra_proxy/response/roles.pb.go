@@ -98,7 +98,7 @@ type RoleListItem struct {
 
 	// Name of the role.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Desscription of the role.
+	// Description of the role.
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// Environment for the role.
 	Environments []string `protobuf:"bytes,3,rep,name=environments,proto3" json:"environments,omitempty"`
@@ -164,16 +164,12 @@ type Role struct {
 
 	// Name of the role.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Type of the chef object.
-	ChefType string `protobuf:"bytes,2,opt,name=chef_type,json=chefType,proto3" json:"chef_type,omitempty"`
-	// Descrption of the role.
+    // Descrption of the role.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// Role default attributes JSON.
 	DefaultAttributes string `protobuf:"bytes,4,opt,name=default_attributes,json=defaultAttributes,proto3" json:"default_attributes,omitempty"`
 	// Role override attributes JSON.
 	OverrideAttributes string `protobuf:"bytes,5,opt,name=override_attributes,json=overrideAttributes,proto3" json:"override_attributes,omitempty"`
-	// Json class name.
-	JsonClass string `protobuf:"bytes,6,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty"`
 	// Run list for the role.
 	RunList []string `protobuf:"bytes,7,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
 }
@@ -217,13 +213,6 @@ func (x *Role) GetName() string {
 	return ""
 }
 
-func (x *Role) GetChefType() string {
-	if x != nil {
-		return x.ChefType
-	}
-	return ""
-}
-
 func (x *Role) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -241,13 +230,6 @@ func (x *Role) GetDefaultAttributes() string {
 func (x *Role) GetOverrideAttributes() string {
 	if x != nil {
 		return x.OverrideAttributes
-	}
-	return ""
-}
-
-func (x *Role) GetJsonClass() string {
-	if x != nil {
-		return x.JsonClass
 	}
 	return ""
 }
