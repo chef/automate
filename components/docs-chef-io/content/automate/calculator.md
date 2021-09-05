@@ -12,6 +12,39 @@ gh_repo = "automate"
     weight = 15
 +++
 
+Use this calculator to determine the storage capacity you need to support your Chef Automate installation.
+
+TODO:
+
+1. Describe the calculator in terms of context + action + impact
+2. What does this information mean? Are the classifications distinct (Do the nodes with chef run data also have compliance data, etc?)
+2. What is the takeaway (the action needed based on estimated # of ES notes)
+
+- Is there one number that the user needs? Where should the user go and act on the information
+- Whatever that information is, it needs to be REALLY CLEAR on the copy page
+- tool tips that explain each category
+- Explain what node Data Size is and where to find it
+- Explain Run interval and where to find it?
+- How does run interval interact with event feed data
+- Where does Service Groups data come from and how does a user find it?
+- Do the spreadsheet calculations reflect reality?
+
+Chef Infra Client Run
+node count: automate/infrastructure/client-runs
+Node data size: ??
+
+Compliance
+node count: automate/compliance/reports/overview
+Node data size: ??
+
+Event Feed
+node count: automate/dashboards/event-feed
+Node data size: ??
+
+Service Groups
+node count: automate/applications/service-groups...but this gives me a count of groups, not of nodes
+Node data size: ??
+
 <!-- markdownlint-disable-file MD033  -->
 <div class="grid-container padding-0">
   <div class="grid-x align-justify large-up-4 small-up-1">
