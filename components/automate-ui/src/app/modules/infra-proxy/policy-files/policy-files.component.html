@@ -17,7 +17,7 @@
     <div data-cy="empty-list" class="empty-section" *ngIf="!policyFiles.length || searchFlag && (searchArr.length === 0) ">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
-      <p *ngIf="searchValue === ''">No policy files available</p>
+      <p *ngIf="searchValue === ''">No Policyfiles available</p>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="deleting" size="50" fixed></chef-loading-spinner>
     <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
