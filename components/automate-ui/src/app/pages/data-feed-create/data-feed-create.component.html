@@ -42,7 +42,7 @@
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
-            <div class="overlay" *ngIf="item.name!='ServiceNow'&&item.name!='Splunk'">
+            <div class="overlay" *ngIf="item.name!='ServiceNow'&&item.name!='Splunk'&&item.name!='Custom'">
               <div class="text">Coming Soon</div>
             </div>
           </div>
@@ -142,7 +142,7 @@
             </div>
           </div>
         </div>
-
+        
         <div class="input-margin" *ngIf="showFields.tokenType && authSelected=='Access Token'">
           <chef-form-field>
             <label>
@@ -254,6 +254,26 @@
             </chef-error>
           </chef-form-field>
         </div>
+        <!--Madhvi-->
+        
+        
+          <div *ngIf="showFields.useHeaders">
+            <chef-form-field>
+            <label>
+              <chef-checkbox id="headers-checkbox" (change)="updatePolicyCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
+              <div *ngIf="headerChecked" class="input-margin2">
+              <textarea
+                chefInput
+                formControlName="headers"
+                data-cy="add-headers"
+                type="text"
+                id="headers-input"
+                autocomplete="off"
+                ></textarea></div>
+            </label>
+            </chef-form-field>
+          </div>
+        
 
         <div class="input-margin" *ngIf="showFields.accessKey">
           <chef-form-field>

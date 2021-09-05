@@ -58,6 +58,8 @@ export class DataFeedCreateComponent {
   private testSuccess: boolean = null;
   private testError: boolean = null;
   private conflictError: string = null;
+  public headerChecked = false;
+
 
   public integrations = {
     webhook: [
@@ -85,7 +87,8 @@ export class DataFeedCreateComponent {
     headers: false,
     bucketName: false,
     accessKey: false,
-    secretKey: false
+    secretKey: false,
+    useHeaders: false
   };
 
   set saveDone(done: boolean) {
@@ -165,6 +168,25 @@ export class DataFeedCreateComponent {
     }};
   }
 
+
+  showCustomField() {
+    this.showFields = {...this.showFields, ...{
+      name: true,
+      url: true,
+      authSelector: true,
+      tokenType: true,
+      token: true,
+      username: true,
+      password: true,
+      useHeaders: true
+    }};
+  }
+
+  updatePolicyCheckbox(event: boolean): void {
+    this.headerChecked = event;
+    this.createForm.controls.headerChecked.setValue(true);
+  }
+
   showFieldStorage() {
     Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
     this.showFields = {...this.showFields, ...{
@@ -199,6 +221,13 @@ export class DataFeedCreateComponent {
       this.createForm.controls['tokenType'].setValue('Splunk');
       this.integrationSelected = true;
 
+    } else if (integration === WebhookIntegrationTypes.CUSTOM) {
+      this.showCustomField(); //madhvi - custom feed call
+      this.createForm.reset(); 
+      this.authSelected = AuthTypes.ACCESSTOKEN;
+      this.createForm.controls['tokenType'].setValue('');
+      this.integrationSelected = true;
+      
     } else if (integration === StorageIntegrationTypes.MINIO) {
       this.showFieldStorage();
       this.showFields.region = false;
@@ -261,8 +290,19 @@ export class DataFeedCreateComponent {
         }
       }
     } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM) {
-
-    } else if (this.integTitle === StorageIntegrationTypes.MINIO) {
+        if (this.authSelected === AuthTypes.ACCESSTOKEN) {
+          if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+            this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+            return true;
+          }
+        } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
+          if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+            this.createForm.get('username').valid && this.createForm.get('password').valid) {
+            return true;
+          }
+        }
+    } 
+    else if (this.integTitle === StorageIntegrationTypes.MINIO) {
         if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
           this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
           this.createForm.get('secretKey').valid) {
