@@ -33,18 +33,15 @@
           </chef-form-field>
           <chef-form-field class="timezone-field chef-form-field">
             <label for="timeformat">Time Format</label>
-            <chef-select 
+            <mat-select 
               #timeformat 
-              [value]="(userPrefsService.timeformat$ | async)?.value" 
-              (change)="handleTimeFormatChange()" 
+              [value]="userDetailsFormControl.timeformat" 
+              (selectionChange)="handleTimeFormatChange($event)" 
               data-cy="timeformat-dropdown">
-                <chef-option value="ddd, DD MMM">ddd, DD MMM</chef-option>
-                <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
-                <chef-option value="DD MMM YYYY">DD MMM YYYY</chef-option>
-                <chef-option value="ddd, DD MMM YYYY HH:mm:ss [UTC]">ddd, DD MMM YYYY HH:mm:ss [UTC]</chef-option>
-                <chef-option value="YYYY-M-D">YYYY-M-D</chef-option>
-                <chef-option value="YYYY-MM-DD">YYYY-MM-DD</chef-option>
-            </chef-select>
+                <mat-option *ngFor="let timeformatValue of userDetailsFormControl.timeformatValues" [value]="timeformatValue">
+                  {{ timeformatValue }}
+                </mat-option>
+            </mat-select>
           </chef-form-field>
           <chef-form-field class="telemetry-checkbox-field">
             <app-telemetry-checkbox></app-telemetry-checkbox>

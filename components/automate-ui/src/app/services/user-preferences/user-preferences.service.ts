@@ -23,7 +23,7 @@ export class UserPreferencesService {
   timeformat$: Observable<UserPreferenceTimeformat> = this.store
   .select(userPreferenceTimeformatSelector);
 
-  setUserTimeformatInternal(format: string) {
+  setUserTimeformatInternal(format: UserPreferenceTimeformat) {
     this.store.dispatch(new SetUserTimeformatInternal(format));
   }
 

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store, select, Action } from '@ngrx/store';
 
-import { combineLatest, Subject, Observable } from 'rxjs';
+import { combineLatest, Subject, Observable, Subscription } from 'rxjs';
 import { filter, pluck, takeUntil, first, map } from 'rxjs/operators';
 
 import { identity, isNil } from 'lodash/fp';
@@ -55,11 +55,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public userDetailsFormControl = {
     isTimeformatDirty: false,
     isTelemetryCheckboxDirty: false,
-    isTelemetryCheckboxEnabled: false
+    isTelemetryCheckboxEnabled: false,
+    timeformatValues: [],
+    timeformat: ''
   };
   public isResetPwdTab = true;
   public userType = 'local';
   public isDisplayNameEditable = true;
+  private timeformatSubscription: Subscription;
+  private telemetryCheckboxSubscription: Subscription;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -124,7 +128,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.userType = this.userPrefsService.uiSettings.userType;
       this.isDisplayNameEditable = this.userPrefsService.uiSettings.isDisplayNameEditable;
     }
-    this.telemetryService.getTelemetryCheckboxObservable().subscribe((telemetryChecked) => {
+    this.timeformatSubscription = this.userPrefsService.timeformat$.subscribe((timeformat) => {
+      this.userDetailsFormControl.timeformat = timeformat.value;
+      if (this.userDetailsFormControl.timeformatValues.length === 0 &&
+         timeformat && timeformat.valid_values && timeformat.valid_values.length > 0) {
+        this.userDetailsFormControl.timeformatValues = timeformat.valid_values;
+      }
+    });
+    this.telemetryCheckboxSubscription = this.telemetryService.getTelemetryCheckboxObservable()
+    .subscribe((telemetryChecked) => {
       this.userDetailsFormControl.isTelemetryCheckboxEnabled = telemetryChecked;
       if (this.userDetailsFormControl.isTelemetryCheckboxDirty) {
         this.userDetailsFormControl.isTelemetryCheckboxDirty = false;
@@ -137,6 +149,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+    this.timeformatSubscription.unsubscribe();
+    this.telemetryCheckboxSubscription.unsubscribe();
   }
 
   public onSelectedTab(event: { target: { value: UserTabName } }): void {
@@ -149,8 +163,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
   }
 
-  public handleTimeFormatChange(): void {
-    this.userDetailsFormControl.isTimeformatDirty = true;
+  public handleTimeFormatChange(event): void {
+    if (event.value !== this.userDetailsFormControl.timeformat) {
+      this.userDetailsFormControl.isTimeformatDirty = true;
+    } else {
+      this.userDetailsFormControl.isTimeformatDirty = false;
+    }
   }
 }
 
@@ -177,17 +195,6 @@ abstract class UserDetails {
   }
 
   public saveUserPreference(timeformat, userDetailsFormControl): void {
-    const payload = {
-      user: {
-         name: this.chefSessionService.username,
-         connector: this.chefSessionService.connector
-      },
-      settings: {
-       date_format: {
-         value: timeformat.value
-       }
-      }
-     };
     this.saveSuccessful = false;
     this.saveInProgress = true;
     if (this.userPrefsService.uiSettings &&
@@ -196,8 +203,21 @@ abstract class UserDetails {
       this.store.dispatch(this.createUpdateNameUserAction(name));
     }
     if (userDetailsFormControl.isTimeformatDirty) {
+      const payload = {
+        user: {
+           name: this.chefSessionService.username,
+           connector: this.chefSessionService.connector
+        },
+        settings: {
+         date_format: {
+           value: timeformat.value
+         }
+        }
+      };
       this.store.dispatch(new UpdateUserPreferences(payload));
-      this.userPrefsService.setUserTimeformatInternal(timeformat.value);
+      this.userPrefsService.setUserTimeformatInternal(
+        {value: timeformat.value, valid_values: userDetailsFormControl.timeformatValues});
+      userDetailsFormControl.timeformat = timeformat.value;
     }
     if (userDetailsFormControl.isTelemetryCheckboxDirty) {
       this.telemetryService
