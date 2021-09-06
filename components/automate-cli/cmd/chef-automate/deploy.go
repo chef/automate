@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -185,7 +186,10 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	if isA2HADeployment(args[0]) {
+	if isA2HADeployment(args) {
+		if len(args) == 0 {
+			return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
+		}
 		conf := new(dc.AutomateConfig)
 		manifestProvider := manifest.NewLocalHartManifestProvider(
 			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),

@@ -80,6 +80,7 @@ var initConfigCmd = &cobra.Command{
 }
 
 func runInitConfigCmd(cmd *cobra.Command, args []string) error {
+	disableDeploymentModeFlag()
 	initConfigPath := initConfigFlags.path
 	if _, err := os.Stat(initConfigPath); err == nil {
 		writer.Printf("Skipping config initialization. Config already exists at %s\n", initConfigPath)
