@@ -16,7 +16,6 @@ const DeploymentModeFlagDirName string = "/de84f3b54b76175ad2fbfbd13354c2e7"
 const DeploymentModeFlagFileName string = "flags.toml"
 const FlagPath string = DeploymentModeFlagParentDir + DeploymentModeFlagDirName + "/" + DeploymentModeFlagFileName
 const AutomateHAMode string = "automate-ha"
-const AutomateMode string = "automate"
 
 var initConfigHAPathFlags = struct {
 	path string
