@@ -5,10 +5,10 @@ import {
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { DeleteDestination, EnableDisableDestination } from 'app/entities/destinations/destination.actions';
 import { Destination } from 'app/entities/destinations/destination.model';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { destinationEnableStatus } from 'app/entities/destinations/destination.selectors';
 
@@ -32,7 +32,6 @@ export class DataFeedTableComponent  {
   public enable = false;
   public sortval = 'DESC';
   selectedFieldDirection = 'DESC';
-  private isDestroyed = new Subject<boolean>();
   integration_typeShow = true;
   serviceShow = true;
 
@@ -101,7 +100,6 @@ export class DataFeedTableComponent  {
     this.store.dispatch(new EnableDisableDestination({enableDisable: destinationEnableObj}));
     this.store.pipe(
       select(destinationEnableStatus),
-      takeUntil(this.isDestroyed),
       filter(state => !pending(state)))
       .subscribe(state => {
         if (state === EntityStatus.loadingSuccess) {
