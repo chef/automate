@@ -18,7 +18,7 @@ import { destinationEnableStatus } from 'app/entities/destinations/destination.s
   templateUrl: './data-feed-table.component.html',
   styleUrls: ['./data-feed-table.component.scss']
 })
-export class DataFeedTableComponent implements OnInit, OnChanges {
+export class DataFeedTableComponent  {
 
   public loading$: Observable<boolean>;
   public sortedDestinations$: Observable<Destination[]>;
