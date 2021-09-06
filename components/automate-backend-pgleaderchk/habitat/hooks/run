@@ -2,4 +2,4 @@
 
 exec 2>&1
 
-exec pgleaderchk -c {{pkg.svc_config_path}}/config.toml serve
+exec automate-backend-pgleaderchk -c {{pkg.svc_config_path}}/config.toml serve
