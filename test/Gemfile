@@ -1,0 +1,12 @@
+source 'https://rubygems.org'
+
+gem 'assert'
+gem 'bcrypt_pbkdf'
+gem 'ed25519'
+gem 'logger'
+gem 'mixlib-shellout'
+gem 'pry'
+gem 'rake'
+gem 'thor'
+gem 'train'
+gem 'toml-rb'

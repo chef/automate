@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+[ -d "./test/vendor/bundle" ] || (cd test && $(hab pkg path core/ruby26)/bin/bundle install --path vendor/bundle)
+cd test && $(hab pkg path core/ruby26)/bin/bundle exec $(hab pkg path core/ruby26)/bin/ruby lib/smoke-test "$@"

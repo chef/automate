@@ -1,0 +1,8 @@
+name: automate-backend-resources
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: success@chef.io
+license: All Rights Reserved
+summary: An InSpec Compliance libraries for testing Chef Automate cluster
+version: 0.1.0

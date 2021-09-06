@@ -1,0 +1,17 @@
+#####################################
+# Certificate Rotation Documentation
+#####################################
+
+1. Run ./scripts/credentials set ssl --help
+2. Run ./scripts/credentials set ssl with the appropriate options to generate list of skeleton files
+3. Place your x.509 SSL certs into the appropriate files in certs/
+   - Put your root cert into ca_root.pem file.
+   - Put your Intermediate CA into the pem file.
+
+   **If your organization issues from an Intermediate CA, chain the Intermediat cert(s) _after_ the Server cert file. And put it 
+   For example, in certs/pg_ssl_public.pem paste them like so:     
+     Server Certificate
+     Intermediate CA Certificate 1
+     Intermediate CA Certificate n
+4. Re-run ./scripts/credentials set ssl with the appropriate options to deploy to nodes
+   **You can ingore other skeleton files that generate by step 2, the flag will only apply change to relevant nodes. It will iterate throught each frontend and then backend.
