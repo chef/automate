@@ -88,3 +88,4 @@ automate-backend-curator components/automate-backend-curator
 automate-backend-postgresql components/automate-backend-postgresql
 automate-backend-ctl components/automate-backend-ctl
 automate-backend-deployment components/automate-backend-deployment
+automate-backend-pgleaderchk components/automate-backend-pgleaderchk

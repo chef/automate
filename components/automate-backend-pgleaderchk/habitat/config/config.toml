@@ -1,0 +1,29 @@
+[database]
+hostname = "{{sys.ip}}"
+{{#if bind.database}}
+  {{#eachAlive bind.database.members as |member|}}
+   {{#if @last}}
+port = {{member.cfg.port}}
+username = "{{member.cfg.superuser_name}}"
+password = "{{member.cfg.superuser_password}}"
+     {{#if member.cfg.ssl }}
+sslmode = "require"
+     {{else}}
+sslmode = "disable"
+     {{/if}}
+    {{/if}}
+  {{/eachAlive}}
+{{else}}
+port = {{cfg.database.port}}
+username = "{{cfg.database.username}}"
+password = "{{cfg.database.password}}"
+sslmode = "{{cfg.database.sslmode}}"
+{{/if}}
+dbname = "{{cfg.database.dbname}}"
+
+[httpd]
+bind = "{{cfg.httpd.bind}}"
+port = {{cfg.httpd.port}}
+
+[log]
+level = "{{cfg.log.level}}"
