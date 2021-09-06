@@ -297,3 +297,4 @@ export class DataFeedCreateComponent {
     return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
   }
 }
+
