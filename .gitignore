@@ -14,9 +14,7 @@ src
 inspec.lock
 
 # Terraform
-terraform/.terraform/
-terraform/test-environments/.terraform/
-terraform/test-license-usage/.terraform/
+.terraform/
 *.tfstate
 *.tfstate.backup
 *_override.tf

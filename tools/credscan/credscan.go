@@ -106,8 +106,6 @@ var a2Config = config{
                 
 		// A2HA Component sample keys and certificates
 		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
-		{regex: `test/lib/certificate_store.rb`},
-		{regex: `test/lib/credentials.rb`},
 		// Test data from workflow
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},
