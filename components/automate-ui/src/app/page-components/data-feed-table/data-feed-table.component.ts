@@ -26,7 +26,7 @@ export class DataFeedTableComponent  {
   public dataFeedToDelete: Destination;
   public deleteModalVisible = false;
   public sendingDataFeed = false;
-  @Input()  destinations: Destination[];
+  @Input()  destinations: Destination[] = [];
   public selectedSortField: string;
   columnDropdownVisible = false;
   public enable = false;
