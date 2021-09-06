@@ -2,11 +2,11 @@ package infra_proxy
 
 import (
 	"context"
-
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
+	log "github.com/sirupsen/logrus"
 )
 
 // GetServers fetches an array of existing servers
@@ -47,6 +47,7 @@ func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServ
 	}
 	res, err := a.client.CreateServer(ctx, req)
 	if err != nil {
+		log.Warnf("Create server error:: %s", err.Error())
 		return nil, err
 	}
 	return &gwres.CreateServer{
@@ -82,6 +83,23 @@ func (a *InfraProxyServer) DeleteServer(ctx context.Context, r *gwreq.DeleteServ
 	}
 	return &gwres.DeleteServer{
 		Server: fromUpstreamServer(res.Server),
+	}, nil
+}
+
+// GetServerStatus get status of server
+func (a *InfraProxyServer) GetServerStatus(ctx context.Context, request *gwreq.GetServerStatus) (*gwres.GetServerStatus, error) {
+	req := &infra_req.GetServerStatus{
+		Fqdn: request.GetFqdn(),
+	}
+
+	res, err := a.client.GetServerStatus(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.GetServerStatus{
+		Status:    res.Status,
+		Upstreams: res.Upstreams,
+		Keygen:    res.Keygen,
 	}, nil
 }
 
