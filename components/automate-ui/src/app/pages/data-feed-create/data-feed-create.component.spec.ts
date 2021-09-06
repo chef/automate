@@ -62,8 +62,8 @@ describe('DataFeedCreateComponent', () => {
     component = fixture.componentInstance;
     component.createForm = new FormBuilder().group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      endpoint: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
-      url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
+      endpoint: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       tokenType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       token: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],

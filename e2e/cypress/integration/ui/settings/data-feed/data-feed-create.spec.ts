@@ -163,7 +163,7 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=close-feed-button]').click();
       });
 
-      it('test error in data feed minio success', () => {
+      it('test connection in data feed minio success', () => {
         const date = Date.now();
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=Minio]').click();
