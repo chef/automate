@@ -24,9 +24,10 @@ As an Automate User, I will use this api to save this data.
 - All Exceptions are Handled Properly 
 - Ensure logs have no unnecessary data. 
 - Test coverage for the new feature is done to at least 70% 
-- Docs changes PR is Raised. 
+- If needed raise Docs PR and tag documentation. 
 - Swagger Documentation updated 
 - Smoke Test done. 
 - Ensure Build and Integration Pipelines are Green. 
 - PR has 2 approvers. 
 - All Code Review Comments are Resolved. 
+- README doc should be updated, if needed.

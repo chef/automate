@@ -40,3 +40,7 @@ CSS and Other settings can be found [here](http://ui-figma-design-preview.com)
 - Ensure Build and Integration Pipelines are Green.
 - PR has 2 approvers.
 - All Code Review Comments are Resolved.
+- Screen shot of the feature developed is provided in the issue.
+- Ensure compatibility with all supporting browser.
+- Demo the feature to UX.
+- Link to the UX wireframe/Requirement Document.

@@ -38,3 +38,4 @@ Or Because of these new features which are supported in new version of this Soft
 - Ensure Build and Integration Pipelines are Green. 
 - PR has 2 approvers. 
 - All Code Review Comments are Resolved. 
+- Test upgrade from n-1 version.
