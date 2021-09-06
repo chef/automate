@@ -69,9 +69,9 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.createDataFeedForm = this.fb.group({
       // Must stay in sync with error checks in create-data-feed-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      endpoint: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
+      endpoint: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
-      url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       tokenType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       token: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -151,7 +151,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   }
 
   public sendTestForDataFeed(event: any): void {
-    this.sendingDataFeed = true;
+    let testConnectionObservable: Observable<Object> = null;
     if (event.name === WebhookIntegrationTypes.SERVICENOW ||
       event.name === WebhookIntegrationTypes.SPLUNK ||
       event.name === WebhookIntegrationTypes.ELK_KIBANA) {
@@ -162,38 +162,19 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const value = JSON.stringify({
           Authorization: tokenType + ' ' + token
         });
-        this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-          value).subscribe(
-            () => this.revealUrlStatus(UrlTestState.Success),
-            () => this.revealUrlStatus(UrlTestState.Failure)
-          );
+        testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
+          value);
       } else if (event.auth === AuthTypes.USERNAMEANDPASSWORD) {
         const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
         const targetUsername: string = this.createDataFeedForm.controls['username'].value;
         const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-        if (targetUrl && targetUsername && targetPassword) {
-          this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
-            targetUsername, targetPassword).subscribe(
-              () => this.revealUrlStatus(UrlTestState.Success),
-              () => this.revealUrlStatus(UrlTestState.Failure)
-            );
-        } else {
-          this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
-            .subscribe(
-              () => this.revealUrlStatus(UrlTestState.Success),
-              () => this.revealUrlStatus(UrlTestState.Failure)
-            );
-        }
+        testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
+          targetUrl, targetUsername, targetPassword);
       }
     } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
 
     } else if (event.name === StorageIntegrationTypes.MINIO) {
       const targetUrl: string = this.createDataFeedForm.controls['endpoint'].value;
-      // const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
-      // const token: string = this.createDataFeedForm.controls['token'].value;
-      // const value = JSON.stringify({
-      //   Authorization: tokenType + ' ' + token
-      // });
       const data = {
         url: targetUrl,
         aws: {
@@ -202,14 +183,14 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
         }
       };
-
-      this.datafeedRequests.testDestinationForMinio(data)
-        .subscribe(
-          () => this.revealUrlStatus(UrlTestState.Success),
-          () => this.revealUrlStatus(UrlTestState.Failure)
-        );
-  }
-    this.sendingDataFeed = false;
+      testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+    }
+    if (testConnectionObservable != null) {
+      testConnectionObservable.subscribe(
+        () => this.revealUrlStatus(UrlTestState.Success),
+        () => this.revealUrlStatus(UrlTestState.Failure)
+      );
+    }
   }
 
   private revealUrlStatus(status: UrlTestState) {
@@ -289,7 +270,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         storage = {accessKey, secretKey};
         headers = null;
     }
-
-    this.store.dispatch(new CreateDestination(destinationObj, headers, storage));
+    if (destinationObj && headers && storage) {
+      this.store.dispatch(new CreateDestination(destinationObj, headers, storage));
+    }
   }
 }
