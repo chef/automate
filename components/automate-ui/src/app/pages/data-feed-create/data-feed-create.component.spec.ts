@@ -100,6 +100,20 @@ describe('DataFeedCreateComponent', () => {
       expect(createForm.valid).toBeFalsy();
     });
 
+    it('opening create slider resets name, url, token to empty string', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue('Bearer');
+      component.createForm.controls['token'].setValue('any');
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Splunk');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
+
     it('should be valid when all fields are filled out for service-now', () => {
       component.name = jasmine.createSpyObj('name', ['nativeElement']);
       component.name.nativeElement = { focus: () => { }};
@@ -209,13 +223,7 @@ describe('DataFeedCreateComponent', () => {
       // Set url to invalid inputs
       url.setValue('  ');
       errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
       expect(errors['required']).toBeFalsy();
-
-      // Set url to valid inputs
-      url.setValue('any');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
     });
   });
 });

@@ -102,18 +102,6 @@ describe('DataFeedComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create slider resets name, url, token to empty string', () => {
-      component.createDataFeedForm.controls['name'].setValue('any');
-      component.createDataFeedForm.controls['url'].setValue('any');
-      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
-      component.createDataFeedForm.controls['token'].setValue('any');
-      component.slidePanel();
-      expect(component.createDataFeedForm.controls['name'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['url'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['tokenType'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['token'].value).toBe(null);
-    });
-
     it('on success, closes slider and adds new data feed', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
