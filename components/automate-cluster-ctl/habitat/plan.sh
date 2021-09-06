@@ -73,11 +73,11 @@ do_install() {
   pushd "$HAB_CACHE_SRC_PATH/$pkg_dirname/"
     cp -r lib $pkg_prefix/
     cp -r libexec $pkg_prefix/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/workspace/inspec/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/workspace/inspec/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/workspace/inspec/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/workspace/inspec/
-    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/workspace/inspec/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-elasticsearch-smoke $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-postgresql-smoke $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-backend-resources $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-chef-server-smoke $pkg_prefix/
+    cp -r $PLAN_CONTEXT/../../../inspec/automate-frontend-smoke $pkg_prefix/
     cp -r templates $pkg_prefix/
     cp -r vendor $pkg_prefix/
   popd
