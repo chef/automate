@@ -91,4 +91,6 @@ service InfraProxyService {
     rpc GetPolicygroup (chef.automate.domain.infra_proxy.request.Policygroup) returns (chef.automate.domain.infra_proxy.response.Policygroup) {};
 
     rpc GetOrgUsersList (chef.automate.domain.infra_proxy.request.OrgUsers) returns (chef.automate.domain.infra_proxy.response.OrgUsers) {};
+    rpc GetServerUsersList (chef.automate.domain.infra_proxy.request.ServerUsers) returns (chef.automate.domain.infra_proxy.response.ServerUsers) {};
+
 }

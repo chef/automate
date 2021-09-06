@@ -1,0 +1,45 @@
+[logging]
+level = "warning"
+to_files = "false"
+
+[journalbeat]
+registry_file = "/hab/svc/automate-backend-journalbeat/data/registry"
+
+#=========================== Journalbeat inputs ================================
+
+[[journalbeat.inputs]]
+paths = []
+seek = "cursor"
+
+#================================ Outputs ======================================
+
+[output]
+[output.elasticsearch]
+hosts = [
+  "https://localhost:9200"
+]
+
+[setup]
+[setup.template]
+fields = "/hab/svc/automate-backend-journalbeat/config/fields.yml"
+
+#============================== Processors =====================================
+
+[[processors]]
+  [processors.add_cloud_metadata]
+  timeout = "3s"
+
+[[processors]]
+  [processors.dissect]
+  target_prefix = "hab"
+  tokenizer = "automate-backend-%{service}.default%{status}): %{log_message}"
+    [processors.dissect.when]
+      [processors.dissect.when.regexp]
+      message = "^automate-backend-.*"
+
+[[processors]]
+  [processors.drop_event]
+    [processors.drop_event.when]
+      [processors.drop_event.when.regexp]
+        [processors.drop_event.when.regexp.hab]
+        log_message = "^[[:space:]].*"

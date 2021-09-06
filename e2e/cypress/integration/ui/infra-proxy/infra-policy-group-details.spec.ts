@@ -13,6 +13,7 @@ describe('infra policy group details', () => {
   let policyFilesCount: number;
   let policyFileName: string;
   let policyFileRevision: number;
+  let nodeName: string;
 
   before(() => {
     cy.adminLogin('/').then(() => {
@@ -159,6 +160,7 @@ describe('infra policy group details', () => {
       cy.get('[data-cy=nodes-table-container] chef-th').contains('Uptime');
       cy.get('[data-cy=nodes-table-container] chef-th').contains('Last Check-In');
       cy.get('[data-cy=nodes-table-container] chef-th').contains('Environment');
+      nodeName = response.body.nodes[0].name;
       return true;
     }
   }
@@ -222,6 +224,25 @@ describe('infra policy group details', () => {
         getPolicyGroupNodes(policyGroupName, 1, 9).then((response) => {
           checkNodesResponse(response);
         });
+      }
+    });
+
+    it('can go to node detail page by click on node name', () => {
+      if (policyGroupName !== '') {
+        getPolicyGroupNodes(policyGroupName, 1, 9).then((response) => {
+          checkNodesResponse(response);
+        });
+        if (nodeName !== '' && nodeName !== undefined) {
+          cy.get('[data-cy=nodes-table-container] chef-td').contains(nodeName)
+            .click();
+            cy.on('url:changed', (newUrl) => {
+              expect(newUrl).to
+              .contain('nodes/' + nodeName);
+            });
+          cy.get('[data-cy=infra-node-head]').contains(nodeName);
+        } else {
+          cy.get('[data-cy=no-nodes]').should('be.visible');
+        }
       }
     });
   });

@@ -1,0 +1,85 @@
+---
+logging:
+  level: {{cfg.logging.level}}
+  redirect_stderr: {{cfg.logging.redirect_stderr}}
+metricbeat:
+  config:
+    modules:
+      reload:
+        enabled: false
+  max_start_delay: 10s
+  modules:
+{{~#if bind.database}}
+  {{~#eachAlive bind.database.members as |member|}}
+    {{~#if @last}}
+    - enabled: true
+      hosts:
+      {{~#if member.cfg.ssl }}
+        - "postgres://localhost:{{member.cfg.port}}/postgres?sslmode=require"
+      {{~else}}
+        - "postgres://localhost:{{member.cfg.port}}/postgres?sslmode=disable"
+      {{~/if}}
+      metricsets:
+        - database
+        - bgwriter
+        - activity
+      module: postgresql
+      password: "{{bind.database.first.cfg.superuser_password}}"
+      period: 30s
+      username: "{{bind.database.first.cfg.superuser_name}}"
+      ssl.verification_mode: "none"
+    {{~/if}}
+  {{~/eachAlive}}
+{{~/if}}
+{{~#if bind.elasticsearch}}
+  {{~#eachAlive bind.elasticsearch.members as |member|}}
+    {{~#if @last}}
+    - enabled: true
+      hosts:
+        - "https://localhost:9200"
+      metricsets:
+        - cluster_stats
+        - index_summary
+        - node
+        - shard
+      {{~#if ../cfg.extended_stats.elasticsearch.node_stats}}
+        - node_stats
+      {{~/if}}
+      module: elasticsearch
+      password: "{{bind.elasticsearch.first.cfg.admin_password}}"
+      period: 30s
+      username: "{{bind.elasticsearch.first.cfg.admin_username}}"
+      ssl.verification_mode: "none"
+    {{~/if}}
+  {{~/eachAlive}}
+{{~/if}}
+    - enabled: true
+      metricsets:
+        - cpu
+        - load
+        - memory
+        - network
+        - process
+        - process_summary
+        - uptime
+        - diskio
+        - filesystem
+      module: system
+      period: 30s
+      processes:
+        - ".*"
+      filesystem.ignore_types: [nfs, smbfs, autofs]
+output:
+  elasticsearch:
+    hosts:
+{{~#each cfg.output.elasticsearch.hosts as |host|}}
+      - "{{host}}"
+{{~/each}}
+    username: "{{bind.elasticsearch.first.cfg.admin_username}}"
+    password: "{{bind.elasticsearch.first.cfg.admin_password}}"
+    ssl:
+      verification_mode: {{cfg.output.elasticsearch.ssl.verification_mode}}
+tags:
+{{~#each cfg.tags as |tag|}}
+  - "{{tag}}"
+{{~/each}}

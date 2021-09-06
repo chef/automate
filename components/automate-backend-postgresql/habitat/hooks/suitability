@@ -1,0 +1,7 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -Exeuo pipefail
+
+source {{pkg.svc_config_path}}/functions.sh
+
+local_xlog_position

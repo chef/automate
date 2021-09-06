@@ -950,4 +950,21 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServerUsersList", "infra:infraServers:{server_id}:users", "infra:infraServers:get", "POST", "/api/v0/infra/servers/{server_id}/users", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.ServerUsers); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "server_id":
+					return m.ServerId
+				case "admin_name":
+					return m.AdminName
+				case "admin_key":
+					return m.AdminKey
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

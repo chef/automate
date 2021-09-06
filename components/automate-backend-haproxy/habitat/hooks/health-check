@@ -1,0 +1,14 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+rc=0
+
+echo "show info" | {{pkgPathFor "core/netcat-openbsd"}}/bin/nc -U {{pkg.svc_var_path}}/run/haproxy.sock | grep -q Pid
+
+case $? in
+  0)
+    rc=0 ;; # Golden
+  *)
+    rc=2 ;; # Critical
+esac
+
+exit $rc

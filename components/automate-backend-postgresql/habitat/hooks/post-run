@@ -1,0 +1,20 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -Exeuo pipefail
+
+exec 2>&1
+
+echo 'Executing post-run hook'
+
+source {{pkg.svc_config_path}}/functions.sh
+
+ensure_dir_ownership
+
+{{#if svc.me.leader }}
+primary_ready
+pg_reload_config
+promote_to_leader
+setup_replication_user_in_primary
+checkpoint
+remove_promotion_trigger
+{{/if}}

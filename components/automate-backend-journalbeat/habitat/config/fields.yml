@@ -1,0 +1,537 @@
+- key: common
+  title: "Common Journalbeat"
+  description: >
+    Contains common fields available in all event types.
+  fields:
+    - name: read_timestamp
+      description: >
+          The time when Journalbeat read the journal entry.
+    - name: coredump
+      type: group
+      description: >
+          Fields used by systemd-coredump kernel helper.
+      fields:
+        - name: unit
+          type: keyword
+          description: >
+            Annotations of messages containing coredumps from system units.
+        - name: user_unit
+          type: keyword
+          description: >
+            Annotations of messages containing coredumps from user units.
+    - name: journald
+      type: group
+      description: >
+          Fields provided by journald.
+      fields:
+        - name: object
+          type: group
+          description: >
+              Fields to log on behalf of a different program.
+          fields:
+            - name: audit
+              type: group
+              description: >
+                  Audit fields of event.
+              fields:
+                - name: login_uid
+                  type: long
+                  required: false
+                  example: 1000
+                  description: >
+                    The login UID of the object process.
+                - name: session
+                  type: long
+                  required: false
+                  example: 3
+                  description: >
+                    The audit session of the object process.
+            - name: cmd
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd --user"
+              description: >
+                The command line of the process.
+            - name: name
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd"
+              description: >
+                Name of the executable.
+            - name: executable
+              type: keyword
+              required: false
+              description: >
+                Path to the the executable.
+              example: "/lib/systemd/systemd"
+            - name: uid
+              type: long
+              required: false
+              description: >
+                UID of the object process.
+            - name: gid
+              type: long
+              required: false
+              description: >
+                GID of the object process.
+            - name: pid
+              type: long
+              required: false
+              description: >
+                PID of the object process.
+            - name: systemd
+              type: group
+              description: >
+                  Systemd fields of event.
+              fields:
+                - name: owner_uid
+                  type: long
+                  required: false
+                  description: >
+                    The UID of the owner.
+                - name: session
+                  type: keyword
+                  required: false
+                  description: >
+                    The ID of the systemd session.
+                - name: unit
+                  type: keyword
+                  required: false
+                  description: >
+                    The name of the systemd unit.
+                - name: user_unit
+                  type: keyword
+                  required: false
+                  description: >
+                    The name of the systemd user unit.
+        - name: kernel
+          type: group
+          description: >
+              Fields to log on behalf of a different program.
+          fields:
+            - name: device
+              type: keyword
+              required: false
+              description: >
+                The kernel device name.
+            - name: subsystem
+              type: keyword
+              required: false
+              description: >
+                The kernel subsystem name.
+            - name: device_symlinks
+              type: text
+              required: false
+              description: >
+                Additional symlink names pointing to the device node in /dev.
+            - name: device_node_path
+              type: text
+              required: false
+              description: >
+                The device node path of this device in /dev.
+            - name: device_name
+              type: text
+              required: false
+              description: >
+                The kernel device name as it shows up in the device tree below /sys.
+        - name: code
+          type: group
+          description: >
+              Fields of the code generating the event.
+          fields:
+            - name: file
+              type: text
+              required: false
+              example: "../src/core/manager.c"
+              description: >
+                The name of the source file where the log is generated.
+            - name: function
+              type: text
+              required: false
+              example: "job_log_status_message"
+              description: >
+                The name of the function which generated the log message.
+            - name: line
+              type: long
+              required: false
+              example: 123
+              description: >
+                The line number of the code which generated the log message.
+        - name: process
+      type: group
+      description: >
+          Fields to log on behalf of a different program.
+      fields:
+        - name: audit
+          type: group
+          description: >
+              Audit fields of event.
+          fields:
+            - name: loginuid
+              type: long
+              required: false
+              example: 1000
+              description: >
+                The login UID of the source process.
+            - name: session
+              type: long
+              required: false
+              example: 3
+              description: >
+                The audit session of the source process.
+        - name: cmd
+          type: keyword
+          required: false
+          example: "/lib/systemd/systemd --user"
+          description: >
+            The command line of the process.
+        - name: name
+          type: keyword
+          required: false
+          example: "/lib/systemd/systemd"
+          description: >
+            Name of the executable.
+        - name: executable
+          type: keyword
+          required: false
+          description: >
+            Path to the the executable.
+          example: "/lib/systemd/systemd"
+        - name: pid
+          type: long
+          required: false
+          example: 1
+          description: >
+            The ID of the process which logged the message.
+        - name: gid
+          type: long
+          required: false
+          example: 1
+          description: >
+            The ID of the group which runs the process.
+        - name: uid
+          type: long
+          required: false
+          example: 1
+          description: >
+            The ID of the user which runs the process.
+        - name: capabilites
+          required: false
+          description: >
+            The effective capabilites of the process.
+    - name: systemd
+      type: group
+      description: >
+          Fields of systemd.
+      fields:
+        - name: invocation_id
+          type: keyword
+          required: false
+          example: "8450f1672de646c88cd133aadd4f2d70"
+          description: >
+            The invocation ID for the runtime cycle of the unit the message was generated in.
+        - name: cgroup
+          type: keyword
+          required: false
+          example: "/user.slice/user-1234.slice/session-2.scope"
+          description: >
+            The control group path in the systemd hierarchy.
+        - name: owner_uid
+          type: long
+          required: false
+          description: >
+            The owner UID of the systemd user unit or systemd session.
+        - name: session
+          type: keyword
+          required: false
+          description: >
+            The ID of the systemd session.
+        - name: slice
+          type: keyword
+          required: false
+          example: "user-1234.slice"
+          description: >
+            The systemd slice unit.
+        - name: user_slice
+          type: keyword
+          required: false
+          description: >
+            The systemd user slice unit.
+        - name: unit
+          type: keyword
+          required: false
+          example: "nginx.service"
+          description: >
+            The name of the systemd unit.
+        - name: user_unit
+          type: keyword
+          required: false
+          example: "user-1234.slice"
+          description: >
+            The name of the systemd user unit.
+        - name: transport
+          type: keyword
+          required: true
+          example: "syslog"
+          description: >
+            How the log message was received by journald.
+    - name: host
+      type: group
+      description: >
+          Fields of the host.
+      fields:
+        - name: boot_id
+          type: text
+          required: false
+          example: "dd8c974asdf01dbe2ef26d7fasdf264c9"
+          description: >
+            The boot ID for the boot the log was generated in.
+    - name: syslog
+      type: group
+      description: >
+          Fields of the code generating the event.
+      fields:
+        - name: priority
+          type: long
+          required: false
+          example: 1
+          description: >
+            The priority of the message. A syslog compatibility field.
+        - name: facility
+          type: long
+          required: false
+          example: 1
+          description: >
+            The facility of the message. A syslog compatibility field.
+        - name: identifier
+          type: text
+          required: false
+          example: "su"
+          description: >
+            The identifier of the message. A syslog compatibility field.
+    - name: message
+      type: text
+      required: true
+      description: >
+        The logged message.
+    - name: custom
+      type: nested
+      required: false
+      description: >
+        Arbitrary fields coming from processes.
+
+- key: beat
+  title: Beat
+  description: >
+    Contains common beat fields available in all event types.
+  fields:
+
+    - name: beat.name
+      description: >
+        The name of the Beat sending the log messages. If the Beat name is
+        set in the configuration file, then that value is used. If it is not
+        set, the hostname is used. To set the Beat name, use the `name`
+        option in the configuration file.
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+    - name: beat.timezone
+      description: >
+        The timezone as returned by the operating system on which the Beat is
+        running.
+    - name: beat.version
+      description: >
+        The version of the beat that generated this event.
+
+    - name: "@timestamp"
+      type: date
+      required: true
+      format: date
+      example: August 26th 2016, 12:35:53.332
+      description: >
+        The timestamp when the event log record was generated.
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: object
+      object_type: keyword
+      description: >
+        Contains user configurable fields.
+
+    - name: error
+      type: group
+      description: >
+        Error fields containing additional info in case of errors.
+      fields:
+        - name: message
+          type: text
+          description: >
+            Error message.
+        - name: code
+          type: long
+          description: >
+            Error code.
+        - name: type
+          type: keyword
+          description: >
+            Error type.
+- key: cloud
+  title: Cloud provider metadata
+  description: >
+    Metadata from cloud providers added by the add_cloud_metadata processor.
+  fields:
+
+    - name: meta.cloud.provider
+      example: ec2
+      description: >
+        Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+
+    - name: meta.cloud.instance_id
+      description: >
+        Instance ID of the host machine.
+
+    - name: meta.cloud.instance_name
+      description: >
+        Instance name of the host machine.
+
+    - name: meta.cloud.machine_type
+      example: t2.medium
+      description: >
+        Machine type of the host machine.
+
+    - name: meta.cloud.availability_zone
+      example: us-east-1c
+      description: >
+        Availability zone in which this host is running.
+
+    - name: meta.cloud.project_id
+      example: project-x
+      description: >
+        Name of the project in Google Cloud.
+
+    - name: meta.cloud.region
+      description: >
+        Region in which this host is running.
+- key: docker
+  title: Docker
+  description: >
+    Docker stats collected from Docker.
+  short_config: false
+  anchor: docker-processor
+  fields:
+    - name: docker
+      type: group
+      fields:
+        - name: container.id
+          type: keyword
+          description: >
+            Unique container id.
+        - name: container.image
+          type: keyword
+          description: >
+            Name of the image the container was built on.
+        - name: container.name
+          type: keyword
+          description: >
+            Container name.
+        - name: container.labels
+          type: object
+          object_type: keyword
+          description: >
+            Image labels.
+- key: host
+  title: Host
+  description: >
+    Info collected for the host machine.
+  anchor: host-processor
+  fields:
+    - name: host
+      type: group
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            Hostname.
+        - name: id
+          type: keyword
+          description: >
+            Unique host id.
+        - name: architecture
+          type: keyword
+          description: >
+            Host architecture (e.g. x86_64, arm, ppc, mips).
+        - name: os.platform
+          type: keyword
+          description: >
+            OS platform (e.g. centos, ubuntu, windows).
+        - name: os.version
+          type: keyword
+          description: >
+            OS version.
+        - name: os.family
+          type: keyword
+          description: >
+            OS family (e.g. redhat, debian, freebsd, windows).
+        - name: ip
+          type: ip
+          description: >
+            List of IP-addresses.
+        - name: mac
+          type: keyword
+          description: >
+            List of hardware-addresses, usually MAC-addresses.
+
+- key: kubernetes
+  title: Kubernetes
+  description: >
+    Kubernetes metadata added by the kubernetes processor
+  short_config: false
+  anchor: kubernetes-processor
+  fields:
+    - name: kubernetes
+      type: group
+      fields:
+        - name: pod.name
+          type: keyword
+          description: >
+            Kubernetes pod name
+
+        - name: pod.uid
+          type: keyword
+          description: >
+            Kubernetes Pod UID
+
+        - name: namespace
+          type: keyword
+          description: >
+            Kubernetes namespace
+
+        - name: node.name
+          type: keyword
+          description: >
+            Kubernetes node name
+
+        - name: labels
+          type: object
+          description: >
+            Kubernetes labels map
+
+        - name: annotations
+          type: object
+          description: >
+            Kubernetes annotations map
+
+        - name: container.name
+          type: keyword
+          description: >
+            Kubernetes container name
+
+        - name: container.image
+          type: keyword
+          description: >
+            Kubernetes container image
