@@ -218,8 +218,14 @@ func enableDeploymentModeFlag() {
 	writer.Printf("generating deployment mode flag file \n")
 
 	if _, err := os.Stat(FlagPath); os.IsNotExist(err) {
-		os.MkdirAll(DeploymentModeFlagParentDir+DeploymentModeFlagDirName, 0700) // Create your file
-		ioutil.WriteFile(FlagPath, []byte(flag), 0600)
+		err := os.MkdirAll(DeploymentModeFlagParentDir+DeploymentModeFlagDirName, 0700) // Create your file
+		if err != nil {
+			writer.Println("error in creating directory for deployment mode flag. " + err.Error())
+		}
+		err = ioutil.WriteFile(FlagPath, []byte(flag), 0600)
+		if err != nil {
+			writer.Println("error in writing to file for deployment mode flag. " + err.Error())
+		}
 	}
 
 }
