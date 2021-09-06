@@ -35,12 +35,6 @@ describe('chef datafeed', () => {
     describe ('chef data feed page', () => {
       const reusableDate = Date.now();
 
-      it('check if clicking on new integration button opens up the slider', () => {
-        cy.get('[data-cy=create-data-feed]').click();
-        cy.get('[data-cy=interation-menu]').should('be.visible');
-        cy.get('[data-cy=close-feed-button]').click();
-      });
-
       it('check if clicking on a interation opens the form', () => {
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=ServiceNow]').click();
