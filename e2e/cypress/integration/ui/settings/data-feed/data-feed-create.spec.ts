@@ -20,7 +20,7 @@ describe('chef datafeed', () => {
             cy.reload();
             cy.contains('know').click();
             cy.contains('Data Feeds').click();
-            cy.get('app-notification.error chef-icon').click({ multiple: true });
+            cy.get('app-notification chef-icon').click({ multiple: true });
         });
     });
 
@@ -34,6 +34,12 @@ describe('chef datafeed', () => {
 
     describe ('chef data feed page', () => {
       const reusableDate = Date.now();
+
+      it('check if clicking on new integration button opens up the slider', () => {
+        cy.get('[data-cy=create-data-feed]').click();
+        cy.get('[data-cy=interation-menu]').should('be.visible');
+        cy.get('[data-cy=close-feed-button]').click();
+      });
 
       it('check if clicking on a interation opens the form', () => {
         cy.get('[data-cy=create-data-feed]').click();
@@ -80,8 +86,8 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-token]').type(token);
         cy.get('[data-cy=add-button]').click();
         cy.get('app-data-feed-create').scrollTo('top');
-        cy.get('app-notification.error').should('be.visible');
-        cy.get('app-notification.error chef-icon').click();
+        cy.get('app-notification').should('be.visible');
+        cy.get('app-notification chef-icon').click();
         cy.get('[data-cy=close-feed-button]').click();
       });
 
@@ -111,8 +117,8 @@ describe('chef datafeed', () => {
         cy.get('[data-cy=add-token]').type(token);
         cy.get('[data-cy=test-button]').click();
         cy.get('app-data-feed-create').scrollTo('top');
-        cy.get('app-notification.error').should('be.visible');
-        cy.get('app-notification.error chef-icon').click();
+        cy.get('app-notification').should('be.visible');
+        cy.get('app-notification chef-icon').click();
       });
     });
   });
