@@ -1174,6 +1174,12 @@ plan_path = "components/automate-backend-deployment"
 paths = [
   "components/automate-backend-deployment/*"
 ]
+
+[automate-backend-pgleaderchk]
+plan_path = "components/automate-backend-pgleaderchk"
+paths = [
+  "components/automate-backend-pgleaderchk/*"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
