@@ -1,3 +1,5 @@
+import { KVData } from '../node-credentials/node-credential.model';
+
 export interface Destination {
   id: string;
   name: string;
@@ -5,13 +7,10 @@ export interface Destination {
   secret: string;
   enable?: boolean;
   integration_types?: string;
-  meta_data?: [];
+  meta_data?: Array<KVData>;
   services?: string;
 }
-export interface Metadata {
-  key?: string;
-  value?: string;
-}
+
 
 
 export interface EnableDestination {

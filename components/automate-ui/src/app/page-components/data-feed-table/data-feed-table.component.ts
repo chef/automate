@@ -41,12 +41,6 @@ export class DataFeedTableComponent implements OnInit, OnChanges {
     private store: Store<NgrxStateAtom>
   ) {}
 
-  ngOnInit() {
-  }
-
-  ngOnChanges() {
-
-  }
 
   toggleColumnDropdown() {
     this.columnDropdownVisible = !this.columnDropdownVisible;
