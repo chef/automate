@@ -35,6 +35,7 @@
             <label for="timeformat">Time Format</label>
             <mat-select 
               #timeformat 
+              panelClass="chef-dropdown"
               [value]="userDetailsFormControl.timeformat" 
               (selectionChange)="handleTimeFormatChange($event)" 
               data-cy="timeformat-dropdown">
