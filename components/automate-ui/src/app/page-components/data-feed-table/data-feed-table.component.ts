@@ -1,8 +1,7 @@
 import {
   Component,
-  OnInit,
-  OnChanges,
-  Input } from '@angular/core';
+  Input
+} from '@angular/core';
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { DeleteDestination, EnableDisableDestination } from 'app/entities/destinations/destination.actions';
 import { Destination } from 'app/entities/destinations/destination.model';
