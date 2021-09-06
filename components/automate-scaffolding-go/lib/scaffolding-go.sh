@@ -22,6 +22,7 @@ do_default_unpack() {
 }
 
 do_default_prepare() {
+  echo "............i am doing the default prepare......................"
   GIT_SHA=$(git rev-parse HEAD)
   GO_LDFLAGS="-X github.com/chef/automate/lib/version.Version=${pkg_release}"
   GO_LDFLAGS="${GO_LDFLAGS} -X github.com/chef/automate/lib/version.GitSHA=${GIT_SHA}"
@@ -30,6 +31,7 @@ do_default_prepare() {
 }
 
 do_default_build() {
+  echo "............i am doing the default build......................"
   tmp_bin="${CACHE_PATH}/bin"
   mkdir -p "${tmp_bin}"
 
@@ -91,6 +93,7 @@ do_default_build() {
 }
 
 do_default_install() {
+  echo "............i am doing the default install......................"
   # Avoids the need to have pkg_bin_dirs=(bin) on every plan
   mkdir -p "${pkg_prefix}/bin/"
 
@@ -105,6 +108,7 @@ do_default_install() {
 }
 
 do_check() {
+  echo "............i am doing the default do check......................"
   # Ensure that the go binaries are static if we've set the flag
   if ! [[ ${scaffolding_go_no_static} ]]; then
     check_static_binary() {

@@ -1,9 +1,9 @@
 # shellcheck disable=SC2148
 pkg_name=automate-backend-pgleaderchk
-binary_name=pgleaderchk
+binary_name=automate-backend-pgleaderchk
 pkg_origin=chef
 pkg_repo=automate
-pkg_version="0.1.2"
+pkg_version="0.1.0"
 pkg_description="Automate Backend PostreSQL leader check"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
@@ -36,10 +36,24 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
+#do_build() {
+#  build_line "Overriding Build process"
+#  pushd "$scaffolding_go_pkg_path" >/dev/null
+#  go install --ldflags "${GO_LDFLAGS} ${LINKER_FLAGS}" "${GO_COMPONENT_IMPORT_PATH}/cmd/${binary_name}"
+#  pwd
+#  popd >/dev/null
+#}
+
 do_install() {
   do_default_install
   build_line "Overriding Install process"
-  cp -r "${GOBIN}/$binary_name" "${pkg_prefix}/bin"
+  echo "................................."
+  ls -l ${GOBIN}
+  echo "................................."
+  echo ${GOBIN}
+  echo ${pkg_prefix}
+  
+ # cp -r "${GOBIN}/$binary_name" "${pkg_prefix}/bin"
 }
 
 do_strip() {
