@@ -85,12 +85,8 @@ describe('user management', () => {
     cy.get('app-user-table chef-td').contains(name).should('exist');
   });
 
-  it('can view and edit user details', () => {
+  it('can view user details', () => {
     cy.route('GET', `**/users/${username}`).as('getUser');
-    cy.route('PUT', `**/users/${username}`).as('updateUser');
-
-    const updated_name = `${name} updated`;
-    const updated_password = 'testing?';
 
     cy.contains(name).click();
     cy.wait('@getUser');
@@ -98,13 +94,12 @@ describe('user management', () => {
     cy.get('app-user-details div.name-column').contains(name).should('exist');
     cy.get('app-user-details div.header-user-id').contains(username).should('exist');
     cy.get('app-user-details chef-form-field').contains('Display Name ').should('exist');
-    cy.get('[formcontrolname=displayName]').clear()
-      .type(updated_name, { delay: typeDelay }).should('have.value', updated_name);
+  });
 
-    // save display name change
-    cy.get('[data-cy=user-details-submit-button]').click();
-    cy.get('app-user-details span#saved-note').contains('All changes saved.').should('exist');
-    cy.get('app-user-details div.name-column').contains(updated_name).should('exist');
+  it('can edit user details', () => {
+    cy.route('PUT', `**/users/${username}`).as('updateUser');
+    const updated_password = 'testing?';
+
 
     // click password tab
     cy.get('app-user-details #chef-option2').click();
@@ -126,6 +121,6 @@ describe('user management', () => {
     cy.get('#main-content-wrapper').scrollTo('top');
 
     cy.wait('@updateUser');
-    cy.get('app-notification.info').contains(`Reset password for user: ${username}`);
+    cy.get('app-notification.info').contains(`Reset password for user: ${username}.`);
   });
 });
