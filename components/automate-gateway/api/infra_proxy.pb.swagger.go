@@ -66,6 +66,37 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/server_status": {
+      "get": {
+        "operationId": "InfraProxy_GetServerStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.GetServerStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fqdn",
+            "description": "Server FQDN.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{id}": {
       "get": {
         "operationId": "InfraProxy_GetServer",
@@ -3805,6 +3836,30 @@ func init() {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server",
           "description": "Chef Infra Server."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.GetServerStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "title": "Chef Server Status"
+        },
+        "upstreams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Chef Server Upstream"
+        },
+        "keygen": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "Chef Server Keygem"
         }
       }
     },
