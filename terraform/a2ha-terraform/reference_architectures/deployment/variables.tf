@@ -1,0 +1,147 @@
+variable "ami_filter_name" {
+  default = "chef-highperf-centos7-*"
+}
+
+variable "ami_filter_owner" {
+  default = "446539779517"
+}
+
+variable "ami_filter_virt_type" {
+  default = "hvm"
+}
+
+variable "automate_ebs_volume_iops" {
+  default = 100
+}
+
+variable "automate_ebs_volume_size" {
+  default = 50
+}
+
+variable "automate_ebs_volume_type" {
+  default = "gp2"
+}
+
+variable "automate_lb_certificate_arn" {
+  default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
+}
+
+variable "automate_server_instance_type" {
+  default = "t3a.medium"
+}
+
+variable "aws_ami_id" {
+  default     = ""
+  description = "Setting this value overrides ami search features"
+}
+
+variable "aws_profile" {
+  default     = "default"
+  description = "The AWS profile to use from your ~/.aws/credentials file."
+}
+
+variable "aws_region" {
+  default     = "us-west-2"
+  description = "The name of the selected AWS region / datacenter."
+}
+
+variable "aws_ssh_key_pair_name" {
+}
+
+variable "aws_tags" {
+}
+
+variable "chef_ebs_volume_iops" {
+  default = 100
+}
+
+variable "chef_ebs_volume_size" {
+  default = 50
+}
+
+variable "chef_ebs_volume_type" {
+  default = "gp2"
+}
+
+variable "chef_server_instance_type" {
+  default = "t3a.medium"
+}
+
+variable "chef_server_lb_certificate_arn" {
+  default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
+}
+
+variable "elasticsearch_ebs_volume_iops" {
+  default = 300
+}
+
+variable "elasticsearch_ebs_volume_size" {
+  default = 50
+}
+
+variable "elasticsearch_ebs_volume_type" {
+  default = "gp2"
+}
+
+variable "elasticsearch_server_instance_type" {
+  default = "m5a.large"
+}
+
+variable "postgresql_ebs_volume_iops" {
+  default = 150
+}
+
+variable "postgresql_ebs_volume_size" {
+  default = 50
+}
+
+variable "postgresql_ebs_volume_type" {
+  default = "gp2"
+}
+
+variable "postgresql_server_instance_type" {
+  default = "t3a.medium"
+}
+
+variable "ssh_key_file" {
+}
+
+variable "ssh_user" {
+  default = "centos"
+}
+
+variable "sudo_cmd" {
+  default = "sudo"
+}
+
+variable "chef_server_private_ips" {
+  default = []
+}
+
+variable "postgresql_private_ips" {
+  default = []
+}
+
+variable "elasticsearch_private_ips" {
+  default = []
+}
+
+variable "automate_private_ips" {
+  default = []
+}
+
+variable "chef_server_public_ips" {
+  default = []
+}
+
+variable "postgresql_public_ips" {
+  default = []
+}
+
+variable "elasticsearch_public_ips" {
+  default = []
+}
+
+variable "automate_public_ips" {
+  default = []
+}

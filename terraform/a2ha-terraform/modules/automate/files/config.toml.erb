@@ -1,0 +1,100 @@
+# Chef Automate config.toml
+#  This file is managed by terraform and chef-backend-ctl, do not modify by hand
+
+[global.v1]
+  fqdn = "<%= overrides[:automate_fqdn] %>"
+
+  [global.v1.external.elasticsearch]
+<% if svc_configs[:elasticsearch] -%>
+    enable = true
+    nodes = <%= services[:elasticsearch][:ips].map { |ip| "https://#{ip}:#{services[:elasticsearch][:svc_port]}" } %>
+    [global.v1.external.elasticsearch.auth]
+      scheme = "basic_auth"
+      [global.v1.external.elasticsearch.auth.basic_auth]
+        username = "<%= svc_configs[:elasticsearch]['opendistro_auth']['admin_username'] -%>"
+        password = "<%= svc_configs[:elasticsearch]['opendistro_auth']['admin_password'] -%>"
+    [global.v1.external.elasticsearch.ssl]
+      server_name = "<%= cn(svc_configs[:elasticsearch]['opendistro_ssl']['ssl_cert']) -%>"
+      root_cert = """<%= svc_configs[:elasticsearch]['opendistro_ssl']['rootCA'] -%>"""
+<% else %>
+    enable = false
+<% end %>
+
+  [global.v1.external.postgresql]
+<% if svc_configs[:postgresql] -%>
+    enable = true
+    nodes = <%= services[:postgresql][:ips].map { |ip| "#{ip}:#{services[:postgresql][:svc_port]}" } %>
+
+  [global.v1.external.postgresql.ssl]
+    enable = <%= services[:postgresql][:ssl] %>
+  root_cert = """<%= svc_configs[:postgresql]['ssl']['issuer_cert'] -%>"""
+
+  [global.v1.external.postgresql.auth]
+    scheme = "password"
+
+  [global.v1.external.postgresql.auth.password.superuser]
+    username = "<%= svc_configs[:postgresql]['superuser']['name'] -%>"
+    password = "<%= svc_configs[:postgresql]['superuser']['password'] -%>"
+
+  [global.v1.external.postgresql.auth.password.dbuser]
+    username = "<%= svc_configs[:postgresql]['superuser']['name'] -%>"
+    password = "<%= svc_configs[:postgresql]['superuser']['password'] -%>"
+
+  [global.v1.external.postgresql.backup]
+    enable = true
+<% else %>
+    enable = false
+<% end %>
+
+<% if overrides[:automate_role] == "chef_api" -%>
+  [global.v1.external.automate]
+  enable = true
+  node = "https://<%= overrides[:automate_fqdn] %>"
+
+  [global.v1.external.automate.auth]
+  token = "<%= overrides[:automate_dc_token] %>"
+<% else %>
+[auth_n.v1.sys.service]
+  a1_data_collector_token = "<%= overrides[:automate_dc_token] %>"
+<% end %>
+
+# Deployment service configuration.
+[deployment.v1]
+  [deployment.v1.svc]
+<% if overrides[:automate_role] == "chef_api" -%>
+    # Deploy only chef-server product
+    products = ["chef-server"]
+<% else %>
+    products = ["automate", "chef-server"]
+<% end %>
+    # Habitat channel to install hartifact from.
+    # Can be 'dev', 'current', or 'acceptance'
+    channel = "<%= overrides[:channel] -%>"
+    upgrade_strategy = "<%= overrides[:upgrade_strategy] -%>"
+    deployment_type = "local"
+
+<% if tls_cert -%>
+# Load Balancer service configuration.
+[load_balancer]
+  [load_balancer.v1.sys]
+    # The following TLS certificate and RSA public key were
+    # automatically generated. The certificate is a self-signed
+    # certificate and will likely produce security warnings when you
+    # visit Chef Automate in your web browser. We recommend using a
+    # certificate signed by a certificate authority you trust.
+    [[load_balancer.v1.sys.frontend_tls]]
+      # The TLS certificate for the load balancer frontend.
+      cert = """<%= tls_cert %>"""
+
+      # The TLS private key for the load balancer frontend.
+      key = """<%= tls_key %>"""
+<% end %>
+
+<% if overrides[:teams_port] != 10128 %>
+[teams.v1.sys.service]
+  port = <%= overrides[:teams_port] %>
+<% end %>
+
+<% if overrides[:automate_config_file] %>
+<%= File.read(overrides[:automate_config_file]) %>
+<% end %>
