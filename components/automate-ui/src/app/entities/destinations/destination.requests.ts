@@ -159,12 +159,11 @@ export class DestinationRequests {
 
   public testDestinationWithUsernamePasswordWithHeaders(url: string,
     username: string, password: string, headers: string): Observable<Object> {
-      if(headers!=""){
+      if (headers !== '') {
         return this.http.post(encodeURI(
           this.joinToDataFeedUrl(['destinations', 'test'])),
-          { url, headers, 'username_password': {username, password},});
-      }
-      else{
+          { url, headers, 'username_password': {username, password} });
+      } else {
         return this.http.post(encodeURI(
           this.joinToDataFeedUrl(['destinations', 'test'])),
           { url, 'username_password': {username, password} });

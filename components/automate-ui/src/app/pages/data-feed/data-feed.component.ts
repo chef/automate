@@ -150,15 +150,15 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public addHeadersforCustomDataFeed(header: string): {}{
+  public addHeadersforCustomDataFeed(header: string): {} {
       const customHeaders: string = header;
-        var headersJson = {}
-        const headersVal = customHeaders.split("\n")
-        for (var values in headersVal) {
-          const word = headersVal[values].split(":")
-          headersJson[word[0]] = word[1]
+        const headersJson = {};
+        const headersVal = customHeaders.split('\n');
+        for (const values in headersVal) {
+          const word = headersVal[values].split(':');
+          headersJson[word[0]] = word[1];
         }
-        return headersJson
+        return headersJson;
   }
 
   public sendTestForDataFeed(event: any): void {
@@ -190,14 +190,13 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const userToken = JSON.stringify({
           Authorization: tokenType + ' ' + token
               });
-        var value
-        if(this.createDataFeedForm.controls['headers'].value){
-          var headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value) 
-          var headers= {...JSON.parse(userToken), ...headersJson}
-          value = JSON.stringify(headers)
-        }
-        else{
-          value = userToken
+        let value;
+        if (this.createDataFeedForm.controls['headers'].value) {
+          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+          const headers = {...JSON.parse(userToken), ...headersJson};
+          value = JSON.stringify(headers);
+        } else {
+          value = userToken;
         }
         this.datafeedRequests.testDestinationWithHeaders(targetUrl,
           value).subscribe(
@@ -208,11 +207,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
         const targetUsername: string = this.createDataFeedForm.controls['username'].value;
         const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-        var value
-        if(this.createDataFeedForm.controls['headers'].value){
-          var headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value)
-          //var headers= {...JSON.parse(userToken), ...headersJson}
-          value = JSON.stringify(headersJson)
+        let value;
+        if (this.createDataFeedForm.controls['headers'].value) {
+          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+          value = JSON.stringify(headersJson);
           if (targetUrl && targetUsername && targetPassword && value) {
             this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
               targetUsername, targetPassword, value).subscribe(
@@ -220,8 +218,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
                 () => this.revealUrlStatus(UrlTestState.Failure)
               );
           }
-        }
-        else{
+        } else {
         if (targetUrl && targetUsername && targetPassword) {
           this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
             targetUsername, targetPassword).subscribe(
@@ -280,7 +277,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.creatingDataFeed = true;
     if (event.name === WebhookIntegrationTypes.SERVICENOW ||
       event.name === WebhookIntegrationTypes.SPLUNK ||
-      event.name === WebhookIntegrationTypes.ELK_KIBANA || event.name === WebhookIntegrationTypes.CUSTOM) {
+      event.name === WebhookIntegrationTypes.ELK_KIBANA) {
       if (event.auth === AuthTypes.ACCESSTOKEN) {
         destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
@@ -310,7 +307,51 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         storage = null;
       }
     } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
+      if (event.auth === AuthTypes.ACCESSTOKEN) {
+        const destinationObj = {
+          name: this.createDataFeedForm.controls['name'].value.trim(),
+          url: this.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: 'Webhook',
+          services: event.name
+        };
+        const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
+        const token: string = this.createDataFeedForm.controls['token'].value.trim();
+        const userToken = JSON.stringify({
+          Authorization: tokenType + ' ' + token
+        });
+        let headers;
+        if (this.createDataFeedForm.controls['headers'].value) {
+          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+          const value = {...JSON.parse(userToken), ...headersJson};
+          headers = JSON.stringify(value);
+        } else {
+          headers = userToken;
+        }
 
+        this.store.dispatch(new CreateDestination(destinationObj, headers, null));
+
+      } else if (event.auth === 'Username and Password') {
+        const destinationObj = {
+          name: this.createDataFeedForm.controls['name'].value.trim(),
+          url: this.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: 'Webhook',
+          services: event.name
+        };
+        const username: string = this.createDataFeedForm.controls['username'].value.trim();
+        const password: string = this.createDataFeedForm.controls['password'].value.trim();
+        const userToken = JSON.stringify({
+          Authorization: 'Basic ' + btoa(username + ':' + password)
+        });
+        let headers;
+        if (this.createDataFeedForm.controls['headers'].value) {
+          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+          const value = {...JSON.parse(userToken), ...headersJson};
+          headers = JSON.stringify(value);
+        } else {
+          headers = userToken;
+        }
+
+        this.store.dispatch(new CreateDestination(destinationObj, headers, null)); }
     } else if (event.name === StorageIntegrationTypes.MINIO) {
         // if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
         //   this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&

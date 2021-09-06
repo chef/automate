@@ -222,12 +222,12 @@ export class DataFeedCreateComponent {
       this.integrationSelected = true;
 
     } else if (integration === WebhookIntegrationTypes.CUSTOM) {
-      this.showCustomField(); //madhvi - custom feed call
-      this.createForm.reset(); 
+      this.showCustomField();
+      this.createForm.reset();
       this.authSelected = AuthTypes.ACCESSTOKEN;
       this.createForm.controls['tokenType'].setValue('');
       this.integrationSelected = true;
-      
+
     } else if (integration === StorageIntegrationTypes.MINIO) {
       this.showFieldStorage();
       this.showFields.region = false;
@@ -301,8 +301,7 @@ export class DataFeedCreateComponent {
             return true;
           }
         }
-    } 
-    else if (this.integTitle === StorageIntegrationTypes.MINIO) {
+    } else if (this.integTitle === StorageIntegrationTypes.MINIO) {
         if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
           this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
           this.createForm.get('secretKey').valid) {

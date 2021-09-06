@@ -151,6 +151,29 @@ describe('DataFeedCreateComponent', () => {
       expect(component.validateForm()).toBeTruthy();
     });
 
+    it('should be valid when all fields are filled out for custom with Access token', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue(token);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for custom with UsernamePassword', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.selectChangeHandlers('Username and Password');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
     it('slider resets name, url, username and password to empty string for servicenow', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['url'].setValue('any');
@@ -196,6 +219,21 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['bucketName'].value).toBe(null);
       expect(component.createForm.controls['accessKey'].value).toBe(null);
       expect(component.createForm.controls['secretKey'].value).toBe(null);
+    });
+
+    it('slider resets name, url, username and password to empty string for custom', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('');
+      expect(component.createForm.controls['token'].value).toBe(null);
     });
   });
 
