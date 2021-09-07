@@ -473,11 +473,26 @@ Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Rev
 
 ##### Content Tab
 
-The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific Policyfile from the *Included Policies* to view the details.
+The **Content** tab contains the list of all:
+
+- Included Policies
+- Run Lists
+
+**Included Policies**
+
+Select a specific Policyfile from the *Included Policies* to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
 In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
+
+**Run List**
+
+Select a specific Run Item from the Run List to view the details in a slider tab.
+
+IMAGE
+
+In the above image, the slider tab shows the *Details* of the select run item. To view the cookbook details of the item, select **Go to Cookbook Details >** option in the tab.
 
 ##### Attributes Tab
 
