@@ -10,9 +10,6 @@ export interface Destination {
   meta_data?: Array<KVData>;
   services?: string;
 }
-
-
-
 export interface EnableDestination {
   id: string;
   enable: boolean;

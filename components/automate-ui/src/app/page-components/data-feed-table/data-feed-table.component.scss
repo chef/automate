@@ -113,6 +113,13 @@ chef-tr.row {
 .column-dropdown {
   position: relative;
 
+  ::ng-deep .mat-select-trigger {
+    background: initial;
+    border: solid 1px blue;
+    margin-right: 3px;
+}
+
+
   chef-checkbox {
     margin-bottom: 7px;
   }
@@ -253,6 +260,10 @@ a, a:visited {
   transition: .5s;
 }
 
+.disable-body {
+  background: #E7E9E9;
+}
+
 .pointer-none {
   pointer-events: none;
 }
@@ -281,6 +292,12 @@ a, a:visited {
   width: 8.5em;
 }
 
+.three-dot-column {
+  ::ng-deep .mat-select-trigger {
+    background: initial;
+  }
+  }
+
 ::ng-deep .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
   background: #3864F2;
 }
@@ -306,4 +323,17 @@ a, a:visited {
   border-color: #CFD2D2;
   border-radius: 0 0 5px 5px;
 
+}
+
+chef-th {
+  border-bottom: transparent;
+  border-top: transparent;
+}
+
+chef-th:first-child {
+  border-left: transparent;
+}
+
+chef-th:last-child {
+  border-right: transparent;
 }
