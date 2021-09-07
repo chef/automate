@@ -12,7 +12,7 @@ This is a service package.
 
 ## Build
 
-In order to build the pkg, you must enter the studio at the root: `a2-ha-backend`
+In order to build the pkg, you must enter the studio at the root: `automate`
 
 ## Bindings
 
