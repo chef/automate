@@ -198,9 +198,10 @@ abstract class UserDetails {
     this.saveSuccessful = false;
     this.saveInProgress = true;
     if (this.userPrefsService.uiSettings &&
-        this.userPrefsService.uiSettings.isDisplayNameEditable) {
+        this.userPrefsService.uiSettings.isDisplayNameEditable && this.displayNameForm.dirty) {
       const name = this.displayNameForm.get('displayName').value.trim();
       this.store.dispatch(this.createUpdateNameUserAction(name));
+      this.resetForms();
     }
     if (userDetailsFormControl.isTimeformatDirty) {
       const payload = {
@@ -218,13 +219,15 @@ abstract class UserDetails {
       this.userPrefsService.setUserTimeformatInternal(
         {value: timeformat.value, valid_values: userDetailsFormControl.timeformatValues});
       userDetailsFormControl.timeformat = timeformat.value;
+      this.saveInProgress = false;
+      this.saveSuccessful = true;
     }
     if (userDetailsFormControl.isTelemetryCheckboxDirty) {
       this.telemetryService
         .setUserTelemetryPreference(userDetailsFormControl.isTelemetryCheckboxEnabled);
-      if (!userDetailsFormControl.isTelemetryCheckboxEnabled) {
-        this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
-      }
+      this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
+      this.saveInProgress = false;
+      this.saveSuccessful = true;
     }
     userDetailsFormControl.isTimeformatDirty = false;
     userDetailsFormControl.isTelemetryCheckboxDirty = false;
