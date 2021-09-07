@@ -319,7 +319,6 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const userToken = JSON.stringify({
           Authorization: tokenType + ' ' + token
         });
-        let headers;
         if (this.createDataFeedForm.controls['headers'].value) {
           const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
           const value = {...JSON.parse(userToken), ...headersJson};
@@ -342,7 +341,6 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const userToken = JSON.stringify({
           Authorization: 'Basic ' + btoa(username + ':' + password)
         });
-        let headers;
         if (this.createDataFeedForm.controls['headers'].value) {
           const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
           const value = {...JSON.parse(userToken), ...headersJson};
