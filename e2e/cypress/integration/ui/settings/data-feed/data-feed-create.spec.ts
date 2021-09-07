@@ -137,9 +137,9 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=Minio]').click();
       cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-endpoint]').type(endpoint);
-      cy.get('[data-cy=add-bucketName]').type(bucketName);
-      cy.get('[data-cy=add-accessKey]').type(accessKey);
-      cy.get('[data-cy=add-secretKey]').type(secretKey);
+      cy.get('[data-cy=add-bucket-name]').type(bucketName);
+      cy.get('[data-cy=add-access-key]').type(accessKey);
+      cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
@@ -153,9 +153,9 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=Minio]').click();
       cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-endpoint]').type(endpoint);
-      cy.get('[data-cy=add-bucketName]').type(bucketName);
-      cy.get('[data-cy=add-accessKey]').type(accessKey);
-      cy.get('[data-cy=add-secretKey]').type(secretKey);
+      cy.get('[data-cy=add-bucket-name]').type(bucketName);
+      cy.get('[data-cy=add-access-key]').type(accessKey);
+      cy.get('[data-cy=add-secret-key]').type(secretKey);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
       cy.get('.data-feed-slider app-notification.error').should('be.visible');
@@ -169,9 +169,9 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=Minio]').click();
       cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-endpoint]').type(minioUrl);
-      cy.get('[data-cy=add-bucketName]').type(minioBucket);
-      cy.get('[data-cy=add-accessKey]').type(minioAccess);
-      cy.get('[data-cy=add-secretKey]').type(minioSecret);
+      cy.get('[data-cy=add-bucket-name]').type(minioBucket);
+      cy.get('[data-cy=add-access-key]').type(minioAccess);
+      cy.get('[data-cy=add-secret-key]').type(minioSecret);
       cy.get('[data-cy=test-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
       cy.get('.data-feed-slider app-notification.info').should('be.visible');

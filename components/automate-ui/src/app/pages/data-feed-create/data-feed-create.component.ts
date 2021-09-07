@@ -271,4 +271,16 @@ export class DataFeedCreateComponent {
   public dismissNotification() {
     this.notificationShow = false;
   }
+
+  public showAuthDropdown() {
+    return this.showFields.authSelector && this.showSelect;
+  }
+
+  public showTokenInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN;
+  }
+
+  public showUserPassInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
+  }
 }
