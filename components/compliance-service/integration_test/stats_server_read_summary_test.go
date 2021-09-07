@@ -27,11 +27,12 @@ func TestReadReportSummary(t *testing.T) {
 		allowedProjects []string
 
 		//report summary
-		expectedEnvironmentCnt int32
-		expectedPlatformCnt    int32
-		expectedProfileCnt     int32
-		expectedNodeCnt        int64
-		expectedStatus         string
+		expectedEnvironmentCnt   int32
+		expectedPlatformCnt      int32
+		expectedProfileCnt       int32
+		expectedNodeCnt          int64
+		expectedStatus           string
+		expectedUnfiltererdStats *stats.Stats
 	}{
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to all projects",
@@ -43,6 +44,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     5,
 			expectedNodeCnt:        5,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports",
@@ -54,6 +56,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     2,
 			expectedNodeCnt:        2,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports",
@@ -65,6 +68,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     4,
 			expectedNodeCnt:        4,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports",
@@ -76,6 +80,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     0,
 			expectedNodeCnt:        0,
 			expectedStatus:         "unknown",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports and unassigned reports",
@@ -87,6 +92,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     3,
 			expectedNodeCnt:        3,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports and unassigned reports",
@@ -98,6 +104,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     5,
 			expectedNodeCnt:        5,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to projects without reports and unassigned reports",
@@ -109,6 +116,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     1,
 			expectedNodeCnt:        1,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 		{
 			description:     "stats_server_read_summary_test.go => Projects: user has access to unassigned reports",
@@ -120,6 +128,7 @@ func TestReadReportSummary(t *testing.T) {
 			expectedProfileCnt:     1,
 			expectedNodeCnt:        1,
 			expectedStatus:         "passed",
+			expectedUnfiltererdStats: nil,
 		},
 	}
 
@@ -146,6 +155,105 @@ func TestReadReportSummary(t *testing.T) {
 			assert.Equal(t, test.expectedProfileCnt, reportSummary.Stats.Profiles, "Profiles count")
 			assert.Equal(t, test.expectedNodeCnt, reportSummary.Stats.Nodes, "Nodes count")
 			assert.Equal(t, test.expectedStatus, reportSummary.Status, "status")
+			assert.Equal(t, test.expectedUnfiltererdStats, reportSummary.UnfilteredStats, "unfiltered stats")
+		})
+	}
+
+	successWithUnfilteredStatsCases := []struct {
+		description     string
+		allowedProjects []string
+
+		//report summary
+		expectedEnvironmentCnt   int32
+		expectedPlatformCnt      int32
+		expectedProfileCnt       int32
+		expectedNodeCnt          int64
+		expectedStatus           string
+		expectedUnfiltererdStats *stats.Stats
+	}{
+		{
+			description:     "stats_server_read_summary_test.go => Projects: user has access to all projects",
+			allowedProjects: []string{authzConstants.AllProjectsExternalID},
+
+			//report summary
+			expectedEnvironmentCnt:   5,
+			expectedPlatformCnt:      5,
+			expectedProfileCnt:       5,
+			expectedNodeCnt:          5,
+			expectedStatus:           "passed",
+			expectedUnfiltererdStats: &stats.Stats{
+				Nodes:5,
+				Platforms: 5,
+				Environments:5,
+				Profiles: 5,
+				NodesCnt: 5,
+				Controls: 5,
+			},
+		},
+		{
+			description:     "stats_server_read_summary_test.go => Projects: user has access to one project with reports",
+			allowedProjects: []string{"project1"},
+
+			//report summary
+			expectedEnvironmentCnt:   2,
+			expectedPlatformCnt:      2,
+			expectedProfileCnt:       2,
+			expectedNodeCnt:          2,
+			expectedStatus:           "passed",
+			expectedUnfiltererdStats: &stats.Stats{
+				Nodes:5,
+				Platforms: 5,
+				Environments:5,
+				Profiles: 5,
+				NodesCnt: 5,
+				Controls: 5,
+			},
+		},
+		{
+			description:     "stats_server_read_summary_test.go => Projects: user has access to some projects with reports",
+			allowedProjects: []string{"project1", "project2"},
+
+			//report summary
+			expectedEnvironmentCnt: 4,
+			expectedPlatformCnt:    4,
+			expectedProfileCnt:     4,
+			expectedNodeCnt:        4,
+			expectedStatus:         "passed",
+			expectedUnfiltererdStats: &stats.Stats{
+				Nodes:        5,
+				Platforms:    5,
+				Environments: 5,
+				Profiles:     5,
+				NodesCnt:     5,
+				Controls:     5,
+			},
+		},
+	}
+	for _, test := range successWithUnfilteredStatsCases {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := contextWithProjects(test.allowedProjects)
+
+			octoberTwentyFifthQuery := &stats.Query{
+				IncludeUnfiltered: true,
+				Filters: []*stats.ListFilter{
+					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+				},
+			}
+			//passing in no type gets us a Summary type that contains a hydrated ReportSummary
+			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+
+			reportSummary := response.ReportSummary
+
+			//report summary
+			assert.Equal(t, test.expectedEnvironmentCnt, reportSummary.Stats.Environments, "Env count")
+			assert.Equal(t, test.expectedPlatformCnt, reportSummary.Stats.Platforms, "Platforms count")
+			assert.Equal(t, test.expectedProfileCnt, reportSummary.Stats.Profiles, "Profiles count")
+			assert.Equal(t, test.expectedNodeCnt, reportSummary.Stats.Nodes, "Nodes count")
+			assert.Equal(t, test.expectedStatus, reportSummary.Status, "status")
+			assert.Equal(t, test.expectedUnfiltererdStats, reportSummary.UnfilteredStats, "unfiltered stats")
 		})
 	}
 }
