@@ -504,7 +504,12 @@ You can **Expand** and **Collapse** the *default* and *override* attributes by s
 
 ##### Cookbook Dependencies
 
-Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. The slider tab also contains the `Operator` and `Version` of the cookbooks.
+Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. Select a specific cookbook from the list to view the details of the cookbook.
+
+{{< note >}} Selecting a specific cookbook will redirect you to the audit section of the **Cookbook** main tab.
+{{< /note >}}
+
+The slider tab also contains the `Operator` and `Version` of the cookbooks.
 
 {{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
