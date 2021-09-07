@@ -85,7 +85,7 @@ func init() {
     "/api/v0/compliance/reporting/stats/summary": {
       "post": {
         "summary": "Read Summary",
-        "description": "Returns summary statistics for compliance reports. \nGeneral report summary information is the default. \nAdding a ` + "`" + `type` + "`" + ` value of ` + "`" + `nodes` + "`" + ` or ` + "`" + `controls` + "`" + ` will return summary statistics for that object.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"nodes\",\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportSummary:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns summary statistics for compliance reports. \nGeneral report summary information is the default. \nAdding a ` + "`" + `type` + "`" + ` value of ` + "`" + `nodes` + "`" + ` or ` + "`" + `controls` + "`" + ` will return summary statistics for that object.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"nodes\",\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nExample: Report Summary with unfiltered_stats included\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"\",\n\"include_unfiltered\":true,\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportSummary:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "StatsService_ReadSummary",
         "responses": {
           "200": {
@@ -550,6 +550,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each paginated request page."
+        },
+        "include_unfiltered": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Flag instructing the api on whether or not to include non-filtered stats as part of response"
         }
       }
     },
@@ -565,10 +570,6 @@ func init() {
     "chef.automate.api.compliance.reporting.stats.v1.ReportSummary": {
       "type": "object",
       "properties": {
-        "stats": {
-          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
-          "description": "Intentionally blank."
-        },
         "status": {
           "type": "string",
           "description": "Overall aggregated status for all the reports."
@@ -581,6 +582,14 @@ func init() {
         "start_date": {
           "type": "string",
           "description": "Not used."
+        },
+        "stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
+          "description": "Intentionally blank."
+        },
+        "unfiltered_stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
+          "description": "Total stats counts for a given day, unfiltered."
         }
       },
       "description": "Statistics on the overall compliance reports."
