@@ -87,6 +87,19 @@ describe('chef datafeed', () => {
         cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
       });
 
+      it('create data feed elk', () => {
+        cy.get('[data-cy=create-data-feed]').click();
+        cy.get('[data-cy=Splunk]').click();
+        cy.get('[data-cy=add-name]').type(name + reusableDate);
+        cy.get('[data-cy=add-url]').type(url);
+        cy.get('[data-cy=add-token]').type(token);
+        cy.get('[data-cy=add-button]').click();
+        cy.get('app-notification.info').should('be.visible');
+        cy.get('app-notification.info chef-icon').click();
+        cy.contains('Data Feeds').click();
+        cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
+      });
+
       it('create data feed error', () => {
         cy.get('[data-cy=create-data-feed]').click();
         cy.get('[data-cy=Splunk]').click();
@@ -120,7 +133,7 @@ describe('chef datafeed', () => {
       it('test error in data feed', () => {
         const date = Date.now();
         cy.get('[data-cy=create-data-feed]').click();
-        cy.get('[data-cy=Splunk]').click();
+        cy.get('[data-cy=elk]').click();
         cy.get('[data-cy=add-name]').type(name + date);
         cy.get('[data-cy=add-url]').type(url);
         cy.get('[data-cy=add-token]').type(token);

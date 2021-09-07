@@ -199,6 +199,11 @@ export class DataFeedCreateComponent {
       this.createForm.controls['tokenType'].setValue('Splunk');
       this.integrationSelected = true;
 
+    } else if (integration === WebhookIntegrationTypes.ELK_KIBANA) {
+      this.showFieldWebhook();
+      this.authSelected = AuthTypes.ACCESSTOKEN;
+      this.createForm.controls['tokenType'].setValue('Bearer');
+      this.integrationSelected = true;
     } else if (integration === StorageIntegrationTypes.MINIO) {
       this.showFieldStorage();
       this.showFields.region = false;
