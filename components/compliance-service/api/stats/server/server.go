@@ -36,6 +36,18 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 		if err != nil {
 			return nil, errorutils.FormatErrorMsg(err, "")
 		}
+
+		if in.IncludeUnfiltered {
+			unfiltered := make(map[string][]string)
+			//the only thing we filter on is end_time
+			unfiltered["end_time"] = formattedFilters["end_time"]
+
+			reportSummaryTotals, err := srv.es.GetStatsSummary(unfiltered)
+			if err != nil {
+				return nil, errorutils.FormatErrorMsg(err, "")
+			}
+			reportSummary.UnfilteredStats = reportSummaryTotals.Stats
+		}
 		summary.ReportSummary = reportSummary
 	}
 	if in.Type == "nodes" {
