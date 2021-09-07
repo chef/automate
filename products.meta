@@ -53,7 +53,9 @@
     "chef/automate-backend-metricbeat",
     "chef/automate-backend-journalbeat",
     "chef/automate-backend-ctl",
-
+    "chef/automate-backend-curator",
+    "chef/automate-backend-haproxy",
+    "chef/automate-backend-postgresql",
     "core/rsync"
   ],
 

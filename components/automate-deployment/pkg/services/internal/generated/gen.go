@@ -473,6 +473,18 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-backend-curator",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-haproxy",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-postgresql",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
