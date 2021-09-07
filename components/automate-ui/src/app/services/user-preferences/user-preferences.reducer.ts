@@ -15,9 +15,8 @@ export interface UserPreferencesEntityState {
 export const UserPreferencesEntityInitialState: UserPreferencesEntityState = {
   list: {
     timeformat: {
-        value: 'ddd, DD MMM YYYY',
-        valid_values: ['ddd, DD MMM YYYY HH:mm:ss [UTC]', 'YYYY-M-D',
-          'ddd, DD MMM YYYY', 'DD MMM YYYY', 'ddd, DD MMM', 'YYYY-MM-DD']
+        value: 'ddd, DD MMM YYYY HH:mm:ss [UTC]',
+        valid_values: []
     }
   },
   error: null,
@@ -50,7 +49,7 @@ export function userPreferencesEntityReducer(
       return set('status', EntityStatus.loadingSuccess, state) as UserPreferencesEntityState;
 
     case UserPreferencesActionTypes.SET_TIMEFORMAT:
-      const timeformat = { value: action.payload };
+      const timeformat = { value: action.payload.value, valid_values: action.payload.valid_values };
       return set('list.timeformat', timeformat, state);
 
     default:
