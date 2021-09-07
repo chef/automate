@@ -125,10 +125,10 @@ section {
 
 ::ng-deep .cdk-overlay-container {
   position: fixed;
-  z-index: 999999999;
+  z-index: 9999;
   .mat-option.mat-selected:not(.mat-option-multiple):not(.mat-option-disabled) {
-    background: #3864F2;
-    color: #FFFFFF;
+    background: $chef-primary-bright;
+    color: $chef-white;
   }
 }
 
@@ -141,8 +141,4 @@ section {
 ::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
   background: $chef-cyan-blue;
   border-radius: 5px;
-}
-
-mat-select {
-  width: 330px;
 }
