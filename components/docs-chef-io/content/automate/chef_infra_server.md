@@ -512,6 +512,8 @@ The Chef Infra Server integration lets you:
 - Search for a Policy Group
 - View all the Policy Groups
 - View the details of a Policy Group
+  - Policyfiles
+  - Nodes
 
 #### Search for a Policy Group
 
@@ -524,6 +526,19 @@ Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups
 Select a Policy Group to view the Policy Group Information and METADATA of that Policy Group.
 
 {{< figure src="/images/automate/details-of-the-policygroup.png" alt="Details of a Policy Group">}}
+
+##### Policyfiles Tab
+
+The details page of the policy group let's you view the list of Policyfiles.
+
+IMAGE
+
+Select a Policyfile from the list to view the details of a policyfile.
+
+IMAGE
+
+{{< note >}} Selecting a specific policyfile will redirect you to the details section of the Policyfiles main tab.
+{{< /note >}}
 
 ## Troubleshoot
 
