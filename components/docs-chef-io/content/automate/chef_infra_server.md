@@ -529,7 +529,7 @@ Select a Policy Group to view the Policy Group Information and METADATA of that 
 
 ##### Policyfiles Tab
 
-The details page of the policy group let's you view the list of Policyfiles.
+The details page of the policy group let's you view the list of **Policyfiles**.
 
 IMAGE
 
@@ -537,7 +537,20 @@ Select a Policyfile from the list to view the details of a policyfile.
 
 IMAGE
 
-{{< note >}} Selecting a specific policyfile will redirect you to the details section of the Policyfiles main tab.
+{{< note >}} Selecting a specific policyfile will redirect you to the details section of the **Policyfiles** main tab.
+{{< /note >}}
+
+##### Nodes Tab
+
+The details page of the policy group let's you view the list of **Nodes**.
+
+IMAGE
+
+Select a node from the list to view the details of a node.
+
+IMAGE
+
+{{< note >}} Selecting a specific node will redirect you to the details section of the **Nodes** main tab.
 {{< /note >}}
 
 ## Troubleshoot
