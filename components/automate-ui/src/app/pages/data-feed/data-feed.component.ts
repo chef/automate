@@ -270,7 +270,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         storage = {accessKey, secretKey};
         headers = null;
     }
-    if (destinationObj && headers && storage) {
+    if (destinationObj && (headers || storage)) {
       this.store.dispatch(new CreateDestination(destinationObj, headers, storage));
     }
   }
