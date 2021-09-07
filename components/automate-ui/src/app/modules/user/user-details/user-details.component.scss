@@ -126,6 +126,7 @@ section {
 ::ng-deep .cdk-overlay-container {
   position: fixed;
   z-index: 9999;
+
   .mat-option.mat-selected:not(.mat-option-multiple):not(.mat-option-disabled) {
     background: $chef-primary-bright;
     color: $chef-white;
