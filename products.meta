@@ -46,6 +46,14 @@
     "chef/sample-data-service",
     "chef/automate-cli",
     "chef/user-settings-service",
+    "chef/automate-backend-deployment",
+    "chef/automate-backend-elasticsearch",
+    "chef/automate-backend-elasticsidecar",
+    "chef/automate-backend-kibana",
+    "chef/automate-backend-metricbeat",
+    "chef/automate-backend-journalbeat",
+    "chef/automate-backend-ctl",
+
     "core/rsync"
   ],
 
