@@ -30,6 +30,7 @@ do_deploy() {
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 
     #shellcheck disable=SC2154
+    #shellcheck disable=SC1090
     source "${source_dir}/helpers/setup_minio.sh"
     start_minio_background
     TIMEOUT=400 wait_for_success curl localhost:9000/minio/health/live
