@@ -41,7 +41,7 @@
           <chef-option value='nodes' data-cy="nodes-tab">Nodes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      
+
       <section class="page-body" *ngIf="tabValue === 'policyfiles'">
         <div class="policyfiles-tab" *ngIf="!policyGroupDetailsLoading">
           <div class="spinner">
@@ -93,7 +93,6 @@
                   <chef-th class="no_border_th">IP Address</chef-th>
                   <chef-th class="no_border_th">Uptime</chef-th>
                   <chef-th class="no_border_th">Last Check-In</chef-th>
-                  <chef-th class="no_border_th">Environment</chef-th>
                 </chef-tr>
               </chef-thead>
               <chef-tbody>
@@ -107,7 +106,6 @@
                   <chef-td>{{node.ip_address === '' ? '--' : node.ip_address}}</chef-td>
                   <chef-td>{{node.uptime === '' ? '--' : node.uptime}}</chef-td>
                   <chef-td>{{timeFromNow(node.check_in)}}</chef-td>
-                  <chef-td>{{node.environment === '' ? '--' : node.environment}}</chef-td>
                 </chef-tr>
               </chef-tbody>
             </chef-table>
