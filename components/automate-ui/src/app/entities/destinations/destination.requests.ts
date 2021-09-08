@@ -211,8 +211,8 @@ export class DestinationRequests {
   }
 
   public enableDisableDestinations(destination: EnableDestination):
-  Observable<DestinationResponse> {
-    return this.http.patch<DestinationResponse>(encodeURI(
-      this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
+    Observable<DestinationResponse> {
+      return this.http.patch<DestinationResponse>(encodeURI(
+        this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
   }
 }

@@ -128,10 +128,10 @@ export function destinationEntityReducer(
     case DestinationActionTypes.UPDATE_FAILURE:
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
-      case DestinationActionTypes.ENABLE_DISABLE:
+    case DestinationActionTypes.ENABLE_DISABLE:
       return set(ENABLE_STATUS, EntityStatus.loading, state);
 
-      case DestinationActionTypes.ENABLE_DISABLE_SUCCESS:
+    case DestinationActionTypes.ENABLE_DISABLE_SUCCESS:
       return set(ENABLE_STATUS, EntityStatus.loadingSuccess,
         destinationEntityAdapter.updateOne({
           id: action.payload.id,
