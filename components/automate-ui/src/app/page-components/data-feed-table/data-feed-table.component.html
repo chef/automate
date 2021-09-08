@@ -1,6 +1,6 @@
 <div class="page-body">
-    <div id="servers-table-container" *ngIf="destinations.length != 0">
-  <chef-table class="node-list">
+  <div id="servers-table-container" *ngIf="destinations.length != 0">
+    <chef-table class="node-list">
       <caption class="visually-hidden">Node List Table with Node States</caption>
       <chef-thead>
           <chef-tr>
@@ -61,13 +61,13 @@
               </mat-select>
             </chef-td>
           </chef-tr>
-        </chef-tbody>
-  </chef-table>
-    </div>
-    <div class="empty-section" *ngIf="(destinations.length === 0)">
+      </chef-tbody>
+    </chef-table>
+  </div>
+  <div class="empty-section" *ngIf="(destinations.length === 0)">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
       <p>No Data feeds Preview Available</p>
-    </div>
+  </div>
 </div>
 <app-delete-object-modal
   [visible]="deleteModalVisible"

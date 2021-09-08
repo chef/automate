@@ -18,9 +18,8 @@
       <div class="page-body">
         <chef-button primary (click)="slidePanel()" data-cy="create-data-feed"><img alt="" class="svg-inline--fa" src="/assets/img/data-feed.svg">&nbsp;New Integration</chef-button>
         <app-data-feed-table [destinations]="sortedDestinations$ | async"
-        [selectedFieldDirection]="fieldDirection$ | async"
-        [selectedSortField]="sortField$ | async"
-        >
+          [selectedFieldDirection]="fieldDirection$ | async"
+          [selectedSortField]="sortField$ | async">
         </app-data-feed-table>
       </div>
       <app-data-feed-create
