@@ -9,31 +9,33 @@
         <chef-heading class="btn-alignleft">
           {{ destination?.name }}
           <div class="btn-alignright">
-            <chef-button tertiary
-            [@fadeEnable]="state"
-            [disabled]="destination?.enable"
-            [ngClass]="!destination?.enable ? 'is-enable enable-btn' : 'is-disable enable-btn'"
-            class="btn-data-feed"
-            (click)="enableDestination(true)" 
-            data-cy="enable-btn"
-            >
-            Enable
+            <chef-button
+              tertiary
+              [@fadeEnable]="state"
+              [disabled]="destination?.enable"
+              [ngClass]="enableBtn()"
+              class="btn-data-feed"
+              (click)="enableDestination(true)" 
+              data-cy="enable-btn">
+              Enable
             </chef-button>
-            <chef-button tertiary
-            [disabled]="!destination?.enable"
-            [@fadeDisable]="state"
-            [ngClass]="destination?.enable ? 'is-enable disable-btn' : 'is-disable disable-btn'"
-            class="btn-data-feed"
-            (click)="enableDestination(false)"
-            data-cy="disable-btn"
-            >
-            Disable
+            <chef-button
+              tertiary
+              [disabled]="!destination?.enable"
+              [@fadeDisable]="state"
+              [ngClass]="disableBtn()"
+              class="btn-data-feed"
+              (click)="enableDestination(false)"
+              data-cy="disable-btn">
+              Disable
             </chef-button>
-            <chef-button tertiary caution 
-            class="btn-data-feed" 
-            data-cy="delete-btn" 
-            (click)="openDeleteModal()">
-            Delete
+            <chef-button 
+              tertiary
+              caution 
+              class="btn-data-feed" 
+              data-cy="delete-btn" 
+              (click)="openDeleteModal()">
+              Delete
             </chef-button>
           </div>
         </chef-heading>
@@ -62,7 +64,12 @@
           <form [formGroup]="updateForm">
             <chef-form-field>
               <label for="name">Name <span aria-hidden="true">*</span></label>
-              <input chefInput id="name" formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
+              <input
+                chefInput
+                id="name"
+                formControlName="name"
+                type="text"
+                [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
               <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
                 Name is required.
               </chef-error>
@@ -75,11 +82,12 @@
               </chef-error>
             </chef-form-field>
           </form>
-          <chef-button primary 
-          [disabled]="testInProgress || !destination?.enable" 
-          (click)="sendTestForDataFeedUrl()" 
-          class="alignright test-connection" 
-          data-cy="test-connection">
+          <chef-button 
+            primary 
+            [disabled]="testInProgress || !destination?.enable" 
+            (click)="sendTestForDataFeedUrl()" 
+            class="alignright test-connection" 
+            data-cy="test-connection">
             <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
             <span *ngIf="testInProgress">Testing...</span>
             <span *ngIf="!testInProgress ">Test Data Feed</span>
@@ -90,10 +98,10 @@
             <span >Cancel</span>
           </chef-button>
           <chef-button primary 
-          [disabled]="saveInProgress || !updateForm.valid || !updateForm.dirty || !destination?.enable" 
-          (click)="saveDataFeed()" 
-          class="alignright save-connection" 
-          data-cy="save-connection">
+            [disabled]="disableOnsave()" 
+            (click)="saveDataFeed()" 
+            class="alignright save-connection" 
+            data-cy="save-connection">
             <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
             <span *ngIf="saveInProgress">Saving...</span>
             <span *ngIf="!saveInProgress">Save</span>
@@ -113,11 +121,11 @@
   </div>
 </div>
 <app-delete-object-modal
-[visible]="deleteModalVisible"
-objectNoun="data feed"
-[objectName]="destination?.name "
-(close)="closeDeleteModal()"
-(deleteClicked)="deleteDataFeed()"
-objectAction="Delete">
+  [visible]="deleteModalVisible"
+  objectNoun="data feed"
+  [objectName]="destination?.name "
+  (close)="closeDeleteModal()"
+  (deleteClicked)="deleteDataFeed()"
+  objectAction="Delete">
 </app-delete-object-modal>
 

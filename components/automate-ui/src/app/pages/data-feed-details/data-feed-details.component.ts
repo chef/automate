@@ -223,5 +223,17 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public cancel(): void {
     this.router.navigate(['/settings/data-feeds']);
   }
+  public disableOnsave() {
+    return this.saveInProgress
+      || !this.updateForm.valid
+      || !this.updateForm.dirty
+      || !this.destination?.enable;
+  }
+  public enableBtn() {
+    return !this.destination?.enable ? 'is-enable enable-btn' : 'is-disable enable-btn';
+  }
+  public disableBtn() {
+    return this.destination?.enable ? 'is-enable disable-btn' : 'is-disable disable-btn';
+  }
 }
 

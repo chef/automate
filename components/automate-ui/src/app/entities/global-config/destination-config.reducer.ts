@@ -52,7 +52,10 @@ export function globalConfigEntityReducer(
           ) as GlobalConfigEntityState;
       }
       case DataFeedGlobalConfigActionTypes.GLOBAL_CONFIG_FAILURE: {
-        return set(GLOBAL_CONFIG_STATUS, EntityStatus.loadingFailure, state
+        return set(
+          GLOBAL_CONFIG_STATUS,
+          EntityStatus.loadingFailure,
+          state
           ) as GlobalConfigEntityState;
       }
 
