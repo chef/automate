@@ -570,7 +570,7 @@ Select a node from the list to view the details of a node.
 
 IMAGE
 
-{{< note >}} Selecting a specific node will redirect you to the details section of the **Nodes** main tab.
+{{< note >}} Selecting a specific node opens details section of the **Nodes** tab.
 {{< /note >}}
 
 ## Troubleshoot
