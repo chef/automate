@@ -6,11 +6,8 @@ import { MatOptionSelectionChange } from '@angular/material/core';
 import { DeleteDestination, EnableDisableDestination } from 'app/entities/destinations/destination.actions';
 import { Destination } from 'app/entities/destinations/destination.model';
 import { Observable } from 'rxjs';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { filter } from 'rxjs/operators';
-import { EntityStatus, pending } from 'app/entities/entities';
-import { destinationEnableStatus } from 'app/entities/destinations/destination.selectors';
 
 @Component({
   selector: 'app-data-feed-table',
@@ -98,14 +95,6 @@ export class DataFeedTableComponent  {
       enable: val
     };
     this.store.dispatch(new EnableDisableDestination({enableDisable: destinationEnableObj}));
-    this.store.pipe(
-      select(destinationEnableStatus),
-      filter(state => !pending(state)))
-      .subscribe(state => {
-        if (state === EntityStatus.loadingSuccess) {
-          console.log('state', state);
-        }
-      });
   }
 
 
