@@ -4,6 +4,7 @@ import { Action } from '@ngrx/store';
 import { set, get, pipe, map } from 'lodash/fp';
 
 import * as destinationEntity from './entities/destinations/destination.reducer';
+import * as destinationConfigEntity from './entities/destinations/destination-config.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
@@ -105,6 +106,7 @@ export interface NgrxStateAtom {
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
+  globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
   infraNodes: infraNodeEntity.InfraNodeEntityState;
@@ -241,6 +243,7 @@ export const defaultInitialState = {
   dataBagItems: dataBagItemsEntity.DataBagItemsEntityInitialState,
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
+  globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
   infraNodes: infraNodeEntity.InfraNodeEntityInitialState,
@@ -314,6 +317,7 @@ export const ngrxReducers = {
   dataBagItems: dataBagItemsEntity.dataBagItemsEntityReducer,
   dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  globalDataFeedConfig: destinationConfigEntity.globalConfigEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
   infraNodes: infraNodeEntity.infraNodeEntityReducer,

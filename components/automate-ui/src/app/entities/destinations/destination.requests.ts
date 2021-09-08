@@ -4,8 +4,8 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-import { Destination } from './destination.model';
-import { CreateDestinationPayload } from './destination.actions';
+import { Destination, EnableDestination, GlobalConfig } from './destination.model';
+import { CreateDestinationPayload, GlobalDataFeedConfigSuccess } from './destination.actions';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -13,6 +13,9 @@ export interface DestinationsResponse {
 
 export interface DestinationResponse {
   destination: Destination;
+}
+export interface GlobalDataFeedConfigResponse {
+  config: GlobalConfig;
 }
 
 const DATA_FEED_URL = environment.data_feed_url;
@@ -94,7 +97,7 @@ export class DestinationRequests {
 
   public testDestination(destination: Destination): Observable<Object> {
     if (destination.secret) {
-      return this.testDestinationWithSecretId(destination.url, destination.secret);
+      return this.testDestinationWithSecretId(destination);
     }
   }
 
@@ -112,9 +115,31 @@ export class DestinationRequests {
       { url, 'header': {value} });
   }
 
-  public testDestinationWithSecretId(url: string, secretId: string): Observable<Object> {
+  public testDestinationWithSecretId(destination: Destination): Observable<Object> {
+    const SecretIdParams = this.secretIdParams(destination);
     return this.http.post(encodeURI(
-      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id': { 'id': secretId } });
+      this.joinToDataFeedUrl(['destinations', 'test'])), SecretIdParams);
+  }
+
+  public secretIdParams(destination: Destination) {
+    if (destination.integration_types !== '') {
+      return {
+        'url': destination.url,
+        'secret_id_with_addon': {
+          'id': destination.secret,
+          'services': destination.services,
+          'integration_types': destination.integration_types,
+          'meta_data': destination.meta_data
+        }
+      };
+    } else {
+      return {
+        'url': destination.url,
+        'secret_id': {
+          'id': destination.secret
+        }
+      };
+    }
   }
 
   public testDestinationWithNoCreds(url: string): Observable<Object> {
@@ -122,6 +147,15 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'none': {}});
   }
 
+  public enableDestinations(destination: EnableDestination): Observable<DestinationResponse> {
+    return this.http.patch<DestinationResponse>(encodeURI(
+      this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
+  }
+
+  public globalDataFeedConfig(): Observable<GlobalDataFeedConfigSuccess> {
+    return this.http.get<GlobalDataFeedConfigSuccess>(encodeURI(
+      this.joinToDataFeedUrl(['config'])));
+  }
   // Generate an notifier url from a list of words.
   // falsey values; false, null, 0, "", undefined, and NaN are ignored
   // example: ['foo', 'bar', null, 'baz'] == '${NOTIFIERURL}/foo/bar/baz'

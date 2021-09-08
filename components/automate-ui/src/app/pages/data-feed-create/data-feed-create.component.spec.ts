@@ -59,7 +59,6 @@ describe('DataFeedCreateComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DataFeedCreateComponent);
     component = fixture.componentInstance;
-    component = fixture.componentInstance;
     component.createForm = new FormBuilder().group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
