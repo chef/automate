@@ -131,7 +131,7 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=close-feed-button]').click();
     });
 
-    it('create data feed Custom', () => {
+    it('create data feed Custom with token', () => {
       cy.get('[data-cy=create-data-feed]').click();
       cy.get('[data-cy=Custom]').click();
       cy.get('[data-cy=add-name]').type(name + reusableDate);
@@ -144,7 +144,7 @@ describe('chef datafeed', () => {
       cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
     });
 
-    it('create data feed custom with username', () => {
+    it('create data feed Custom with username', () => {
       const date = Date.now();
       cy.get('[data-cy=create-data-feed]').click();
       cy.get('[data-cy=Custom]').click();

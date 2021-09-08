@@ -204,11 +204,12 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         } else {
           value = userToken;
         }
-        this.datafeedRequests.testDestinationWithHeaders(targetUrl,
+        testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,value);
+        /*this.datafeedRequests.testDestinationWithHeaders(targetUrl,
           value).subscribe(
             () => this.revealUrlStatus(UrlTestState.Success),
             () => this.revealUrlStatus(UrlTestState.Failure)
-          );
+          );*/
       } else if (event.auth === AuthTypes.USERNAMEANDPASSWORD) {
         const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
         const targetUsername: string = this.createDataFeedForm.controls['username'].value;
@@ -218,19 +219,23 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
           value = JSON.stringify(headersJson);
           if (targetUrl && targetUsername && targetPassword && value) {
-            this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
+            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
+              targetUsername, targetPassword, value);
+            /*this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
               targetUsername, targetPassword, value).subscribe(
                 () => this.revealUrlStatus(UrlTestState.Success),
                 () => this.revealUrlStatus(UrlTestState.Failure)
-              );
+              );*/
           }
         } else {
         if (targetUrl && targetUsername && targetPassword) {
-          this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
+          testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
+            targetUsername, targetPassword);
+          /*this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
             targetUsername, targetPassword).subscribe(
               () => this.revealUrlStatus(UrlTestState.Success),
               () => this.revealUrlStatus(UrlTestState.Failure)
-            );
+            );*/
         } else {
           this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
             .subscribe(
