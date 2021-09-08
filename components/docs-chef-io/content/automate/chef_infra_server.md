@@ -562,7 +562,7 @@ IMAGE
 
 ##### Nodes Tab
 
-The details page of the policy group let's you view the list of **Nodes**.
+The details page of the policy group lets you view the list of **Nodes**.
 
 IMAGE
 
