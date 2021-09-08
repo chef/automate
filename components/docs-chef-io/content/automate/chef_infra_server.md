@@ -492,7 +492,7 @@ Select a specific Run Item from the Run List to view the details in a slider tab
 
 IMAGE
 
-In the above image, the slider tab shows the *Details* of the select run item. To view the cookbook details of the item, select **Go to Cookbook Details >** option in the tab.
+To view the cookbook details of the item, select **Go to Cookbook Details** option in the tab.
 
 ##### Attributes Tab
 
