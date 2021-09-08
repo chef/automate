@@ -549,7 +549,7 @@ Select a Policy Group to view the Policy Group Information and METADATA of that 
 
 ##### Policyfiles Tab
 
-The details page of the policy group let's you view the list of **Policyfiles**.
+The details page of the policy group lets you view the list of **Policyfiles**.
 
 IMAGE
 
