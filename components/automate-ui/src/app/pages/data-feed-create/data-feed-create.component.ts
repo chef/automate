@@ -103,11 +103,11 @@ export class DataFeedCreateComponent {
 
   set testErrorSetter(val: boolean) {
     let errorString: string;
-    if (this.integTitle === 'Minio') {
+    if (this.integTitle === StorageIntegrationTypes.MINIO) {
       errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
-    } else if (this.authSelected === 'Username and Password') {
+    } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
       errorString = 'Unable to connect: check URL, username and password.';
-    } else if (this.authSelected === 'Access Token') {
+    } else if (this.authSelected === AuthTypes.ACCESSTOKEN) {
       errorString = 'Unable to connect: check Token Type (Prefix) and token.';
     }
     this.dismissNotification();
@@ -188,23 +188,26 @@ export class DataFeedCreateComponent {
       this.name.nativeElement.focus();
     });
 
-    if (integration === WebhookIntegrationTypes.SERVICENOW) {
-      this.showFieldWebhook();
-      this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
-      this.createForm.controls['tokenType'].setValue('Bearer');
-      this.integrationSelected = true;
-
-    } else if (integration === WebhookIntegrationTypes.SPLUNK) {
-      this.showFieldWebhook();
-      this.authSelected = AuthTypes.ACCESSTOKEN;
-      this.createForm.controls['tokenType'].setValue('Splunk');
-      this.integrationSelected = true;
-
-    } else if (integration === StorageIntegrationTypes.MINIO) {
-      this.showFieldStorage();
-      this.showFields.region = false;
-      this.integrationSelected = true;
-
+    switch (integration) {
+      case WebhookIntegrationTypes.SERVICENOW: {
+        this.showFieldWebhook();
+        this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
+        this.createForm.controls['tokenType'].setValue('Bearer');
+        this.integrationSelected = true;
+        break;
+      }
+      case WebhookIntegrationTypes.SPLUNK: {
+        this.showFieldWebhook();
+        this.authSelected = AuthTypes.ACCESSTOKEN;
+        this.createForm.controls['tokenType'].setValue('Splunk');
+        this.integrationSelected = true;
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        this.showFieldStorage();
+        this.showFields.region = false;
+        this.integrationSelected = true;
+      }
     }
   }
 
@@ -229,32 +232,42 @@ export class DataFeedCreateComponent {
   }
 
   public validateForm() {
-    if (this.integTitle === WebhookIntegrationTypes.SERVICENOW ||
-      this.integTitle === WebhookIntegrationTypes.SPLUNK ||
-      this.integTitle === WebhookIntegrationTypes.ELK_KIBANA) {
-      // handling access token and user pass auth
-      // for servicenow, splunk and elk
-      if (this.authSelected === AuthTypes.ACCESSTOKEN) {
-        if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-          this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-          return true;
-        }
-      } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
-        if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-          this.createForm.get('username').valid && this.createForm.get('password').valid) {
-          return true;
-        }
-      }
-    } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM) {
-      // handling access token and user pass auth
-      // with headers for webhooks
 
-    } else if (this.integTitle === StorageIntegrationTypes.MINIO) {
-      // handling minio
-      if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
-        this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
-        this.createForm.get('secretKey').valid) {
-        return true;
+    switch (this.integTitle) {
+      case WebhookIntegrationTypes.SERVICENOW:
+      case WebhookIntegrationTypes.SPLUNK:
+      case WebhookIntegrationTypes.ELK_KIBANA: {
+        // handling access token and user pass auth
+        // for servicenow, splunk and elk
+        switch (this.authSelected) {
+          case AuthTypes.ACCESSTOKEN: {
+            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+              return true;
+            }
+            break;
+          }
+          case AuthTypes.USERNAMEANDPASSWORD: {
+            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+              this.createForm.get('username').valid && this.createForm.get('password').valid) {
+              return true;
+            }
+          }
+        }
+        break;
+      }
+      case WebhookIntegrationTypes.CUSTOM: {
+        // handling access token and user pass auth
+        // with headers for webhooks
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        // handling minio
+        if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
+          this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
+          this.createForm.get('secretKey').valid) {
+          return true;
+        }
       }
     }
     return false;
