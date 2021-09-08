@@ -31,3 +31,16 @@ The Display Name bar should not be kept empty or else it throws error.
 
 ### Update the Date/Time Format
 
+You can select the date and time format amongst the five formats provided in Chef Automate.
+
+{{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
+
+Select the date/time format and save to get the changes reflected in the interface.
+
+### Reset Password
+
+You can reset the password of Chef Automate login from the **Reset Password** tab in Profile.
+
+{{< figure src="/images/automate/reset-password-from-profile.png" alt="Reset Password From Profile">}}
+
+Insert the the _Previous Password_ and the _New Password_ and select **Reset Password**.
