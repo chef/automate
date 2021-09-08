@@ -84,8 +84,8 @@ module AutomateCluster
       so
     end
 
-    def _shellout(cmd, **opts)
-      Mixlib::ShellOut.new(cmd, opts)
+    def _shellout(cmd, opts)
+      Mixlib::ShellOut.new(cmd, **opts)
     end
 
     def run_make_cmd(cmd, **opts)
