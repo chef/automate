@@ -60,27 +60,27 @@ describe('DataFeedTableComponent', () => {
 
   const destination = <Destination[]> [
     {
-    id: '1',
-    name: 'new data feed',
-    secret: 'testSecret',
-    url: 'http://foo.com'
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
     }, {
-    id: '1',
-    name: 'new data feed',
-    secret: 'testSecret',
-    url: 'http://foo.com'
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
     }, {
-    id: '1',
-    name: 'new data feed',
-    secret: 'testSecret',
-    url: 'http://foo.com'
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
     }, {
-    id: '1',
-    name: 'new data feed',
-    secret: 'testSecret',
-    url: 'http://foo.com'
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com'
     }
-    ];
+  ];
 
 
   beforeEach(async () => {
