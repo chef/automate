@@ -36,6 +36,7 @@ import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
 import { RoleModule } from './modules/roles/roles.module';
 import { LicenseModule } from 'app/modules/license/license.module';
+import { TelemetryCheckboxModule } from 'app/page-components/telemetry-checkbox/telemetry-checkbox.module';
 import { UserModule } from 'app/modules/user/user.module';
 import { TeamModule } from 'app/modules/team/team.module';
 import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
@@ -198,9 +199,6 @@ import { SigninComponent } from './pages/signin/signin.component';
 import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
-import {
-  TelemetryCheckboxComponent
-} from './page-components/telemetry-checkbox/telemetry-checkbox.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
@@ -265,7 +263,6 @@ import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-crea
     ServicesSidebarComponent,
     SettingsLandingComponent,
     SigninComponent,
-    TelemetryCheckboxComponent,
     TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent,
@@ -289,6 +286,7 @@ import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-crea
     PolicyModule,
     ProjectModule,
     LicenseModule,
+    TelemetryCheckboxModule,
     UserModule,
     TeamModule,
     ReactiveFormsModule,

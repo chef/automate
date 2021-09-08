@@ -1,11 +1,10 @@
-<div ngClass="{slide : isSlideOpen}">
+<div ngClass="{slide : isSlideOpen}" class="data-feed-slider">
   <div class="sidenav-header-data-feed">
     <div *ngIf="integrationSelected">
       <chef-button class="arrow-btn" secondary (click)="returnToMenu()" data-cy="close-data-feed-button">
         <chef-icon>arrow_back</chef-icon>
       </chef-button>
-    </div>
-    
+    </div>  
     <h1 slot="title" class="bolder-font" *ngIf="!integrationSelected">Choose a Data Feed Integration</h1>
     <h1 slot="title" class="bolder-font" data-cy="title-integration" *ngIf="integrationSelected">{{integTitle}}</h1>
     <chef-button class="close" secondary (click)="closeCreateSlider()" data-cy="close-feed-button">
@@ -13,25 +12,11 @@
     </chef-button>
   </div>
   <app-notification
-    *ngIf="testErrorGetter"
-    type="error"
+    *ngIf="notificationShow"
+    type="{{notificationType}}"
     timeout="5"
     (dismissed)="dismissNotification()">
-    <span>{{errorString}}</span>
-  </app-notification>
-  <app-notification
-    *ngIf="conflictErrorGetter"
-    type="error"
-    timeout="5"
-    (dismissed)="dismissNotification()">
-    <span>{{conflictErrorGetter}}</span>
-  </app-notification>
-  <app-notification
-    *ngIf="testSuccessGetter"
-    type="info"
-    timeout="5"
-    (dismissed)="dismissNotification()">
-    Notification test connected successfully!
+    <span>{{notificationMessage}}</span>
   </app-notification>
   <main *ngIf="!integrationSelected" data-cy="interation-menu">
     <div class="flex-container">
@@ -42,7 +27,7 @@
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
-            <div class="overlay" *ngIf="item.name!='ServiceNow'&&item.name!='Splunk'&&item.name!='Custom'">
+            <div class="overlay" *ngIf="item.name !== 'ServiceNow' && item.name !== 'Splunk'">
               <div class="text">Coming Soon</div>
             </div>
           </div>
@@ -56,7 +41,7 @@
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
-            <div class="overlay" *ngIf="item.name!='Minio'">
+            <div class="overlay" *ngIf="item.name !== 'Minio'">
               <div class="text">Coming Soon</div>
             </div>
           </div>
@@ -130,8 +115,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-
-        <div class="input-margin" *ngIf="showFields.authSelector && showSelect">
+        <div class="input-margin" *ngIf="showAuthDropdown()">
           <div class="name-margin">
             <label for="version">Authentication</label>
             <div class="version-dropdown">
@@ -142,8 +126,7 @@
             </div>
           </div>
         </div>
-        
-        <div class="input-margin" *ngIf="showFields.tokenType && authSelected=='Access Token'">
+        <div class="input-margin" *ngIf="showTokenInput('tokenType')">
           <chef-form-field>
             <label>
               <span class="label">Token Type (Prefix)<span aria-hidden="true">*</span></span>
@@ -155,8 +138,7 @@
                   data-cy="add-token-type"
                   id="token-type-input"
                   autocomplete="off"
-                  [readonly]="tokenToggle"
-                />
+                  [readonly]="tokenToggle"/>
                 <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()">
                   Edit
                 </chef-button>
@@ -164,8 +146,7 @@
             </label>
           </chef-form-field>
         </div>
-
-        <div class="input-margin" *ngIf="showFields.token && authSelected=='Access Token'">
+        <div class="input-margin" *ngIf="showTokenInput('token')">
           <chef-form-field>
             <label>
               <span class="label">Token <span aria-hidden="true">*</span></span>
@@ -175,8 +156,7 @@
                 type="text"
                 data-cy="add-token"
                 id="token-input"
-                autocomplete="off"
-              />
+                autocomplete="off"/>
             </label>
             <chef-error
               *ngIf="createForm.get('token').hasError('required') && createForm.get('token').dirty">
@@ -188,8 +168,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-
-        <div class="input-margin" *ngIf="showFields.username && authSelected=='Username and Password'">
+        <div class="input-margin" *ngIf="showUserPassInput('username')">
           <chef-form-field>
             <label>
               <span class="label">Username <span aria-hidden="true">*</span></span>
@@ -199,8 +178,7 @@
                 type="text"
                 data-cy="add-username"
                 id="username-input"
-                autocomplete="off"
-              />
+                autocomplete="off"/>
             </label>
             <chef-error
               *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
@@ -212,8 +190,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-
-        <div class="input-margin" *ngIf="showFields.password && authSelected=='Username and Password'">
+        <div class="input-margin" *ngIf="showUserPassInput('password')">
           <chef-form-field>
             <label>
               <span class="label">Password <span aria-hidden="true">*</span></span>
@@ -223,8 +200,7 @@
                 type="password"
                 data-cy="add-password"
                 id="password-input"
-                autocomplete="off"
-              />
+                autocomplete="off"/>
             </label>
             <chef-error
               *ngIf="createForm.get('password').hasError('required') && createForm.get('password').dirty">
@@ -243,7 +219,7 @@
               <input
                 chefInput
                 formControlName="bucketName"
-                data-cy="add-bucketName"
+                data-cy="add-bucket-name"
                 type="text"
                 id="bucketName-input"
                 autocomplete="off"/>
@@ -254,8 +230,6 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <!--Madhvi-->
-        
         
           <div *ngIf="showFields.useHeaders">
             <chef-form-field>
@@ -283,10 +257,9 @@
                 chefInput
                 formControlName="accessKey" 
                 type="password"
-                data-cy="add-accessKey"
+                data-cy="add-access-key"
                 id="accessKey-input"
-                autocomplete="off"
-              />
+                autocomplete="off"/>
             </label>
             <chef-error
               *ngIf="createForm.get('accessKey').hasError('required') && createForm.get('accessKey').dirty">
@@ -306,10 +279,9 @@
                 chefInput
                 formControlName="secretKey" 
                 type="password"
-                data-cy="add-secretKey"
+                data-cy="add-secret-key"
                 id="secretKey-input"
-                autocomplete="off"
-              />
+                autocomplete="off"/>
             </label>
             <chef-error
               *ngIf="createForm.get('secretKey').hasError('required') && createForm.get('secretKey').dirty">
@@ -320,8 +292,7 @@
               Secret Key is invalid.
             </chef-error>
           </chef-form-field>
-        </div>
-        
+        </div>    
         <div class="input-margin">
           <div class="button-bar">
             <chef-button data-cy="test-button" id="testConnection" (click)="testConnection()" primary [disabled]="!validateForm()">
@@ -331,16 +302,14 @@
             </chef-button>
           </div>
         </div>
-        <hr>
-        
+        <hr>      
         <div class="button-bar">
           <chef-button id="cancel-server-popup" (click)="returnToMenu()" tertiary>Cancel</chef-button>
           <chef-button [disabled]="!validateForm()"
             primary
             data-cy="add-button"
             id="create-button-object-modal"
-            (click)="saveDestination()"
-            >
+            (click)="saveDestination()">
             <chef-loading-spinner *ngIf="saveDoneGetter"></chef-loading-spinner>
             <span *ngIf="saveDoneGetter">Saving...</span>
             <span *ngIf="!saveDoneGetter">Save</span>

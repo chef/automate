@@ -27,6 +27,11 @@ export enum AuthTypes {
   USERNAMEANDPASSWORD = 'Username and Password'
 }
 
+export enum IntegrationTypes {
+  WEBHOOK = 'Webhook',
+  STORAGE = 'Storage'
+}
+
 @Component({
   selector: 'app-data-feed-create',
   templateUrl: './data-feed-create.component.html',
@@ -51,15 +56,11 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
-  public errorString: string;
-
+  public notificationShow = false;
+  public notificationMessage = '';
+  public notificationType = 'error';
   private saveInProgress = false;
   private testInProgress = false;
-  private testSuccess: boolean = null;
-  private testError: boolean = null;
-  private conflictError: string = null;
-  public headerChecked = false;
-
 
   public integrations = {
     webhook: [
@@ -87,8 +88,7 @@ export class DataFeedCreateComponent {
     headers: false,
     bucketName: false,
     accessKey: false,
-    secretKey: false,
-    useHeaders: false
+    secretKey: false
   };
 
   set saveDone(done: boolean) {
@@ -97,25 +97,35 @@ export class DataFeedCreateComponent {
 
   set testSuccessSetter(val: boolean) {
     this.dismissNotification();
-    this.testSuccess = val;
+    const message = 'Notification test connected successfully!';
+    this.showNotification(val, message, 'info');
   }
 
   set testErrorSetter(val: boolean) {
+    let errorString: string;
     if (this.integTitle === 'Minio') {
-      this.errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
+      errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
     } else if (this.authSelected === 'Username and Password') {
-      this.errorString = 'Unable to connect: check URL, username and password.';
+      errorString = 'Unable to connect: check URL, username and password.';
     } else if (this.authSelected === 'Access Token') {
-      this.errorString = 'Unable to connect: check Token Type (Prefix) and token.';
+      errorString = 'Unable to connect: check Token Type (Prefix) and token.';
     }
     this.dismissNotification();
-    this.testError = val;
+    this.showNotification(val, errorString, 'error');
+  }
+
+  public showNotification(show: boolean, message: string , type: string) {
+    setTimeout(() => {
+      this.notificationShow = show;
+    });
+    this.notificationType = type;
+    this.notificationMessage = message;
   }
 
   set conflictErrorSetter(val: string) {
     this.saveDone = false;
     this.dismissNotification();
-    this.conflictError = val;
+    this.showNotification(true, val, 'error');
   }
 
   set testDoneSetter(done: boolean) {
@@ -124,18 +134,6 @@ export class DataFeedCreateComponent {
 
   get saveDoneGetter() {
     return this.saveInProgress;
-  }
-
-  get testSuccessGetter() {
-    return this.testSuccess;
-  }
-
-  get testErrorGetter() {
-    return this.testError;
-  }
-
-  get conflictErrorGetter() {
-    return this.conflictError;
   }
 
   get testDoneGetter() {
@@ -180,11 +178,6 @@ export class DataFeedCreateComponent {
       password: true,
       useHeaders: true
     }};
-  }
-
-  updatePolicyCheckbox(event: boolean): void {
-    this.headerChecked = event;
-    this.createForm.controls.headerChecked.setValue(true);
   }
 
   showFieldStorage() {
@@ -254,6 +247,7 @@ export class DataFeedCreateComponent {
     //   this.createForm.reset();
     // }
   }
+
   public returnToMenu() {
     this.integrationSelected = false;
   }
@@ -278,6 +272,8 @@ export class DataFeedCreateComponent {
     if (this.integTitle === WebhookIntegrationTypes.SERVICENOW ||
       this.integTitle === WebhookIntegrationTypes.SPLUNK ||
       this.integTitle === WebhookIntegrationTypes.ELK_KIBANA) {
+      // handling access token and user pass auth
+      // for servicenow, splunk and elk
       if (this.authSelected === AuthTypes.ACCESSTOKEN) {
         if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
           this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
@@ -328,9 +324,18 @@ export class DataFeedCreateComponent {
   }
 
   public dismissNotification() {
-    this.testSuccess = false;
-    this.testError = false;
-    this.conflictError = null;
+    this.notificationShow = false;
   }
 
+  public showAuthDropdown() {
+    return this.showFields.authSelector && this.showSelect;
+  }
+
+  public showTokenInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN;
+  }
+
+  public showUserPassInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
+  }
 }
