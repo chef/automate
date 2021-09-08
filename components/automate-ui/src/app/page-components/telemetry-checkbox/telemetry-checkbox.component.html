@@ -1,4 +1,5 @@
 <chef-checkbox
+  data-cy="telemetry-checkbox"
   *ngIf="isTelemetryServiceEnabled"
   (change)="togglePersonalTelemetryCollection()"
   [checked]="telemetryPersonalPref">

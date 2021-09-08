@@ -31,6 +31,7 @@ message Query {
 	string sort = 22;
 	int32 page = 23;
 	int32 per_page = 24;
+	bool include_unfiltered = 26;
 }
 
 message Summary {
@@ -72,10 +73,11 @@ message Stats {
 }
 
 message ReportSummary {
-	Stats stats = 4;
 	string status = 1;
 	double duration = 2;
 	string start_date = 3;
+	Stats stats = 4;
+	Stats unfiltered_stats = 5;
 }
 message Trend {
 	string report_time = 1;

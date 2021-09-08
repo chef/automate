@@ -480,7 +480,7 @@ The **Content** tab contains the list of all:
 
 **Included Policies**
 
-Select a specific Policyfile from the *Included Policies* to view the details.
+Select a specific Policyfile from the _Included Policies_ to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
@@ -492,7 +492,7 @@ Select a specific Run Item from the Run List to view the details in a slider tab
 
 IMAGE
 
-In the above image, the slider tab shows the *Details* of the select run item. To view the cookbook details of the item, select **Go to Cookbook Details >** option in the tab.
+To view the cookbook details of the item, select **Go to Cookbook Details** option in the tab.
 
 ##### Attributes Tab
 
@@ -509,7 +509,7 @@ Select the **Cookbook Dependencies** button to view all the *Dependencies Rules*
 {{< note >}} Selecting a specific cookbook will redirect you to the audit section of the **Cookbook** main tab.
 {{< /note >}}
 
-The slider tab also contains the `Operator` and `Version` of the cookbooks.
+The slider tab contains the `Operator` and `Version` of the cookbooks.
 
 {{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
@@ -549,11 +549,11 @@ Select a Policy Group to view the Policy Group Information and METADATA of that 
 
 ##### Policyfiles Tab
 
-The details page of the policy group let's you view the list of **Policyfiles**.
+The details page of the policy group lets you view the list of **Policyfiles**.
 
 IMAGE
 
-Select a Policyfile from the list to view the details of a policyfile.
+Select a Policyfile from the list to view its details.
 
 IMAGE
 
@@ -562,15 +562,15 @@ IMAGE
 
 ##### Nodes Tab
 
-The details page of the policy group let's you view the list of **Nodes**.
+The details page of the policy group lets you view the list of **Nodes**.
 
 IMAGE
 
-Select a node from the list to view the details of a node.
+Select a node from the list to view its details
 
 IMAGE
 
-{{< note >}} Selecting a specific node will redirect you to the details section of the **Nodes** main tab.
+{{< note >}} Selecting a specific node opens details section of the **Nodes** tab.
 {{< /note >}}
 
 ## Troubleshoot
