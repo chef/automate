@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"net/http"
 )
 
 type Config struct {
@@ -100,11 +101,11 @@ func WithURI(hostname string, port int) Opts {
 // WithDB allows setting the URI to use from hostname and port
 func WithDB(hostname string, port int, user string, password string, dbname string, sslmode string) Opts {
 	return func(s *Server) {
-		s.dbConnectHost    = hostname
-		s.dbConnectPort    = port
-		s.dbConnectUser    = user
-		s.dbConnectPass    = password
-		s.dbConnectDb      = dbname
+		s.dbConnectHost = hostname
+		s.dbConnectPort = port
+		s.dbConnectUser = user
+		s.dbConnectPass = password
+		s.dbConnectDb = dbname
 		s.dbConnectSslmode = sslmode
 	}
 }
@@ -229,7 +230,7 @@ func (s *Server) Serve() error {
 	uri := fmt.Sprintf("%s:%d", s.httpListenHost, s.httpListenPort)
 	http.HandleFunc("/", defaultHandler(s))
 	http.HandleFunc("/healthz", healthzHandler)
-	err := http.ListenAndServe(uri, nil)
+	err := http.ListenAndServe(uri, nil) // nosemgrep
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 		return err
