@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# encoding: utf-8
+
+# Put the rest of the shave command here
+cd $_CLUSTER_CTL_ROOT
+
+bundle install --path vendor/bundle

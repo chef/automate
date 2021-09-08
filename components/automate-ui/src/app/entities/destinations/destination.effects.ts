@@ -91,8 +91,8 @@ export class DestinationEffects {
   createDestination$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE),
-      mergeMap(({ payload, headers }: CreateDestination) =>
-      this.requests.createDestination( payload, headers ).pipe(
+      mergeMap(({ payload, headers, storage }: CreateDestination) =>
+      this.requests.createDestination( payload, headers, storage ).pipe(
         map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
           observableOf(new CreateDestinationFailure(error)))))));
@@ -200,28 +200,29 @@ export class DestinationEffects {
         });
     })));
 
-    enableDisableDestination$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(DestinationActionTypes.ENABLE_DISABLE),
-        mergeMap(( {payload:  {enableDisable} }: EnableDisableDestination) =>
-          this.requests.enableDestinations(enableDisable).pipe(
-            map((resp: DestinationSuccessPayload) => new EnableDisableDestinationSuccess(resp)),
-            catchError((error: HttpErrorResponse) =>
-              observableOf(new EnableDisableDestinationFailure(error)))))));
+  enableDisableDestination$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(DestinationActionTypes.ENABLE_DISABLE),
+    mergeMap(( {payload:  {enableDisable} }: EnableDisableDestination) =>
+    this.requests.enableDisableDestinations(enableDisable).pipe(
+      map((resp: DestinationSuccessPayload) => new EnableDisableDestinationSuccess(resp)),
+      catchError((error: HttpErrorResponse) =>
+        observableOf(new GetDestinationsFailure(error)))))));
 
-    enableDisableDestinationFailure$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(DestinationActionTypes.ENABLE_DISABLE_FAILURE),
-        map(({ payload  }: EnableDisableDestinationFailure) => new CreateNotification({
-          type: Type.info,
-          message: `Could not enable or Disable: error ${payload.error}.`
-        }))));
+  enableDisableDestinationFailure$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(DestinationActionTypes.ENABLE_DISABLE_FAILURE),
+    map(({ payload  }: EnableDisableDestinationFailure) => new CreateNotification({
+      type: Type.info,
+      message: `Could not enable or Disable: error ${payload.error}.`
+  }))));
 
-    enableDisableDestinationSuccess$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(DestinationActionTypes.ENABLE_DISABLE_SUCCESS),
-        map(({ payload  }: EnableDisableDestinationSuccess) => new CreateNotification({
-          type: Type.info,
-          message: `Destination is ${payload.enable ? 'Enabled' : 'Disabled'}.`
-      }))));
+  enableDisableDestinationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(DestinationActionTypes.ENABLE_DISABLE_SUCCESS),
+    map(({ payload  }: EnableDisableDestinationSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Destination is ${ payload.enable ? 'Enabled' : 'Disabled' }.`
+  }))));
+
 }

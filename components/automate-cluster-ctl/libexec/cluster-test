@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl test
+# Summary: Run the smoke tests for the Automate cluster
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+require 'cluster/inspec_inputs'
+require 'tty/table'
+require 'base64'
+require 'tempfile'
+require 'yaml'
+require 'json'
+
+
+class AutomateClusterTest < AutomateCluster::Command
+  INSPEC_PROFILES = {
+    elasticsearch: ['automate-backend-elasticsearch-smoke'],
+    postgresql: ['automate-backend-postgresql-smoke'],
+    automate: ['automate-frontend-smoke'],
+    chef_server: ['automate-frontend-chef-server-smoke'],
+  }
+  SUMMARY_HEADER = ['Profile', 'IP', 'Results'].freeze
+
+  option ['-c', '--sudo-command'], 'SUDO_COMMAND', 'Alternate command for sudo'
+  option ['-s', '--sudo-options'], 'SUDO_OPTIONS', 'Additional options for remote sudo'
+  option ["-j", "--json"], :flag, "Enable json output"
+  parameter "[NAME]", "Name of service to smoke test", attribute_name: :service_name
+  option ['-f', '--full'], :flag, 'Run automate diagnostics test'
+
+  def execute
+    results = []
+
+    INSPEC_PROFILES.each do |name, profiles|
+      next unless service_name.nil? || name == service_name.to_sym
+
+      AutomateCluster.terraform.output["#{name}_public_ips"].each do |ip|
+        profiles.each do |profile|
+          results << [profile, ip, run_smoke_test(name, ip, profile)]
+        end
+      end
+    end
+
+    display_summary(results)
+  end
+
+  def sudo_password(service)
+    if backend?(service)
+      be_sudo_password
+    else
+      fe_sudo_password
+    end
+  end
+
+  def be_sudo_password
+    @be_sudo_password ||= AutomateCluster.secrets['be_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def fe_sudo_password
+    @fe_sudo_password ||= AutomateCluster.secrets['fe_sudo_password'] || AutomateCluster.secrets['sudo_password']
+  end
+
+  def backend?(name)
+    [:elasticsearch, :postgresql].include?(name)
+  end
+
+  # def default_sudo_password
+  #   AutomateCluster.secrets['sudo_password']
+  # end
+
+  def inspec_command(service, server, profile, input_file)
+    cmd = [
+      "CHEF_LICENSE=accept-no-persist",
+      "inspec exec",
+      "--sudo #{sudo_options}",
+      "--key-files #{config.ssh_key_file}",
+      "--log-level=#{ verbose? ? 'debug' : 'info' }",
+    ]
+
+    cmd << "--input-file #{input_file}"
+    cmd << "--sudo-password=#{sudo_password(service)}" if sudo_password(service)
+    cmd << "--sudo-command=#{AutomateCluster.sudo_}" if sudo_command
+    cmd << "--target ssh://#{config.ssh_user}@#{server}"
+    cmd << File.join(profile_path, profile)
+
+    cmd.join(' ')
+  end
+
+  def setup_inspec_data
+    inspec_inputs = AutomateCluster::InspecInputs.new
+    inspec_inputs.add("automate_admin_token", AutomateCluster.secrets['automate_admin_token']) if AutomateCluster.secrets['automate_admin_token']
+    inspec_inputs.add("run_diagnostics", full?)
+    inspec_inputs.save
+
+    inspec_inputs
+  end
+
+  def run_smoke_test(service, ip, profile)
+    inspec_inputs = setup_inspec_data
+
+    cmd = inspec_command(service, ip, profile, inspec_inputs.path)
+    logger.debug "Running smoke-test command: #{cmd}"
+    results = ''
+
+    wait_while "Running smoke-test #{term.green(profile)} on #{term.green(ip)}" do |spinner|
+      so = shellout!(cmd, { returns: [0, 100, 101] })
+
+      # force encoding because Chef Inspec sometimes gives this to us as ASCII
+      output = so.stdout.chomp.force_encoding('UTF-8')
+      last_message = output.lines.last.to_s.chomp
+
+      # exit code 100 means Chef Inspec ran successfully but there were some failed tests
+      if [100, 101, 0].include?(so.exitstatus)
+        if so.exitstatus == 100
+          # At least one control failed
+          logger.error output
+        else
+          logger.debug output
+        end
+
+        results = last_message
+        spinner.success("(#{results})")
+      else
+        logger.error output
+        results = "ERROR (Inspec exited: #{so.exitstatus})"
+        spinner.error("(#{last_message})")
+      end
+    end
+
+    results
+  ensure
+    inspec_inputs.delete
+  end
+
+  def display_summary(results)
+    if json?
+      puts term.bold("Smoke test summary")
+      results = results.map{|item| Hash[SUMMARY_HEADER.zip(item)]}
+      puts JSON.pretty_generate(results)
+    else  
+      puts # intentionally left blank
+      puts term.bold("Smoke test summary")
+      table = TTY::Table.new(SUMMARY_HEADER, results)
+      puts table.render(:ascii, padding: [0,1,0,1])
+      puts # intentionally left blank
+    end
+  end
+end
+
+AutomateClusterTest.run

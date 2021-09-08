@@ -209,6 +209,9 @@ import { WarningBannerComponent } from './page-components/warning-banner/warning
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
 import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details/data-feed-config-details.component';
+import {
+  DataFeedTableComponent
+} from './page-components/data-feed-table/data-feed-table.component';
 
 @NgModule({
   declarations: [
@@ -269,7 +272,8 @@ import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details
     UIComponent,
     WelcomeModalComponent,
     WarningBannerComponent,
-    DataFeedConfigDetailsComponent
+    DataFeedConfigDetailsComponent,
+    DataFeedTableComponent
   ],
   imports: [
     ApiTokenModule,

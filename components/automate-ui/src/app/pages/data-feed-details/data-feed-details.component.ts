@@ -153,7 +153,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public sendTestForDataFeedUrl(): void {
     this.testInProgress = true;
     const destinationObj = {
-      id: this.destination.id,
+      ...this.destination,
       name: this.updateForm.controls['name'].value.trim(),
       url: this.updateForm.controls['url'].value.trim(),
       secret: this.destination.secret,

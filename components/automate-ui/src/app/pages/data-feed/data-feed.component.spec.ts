@@ -10,10 +10,16 @@ import { DataFeedComponent } from './data-feed.component';
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Destination } from 'app/entities/destinations/destination.model';
-import { CreateDestinationSuccess, CreateDestinationFailure } from 'app/entities/destinations/destination.actions';
+import { CreateDestinationSuccess, CreateDestinationFailure, CreateDestination } from 'app/entities/destinations/destination.actions';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { DataFeedCreateComponent } from '../data-feed-create/data-feed-create.component';
+import {
+  AuthTypes,
+  DataFeedCreateComponent,
+  IntegrationTypes,
+  StorageIntegrationTypes,
+  WebhookIntegrationTypes
+} from '../data-feed-create/data-feed-create.component';
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
@@ -84,6 +90,9 @@ describe('DataFeedComponent', () => {
     const username = 'test';
     const password = 'test123';
     const token = 'test123';
+    const bucketName = 'b123';
+    const accessKey = 'test123';
+    const secretKey = 'test123';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -102,18 +111,6 @@ describe('DataFeedComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create slider resets name, url, token to empty string', () => {
-      component.createDataFeedForm.controls['name'].setValue('any');
-      component.createDataFeedForm.controls['url'].setValue('any');
-      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
-      component.createDataFeedForm.controls['token'].setValue('any');
-      component.slidePanel();
-      expect(component.createDataFeedForm.controls['name'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['url'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['tokenType'].value).toBe(null);
-      expect(component.createDataFeedForm.controls['token'].value).toBe(null);
-    });
-
     it('on success, closes slider and adds new data feed', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
@@ -121,7 +118,10 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
 
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
@@ -137,7 +137,30 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
       component.createDataFeedForm.controls['token'].setValue(token);
 
-      component.saveDestination({auth: 'Access Token', name: 'Service Now'});
+      component.saveDestination({
+        auth: AuthTypes.ACCESSTOKEN,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
+
+      store.dispatch(new CreateDestinationSuccess(destination));
+      component.sortedDestinations$.subscribe(destinations => {
+        expect(destinations).toContain(destination);
+      });
+    });
+
+    it('on success, closes slider and adds new data feed minio', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['endpoint'].setValue(destination.url);
+      component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
+      component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
+      component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
+
+      component.saveDestination({
+        auth: null,
+        name: StorageIntegrationTypes.MINIO
+      });
 
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
@@ -155,7 +178,10 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
 
       const conflict = <HttpErrorResponse>{
         status: HttpStatus.CONFLICT,
@@ -177,7 +203,10 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-      component.saveDestination({auth: 'Username and Password', name: 'Service Now'});
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
 
       const error = <HttpErrorResponse>{
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -187,6 +216,161 @@ describe('DataFeedComponent', () => {
 
       expect(component.createModalVisible).toBe(true);
       expect(component.conflictErrorEvent.emit).toHaveBeenCalledWith(false);
+    });
+
+    it('on success, adds new data feed service now and check dispatched store data', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+
+      spyOn(component['store'], 'dispatch');
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
+
+      expect(component['store'].dispatch).toHaveBeenCalledWith(
+        new CreateDestination({
+          name: component.createDataFeedForm.controls['name'].value.trim(),
+          url: component.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: IntegrationTypes.WEBHOOK,
+          services: WebhookIntegrationTypes.SERVICENOW
+        }, JSON.stringify({
+          Authorization: 'Basic ' + btoa(username + ':' + password)
+        }), null)
+      );
+    });
+
+    it('on success, adds new data feed splunk and check dispatched store data', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
+      component.createDataFeedForm.controls['token'].setValue(token);
+
+      spyOn(component['store'], 'dispatch');
+      component.saveDestination({
+        auth: AuthTypes.ACCESSTOKEN,
+        name: WebhookIntegrationTypes.SPLUNK
+      });
+
+      expect(component['store'].dispatch).toHaveBeenCalledWith(
+        new CreateDestination({
+          name: component.createDataFeedForm.controls['name'].value.trim(),
+          url: component.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: IntegrationTypes.WEBHOOK,
+          services: WebhookIntegrationTypes.SPLUNK
+        }, JSON.stringify({
+          Authorization: 'Bearer' + ' ' + token
+        }), null)
+      );
+    });
+
+    it('on success, adds new data feed minio and check dispatched store data', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['endpoint'].setValue(destination.url);
+      component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
+      component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
+      component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
+
+      spyOn(component['store'], 'dispatch');
+      component.saveDestination({
+        auth: null,
+        name: StorageIntegrationTypes.MINIO
+      });
+
+      expect(component['store'].dispatch).toHaveBeenCalledWith(
+        new CreateDestination({
+          name: component.createDataFeedForm.controls['name'].value.trim(),
+          url: component.createDataFeedForm.controls['endpoint'].value.trim(),
+          integration_types: IntegrationTypes.STORAGE,
+          services: StorageIntegrationTypes.MINIO,
+          meta_data: [
+            {
+              key: 'bucket',
+              value: component.createDataFeedForm.controls['bucketName'].value.trim()
+            }
+          ]
+        }, null,
+        {
+          accessKey: component.createDataFeedForm.controls['accessKey'].value.trim(),
+          secretKey: component.createDataFeedForm.controls['secretKey'].value.trim()
+        })
+      );
+    });
+
+    it('on test success for Service now and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+
+      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePassword');
+      component.sendTestForDataFeed({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.SERVICENOW
+      });
+
+      expect(component['datafeedRequests']
+      .testDestinationWithUsernamePassword).toHaveBeenCalledWith(
+        destination.url,
+        username,
+        password
+      );
+    });
+
+    it('on test success for Splunk and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
+      component.createDataFeedForm.controls['token'].setValue(token);
+
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
+      component.sendTestForDataFeed({
+        auth: AuthTypes.ACCESSTOKEN,
+        name: WebhookIntegrationTypes.SPLUNK
+      });
+
+      expect(component['datafeedRequests']
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
+        destination.url,
+        JSON.stringify({
+          Authorization: 'Bearer' + ' ' + token
+        })
+      );
+    });
+
+    it('on test success for Minio and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['endpoint'].setValue(destination.url);
+      component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
+      component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
+      component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
+
+      spyOn(component['datafeedRequests'], 'testDestinationForMinio');
+      component.sendTestForDataFeed({
+        auth: null,
+        name: StorageIntegrationTypes.MINIO
+      });
+
+      expect(component['datafeedRequests']
+      .testDestinationForMinio).toHaveBeenCalledWith({
+        url: destination.url,
+        aws: {
+          access_key: component.createDataFeedForm.controls['accessKey'].value.trim(),
+          secret_access_key: component.createDataFeedForm.controls['secretKey'].value.trim(),
+          bucket: component.createDataFeedForm.controls['bucketName'].value.trim()
+        }
+      });
     });
 
   });
