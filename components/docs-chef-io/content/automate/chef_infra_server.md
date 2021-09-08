@@ -509,7 +509,7 @@ Select the **Cookbook Dependencies** button to view all the *Dependencies Rules*
 {{< note >}} Selecting a specific cookbook will redirect you to the audit section of the **Cookbook** main tab.
 {{< /note >}}
 
-The slider tab also contains the `Operator` and `Version` of the cookbooks.
+The slider tab contains the `Operator` and `Version` of the cookbooks.
 
 {{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
