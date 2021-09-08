@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
+import { KVData } from '../node-credentials/node-credential.model';
 
 import { Destination } from './destination.model';
 
@@ -72,15 +73,15 @@ export interface CreateDestinationPayload {
   url: string;
   secret?: string;
   enable?: boolean;
-  integration_type?: string;
-  meta_data?: string;
+  integration_types?: string;
+  meta_data?: Array<KVData>;
   services?: string;
 }
 
 export class CreateDestination implements Action {
   readonly type = DestinationActionTypes.CREATE;
   constructor(public payload: CreateDestinationPayload,
-    public headers: string ) { }
+    public headers: string, public storage: { accessKey: string; secretKey: string }) { }
 }
 
 export class CreateDestinationSuccess implements Action {
