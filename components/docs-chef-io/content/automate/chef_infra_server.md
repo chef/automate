@@ -553,7 +553,7 @@ The details page of the policy group let's you view the list of **Policyfiles**.
 
 IMAGE
 
-Select a Policyfile from the list to view the details of a policyfile.
+Select a Policyfile from the list to view its details.
 
 IMAGE
 
