@@ -14,7 +14,7 @@ NO_GIT=${NO_GIT:-false}
 SED=${SED:-sed}
 
 if [[ "$NO_GIT" != "true" ]]; then
-    branch="expeditor/bump-chef-server"
+    branch="meet58/test-bump-version"
     git checkout -b "$branch"
 fi
 
@@ -37,12 +37,12 @@ while read -r line; do
 done < <(jq -rn --argjson manifest "$manifest_content" '$manifest.packages[]')
 
 file_for_pkg=(
-    [chef-server-ctl]="components/automate-cs-nginx/habitat/plan.sh"
-    [chef-server-nginx]="components/automate-cs-nginx/habitat/plan.sh"
-    [bookshelf]="components/automate-cs-bookshelf/habitat/plan.sh"
-    [oc_bifrost]="components/automate-cs-oc-bifrost/habitat/plan.sh"
-    [oc_erchef]="components/automate-cs-oc-erchef/habitat/plan.sh"
-    [openresty-noroot]="components/automate-workflow-nginx/habitat/plan.sh"
+    [chef-server-ctl]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-cs-nginx/habitat/plan.sh"
+    [chef-server-nginx]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-cs-nginx/habitat/plan.sh"
+    [bookshelf]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-cs-bookshelf/habitat/plan.sh"
+    [oc_bifrost]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-cs-oc-bifrost/habitat/plan.sh"
+    [oc_erchef]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-cs-oc-erchef/habitat/plan.sh"
+    [openresty-noroot]="/home/meetgadhiya/meet/automate-metricbeat/automate/components/automate-workflow-nginx/habitat/plan.sh"
 )
 
 for i in "${!file_for_pkg[@]}"; do
