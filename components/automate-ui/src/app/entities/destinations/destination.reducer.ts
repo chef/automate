@@ -30,7 +30,7 @@ export const destinationEntityAdapter: EntityAdapter<Destination> =
 
 
 export const DestinationEntityInitialState: DestinationEntityState =
-destinationEntityAdapter.getInitialState({
+  destinationEntityAdapter.getInitialState({
     status: EntityStatus.notLoaded,
     saveStatus: EntityStatus.notLoaded,
     saveError: null,
@@ -157,15 +157,16 @@ export function destinationEntityReducer(
         TEST_CONNECTION_STATUS,
         EntityStatus.loadingSuccess,
         state
-        );
+      );
 
-    case DestinationActionTypes.SEND_TEST_FAILURE: {
+    case DestinationActionTypes.SEND_TEST_FAILURE:
       return set(
         TEST_CONNECTION_STATUS,
         EntityStatus.loadingFailure,
         state
-        );
-    }
+      );
+
+      default:
+        return state;
   }
-  return state;
 }

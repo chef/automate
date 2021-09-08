@@ -4,8 +4,8 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-import { Destination, EnableDestination, GlobalConfig } from './destination.model';
-import { CreateDestinationPayload, GlobalDataFeedConfigSuccess } from './destination.actions';
+import { Destination, EnableDestination } from './destination.model';
+import { CreateDestinationPayload } from './destination.actions';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -13,9 +13,6 @@ export interface DestinationsResponse {
 
 export interface DestinationResponse {
   destination: Destination;
-}
-export interface GlobalDataFeedConfigResponse {
-  config: GlobalConfig;
 }
 
 const DATA_FEED_URL = environment.data_feed_url;
@@ -152,10 +149,6 @@ export class DestinationRequests {
       this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
   }
 
-  public globalDataFeedConfig(): Observable<GlobalDataFeedConfigSuccess> {
-    return this.http.get<GlobalDataFeedConfigSuccess>(encodeURI(
-      this.joinToDataFeedUrl(['config'])));
-  }
   // Generate an notifier url from a list of words.
   // falsey values; false, null, 0, "", undefined, and NaN are ignored
   // example: ['foo', 'bar', null, 'baz'] == '${NOTIFIERURL}/foo/bar/baz'

@@ -3,12 +3,12 @@ import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import {
   GlobalDataFeedConfig
-} from 'app/entities/destinations/destination.actions';
+} from 'app/entities/global-config/destination-config.actions';
 import {
   globalDataFeed
-} from 'app/entities/destinations/destination.selectors';
+} from 'app/entities/global-config/destination-config.selectors';
 import { Observable } from 'rxjs';
-import { GlobalConfig } from 'app/entities/destinations/destination.model';
+import { GlobalConfig } from 'app/entities/global-config/destination-config.model';
 import { map } from 'rxjs/operators';
 import { EntityStatus } from 'app/entities/entities';
 

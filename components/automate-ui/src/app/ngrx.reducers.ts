@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { set, get, pipe, map } from 'lodash/fp';
 
 import * as destinationEntity from './entities/destinations/destination.reducer';
-import * as destinationConfigEntity from './entities/destinations/destination-config.reducer';
+import * as destinationConfigEntity from './entities/global-config/destination-config.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';

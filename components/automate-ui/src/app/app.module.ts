@@ -81,6 +81,7 @@ import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
+import { DataFeedGlobalConfigRequests } from './entities/global-config/destination-config.requests';
 import { EnvironmentRequests } from './entities/environments/environment.requests';
 import { InfraNodeRequests } from './entities/infra-nodes/infra-nodes.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
@@ -328,6 +329,7 @@ import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details
     DataBagsRequests,
     DesktopRequests,
     DestinationRequests,
+    DataFeedGlobalConfigRequests,
     EnvironmentRequests,
     EventFeedService,
     FeatureFlagsService,

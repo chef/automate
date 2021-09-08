@@ -4,25 +4,15 @@ import {
   DestinationEntityState,
   destinationEntityAdapter
  } from './destination.reducer';
- import {
-  GlobalConfigEntityState,
-  globalConfigEntityAdapter
- } from './destination-config.reducer';
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
 export const destinationState = createFeatureSelector<DestinationEntityState>('destinations');
-export const globalDataFeedConfigState = createFeatureSelector<GlobalConfigEntityState>('globalDataFeedConfig');
 
 export const {
   selectAll: allDestinations,
   selectEntities: destinationEntities
 } = destinationEntityAdapter.getSelectors(destinationState);
-
-export const {
-  selectAll: allglobalDataFeedConfig,
-  selectEntities: globalDataFeedConfigEntities
-} = globalConfigEntityAdapter.getSelectors(globalDataFeedConfigState);
 
 export const destinationStatus = createSelector(
   destinationState,
@@ -70,17 +60,3 @@ export const testConnectionStatus = createSelector(
   (state) => state.testConnectionStatus
 );
 
-export const globalDataFeedStatus = createSelector(
-  globalDataFeedConfigState,
-  (state) => state.globalConfigStatus
-);
-
-export const globalDataFeed = createSelector(
-  globalDataFeedConfigState,
-  (state) => {
-    return {
-    globalConfig: state.globalConfig,
-    globalConfigStatus: state.globalConfigStatus
-    };
-  }
-);
