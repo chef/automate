@@ -47,8 +47,6 @@ describe('login the app', () => {
 
     it('timeformat updated in user detail page', function () {
       cy.get('app-user-details').should('exist').then(() =>  {
-        console.log('line 54');
-        console.log(timeformat);
           cy.get('[data-cy=timeformat-dropdown]').should('exist');
           cy.get('[data-cy=timeformat-dropdown] .mat-select-min-line')
           .then(() => {
