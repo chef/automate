@@ -56,11 +56,15 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
+  public errorString: string;
+
+  private saveInProgress = false;
+  private testInProgress = false;
+  public headerChecked = false;
   public notificationShow = false;
   public notificationMessage = '';
   public notificationType = 'error';
-  private saveInProgress = false;
-  private testInProgress = false;
+ 
 
   public integrations = {
     webhook: [
@@ -88,7 +92,8 @@ export class DataFeedCreateComponent {
     headers: false,
     bucketName: false,
     accessKey: false,
-    secretKey: false
+    secretKey: false,
+    useHeaders: false
   };
 
   set saveDone(done: boolean) {
@@ -180,6 +185,11 @@ export class DataFeedCreateComponent {
     }};
   }
 
+  updatePolicyCheckbox(event: boolean): void {
+    this.headerChecked = event;
+    this.createForm.controls.headerChecked.setValue(true);
+  }
+
   showFieldStorage() {
     Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
     this.showFields = {...this.showFields, ...{
@@ -218,7 +228,7 @@ export class DataFeedCreateComponent {
       this.showCustomField();
       this.createForm.reset();
       this.authSelected = AuthTypes.ACCESSTOKEN;
-      this.createForm.controls['tokenType'].setValue('');
+      this.createForm.controls['tokenType'].setValue('Bearer');
       this.integrationSelected = true;
 
     } else if (integration === StorageIntegrationTypes.MINIO) {

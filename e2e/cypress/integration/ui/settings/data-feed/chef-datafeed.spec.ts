@@ -34,18 +34,5 @@ describe('chef datafeed', () => {
       cy.contains('Data Feeds').click();
       cy.get('[data-cy=create-data-feed]').should('exist');
     });
-
-    it('create data feed error', () => {
-      cy.get('[data-cy=create-data-feed]').click();
-      cy.get('[data-cy=Custom]').click();
-      cy.get('[data-cy=add-name]').type(name + reusableDate);
-      cy.get('[data-cy=add-url]').type(url);
-      cy.get('[data-cy=add-token]').type(token);
-      cy.get('[data-cy=add-button]').click();
-      cy.get('app-data-feed-create').scrollTo('top');
-      cy.get('app-notification.error').should('be.visible');
-      cy.get('app-notification.error chef-icon').click();
-      cy.get('[data-cy=close-feed-button]').click();
-    });
   });
 });

@@ -232,7 +232,7 @@ describe('DataFeedCreateComponent', () => {
       component.selectIntegration('Custom');
       expect(component.createForm.controls['name'].value).toBe(null);
       expect(component.createForm.controls['url'].value).toBe(null);
-      expect(component.createForm.controls['tokenType'].value).toBe('');
+      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
   });

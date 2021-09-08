@@ -373,6 +373,43 @@ describe('DataFeedComponent', () => {
       });
     });
 
+    it('on success, closes slider and adds new custom data feed with username-password', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.CUSTOM
+      });
+
+      store.dispatch(new CreateDestinationSuccess(destination));
+      component.sortedDestinations$.subscribe(destinations => {
+        expect(destinations).toContain(destination);
+      });
+    });
+
+    it('on success, closes slider and adds new custom data feed with access token', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.saveDestination({
+        auth: AuthTypes.ACCESSTOKEN,
+        name: WebhookIntegrationTypes.CUSTOM
+      });
+
+      store.dispatch(new CreateDestinationSuccess(destination));
+      component.sortedDestinations$.subscribe(destinations => {
+        expect(destinations).toContain(destination);
+      });
+    });
+    
+
   });
 
 });
