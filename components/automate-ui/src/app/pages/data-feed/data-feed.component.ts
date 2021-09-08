@@ -8,7 +8,7 @@ import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
-import { HttpStatus } from 'app/types/types';
+import { HttpStatus, SortDirection } from 'app/types/types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Destination } from 'app/entities/destinations/destination.model';
@@ -61,6 +61,12 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   @ViewChild(DataFeedCreateComponent) createChild: DataFeedCreateComponent;
+
+  // The field or column used to sort nodes
+  sortField$: Observable<string>;
+
+  // The direction nodes are sorted
+  fieldDirection$: Observable<SortDirection>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -299,3 +305,4 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     }
   }
 }
+

@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import { KVData } from '../node-credentials/node-credential.model';
 
-import { Destination } from './destination.model';
+import { Destination, EnableDestination } from './destination.model';
 
 export enum DestinationActionTypes {
   GET_ALL                        = 'DESTINATION::GET_ALL',
@@ -22,7 +22,10 @@ export enum DestinationActionTypes {
   DELETE_FAILURE                 = 'DESTINATION::CREATE::DELETE::FAILURE',
   SEND_TEST                      = 'DESTINATION::SEND_TEST',
   SEND_TEST_SUCCESS              = 'DESTINATION::SEND_TEST::SUCCESS',
-  SEND_TEST_FAILURE              = 'DESTINATION::SEND_TEST::FAILURE'
+  SEND_TEST_FAILURE              = 'DESTINATION::SEND_TEST::FAILURE',
+  ENABLE_DISABLE                 = 'DESTINATION::ENABLE_DISABLE',
+  ENABLE_DISABLE_SUCCESS         = 'DESTINATION::ENABLE_DISABLE::SUCCESS',
+  ENABLE_DISABLE_FAILURE         = 'DESTINATION::ENABLE_DISABLE::FAILURE'
 }
 
 
@@ -145,6 +148,21 @@ export class TestDestinationFailure implements Action {
   constructor(public payload: Destination) { }
 }
 
+export class EnableDisableDestination implements Action {
+  readonly type = DestinationActionTypes.ENABLE_DISABLE;
+  constructor(public payload: { enableDisable: EnableDestination }) { }
+}
+
+export class EnableDisableDestinationSuccess implements Action {
+  readonly type = DestinationActionTypes.ENABLE_DISABLE_SUCCESS;
+  constructor(public payload) { }
+}
+export class EnableDisableDestinationFailure implements Action {
+  readonly type = DestinationActionTypes.ENABLE_DISABLE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+
 export type DestinationActions =
   | GetDestinations
   | GetDestinationsSuccess
@@ -163,4 +181,7 @@ export type DestinationActions =
   | DeleteDestinationFailure
   | TestDestination
   | TestDestinationSuccess
-  | TestDestinationFailure;
+  | TestDestinationFailure
+  | EnableDisableDestination
+  | EnableDisableDestinationSuccess
+  | EnableDisableDestinationFailure;
