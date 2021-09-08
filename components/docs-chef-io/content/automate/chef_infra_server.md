@@ -480,7 +480,7 @@ The **Content** tab contains the list of all:
 
 **Included Policies**
 
-Select a specific Policyfile from the *Included Policies* to view the details.
+Select a specific Policyfile from the _Included Policies_ to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
