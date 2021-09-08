@@ -566,7 +566,7 @@ The details page of the policy group let's you view the list of **Nodes**.
 
 IMAGE
 
-Select a node from the list to view the details of a node.
+Select a node from the list to view its details
 
 IMAGE
 
