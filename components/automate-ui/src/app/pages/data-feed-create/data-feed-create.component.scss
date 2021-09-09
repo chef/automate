@@ -10,10 +10,10 @@ main {
     padding: 54px 54px;
 
     .flex-child {
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 186px);
+      grid-column-gap: 66px;
       column-gap: 66px;
-      flex-wrap: wrap;
 
       .card {
         display: flex;
