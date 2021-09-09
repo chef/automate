@@ -115,28 +115,33 @@ var gatherLogsCmdFlags = struct {
 }{}
 
 func runGatherLogsCmd(cmd *cobra.Command, args []string) error {
-	// Ensure we can write to any user given log locations
-	overridePath := ""
-	if len(args) > 0 && args[0] != "" {
-		var err error
-		overridePath, err = expandOutFilePath(args[0])
-		if err != nil {
-			return err
+	if isA2HADeployment() {
+		return executeHAGatherLogsA2HA(args)
+	} else {
+		// Ensure we can write to any user given log locations
+		overridePath := ""
+		if len(args) > 0 && args[0] != "" {
+			var err error
+			overridePath, err = expandOutFilePath(args[0])
+			if err != nil {
+				return err
+			}
+			if err = handleOverwriteIfExists(overridePath); err != nil {
+				return err
+			}
 		}
-		if err = handleOverwriteIfExists(overridePath); err != nil {
-			return err
+
+		if gatherLogsCmdFlags.captureData {
+			return runCaptureDataLocalCmd(overridePath, gatherLogsCmdFlags.captureTime, gatherLogsCmdFlags.yes)
 		}
+
+		if gatherLogsCmdFlags.localFallback {
+			return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
+		}
+
+		return gatherLogsFromServer(overridePath, gatherLogsCmdFlags.logLines)
 	}
 
-	if gatherLogsCmdFlags.captureData {
-		return runCaptureDataLocalCmd(overridePath, gatherLogsCmdFlags.captureTime, gatherLogsCmdFlags.yes)
-	}
-
-	if gatherLogsCmdFlags.localFallback {
-		return runGatherLogsLocalCmd(overridePath, gatherLogsCmdFlags.logLines)
-	}
-
-	return gatherLogsFromServer(overridePath, gatherLogsCmdFlags.logLines)
 }
 
 const recoveryMsg = `

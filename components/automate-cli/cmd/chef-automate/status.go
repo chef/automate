@@ -54,87 +54,92 @@ var (
 )
 
 func runStatusCmd(cmd *cobra.Command, args []string) error {
-	writeStatus := func(res *api.StatusResponse) {
-		writer.Titlef(
-			"Status from deployment with channel [%s] and type [%s]",
-			res.DeploymentConfig.V1.Svc.Channel.GetValue(),
-			res.DeploymentConfig.V1.Svc.DeploymentType.GetValue(),
-		)
-		writer.Title(res.ServiceStatus.FormatStatus())
-		status.GlobalResult = statusResult{
-			Services: res.ServiceStatus.FormattedServices(),
-		}
-	}
-
-	getStatus := func() (*api.StatusResponse, error) {
-		connection, err := client.Connection(client.DefaultClientTimeout)
-		if err != nil {
-			return nil, err
-		}
-
-		res, err := connection.Status(context.Background(), &api.StatusRequest{})
-		if err != nil {
-			return nil, status.Wrap(
-				err,
-				status.DeploymentServiceCallError,
-				"Request to obtain Chef Automate status information failed",
+	if isA2HADeployment() {
+		return executeHAStatus(args)
+	} else {
+		writeStatus := func(res *api.StatusResponse) {
+			writer.Titlef(
+				"Status from deployment with channel [%s] and type [%s]",
+				res.DeploymentConfig.V1.Svc.Channel.GetValue(),
+				res.DeploymentConfig.V1.Svc.DeploymentType.GetValue(),
 			)
+			writer.Title(res.ServiceStatus.FormatStatus())
+			status.GlobalResult = statusResult{
+				Services: res.ServiceStatus.FormattedServices(),
+			}
 		}
 
-		return res, nil
-	}
+		getStatus := func() (*api.StatusResponse, error) {
+			connection, err := client.Connection(client.DefaultClientTimeout)
+			if err != nil {
+				return nil, err
+			}
 
-	handleBadStatus := func(res *api.StatusResponse, err error) error {
-		if err != nil {
-			return err
+			res, err := connection.Status(context.Background(), &api.StatusRequest{})
+			if err != nil {
+				return nil, status.Wrap(
+					err,
+					status.DeploymentServiceCallError,
+					"Request to obtain Chef Automate status information failed",
+				)
+			}
+
+			return res, nil
 		}
 
-		writeStatus(res)
+		handleBadStatus := func(res *api.StatusResponse, err error) error {
+			if err != nil {
+				return err
+			}
 
-		if len(res.ServiceStatus.Services) == 0 {
-			return statusErrUndeployed
-		}
-
-		return statusErrUnhealthy
-	}
-
-	startTime := time.Now()
-	res, err := getStatus()
-	if err == nil {
-		if res.ServiceStatus.AllHealthy() {
 			writeStatus(res)
-			return nil
+
+			if len(res.ServiceStatus.Services) == 0 {
+				return statusErrUndeployed
+			}
+
+			return statusErrUnhealthy
 		}
-	}
 
-	if !statusCmdFlags.waitForHealthy {
-		return handleBadStatus(res, err)
-	}
+		startTime := time.Now()
+		res, err := getStatus()
+		if err == nil {
+			if res.ServiceStatus.AllHealthy() {
+				writeStatus(res)
+				return nil
+			}
+		}
 
-	timeout := startTime.Add(time.Second * time.Duration(statusCmdFlags.waitTimeout))
-	refresh := time.NewTicker(time.Second * time.Duration(statusCmdFlags.waitRefreshInterval)).C
+		if !statusCmdFlags.waitForHealthy {
+			return handleBadStatus(res, err)
+		}
 
-	// Listen to the refresh channel and query for the status. If the timeout
-	// elapses before a healthy status has been returned then write the status
-	// if possible and return an error.
-	for {
-		select {
-		case <-refresh:
-			logrus.Debug("Refreshing status")
-			res, err := getStatus()
-			if err == nil {
-				if res.ServiceStatus.AllHealthy() {
-					writeStatus(res)
-					return nil
+		timeout := startTime.Add(time.Second * time.Duration(statusCmdFlags.waitTimeout))
+		refresh := time.NewTicker(time.Second * time.Duration(statusCmdFlags.waitRefreshInterval)).C
+
+		// Listen to the refresh channel and query for the status. If the timeout
+		// elapses before a healthy status has been returned then write the status
+		// if possible and return an error.
+		for {
+			select {
+			case <-refresh:
+				logrus.Debug("Refreshing status")
+				res, err := getStatus()
+				if err == nil {
+					if res.ServiceStatus.AllHealthy() {
+						writeStatus(res)
+						return nil
+					}
+				}
+
+				if time.Now().After(timeout) {
+					logrus.Debug("Timeout elapsed")
+					return handleBadStatus(res, err)
 				}
 			}
-
-			if time.Now().After(timeout) {
-				logrus.Debug("Timeout elapsed")
-				return handleBadStatus(res, err)
-			}
 		}
 	}
+
 }
 
 func init() {
