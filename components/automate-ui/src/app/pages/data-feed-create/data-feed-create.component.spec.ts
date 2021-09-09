@@ -220,6 +220,9 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['accessKey'].value).toBe(null);
       expect(component.createForm.controls['secretKey'].value).toBe(null);
     });
+  });
+
+  describe('create data feed form validation', () => {
 
     it('- url field validity', () => {
       component.integrationSelected = true;
