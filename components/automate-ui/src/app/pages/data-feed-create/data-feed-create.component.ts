@@ -63,7 +63,7 @@ export class DataFeedCreateComponent {
   public headerChecked = false;
   public notificationShow = false;
   public notificationMessage = '';
-  public notificationType = 'error'; 
+  public notificationType = 'error';
 
   public integrations = {
     webhook: [
@@ -285,7 +285,8 @@ export class DataFeedCreateComponent {
     switch (this.integTitle) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
+      case WebhookIntegrationTypes.ELK_KIBANA:
+      case WebhookIntegrationTypes.CUSTOM: {
         // handling access token and user pass auth
         // for servicenow, splunk and elk
         switch (this.authSelected) {
@@ -301,27 +302,6 @@ export class DataFeedCreateComponent {
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
               return true;
             }
-          }
-        }
-        break;
-      }
-      case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for webhooks
-        switch (this.authSelected) {
-          case AuthTypes.ACCESSTOKEN: {
-            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              return true;
-            }
-            break;
-          }
-          case AuthTypes.USERNAMEANDPASSWORD: {
-            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              return true;
-            }
-            break;
           }
         }
         break;

@@ -67,7 +67,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   // The direction nodes are sorted
   fieldDirection$: Observable<SortDirection>;
-    
+  
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -160,8 +160,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public addHeadersforCustomDataFeed(header: string): {} {
-      const customHeaders: string = header;
+  public addHeadersforCustomDataFeed(customHeaders: string): {} {
+    //  const customHeaders: string = header;
         const headersJson = {};
         const headersVal = customHeaders.split('\n');
         for (const values in headersVal) {
@@ -177,67 +177,44 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     switch (event.name) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
-        switch (event.auth) {
-          case AuthTypes.ACCESSTOKEN: {
-            const targetUrl: string = this.createDataFeedForm.controls['url'].value;
-            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
-            const token: string = this.createDataFeedForm.controls['token'].value;
-            const value = JSON.stringify({
-              Authorization: tokenType + ' ' + token
-            });
-            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-              value);
-            break;
-          }
-          case AuthTypes.USERNAMEANDPASSWORD: {
-            const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
-            const targetUsername: string = this.createDataFeedForm.controls['username'].value;
-            const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
-              targetUrl, targetUsername, targetPassword);
-          }
-        }
-        break;
-      }
+      case WebhookIntegrationTypes.ELK_KIBANA:
       case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for custom webhooks
         switch (event.auth) {
           case AuthTypes.ACCESSTOKEN: {
             const targetUrl: string = this.createDataFeedForm.controls['url'].value;
             const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
             const token: string = this.createDataFeedForm.controls['token'].value;
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
             const userToken = JSON.stringify({
               Authorization: tokenType + ' ' + token
-                  });
+            });
             let value;
-            if (this.createDataFeedForm.controls['headers'].value) {
-              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+            if (headerVal) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const headers = {...JSON.parse(userToken), ...headersJson};
               value = JSON.stringify(headers);
             } else {
               value = userToken;
             }
-            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,value);
+            testConnectionObservable = this.datafeedRequests.
+                testDestinationWithHeaders(targetUrl, value);
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
             const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
             const targetUsername: string = this.createDataFeedForm.controls['username'].value;
             const targetPassword: string = this.createDataFeedForm.controls['password'].value;
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
             let value;
-            if (targetUrl && targetUsername && targetPassword && 
-              this.createDataFeedForm.controls['headers'].value) {
-              var headersJson = this.addHeadersforCustomDataFeed(
-                this.createDataFeedForm.controls['headers'].value);
+            if (targetUrl && targetUsername && targetPassword && headerVal) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               value = JSON.stringify(headersJson);
               testConnectionObservable = this.datafeedRequests.
-              testDestinationWithUsernamePasswordWithHeaders(targetUrl,targetUsername, targetPassword, value);
-            } else if (targetUrl && targetUsername && targetPassword &&
-               !(this.createDataFeedForm.controls['headers'].value)) {
+              testDestinationWithUsernamePasswordWithHeaders(targetUrl, targetUsername,
+                targetPassword, value);
+            } else if (targetUrl && targetUsername && targetPassword && !(headerVal)) {
               testConnectionObservable = this.datafeedRequests.
-              testDestinationWithUsernamePassword(targetUrl,targetUsername, targetPassword);
+              testDestinationWithUsernamePassword(targetUrl, targetUsername, targetPassword);
             }
             break;
           }
@@ -291,59 +268,24 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     switch (event.name) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
+      case WebhookIntegrationTypes.ELK_KIBANA:
+      case WebhookIntegrationTypes.CUSTOM: {
+        destinationObj = {
+          name: this.createDataFeedForm.controls['name'].value.trim(),
+          url: this.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: IntegrationTypes.WEBHOOK,
+          services: event.name
+        };
         switch (event.auth) {
           case AuthTypes.ACCESSTOKEN: {
-            destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
             const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
             const token: string = this.createDataFeedForm.controls['token'].value.trim();
-            headers = JSON.stringify({
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
+            const userToken = JSON.stringify({
               Authorization: tokenType + ' ' + token
             });
-            storage = null;
-            break;
-          }
-          case AuthTypes.USERNAMEANDPASSWORD: {
-            destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
-            const username: string = this.createDataFeedForm.controls['username'].value.trim();
-            const password: string = this.createDataFeedForm.controls['password'].value.trim();
-            headers = JSON.stringify({
-              Authorization: 'Basic ' + btoa(username + ':' + password)
-            });
-            storage = null;
-            break;
-          }
-        }
-        break;
-      }
-      case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for custom webhooks
-        switch (event.auth) {
-          case AuthTypes.ACCESSTOKEN: {
-            destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
-            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
-            const token: string = this.createDataFeedForm.controls['token'].value.trim();
-            const userToken = JSON.stringify({
-            Authorization: tokenType + ' ' + token
-            });
-            if (this.createDataFeedForm.controls['headers'].value) {
-              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+            if (headerVal) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const value = {...JSON.parse(userToken), ...headersJson};
               headers = JSON.stringify(value);
             } else {
@@ -353,19 +295,14 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
-             destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
             const username: string = this.createDataFeedForm.controls['username'].value.trim();
             const password: string = this.createDataFeedForm.controls['password'].value.trim();
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
             const userToken = JSON.stringify({
               Authorization: 'Basic ' + btoa(username + ':' + password)
             });
-            if (this.createDataFeedForm.controls['headers'].value) {
-              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+            if (headerVal) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const value = {...JSON.parse(userToken), ...headersJson};
               headers = JSON.stringify(value);
             } else {

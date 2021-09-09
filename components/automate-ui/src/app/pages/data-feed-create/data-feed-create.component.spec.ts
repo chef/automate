@@ -88,6 +88,7 @@ describe('DataFeedCreateComponent', () => {
     const secretKey = 'test123';
     const userName = 'test123';
     const password = 'test123';
+    const header = '{“test”:”123”}';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -170,6 +171,7 @@ describe('DataFeedCreateComponent', () => {
       component.createForm.controls['url'].setValue(destination.url);
       component.createForm.controls['username'].setValue(userName);
       component.createForm.controls['password'].setValue(password);
+      component.createForm.controls['headers'].setValue(header);
       expect(component.validateForm()).toBeTruthy();
     });
 

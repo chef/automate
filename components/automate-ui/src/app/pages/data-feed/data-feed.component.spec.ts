@@ -407,7 +407,7 @@ describe('DataFeedComponent', () => {
       component.sortedDestinations$.subscribe(destinations => {
         expect(destinations).toContain(destination);
       });
-    });    
+    });
 
   });
 
