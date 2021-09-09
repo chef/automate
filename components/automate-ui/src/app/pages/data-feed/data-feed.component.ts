@@ -216,7 +216,22 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,value);
             break;
           }
-
+          case AuthTypes.USERNAMEANDPASSWORD: {
+            const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
+            const targetUsername: string = this.createDataFeedForm.controls['username'].value;
+            const targetPassword: string = this.createDataFeedForm.controls['password'].value;
+            let value;
+            if (targetUrl && targetUsername && targetPassword && this.createDataFeedForm.controls['headers'].value) {
+              var headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+              value = JSON.stringify(headersJson);
+              testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
+                targetUsername, targetPassword, value);
+            } else if (targetUrl && targetUsername && targetPassword && !(this.createDataFeedForm.controls['headers'].value)) {
+              testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
+                targetUsername, targetPassword);
+            }
+            break;
+          }
         }
         break;
       }

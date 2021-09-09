@@ -46,3 +46,8 @@ export const deleteStatus = createSelector(
   destinationState,
   (state) => state.deleteStatus
 );
+
+export const destinationEnableStatus = createSelector(
+  destinationState,
+  (state) => state.enableStatus
+);

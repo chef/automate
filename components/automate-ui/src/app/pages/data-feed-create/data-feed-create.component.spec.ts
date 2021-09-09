@@ -221,24 +221,6 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['secretKey'].value).toBe(null);
     });
 
-    it('slider resets name, url, username and password to empty string for custom', () => {
-      component.createForm.controls['name'].setValue('any');
-      component.createForm.controls['url'].setValue('any');
-      component.createForm.controls['tokenType'].setValue(tokenType);
-      component.createForm.controls['token'].setValue('any');
-      component.slidePanel();
-      component.name = jasmine.createSpyObj('name', ['nativeElement']);
-      component.name.nativeElement = { focus: () => { }};
-      component.selectIntegration('Custom');
-      expect(component.createForm.controls['name'].value).toBe(null);
-      expect(component.createForm.controls['url'].value).toBe(null);
-      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
-      expect(component.createForm.controls['token'].value).toBe(null);
-    });
-  });
-
-  describe('create data feed form validation', () => {
-
     it('- url field validity', () => {
       component.integrationSelected = true;
       component.name = jasmine.createSpyObj('name', ['nativeElement']);

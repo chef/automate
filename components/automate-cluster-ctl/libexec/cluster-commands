@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Usage: automate-cluster-ctl commands
+# Summary: List all automate-cluster-ctl commands
+# Help: This command is mostly used for autocompletion in various shells, and for `automate-cluster-ctl help`.
+# Also, this command helps find commands that are named the same as potentially builtin shell commands (which, cd, etc)
+
+set -e
+
+shopt -s nullglob
+
+{ for path in ${PATH//:/$'\n'}; do
+    for command in "${path}/cluster-"*; do
+      echo "${command##*cluster-}"
+    done
+  done
+} | sort | uniq

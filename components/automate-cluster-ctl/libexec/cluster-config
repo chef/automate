@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl config
+# Summary: Manage the Automate cluster config file
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster'
+require 'cluster/command'
+require 'cluster/config/generator'
+require 'tempfile'
+require 'fileutils'
+
+class AutomateClusterConfigInit < AutomateCluster::SubCommand
+  option ['-a', '--architecture'], 'ARCH', 'Architecture type to use when generating the config'
+
+  skip_config_file
+
+  def execute
+    config.architecture = architecture unless architecture.nil?
+
+    if AutomateCluster::Config.architecture.nil?
+      choices = AutomateCluster::Config::VALID_ARCHS.sort
+      arch = prompt.select("Select an architecture", choices)
+      AutomateCluster::Config.architecture = arch
+    end
+    AutomateCluster::Config.workspace_path = File.dirname(config_file)
+
+    generator = AutomateCluster::ConfigGenerator.new(config)
+    output = generator.render(architecture)
+
+    tmpfile = Tempfile.new(config_file)
+    tmpfile << output
+    tmpfile.close
+
+    backup_existing_config
+    FileUtils.mv(tmpfile.path, config_file)
+    logger.info "Config file updated '#{config_file}'"
+
+    # TODO: Add a list of secrets the user can set and prompt them here for it.
+  rescue AutomateCluster::Config::ConfigurationError => e
+    signal_usage_error e.message
+  ensure
+    unless tmpfile.nil?
+      tmpfile.close
+      tmpfile.unlink
+    end
+  end
+
+  def backup_existing_config
+    if File.exist?(config_file)
+      dirname = File.dirname(config_file)
+      filename = File.basename(config_file)
+      backup_file = File.join(dirname, 'backups', "#{filename}.#{Time.now.strftime('%Y%m%d%H%M%S')}")
+      logger.info "Found existing config, backed up to #{backup_file}"
+      FileUtils.mkdir_p(File.dirname(backup_file))
+      FileUtils.cp(config_file, backup_file)
+    end
+  end
+end
+
+class AutomateClusterConfig < AutomateCluster::Command
+  skip_config_file
+
+  subcommand "init", "initialize the default config", AutomateClusterConfigInit
+end
+
+AutomateClusterConfig.run
