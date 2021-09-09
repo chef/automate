@@ -6,53 +6,126 @@
         {{ destination?.name }}
       </chef-breadcrumbs>
       <chef-page-header>
-        <chef-heading>{{ destination?.name }}</chef-heading>
-        <table>
-          <thead>
-            <tr class="detail-row">
-              <th class="header-column">URL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="detail-row">
-              <td class="header-column" data-cy="destination-url">{{ destination?.url }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <chef-heading class="btn-alignleft">
+          {{ destination?.name }}
+          <div class="btn-alignright">
+            <chef-button
+              tertiary
+              [@fadeEnable]="state"
+              [disabled]="destination?.enable"
+              [ngClass]="enableBtn()"
+              class="btn-data-feed"
+              (click)="enableDestination(true)" 
+              data-cy="enable-btn">
+              Enable
+            </chef-button>
+            <chef-button
+              tertiary
+              [disabled]="!destination?.enable"
+              [@fadeDisable]="state"
+              [ngClass]="disableBtn()"
+              class="btn-data-feed"
+              (click)="enableDestination(false)"
+              data-cy="disable-btn">
+              Disable
+            </chef-button>
+            <chef-button 
+              tertiary
+              caution 
+              class="btn-data-feed" 
+              data-cy="delete-btn" 
+              (click)="openDeleteModal()">
+              Delete
+            </chef-button>
+          </div>
+        </chef-heading>
+        <div class="details-border" *ngIf="destination?.services && destination?.integration_types">
+          <table summary="show service and integration types">
+            <thead>
+              <tr class="detail-row">
+                <th class="header-column" id="service-header">SERVICE</th>
+                <th class="header-column" id="integration-types">INTEGRATION TYPE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="detail-row">
+                <td class="header-column">{{ destination?.services }}</td>
+                <td class="header-column">{{ destination?.integration_types }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <chef-tab-selector [value]="tabValue">
           <chef-option value='details'>Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <section class="page-body">
-        <form [formGroup]="updateForm">
-          <chef-form-field>
-            <label for="name">Name <span aria-hidden="true">*</span></label>
-            <input chefInput id="name" formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
-            <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
-              Name is required.
-            </chef-error>
-          </chef-form-field>
-          <chef-form-field>
-            <label for="url">Data Feed URL <span aria-hidden="true">*</span></label>
-            <input chefInput id="url" formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
-            <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
-              Data Feed URL is required.
-            </chef-error>
-          </chef-form-field>
-        </form>
-        <div>
-          <chef-button secondary [disabled]="testInProgress" (click)="sendTestForDataFeedUrl()">
+      <div [ngClass]="{'disable-main-body': !destination?.enable}">
+        <section class="page-body alignleft">
+          <form [formGroup]="updateForm">
+            <chef-form-field>
+              <label for="name">Name <span aria-hidden="true">*</span></label>
+              <input
+                chefInput
+                id="name"
+                formControlName="name"
+                type="text"
+                [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
+              <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
+                Name is required.
+              </chef-error>
+            </chef-form-field>
+            <chef-form-field>
+              <label for="url">Data Feed URL <span aria-hidden="true">*</span></label>
+              <input chefInput id="url" formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
+              <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
+                Data Feed URL is required.
+              </chef-error>
+            </chef-form-field>
+          </form>
+          <chef-button 
+            primary 
+            [disabled]="testInProgress || !destination?.enable" 
+            (click)="sendTestForDataFeedUrl()" 
+            class="alignright test-connection" 
+            data-cy="test-connection">
             <chef-loading-spinner *ngIf="testInProgress"></chef-loading-spinner>
             <span *ngIf="testInProgress">Testing...</span>
-            <span *ngIf="!testInProgress">Test Data Feed</span>
+            <span *ngIf="!testInProgress ">Test Data Feed</span>
           </chef-button>
-          <chef-button primary [disabled]="saveInProgress || !updateForm.valid || !updateForm.dirty" (click)="saveDataFeed()">
+          <br>
+          <hr>
+          <chef-button tertiary class="alignright" (click)="cancel()">
+            <span >Cancel</span>
+          </chef-button>
+          <chef-button primary 
+            [disabled]="disableOnsave()" 
+            (click)="saveDataFeed()" 
+            class="alignright save-connection" 
+            data-cy="save-connection">
             <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
             <span *ngIf="saveInProgress">Saving...</span>
             <span *ngIf="!saveInProgress">Save</span>
           </chef-button>
-        </div>
-      </section>
+        </section>
+        <section class="page-body alignright config-details">
+          <chef-card>
+            <app-data-feed-config-details>
+            </app-data-feed-config-details>
+          </chef-card>
+          <label class="config-details-note">
+            To change these settings you will have to do this in the global config file.
+          </label>
+        </section>
+      </div>
     </main>
   </div>
 </div>
+<app-delete-object-modal
+  [visible]="deleteModalVisible"
+  objectNoun="data feed"
+  [objectName]="destination?.name "
+  (close)="closeDeleteModal()"
+  (deleteClicked)="deleteDataFeed()"
+  objectAction="Delete">
+</app-delete-object-modal>
+

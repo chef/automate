@@ -192,12 +192,12 @@ export class DestinationEffects {
 
   testDestinationFailure$ = createEffect(() =>
     this.actions$.pipe(
-    ofType(DestinationActionTypes.SEND_TEST_FAILURE),
-    map(({ payload }: TestDestinationFailure) => {
-      return new CreateNotification({
-        type: Type.error,
-        message: `Unable to connect to data feed ${payload.name}.`
-      });
+      ofType(DestinationActionTypes.SEND_TEST_FAILURE),
+      map(({ payload }: TestDestinationFailure) => {
+        return new CreateNotification({
+          type: Type.error,
+          message: `Unable to connect to data feed ${payload.name}.`
+        });
     })));
 
   enableDisableDestination$ = createEffect(() =>

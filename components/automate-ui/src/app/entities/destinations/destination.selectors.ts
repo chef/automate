@@ -1,6 +1,9 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
-import { DestinationEntityState, destinationEntityAdapter } from './destination.reducer';
+import {
+  DestinationEntityState,
+  destinationEntityAdapter
+ } from './destination.reducer';
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
@@ -51,3 +54,9 @@ export const destinationEnableStatus = createSelector(
   destinationState,
   (state) => state.enableStatus
 );
+
+export const testConnectionStatus = createSelector(
+  destinationState,
+  (state) => state.testConnectionStatus
+);
+

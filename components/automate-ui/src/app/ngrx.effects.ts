@@ -18,6 +18,9 @@ import { DataBagItemsEffects } from './entities/data-bags/data-bag-details.effec
 import { DataBagItemDetailsEffects } from './entities/data-bags/data-bag-item-details.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
 import { DestinationEffects } from './entities/destinations/destination.effects';
+import {
+  DestinationGlobalConfigEffects
+} from './entities/global-config/destination-config.effects';
 import { EnvironmentEffects } from './entities/environments/environment.effects';
 import { EventFeedEffects } from './services/event-feed/event-feed.effects';
 import { InfraNodeEffects } from './entities/infra-nodes/infra-nodes.effects';
@@ -68,6 +71,7 @@ import { UserPreferencesEffects } from './services/user-preferences/user-prefere
       DataBagItemDetailsEffects,
       DesktopEffects,
       DestinationEffects,
+      DestinationGlobalConfigEffects,
       EnvironmentEffects,
       EventFeedEffects,
       InfraNodeEffects,
