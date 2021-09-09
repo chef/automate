@@ -12,10 +12,6 @@ main {
     padding: 54px 54px;
 
     .flex-child {
-      // display: flex;
-      // flex-direction: row;
-      // // column-gap: 66px;
-      // flex-wrap: wrap;
       display: grid;
       grid-template-columns: repeat(auto-fill, 186px);
       grid-column-gap: 66px;
