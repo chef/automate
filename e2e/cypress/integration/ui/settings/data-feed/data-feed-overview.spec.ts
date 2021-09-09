@@ -69,8 +69,9 @@ describe('chef datafeed', () => {
                   }).then((dataFeedResp) => {
                     expect(dataFeedResp.status).to.equal(200);
                     expect(dataFeedResp.body).to.property('id');
-
                     cy.visit(`/settings/data-feeds/${dataFeedResp.body.id}`);
+                    cy.get('app-welcome-modal').invoke('hide');
+                    cy.restoreStorage();
                   });
             });
         });
