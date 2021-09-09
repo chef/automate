@@ -19,7 +19,6 @@ swap:
   acquiesce: agree
   acquire: get|buy
   additional: more|extra
-  address: discuss
   addressees: you
   adjacent to: next to
   adjustment: change
@@ -118,3 +117,5 @@ swap:
   transmit: send
   utilization: use
   utilize: use
+exceptions:
+  email address

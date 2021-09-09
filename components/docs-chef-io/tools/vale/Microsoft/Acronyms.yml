@@ -16,9 +16,11 @@ exceptions:
   - CSS
   - CSV
   - DEBUG
+  - DNS
   - DOM
   - DPI
   - FAQ
+  - FQDN
   - GCC
   - GDB
   - GET
@@ -45,6 +47,7 @@ exceptions:
   - RAM
   - REPL
   - REST
+  - RHEL
   - RSA
   - SCM
   - SCSS
