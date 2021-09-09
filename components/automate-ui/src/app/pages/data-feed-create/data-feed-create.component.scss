@@ -1,6 +1,8 @@
 @import "~styles/variables";
 @import '../shared/slide-panel';
 
+.flex-child > * + * { margin-left: 8rem;}
+
 main {
   margin: 0 32px 32px 32px;
 
@@ -10,10 +12,14 @@ main {
     padding: 54px 54px;
 
     .flex-child {
-      display: flex;
-      flex-direction: row;
+      // display: flex;
+      // flex-direction: row;
+      // // column-gap: 66px;
+      // flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 186px);
+      grid-column-gap: 66px;
       column-gap: 66px;
-      flex-wrap: wrap;
 
       .card {
         display: flex;
