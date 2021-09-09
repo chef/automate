@@ -167,95 +167,72 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   public sendTestForDataFeed(event: {name: string, auth: string}): void {
     let testConnectionObservable: Observable<Object> = null;
-    if (event.name === WebhookIntegrationTypes.SERVICENOW ||
-      event.name === WebhookIntegrationTypes.SPLUNK ||
-      event.name === WebhookIntegrationTypes.ELK_KIBANA) {
-      // handling access token and user pass auth
-      // for servicenow, splunk and elk
-      if (event.auth === AuthTypes.ACCESSTOKEN) {
-        const targetUrl: string = this.createDataFeedForm.controls['url'].value;
-        const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
-        const token: string = this.createDataFeedForm.controls['token'].value;
-        const value = JSON.stringify({
-          Authorization: tokenType + ' ' + token
-        });
-        testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-          value);
-      } else if (event.auth === AuthTypes.USERNAMEANDPASSWORD) {
-        const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
-        const targetUsername: string = this.createDataFeedForm.controls['username'].value;
-        const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-        testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
-          targetUrl, targetUsername, targetPassword);
-      }
-    } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
-      if (event.auth === AuthTypes.ACCESSTOKEN) {
-        const targetUrl: string = this.createDataFeedForm.controls['url'].value;
-        const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
-        const token: string = this.createDataFeedForm.controls['token'].value;
-        const userToken = JSON.stringify({
-          Authorization: tokenType + ' ' + token
-              });
-        let value;
-        if (this.createDataFeedForm.controls['headers'].value) {
-          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
-          const headers = {...JSON.parse(userToken), ...headersJson};
-          value = JSON.stringify(headers);
-        } else {
-          value = userToken;
-        }
-        testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,value);
-        /*this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-          value).subscribe(
-            () => this.revealUrlStatus(UrlTestState.Success),
-            () => this.revealUrlStatus(UrlTestState.Failure)
-          );*/
-      } else if (event.auth === AuthTypes.USERNAMEANDPASSWORD) {
-        const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
-        const targetUsername: string = this.createDataFeedForm.controls['username'].value;
-        const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-        let value;
-        if (this.createDataFeedForm.controls['headers'].value) {
-          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
-          value = JSON.stringify(headersJson);
-          if (targetUrl && targetUsername && targetPassword && value) {
-            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
-              targetUsername, targetPassword, value);
-            /*this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
-              targetUsername, targetPassword, value).subscribe(
-                () => this.revealUrlStatus(UrlTestState.Success),
-                () => this.revealUrlStatus(UrlTestState.Failure)
-              );*/
+
+    switch (event.name) {
+      case WebhookIntegrationTypes.SERVICENOW:
+      case WebhookIntegrationTypes.SPLUNK:
+      case WebhookIntegrationTypes.ELK_KIBANA: {
+        switch (event.auth) {
+          case AuthTypes.ACCESSTOKEN: {
+            const targetUrl: string = this.createDataFeedForm.controls['url'].value;
+            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
+            const token: string = this.createDataFeedForm.controls['token'].value;
+            const value = JSON.stringify({
+              Authorization: tokenType + ' ' + token
+            });
+            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
+              value);
+            break;
           }
-        } else {
-        if (targetUrl && targetUsername && targetPassword) {
-          testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
-            targetUsername, targetPassword);
-          /*this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
-            targetUsername, targetPassword).subscribe(
-              () => this.revealUrlStatus(UrlTestState.Success),
-              () => this.revealUrlStatus(UrlTestState.Failure)
-            );*/
-        } else {
-          this.datafeedRequests.testDestinationWithNoCreds(targetUrl)
-            .subscribe(
-              () => this.revealUrlStatus(UrlTestState.Success),
-              () => this.revealUrlStatus(UrlTestState.Failure)
-            );
+          case AuthTypes.USERNAMEANDPASSWORD: {
+            const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
+            const targetUsername: string = this.createDataFeedForm.controls['username'].value;
+            const targetPassword: string = this.createDataFeedForm.controls['password'].value;
+            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
+              targetUrl, targetUsername, targetPassword);
+          }
         }
+        break;
       }
-      }
-    } else if (event.name === StorageIntegrationTypes.MINIO) {
-      const targetUrl: string = this.createDataFeedForm.controls['endpoint'].value;
-      const data = {
-        url: targetUrl,
-        aws: {
-          access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
-          secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
-          bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
+      case WebhookIntegrationTypes.CUSTOM: {
+        // handling access token and user pass auth
+        // with headers for custom webhooks
+        switch (event.auth) {
+          case AuthTypes.ACCESSTOKEN: {
+            const targetUrl: string = this.createDataFeedForm.controls['url'].value;
+            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
+            const token: string = this.createDataFeedForm.controls['token'].value;
+            const userToken = JSON.stringify({
+              Authorization: tokenType + ' ' + token
+                  });
+            let value;
+            if (this.createDataFeedForm.controls['headers'].value) {
+              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+              const headers = {...JSON.parse(userToken), ...headersJson};
+              value = JSON.stringify(headers);
+            } else {
+              value = userToken;
+            }
+            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,value);
+            break;
+          }
+
         }
-      };
-      testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        // handling minio
+        const targetUrl: string = this.createDataFeedForm.controls['endpoint'].value;
+        const data = {
+          url: targetUrl,
+          aws: {
+            access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
+            secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
+            bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
+          }
+        };
+        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+      }
     }
     if (testConnectionObservable != null) {
       testConnectionObservable.subscribe(
@@ -286,93 +263,99 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         storage: any;
 
     this.creatingDataFeed = true;
-    if (event.name === WebhookIntegrationTypes.SERVICENOW ||
-      event.name === WebhookIntegrationTypes.SPLUNK ||
-      event.name === WebhookIntegrationTypes.ELK_KIBANA) {
-      // handling access token and user pass auth
-      // for servicenow, splunk and elk
-      if (event.auth === AuthTypes.ACCESSTOKEN) {
-        destinationObj = {
-          name: this.createDataFeedForm.controls['name'].value.trim(),
-          url: this.createDataFeedForm.controls['url'].value.trim(),
-          integration_types: IntegrationTypes.WEBHOOK,
-          services: event.name
-        };
-        const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
-        const token: string = this.createDataFeedForm.controls['token'].value.trim();
-        headers = JSON.stringify({
-          Authorization: tokenType + ' ' + token
-        });
-        storage = null;
 
-      } else if (event.auth === 'Username and Password') {
-        destinationObj = {
-          name: this.createDataFeedForm.controls['name'].value.trim(),
-          url: this.createDataFeedForm.controls['url'].value.trim(),
-          integration_types: IntegrationTypes.WEBHOOK,
-          services: event.name
-        };
-        const username: string = this.createDataFeedForm.controls['username'].value.trim();
-        const password: string = this.createDataFeedForm.controls['password'].value.trim();
-        headers = JSON.stringify({
-          Authorization: 'Basic ' + btoa(username + ':' + password)
-        });
-        storage = null;
+    switch (event.name) {
+      case WebhookIntegrationTypes.SERVICENOW:
+      case WebhookIntegrationTypes.SPLUNK:
+      case WebhookIntegrationTypes.ELK_KIBANA: {
+        switch (event.auth) {
+          case AuthTypes.ACCESSTOKEN: {
+            destinationObj = {
+              name: this.createDataFeedForm.controls['name'].value.trim(),
+              url: this.createDataFeedForm.controls['url'].value.trim(),
+              integration_types: IntegrationTypes.WEBHOOK,
+              services: event.name
+            };
+            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
+            const token: string = this.createDataFeedForm.controls['token'].value.trim();
+            headers = JSON.stringify({
+              Authorization: tokenType + ' ' + token
+            });
+            storage = null;
+            break;
+          }
+          case AuthTypes.USERNAMEANDPASSWORD: {
+            destinationObj = {
+              name: this.createDataFeedForm.controls['name'].value.trim(),
+              url: this.createDataFeedForm.controls['url'].value.trim(),
+              integration_types: IntegrationTypes.WEBHOOK,
+              services: event.name
+            };
+            const username: string = this.createDataFeedForm.controls['username'].value.trim();
+            const password: string = this.createDataFeedForm.controls['password'].value.trim();
+            headers = JSON.stringify({
+              Authorization: 'Basic ' + btoa(username + ':' + password)
+            });
+            storage = null;
+          }
+        }
+        break;
       }
-    } else if (event.name === WebhookIntegrationTypes.CUSTOM) {
-      if (event.auth === AuthTypes.ACCESSTOKEN) {
-        const destinationObj = {
-          name: this.createDataFeedForm.controls['name'].value.trim(),
-          url: this.createDataFeedForm.controls['url'].value.trim(),
-          integration_types: 'Webhook',
-          services: event.name
-        };
-        const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
-        const token: string = this.createDataFeedForm.controls['token'].value.trim();
-        const userToken = JSON.stringify({
-          Authorization: tokenType + ' ' + token
-        });
-        if (this.createDataFeedForm.controls['headers'].value) {
-          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
-          const value = {...JSON.parse(userToken), ...headersJson};
-          headers = JSON.stringify(value);
-        } else {
-          headers = userToken;
+      case WebhookIntegrationTypes.CUSTOM: {
+        // handling access token and user pass auth
+        // with headers for custom webhooks
+        switch (event.auth) {
+          case AuthTypes.ACCESSTOKEN: {
+            destinationObj = {
+              name: this.createDataFeedForm.controls['name'].value.trim(),
+              url: this.createDataFeedForm.controls['url'].value.trim(),
+              integration_types: IntegrationTypes.WEBHOOK,
+              services: event.name
+            };
+            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
+            const token: string = this.createDataFeedForm.controls['token'].value.trim();
+            const userToken = JSON.stringify({
+            Authorization: tokenType + ' ' + token
+            });
+            if (this.createDataFeedForm.controls['headers'].value) {
+              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+              const value = {...JSON.parse(userToken), ...headersJson};
+              headers = JSON.stringify(value);
+            } else {
+              headers = userToken;
+            }
+            break;
+          }
+          case AuthTypes.USERNAMEANDPASSWORD: {
+             destinationObj = {
+              name: this.createDataFeedForm.controls['name'].value.trim(),
+              url: this.createDataFeedForm.controls['url'].value.trim(),
+              integration_types: IntegrationTypes.WEBHOOK,
+              services: event.name
+            };
+            const username: string = this.createDataFeedForm.controls['username'].value.trim();
+            const password: string = this.createDataFeedForm.controls['password'].value.trim();
+            const userToken = JSON.stringify({
+              Authorization: 'Basic ' + btoa(username + ':' + password)
+            });
+            if (this.createDataFeedForm.controls['headers'].value) {
+              const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+              const value = {...JSON.parse(userToken), ...headersJson};
+              headers = JSON.stringify(value);
+            } else {
+              headers = userToken;
+            }
+            break;
+          }
         }
-
-        this.store.dispatch(new CreateDestination(destinationObj, headers, null));
-
-      } else if (event.auth === 'Username and Password') {
-        const destinationObj = {
-          name: this.createDataFeedForm.controls['name'].value.trim(),
-          url: this.createDataFeedForm.controls['url'].value.trim(),
-          integration_types: 'Webhook',
-          services: event.name
-        };
-        const username: string = this.createDataFeedForm.controls['username'].value.trim();
-        const password: string = this.createDataFeedForm.controls['password'].value.trim();
-        const userToken = JSON.stringify({
-          Authorization: 'Basic ' + btoa(username + ':' + password)
-        });
-        if (this.createDataFeedForm.controls['headers'].value) {
-          const headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
-          const value = {...JSON.parse(userToken), ...headersJson};
-          headers = JSON.stringify(value);
-        } else {
-          headers = userToken;
-        }
-
-        this.store.dispatch(new CreateDestination(destinationObj, headers, null)); }
-    } else if (event.name === StorageIntegrationTypes.MINIO) {
-        // if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
-        //   this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
-        //   this.createForm.get('secretKey').valid) {
-        //   return true;
-        // }
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        // handling minio
         destinationObj = {
           name: this.createDataFeedForm.controls['name'].value.trim(),
           url: this.createDataFeedForm.controls['endpoint'].value.trim(),
-          integration_types: 'Storage',
+          integration_types: IntegrationTypes.STORAGE,
           services: event.name,
           meta_data: [
             {
@@ -385,27 +368,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
         storage = {accessKey, secretKey};
         headers = null;
-      // handling access token and user pass auth
-      // with headers for custom webhooks
-
-    } else if (event.name === StorageIntegrationTypes.MINIO) {
-      // handling minio
-      destinationObj = {
-        name: this.createDataFeedForm.controls['name'].value.trim(),
-        url: this.createDataFeedForm.controls['endpoint'].value.trim(),
-        integration_types: IntegrationTypes.STORAGE,
-        services: event.name,
-        meta_data: [
-          {
-            key: 'bucket',
-            value: this.createDataFeedForm.controls['bucketName'].value.trim()
-          }
-        ]
-      };
-      const accessKey: string = this.createDataFeedForm.controls['accessKey'].value.trim();
-      const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
-      storage = {accessKey, secretKey};
-      headers = null;
+      }
     }
     if (destinationObj && (headers || storage)) {
       this.store.dispatch(new CreateDestination(destinationObj, headers, storage));
