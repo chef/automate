@@ -40,7 +40,6 @@ func newGatherLogsCmd() *cobra.Command {
 		Short: "Gather system diagnostics and logs",
 		Long:  "Collect system diagnostics and logs from Chef Automate and other services",
 		RunE:  runGatherLogsCmd,
-		Args:  cobra.RangeArgs(0, 1),
 	}
 
 	gatherLogsCmd.Flags().BoolVarP(
