@@ -63,8 +63,7 @@ export class DataFeedCreateComponent {
   public headerChecked = false;
   public notificationShow = false;
   public notificationMessage = '';
-  public notificationType = 'error';
- 
+  public notificationType = 'error'; 
 
   public integrations = {
     webhook: [
@@ -228,7 +227,7 @@ export class DataFeedCreateComponent {
         break;
       }
       case WebhookIntegrationTypes.CUSTOM: {
-        this.showFieldWebhook();
+        this.showCustomField();
         this.authSelected = AuthTypes.ACCESSTOKEN;
         this.createForm.controls['tokenType'].setValue('Bearer');
         this.integrationSelected = true;
@@ -312,20 +311,21 @@ export class DataFeedCreateComponent {
         switch (this.authSelected) {
           case AuthTypes.ACCESSTOKEN: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-            this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-            return true;
+              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+              return true;
             }
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-            this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-            return true;
+              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+              return true;
             }
             break;
           }
-           }
-          }
+        }
+        break;
+      }
       case StorageIntegrationTypes.MINIO: {
         // handling minio
         if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&

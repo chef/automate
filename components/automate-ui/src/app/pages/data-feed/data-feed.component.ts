@@ -67,7 +67,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   // The direction nodes are sorted
   fieldDirection$: Observable<SortDirection>;
-  
+    
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -227,14 +227,17 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             const targetUsername: string = this.createDataFeedForm.controls['username'].value;
             const targetPassword: string = this.createDataFeedForm.controls['password'].value;
             let value;
-            if (targetUrl && targetUsername && targetPassword && this.createDataFeedForm.controls['headers'].value) {
-              var headersJson = this.addHeadersforCustomDataFeed(this.createDataFeedForm.controls['headers'].value);
+            if (targetUrl && targetUsername && targetPassword && 
+              this.createDataFeedForm.controls['headers'].value) {
+              var headersJson = this.addHeadersforCustomDataFeed(
+                this.createDataFeedForm.controls['headers'].value);
               value = JSON.stringify(headersJson);
-              testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePasswordWithHeaders(targetUrl,
-                targetUsername, targetPassword, value);
-            } else if (targetUrl && targetUsername && targetPassword && !(this.createDataFeedForm.controls['headers'].value)) {
-              testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(targetUrl,
-                targetUsername, targetPassword);
+              testConnectionObservable = this.datafeedRequests.
+              testDestinationWithUsernamePasswordWithHeaders(targetUrl,targetUsername, targetPassword, value);
+            } else if (targetUrl && targetUsername && targetPassword &&
+               !(this.createDataFeedForm.controls['headers'].value)) {
+              testConnectionObservable = this.datafeedRequests.
+              testDestinationWithUsernamePassword(targetUrl,targetUsername, targetPassword);
             }
             break;
           }
@@ -318,6 +321,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
               Authorization: 'Basic ' + btoa(username + ':' + password)
             });
             storage = null;
+            break;
           }
         }
         break;
@@ -345,6 +349,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             } else {
               headers = userToken;
             }
+            storage = null;
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
@@ -366,6 +371,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             } else {
               headers = userToken;
             }
+            storage = null;
             break;
           }
         }
