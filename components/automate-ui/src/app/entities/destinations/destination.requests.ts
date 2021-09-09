@@ -136,18 +136,7 @@ export class DestinationRequests {
 
   public testDestination(destination: Destination): Observable<Object> {
     if (destination.secret) {
-      if (destination.services === 'Minio') {
-        return this.testDestinationWithSecretIdMinio(
-          destination.url,
-          destination.secret,
-          destination.services,
-          destination.integration_types,
-          destination.enable,
-          destination.meta_data
-        );
-      } else {
-        return this.testDestinationWithSecretId(destination.url, destination.secret);
-      }
+      return this.testDestinationWithSecretId(destination);
     }
   }
   public testDestinationWithUsernamePassword(url: string,
@@ -183,36 +172,41 @@ export class DestinationRequests {
       { ...data });
   }
 
-  public testDestinationWithSecretId(url: string, secretId: string): Observable<Object> {
+  public testDestinationWithSecretId(destination: Destination): Observable<Object> {
+    const SecretIdParams = this.secretIdParams(destination);
     return this.http.post(encodeURI(
-      this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'secret_id': { 'id': secretId } });
-  }
+      this.joinToDataFeedUrl(['destinations', 'test'])), SecretIdParams);
+    }
 
-  public testDestinationWithSecretIdMinio(
-    url: string,
-    secretId: string,
-    services: string,
-    integration_types: string,
-    enable: boolean,
-    meta_data: any
-  ): Observable<Object> {
-    return this.http.post(encodeURI(
-      this.joinToDataFeedUrl(['destinations', 'test'])), {
-        url,
+  public secretIdParams(destination: Destination) {
+    if (destination.integration_types !== '') {
+      return {
+        'url': destination.url,
         'secret_id_with_addon': {
-          'id': secretId,
-          services,
-          integration_types,
-          enable,
-          meta_data
+          'id': destination.secret,
+          'services': destination.services,
+          'integration_types': destination.integration_types,
+          'meta_data': destination.meta_data
         }
-      }
-    );
+      };
+    } else {
+      return {
+        'url': destination.url,
+        'secret_id': {
+          'id': destination.secret
+        }
+      };
+    }
   }
 
   public testDestinationWithNoCreds(url: string): Observable<Object> {
     return this.http.post(encodeURI(
       this.joinToDataFeedUrl(['destinations', 'test'])), { url, 'none': {}});
+  }
+
+  public enableDestinations(destination: EnableDestination): Observable<DestinationResponse> {
+    return this.http.patch<DestinationResponse>(encodeURI(
+      this.joinToDataFeedUrl(['destination', 'enable', destination.id.toString()])), destination);
   }
 
   // Generate an notifier url from a list of words.
