@@ -27,7 +27,7 @@ func newTestCmd() *cobra.Command {
 
 func runTestCmd(cmd *cobra.Command, args []string) error {
 	if isA2HADeployment() {
-		writer.Printf("getting status \n")
+		writer.Printf("executing smoke test for automate HA \n")
 		args = append([]string{"test"}, args...)
 		c := exec.Command("automate-cluster-ctl", args...)
 		c.Dir = "/hab/a2_deploy_workspace"
