@@ -132,6 +132,6 @@ func (b *compatBootstrapper) getDSCmd(dsPkg habpkg.VersionedPackage, target targ
 	return b.dsCmd
 }
 
-func (b *compatBootstrapper) InstallAutomateBackendDeployment(ctx context.Context) error {
-	return b.target.InstallAutomateBackendDeployment(ctx)
+func (b *compatBootstrapper) InstallAutomateBackendDeployment(ctx context.Context, m manifest.ReleaseManifest) error {
+	return b.target.InstallAutomateBackendDeployment(ctx, m)
 }
