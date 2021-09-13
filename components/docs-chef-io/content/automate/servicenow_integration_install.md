@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef Automate Incident Creation"
-    parent = "automate/reference"
-    identifier = "automate/reference/servicenow_integration_install.md ServiceNow Integration"
-    weight = 40
+    parent = "automate/integrations/servicenow"
+    identifier = "automate/integrations/servicenow/servicenow_integration_install.md ServiceNow Integration"
+    weight = 20
 +++
 
 This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Infra Client runs and Compliance scans.

@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Chef Automate Integration App"
-    parent = "automate/reference"
-    identifier = "automate/reference/servicenow_integration.md ServiceNow Integration"
-    weight = 50
+    parent = "automate/integrations/servicenow"
+    identifier = "automate/integrations/servicenow/servicenow_integration.md ServiceNow Integration"
+    weight = 10
 +++
 
 [ServiceNow](https://www.servicenow.com/) provides cloud-based services that automate enterprise IT operations. ServiceNow specializes in IT service management (ITSM) applications and provides forms-based workflow application development. It supports third-party application and data integrations. The most common integrations are for configuration management, incident management, problem management, change management, user administration, and single sign-on authentication.
