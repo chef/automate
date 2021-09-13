@@ -13,6 +13,8 @@ gh_repo = "automate"
     weight = 20
 +++
 
+## Overview
+
 The Chef Automate **Profile** help you set your personal information about the entities. You can set the _Display Name_, _Time Format_ and reset your _Password_.
 
 {{< figure src="/images/automate/chef-automate-profile.png" alt="Profile Section in Chef Automate">}}
