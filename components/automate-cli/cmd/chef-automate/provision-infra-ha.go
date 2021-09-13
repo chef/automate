@@ -37,12 +37,12 @@ func runTestCmd(cmd *cobra.Command, args []string) error {
 		err := c.Run()
 		if err != nil {
 			writer.Printf(stderr.String())
-			return status.Wrap(err, status.CommandExecutionError, "")
+			return status.Wrap(err, status.CommandExecutionError, provisionInfraHelpDocs)
 		}
 		writer.Print(out.String())
 		return err
 	} else {
-		return status.Wrap(errors.New("provision-infra only works for HA mode of automate"), status.ConfigError, "")
+		return status.Wrap(errors.New("provision-infra only works for HA mode of automate"), status.ConfigError, provisionInfraHelpDocs)
 	}
 
 }
