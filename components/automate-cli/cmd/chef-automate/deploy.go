@@ -203,9 +203,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.DeployError)
 		}
-		//TODO full fetch implementation of deploy command with a2ha command's mapping
-		//
-		//
 		err = deployA2HA()
 		return err
 	} else {

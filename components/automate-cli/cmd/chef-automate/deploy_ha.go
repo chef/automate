@@ -3,8 +3,6 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -29,17 +27,8 @@ func isA2HADeployment(configPath []string) bool {
 		} else {
 			return false
 		}
-	} else if checkIfFileExist(FlagPath) {
-		flag, err := checkDeploymentModeFromFlag()
-		fmt.Println(flag)
-		if err != nil {
-			writer.Println(err.Error())
-			return false
-		} else if flag.DeploymentMode == AutomateHAMode {
-			return true
-		} else {
-			return false
-		}
+	} else if checkIfFileExist(initConfigHabA2HAPathFlag.a2haDirPath + "a2ha.rb") {
+		return true
 	} else {
 		return false
 	}
@@ -58,23 +47,6 @@ func deployA2HA() error {
 	writer.Print(b.String())
 	writer.Printf("A2HA deployment done. %d, exiting\n", cmd.Process.Pid)
 	return err
-}
-
-func checkDeploymentModeFromFlag() (DeploymentModeFlag, error) {
-	deploymentModeFlag := DeploymentModeFlag{}
-	templateBytes, err := ioutil.ReadFile(FlagPath)
-	writer.Println(string(templateBytes))
-	if err != nil {
-		return deploymentModeFlag, status.Wrap(err, status.FileAccessError, "error in reading config toml file")
-	}
-	err = ptoml.Unmarshal(templateBytes, &deploymentModeFlag)
-	fmt.Println(deploymentModeFlag)
-	if err != nil {
-		fmt.Println(err)
-		return deploymentModeFlag, status.Wrap(err, status.ConfigError, "error in unmarshalling config toml file")
-	} else {
-		return deploymentModeFlag, nil
-	}
 }
 
 func checkIfFileExist(path string) bool {

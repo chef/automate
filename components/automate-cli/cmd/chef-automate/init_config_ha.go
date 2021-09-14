@@ -4,8 +4,6 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
@@ -195,7 +193,6 @@ var initConfigHACmd = &cobra.Command{
 }
 
 func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
-	enableDeploymentModeFlag()
 	if len(args) == 0 {
 		msg := "one argument expected, please refer help doc."
 		writer.Printf("%s\n\n%s\n", msg, UsageTemplate)
@@ -209,30 +206,5 @@ func runInitConfigHACmd(cmd *cobra.Command, args []string) error {
 	} else {
 		msg := "Incorrect argument, please refer help doc."
 		return status.Wrap(errors.New(msg), status.ConfigError, UsageTemplate)
-	}
-}
-
-func enableDeploymentModeFlag() {
-	const flag = `deploymentMode = "automate-ha"`
-	writer.Printf("generating deployment mode flag file \n")
-
-	if _, err := os.Stat(FlagPath); os.IsNotExist(err) {
-		err := os.MkdirAll(DeploymentModeFlagParentDir+DeploymentModeFlagDirName, 0700) // Create your file
-		if err != nil {
-			writer.Println("error in creating directory for deployment mode flag. " + err.Error())
-		}
-		err = ioutil.WriteFile(FlagPath, []byte(flag), 0600)
-		if err != nil {
-			writer.Println("error in writing to file for deployment mode flag. " + err.Error())
-		}
-	}
-
-}
-
-func disableDeploymentModeFlag() {
-	if _, err := os.Stat(FlagPath); os.IsNotExist(err) {
-		writer.Printf("ha flag file no exist")
-	} else {
-		os.Remove(FlagPath)
 	}
 }
