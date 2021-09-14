@@ -47,6 +47,7 @@ export class CreateChefServerModalComponent implements OnInit {
   createChefServer(): void {
     this.toggleSlide();
     this.createClicked.emit();
+    this.modifyID = false;
   }
 
   closeSeverSlider() {

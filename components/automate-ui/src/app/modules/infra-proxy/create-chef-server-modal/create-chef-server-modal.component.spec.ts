@@ -23,10 +23,6 @@ describe('CreateChefServerModalComponent', () => {
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal',
-          inputs: ['visible'],
-          outputs: ['close']
-        }),
         CreateChefServerModalComponent
       ],
       imports: [
