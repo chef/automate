@@ -379,7 +379,7 @@ export class TelemetryService {
     });
     const unfilteredStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
-      event: 'client runs global',
+      event: 'complianceCountsGlobal',
       properties: unfilteredStats
     }, true).subscribe(() => {
       if (unfilteredStatsSubscription) {
