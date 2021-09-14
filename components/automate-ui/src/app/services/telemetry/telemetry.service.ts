@@ -273,7 +273,8 @@ export class TelemetryService {
     }`;
 
     if (useReturn) {
-      return this.httpClient.post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } });
+      return this.httpClient
+        .post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } });
     }
 
     this.httpClient.post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } })
@@ -337,15 +338,16 @@ export class TelemetryService {
   async initiateTelemetry(trackingOperations) {
     try {
       await this.fetchBuildVersion();
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
     try {
-      let unfilteredStats: UnfilteredStats = await this.complianceStatsService.getComplianceStats();
+      const unfilteredStats: UnfilteredStats = await this.complianceStatsService
+        .getComplianceStats();
       if (unfilteredStats) {
         await this.sendUnfilteredStatsToTelemetry(unfilteredStats);
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
     if (this.chefSessionService.telemetry_enabled) {
@@ -359,7 +361,7 @@ export class TelemetryService {
     const promise = new Promise((resolve) => {
       resolver = resolve;
     });
-    let metadataSubscription = this.metadataService.getBuildVersion()
+    const metadataSubscription = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
         this.buildVersion = buildVersion;
         if (metadataSubscription) {
@@ -375,10 +377,10 @@ export class TelemetryService {
     const promise = new Promise((resolve) => {
       resolver = resolve;
     });
-    let unfilteredStatsSubscription = this.emitToPipeline('track', {
+    const unfilteredStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'client runs global',
-      properties: unfilteredStats,
+      properties: unfilteredStats
     }, true).subscribe(() => {
       if (unfilteredStatsSubscription) {
         unfilteredStatsSubscription.unsubscribe();

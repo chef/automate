@@ -18,7 +18,6 @@ export class ComplianceStatsService {
       resolver = resolve;
     });
     this.complianceStatsSubscription = this.fetchUnfilteredStats().subscribe((data) => {
-        console.log(data);
         if (this.complianceStatsSubscription) {
             this.complianceStatsSubscription.unsubscribe();
         }
@@ -29,7 +28,7 @@ export class ComplianceStatsService {
 
   fetchUnfilteredStats(): Observable<UnfilteredStats> {
     const url = '/api/v0/compliance/reporting/stats/summary';
-    return this.httpClient.post(url, { include_unfiltered:true }).pipe(
+    return this.httpClient.post(url, {include_unfiltered: true}).pipe(
       map((res) => {
           if (res && res['report_summary'] && res['report_summary'].unfiltered_stats) {
             return res['report_summary'].unfiltered_stats;
