@@ -1,16 +1,15 @@
 +++
 title = "Profile"
 
-weight = 20
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Profile"
-    parent = "automate"
-    identifier = "automate/chef_automate_profile.md Profile"
-    weight = 20
+    parent = "automate/settings"
+    identifier = "automate/settings/chef_automate_profile.md Profile"
+    weight = 120
 +++
 
 ## Overview
