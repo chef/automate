@@ -251,7 +251,7 @@ export class TelemetryService {
     );
   }
 
-  private emitToPipeline(operation: String, payload: Object, useReturn?) {
+  private emitToPipeline(operation: String, payload: Object, isReturnHttp?) {
     const headers = new HttpHeaders({
       'Content-Type' :  'application/json'
     });
@@ -272,7 +272,7 @@ export class TelemetryService {
       "payload": ${JSON.stringify(payload)}
     }`;
 
-    if (useReturn) {
+    if (isReturnHttp) {
       return this.httpClient
         .post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } });
     }
