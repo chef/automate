@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT infra_server_username_server_id_key
   UNIQUE(infra_server_username,server_id)
 );
-CREATE INDEX IF NOT EXISTS users_automate_user_id_index ON users (automate_user_id)
+CREATE INDEX IF NOT EXISTS users_automate_user_id_index ON users (automate_user_id);
