@@ -225,6 +225,7 @@ export class DataFeedCreateComponent {
         this.showFields.useHeaders = true;
         this.authSelected = AuthTypes.ACCESSTOKEN;
         this.createForm.controls['tokenType'].setValue('');
+        this.integrationSelected = true;
         break;
       }
       case WebhookIntegrationTypes.ELK_KIBANA: {
