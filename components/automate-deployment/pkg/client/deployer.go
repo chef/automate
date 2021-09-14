@@ -278,12 +278,13 @@ func Deploy(writer cli.FormatWriter,
 func DeployHA(writer cli.FormatWriter,
 	manifestProvider manifest.ReleaseManifestProvider) error {
 	ctx := context.Background()
-	m, err := manifestProvider.GetCurrentManifest(ctx, "current")
+	devM, err := manifestProvider.GetCurrentManifest(ctx, "dev")
+	currentM, err := manifestProvider.GetCurrentManifest(ctx, "current")
 	if err != nil {
 		logrus.Debug("Failed")
 	}
 	b := bootstrap.NewCompatBootstrapper(target.NewLocalTarget(false))
-	err = bootstrap.FullBootstrapHA(context.Background(), b, m, writer)
+	err = bootstrap.FullBootstrapHA(context.Background(), b, devM, currentM, writer)
 	return err
 }
 

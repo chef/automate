@@ -10,17 +10,18 @@ import (
 
 func FullBootstrapHA(ctx context.Context,
 	b target.Bootstrapper,
-	m manifest.ReleaseManifest,
+	devM manifest.ReleaseManifest,
+	currentM manifest.ReleaseManifest,
 	writer cli.FormatWriter) error {
 
 	writer.Body("Installing Habitat")
-	err := b.InstallHabitat(ctx, m, writer)
+	err := b.InstallHabitat(ctx, currentM, writer)
 	if err != nil {
 		return err
 	}
 
 	writer.Body("Installing the Chef Automate backend deployment")
-	err = b.InstallAutomateBackendDeployment(ctx, m)
+	err = b.InstallAutomateBackendDeployment(ctx, devM)
 	if err != nil {
 		writer.Printf("Some error occurred %s\n", err.Error())
 		return err

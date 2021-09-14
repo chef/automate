@@ -86,7 +86,7 @@ section {
     font-size: 12px;
   }
 
-  chef-form-field {
+  .chef-form-field {
     width: 310px;
   }
 
@@ -116,4 +116,30 @@ section {
   chef-select {
     width: 100%;
   }
+}
+
+.telemetry-checkbox-field {
+  margin-top: 25px;
+  width: 500px;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed;
+  z-index: 9999;
+
+  .mat-option.mat-selected:not(.mat-option-multiple):not(.mat-option-disabled) {
+    background: $chef-primary-bright;
+    color: $chef-white;
+  }
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar {
+  width: 4.5px;
+  background: $chef-form-input;
+  border-radius: 5px;
+}
+
+::ng-deep .cdk-overlay-container .cdk-overlay-pane .mat-select-panel-wrap .mat-select-panel::-webkit-scrollbar-thumb {
+  background: $chef-cyan-blue;
+  border-radius: 5px;
 }

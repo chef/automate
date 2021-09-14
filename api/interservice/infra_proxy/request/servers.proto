@@ -36,3 +36,10 @@ message GetServer {
     // Chef Infra Server ID.
     string id = 1;
 }
+
+message GetServerStatus {
+    // Chef Infra Server FQDN
+    string fqdn = 1;
+    // Chef Infra Server IP Address.
+    string ip_address = 2;
+}

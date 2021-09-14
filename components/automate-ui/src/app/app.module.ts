@@ -36,6 +36,7 @@ import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
 import { RoleModule } from './modules/roles/roles.module';
 import { LicenseModule } from 'app/modules/license/license.module';
+import { TelemetryCheckboxModule } from 'app/page-components/telemetry-checkbox/telemetry-checkbox.module';
 import { UserModule } from 'app/modules/user/user.module';
 import { TeamModule } from 'app/modules/team/team.module';
 import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
@@ -80,6 +81,7 @@ import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { DestinationRequests } from './entities/destinations/destination.requests';
+import { DataFeedGlobalConfigRequests } from './entities/global-config/destination-config.requests';
 import { EnvironmentRequests } from './entities/environments/environment.requests';
 import { InfraNodeRequests } from './entities/infra-nodes/infra-nodes.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
@@ -198,9 +200,6 @@ import { SigninComponent } from './pages/signin/signin.component';
 import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
-import {
-  TelemetryCheckboxComponent
-} from './page-components/telemetry-checkbox/telemetry-checkbox.component';
 import { TopNavLandingComponent } from './pages/top-nav-landing/top-nav-landing.component';
 import { UIComponent } from 'app/ui.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
@@ -209,6 +208,10 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
 import { WarningBannerComponent } from './page-components/warning-banner/warning-banner.component';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
 import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-create.component';
+import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details/data-feed-config-details.component';
+import {
+  DataFeedTableComponent
+} from './page-components/data-feed-table/data-feed-table.component';
 
 @NgModule({
   declarations: [
@@ -265,11 +268,12 @@ import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-crea
     ServicesSidebarComponent,
     SettingsLandingComponent,
     SigninComponent,
-    TelemetryCheckboxComponent,
     TopNavLandingComponent,
     UIComponent,
     WelcomeModalComponent,
-    WarningBannerComponent
+    WarningBannerComponent,
+    DataFeedConfigDetailsComponent,
+    DataFeedTableComponent
   ],
   imports: [
     ApiTokenModule,
@@ -289,6 +293,7 @@ import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-crea
     PolicyModule,
     ProjectModule,
     LicenseModule,
+    TelemetryCheckboxModule,
     UserModule,
     TeamModule,
     ReactiveFormsModule,
@@ -328,6 +333,7 @@ import { DataFeedCreateComponent } from './pages/data-feed-create/data-feed-crea
     DataBagsRequests,
     DesktopRequests,
     DestinationRequests,
+    DataFeedGlobalConfigRequests,
     EnvironmentRequests,
     EventFeedService,
     FeatureFlagsService,

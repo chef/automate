@@ -1,0 +1,4 @@
+When cfg.paranoid.enabled is true, this service removes the metricbeat.yml file to prevent
+exposing authentication credentials.
+
+cfg.paranoid.enabled: {{cfg.paranoid.enabled}}

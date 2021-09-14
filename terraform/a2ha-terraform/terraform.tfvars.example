@@ -1,0 +1,49 @@
+# AWS
+################################################################################
+aws_profile = "default"
+aws_region = "us-east-1"
+aws_ssh_key_file = "~/.ssh/keyname"
+aws_ssh_key_pair_name = "keypairname"
+automate_lb_certificate_arn = "arn:aws:acm:..."
+chef_server_lb_certificate_arn = "arn:aws:acm:..."
+
+# vSphere
+################################################################################
+vsphere_ssh_user = "vagrant"
+vsphere_ssh_key_file = "~/.ssh/vagrant"
+vsphere_server = "vcenter.example.com"
+vsphere_user = "youruser"
+vsphere_password = "yourpassword"
+vsphere_datacenter = "Tierpoint"
+vsphere_datastore = "vsanDatastore"
+vsphere_resource_pool = "a2-ha-backend"
+vsphere_network = "VM Network"
+vsphere_linux_template = "centos76-template"
+
+# Existing nodes
+################################################################################
+existing_ssh_user = "vagrant"
+existing_ssh_user_sudo_password = "SuperSecurePassword42"
+existing_ssh_key_file = "~/.ssh/vagrant"
+existing_automate_ips = [ "192.168.0.10", ]
+existing_chef_server_ips = [ "192.168.0.20", "192.168.0.21", ]
+existing_elasticsearch_ips = [ "192.168.0.30", "192.168.0.31", "192.168.0.32", ]
+existing_postgresql_ips = [ "192.168.0.40", "192.168.0.41", "192.168.0.42", ]
+existing_automate_private_ips = [ "192.168.0.50", ]
+existing_chef_server_private_ips = [ "192.168.0.60", "192.168.0.61", ]
+existing_elasticsearch_private_ips = [ "192.168.0.70", "192.168.0.71", "192.168.0.72", ]
+existing_postgresql_private_ips = [ "192.168.0.80", "192.168.0.81", "192.168.0.82", ]
+
+# Common
+################################################################################
+automate_admin_password = "CHANGE ME"
+#automate_fqdn = "" # leave commented out for AWS, othewise must be assigned
+automate_instance_count = 1
+chef_server_instance_count = 1
+elasticsearch_instance_count = 3
+nfs_mount_path = "/mnt/automate_backups"
+postgresql_instance_count = 3
+postgresql_archive_disk_fs_path = "/mnt/automate_backups/postgresql"
+tag_contact = "youremail@example.com"
+tag_dept = "YourDept"
+tag_project = "YourProject"

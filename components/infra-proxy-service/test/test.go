@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/url"
 	"os"
 	"testing"
@@ -27,6 +28,24 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 )
+
+type MockStatusChecker struct{}
+
+func (s MockStatusChecker) GetInfraServerStatus(_ string) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: 200,
+	}, nil
+}
+
+type MockStatusFailedChecker struct{}
+
+func (s MockStatusFailedChecker) GetInfraServerStatus(_ string) (*http.Response, error) {
+	return nil, errors.New("Not able to connect to the server")
+}
+
+func SetMockStatusChecker(mockInfraServer *server.Server, checker server.StatusChecker) {
+	mockInfraServer.SetAuthenticator(checker)
+}
 
 // migrationConfigIfPGTestsToBeRun either returns the pg migration config
 // if PG_URL is set or we are in CI system, otherwise it returns nil, indicating
@@ -108,6 +127,7 @@ func SetupInfraProxyService(ctx context.Context,
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 	newServer := server.NewServer(serviceRef)
+	newServer.SetAuthenticator(MockStatusChecker{})
 	infra_proxy.RegisterInfraProxyServiceServer(grpcServ, newServer)
 	health.RegisterHealthServer(grpcServ, health.NewService())
 

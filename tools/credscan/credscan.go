@@ -96,11 +96,18 @@ var a2Config = config{
 		{regex: `dev/config.toml`},
 		{regex: `lib/grpc/secureconn/testdata/.*\.key`},
 
+		// Backend-elasticsidecar certificates folder, which has only placeholders. Actual files are coming from elasticsearch binds
+		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.pem`},
+		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.key`},
+
+
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
                 
 		// A2HA Component sample keys and certificates
 		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
+		{regex: `test/lib/certificate_store.rb`},
+		{regex: `test/lib/credentials.rb`},
 		// Test data from workflow
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/expired.key`},
 		{regex: `components/automate-workflow-server/apps/delivery/test/unit/data/certificates/untrusted.key`},
@@ -114,6 +121,8 @@ var a2Config = config{
 		{regex: `components/automate-dex/habitat/config/ldap-ca.pem`},
 		{regex: `components/automate-dex/habitat/config/saml-ca.pem`},
 		{regex: `components/automate-postgresql/habitat/config/server.key`},
+		{regex: `components/automate-backend-kibana/habitat/config/certificates/*`},
+		{regex: `components/automate-backend-postgresql/habitat/config/server.key`},
 
 		// It's an example in the readme of a crypto lib
 		{regex: `vendor/github.com/nats-io/nkeys/README.md`},

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+exec 2>&1
+
+while [ 1 ]
+do
+  PYTHONWARNINGS=ignore curator --config {{pkg.svc_path}}/config/curator.yml {{pkg.svc_path}}/config/actions.yml &
+  sleep 3600
+done

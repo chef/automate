@@ -11,54 +11,34 @@
         <chef-heading data-cy="infra-node-head">{{InfraNode?.name}}</chef-heading>
         <div class="meta-box" *ngIf="!nodeDetailsLoading">
           <div class="summary-body">
-            <table>
-              <tr>
-                <th>
-                  <p class="meta-head">NODE INFORMATION</p>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  Environment
-                </th>
-                <td data-cy="node-env">{{InfraNode?.environment}}</td>
-              </tr>
-              <tr>
-                <th>
-                  Policy Group
-                </th>
-                <td>{{InfraNode?.policy_group === '' ? '--' : InfraNode?.policy_group}}</td>
-              </tr>
-              <tr>
-                <th>
-                  Policy Name
-                </th>
-                <td>{{InfraNode?.policy_name === '' ? '--' : InfraNode?.policy_name}}</td>
-              </tr>
-            </table>
-            <table>
-              <tr>
-                <th>
-                  <p class="meta-head">METADATA</p>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  Chef Server
-                </th>
-                <td data-cy="node-server">
-                  {{serverId}}
-                </td>
-              </tr>
-              <tr>
-                <th>
-                  Chef Organization
-                </th>
-                <td data-cy="node-org">
-                  {{orgId}}
-                </td>
-              </tr>
-            </table>
+            <h3 class="meta-head">Node Information</h3>
+            <ul>
+              <li>
+                <span class="heading">Environment</span>
+                <span data-cy="node-env">{{InfraNode?.environment}}</span>
+              </li>
+              <li>
+                <span class="heading">Policy Group</span>
+                <span>{{InfraNode?.policy_group === '' ? '--' : InfraNode?.policy_group}}</span>
+              </li>
+              <li>
+                <span class="heading">Policy Name</span>
+                <span>{{InfraNode?.policy_name === '' ? '--' : InfraNode?.policy_name}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="summary-body">
+            <h3 class="meta-head">Metadata</h3>
+            <ul>
+              <li>
+                <span class="heading">Chef Infra Server</span>
+                <span data-cy="node-server">{{serverId}}</span>
+              </li>
+              <li>
+                <span class="heading">Chef Infra Organization</span>
+                <span data-cy="node-org">{{orgId}}</span>
+              </li>
+            </ul>
           </div>
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">

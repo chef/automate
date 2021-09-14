@@ -22,7 +22,7 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="userDetails.displayNameForm">
           <!-- displayname is shown for saml & ldap users in future -->
-          <chef-form-field *ngIf="userType === 'local'">
+          <chef-form-field class="chef-form-field" *ngIf="userType === 'local'">
             <label for="displayName">Display Name <span aria-hidden="true">*</span></label>
             <input id="displayName" chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input" [readonly]="!isDisplayNameEditable">
@@ -31,26 +31,27 @@
               Display Name is required.
             </chef-error>
           </chef-form-field>
-          <chef-form-field class="timezone-field">
+          <chef-form-field class="timezone-field chef-form-field">
             <label for="timeformat">Time Format</label>
-            <chef-select 
+            <mat-select 
               #timeformat 
-              [value]="(userPrefsService.timeformat$ | async)?.value" 
-              (change)="handleTimeFormatChange()" 
+              panelClass="chef-dropdown"
+              [value]="userDetailsFormControl.timeformat" 
+              (selectionChange)="handleTimeFormatChange($event)" 
               data-cy="timeformat-dropdown">
-                <chef-option value="ddd, DD MMM">ddd, DD MMM</chef-option>
-                <chef-option value="ddd, DD MMM YYYY">ddd, DD MMM YYYY</chef-option>
-                <chef-option value="DD MMM YYYY">DD MMM YYYY</chef-option>
-                <chef-option value="ddd, DD MMM YYYY HH:mm:ss [UTC]">ddd, DD MMM YYYY HH:mm:ss [UTC]</chef-option>
-                <chef-option value="YYYY-M-D">YYYY-M-D</chef-option>
-                <chef-option value="YYYY-MM-DD">YYYY-MM-DD</chef-option>
-            </chef-select>
+                <mat-option *ngFor="let timeformatValue of userDetailsFormControl.timeformatValues" [value]="timeformatValue">
+                  {{ timeformatValue }}
+                </mat-option>
+            </mat-select>
+          </chef-form-field>
+          <chef-form-field class="telemetry-checkbox-field">
+            <app-telemetry-checkbox></app-telemetry-checkbox>
           </chef-form-field>
         </form>
         <chef-button 
-          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !timeformatControl.isTimeformatDirty" 
+          [disabled]="((userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty) && !userDetailsFormControl.isTimeformatDirty && !userDetailsFormControl.isTelemetryCheckboxDirty" 
           primary inline 
-          (click)="userDetails.saveUserPreference(timeformat, timeformatControl)" 
+          (click)="userDetails.saveUserPreference(timeformat, userDetailsFormControl)" 
           data-cy="user-details-submit-button">
             <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
             <span *ngIf="userDetails.saveInProgress">Saving...</span>
@@ -60,7 +61,7 @@
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="userDetails.passwordForm">
-          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password">
+          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password chef-form-field">
             <label>
               <span class="label">Previous Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="previousPassword" type="password"/>
@@ -74,7 +75,7 @@
               Previous Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
-          <chef-form-field class="password">
+          <chef-form-field class="password chef-form-field">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput()" />
@@ -92,7 +93,7 @@
             Must be a minimum of 8 total characters with at least 3 distinct characters. <br/>
             May include both upper and lower case letters, punctuation marks, and symbols.
           </p>
-          <chef-form-field class="password">
+          <chef-form-field class="password chef-form-field">
             <label>
               <span class="label">Confirm New Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="confirmPassword" type="password"/>

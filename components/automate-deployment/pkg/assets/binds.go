@@ -8,7 +8,21 @@ authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-ser
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
+automate-backend-curator REQUIRED elasticsearch
+automate-backend-curator BINDING_MODE strict
 automate-backend-elasticsearch BINDING_MODE strict
+automate-backend-elasticsidecar REQUIRED elasticsearch
+automate-backend-elasticsidecar BINDING_MODE strict
+automate-backend-haproxy OPTIONAL database pgleaderchk
+automate-backend-haproxy BINDING_MODE strict
+automate-backend-journalbeat REQUIRED elasticsearch
+automate-backend-journalbeat BINDING_MODE strict
+automate-backend-kibana REQUIRED elasticsearch
+automate-backend-kibana BINDING_MODE strict
+automate-backend-metricbeat REQUIRED elasticsearch
+automate-backend-metricbeat OPTIONAL database
+automate-backend-metricbeat BINDING_MODE strict
+automate-backend-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api

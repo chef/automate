@@ -36,6 +36,11 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:list";
   };
+  rpc GetServerStatus (infra_proxy.request.GetServerStatus) returns (infra_proxy.response.GetServerStatus) {
+    option (google.api.http).get = "/api/v0/infra/servers/server_status";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
   rpc GetServer (infra_proxy.request.GetServer) returns (infra_proxy.response.GetServer) {
     option (google.api.http).get = "/api/v0/infra/servers/{id}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{id}";
@@ -335,6 +340,13 @@ service InfraProxy {
   rpc GetOrgUsersList (infra_proxy.request.OrgUsers) returns (infra_proxy.response.OrgUsers) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/users";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:users";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+
+  rpc GetServerUsersList (infra_proxy.request.ServerUsers) returns (infra_proxy.response.ServerUsers) {
+    option (google.api.http).post = "/api/v0/infra/servers/{server_id}/users";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:users";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 }

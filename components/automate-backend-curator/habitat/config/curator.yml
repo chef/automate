@@ -1,0 +1,11 @@
+---
+client:
+  hosts:
+    - 127.0.0.1
+  port: 9200
+  url_prefix:
+  use_ssl: True
+  ssl_no_validate: True
+  http_auth: {{bind.elasticsearch.first.cfg.admin_username}}:{{bind.elasticsearch.first.cfg.admin_password}}
+  timeout: 30
+  master_only: True

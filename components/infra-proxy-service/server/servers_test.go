@@ -20,7 +20,7 @@ import (
 
 func TestServers(t *testing.T) {
 	ctx := context.Background()
-	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
+	mockServer, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 
 	defer close()
@@ -45,7 +45,7 @@ func TestServers(t *testing.T) {
 			req := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			}
 			resp, err := cl.CreateServer(ctx, req)
@@ -59,10 +59,24 @@ func TestServers(t *testing.T) {
 			cleanupServer(ctx, t, cl, resp.Server.Id)
 		})
 
+		t.Run("when a invalid server is submitted, raise invalid FQDN error", func(t *testing.T) {
+			test.SetMockStatusChecker(mockServer, test.MockStatusFailedChecker{})
+			req := &request.CreateServer{
+				Id:        "chef-infra-server",
+				Name:      "Chef infra server",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
+			}
+			resp, err := cl.CreateServer(ctx, req)
+			assert.Nil(t, resp)
+			assert.Error(t, err, "Not able to connect to the server")
+		})
+
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
+
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Name:      "Chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -71,10 +85,12 @@ func TestServers(t *testing.T) {
 		})
 
 		t.Run("when the server ID already exists, raise invalid argument error", func(t *testing.T) {
+			test.SetMockStatusChecker(mockServer, test.MockStatusChecker{})
+
 			req1 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			}
 			resp1, err := cl.CreateServer(ctx, req1)
@@ -85,7 +101,7 @@ func TestServers(t *testing.T) {
 			req2 := &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "New chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			}
 			resp2, err := cl.CreateServer(ctx, req2)
@@ -97,33 +113,11 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server name")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server fqdn is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				IpAddress: "0.0.0.0",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server fqdn")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server IP address is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:   "chef-infra-server",
-				Name: "Chef infra server",
-				Fqdn: "domain.com",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server IP address")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	})
@@ -142,8 +136,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -151,8 +145,8 @@ func TestServers(t *testing.T) {
 			resp2, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server2",
 				Name:      "Chef infra server",
-				Fqdn:      "domain2.com",
-				IpAddress: "10.0.0.2",
+				Fqdn:      "api.chef.io",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
@@ -176,8 +170,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -231,8 +225,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -259,8 +253,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -299,8 +293,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "api.chef.io",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -327,8 +321,8 @@ func TestServers(t *testing.T) {
 			resp1, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server1",
 				Name:      "Chef infra server",
-				Fqdn:      "domain1.com",
-				IpAddress: "10.0.0.1",
+				Fqdn:      "api.chef.io",
+				IpAddress: "",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -388,7 +382,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.CreateServer(ctx, &request.CreateServer{
 				Id:        "chef-infra-server",
 				Name:      "Chef infra server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			require.NoError(t, err)
@@ -397,7 +391,7 @@ func TestServers(t *testing.T) {
 			updateReq := &request.UpdateServer{
 				Id:        resp.Server.Id,
 				Name:      "new-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			}
 
@@ -413,7 +407,7 @@ func TestServers(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "",
 				Name:      "new-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -424,7 +418,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server ID for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Name:      "chef-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -435,7 +429,7 @@ func TestServers(t *testing.T) {
 		t.Run("when the server name for the server to update is missing, raise invalid argument error", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "chef-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)
@@ -443,33 +437,11 @@ func TestServers(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the server fqdn for the server to update is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				IpAddress: "0.0.0.0",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server fqdn")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
-		t.Run("when the server IP address for the server to update is missing, raise invalid argument error", func(t *testing.T) {
-			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
-				Id:   "chef-infra-server",
-				Name: "Chef infra server",
-				Fqdn: "domain.com",
-			})
-			assert.Nil(t, resp)
-			assert.Error(t, err, "must supply server IP address")
-			grpctest.AssertCode(t, codes.InvalidArgument, err)
-		})
-
 		t.Run("when the server to update does not exist, raise server not found", func(t *testing.T) {
 			resp, err := cl.UpdateServer(ctx, &request.UpdateServer{
 				Id:        "no-chef-infra-server-id",
 				Name:      "chef-infra-server",
-				Fqdn:      "domain.com",
+				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
 			})
 			assert.Nil(t, resp)

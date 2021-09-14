@@ -2,7 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import {
   UserPreferencesPayload,
-  UserPreferenceResponse
+  UserPreferenceResponse,
+  UserPreferenceTimeformat
 } from './user-preferences.model';
 
 export enum UserPreferencesActionTypes {
@@ -50,7 +51,7 @@ export class UpdateUserPreferencesFailure implements Action {
 export class SetUserTimeformatInternal implements Action {
   readonly type = UserPreferencesActionTypes.SET_TIMEFORMAT;
 
-  constructor(public payload: string) {}
+  constructor(public payload: UserPreferenceTimeformat) {}
 }
 
 export type UserPreferencesActions =

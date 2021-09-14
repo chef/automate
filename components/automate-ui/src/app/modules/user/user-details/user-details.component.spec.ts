@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import {
@@ -32,10 +32,20 @@ import { EntityStatus } from 'app/entities/entities';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { UserPreferencesService } from 'app/services/user-preferences/user-preferences.service';
+import { UserPreferenceTimeformat } from 'app/services/user-preferences/user-preferences.model';
 import { SigninUiSetting, UISettings } from 'app/services/user-preferences/signin-ui-settings';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 class MockUserPreferencesService {
   public uiSettings: SigninUiSetting = new UISettings()['local'];
+  public timeformat$: Observable<UserPreferenceTimeformat>
+   = new Observable<UserPreferenceTimeformat>();
+}
+
+class MockTelemetryService {
+  getTelemetryCheckboxObservable() {
+    return new Subject<boolean>();
+  }
 }
 
 describe('UserDetailsComponent', () => {
@@ -107,7 +117,8 @@ describe('UserDetailsComponent', () => {
           FeatureFlagsService,
           { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
           { provide: ChefSessionService, useClass: MockChefSessionService },
-          { provide: UserPreferencesService, useClass: MockUserPreferencesService }
+          { provide: UserPreferencesService, useClass: MockUserPreferencesService },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ]
       });
       store = TestBed.inject(Store);
@@ -269,7 +280,8 @@ describe('UserDetailsComponent', () => {
         providers: [
           FeatureFlagsService,
           { provide: ActivatedRoute, useValue: {data: isNonAdmin} },
-          { provide: ChefSessionService, useClass: MockChefSessionService }
+          { provide: ChefSessionService, useClass: MockChefSessionService },
+          { provide: TelemetryService, useClass: MockTelemetryService }
         ]
       });
       store = TestBed.inject(Store);

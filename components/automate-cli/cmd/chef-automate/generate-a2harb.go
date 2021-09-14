@@ -97,8 +97,6 @@ func validateAwsFields(awsConfig AwsConfigToml) error {
 		return errors.New("Invalid or empty ssh_user")
 	} else if len(awsConfig.Architecture.ConfigInitials.SSHKeyFile) < 1 {
 		return errors.New("Invalid or empty ssh_key_file")
-	} else if len(awsConfig.Architecture.ConfigInitials.SudoPassword) < 1 {
-		return errors.New("Invalid or empty sudo_password")
 	} else if len(awsConfig.Architecture.ConfigInitials.BackupMount) < 1 {
 		return errors.New("Invalid or empty backup_mount")
 	} else if len(awsConfig.Architecture.ConfigInitials.HabitatUIDGid) < 1 {
@@ -173,8 +171,6 @@ func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) error {
 		return errors.New("Invalid or empty ssh_user")
 	} else if len(exitingInfra.Architecture.ConfigInitials.SSHKeyFile) < 1 {
 		return errors.New("Invalid or empty ssh_key_file")
-	} else if len(exitingInfra.Architecture.ConfigInitials.SudoPassword) < 1 {
-		return errors.New("Invalid or empty sudo_password")
 	} else if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
 		return errors.New("Invalid or empty backup_mount")
 	} else if len(exitingInfra.Architecture.ConfigInitials.HabitatUIDGid) < 1 {
