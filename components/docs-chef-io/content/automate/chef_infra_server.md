@@ -490,7 +490,7 @@ In the above image, the slider tab shows the *Details* of the selected policyfil
 
 Select a specific Run Item from the Run List to view the details in a slider tab.
 
-IMAGE
+{{< figure src="/images/automate/runlist-tab-for-policyfiles.png" alt="Runlist Tab under Policyfiles">}}
 
 To view the cookbook details of the item, select **Go to Cookbook Details** option in the tab.
 
@@ -551,11 +551,9 @@ Select a Policy Group to view the Policy Group Information and METADATA of that 
 
 The details page of the policy group lets you view the list of **Policyfiles**.
 
-IMAGE
+{{< figure src="/images/automate/policyfiles-under-policygroup.png" alt="Policyfiles under Policy Group">}}
 
 Select a Policyfile from the list to view its details.
-
-IMAGE
 
 {{< note >}} Selecting a specific policyfile will redirect you to the details section of the **Policyfiles** main tab.
 {{< /note >}}
@@ -564,7 +562,7 @@ IMAGE
 
 The details page of the policy group lets you view the list of **Nodes**.
 
-IMAGE
+{{< figure src="/images/automate/nodes-tab-in-policygroup.png" alt="Nodes Tab in Policy Group">}}
 
 Select a node from the list to view its details
 
