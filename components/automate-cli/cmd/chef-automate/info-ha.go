@@ -27,14 +27,14 @@ var infoCmd = &cobra.Command{
 	RunE: runInfoConfigCmd,
 }
 
-func runInfoConfigCmd(cmd *cobra.Command,args []string) error {
+func runInfoConfigCmd(cmd *cobra.Command, args []string) error {
 	return executeInfoCommand()
 }
 
 func executeInfoCommand() error {
 	writer.Printf("Automate HA info \n")
 	//args = append([]string{"info"})
-	c := exec.Command("automate-cluster-ctl","info")
+	c := exec.Command("automate-cluster-ctl", "info")
 	c.Dir = "/hab/a2_deploy_workspace"
 	c.Stdin = os.Stdin
 	var out bytes.Buffer
