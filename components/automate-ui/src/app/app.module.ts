@@ -324,6 +324,7 @@ import {
     AutomateSettingsRequests,
     CdsRequests,
     ChefSessionService,
+    ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
     CookbookDetailsRequests,
@@ -384,8 +385,7 @@ import {
     TelemetryService,
     UserPermsRequests,
     UserPreferencesRequests,
-    UserRequests,
-    ComplianceStatsService
+    UserRequests
   ],
   bootstrap: [ AppComponent ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
