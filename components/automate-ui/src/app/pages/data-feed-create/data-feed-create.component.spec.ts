@@ -126,6 +126,18 @@ describe('DataFeedCreateComponent', () => {
       expect(component.validateForm()).toBeTruthy();
     });
 
+    it('should be valid when all fields are filled out for ELK', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ELK');
+      // component.selectChangeHandlers('Access Token');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
     it('should be valid when all fields are filled out for splunk', () => {
       component.name = jasmine.createSpyObj('name', ['nativeElement']);
       component.name.nativeElement = { focus: () => { }};
@@ -204,7 +216,34 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
-
+    it('slider resets name, url, username and password to empty string for ELK', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ELK');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
+    it('slider resets name, url, username and password to empty string for ELK', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ELK');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
     it('slider resets name, url, username and password to empty string for Minio', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['endpoint'].setValue('any');

@@ -14,7 +14,7 @@ import { Regex } from 'app/helpers/auth/regex';
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
   SPLUNK = 'Splunk',
-  ELK_KIBANA = 'ELK/Kibana',
+  ELK_KIBANA = 'ELK',
   CUSTOM = 'Custom'
 }
 
@@ -225,6 +225,12 @@ export class DataFeedCreateComponent {
         this.showFields.useHeaders = true;
         this.authSelected = AuthTypes.ACCESSTOKEN;
         this.createForm.controls['tokenType'].setValue('');
+        break;
+      }
+      case WebhookIntegrationTypes.ELK_KIBANA: {
+        this.showFieldWebhook();
+        this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
+        this.createForm.controls['tokenType'].setValue('Bearer');
         this.integrationSelected = true;
         break;
       }
