@@ -71,14 +71,14 @@ export class DataFeedCreateComponent {
 
   public integrations = {
     webhook: [
-      { name: WebhookIntegrationTypes.SERVICENOW, asset: 'servicenow' },
-      { name: WebhookIntegrationTypes.SPLUNK, asset: 'splunk' },
-      { name: WebhookIntegrationTypes.ELK_KIBANA, asset: 'elk' },
-      { name: WebhookIntegrationTypes.CUSTOM, asset: 'custom' }
+      {name: WebhookIntegrationTypes.SERVICENOW, asset: 'servicenow'},
+      {name: WebhookIntegrationTypes.SPLUNK, asset: 'splunk'},
+      {name: WebhookIntegrationTypes.ELK_KIBANA, asset: 'elk'},
+      {name: WebhookIntegrationTypes.CUSTOM, asset: 'custom'}
     ],
     storage: [
-      { name: StorageIntegrationTypes.MINIO, asset: 'minio' },
-      { name: StorageIntegrationTypes.AMAZON_S3, asset: 's3' }
+      {name: StorageIntegrationTypes.MINIO, asset: 'minio'},
+      {name: StorageIntegrationTypes.AMAZON_S3, asset: 's3'}
     ]
   };
 
