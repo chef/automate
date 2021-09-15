@@ -71,9 +71,7 @@ describe('chef datafeed', () => {
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
       cy.contains('Data Feeds').click();
-      cy.get('chef-table chef-tbody chef-td')
-        .contains('cytest' + date)
-        .should('exist');
+      cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
     });
 
     it('create data feed splunk', () => {
