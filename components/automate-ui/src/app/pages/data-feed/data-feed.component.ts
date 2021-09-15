@@ -92,7 +92,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       headers: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       bucketName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       accessKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      secretKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      secretKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
@@ -237,33 +237,25 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const data = {
           url: targetUrl,
           aws: {
-            access_key:
-              this.createDataFeedForm.controls['accessKey'].value.trim(),
-            secret_access_key:
-              this.createDataFeedForm.controls['secretKey'].value.trim(),
-            bucket: this.createDataFeedForm.controls['bucketName'].value.trim(),
+            access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
+            secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
+            bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
           }
         };
-        testConnectionObservable =
-          this.datafeedRequests.testDestinationForMinio(data);
+        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
           break;
       }
       case StorageIntegrationTypes.AMAZON_S3: {
         const data = {
           url: 'null',
           aws: {
-            access_key:
-              this.createDataFeedForm.controls['accessKey'].value.trim(),
-            secret_access_key:
-              this.createDataFeedForm.controls['secretKey'].value.trim(),
+            access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
+            secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
             bucket: this.createDataFeedForm.controls['bucketName'].value.trim(),
             region: event.region
           }
         };
-        console.log('region is', event.region);
-        console.log(data)
-        testConnectionObservable =
-          this.datafeedRequests.testDestinationForMinio(data);
+        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
       }
     }
     if (testConnectionObservable != null) {
@@ -355,15 +347,12 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           meta_data: [
             {
               key: 'bucket',
-              value:
-                this.createDataFeedForm.controls['bucketName'].value.trim(),
-            },
-          ],
+              value: this.createDataFeedForm.controls['bucketName'].value.trim()
+            }
+          ]
         };
-        const accessKey: string =
-          this.createDataFeedForm.controls['accessKey'].value.trim();
-        const secretKey: string =
-          this.createDataFeedForm.controls['secretKey'].value.trim();
+        const accessKey: string = this.createDataFeedForm.controls['accessKey'].value.trim();
+        const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
         storage = { accessKey, secretKey };
         headers = null;
         break;
@@ -377,8 +366,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           meta_data: [
             {
               key: 'bucket',
-              value:
-                this.createDataFeedForm.controls['bucketName'].value.trim()
+              value: this.createDataFeedForm.controls['bucketName'].value.trim()
             },
             {
               key: 'region',
@@ -386,12 +374,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             }
           ]
         };
-        console.log('Region in save is ',event.region)
-        console.log('destinationobject',destinationObj)
-        const accessKey: string =
-          this.createDataFeedForm.controls['accessKey'].value.trim();
-        const secretKey: string =
-          this.createDataFeedForm.controls['secretKey'].value.trim();
+        const accessKey: string = this.createDataFeedForm.controls['accessKey'].value.trim();
+        const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
         storage = { accessKey, secretKey };
         headers = null;
         break;

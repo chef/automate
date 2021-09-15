@@ -71,7 +71,9 @@ describe('chef datafeed', () => {
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
       cy.contains('Data Feeds').click();
-      cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
+      cy.get('chef-table chef-tbody chef-td')
+        .contains('cytest' + date)
+        .should('exist');
     });
 
     it('create data feed splunk', () => {
@@ -327,6 +329,50 @@ describe('chef datafeed', () => {
       cy.get('app-data-feed-create').scrollTo('top');
       cy.get('.data-feed-slider app-notification.info').should('be.visible');
       cy.get('.data-feed-slider app-notification.info chef-icon').click();
+      cy.get('[data-cy=close-feed-button]').click();
+    });
+
+    it('create data feed for S3', () => {
+      cy.get('[data-cy=create-data-feed]').click();
+      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy=add-name]').type(name + reusableDate);
+      cy.get('[data-cy=add-bucket-name]').type(bucketName);
+      cy.get('[data-cy=add-access-key]').type(accessKey);
+      cy.get('[data-cy=add-secret-key]').type(secretKey);
+      cy.get('[data-cy=add-button]').click();
+      cy.get('app-notification.info').should('be.visible');
+      cy.get('app-notification.info chef-icon').click();
+      cy.contains('Data Feeds').click();
+      cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
+    });
+
+    it('error in creating data feed for S3', () => {
+      cy.get('[data-cy=create-data-feed]').click();
+      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy=add-name]').type(name + reusableDate);
+      cy.get('[data-cy=add-bucket-name]').type(bucketName);
+      cy.get('[data-cy=add-access-key]').type(accessKey);
+      cy.get('[data-cy=add-secret-key]').type(secretKey);
+      cy.get('[data-cy=add-button]').click();
+      cy.get('app-data-feed-create').scrollTo('top');
+      cy.get('.data-feed-slider app-notification.error').should('be.visible');
+      cy.get('.data-feed-slider app-notification.error chef-icon').click();
+      cy.get('[data-cy=close-feed-button]').click();
+    });
+
+    it('test faliure in data feed S3', () => {
+      const date = Date.now();
+      cy.get('[data-cy=create-data-feed]').click();
+      cy.get('app-data-feed-create').scrollTo('bottom');
+      cy.get('[data-cy="Amazon S3"]').click();
+      cy.get('[data-cy=add-name]').type(name + date);
+      cy.get('[data-cy=add-bucket-name]').type(bucketName);
+      cy.get('[data-cy=add-access-key]').type(accessKey);
+      cy.get('[data-cy=add-secret-key]').type(secretKey);
+      cy.get('[data-cy=test-button]').click();
+      cy.get('app-data-feed-create').scrollTo('top');
+      cy.get('.data-feed-slider app-notification.error').should('be.visible');
+      cy.get('.data-feed-slider app-notification.error chef-icon').click();
       cy.get('[data-cy=close-feed-button]').click();
     });
   });
