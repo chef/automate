@@ -99,8 +99,6 @@ func validateAwsFields(awsConfig AwsConfigToml) error {
 		return errors.New("Invalid or empty ssh_key_file")
 	} else if len(awsConfig.Architecture.ConfigInitials.BackupMount) < 1 {
 		return errors.New("Invalid or empty backup_mount")
-	} else if len(awsConfig.Architecture.ConfigInitials.HabitatUIDGid) < 1 {
-		return errors.New("Invalid or empty habitat_uid_gid")
 	} else if len(awsConfig.Automate.Config.InstanceCount) < 1 {
 		return errors.New("Invalid or empty automate instance_count")
 	} else if len(awsConfig.ChefServer.Config.InstanceCount) < 1 {
@@ -173,8 +171,6 @@ func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) error {
 		return errors.New("Invalid or empty ssh_key_file")
 	} else if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
 		return errors.New("Invalid or empty backup_mount")
-	} else if len(exitingInfra.Architecture.ConfigInitials.HabitatUIDGid) < 1 {
-		return errors.New("Invalid or empty habitat_uid_gid")
 	} else if len(exitingInfra.Automate.Config.InstanceCount) < 1 {
 		return errors.New("Invalid or empty automate instance_count")
 	} else if len(exitingInfra.ChefServer.Config.InstanceCount) < 1 {
@@ -200,51 +196,51 @@ func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) error {
 	} else if len(exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
 		return errors.New("Invalid or empty postgresql_private_ips")
 	} else {
-		for index, element := range exitingInfra.ExistingInfra.Config.AutomateIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("Automate Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.AutomateIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("Automate Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.AutomatePrivateIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("Automate private Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.AutomatePrivateIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("Automate private Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.ChefServerIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("chef server Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.ChefServerIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("chef server Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.ChefServerPrivateIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("chef server private Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.ChefServerPrivateIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("chef server private Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.ElasticsearchIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("elastic search Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("elastic search Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("elastic search private Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("elastic search private Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.PostgresqlIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("postgresql Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("postgresql Ip " + element + "is not valid")
 			}
 		}
 
-		for index, element := range exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps {
-			if checkIPAddress(element.(string)) != nil {
-				return errors.New("Postgresql private Ip " + element.(string) + "is not valid at index : " + string(index))
+		for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps {
+			if checkIPAddress(element) != nil {
+				return errors.New("Postgresql private Ip " + element + "is not valid")
 			}
 		}
 		return nil
