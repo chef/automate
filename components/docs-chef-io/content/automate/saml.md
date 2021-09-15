@@ -51,6 +51,11 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 - Ping
 - Tivoli Federated Identity Manager
 
+## Unsupported auth mode
+
+idP-initiated SAML logins are not supported with any of the above idPs due to the library we use to do the authentications.
+Fall back to the typical SP-initiated login mode and proceed with your Automate SAML configuration.
+
 ### Azure AD
 
 Using Azure AD as an SAML IdP requires specific configuration for both Azure AD and Chef Automate.
