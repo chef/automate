@@ -55,6 +55,7 @@ steps:
     command:
       - scripts/verify_build.sh
     timeout_in_minutes: 60
+    soft_fail: true
     env:
       ALLOW_LOCAL_PACKAGES: true
       HAB_STUDIO_SUP: false
