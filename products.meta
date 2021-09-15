@@ -56,6 +56,8 @@
     "chef/automate-backend-curator",
     "chef/automate-backend-haproxy",
     "chef/automate-backend-postgresql",
+    "chef/report-manager-service",
+    "chef/report-manager-minio-gateway",
     "core/rsync"
   ],
 
@@ -161,6 +163,8 @@
       "dependencies": ["automate"],
       "services": [
         "chef/automate-cds",
+        "chef/report-manager-service",
+        "chef/report-manager-minio-gateway",
         "chef/user-settings-service"
       ]
     },
