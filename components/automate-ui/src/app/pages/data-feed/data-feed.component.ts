@@ -67,7 +67,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
 
   // The direction nodes are sorted
   fieldDirection$: Observable<SortDirection>;
-  
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -160,8 +160,11 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public setCheck(event) {
+    console.log(event);
+  }
+
   public addHeadersforCustomDataFeed(customHeaders: string): {} {
-    //  const customHeaders: string = header;
         const headersJson = {};
         const headersVal = customHeaders.split('\n');
         for (const values in headersVal) {

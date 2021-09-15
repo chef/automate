@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -43,6 +44,7 @@ export class DataFeedCreateComponent {
   @Input() createForm: FormGroup;
   @Output() saveDestinationEvent = new EventEmitter<any>();
   @Output() testDestinationEvent = new EventEmitter<any>();
+  @Output() checkEvent = new EventEmitter<any>();
 
   public revisions: Revision[] = [];
   public revisionsListLoading = true;
@@ -56,7 +58,7 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
-  public errorString: string;
+  public flagHeaders = true;
 
   private saveInProgress = false;
   private testInProgress = false;
@@ -184,7 +186,8 @@ export class DataFeedCreateComponent {
     }};
   }
 
-  updatePolicyCheckbox(event: boolean): void {
+  updateHeaderCheckbox(event: boolean): void {
+    this.checkEvent.emit(event);
     this.headerChecked = event;
     this.createForm.controls.headerChecked.setValue(true);
   }
@@ -239,25 +242,6 @@ export class DataFeedCreateComponent {
         this.integrationSelected = true;
       }
     }
-
-    // else if (integration === WebhookIntegrationTypes.ELK_KIBANA) {
-    //   this.showFieldWebhook();
-    //   this.authSelected = AuthTypes.ACCESSTOKEN;
-    //   this.createForm.controls['tokenType'].setValue('Bearer');
-
-    // }
-    // else if (integration === WebhookIntegrationTypes.CUSTOM) {
-    //   this.showFieldWebhook();
-    //   this.showFields.headers = true;
-    //   this.authSelected = AuthTypes.ACCESSTOKEN;
-    //   this.createForm.controls['tokenType'].setValue('Bearer');
-
-    // }
-    // else if (integration === StorageIntegrationTypes.AMAZON_S3) {
-    //   this.showFieldStorage();
-    //   this.showFields.endpoint = false;
-    //   this.createForm.reset();
-    // }
   }
 
   public returnToMenu() {
@@ -273,6 +257,9 @@ export class DataFeedCreateComponent {
   }
 
   public testConnection() {
+    if (!this.headerChecked) {
+      this.createForm.get('headers').setValue('');
+    }
     this.testInProgress = true;
     this.testDestinationEvent.emit({
       name: this.integTitle,
@@ -288,7 +275,7 @@ export class DataFeedCreateComponent {
       case WebhookIntegrationTypes.ELK_KIBANA:
       case WebhookIntegrationTypes.CUSTOM: {
         // handling access token and user pass auth
-        // for servicenow, splunk and elk
+        // for servicenow, splunk, elk and custom
         switch (this.authSelected) {
           case AuthTypes.ACCESSTOKEN: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
@@ -316,17 +303,12 @@ export class DataFeedCreateComponent {
       }
     }
     return false;
-
-    // else if (this.integTitle === StorageIntegrationTypes.AMAZON_S3) {
-    //     if (this.createForm.get('name').valid && this.createForm.get('region').valid &&
-    //       this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
-    //       this.createForm.get('secretKey').valid) {
-    //       return true;
-    //     }
-    // }
   }
 
   public saveDestination() {
+    if (!this.headerChecked) {
+      this.createForm.get('headers').setValue('');
+    }
     this.saveInProgress = true;
     this.saveDestinationEvent.emit({
       name: this.integTitle,
@@ -348,5 +330,15 @@ export class DataFeedCreateComponent {
 
   public showUserPassInput(field: string) {
     return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
+  }
+
+  public validateHeaders(customHeaders: string): void {
+    const headersVal = customHeaders.split('\n');
+    for (const values in headersVal) {
+      this.flagHeaders = Regex.patterns.VALID_HEADER.test(headersVal[values]);
+      if (this.flagHeaders === false) {
+        break;
+      }
+    }
   }
 }

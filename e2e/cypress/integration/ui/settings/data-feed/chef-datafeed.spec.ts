@@ -1,10 +1,4 @@
 describe('chef datafeed', () => {
-  const name = 'cytest',
-  url = 'http://test.com',
-  username = 'admin',
-  password = 'password',
-  tokenType = 'TestType',
-  token = 'behwveh3238238=';
   const reusableDate = Date.now();
 
   before(() => {

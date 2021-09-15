@@ -157,10 +157,26 @@ main {
   }
 }
 
-.input-margin2 {
-  display: flex;
-  margin: 15px 0;
-  width: 70%;
+.chef-inputtextarea {
+  width: 100%;
+  height: auto;
+  background-color: #FFFFFF;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid #E6EBEE;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+}
+
+.error {
+  .chef-inputtextarea {
+    border-color: #DC267F;
+    border-radius: 4px 4px 0 0;
+    outline: none;
+    margin-bottom: -7px;
+  }
 }
 
 chef-loading-spinner {

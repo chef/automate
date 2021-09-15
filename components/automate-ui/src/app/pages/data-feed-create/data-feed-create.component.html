@@ -232,20 +232,27 @@
         </div>
 
         
-          <div *ngIf="showFields.useHeaders">
+          <div *ngIf="showFields.useHeaders" class="input-margin" [ngClass]="{'error' : !flagHeaders}">
             <chef-form-field>
             <label>
-              <chef-checkbox id="headers-checkbox" (change)="updatePolicyCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
-              <div *ngIf="headerChecked" class="input-margin2">
+              <chef-checkbox id="headers-checkbox" (change)="updateHeaderCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
+              <div *ngIf="headerChecked">
               <textarea
-                chefInput
+                class="chef-inputtextarea"
                 formControlName="headers"
                 data-cy="add-headers"
                 type="text"
                 id="headers-input"
+                placeholder="key:value"
                 autocomplete="off"
+                (input)="validateHeaders($event.target.value)"
+                rows="5"
                 ></textarea></div>
             </label>
+            <chef-error
+              *ngIf="!flagHeaders && headerChecked">
+              Headers are invalid.
+            </chef-error>
             </chef-form-field>
           </div>
         

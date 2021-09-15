@@ -25,7 +25,8 @@
       <app-data-feed-create
         [createForm]="createDataFeedForm"
         (saveDestinationEvent)="saveDestination($event)"
-        (testDestinationEvent)="sendTestForDataFeed($event)">
+        (testDestinationEvent)="sendTestForDataFeed($event)"
+        (checkEvent)="setCheck($event)">
       </app-data-feed-create>
     </main>
   </div>

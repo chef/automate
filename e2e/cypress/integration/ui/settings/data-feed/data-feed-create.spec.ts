@@ -132,16 +132,34 @@ describe('chef datafeed', () => {
     });
 
     it('create data feed Custom with token', () => {
+      const date = Date.now();
       cy.get('[data-cy=create-data-feed]').click();
       cy.get('[data-cy=Custom]').click();
-      cy.get('[data-cy=add-name]').type(name + reusableDate);
+      cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-url]').type(url);
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-notification.info').should('be.visible');
       cy.get('app-notification.info chef-icon').click();
       cy.contains('Data Feeds').click();
-      cy.get('chef-table chef-tbody chef-td').contains('cytest' + reusableDate).should('exist');
+      cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
+    });
+
+    it('test connection in data feed Custom', () => {
+      const date = Date.now();
+      cy.get('[data-cy=create-data-feed]').click();
+      cy.get('[data-cy=Custom]').click();
+      cy.get('[data-cy=add-name]').type(name + date);
+      cy.get('[data-cy=add-url]').type(url);
+      cy.get('[data-cy=select-auth-type]').click();
+      cy.get('[data-cy=select-username-password]').click();
+      cy.get('[data-cy=add-username]').type(username);
+      cy.get('[data-cy=add-password]').type(password);
+      cy.get('[data-cy=test-button]').click();
+      cy.get('app-data-feed-create').scrollTo('top');
+      cy.get('.data-feed-slider app-notification.error').should('be.visible');
+      cy.get('.data-feed-slider app-notification.error chef-icon').click();
+      cy.get('[data-cy=close-feed-button]').click();
     });
 
     it('create data feed Custom with username', () => {
@@ -161,7 +179,7 @@ describe('chef datafeed', () => {
       cy.get('chef-table chef-tbody chef-td').contains('cytest' + date).should('exist');
     });
 
-    it('create data feed error', () => {
+    it('create data feed error custom', () => {
       cy.get('[data-cy=create-data-feed]').click();
       cy.get('[data-cy=Custom]').click();
       cy.get('[data-cy=add-name]').type(name + reusableDate);

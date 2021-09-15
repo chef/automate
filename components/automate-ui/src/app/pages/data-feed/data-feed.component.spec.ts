@@ -93,6 +93,7 @@ describe('DataFeedComponent', () => {
     const bucketName = 'b123';
     const accessKey = 'test123';
     const secretKey = 'test123';
+    const headers = 'test:123';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -373,18 +374,26 @@ describe('DataFeedComponent', () => {
       });
     });
 
+    it('add Headers for Custom dataFeed', () => {
+      component.createDataFeedForm.controls['headers'].setValue(headers);
+      const headerJson = component.addHeadersforCustomDataFeed(headers);
+      expect(headerJson).toEqual({test : '123'});
+    });
+
     it('on success, closes slider and adds new custom data feed with username-password', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
-
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeedForm.controls['headers'].setValue(headers);
+
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.CUSTOM
       });
 
+      component.addHeadersforCustomDataFeed(headers);
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
         expect(destinations).toContain(destination);
@@ -398,17 +407,67 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeedForm.controls['headers'].setValue(headers);
       component.saveDestination({
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.CUSTOM
       });
 
+      component.addHeadersforCustomDataFeed(headers);
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
         expect(destinations).toContain(destination);
       });
     });
 
+    it('on test success for custom and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
+      component.createDataFeedForm.controls['token'].setValue(token);
+      component.createDataFeedForm.controls['headers'].setValue(headers);
+
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
+      component.sendTestForDataFeed({
+        auth: AuthTypes.ACCESSTOKEN,
+        name: WebhookIntegrationTypes.CUSTOM
+      });
+      const userToken = JSON.stringify({
+        Authorization: 'Bearer' + ' ' + token
+      });
+      const headersJson = component.addHeadersforCustomDataFeed(headers);
+      const headersVal = {...JSON.parse(userToken), ...headersJson};
+
+      expect(component['datafeedRequests']
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
+        destination.url,
+        JSON.stringify(headersVal)
+      );
+    });
+
+    it('on test success for Custom now and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      component.createDataFeedForm.controls['headers'].setValue(headers);
+
+      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePasswordWithHeaders');
+      component.sendTestForDataFeed({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.CUSTOM
+      });
+
+      expect(component['datafeedRequests']
+      .testDestinationWithUsernamePasswordWithHeaders).toHaveBeenCalledWith(
+        destination.url,
+        username,
+        password,
+        JSON.stringify(component.addHeadersforCustomDataFeed(headers))
+      );
+    });
   });
 
 });
