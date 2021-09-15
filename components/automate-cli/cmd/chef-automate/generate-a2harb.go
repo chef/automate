@@ -107,7 +107,59 @@ func validateAwsFields(awsConfig AwsConfigToml) error {
 		return errors.New("Invalid or empty elastic-search instance_count")
 	} else if len(awsConfig.Postgresql.Config.InstanceCount) < 1 {
 		return errors.New("Invalid or empty postgres-sql instance_count")
-	} else if len(awsConfig.Aws.Config.Profile) < 1 {
+	} else {
+		return validateAwsConfigFields(awsConfig)
+	}
+}
+
+func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) error {
+	if len(exitingInfra.Architecture.ConfigInitials.SecretsKeyFile) < 1 {
+		return errors.New("Invalid or empty secrets_key_file")
+	} else if len(exitingInfra.Architecture.ConfigInitials.SecretsStoreFile) < 1 {
+		return errors.New("Invalid or empty secrets_store_file")
+	} else if len(exitingInfra.Architecture.ConfigInitials.Architecture) < 1 {
+		return errors.New("Invalid or empty Architecture")
+	} else if len(exitingInfra.Architecture.ConfigInitials.WorkspacePath) < 1 {
+		return errors.New("Invalid or empty workspace_path")
+	} else if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
+		return errors.New("Invalid or empty ssh_user")
+	} else if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
+		return errors.New("Invalid or empty ssh_user")
+	} else if len(exitingInfra.Architecture.ConfigInitials.SSHKeyFile) < 1 {
+		return errors.New("Invalid or empty ssh_key_file")
+	} else if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
+		return errors.New("Invalid or empty backup_mount")
+	} else if len(exitingInfra.Automate.Config.InstanceCount) < 1 {
+		return errors.New("Invalid or empty automate instance_count")
+	} else if len(exitingInfra.ChefServer.Config.InstanceCount) < 1 {
+		return errors.New("Invalid or empty chef-server instance_count")
+	} else if len(exitingInfra.Elasticsearch.Config.InstanceCount) < 1 {
+		return errors.New("Invalid or empty elastic-search instance_count")
+	} else if len(exitingInfra.Postgresql.Config.InstanceCount) < 1 {
+		return errors.New("Invalid or empty postgres-sql instance_count")
+	} else if len(exitingInfra.ExistingInfra.Config.AutomateIps) < 1 {
+		return errors.New("Invalid or empty automate Ips")
+	} else if len(exitingInfra.ExistingInfra.Config.AutomatePrivateIps) < 1 {
+		return errors.New("Invalid or empty automate_private_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.ChefServerIps) < 1 {
+		return errors.New("Invalid or empty chef_server_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.ChefServerPrivateIps) < 1 {
+		return errors.New("Invalid or empty chef_server_private_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.ElasticsearchIps) < 1 {
+		return errors.New("Invalid or empty elasticsearch_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps) < 1 {
+		return errors.New("Invalid or empty elasticsearch_private_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.PostgresqlIps) < 1 {
+		return errors.New("Invalid or empty postgresql_ips")
+	} else if len(exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
+		return errors.New("Invalid or empty postgresql_private_ips")
+	} else {
+		return validateIPs(exitingInfra)
+	}
+}
+
+func validateAwsConfigFields(awsConfig AwsConfigToml) error {
+	if len(awsConfig.Aws.Config.Profile) < 1 {
 		return errors.New("Invalid or empty aws profile name")
 	} else if len(awsConfig.Aws.Config.Region) < 1 {
 		return errors.New("Invalid or empty aws region")
@@ -154,97 +206,55 @@ func validateAwsFields(awsConfig AwsConfigToml) error {
 	}
 }
 
-func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) error {
-	if len(exitingInfra.Architecture.ConfigInitials.SecretsKeyFile) < 1 {
-		return errors.New("Invalid or empty secrets_key_file")
-	} else if len(exitingInfra.Architecture.ConfigInitials.SecretsStoreFile) < 1 {
-		return errors.New("Invalid or empty secrets_store_file")
-	} else if len(exitingInfra.Architecture.ConfigInitials.Architecture) < 1 {
-		return errors.New("Invalid or empty Architecture")
-	} else if len(exitingInfra.Architecture.ConfigInitials.WorkspacePath) < 1 {
-		return errors.New("Invalid or empty workspace_path")
-	} else if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
-		return errors.New("Invalid or empty ssh_user")
-	} else if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
-		return errors.New("Invalid or empty ssh_user")
-	} else if len(exitingInfra.Architecture.ConfigInitials.SSHKeyFile) < 1 {
-		return errors.New("Invalid or empty ssh_key_file")
-	} else if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
-		return errors.New("Invalid or empty backup_mount")
-	} else if len(exitingInfra.Automate.Config.InstanceCount) < 1 {
-		return errors.New("Invalid or empty automate instance_count")
-	} else if len(exitingInfra.ChefServer.Config.InstanceCount) < 1 {
-		return errors.New("Invalid or empty chef-server instance_count")
-	} else if len(exitingInfra.Elasticsearch.Config.InstanceCount) < 1 {
-		return errors.New("Invalid or empty elastic-search instance_count")
-	} else if len(exitingInfra.Postgresql.Config.InstanceCount) < 1 {
-		return errors.New("Invalid or empty postgres-sql instance_count")
-	} else if len(exitingInfra.ExistingInfra.Config.AutomateIps) < 1 {
-		return errors.New("Invalid or empty automate Ips")
-	} else if len(exitingInfra.ExistingInfra.Config.AutomatePrivateIps) < 1 {
-		return errors.New("Invalid or empty automate_private_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.ChefServerIps) < 1 {
-		return errors.New("Invalid or empty chef_server_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.ChefServerPrivateIps) < 1 {
-		return errors.New("Invalid or empty chef_server_private_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.ElasticsearchIps) < 1 {
-		return errors.New("Invalid or empty elasticsearch_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps) < 1 {
-		return errors.New("Invalid or empty elasticsearch_private_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.PostgresqlIps) < 1 {
-		return errors.New("Invalid or empty postgresql_ips")
-	} else if len(exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps) < 1 {
-		return errors.New("Invalid or empty postgresql_private_ips")
-	} else {
-		for _, element := range exitingInfra.ExistingInfra.Config.AutomateIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("Automate Ip " + element + "is not valid")
-			}
+func validateIPs(exitingInfra ExistingInfraConfigToml) error {
+	for _, element := range exitingInfra.ExistingInfra.Config.AutomateIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("Automate Ip " + element + "is not valid")
 		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.AutomatePrivateIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("Automate private Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.ChefServerIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("chef server Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.ChefServerPrivateIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("chef server private Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("elastic search Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("elastic search private Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("postgresql Ip " + element + "is not valid")
-			}
-		}
-
-		for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps {
-			if checkIPAddress(element) != nil {
-				return errors.New("Postgresql private Ip " + element + "is not valid")
-			}
-		}
-		return nil
 	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.AutomatePrivateIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("Automate private Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.ChefServerIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("chef server Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.ChefServerPrivateIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("chef server private Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("elastic search Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("elastic search private Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("postgresql Ip " + element + "is not valid")
+		}
+	}
+
+	for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps {
+		if checkIPAddress(element) != nil {
+			return errors.New("Postgresql private Ip " + element + "is not valid")
+		}
+	}
+	return nil
 }
 
 func checkIPAddress(ip string) error {

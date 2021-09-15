@@ -9,12 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const DeploymentModeFlagParentDir string = "/var"
-const DeploymentModeFlagDirName string = "/de84f3b54b76175ad2fbfbd13354c2e7"
-const DeploymentModeFlagFileName string = "flags.toml"
-const FlagPath string = DeploymentModeFlagParentDir + DeploymentModeFlagDirName + "/" + DeploymentModeFlagFileName
-const AutomateHAMode string = "automate-ha"
-
 var initConfigHAPathFlags = struct {
 	path string
 }{}
@@ -22,10 +16,6 @@ var initConfigHAPathFlags = struct {
 var initConfigHabA2HAPathFlag = struct {
 	a2haDirPath string
 }{}
-
-type DeploymentModeFlag struct {
-	DeploymentMode string `toml:"deploymentMode"`
-}
 
 type AwsConfigToml struct {
 	Architecture struct {
