@@ -37,6 +37,7 @@ describe('login the app', () => {
             return;
           }
         });
+        cy.get('app-welcome-modal').invoke('hide');
         cy.visit('/user-details/admin').then(() => {
           cy.get('[data-cy=welcome-title]').should('exist').then(() => {
             cy.get('[data-cy=close-x]').click();

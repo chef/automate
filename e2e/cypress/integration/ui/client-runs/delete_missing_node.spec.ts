@@ -53,6 +53,7 @@ describe('delete missing node from UI', () => {
       cy.get('app-welcome-modal').invoke('hide');
     });
 
+    cy.get('app-welcome-modal').invoke('hide');
     // Check the check box to delete all missing nodes
     cy.get('chef-checkbox.header').click();
 
