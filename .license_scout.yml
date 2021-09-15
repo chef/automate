@@ -56,7 +56,9 @@ directories:
 habitat:
   channel_for_origin:
     - origin: chef
-      channel: dev
+      channel: stable2021-q2
+    - origin: core
+      channel: stable2021-q2
 allowed_licenses:
   - 0BSD
   - Apache-1.0
