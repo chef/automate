@@ -131,7 +131,7 @@
             <label for="version">Region *</label>
             <div class="version-dropdown">
               <chef-select #reg [value]="dropDownVal" (change)="dropDownChangeHandlers(reg.value)" data-cy="select-auth-type">
-                <chef-option *ngFor="let region of awsRegions" value={{region.code}}  data-cy="select-access-token">{{region.name}}</chef-option>
+                <chef-option *ngFor="let region of awsRegions" value="{{region.code}}""  data-cy="select-access-token">{{region.name}}</chef-option>
               </chef-select>
             </div>
           </div>
