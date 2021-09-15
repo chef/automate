@@ -113,13 +113,12 @@ chef-modal {
   }
 
   chef-select {
-    margin-top: 18px;
     font-size: 14px;
   }
 
   ::ng-deep chef-select .selected-value {
     height: 36px;
-    width: 450px;
+    width: 464px;
     background: $chef-white;
     padding: 0.5em;
     border: 1px solid $chef-form-input;
