@@ -27,6 +27,8 @@ describe('user management', () => {
   it('can create a user', () => {
     cy.get('app-user-table').should('exist');
 
+    cy.get('app-welcome-modal').invoke('hide');
+
     // local admin user should always exist
     cy.get('.username-column').contains('admin').should('exist');
 
