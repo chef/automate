@@ -279,9 +279,12 @@ func DeployHA(writer cli.FormatWriter,
 	manifestProvider manifest.ReleaseManifestProvider) error {
 	ctx := context.Background()
 	devM, err := manifestProvider.GetCurrentManifest(ctx, "dev")
+	if err != nil {
+		logrus.Debug("Failed to get mainfest for dev channel")
+	}
 	currentM, err := manifestProvider.GetCurrentManifest(ctx, "current")
 	if err != nil {
-		logrus.Debug("Failed")
+		logrus.Debug("Failed to get mainfest for current channel")
 	}
 	b := bootstrap.NewCompatBootstrapper(target.NewLocalTarget(false))
 	err = bootstrap.FullBootstrapHA(context.Background(), b, devM, currentM, writer)
