@@ -472,6 +472,9 @@ function LoginHelper(username: string) {
   // the global permissions for the user that populates the initial permissions cache
   cy.route('GET', '/apis/iam/v2/introspect').as('getAuthPopulateCache');
 
+  // close welcome modal if present
+  cy.get('app-welcome-modal').invoke('hide');
+
   // login
   cy.get('#login').type(username);
   cy.get('#password').type('chefautomate');
