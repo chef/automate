@@ -56,7 +56,7 @@ directories:
 habitat:
   channel_for_origin:
     - origin: chef
-      channel: stable2021-q2
+      channel: dev
     - origin: core
       channel: stable2021-q2
 allowed_licenses:
