@@ -88,6 +88,7 @@ describe('DataFeedCreateComponent', () => {
     const secretKey = 'test123';
     const userName = 'test123';
     const password = 'test123';
+    const region = 'region1';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -196,6 +197,41 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['accessKey'].value).toBe(null);
       expect(component.createForm.controls['secretKey'].value).toBe(null);
     });
+
+    it('should be valid when all fields are filled out for S3', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => {} };
+      component.selectIntegration('Amazon S3');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['bucketName'].setValue(bucketName);
+      component.createForm.controls['accessKey'].setValue(accessKey);
+      component.createForm.controls['secretKey'].setValue(secretKey);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('Dropdown is populated for S3', () => {
+      expect(component.dropDownVal).toBe(null);
+      component.dropDownChangeHandlers(region);
+      expect(component.dropDownVal).toBe(region);
+    });
+
+    it('slider resets name, bucketname , accessKey and secretkey to empty string for S3', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['bucketName'].setValue('any');
+      component.createForm.controls['accessKey'].setValue('any');
+      component.createForm.controls['secretKey'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => {} };
+      component.selectIntegration('Amazon S3');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['bucketName'].value).toBe(null);
+      expect(component.createForm.controls['accessKey'].value).toBe(null);
+      expect(component.createForm.controls['secretKey'].value).toBe(null);
+    });
+
+
+
   });
 
   describe('create data feed form validation', () => {

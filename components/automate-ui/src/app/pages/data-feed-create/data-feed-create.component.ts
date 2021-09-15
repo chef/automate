@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
+import { regions } from 'app/entities/destinations/destination.model';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -37,9 +38,7 @@ export enum IntegrationTypes {
   templateUrl: './data-feed-create.component.html',
   styleUrls: ['./data-feed-create.component.scss']
 })
-
 export class DataFeedCreateComponent {
-
   @Input() createForm: FormGroup;
   @Output() saveDestinationEvent = new EventEmitter<any>();
   @Output() testDestinationEvent = new EventEmitter<any>();
@@ -61,17 +60,19 @@ export class DataFeedCreateComponent {
   public notificationType = 'error';
   private saveInProgress = false;
   private testInProgress = false;
+  public dropDownVal = null;
+  public awsRegions = regions;
 
   public integrations = {
     webhook: [
-      {name: WebhookIntegrationTypes.SERVICENOW, asset: 'servicenow'},
-      {name: WebhookIntegrationTypes.SPLUNK, asset: 'splunk'},
-      {name: WebhookIntegrationTypes.ELK_KIBANA, asset: 'elk'},
-      {name: WebhookIntegrationTypes.CUSTOM, asset: 'custom'}
+      { name: WebhookIntegrationTypes.SERVICENOW, asset: 'servicenow' },
+      { name: WebhookIntegrationTypes.SPLUNK, asset: 'splunk' },
+      { name: WebhookIntegrationTypes.ELK_KIBANA, asset: 'elk' },
+      { name: WebhookIntegrationTypes.CUSTOM, asset: 'custom' }
     ],
     storage: [
-      {name: StorageIntegrationTypes.MINIO, asset: 'minio'},
-      {name: StorageIntegrationTypes.AMAZON_S3, asset: 's3'}
+      { name: StorageIntegrationTypes.MINIO, asset: 'minio' },
+      { name: StorageIntegrationTypes.AMAZON_S3, asset: 's3' }
     ]
   };
 
@@ -104,7 +105,8 @@ export class DataFeedCreateComponent {
   set testErrorSetter(val: boolean) {
     let errorString: string;
     if (this.integTitle === StorageIntegrationTypes.MINIO) {
-      errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
+      errorString =
+        'Unable to connect: check endpoint, bucket name, access key and secret key.';
     } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
       errorString = 'Unable to connect: check URL, username and password.';
     } else if (this.authSelected === AuthTypes.ACCESSTOKEN) {
@@ -114,7 +116,7 @@ export class DataFeedCreateComponent {
     this.showNotification(val, errorString, 'error');
   }
 
-  public showNotification(show: boolean, message: string , type: string) {
+  public showNotification(show: boolean, message: string, type: string) {
     setTimeout(() => {
       this.notificationShow = show;
     });
@@ -154,28 +156,34 @@ export class DataFeedCreateComponent {
   }
 
   showFieldWebhook() {
-    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
-    this.showFields = {...this.showFields, ...{
-      name: true,
-      url: true,
-      authSelector: true,
-      tokenType: true,
-      token: true,
-      username: true,
-      password: true
-    }};
+    Object.keys(this.showFields).forEach((v) => (this.showFields[v] = false));
+    this.showFields = {
+      ...this.showFields,
+      ...{
+        name: true,
+        url: true,
+        authSelector: true,
+        tokenType: true,
+        token: true,
+        username: true,
+        password: true
+      }
+    };
   }
 
   showFieldStorage() {
-    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
-    this.showFields = {...this.showFields, ...{
-      name: true,
-      endpoint: true,
-      region: true,
-      bucketName: true,
-      accessKey: true,
-      secretKey: true
-    }};
+    Object.keys(this.showFields).forEach((v) => (this.showFields[v] = false));
+    this.showFields = {
+      ...this.showFields,
+      ...{
+        name: true,
+        endpoint: true,
+        region: true,
+        bucketName: true,
+        accessKey: true,
+        secretKey: true
+      }
+    };
   }
 
   public selectIntegration(integration: string) {
@@ -207,6 +215,14 @@ export class DataFeedCreateComponent {
         this.showFieldStorage();
         this.showFields.region = false;
         this.integrationSelected = true;
+        break;
+      }
+      case StorageIntegrationTypes.AMAZON_S3: {
+        this.dropDownVal = 'us-east-2';
+        this.showFieldStorage();
+        this.showFields.endpoint = false;
+        this.integrationSelected = true;
+        break;
       }
     }
   }
@@ -223,16 +239,21 @@ export class DataFeedCreateComponent {
     this.authSelected = type;
   }
 
+  public dropDownChangeHandlers(val: string) {
+    this.dropDownVal = val;
+    console.log(val);
+  }
+
   public testConnection() {
     this.testInProgress = true;
     this.testDestinationEvent.emit({
       name: this.integTitle,
-      auth: this.authSelected
+      auth: this.authSelected,
+      region: this.dropDownVal
     });
   }
 
   public validateForm() {
-
     switch (this.integTitle) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
@@ -241,15 +262,23 @@ export class DataFeedCreateComponent {
         // for servicenow, splunk and elk
         switch (this.authSelected) {
           case AuthTypes.ACCESSTOKEN: {
-            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+            if (
+              this.createForm.get('name').valid &&
+              this.createForm.get('url').valid &&
+              this.createForm.get('tokenType').valid &&
+              this.createForm.get('token').valid
+            ) {
               return true;
             }
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
-            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
-              this.createForm.get('username').valid && this.createForm.get('password').valid) {
+            if (
+              this.createForm.get('name').valid &&
+              this.createForm.get('url').valid &&
+              this.createForm.get('username').valid &&
+              this.createForm.get('password').valid
+            ) {
               return true;
             }
           }
@@ -263,9 +292,24 @@ export class DataFeedCreateComponent {
       }
       case StorageIntegrationTypes.MINIO: {
         // handling minio
-        if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
-          this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
-          this.createForm.get('secretKey').valid) {
+        if (
+          this.createForm.get('name').valid &&
+          this.createForm.get('endpoint').valid &&
+          this.createForm.get('bucketName').valid &&
+          this.createForm.get('accessKey').valid &&
+          this.createForm.get('secretKey').valid
+        ) {
+          return true;
+        }
+        break;
+      }
+      case StorageIntegrationTypes.AMAZON_S3: {
+        if (
+          this.createForm.get('name').valid &&
+          this.createForm.get('bucketName').valid &&
+          this.createForm.get('accessKey').valid &&
+          this.createForm.get('secretKey').valid
+        ) {
           return true;
         }
       }
@@ -277,7 +321,8 @@ export class DataFeedCreateComponent {
     this.saveInProgress = true;
     this.saveDestinationEvent.emit({
       name: this.integTitle,
-      auth: this.authSelected
+      auth: this.authSelected,
+      region: this.dropDownVal
     });
   }
 
@@ -290,11 +335,16 @@ export class DataFeedCreateComponent {
   }
 
   public showTokenInput(field: string) {
-    return this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN;
+    return (
+      this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN
+    );
   }
 
   public showUserPassInput(field: string) {
-    return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
+    return (
+      this.showFields[field] &&
+      this.authSelected === AuthTypes.USERNAMEANDPASSWORD
+    );
   }
 }
 

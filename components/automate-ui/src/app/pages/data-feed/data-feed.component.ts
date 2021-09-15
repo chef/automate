@@ -35,6 +35,7 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 
+
 enum UrlTestState {
   Inactive,
   Loading,
@@ -91,7 +92,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       headers: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       bucketName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       accessKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      secretKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      secretKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
     });
   }
 
@@ -160,7 +161,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public sendTestForDataFeed(event: {name: string, auth: string}): void {
+  public sendTestForDataFeed(event: {name: string, auth: string, region: string}): void {
     let testConnectionObservable: Observable<Object> = null;
 
     switch (event.name) {
@@ -169,22 +170,35 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       case WebhookIntegrationTypes.ELK_KIBANA: {
         switch (event.auth) {
           case AuthTypes.ACCESSTOKEN: {
-            const targetUrl: string = this.createDataFeedForm.controls['url'].value;
-            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
-            const token: string = this.createDataFeedForm.controls['token'].value;
+            const targetUrl: string =
+              this.createDataFeedForm.controls['url'].value;
+            const tokenType: string =
+              this.createDataFeedForm.controls['tokenType'].value;
+            const token: string =
+              this.createDataFeedForm.controls['token'].value;
             const value = JSON.stringify({
-              Authorization: tokenType + ' ' + token
+              Authorization: tokenType + ' ' + token,
             });
-            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-              value);
+            testConnectionObservable =
+              this.datafeedRequests.testDestinationWithHeaders(
+                targetUrl,
+                value
+              );
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
-            const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
-            const targetUsername: string = this.createDataFeedForm.controls['username'].value;
-            const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
-              targetUrl, targetUsername, targetPassword);
+            const targetUrl: string =
+              this.createDataFeedForm.controls['url'].value;
+            const targetUsername: string =
+              this.createDataFeedForm.controls['username'].value;
+            const targetPassword: string =
+              this.createDataFeedForm.controls['password'].value;
+            testConnectionObservable =
+              this.datafeedRequests.testDestinationWithUsernamePassword(
+                targetUrl,
+                targetUsername,
+                targetPassword
+              );
           }
         }
         break;
@@ -196,16 +210,38 @@ export class DataFeedComponent implements OnInit, OnDestroy {
       }
       case StorageIntegrationTypes.MINIO: {
         // handling minio
-        const targetUrl: string = this.createDataFeedForm.controls['endpoint'].value;
+        const targetUrl: string =
+          this.createDataFeedForm.controls['endpoint'].value;
         const data = {
           url: targetUrl,
           aws: {
-            access_key: this.createDataFeedForm.controls['accessKey'].value.trim(),
-            secret_access_key: this.createDataFeedForm.controls['secretKey'].value.trim(),
-            bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
+            access_key:
+              this.createDataFeedForm.controls['accessKey'].value.trim(),
+            secret_access_key:
+              this.createDataFeedForm.controls['secretKey'].value.trim(),
+            bucket: this.createDataFeedForm.controls['bucketName'].value.trim(),
           }
         };
-        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+        testConnectionObservable =
+          this.datafeedRequests.testDestinationForMinio(data);
+          break;
+      }
+      case StorageIntegrationTypes.AMAZON_S3: {
+        const data = {
+          url: 'null',
+          aws: {
+            access_key:
+              this.createDataFeedForm.controls['accessKey'].value.trim(),
+            secret_access_key:
+              this.createDataFeedForm.controls['secretKey'].value.trim(),
+            bucket: this.createDataFeedForm.controls['bucketName'].value.trim(),
+            region: event.region
+          }
+        };
+        console.log('region is', event.region);
+        console.log(data)
+        testConnectionObservable =
+          this.datafeedRequests.testDestinationForMinio(data);
       }
     }
     if (testConnectionObservable != null) {
@@ -230,7 +266,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.createChild.slidePanel();
   }
 
-  public saveDestination(event: {name: string, auth: string}) {
+  public saveDestination(event: {name: string, auth: string, region: string}) {
 
     let destinationObj: CreateDestinationPayload,
         headers: string,
@@ -248,12 +284,14 @@ export class DataFeedComponent implements OnInit, OnDestroy {
               name: this.createDataFeedForm.controls['name'].value.trim(),
               url: this.createDataFeedForm.controls['url'].value.trim(),
               integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
+              services: event.name,
             };
-            const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
-            const token: string = this.createDataFeedForm.controls['token'].value.trim();
+            const tokenType: string =
+              this.createDataFeedForm.controls['tokenType'].value.trim();
+            const token: string =
+              this.createDataFeedForm.controls['token'].value.trim();
             headers = JSON.stringify({
-              Authorization: tokenType + ' ' + token
+              Authorization: tokenType + ' ' + token,
             });
             storage = null;
             break;
@@ -263,12 +301,14 @@ export class DataFeedComponent implements OnInit, OnDestroy {
               name: this.createDataFeedForm.controls['name'].value.trim(),
               url: this.createDataFeedForm.controls['url'].value.trim(),
               integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
+              services: event.name,
             };
-            const username: string = this.createDataFeedForm.controls['username'].value.trim();
-            const password: string = this.createDataFeedForm.controls['password'].value.trim();
+            const username: string =
+              this.createDataFeedForm.controls['username'].value.trim();
+            const password: string =
+              this.createDataFeedForm.controls['password'].value.trim();
             headers = JSON.stringify({
-              Authorization: 'Basic ' + btoa(username + ':' + password)
+              Authorization: 'Basic ' + btoa(username + ':' + password),
             });
             storage = null;
           }
@@ -290,14 +330,46 @@ export class DataFeedComponent implements OnInit, OnDestroy {
           meta_data: [
             {
               key: 'bucket',
-              value: this.createDataFeedForm.controls['bucketName'].value.trim()
+              value:
+                this.createDataFeedForm.controls['bucketName'].value.trim(),
+            },
+          ],
+        };
+        const accessKey: string =
+          this.createDataFeedForm.controls['accessKey'].value.trim();
+        const secretKey: string =
+          this.createDataFeedForm.controls['secretKey'].value.trim();
+        storage = { accessKey, secretKey };
+        headers = null;
+        break;
+      }
+      case StorageIntegrationTypes.AMAZON_S3: {
+        destinationObj = {
+          name: this.createDataFeedForm.controls['name'].value.trim(),
+          url: 'null',
+          integration_types: IntegrationTypes.STORAGE,
+          services: event.name,
+          meta_data: [
+            {
+              key: 'bucket',
+              value:
+                this.createDataFeedForm.controls['bucketName'].value.trim()
+            },
+            {
+              key: 'region',
+              value: event.region
             }
           ]
         };
-        const accessKey: string = this.createDataFeedForm.controls['accessKey'].value.trim();
-        const secretKey: string = this.createDataFeedForm.controls['secretKey'].value.trim();
-        storage = {accessKey, secretKey};
+        console.log('Region in save is ',event.region)
+        console.log('destinationobject',destinationObj)
+        const accessKey: string =
+          this.createDataFeedForm.controls['accessKey'].value.trim();
+        const secretKey: string =
+          this.createDataFeedForm.controls['secretKey'].value.trim();
+        storage = { accessKey, secretKey };
         headers = null;
+        break;
       }
     }
     if (destinationObj && (headers || storage)) {
