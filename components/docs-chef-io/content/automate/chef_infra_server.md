@@ -566,8 +566,6 @@ The details page of the policy group lets you view the list of **Nodes**.
 
 Select a node from the list to view its details
 
-IMAGE
-
 {{< note >}} Selecting a specific node opens details section of the **Nodes** tab.
 {{< /note >}}
 
