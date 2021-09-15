@@ -93,6 +93,7 @@ describe('DataFeedComponent', () => {
     const bucketName = 'b123';
     const accessKey = 'test123';
     const secretKey = 'test123';
+    const region = 'region1';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -120,7 +121,8 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['password'].setValue(password);
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null
       });
 
       store.dispatch(new CreateDestinationSuccess(destination));
@@ -139,7 +141,8 @@ describe('DataFeedComponent', () => {
 
       component.saveDestination({
         auth: AuthTypes.ACCESSTOKEN,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null
       });
 
       store.dispatch(new CreateDestinationSuccess(destination));
@@ -159,7 +162,8 @@ describe('DataFeedComponent', () => {
 
       component.saveDestination({
         auth: null,
-        name: StorageIntegrationTypes.MINIO
+        name: StorageIntegrationTypes.MINIO,
+        region: null
       });
 
       store.dispatch(new CreateDestinationSuccess(destination));
@@ -180,7 +184,8 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['password'].setValue(password);
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null
       });
 
       const conflict = <HttpErrorResponse>{
@@ -205,7 +210,8 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['password'].setValue(password);
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null
       });
 
       const error = <HttpErrorResponse>{
@@ -229,7 +235,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['store'], 'dispatch');
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null,
       });
 
       expect(component['store'].dispatch).toHaveBeenCalledWith(
@@ -255,7 +262,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['store'], 'dispatch');
       component.saveDestination({
         auth: AuthTypes.ACCESSTOKEN,
-        name: WebhookIntegrationTypes.SPLUNK
+        name: WebhookIntegrationTypes.SPLUNK,
+        region: null
       });
 
       expect(component['store'].dispatch).toHaveBeenCalledWith(
@@ -282,7 +290,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['store'], 'dispatch');
       component.saveDestination({
         auth: null,
-        name: StorageIntegrationTypes.MINIO
+        name: StorageIntegrationTypes.MINIO,
+        region: null
       });
 
       expect(component['store'].dispatch).toHaveBeenCalledWith(
@@ -315,7 +324,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePassword');
       component.sendTestForDataFeed({
         auth: AuthTypes.USERNAMEANDPASSWORD,
-        name: WebhookIntegrationTypes.SERVICENOW
+        name: WebhookIntegrationTypes.SERVICENOW,
+        region: null
       });
 
       expect(component['datafeedRequests']
@@ -336,7 +346,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
       component.sendTestForDataFeed({
         auth: AuthTypes.ACCESSTOKEN,
-        name: WebhookIntegrationTypes.SPLUNK
+        name: WebhookIntegrationTypes.SPLUNK,
+        region: null
       });
 
       expect(component['datafeedRequests']
@@ -359,7 +370,8 @@ describe('DataFeedComponent', () => {
       spyOn(component['datafeedRequests'], 'testDestinationForMinio');
       component.sendTestForDataFeed({
         auth: null,
-        name: StorageIntegrationTypes.MINIO
+        name: StorageIntegrationTypes.MINIO,
+        region: null
       });
 
       expect(component['datafeedRequests']
@@ -369,6 +381,74 @@ describe('DataFeedComponent', () => {
           access_key: component.createDataFeedForm.controls['accessKey'].value.trim(),
           secret_access_key: component.createDataFeedForm.controls['secretKey'].value.trim(),
           bucket: component.createDataFeedForm.controls['bucketName'].value.trim()
+        }
+      });
+    });
+
+    it('on save success for s3 and check dispatched store data', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
+      component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
+      component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
+
+      spyOn(component['store'], 'dispatch');
+      component.saveDestination({
+        auth: null,
+        name: StorageIntegrationTypes.AMAZON_S3,
+        region: region
+      });
+
+      expect(component['store'].dispatch).toHaveBeenCalledWith(
+        new CreateDestination(
+          {
+            name: component.createDataFeedForm.controls['name'].value.trim(),
+            url: 'null',
+            integration_types: IntegrationTypes.STORAGE,
+            services: StorageIntegrationTypes.AMAZON_S3,
+            meta_data: [
+              {
+                key: 'bucket',
+                value: component.createDataFeedForm.controls['bucketName'].value.trim()
+              },
+              {
+                key: 'region',
+                value: region
+              }
+            ]
+          },
+          null,
+          {
+            accessKey: component.createDataFeedForm.controls['accessKey'].value.trim(),
+            secretKey: component.createDataFeedForm.controls['secretKey'].value.trim()
+          }
+        )
+      );
+    });
+
+    it('on test success for S3 and check dispatched store data', () => {
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
+      component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
+      component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
+
+      spyOn(component['datafeedRequests'], 'testDestinationForMinio');
+      component.sendTestForDataFeed({
+        auth: null,
+        name: StorageIntegrationTypes.AMAZON_S3,
+        region: region
+      });
+
+      expect(component['datafeedRequests']
+      .testDestinationForMinio).toHaveBeenCalledWith({
+        url: 'null',
+        aws: {
+          access_key: component.createDataFeedForm.controls['accessKey'].value.trim(),
+          secret_access_key: component.createDataFeedForm.controls['secretKey'].value.trim(),
+          bucket: component.createDataFeedForm.controls['bucketName'].value.trim(),
+          region: region
         }
       });
     });

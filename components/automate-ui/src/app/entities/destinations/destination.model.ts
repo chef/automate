@@ -38,5 +38,5 @@ export const regions = [
   { name: 'Europe (Paris) eu-west-3', code: 'eu-west-3' },
   { name: 'Europe (Stockholm) eu-north-1', code: 'eu-north-1' },
   { name: 'Middle East (Bahrain) me-south-1', code: 'me-south-1' },
-  { name: 'South America (São Paulo) sa-east-1', code: 'sa-east-1' },
+  { name: 'South America (São Paulo) sa-east-1', code: 'sa-east-1' }
 ];
