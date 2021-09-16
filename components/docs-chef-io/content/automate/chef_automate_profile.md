@@ -32,7 +32,7 @@ The Display Name bar should not be kept empty or else it throws error.
 
 {{< figure src="/images/automate/error-in-display-name-bar.png" alt="Error in Display Name">}}
 
-### Update the Date/Time Format
+### Change the Date/Time Format
 
 You can select the date and time format amongst the five formats provided in Chef Automate.
 
