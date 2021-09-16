@@ -166,21 +166,6 @@ export class EnableDisableDestinationFailure implements Action {
 
 
 
-export class EnableDisableDestination implements Action {
-  readonly type = DestinationActionTypes.ENABLE_DISABLE;
-  constructor(public payload: { enableDisable: EnableDestination }) { }
-}
-
-export class EnableDisableDestinationSuccess implements Action {
-  readonly type = DestinationActionTypes.ENABLE_DISABLE_SUCCESS;
-  constructor(public payload) { }
-}
-export class EnableDisableDestinationFailure implements Action {
-  readonly type = DestinationActionTypes.ENABLE_DISABLE_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
-}
-
-
 export type DestinationActions =
   | GetDestinations
   | GetDestinationsSuccess
