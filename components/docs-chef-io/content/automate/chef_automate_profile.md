@@ -22,9 +22,13 @@ Select **Profile** to view the details with respect to your _username_. The **De
 
 ### Change a Display Name
 
-You can update the display name for your Chef Automate in the bar.
+You can change the display name for your Chef Automate in the bar.
 
 {{< figure src="/images/automate/display-name-in-profile.png" alt="Display Name of Chef Automate">}}
+
+{{< note >}}
+The **Display Name** gets updated as soon as you change the name in the bar.
+{{< /note >}}
 
 The Display Name bar should not be kept empty or else it throws error.
 
@@ -37,6 +41,10 @@ You can select one of five date and time formats.
 {{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
 
 Select the date/time format and save to get the changes reflected in the interface.
+
+{{< note >}}
+The **Date/Time Format** gets updated as soon as you select a new time format from the drop down.
+{{< /note >}}
 
 ### Reset Password
 
