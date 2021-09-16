@@ -70,8 +70,6 @@ if (Cypress.env('SKIP_SSO')) {
           cy.get('[type=submit]').click().then(() => {
             cy.get('[data-cy=welcome-title]').should('exist');
             cy.url().should('include', '/event-feed'); // default landing page
-            // close welcome modal if present
-            cy.get('app-welcome-modal').invoke('hide');
             cy.contains('Local Administrator'); // current user name
             // cy.screenshot()
           });
