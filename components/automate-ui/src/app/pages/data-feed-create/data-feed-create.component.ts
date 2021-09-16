@@ -335,9 +335,11 @@ export class DataFeedCreateComponent {
   public validateHeaders(customHeaders: string): void {
     const headersVal = customHeaders.split('\n');
     for (const values in headersVal) {
-      this.flagHeaders = Regex.patterns.VALID_HEADER.test(headersVal[values]);
-      if (this.flagHeaders === false) {
-        break;
+      if (headersVal[values]) {
+        this.flagHeaders = Regex.patterns.VALID_HEADER.test(headersVal[values]);
+        if (this.flagHeaders === false) {
+          break;
+        }
       }
     }
   }

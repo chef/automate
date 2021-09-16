@@ -168,8 +168,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
         const headersJson = {};
         const headersVal = customHeaders.split('\n');
         for (const values in headersVal) {
-          const word = headersVal[values].split(':');
-          headersJson[word[0]] = word[1];
+          if (headersVal[values]) {
+            const word = headersVal[values].split(':');
+            headersJson[word[0]] = word[1];
+          }
         }
         return headersJson;
   }
