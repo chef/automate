@@ -59,6 +59,7 @@ export class DataFeedCreateComponent {
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
   public flagHeaders = true;
+  public validHeadersValue = false;
 
   private saveInProgress = false;
   private testInProgress = false;
@@ -257,9 +258,6 @@ export class DataFeedCreateComponent {
   }
 
   public testConnection() {
-    if (!this.headerChecked) {
-      this.createForm.get('headers').setValue('');
-    }
     this.testInProgress = true;
     this.testDestinationEvent.emit({
       name: this.integTitle,
@@ -280,14 +278,22 @@ export class DataFeedCreateComponent {
           case AuthTypes.ACCESSTOKEN: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              return true;
+                if (this.headerChecked && this.validHeadersValue && this.flagHeaders) {
+                  return true;
+                } else if (!this.headerChecked && this.flagHeaders) {
+                  return true;
+                }
             }
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
-              return true;
+              if (this.headerChecked && this.validHeadersValue && this.flagHeaders) {
+                return true;
+              } else if (!this.headerChecked && this.flagHeaders) {
+                return true;
+              }
             }
           }
         }
@@ -306,9 +312,6 @@ export class DataFeedCreateComponent {
   }
 
   public saveDestination() {
-    if (!this.headerChecked) {
-      this.createForm.get('headers').setValue('');
-    }
     this.saveInProgress = true;
     this.saveDestinationEvent.emit({
       name: this.integTitle,
@@ -335,11 +338,14 @@ export class DataFeedCreateComponent {
   public validateHeaders(customHeaders: string): void {
     const headersVal = customHeaders.split('\n');
     for (const values in headersVal) {
-      if (headersVal[values]) {
+      if (this.headerChecked && headersVal[values]) {
         this.flagHeaders = Regex.patterns.VALID_HEADER.test(headersVal[values]);
+        this.validHeadersValue = this.flagHeaders;
         if (this.flagHeaders === false) {
           break;
         }
+      } else if (headersVal[values] === '') {
+        this.flagHeaders = true;
       }
     }
   }

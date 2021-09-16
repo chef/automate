@@ -160,10 +160,6 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public setCheck(event) {
-    console.log(event);
-  }
-
   public addHeadersforCustomDataFeed(customHeaders: string): {} {
         const headersJson = {};
         const headersVal = customHeaders.split('\n');
