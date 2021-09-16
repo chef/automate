@@ -137,6 +137,7 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=Custom]').click();
       cy.get('[data-cy=add-name]').type(name + date);
       cy.get('[data-cy=add-url]').type(url);
+      cy.get('[data-cy=add-token-type]').type(tokenType);
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-notification.info').should('be.visible');
@@ -184,6 +185,7 @@ describe('chef datafeed', () => {
       cy.get('[data-cy=Custom]').click();
       cy.get('[data-cy=add-name]').type(name + reusableDate);
       cy.get('[data-cy=add-url]').type(url);
+      cy.get('[data-cy=add-token-type]').type(tokenType);
       cy.get('[data-cy=add-token]').type(token);
       cy.get('[data-cy=add-button]').click();
       cy.get('app-data-feed-create').scrollTo('top');
