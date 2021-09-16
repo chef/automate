@@ -3,7 +3,6 @@
 .delivery/**            @chef/jex-team
 .expeditor/**           @chef/jex-team
 .github/**              @chef/a2-maintainers @chef/jex-team
-.travis.yml             @chef/a2-maintainers @chef/jex-team
 dev/**                  @chef/a2-maintainers
 docs/**                 @chef/a2-maintainers @chef/jex-team @chef/docs-team
 inspec/**               @chef/a2-maintainers @chef/jex-team
