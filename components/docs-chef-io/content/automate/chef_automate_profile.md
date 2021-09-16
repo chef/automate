@@ -22,7 +22,7 @@ Chef Automate users can manage their own display name, time zone, and password. 
 
 Select **Profile** to view the details with respect to your _username_. The **Details** tab lets you update your _Display Name_ and the _Time Format_, whereas the **Reset Password** tab lets you update your password.
 
-### Update the Display Name
+### Change a Display Name
 
 You can update the display name for your Chef Automate in the bar.
 
