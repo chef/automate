@@ -482,9 +482,7 @@ function LoginHelper(username: string) {
     cy.get('app-welcome-modal').invoke('hide');
     cy.saveStorage();
 
-    cy.wait(['@getAuthPopulateCache']);
-    // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
+    cy.wait(['@getAuthPopulateCache']);    
   });
 }
 
