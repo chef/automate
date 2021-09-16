@@ -190,6 +190,16 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
 		}
+		if !deployCmdFlags.acceptMLSA {
+			agree, err := writer.Confirm(promptMLSA)
+			if err != nil {
+				return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+			}
+
+			if !agree {
+				return status.New(status.InvalidCommandArgsError, errMLSA)
+			}
+		}
 		conf := new(dc.AutomateConfig)
 		manifestProvider := manifest.NewLocalHartManifestProvider(
 			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),

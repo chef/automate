@@ -37,7 +37,7 @@ func isA2HADeployment(configPath []string) bool {
 }
 
 func deployA2HA() error {
-	writer.Printf("A2HA deployment started \n")
+	writer.Printf("A2HA deployment started \n\n\n")
 	//args := []string{"deploy"}
 	c := exec.Command("automate-cluster-ctl", "deploy")
 	c.Dir = "/hab/a2_deploy_workspace"
