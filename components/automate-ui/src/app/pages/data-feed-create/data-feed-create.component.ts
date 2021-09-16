@@ -173,20 +173,6 @@ export class DataFeedCreateComponent {
     }};
   }
 
-
-  showCustomField() {
-    this.showFields = {...this.showFields, ...{
-      name: true,
-      url: true,
-      authSelector: true,
-      tokenType: true,
-      token: true,
-      username: true,
-      password: true,
-      useHeaders: true
-    }};
-  }
-
   updateHeaderCheckbox(event: boolean): void {
     this.checkEvent.emit(event);
     this.headerChecked = event;
@@ -231,7 +217,8 @@ export class DataFeedCreateComponent {
         break;
       }
       case WebhookIntegrationTypes.CUSTOM: {
-        this.showCustomField();
+        this.showFieldWebhook();
+        this.showFields.useHeaders = true;
         this.authSelected = AuthTypes.ACCESSTOKEN;
         this.createForm.controls['tokenType'].setValue('Bearer');
         this.integrationSelected = true;

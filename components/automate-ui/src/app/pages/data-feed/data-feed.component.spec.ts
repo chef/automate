@@ -427,12 +427,13 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
       component.createDataFeedForm.controls['token'].setValue(token);
       component.createDataFeedForm.controls['headers'].setValue(headers);
-
+      component.checkedHeaders = true;
       spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
       component.sendTestForDataFeed({
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.CUSTOM
       });
+      
       const userToken = JSON.stringify({
         Authorization: 'Bearer' + ' ' + token
       });
@@ -453,7 +454,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
       component.createDataFeedForm.controls['headers'].setValue(headers);
-
+      component.checkedHeaders = true;
       spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePasswordWithHeaders');
       component.sendTestForDataFeed({
         auth: AuthTypes.USERNAMEANDPASSWORD,

@@ -59,6 +59,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public sendingDataFeed = false;
   private isDestroyed = new Subject<boolean>();
+  public checkedHeaders = false;
 
   @ViewChild(DataFeedCreateComponent) createChild: DataFeedCreateComponent;
 
@@ -160,6 +161,10 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public setCheck(event) {
+    this.checkedHeaders = event;
+  }
+
   public addHeadersforCustomDataFeed(customHeaders: string): {} {
         const headersJson = {};
         const headersVal = customHeaders.split('\n');
@@ -190,7 +195,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
               Authorization: tokenType + ' ' + token
             });
             let value;
-            if (headerVal) {
+            if (headerVal && this.checkedHeaders) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const headers = {...JSON.parse(userToken), ...headersJson};
               value = JSON.stringify(headers);
@@ -207,13 +212,13 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             const targetPassword: string = this.createDataFeedForm.controls['password'].value;
             const headerVal: string = this.createDataFeedForm.controls['headers'].value;
             let value;
-            if (targetUrl && targetUsername && targetPassword && headerVal) {
+            if (targetUrl && targetUsername && targetPassword && headerVal && this.checkedHeaders) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               value = JSON.stringify(headersJson);
               testConnectionObservable = this.datafeedRequests.
               testDestinationWithUsernamePasswordWithHeaders(targetUrl, targetUsername,
                 targetPassword, value);
-            } else if (targetUrl && targetUsername && targetPassword && !(headerVal)) {
+            } else if (targetUrl && targetUsername && targetPassword && !(headerVal && this.checkedHeaders)) {
               testConnectionObservable = this.datafeedRequests.
               testDestinationWithUsernamePassword(targetUrl, targetUsername, targetPassword);
             }
