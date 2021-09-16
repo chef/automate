@@ -14,7 +14,7 @@ gh_repo = "automate"
 
 ## Overview
 
-Chef Automate users can manage their own display name, time zone, and password. Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
+Chef Automate users can manage their own display name, date/time format, and password. Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
 
 {{< figure src="/images/automate/chef-automate-profile.png" alt="Profile Section in Chef Automate">}}
 
