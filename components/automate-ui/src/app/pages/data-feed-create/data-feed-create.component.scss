@@ -93,7 +93,7 @@ main {
     }
 
     .input-margin {
-      display: flex;
+      display: inline-block;
       margin: 15px 0;
       width: 70%;
       flex-direction: row-reverse;
@@ -153,6 +153,20 @@ main {
           cursor: not-allowed;
         }
       }
+    }
+
+    .customtokenblock {
+      width: 40%;
+    }
+
+    .customtokentypeblock {
+      width: calc(30% - 16px);
+      margin-right: 16px;
+    }
+
+    .custompasswordblock {
+      width: 34%;
+      margin-right: 16px;
     }
   }
 }

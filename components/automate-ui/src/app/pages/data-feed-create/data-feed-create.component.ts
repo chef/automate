@@ -95,7 +95,8 @@ export class DataFeedCreateComponent {
     bucketName: false,
     accessKey: false,
     secretKey: false,
-    useHeaders: false
+    useHeaders: false,
+    customToken: false
   };
 
   set saveDone(done: boolean) {
@@ -196,6 +197,8 @@ export class DataFeedCreateComponent {
     this.showFields.headers = false;
     this.integTitle = integration;
     this.createForm.reset();
+    this.headerChecked = false;
+    this.flagHeaders = true;
     setTimeout(() => {
       this.showSelect = true;
       this.name.nativeElement.focus();
@@ -218,9 +221,10 @@ export class DataFeedCreateComponent {
       }
       case WebhookIntegrationTypes.CUSTOM: {
         this.showFieldWebhook();
+        this.showFields.customToken = true;
         this.showFields.useHeaders = true;
         this.authSelected = AuthTypes.ACCESSTOKEN;
-        this.createForm.controls['tokenType'].setValue('Bearer');
+        this.createForm.controls['tokenType'].setValue('');
         this.integrationSelected = true;
         break;
       }
@@ -265,9 +269,13 @@ export class DataFeedCreateComponent {
           case AuthTypes.ACCESSTOKEN: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-                if (this.headerChecked && this.validHeadersValue && this.flagHeaders) {
+                if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                  this.validHeadersValue && this.flagHeaders) {
                   return true;
-                } else if (!this.headerChecked && this.flagHeaders) {
+                } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                  !this.headerChecked && this.flagHeaders) {
+                  return true;
+                } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
                   return true;
                 }
             }
@@ -276,9 +284,13 @@ export class DataFeedCreateComponent {
           case AuthTypes.USERNAMEANDPASSWORD: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
-              if (this.headerChecked && this.validHeadersValue && this.flagHeaders) {
+              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                this.validHeadersValue && this.flagHeaders) {
                 return true;
-              } else if (!this.headerChecked && this.flagHeaders) {
+              } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                !this.headerChecked && this.flagHeaders) {
+                return true;
+              } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
                 return true;
               }
             }
