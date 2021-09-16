@@ -291,7 +291,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             const userToken = JSON.stringify({
               Authorization: tokenType + ' ' + token
             });
-            if (headerVal) {
+            if (headerVal && this.checkedHeaders) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const value = {...headersJson, ...JSON.parse(userToken)};
               headers = JSON.stringify(value);
@@ -308,7 +308,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             const userToken = JSON.stringify({
               Authorization: 'Basic ' + btoa(username + ':' + password)
             });
-            if (headerVal) {
+            if (headerVal && this.checkedHeaders) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
               const value = {...headersJson, ...JSON.parse(userToken)};
               headers = JSON.stringify(value);

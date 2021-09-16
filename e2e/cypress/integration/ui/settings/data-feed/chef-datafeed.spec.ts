@@ -1,5 +1,4 @@
 describe('chef datafeed', () => {
-  const reusableDate = Date.now();
 
   before(() => {
     cy.adminLogin('/settings/notifications').then(() => {

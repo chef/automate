@@ -144,6 +144,10 @@
                 </chef-button>
               </div>
             </label>
+            <chef-error
+              *ngIf="createForm.get('tokenType').hasError('required') && createForm.get('tokenType').dirty">
+              token type is required.
+            </chef-error>
           </chef-form-field>
         </div>
         <div class="input-margin" *ngIf="showTokenInput('token')" [ngClass]="{'customtokenblock' : showFields.customToken}">
