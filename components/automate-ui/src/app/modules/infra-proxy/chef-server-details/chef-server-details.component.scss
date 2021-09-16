@@ -102,6 +102,7 @@ img {
 
 .version-dropdown {
   color: $chef-primary-dark;
+  margin-bottom: 30px;
 
   ::ng-deep label {
     display: inline;
@@ -112,10 +113,11 @@ img {
 
   chef-select {
     font-size: 14px;
+    font-weight: normal;
   }
 
   ::ng-deep chef-select .selected-value {
-    height: 36px;
+    height: 45px;
     width: 309px;
     background: $chef-white;
     padding: 0.5em;

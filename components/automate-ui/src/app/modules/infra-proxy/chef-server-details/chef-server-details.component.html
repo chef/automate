@@ -88,7 +88,8 @@
                   type="text"
                   [resetOrigin]="saveSuccessful"
                   autocomplete="off"
-                  data-cy="update-server-fqdn">
+                  data-cy="update-server-fqdn"
+                  placeholder="FQDN">
               </label>
               <chef-error
                 *ngIf="selected === 'fqdn' && fqdnForm.get('fqdn').hasError('required') && fqdnForm.get('fqdn').dirty">
@@ -112,7 +113,8 @@
                   type="text"
                   [resetOrigin]="saveSuccessful"
                   autocomplete="off"
-                  data-cy="update-server-ip-address">
+                  data-cy="update-server-ip-address"
+                  placeholder="IP Address">
               </label>
               <chef-error
                 *ngIf="ipForm.get('ip_address').hasError('required') && ipForm.get('ip_address').dirty">
