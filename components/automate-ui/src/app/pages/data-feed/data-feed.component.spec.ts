@@ -433,7 +433,6 @@ describe('DataFeedComponent', () => {
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.CUSTOM
       });
-      
       const userToken = JSON.stringify({
         Authorization: 'Bearer' + ' ' + token
       });

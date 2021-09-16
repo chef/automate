@@ -218,7 +218,8 @@ export class DataFeedComponent implements OnInit, OnDestroy {
               testConnectionObservable = this.datafeedRequests.
               testDestinationWithUsernamePasswordWithHeaders(targetUrl, targetUsername,
                 targetPassword, value);
-            } else if (targetUrl && targetUsername && targetPassword && !(headerVal && this.checkedHeaders)) {
+            } else if (targetUrl && targetUsername && targetPassword &&
+              !(headerVal && this.checkedHeaders)) {
               testConnectionObservable = this.datafeedRequests.
               testDestinationWithUsernamePassword(targetUrl, targetUsername, targetPassword);
             }
