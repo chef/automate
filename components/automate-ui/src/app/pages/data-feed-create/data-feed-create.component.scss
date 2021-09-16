@@ -1,5 +1,5 @@
 @import "~styles/variables";
-@import '../shared/slide-panel';
+@import "../shared/slide-panel";
 
 main {
   margin: 0 32px 32px 32px;
@@ -36,8 +36,8 @@ main {
           overflow: hidden;
           width: 100%;
           height: 0;
-          transition: .5s ease;
-          opacity: 0.80;
+          transition: 0.5s ease;
+          opacity: 0.8;
           font-weight: 900;
           letter-spacing: 1.2px;
 
@@ -175,7 +175,7 @@ app-notification {
   border-bottom: 0.5px solid $chef-key-tab;
 
   h1 {
-    margin: .40em 0;
+    margin: 0.4em 0;
     flex-grow: 2;
     text-align: left;
     font-weight: bold;
@@ -213,4 +213,12 @@ app-notification {
 ::ng-deep [panelClass="chef-dropdown"] {
   font-size: inherit;
   font-weight: 100;
+}
+
+.dropdown-menu {
+
+  ::ng-deep chef-dropdown {
+    max-height: 256px;
+    overflow: scroll;
+  }
 }

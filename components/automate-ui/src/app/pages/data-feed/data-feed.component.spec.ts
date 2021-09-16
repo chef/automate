@@ -236,7 +236,7 @@ describe('DataFeedComponent', () => {
       component.saveDestination({
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.SERVICENOW,
-        region: null,
+        region: null
       });
 
       expect(component['store'].dispatch).toHaveBeenCalledWith(
