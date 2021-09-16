@@ -1,22 +1,20 @@
 +++
-title = "Profile"
+title = "User Profile"
 
 draft = false
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Profile"
+    title = "User Profile"
     parent = "automate/settings"
-    identifier = "automate/settings/chef_automate_profile.md Profile"
+    identifier = "automate/settings/chef_automate_profile.md User Profile"
     weight = 120
 +++
 
 ## Overview
 
 Chef Automate users can manage their own display name, time zone, and password. Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
-
-
 
 {{< figure src="/images/automate/chef-automate-profile.png" alt="Profile Section in Chef Automate">}}
 
