@@ -197,7 +197,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             let value;
             if (headerVal && this.checkedHeaders) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
-              const headers = {...JSON.parse(userToken), ...headersJson};
+              const headers = {...headersJson, ...JSON.parse(userToken)};
               value = JSON.stringify(headers);
             } else {
               value = userToken;
@@ -293,7 +293,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             });
             if (headerVal) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
-              const value = {...JSON.parse(userToken), ...headersJson};
+              const value = {...headersJson, ...JSON.parse(userToken)};
               headers = JSON.stringify(value);
             } else {
               headers = userToken;
@@ -310,7 +310,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             });
             if (headerVal) {
               const headersJson = this.addHeadersforCustomDataFeed(headerVal);
-              const value = {...JSON.parse(userToken), ...headersJson};
+              const value = {...headersJson, ...JSON.parse(userToken)};
               headers = JSON.stringify(value);
             } else {
               headers = userToken;
