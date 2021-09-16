@@ -99,3 +99,45 @@ img {
 ::ng-deep chef-button button:focus {
   outline: none;
 }
+
+.version-dropdown {
+  color: $chef-primary-dark;
+
+  ::ng-deep label {
+    display: inline;
+    color: $chef-primary-dark;
+    font-size: 15px;
+    margin-right: 15px;
+  }
+
+  chef-select {
+    font-size: 14px;
+  }
+
+  ::ng-deep chef-select .selected-value {
+    height: 36px;
+    width: 309px;
+    background: $chef-white;
+    padding: 0.5em;
+    border: 1px solid $chef-form-input;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+
+  ::ng-deep chef-select chef-dropdown {
+    border: 1px solid $chef-key-tab;
+    box-sizing: border-box;
+    border-radius: 4px;
+  }
+
+  ::ng-deep chef-select chef-option {
+    height: 32px;
+    padding: 0.4em;
+  }
+
+  ::ng-deep chef-select .selected {
+    background: $chef-primary-bright;
+    border-radius: 4px;
+  }
+}
+
