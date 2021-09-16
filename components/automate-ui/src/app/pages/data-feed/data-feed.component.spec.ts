@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-import { DataFeedComponent } from './data-feed.component';
+import { DataFeedComponent, UrlTestState } from './data-feed.component';
 import { DestinationRequests } from 'app/entities/destinations/destination.requests';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { Destination } from 'app/entities/destinations/destination.model';
@@ -20,6 +20,7 @@ import {
   StorageIntegrationTypes,
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
+import { of, throwError } from 'rxjs';
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
@@ -110,6 +111,16 @@ describe('DataFeedComponent', () => {
       expect(component.createModalVisible).toBe(false);
       component.slidePanel();
       expect(component.createModalVisible).toBe(true);
+    });
+
+    it('reveal url status success', () => {
+      component.revealUrlStatus(UrlTestState.Success);
+      expect(component.createChild.notificationMessage).not.toBe('');
+    });
+
+    it('reveal url status failure', () => {
+      component.revealUrlStatus(UrlTestState.Failure);
+      expect(component.createChild.notificationMessage).not.toBe('');
     });
 
     it('on success, closes slider and adds new data feed', () => {
@@ -307,39 +318,38 @@ describe('DataFeedComponent', () => {
     });
 
     it('on test success for Service now and check dispatched store data', () => {
-
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
-
-      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePassword');
+      spyOn(component, 'revealUrlStatus');
+      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePassword')
+      .and.returnValue(of([]));
       component.sendTestForDataFeed({
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.SERVICENOW
       });
-
       expect(component['datafeedRequests']
       .testDestinationWithUsernamePassword).toHaveBeenCalledWith(
         destination.url,
         username,
         password
       );
+      expect(component.revealUrlStatus).toHaveBeenCalledWith(UrlTestState.Success);
     });
 
     it('on test success for Splunk and check dispatched store data', () => {
-
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
       component.createDataFeedForm.controls['token'].setValue(token);
-
-      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
+      spyOn(component, 'revealUrlStatus');
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders')
+      .and.returnValue(throwError([]));
       component.sendTestForDataFeed({
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.SPLUNK
       });
-
       expect(component['datafeedRequests']
       .testDestinationWithHeaders).toHaveBeenCalledWith(
         destination.url,
@@ -347,6 +357,7 @@ describe('DataFeedComponent', () => {
           Authorization: 'Bearer' + ' ' + token
         })
       );
+      expect(component.revealUrlStatus).toHaveBeenCalledWith(UrlTestState.Failure);
     });
 
     it('on test success for Minio and check dispatched store data', () => {

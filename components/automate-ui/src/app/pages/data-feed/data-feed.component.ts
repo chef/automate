@@ -35,7 +35,7 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 
-enum UrlTestState {
+export enum UrlTestState {
   Inactive,
   Loading,
   Success,
@@ -250,7 +250,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  private revealUrlStatus(status: UrlTestState) {
+  revealUrlStatus(status: UrlTestState) {
     this.createChild.testDoneSetter = false;
     if (status === UrlTestState.Success) {
       this.createChild.testSuccessSetter = true;
