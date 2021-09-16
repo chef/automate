@@ -26,9 +26,10 @@ import {
   deleteStatus,
   testConnectionStatus
 } from 'app/entities/destinations/destination.selectors';
-import { Destination } from 'app/entities/destinations/destination.model';
+import { Destination, regions } from 'app/entities/destinations/destination.model';
 import { Router } from '@angular/router';
 import { trigger, state, animate, transition, style, keyframes } from '@angular/animations';
+import { KVData } from 'app/entities/node-credentials/node-credential.model';
 
 const fadeEnable = trigger('fadeEnable', [
    state('inactive', style({})),
@@ -81,6 +82,9 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public deleteModalVisible = false;
   public state = 'inactive';
+  public regionSelected: string;
+  public regionList = regions;
+  public regionName: string;
 
   constructor(
     private fb: FormBuilder,
@@ -111,13 +115,26 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
         this.destination = destination;
         this.updateForm.controls.name.setValue(this.destination.name);
         this.updateForm.controls.url.setValue(this.destination.url);
+        if (this.destination.integration_types === 'Storage') {
+          this.destination.meta_data.forEach((v) => {
+            if (v.key === 'bucket') {
+              this.updateForm.controls.bucket.setValue(v.value);
+            }
+            if (v.key === 'region') {
+              this.regionName = v.value;
+              this.regionSelected = v.value;
+            }
+          });
+        }
       });
 
     this.updateForm = this.fb.group({
       // Must stay in sync with error checks in data-feed-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
-      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      bucket: this.destination?.services === 'S3' ?
+        ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]] : null
     });
 
     this.store.pipe(
@@ -132,6 +149,31 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
         }
       });
   }
+  selectChangeHandlers(region: string): void {
+    this.regionSelected = region;
+  }
+  metaDataValue(): Array<KVData> {
+    if (this.destination.integration_types === 'Storage') {
+      if (this.destination.services === 'S3') {
+        console.log(this.destination);
+        return Array<KVData>(
+          {
+            key: 'bucket', value: this.updateForm.controls['bucket'].value.trim()
+          },
+          {
+            key: 'region', value: this.regionSelected
+          }
+        );
+      }
+      if (this.destination.services === 'Minio') {
+        return Array<KVData>(
+          {
+            key: 'bucket', value: this.updateForm.controls['bucket'].value.trim()
+          }
+        );
+      }
+    }
+  }
 
   public saveDataFeed(): void {
     this.saveSuccessful = false;
@@ -143,7 +185,9 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       secret: this.destination.secret,
       enable: this.destination.enable,
       integration_types: this.destination.integration_types,
-      meta_data: this.destination.meta_data,
+      meta_data:
+        this.destination.integration_types === 'Storage' ?
+          this.metaDataValue() : this.destination.meta_data,
       services: this.destination.services
     };
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));
@@ -159,7 +203,9 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       secret: this.destination.secret,
       enable: this.destination.enable,
       integration_types: this.destination.integration_types,
-      meta_data: this.destination.meta_data,
+      meta_data:
+        this.destination.integration_types === 'Storage' ?
+          this.metaDataValue() : this.destination.meta_data,
       services: this.destination.services
     };
     this.store.dispatch(new TestDestination({destination: destinationObj}));
@@ -176,6 +222,9 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
 
   public get nameCtrl(): FormControl {
     return <FormControl>this.updateForm.controls.name;
+  }
+  public get bucketCtrl(): FormControl {
+    return <FormControl>this.updateForm.controls.bucket;
   }
 
   public get urlCtrl(): FormControl {
@@ -223,11 +272,17 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public cancel(): void {
     this.router.navigate(['/settings/data-feeds']);
   }
-  public disableOnsave() {
-    return this.saveInProgress
-      || !this.updateForm.valid
-      || !this.updateForm.dirty
-      || !this.destination?.enable;
+  public disableOnsave(service: string) {
+    const isDisable = this.saveInProgress
+    || !this.updateForm.valid
+    || !this.updateForm.dirty
+    || !this.destination?.enable;
+    if (service === 'S3') {
+      return isDisable && this.regionSelected === this.regionName;
+    } else {
+      return isDisable ;
+    }
+
   }
   public enableBtn() {
     return !this.destination?.enable ? 'is-enable enable-btn' : 'is-disable enable-btn';

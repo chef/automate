@@ -87,16 +87,13 @@ describe('DataFeedDetailsComponent', () => {
         buttonElement.triggerEventHandler('click', null);
         expect(component.destination.name).toEqual(updatedDestination.name);
         expect(component.destination.url).toEqual(updatedDestination.url);
-
       });
-
       it('check sendTestForDataFeedUrl func', () => {
         component.destination = destination;
         component.testInProgress = true;
         const buttonElement = fixture.debugElement.query(By.css('.test-connection'));
         buttonElement.triggerEventHandler('click', null);
         expect(component.testInProgress).toEqual(true);
-
       });
       it('check deleteModalVisible func', () => {
         component.deleteModalVisible = true;
@@ -109,6 +106,45 @@ describe('DataFeedDetailsComponent', () => {
         // tslint:disable-next-line:no-unused-expression
         component.openDeleteModal;
         expect(component.deleteModalVisible).toEqual(false);
+      });
+      it('disableOnsave for S3', () => {
+        component.regionSelected = 'Hello';
+        component.regionName = 'World';
+        expect(component.disableOnsave('S3')).toEqual(false);
+        component.regionSelected = 'Hello World';
+        component.regionName = 'Hello World';
+        expect(component.disableOnsave('S3')).toEqual(true);
+      });
+      it('metaDataValue fuc for S3', () => {
+        const destinationValue = <Destination> {
+          id: '1',
+          name: 'new data feed',
+          secret: 'testSecret',
+          url: 'null',
+          integration_types: 'Storage',
+          services: 'S3'
+        };
+        component.destination = destinationValue;
+        console.log(component.destination);
+        component.updateForm.controls['bucket'].setValue('s3-bucket');
+        component.regionSelected = 'us-east-1';
+        expect(component.metaDataValue()[0]['value']).toEqual('s3-bucket');
+        expect(component.metaDataValue()[1]['value']).toEqual('us-east-1');
+      });
+      it('metaDataValue fuc for Minio', () => {
+        const destinationValue = <Destination> {
+          id: '1',
+          name: 'new data feed',
+          secret: 'testSecret',
+          url: 'http://foo.com',
+          integration_types: 'Storage',
+          services: 'Minio'
+        };
+        component.destination = destinationValue;
+        console.log(component.destination);
+        component.updateForm.controls['bucket'].setValue('s3-bucket');
+        component.regionSelected = 'us-east-1';
+        expect(component.metaDataValue()[0]['value']).toEqual('s3-bucket');
       });
     });
   });

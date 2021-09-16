@@ -101,6 +101,14 @@ chef-form-field {
   transition: width 0.5s;
 }
 
+.select-region {
+  width: 45em;
+
+  ::ng-deep chef-dropdown {
+    height: 15em;
+    overflow: auto;
+  }
+}
 chef-radio chef-option {
   display: inline-block;
 }
@@ -188,7 +196,8 @@ chef-modal {
 
 @media screen and (max-width: 1668px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 35em;
   }
 
@@ -199,7 +208,8 @@ chef-modal {
 }
 
 @media screen and (max-width: 1460px) {
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 25em;
   }
 
@@ -210,7 +220,8 @@ chef-modal {
 }
 
 @media screen and (max-width: 1220px) {
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 20em;
   }
 
@@ -222,7 +233,8 @@ chef-modal {
 
 @media screen and (max-width: 1220px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 18em;
   }
 
@@ -233,7 +245,8 @@ chef-modal {
 }
 @media screen and (max-width: 898px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 100%;
   }
 
@@ -259,4 +272,7 @@ chef-modal {
   font-weight: normal;
   line-height: 18px;
   letter-spacing: 0.2px;
+}
+chef-dropdown {
+  display: block;
 }
