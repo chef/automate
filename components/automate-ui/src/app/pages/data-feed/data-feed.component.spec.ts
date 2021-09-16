@@ -437,7 +437,7 @@ describe('DataFeedComponent', () => {
         Authorization: 'Bearer' + ' ' + token
       });
       const headersJson = component.addHeadersforCustomDataFeed(headers);
-      const headersVal = {...JSON.parse(userToken), ...headersJson};
+      const headersVal = {...headersJson, ...JSON.parse(userToken)};
 
       expect(component['datafeedRequests']
       .testDestinationWithHeaders).toHaveBeenCalledWith(
