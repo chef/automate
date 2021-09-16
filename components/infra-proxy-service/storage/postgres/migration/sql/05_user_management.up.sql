@@ -16,3 +16,13 @@ CREATE TABLE IF NOT EXISTS users (
   UNIQUE(infra_server_username,server_id)
 );
 CREATE INDEX IF NOT EXISTS users_automate_user_id_index ON users (automate_user_id);
+
+-- create table org_users
+CREATE TABLE IF NOT EXISTS org_users (
+  id           TEXT PRIMARY KEY,
+  org_id       TEXT NOT NULL references orgs(id) ON DELETE RESTRICT,
+  user_id      TEXT NOT NULL references users(id) ON DELETE RESTRICT, 
+  is_admin     BOOLEAN NOT NULL DEFAULT FALSE
+);
+CREATE INDEX IF NOT EXISTS org_users_org_id_index ON org_users (org_id);
+CREATE INDEX IF NOT EXISTS org_users_user_id_index ON org_users (user_id);
