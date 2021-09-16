@@ -12,7 +12,7 @@ import (
 	ptoml "github.com/pelletier/go-toml"
 )
 
-func isA2HADeployment(configPath []string) bool {
+func isA2HADeployment(configPath []string) (bool, string) {
 	initConfigHAPath := initConfigHAPathFlags.path
 	if len(configPath) > 0 {
 		initConfigHAPath = configPath[0]
@@ -21,17 +21,19 @@ func isA2HADeployment(configPath []string) bool {
 		config, err := ptoml.LoadFile(initConfigHAPath)
 		if err != nil {
 			writer.Println(err.Error())
-			return false
+			return false, AUTOMATE
 		}
-		if config.Get("architecture.existing_infra") != nil || config.Get("architecture.aws") != nil {
-			return true
+		if config.Get("architecture.existing_infra") != nil {
+			return true, EXISTING_INFRA_MODE
+		} else if config.Get("architecture.aws") != nil {
+			return true, AWS_MODE
 		} else {
-			return false
+			return false, AUTOMATE
 		}
 	} else if checkIfFileExist(initConfigHabA2HAPathFlag.a2haDirPath + "a2ha.rb") {
-		return true
+		return true, HA_MODE
 	} else {
-		return false
+		return false, AUTOMATE
 	}
 
 }

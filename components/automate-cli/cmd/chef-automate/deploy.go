@@ -20,6 +20,13 @@ import (
 	"github.com/chef/automate/lib/version"
 )
 
+const (
+	AWS_MODE            = "AWS_MODE"
+	EXISTING_INFRA_MODE = "EXISTING_INFRA_MODE"
+	AUTOMATE            = "AUTOMATE"
+	HA_MODE             = "HA_MODE"
+)
+
 var deployLong = `Deploy a new Chef Automate instance using the supplied configuration.
 	- <CONFIG_FILE> must be a valid path to a TOML formatted configuration file`
 var promptMLSA = `
@@ -34,6 +41,12 @@ https://www.chef.io/online-master-agreement
 I agree to the Terms of Service and the Master License and Services Agreement
 `
 var errMLSA = "Chef Software Terms of Service and Master License and Services Agreement were not accepted"
+var errProvisonInfra = `Architecture does not match with requested one. 
+If you want to provision cluster then you have to first run provision command.
+
+		chef-automate provision-infra
+
+After that you can run this command`
 
 var deployCmdFlags = struct {
 	channel                         string
@@ -186,35 +199,8 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	if isA2HADeployment(args) {
-		if len(args) == 0 {
-			return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
-		}
-		if !deployCmdFlags.acceptMLSA {
-			agree, err := writer.Confirm(promptMLSA)
-			if err != nil {
-				return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
-			}
-
-			if !agree {
-				return status.New(status.InvalidCommandArgsError, errMLSA)
-			}
-		}
-		conf := new(dc.AutomateConfig)
-		manifestProvider := manifest.NewLocalHartManifestProvider(
-			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
-			conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
-			conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
-		err := client.DeployHA(writer, manifestProvider)
-		if err != nil && !status.IsStatusError(err) {
-			return status.Annotate(err, status.DeployError)
-		}
-		err = readConfigAndWriteToFile(args[0])
-		if err != nil {
-			return status.Annotate(err, status.DeployError)
-		}
-		err = deployA2HA()
-		return err
+	if isA2ha, mode := isA2HADeployment(args); isA2ha {
+		return a2haDeploy(args, mode)
 	} else {
 		writer.Printf("Automate deployment non HA mode proceeding...")
 		if !deployCmdFlags.acceptMLSA {
@@ -311,6 +297,50 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		}
 		return err
 	}
+}
+
+func a2haDeploy(args []string, mode string) error {
+	writer.Println(mode)
+	if len(args) == 0 {
+		return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
+	}
+	if mode == EXISTING_INFRA_MODE {
+		if !deployCmdFlags.acceptMLSA {
+			agree, err := writer.Confirm(promptMLSA)
+			if err != nil {
+				return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
+			}
+
+			if !agree {
+				return status.New(status.InvalidCommandArgsError, errMLSA)
+			}
+		}
+		conf := new(dc.AutomateConfig)
+		manifestProvider := manifest.NewLocalHartManifestProvider(
+			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
+			conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
+			conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
+		err := client.DeployHA(writer, manifestProvider)
+		if err != nil && !status.IsStatusError(err) {
+			return status.Annotate(err, status.DeployError)
+		}
+		err = readConfigAndWriteToFile(args[0])
+		if err != nil {
+			return status.Annotate(err, status.DeployError)
+		}
+		err = deployA2HA()
+		return err
+	} else if mode == AWS_MODE {
+		if checkIfFileExist(initConfigHabA2HAPathFlag.a2haDirPath + "a2ha.rb") {
+			err := deployA2HA()
+			return err
+		} else {
+			return status.New(status.InvalidCommandArgsError, errProvisonInfra)
+		}
+	} else {
+		return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
+	}
+
 }
 
 func generatedConfig() (*dc.AutomateConfig, error) {
