@@ -34,7 +34,7 @@ The Display Name bar should not be kept empty or else it throws error.
 
 ### Change the Date/Time Format
 
-You can select the date and time format amongst the five formats provided in Chef Automate.
+You can select one of five date and time formats.
 
 {{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
 
