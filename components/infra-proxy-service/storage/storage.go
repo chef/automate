@@ -20,6 +20,11 @@ type Storage interface {
 	DeleteOrg(ctx context.Context, orgID string, serverID string) (Org, error)
 	EditOrg(ctx context.Context, id string, name string, adminUser string, serverID string, projects []string) (Org, error)
 	TouchOrg(ctx context.Context, id string, serverID string) (Org, error)
+
+	InsertUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
+	GetUser(ctx context.Context, id string) (User, error)
+	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
+	DeleteUser(ctx context.Context, id string) (User, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
@@ -49,6 +54,19 @@ type Org struct {
 	Projects     []string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+// User is the struct ingested and returned by our backend implementations.
+type User struct {
+	ID                  string
+	ServerID            string
+	InfraServerUsername string
+	CredentialID        string
+	Connector           string
+	AutomateUserID      string
+	IsServerAdmin       bool
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 }
 
 // Errors returned from the backend
