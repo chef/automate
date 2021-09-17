@@ -200,9 +200,7 @@ document "build" <<EOF
 EOF
 function build() {
   local hab_build
-  #set HAB_BLDR_CHANNEL to dev as part of the hab package refresh
-  local HAB_BLDR_CHANNEL=dev
-  
+  HAB_BLDR_CHANNEL=dev
   # Support for hab v.0.63.0
   if [ -f /bin/build ]; then
     hab_build=/bin/build
