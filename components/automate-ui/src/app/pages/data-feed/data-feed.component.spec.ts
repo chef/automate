@@ -21,6 +21,8 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 import { of, throwError } from 'rxjs';
+import { pass } from 'fp-ts/lib/Writer';
+import { values } from 'fp-ts/lib/Map';
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
@@ -101,6 +103,14 @@ describe('DataFeedComponent', () => {
       secret: 'testSecret',
       url: 'http://foo.com'
     };
+    const destinationwithHeader = <Destination> {
+      id: '1',
+      name: 'new data feed',
+      secret: 'testSecret',
+      url: 'http://foo.com',
+      headers: 'test:123'
+    };
+
 
     beforeEach(() => {
       store = TestBed.inject(Store);
@@ -323,18 +333,22 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
       spyOn(component, 'revealUrlStatus');
-      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePassword')
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders')
       .and.returnValue(of([]));
       component.sendTestForDataFeed({
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.SERVICENOW
       });
+      const userToken = JSON.stringify({
+        Authorization: 'Basic ' + btoa(username + ':' + password)
+      });
+
       expect(component['datafeedRequests']
-      .testDestinationWithUsernamePassword).toHaveBeenCalledWith(
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
         destination.url,
-        username,
-        password
+        userToken
       );
+      
       expect(component.revealUrlStatus).toHaveBeenCalledWith(UrlTestState.Success);
     });
 
@@ -403,11 +417,9 @@ describe('DataFeedComponent', () => {
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.CUSTOM
       });
-
-      component.addHeadersforCustomDataFeed(headers);
-      store.dispatch(new CreateDestinationSuccess(destination));
+      store.dispatch(new CreateDestinationSuccess(destinationwithHeader));
       component.sortedDestinations$.subscribe(destinations => {
-        expect(destinations).toContain(destination);
+        expect(destinations).toContain(destinationwithHeader);
       });
     });
 
@@ -423,8 +435,6 @@ describe('DataFeedComponent', () => {
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.CUSTOM
       });
-
-      component.addHeadersforCustomDataFeed(headers);
       store.dispatch(new CreateDestinationSuccess(destination));
       component.sortedDestinations$.subscribe(destinations => {
         expect(destinations).toContain(destination);
@@ -432,8 +442,6 @@ describe('DataFeedComponent', () => {
     });
 
     it('on test success for custom and check dispatched store data', () => {
-
-      component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
       component.createDataFeedForm.controls['token'].setValue(token);
@@ -458,25 +466,26 @@ describe('DataFeedComponent', () => {
     });
 
     it('on test success for Custom now and check dispatched store data', () => {
-
-      component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
       component.createDataFeedForm.controls['password'].setValue(password);
       component.createDataFeedForm.controls['headers'].setValue(headers);
       component.checkedHeaders = true;
-      spyOn(component['datafeedRequests'], 'testDestinationWithUsernamePasswordWithHeaders');
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
       component.sendTestForDataFeed({
         auth: AuthTypes.USERNAMEANDPASSWORD,
         name: WebhookIntegrationTypes.CUSTOM
       });
+      const userToken = JSON.stringify({
+        Authorization: 'Basic ' + btoa(username + ':' + password)
+      });
+      const headersJson = component.addHeadersforCustomDataFeed(headers);
+      const headersVal = {...headersJson, ...JSON.parse(userToken)};
 
       expect(component['datafeedRequests']
-      .testDestinationWithUsernamePasswordWithHeaders).toHaveBeenCalledWith(
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
         destination.url,
-        username,
-        password,
-        JSON.stringify(component.addHeadersforCustomDataFeed(headers))
+        JSON.stringify(headersVal)
       );
     });
   });
