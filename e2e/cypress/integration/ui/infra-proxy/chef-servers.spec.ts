@@ -142,6 +142,7 @@ describe('chef server', () => {
       cy.get('[data-cy=chef-infra-server-slider]').should('exist');
       cy.get('[data-cy=add-name]').type(serverName);
       cy.get('[data-cy=id-label]').contains(generatedServerID);
+      cy.get('[data-cy=add-fqdn]').type(serverFQDN);
 
       // check for disabled
       cy.get('[data-cy=add-button]')
