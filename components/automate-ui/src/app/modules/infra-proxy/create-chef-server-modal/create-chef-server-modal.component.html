@@ -1,60 +1,37 @@
-<chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 slot="title">Add Chef Infra Server </h2>
-  <div class="flex-container">
-    <form [formGroup]="createForm">
-      <div class="input-margin">
-        <chef-form-field>
-          <label>
-            <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input
-              chefInput
-              firstFocus
-              formControlName="name"
-              data-cy="add-name"
-              type="text"
-              id="name-input"
-              (keyup)="handleNameInput($event)" 
-              autocomplete="off"/>
-          </label>
-          <chef-error
-          *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
-          Name is required.
-        </chef-error>
-        </chef-form-field>
-        <span class="detail light">Don't worry, server names can be changed later.</span>
-      </div>
-      <div *ngIf="modifyID" class="id-margin">
-        <chef-form-field>
-          <label>
-            <span class="label">ID <span aria-hidden="true">*</span></span>
-            <input
-              chefInput
-              formControlName="id"
-              type="text"
-              (keyup)="handleInput($event)" 
-              id="id-input"
-              data-cy="add-id"
-              autocomplete="off"/>
-          </label>
-          <chef-error *ngIf="createForm.get('id').hasError('maxlength') && createForm.get('id').dirty">
-            ID must be 64 characters or less.
+<div data-cy="chef-infra-server-slider" ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <h2 slot="title">Add Chef Infra Server </h2>
+    <chef-button 
+    class="close"
+    secondary
+    (click)="closeSeverSlider()" 
+    data-cy="close-chef-infra-button">
+    <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="sidenav-body">
+    <div class="flex-container">
+      <form [formGroup]="createForm">
+        <div class="input-margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Name <span aria-hidden="true">*</span></span>
+              <input
+                chefInput
+                firstFocus
+                formControlName="name"
+                data-cy="add-name"
+                type="text"
+                id="name-input"
+                (keyup)="handleNameInput($event)"
+                autocomplete="off"/>
+            </label>
+            <chef-error
+            *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
+            Name is required.
           </chef-error>
-          <chef-error *ngIf="createForm.get('id').hasError('required') && createForm.get('id').dirty">
-            ID is required.
-          </chef-error>
-          <chef-error *ngIf="createForm.get('id').hasError('pattern') && createForm.get('id').dirty">
-            Only lowercase letters, numbers, hyphens, and underscores are allowed.
-          </chef-error>
-          <chef-error *ngIf="conflictError">
-            Server ID "{{createForm.get('id').value}}" already exists.
-          </chef-error>
-        </chef-form-field>
-        <span class="detail light">Server IDs are unique, permanent, and cannot be changed later.</span>
-      </div>
-      <div *ngIf="!modifyID" class="id-margin">
-        <div id="id-fields">
-          <span class="key-label">ID:&nbsp;</span>
-          <span data-cy="id-label" class="object-id">{{ this.createForm?.value.id }}</span>
+          </chef-form-field>
+          <span class="detail light">Don't worry, server names can be changed later.</span>
         </div>
         <chef-toolbar>
           <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
@@ -138,4 +115,4 @@
       </div>
     </form>
   </div>
-</chef-modal>
+</div>
