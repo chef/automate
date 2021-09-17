@@ -348,7 +348,6 @@ describe('DataFeedComponent', () => {
         destination.url,
         userToken
       );
-      
       expect(component.revealUrlStatus).toHaveBeenCalledWith(UrlTestState.Success);
     });
 
