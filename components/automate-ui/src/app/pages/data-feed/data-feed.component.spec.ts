@@ -21,8 +21,6 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 import { of, throwError } from 'rxjs';
-import { pass } from 'fp-ts/lib/Writer';
-import { values } from 'fp-ts/lib/Map';
 
 describe('DataFeedComponent', () => {
   let component: DataFeedComponent;
