@@ -7,6 +7,7 @@
         <chef-subheading>Manage Chef Infra Servers with Chef Automate.</chef-subheading>
       </chef-page-header>
       <app-create-chef-server-modal 
+        #server
         [visible]="createModalVisible" 
         [creating]="creatingChefServer"
         [createForm]="createChefServerForm"
@@ -33,7 +34,7 @@
       <div class="page-body">
         <chef-toolbar>
           <app-authorized [allOf]="['/api/v0/infra/servers', 'post']">
-            <chef-button primary (click)="openCreateModal()" data-cy="add-server-button">Add Chef Infra Server</chef-button>
+            <chef-button primary (click)="server.slidePanel()" data-cy="add-server-button">Add Chef Infra Server</chef-button>
           </app-authorized>
         </chef-toolbar>
         <div id="servers-table-container" *ngIf="servers.length != 0">
