@@ -26,7 +26,9 @@
           [pageIndex]= "current_page"
           (changePage)= "onUpdatePage($event)"
         ></app-paginator>
-        <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
+        <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments', 'post', [serverId, orgId]]">
+          <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
+        </app-authorized>
       </div>
       <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || deleting" size="50" fixed></chef-loading-spinner>
       <div *ngIf="!authFailure">
