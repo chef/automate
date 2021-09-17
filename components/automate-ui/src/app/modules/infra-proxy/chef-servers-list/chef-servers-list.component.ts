@@ -131,6 +131,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       ip_address: this.createChefServerForm.controls['ip_address'].value.trim()
     };
     this.store.dispatch(new CreateServer(server));
+    this.creatingChefServer = false;
+    this.createChefServerForm.reset();
   }
 
   private resetCreateModal(): void {
