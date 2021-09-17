@@ -216,6 +216,7 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
+
     it('slider resets name, url, username and password to empty string for ELK', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['url'].setValue('any');
@@ -230,6 +231,7 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
+
     it('slider resets name, url, username and password to empty string for Minio', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['endpoint'].setValue('any');
