@@ -140,6 +140,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new CreateServer(server));
     this.telemetryService.track('InfraServer_Add_Chef_InfraServer');
+    this.creatingChefServer = false;
+    this.createChefServerForm.reset();
   }
 
   private resetCreateModal(): void {
