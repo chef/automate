@@ -445,6 +445,46 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-backend-deployment",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-elasticsearch",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-elasticsidecar",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-kibana",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-metricbeat",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-journalbeat",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-ctl",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-curator",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-haproxy",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-backend-postgresql",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

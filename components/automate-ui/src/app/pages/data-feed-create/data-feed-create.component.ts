@@ -10,21 +10,26 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
 
-enum WebhookIntegrationTypes {
+export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
   SPLUNK = 'Splunk',
   ELK_KIBANA = 'ELK/Kibana',
   CUSTOM = 'Custom'
 }
 
-enum StorageIntegrationTypes {
+export enum StorageIntegrationTypes {
   MINIO = 'Minio',
   AMAZON_S3 = 'Amazon S3'
 }
 
-enum AuthTypes {
+export enum AuthTypes {
   ACCESSTOKEN = 'Access Token',
   USERNAMEANDPASSWORD = 'Username and Password'
+}
+
+export enum IntegrationTypes {
+  WEBHOOK = 'Webhook',
+  STORAGE = 'Storage'
 }
 
 @Component({
@@ -51,12 +56,11 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
-
+  public notificationShow = false;
+  public notificationMessage = '';
+  public notificationType = 'error';
   private saveInProgress = false;
   private testInProgress = false;
-  private testSuccess: boolean = null;
-  private testError: boolean = null;
-  private conflictError: string = null;
 
   public integrations = {
     webhook: [
@@ -71,24 +75,57 @@ export class DataFeedCreateComponent {
     ]
   };
 
+  public showFields = {
+    name: false,
+    endpoint: false,
+    region: false,
+    url: false,
+    authSelector: false,
+    tokenType: false,
+    token: false,
+    username: false,
+    password: false,
+    headers: false,
+    bucketName: false,
+    accessKey: false,
+    secretKey: false
+  };
+
   set saveDone(done: boolean) {
     this.saveInProgress = done;
   }
 
   set testSuccessSetter(val: boolean) {
     this.dismissNotification();
-    this.testSuccess = val;
+    const message = 'Notification test connected successfully!';
+    this.showNotification(val, message, 'info');
   }
 
   set testErrorSetter(val: boolean) {
+    let errorString: string;
+    if (this.integTitle === StorageIntegrationTypes.MINIO) {
+      errorString = 'Unable to connect: check endpoint, bucket name, access key and secret key.';
+    } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
+      errorString = 'Unable to connect: check URL, username and password.';
+    } else if (this.authSelected === AuthTypes.ACCESSTOKEN) {
+      errorString = 'Unable to connect: check Token Type (Prefix) and token.';
+    }
     this.dismissNotification();
-    this.testError = val;
+    this.showNotification(val, errorString, 'error');
+  }
+
+  public showNotification(show: boolean, message: string , type: string) {
+    setTimeout(() => {
+      this.notificationShow = show;
+    });
+    this.notificationType = type;
+    this.notificationMessage = message;
   }
 
   set conflictErrorSetter(val: string) {
     this.saveDone = false;
     this.dismissNotification();
-    this.conflictError = val;
+    this.showNotification(true, val, 'error');
   }
 
   set testDoneSetter(done: boolean) {
@@ -99,25 +136,12 @@ export class DataFeedCreateComponent {
     return this.saveInProgress;
   }
 
-  get testSuccessGetter() {
-    return this.testSuccess;
-  }
-
-  get testErrorGetter() {
-    return this.testError;
-  }
-
-  get conflictErrorGetter() {
-    return this.conflictError;
-  }
-
   get testDoneGetter() {
     return this.testInProgress;
   }
 
   public closeCreateSlider() {
     this.toggleSlide();
-    this.createForm.reset();
   }
 
   public toggleSlide() {
@@ -126,34 +150,67 @@ export class DataFeedCreateComponent {
 
   public slidePanel() {
     this.isSlideOpen = true;
-    this.createForm.reset();
     this.integrationSelected = false;
+  }
+
+  showFieldWebhook() {
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
+    this.showFields = {...this.showFields, ...{
+      name: true,
+      url: true,
+      authSelector: true,
+      tokenType: true,
+      token: true,
+      username: true,
+      password: true
+    }};
+  }
+
+  showFieldStorage() {
+    Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
+    this.showFields = {...this.showFields, ...{
+      name: true,
+      endpoint: true,
+      region: true,
+      bucketName: true,
+      accessKey: true,
+      secretKey: true
+    }};
   }
 
   public selectIntegration(integration: string) {
     this.showSelect = false;
-    if (integration === WebhookIntegrationTypes.SERVICENOW) {
-      this.createForm.reset();
-      this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
-      this.createForm.controls['tokenType'].setValue('Bearer');
-      this.integrationSelected = true;
-      this.integTitle = integration;
-      setTimeout(() => {
-        this.showSelect = true;
-        this.name.nativeElement.focus();
-      });
-    } else if (integration === WebhookIntegrationTypes.SPLUNK) {
-      this.createForm.reset();
-      this.authSelected = AuthTypes.ACCESSTOKEN;
-      this.createForm.controls['tokenType'].setValue('Splunk');
-      this.integrationSelected = true;
-      this.integTitle = integration;
-      setTimeout(() => {
-        this.showSelect = true;
-        this.name.nativeElement.focus();
-      });
+    this.showFields.headers = false;
+    this.integTitle = integration;
+    this.createForm.reset();
+    setTimeout(() => {
+      this.showSelect = true;
+      this.name.nativeElement.focus();
+    });
+
+    switch (integration) {
+      case WebhookIntegrationTypes.SERVICENOW: {
+        this.showFieldWebhook();
+        this.authSelected = AuthTypes.USERNAMEANDPASSWORD;
+        this.createForm.controls['tokenType'].setValue('Bearer');
+        this.integrationSelected = true;
+        break;
+      }
+      case WebhookIntegrationTypes.SPLUNK: {
+        this.showFieldWebhook();
+        this.authSelected = AuthTypes.ACCESSTOKEN;
+        this.createForm.controls['tokenType'].setValue('Splunk');
+        this.integrationSelected = true;
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        this.showFieldStorage();
+        this.showFields.region = false;
+        this.integrationSelected = true;
+      }
     }
   }
+
   public returnToMenu() {
     this.integrationSelected = false;
   }
@@ -175,19 +232,42 @@ export class DataFeedCreateComponent {
   }
 
   public validateForm() {
-    if (this.authSelected === AuthTypes.ACCESSTOKEN) {
-      if (this.createForm.get('name').valid &&
-        this.createForm.get('url').valid &&
-        this.createForm.get('tokenType').valid &&
-        this.createForm.get('token').valid) {
-        return true;
+
+    switch (this.integTitle) {
+      case WebhookIntegrationTypes.SERVICENOW:
+      case WebhookIntegrationTypes.SPLUNK:
+      case WebhookIntegrationTypes.ELK_KIBANA: {
+        // handling access token and user pass auth
+        // for servicenow, splunk and elk
+        switch (this.authSelected) {
+          case AuthTypes.ACCESSTOKEN: {
+            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+              this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
+              return true;
+            }
+            break;
+          }
+          case AuthTypes.USERNAMEANDPASSWORD: {
+            if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
+              this.createForm.get('username').valid && this.createForm.get('password').valid) {
+              return true;
+            }
+          }
+        }
+        break;
       }
-    } else if (this.authSelected === AuthTypes.USERNAMEANDPASSWORD) {
-      if (this.createForm.get('name').valid &&
-        this.createForm.get('url').valid &&
-        this.createForm.get('username').valid &&
-        this.createForm.get('password').valid) {
-        return true;
+      case WebhookIntegrationTypes.CUSTOM: {
+        // handling access token and user pass auth
+        // with headers for webhooks
+        break;
+      }
+      case StorageIntegrationTypes.MINIO: {
+        // handling minio
+        if (this.createForm.get('name').valid && this.createForm.get('endpoint').valid &&
+          this.createForm.get('bucketName').valid && this.createForm.get('accessKey').valid &&
+          this.createForm.get('secretKey').valid) {
+          return true;
+        }
       }
     }
     return false;
@@ -202,9 +282,19 @@ export class DataFeedCreateComponent {
   }
 
   public dismissNotification() {
-    this.testSuccess = false;
-    this.testError = false;
-    this.conflictError = null;
+    this.notificationShow = false;
   }
 
+  public showAuthDropdown() {
+    return this.showFields.authSelector && this.showSelect;
+  }
+
+  public showTokenInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN;
+  }
+
+  public showUserPassInput(field: string) {
+    return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
+  }
 }
+

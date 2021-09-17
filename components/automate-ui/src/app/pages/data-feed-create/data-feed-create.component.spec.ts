@@ -59,15 +59,18 @@ describe('DataFeedCreateComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DataFeedCreateComponent);
     component = fixture.componentInstance;
-    component = fixture.componentInstance;
     component.createForm = new FormBuilder().group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      // Note that URL here may be FQDN -or- IP!
-      url: ['', [Validators.required, Validators.pattern(Regex.patterns.VALID_FQDN)]],
+      endpoint: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       tokenType: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       token: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      password: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      headers: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      bucketName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      accessKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      secretKey: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     createForm = component.createForm;
     fixture.detectChanges();
@@ -80,6 +83,11 @@ describe('DataFeedCreateComponent', () => {
   describe('Data Feed Create', () => {
     const tokenType = 'Bearer';
     const token = 'test123';
+    const bucketName = 'bar';
+    const accessKey = 'test123';
+    const secretKey = 'test123';
+    const userName = 'test123';
+    const password = 'test123';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -91,13 +99,54 @@ describe('DataFeedCreateComponent', () => {
       expect(createForm.valid).toBeFalsy();
     });
 
-    it('should be valid when all fields are filled out', () => {
-      component.integrationSelected = true;
-      component.selectChangeHandlers('Access Token');
+    it('opening create slider resets name, url, token to empty string', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue('Bearer');
+      component.createForm.controls['token'].setValue('any');
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Splunk');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
+
+    it('should be valid when all fields are filled out for service-now', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ServiceNow');
+      // component.selectChangeHandlers('Access Token');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for splunk', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Splunk');
+      // component.selectChangeHandlers('Access Token');
       component.createForm.controls['name'].setValue(destination.name);
       component.createForm.controls['url'].setValue(destination.url);
       component.createForm.controls['tokenType'].setValue(tokenType);
       component.createForm.controls['token'].setValue(token);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for minio', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Minio');
+      // component.selectChangeHandlers('Access Token');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['endpoint'].setValue(destination.url);
+      component.createForm.controls['bucketName'].setValue(bucketName);
+      component.createForm.controls['accessKey'].setValue(accessKey);
+      component.createForm.controls['secretKey'].setValue(secretKey);
       expect(component.validateForm()).toBeTruthy();
     });
 
@@ -130,6 +179,23 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['tokenType'].value).toBe('Splunk');
       expect(component.createForm.controls['token'].value).toBe(null);
     });
+
+    it('slider resets name, url, username and password to empty string for Minio', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['endpoint'].setValue('any');
+      component.createForm.controls['bucketName'].setValue('any');
+      component.createForm.controls['accessKey'].setValue('any');
+      component.createForm.controls['secretKey'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Minio');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['endpoint'].value).toBe(null);
+      expect(component.createForm.controls['bucketName'].value).toBe(null);
+      expect(component.createForm.controls['accessKey'].value).toBe(null);
+      expect(component.createForm.controls['secretKey'].value).toBe(null);
+    });
   });
 
   describe('create data feed form validation', () => {
@@ -156,13 +222,7 @@ describe('DataFeedCreateComponent', () => {
       // Set url to invalid inputs
       url.setValue('  ');
       errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
       expect(errors['required']).toBeFalsy();
-
-      // Set url to valid inputs
-      url.setValue('any');
-      errors = url.errors || {};
-      expect(errors['pattern']).toBeTruthy();
     });
   });
 });

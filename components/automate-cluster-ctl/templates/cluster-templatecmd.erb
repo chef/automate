@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl template
+# Summary: Template command file used when making new commands
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+
+class AutomateClusterTemplateCmd < AutomateCluster::Command
+  option ['-e', '--example-options'], 'EXAMPLE_OPTIONS', 'Additional options for example'
+  parameter "[NAME]", "Name of something", attribute_name: :name
+
+  def execute
+  end
+end
+
+AutomateClusterTemplateCmd.run
