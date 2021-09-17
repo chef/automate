@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, HostBinding } from '@angular/core';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { FormGroup } from '@angular/forms';
 import { Utilities } from 'app/helpers/utilities/utilities';
@@ -17,6 +17,7 @@ export class CreateChefServerModalComponent implements OnInit {
   @Input() createForm: FormGroup;
   @Input() fqdnForm: FormGroup;
   @Input() ipForm: FormGroup;
+  @HostBinding('class.active') isSlideOpen = false;
 
   public modifyID = false; // Whether the edit ID form is open or not.
 
@@ -50,13 +51,23 @@ export class CreateChefServerModalComponent implements OnInit {
     this.conflictError = false;
   }
 
-  closeEvent(): void {
+  createChefServer(): void {
+    this.toggleSlide();
+    this.createClicked.emit();
+    this.modifyID = false;
+  }
+
+  closeSeverSlider() {
+    this.toggleSlide();
     this.modifyID = false;
     this.close.emit();
   }
 
-  createChefServer(): void {
-    this.createClicked.emit();
+  toggleSlide() {
+    this.isSlideOpen = !this.isSlideOpen;
   }
 
+  slidePanel() {
+    this.isSlideOpen = true;
+  }
 }

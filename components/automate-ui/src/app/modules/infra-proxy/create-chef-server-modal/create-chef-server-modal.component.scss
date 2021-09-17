@@ -1,13 +1,24 @@
 @import "~styles/variables";
+@import '../infra_shared/slide-panel';
 
-chef-modal {
+:host {
+  z-index: 1;
+  width: 50%;
+  box-shadow: 0 35.8px 140.2px $chef-gulf-blue;
+  padding: 25px;
 
-  [slot=title] {
-    text-align: left;
-    font-size: 24px;
-    font-weight: 700;
-    margin-top: 0px;
-    padding-bottom: 27px;
+  .sidenav-header {
+    margin-bottom: 60px;
+
+    h2 {
+      flex-grow: 2;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: $chef-primary-dark;
+      line-height: 27px;
+      margin-bottom: 10px;
+    }
   }
 
   .flex-container {
@@ -48,57 +59,39 @@ chef-modal {
     }
   }
 
-  ::ng-deep {
+  .label {
+    font-size: 16px;
+    font-weight: 400;
+    padding-bottom: 0.50em;
+    color: $chef-black;
+    letter-spacing: 0.2px;
+    line-height: 24px;
+  }
 
-    .modal {
-      box-shadow: 0px 0px 30px 0px $light-grey;
-      max-width: 528px;
-      min-width: 528px;
-      outline: none;
-      padding: 32px;
-    }
+  chef-button {
+    height: 36px;
+    margin-top: 0;
 
-    label {
-      font-size: 16px;
-      font-weight: 400;
-    }
-
-    .label {
-      font-size: 16px;
-      font-weight: 400;
-      padding-bottom: 0.50em;
-    }
-
-    chef-button {
-      height: 36px;
-    }
-
-    chef-button#create-button-object-modal {
-      margin: 10px 0px 0px 0px;
-    }
-
-    chef-button#cancel-server-popup {
-      margin: 10px 15px 0px 0px;
-    }
-
-    .modal-overlay {
-      background-color: #FFFFFF;
-      mix-blend-mode: normal;
-      opacity: 0.7;
-    }
-
-    chef-button.close {
+    .close {
+      margin: 0;
       border: none;
       color: var(--chef-primary-dark);
       outline: none;
-      margin-top: 18px;
-      margin-right: 18px;
-    }
 
-    chef-button.close:active {
-      background: none;
-      color: var(--chef-primary-dark);
+      &:active {
+        background: none;
+        color: var(--chef-primary-dark);
+      }
+
     }
+  }
+
+  chef-button#create-button-object-modal {
+    margin: 10px 0px 0px 0px;
+  }
+
+  chef-button#cancel-server-popup {
+    margin: 10px 15px 0px 0px;
   }
 }
 
