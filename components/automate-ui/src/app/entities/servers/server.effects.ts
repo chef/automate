@@ -99,10 +99,14 @@ export class ServerEffects {
     this.actions$.pipe(
     ofType(ServerActionTypes.CREATE_FAILURE),
     filter(({ payload }: CreateServerFailure) => payload.status !== HttpStatus.CONFLICT),
-    map(({ payload }: CreateServerFailure) => new CreateNotification({
+    map(({ payload }: CreateServerFailure) => {
+      const msg = payload.status ===
+        HttpStatus.TIME_OUT_ERROR ? 'Gateway Time out ' : payload.error.error;
+      return new CreateNotification({
         type: Type.error,
-        message: `Could not create server: ${payload.error.error || payload}`
-      }))));
+        message: `Could not create server: ${msg || payload}`
+      });
+    })));
 
   updateServer$ = createEffect(() =>
     this.actions$.pipe(
