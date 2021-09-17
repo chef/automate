@@ -33,13 +33,15 @@
           [pageIndex]= "currentPage"
           (changePage)= "onUpdatePage($event)"
         ></app-paginator>
-        <chef-button
-          id="role-create"
-          primary
-          (click)="openCreateModal()"
-          data-cy="create-role-button">
-          Create Role
-        </chef-button>
+        <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'post', [serverId, orgId]]">
+          <chef-button
+            id="role-create"
+            primary
+            (click)="openCreateModal()"
+            data-cy="create-role-button">
+            Create Role
+          </chef-button>
+        </app-authorized>
       </div>
       <chef-loading-spinner
         class="full-screen-spinner"
@@ -83,7 +85,6 @@
           </chef-tbody>
         </chef-table>
       </div>
-
       <app-page-picker
         *ngIf="!loading"
         class="roles-list-paging"
