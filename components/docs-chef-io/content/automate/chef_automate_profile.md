@@ -18,7 +18,7 @@ Chef Automate users can manage their own display name, date/time format, and pas
 
 {{< figure src="/images/automate/chef-automate-profile.png" alt="Profile Section in Chef Automate">}}
 
-Select **Profile** to view the details with respect to your _username_. The **Details** tab lets you update your _Display Name_ and the _Time Format_, whereas the **Reset Password** tab lets you update your password.
+Select **Profile** to view the details. The **Details** tab lets you update your _Display Name_ and the _Time Format_, whereas the **Reset Password** tab lets you update your password.
 
 ### Change a Display Name
 
