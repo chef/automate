@@ -19,7 +19,9 @@
     <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchDataBags($event)" placeHolder="data bags by name...">
       </app-infra-search-bar>
-      <chef-button data-cy="create-databag-button" primary (click)="openCreateModal()">Create Data Bag</chef-button>
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags', 'post', [serverId, orgId]]">
+        <chef-button data-cy="create-databag-button" primary (click)="openCreateModal()">Create Data Bag</chef-button>
+      </app-authorized>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
     <chef-table *ngIf="dataBags.length" id="databags-table-container" data-cy="databags-table-container">
@@ -32,21 +34,25 @@
       <chef-tbody *ngIf="!searchFlag">
         <chef-tr *ngFor="let dataBag of dataBags">
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
-          <chef-td class="three-dot-column">
-            <mat-select panelClass="chef-control-menu">
-              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
-            </mat-select>
-          </chef-td>
+            <chef-td class="three-dot-column">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}', 'post', [serverId, orgId, dataBag.name]]">
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
+                </mat-select>
+              </app-authorized>
+            </chef-td>
         </chef-tr>
       </chef-tbody>
       <chef-tbody *ngIf="searchFlag">
         <chef-tr *ngFor="let dataBag of serachArr">
           <chef-td><a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'data-bags', dataBag.name]">{{ dataBag.name }}</a></chef-td>
-          <chef-td class="three-dot-column">
-            <mat-select panelClass="chef-control-menu">
-              <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
-            </mat-select>
-          </chef-td>
+            <chef-td class="three-dot-column">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}', 'post', [serverId, orgId, dataBag.name]]">
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option data-cy="delete" (onSelectionChange)="startDataBagDelete(dataBag)">Delete</mat-option>
+                </mat-select>
+              </app-authorized>
+            </chef-td>
         </chef-tr>
       </chef-tbody>
     </chef-table>
