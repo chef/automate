@@ -70,7 +70,22 @@
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
           </chef-toolbar>
         </div>
-        <div class="input-margin">
+      </form>
+      <div class="input-margin">
+        <chef-form-field id="create-type">
+          <label>
+            <span class="label">Type <span aria-hidden="true">*</span></span>
+            <div class="version-dropdown">
+              <chef-select #li [value]="selected" (change)="updateFormDisplay(li.value)" data-cy="type">
+                <chef-option value="fqdn">FQDN</chef-option>
+                <chef-option value="ip">IP Address</chef-option>
+              </chef-select>
+            </div>
+          </label>
+        </chef-form-field>
+      </div>
+      <form [formGroup]="fqdnForm">
+        <div class="input-margin" *ngIf="selected === 'fqdn'">
           <chef-form-field>
             <label>
               <span class="label">FQDN <span aria-hidden="true">*</span></span>
@@ -84,16 +99,18 @@
                 autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="createForm.get('fqdn').hasError('required') && createForm.get('fqdn').dirty">
+            *ngIf="fqdnForm.get('fqdn').hasError('required') && fqdnForm.get('fqdn').dirty">
             FQDN is required.
             </chef-error>
             <chef-error
-            *ngIf="createForm.get('fqdn').hasError('pattern')">
+            *ngIf="fqdnForm.get('fqdn').hasError('pattern')">
             FQDN is invalid.
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin">
+      </form>
+      <form [formGroup]="ipForm">
+        <div class="input-margin" *ngIf="selected === 'ip'">
           <chef-form-field>
             <label>
               <span class="label">IP Address <span aria-hidden="true">*</span></span>
@@ -108,18 +125,18 @@
               />
             </label>
             <chef-error
-              *ngIf="createForm.get('ip_address').hasError('required') && createForm.get('ip_address').dirty">
+              *ngIf="ipForm.get('ip_address').hasError('required') && ipForm.get('ip_address').dirty">
               IP Address is required.
             </chef-error>
             <chef-error
-              *ngIf="createForm.get('ip_address').hasError('pattern')">
+              *ngIf="ipForm.get('ip_address').hasError('pattern')">
               IP Address is invalid.
             </chef-error>
           </chef-form-field>
         </div>
         <div id="button-bar">
           <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeSeverSlider()">Cancel</chef-button>
-          <chef-button [disabled]="!createForm?.valid || creating || conflictError"
+          <chef-button [disabled]="!createForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
             primary
             data-cy="add-button"
             id="create-button-object-modal"
