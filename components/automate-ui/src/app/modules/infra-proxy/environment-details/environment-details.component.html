@@ -37,11 +37,13 @@
             </label>
             <div class="constraint-table">
               <div class="edit">
-                <chef-button tertiary class="right-button-box" tabindex="1"
-                  (click)="openEditAttributeModal(environment?.default_attributes, 'Constraints')">
-                  <span class="material-icons edit-item">mode_edit</span>
-                  <span class="edit-text">Edit</span>
-                </chef-button>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}', 'post', [serverId, orgId, environment.name]]">
+                  <chef-button tertiary class="right-button-box" tabindex="1"
+                    (click)="openEditAttributeModal(environment?.default_attributes, 'Constraints')">
+                    <span class="material-icons edit-item">mode_edit</span>
+                    <span class="edit-text">Edit</span>
+                  </chef-button>
+                </app-authorized>
               </div>
               <hr class="divider-constraint" />
               <div class="constraint-container" *ngIf="hasCookbookConstraints">
@@ -88,13 +90,15 @@
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button
-              tertiary
-              class="right-button-box"
-              (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
-              <span class="material-icons edit-item">mode_edit</span>
-              <span class="edit-text">Edit</span>
-            </chef-button>
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}', 'post', [serverId, orgId, environment.name]]">
+              <chef-button
+                tertiary
+                class="right-button-box"
+                (click)="openEditAttributeModal(environment?.default_attributes, 'Default')">
+                <span class="material-icons edit-item">mode_edit</span>
+                <span class="edit-text">Edit</span>
+              </chef-button>
+            </app-authorized>
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
@@ -129,13 +133,15 @@
               <chef-icon>remove_circle</chef-icon>
               <span>Collapse All</span>
             </chef-button>
-            <chef-button
-              tertiary
-              class="right-button-box"
-              (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
-              <span class="material-icons edit-item">mode_edit</span>
-              <span class="edit-text">Edit</span>
-            </chef-button>
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}', 'post', [serverId, orgId, environment.name]]">
+              <chef-button
+                tertiary
+                class="right-button-box"
+                (click)="openEditAttributeModal(environment?.override_attributes, 'Override')">
+                <span class="material-icons edit-item">mode_edit</span>
+                <span class="edit-text">Edit</span>
+              </chef-button>
+            </app-authorized>
           </div>
           <hr class="divider-constraints" />
           <div class="json-container">
