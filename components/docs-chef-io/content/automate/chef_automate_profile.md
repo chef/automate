@@ -48,7 +48,7 @@ The **Date/Time Format** gets updated as soon as you select a new time format fr
 
 ### Reset Password
 
-You can reset the password of Chef Automate login from the **Reset Password** tab in Profile.
+Reset your password of Chef Automate login from the **Reset Password** tab in Profile.
 
 {{< figure src="/images/automate/reset-password-from-profile.png" alt="Reset Password From Profile">}}
 
