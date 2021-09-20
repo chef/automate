@@ -34,6 +34,7 @@ The objects that you can manage from the Chef Infra Server are:
 - Clients
 - Nodes
 - Policyfiles
+- PolicyGroup
 
 ## Connect Chef Infra Servers to Chef Automate
 
@@ -478,7 +479,7 @@ The **Content** tab contains the list of all:
 - Included Policies
 - Run Lists
 
-**Included Policies**
+###### Included Policies
 
 Select a specific Policyfile from the _Included Policies_ to view the details.
 
@@ -486,7 +487,7 @@ Select a specific Policyfile from the _Included Policies_ to view the details.
 
 In the above image, the slider tab shows the _Details_ of the selected policyfile. To view the _Revision ID_ select the **Revisions** option in the tab.
 
-**Run List**
+###### Run List
 
 Select a specific Run Item from the Run List to view the details in a slider tab.
 
