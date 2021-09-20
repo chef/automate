@@ -84,6 +84,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public node: InfraNode;
   public jsonText;
   public attributes;
+  public isGetNode = false;
   public openAttributeModal = new EventEmitter<void>();
 
   constructor(

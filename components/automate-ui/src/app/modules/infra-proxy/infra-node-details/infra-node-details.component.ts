@@ -113,6 +113,7 @@ export class InfraNodeDetailsComponent implements OnInit, OnDestroy {
   public nodeAttributesLoading = true;
   public hasattributes = true;
   public openEditAttr = false;
+  public isGetNode = true;
   public openAttributeModal = new EventEmitter<boolean>();
 
   @ViewChild(JsonTreeTable, { static: true })
