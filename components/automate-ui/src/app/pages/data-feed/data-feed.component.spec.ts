@@ -100,14 +100,14 @@ describe('DataFeedComponent', () => {
       id: '1',
       name: 'new data feed',
       secret: 'testSecret',
-      url: 'http://foo.com',
+      url: 'http://foo.com'
     };
     const destinationwithHeader = <Destination>{
       id: '1',
       name: 'new data feed',
       secret: 'testSecret',
       url: 'http://foo.com',
-      headers: 'test:123',
+      headers: 'test:123'
     };
 
     beforeEach(() => {
@@ -174,9 +174,7 @@ describe('DataFeedComponent', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
       component.createDataFeedForm.controls['name'].setValue(destination.name);
-      component.createDataFeedForm.controls['endpoint'].setValue(
-        destination.url
-      );
+      component.createDataFeedForm.controls['endpoint'].setValue(destination.url);
       component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
       component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
       component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
@@ -311,9 +309,7 @@ describe('DataFeedComponent', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
 
       component.createDataFeedForm.controls['name'].setValue(destination.name);
-      component.createDataFeedForm.controls['endpoint'].setValue(
-        destination.url
-      );
+      component.createDataFeedForm.controls['endpoint'].setValue(destination.url);
       component.createDataFeedForm.controls['bucketName'].setValue(bucketName);
       component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
       component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
@@ -372,9 +368,10 @@ describe('DataFeedComponent', () => {
         Authorization: 'Basic ' + btoa(username + ':' + password)
       });
 
-      expect(
-        component['datafeedRequests'].testDestinationWithHeaders
-      ).toHaveBeenCalledWith(destination.url, userToken);
+      expect(component['datafeedRequests']
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
+        destination.url,
+        userToken);
       expect(component.revealUrlStatus).toHaveBeenCalledWith(
         UrlTestState.Success
       );
@@ -386,10 +383,8 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['tokenType'].setValue('Bearer');
       component.createDataFeedForm.controls['token'].setValue(token);
       spyOn(component, 'revealUrlStatus');
-      spyOn(
-        component['datafeedRequests'],
-        'testDestinationWithHeaders'
-      ).and.returnValue(throwError([]));
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders')
+      .and.returnValue(throwError([]));
       component.sendTestForDataFeed({
         auth: AuthTypes.ACCESSTOKEN,
         name: WebhookIntegrationTypes.SPLUNK,
