@@ -105,13 +105,14 @@
     margin-right: 15px;
   }
 
-  chef-select {
+  ::ng-deep chef-select {
     font-size: 14px;
+    font-weight: 100;
+    width: 96%;
   }
 
   ::ng-deep chef-select .selected-value {
     height: 36px;
-    width: 464px;
     background: $chef-white;
     padding: 0.5em;
     border: 1px solid $chef-form-input;
