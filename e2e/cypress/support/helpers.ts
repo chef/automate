@@ -18,3 +18,45 @@ export function eventExist(entityName: string, events: any[]): boolean {
 
   return false;
 }
+
+
+export const nodejson = [
+  {
+    name: "109node-0.0.9.9",
+    manager: "automate",
+    target_config: {
+      backend: "ssh",
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ["0.0.9.9"],
+    },
+    tags: [],
+  },
+  {
+    name: "108node-0.0.9.9",
+    manager: "automate",
+    target_config: {
+      backend: "ssh",
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ["0.0.9.9"],
+    },
+    tags: [],
+  },
+  {
+    name: "107node-0.0.9.9",
+    manager: "automate",
+    target_config: {
+      backend: "ssh",
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ["0.0.9.9"],
+    },
+    tags: [],
+  },
+];
+
+
