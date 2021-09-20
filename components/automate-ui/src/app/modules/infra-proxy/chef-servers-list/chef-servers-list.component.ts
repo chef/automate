@@ -144,9 +144,12 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       webui_key: this.webUIKeyForm.controls['webui_key'].value || ''
     };
     this.store.dispatch(new CreateServer(server));
+<<<<<<< HEAD
     this.telemetryService.track('InfraServer_Add_Chef_InfraServer');
     this.creatingChefServer = false;
     this.createChefServerForm.reset();
+=======
+>>>>>>> d7dca2875 (Add changes for the create server slider (#5755))
     this.resetCreateModal();
   }
 
