@@ -139,12 +139,24 @@ export class DestinationRequests {
       return this.testDestinationWithSecretId(destination);
     }
   }
-
   public testDestinationWithUsernamePassword(url: string,
     username: string, password: string): Observable<Object> {
-    return this.http.post(encodeURI(
-      this.joinToDataFeedUrl(['destinations', 'test'])),
-      { url, 'username_password': {username, password} });
+        return this.http.post(encodeURI(
+          this.joinToDataFeedUrl(['destinations', 'test'])),
+          { url, 'username_password': {username, password} });
+  }
+
+  public testDestinationWithUsernamePasswordWithHeaders(url: string,
+    username: string, password: string, headers: string): Observable<Object> {
+      if (headers !== '') {
+        return this.http.post(encodeURI(
+          this.joinToDataFeedUrl(['destinations', 'test'])),
+          { url, headers, 'username_password': {username, password} });
+      } else {
+        return this.http.post(encodeURI(
+          this.joinToDataFeedUrl(['destinations', 'test'])),
+          { url, 'username_password': {username, password} });
+    }
   }
 
   public testDestinationWithHeaders(url: string,

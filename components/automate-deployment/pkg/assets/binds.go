@@ -22,6 +22,8 @@ automate-backend-kibana BINDING_MODE strict
 automate-backend-metricbeat REQUIRED elasticsearch
 automate-backend-metricbeat OPTIONAL database
 automate-backend-metricbeat BINDING_MODE strict
+automate-backend-pgleaderchk OPTIONAL database
+automate-backend-pgleaderchk BINDING_MODE strict
 automate-backend-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
