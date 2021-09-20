@@ -14,11 +14,11 @@ gh_repo = "automate"
 
 ## Overview
 
-Chef Automate users can manage their own display name, date/time format, and password. Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
+Chef Automate users can manage their display name, date/time format, and password. Select the user icon in the top navigation bar, and select **Profile** from the drop-down menu.
 
 {{< figure src="/images/automate/chef-automate-profile.png" alt="Profile Section in Chef Automate">}}
 
-Select **Profile** to view the details. The **Details** tab lets you update your _Display Name_ and the _Time Format_, whereas the **Reset Password** tab lets you update your password.
+Select **Profile** to view the details. The **Details** tab lets you update your _Display Name_ and the _Time Format_, whereas the **Reset Password** tab lets you edit your password.
 
 ### Change a Display Name
 
@@ -32,7 +32,7 @@ Every user needs a display name. An empty display name causes an error.
 
 ### Change the Date/Time Format
 
-You can select one of five date and time formats from the drop down. The date/time format will get updated as soon as you select any one and click **Save**.
+You can select one of five date and time formats from the drop-down. The date/time format will get updated as soon as you choose anyone and click **Save**.
 
 {{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
 
@@ -44,4 +44,4 @@ Reset your password of Chef Automate login from the **Reset Password** tab in Pr
 
 {{< figure src="/images/automate/reset-password-from-profile.png" alt="Reset Password From Profile">}}
 
-Insert the the _Previous Password_ and the _New Password_ and select **Reset Password**.
+Insert the _Previous Password_ and the _New Password_ and select **Reset Password**.
