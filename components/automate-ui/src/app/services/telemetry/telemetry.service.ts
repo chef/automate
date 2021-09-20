@@ -13,6 +13,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
 
 import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/services/user-preferences/user-preferences.actions';
+import { ComplianceStatsService } from './complicance-stats/complicance-stats.service';
+import { UnfilteredStats } from './complicance-stats/complicance-stats.model';
 
 declare let analytics: any;
 
@@ -59,7 +61,8 @@ export class TelemetryService {
     private cookieService: CookieService,
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
-    private store: Store<NgrxStateAtom>) {
+    private store: Store<NgrxStateAtom>,
+    private complianceStatsService: ComplianceStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -86,10 +89,7 @@ export class TelemetryService {
         return this.trackingOperations;
       }))
       .subscribe((trackingOperations) => {
-        if (this.chefSessionService.telemetry_enabled) {
-          this.isSkipNotification = true;
-          this.engageTelemetry(trackingOperations);
-        }
+        this.initiateTelemetry(trackingOperations);
       });
   }
 
@@ -164,34 +164,26 @@ export class TelemetryService {
 
           analytics.sanitizeDomainURL = this.sanitizeDomainURL;
           analytics.addSourceMiddleware(this.middleware);
-          // First we want to get the build version so we can send it with the
-          // metadata to the telemetry pipeline
-          this.metadataService
-          .getBuildVersion()
-          .subscribe(buildVersion => {
-            this.buildVersion = buildVersion;
+          // For segment the first call we need to make must be identify().
+          // In the calls below we might as well call analytics.identify() and
+          // analytics.group() but we would like to ensure that we call analytics
+          // from a single place so we queue these requests as the first items in
+          // our trackingOperations queue.
 
-            // For segment the first call we need to make must be identify().
-            // In the calls below we might as well call analytics.identify() and
-            // analytics.group() but we would like to ensure that we call analytics
-            // from a single place so we queue these requests as the first items in
-            // our trackingOperations queue.
+          // Currently we depend on anonymousId segment creates for us. We should
+          // add a userId into this call in the future.
+          this.identify();
+          // Currently we group users by license ID and customer ID
+          this.group(this.licenseId);
+          this.group(this.customerId);
 
-            // Currently we depend on anonymousId segment creates for us. We should
-            // add a userId into this call in the future.
-            this.identify();
-            // Currently we group users by license ID and customer ID
-            this.group(this.licenseId);
-            this.group(this.customerId);
-
-            // We want to make sure we have the config and the required calls are
-            // queued up before starting to send things into analytics. So we don't
-            // subscribe to trackingOperations before these are done.
-            trackingOperations.subscribe((trackingData) => {
-              analytics[trackingData.operation](trackingData.identifier, trackingData.properties);
-            });
-            this.trackInitialData();
-           });
+          // We want to make sure we have the config and the required calls are
+          // queued up before starting to send things into analytics. So we don't
+          // subscribe to trackingOperations before these are done.
+          trackingOperations.subscribe((trackingData) => {
+            analytics[trackingData.operation](trackingData.identifier, trackingData.properties);
+          });
+          this.trackInitialData();
            if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
            }
@@ -259,7 +251,7 @@ export class TelemetryService {
     );
   }
 
-  private emitToPipeline(operation: String, payload: Object) {
+  private emitToPipeline(operation: String, payload: Object, isReturnHttp?) {
     const headers = new HttpHeaders({
       'Content-Type' :  'application/json'
     });
@@ -279,6 +271,12 @@ export class TelemetryService {
       "timestamp": "${this.getCurrentDateTime()}",
       "payload": ${JSON.stringify(payload)}
     }`;
+
+    if (isReturnHttp) {
+      return this.httpClient
+        .post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } });
+    }
+
     this.httpClient.post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } })
       .subscribe(
          _response => {
@@ -335,6 +333,65 @@ export class TelemetryService {
 
   updateTelemetryCheckbox(telemetryPref: boolean) {
     this.telemetryCheckboxObservable.next(telemetryPref);
+  }
+
+  async initiateTelemetry(trackingOperations) {
+    try {
+      await this.fetchBuildVersion();
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      const unfilteredStats: UnfilteredStats = await this.complianceStatsService
+        .getComplianceStats();
+      if (unfilteredStats) {
+        await this.sendUnfilteredStatsToTelemetry(unfilteredStats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    if (this.chefSessionService.telemetry_enabled) {
+      this.isSkipNotification = true;
+      this.engageTelemetry(trackingOperations);
+    }
+  }
+
+  fetchBuildVersion() {
+    let resolver;
+    const promise = new Promise((resolve) => {
+      resolver = resolve;
+    });
+    const metadataSubscription = this.metadataService.getBuildVersion()
+      .subscribe((buildVersion) => {
+        this.buildVersion = buildVersion;
+        if (metadataSubscription) {
+          metadataSubscription.unsubscribe();
+        }
+        resolver('success');
+    });
+    return promise;
+  }
+
+  sendUnfilteredStatsToTelemetry(unfilteredStats: UnfilteredStats) {
+    let resolver;
+    const promise = new Promise((resolve) => {
+      resolver = resolve;
+    });
+    const unfilteredStatsSubscription = this.emitToPipeline('track', {
+      userId: this.anonymousId,
+      event: 'complianceCountsGlobal',
+      properties: unfilteredStats
+    }, true).subscribe(() => {
+      if (unfilteredStatsSubscription) {
+        unfilteredStatsSubscription.unsubscribe();
+      }
+      resolver('success');
+    },
+    ({ status, error: { message } }: HttpErrorResponse) => {
+      console.log(`Error emitting telemetry event: ${status} - ${message}`);
+      resolver('error');
+    });
+    return promise;
   }
 
 }
