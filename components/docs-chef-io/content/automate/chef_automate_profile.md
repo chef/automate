@@ -30,7 +30,7 @@ Change your display name by entering your preferred name.
 The **Display Name** gets updated as soon as you change the name in the bar.
 {{< /note >}}
 
-The Display Name bar should not be kept empty or else it throws error.
+Every user needs a display name. An empty display name causes an error.
 
 {{< figure src="/images/automate/error-in-display-name-bar.png" alt="Error in Display Name">}}
 
