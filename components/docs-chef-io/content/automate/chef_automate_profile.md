@@ -22,13 +22,9 @@ Select **Profile** to view the details. The **Details** tab lets you update your
 
 ### Change a Display Name
 
-Change your display name by entering your preferred name.
+Change your display name by entering your preferred name. The display name gets updated as soon as you change the name in the bar and click **Save**.
 
 {{< figure src="/images/automate/display-name-in-profile.png" alt="Display Name of Chef Automate">}}
-
-{{< note >}}
-The **Display Name** gets updated as soon as you change the name in the bar.
-{{< /note >}}
 
 Every user needs a display name. An empty display name causes an error.
 
@@ -36,15 +32,11 @@ Every user needs a display name. An empty display name causes an error.
 
 ### Change the Date/Time Format
 
-You can select one of five date and time formats.
+You can select one of five date and time formats from the drop down. The date/time format will get updated as soon as you select any one and click **Save**.
 
 {{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
 
 Select the date/time format and save to get the changes reflected in the interface.
-
-{{< note >}}
-The **Date/Time Format** gets updated as soon as you select a new time format from the drop down.
-{{< /note >}}
 
 ### Reset Password
 
