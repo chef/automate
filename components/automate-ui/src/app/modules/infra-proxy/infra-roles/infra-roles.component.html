@@ -69,13 +69,13 @@
             </chef-td>
             <chef-td>{{ role.environments.join(", ") }}</chef-td>
             <chef-td></chef-td>
-            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'delete', [serverId, orgId, role.name]]">
             <chef-td class="three-dot-column">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'delete', [serverId, orgId, role.name]]">
               <mat-select panelClass="chef-control-menu">
                 <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
               </mat-select>
-            </chef-td>
             </app-authorized>
+            </chef-td>
           </chef-tr>
         </chef-tbody>
       </chef-table>
