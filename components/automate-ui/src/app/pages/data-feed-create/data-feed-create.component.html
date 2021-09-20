@@ -27,7 +27,7 @@
             <div class="container image-footer">
               <h3 class="bolder-font">{{item.name}}</h3> 
             </div>
-            <div class="overlay" *ngIf="item.name !== 'ServiceNow' && item.name !== 'Splunk'">
+            <div class="overlay" *ngIf="item.name !== 'ServiceNow' && item.name !== 'Splunk' && item.name !== 'Custom'">
               <div class="text">Coming Soon</div>
             </div>
           </div>
@@ -126,7 +126,7 @@
             </div>
           </div>
         </div>
-        <div class="input-margin" *ngIf="showTokenInput('tokenType')">
+        <div class="input-margin" *ngIf="showTokenInput('tokenType')" [ngClass]="{'customtokentypeblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Token Type (Prefix)<span aria-hidden="true">*</span></span>
@@ -138,15 +138,19 @@
                   data-cy="add-token-type"
                   id="token-type-input"
                   autocomplete="off"
-                  [readonly]="tokenToggle"/>
-                <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()">
+                  [readonly]="tokenToggle && !showFields.customToken"/>
+                <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()" *ngIf="!showFields.customToken">
                   Edit
                 </chef-button>
               </div>
             </label>
+            <chef-error
+              *ngIf="createForm.get('tokenType').hasError('required') && createForm.get('tokenType').dirty">
+              token type is required.
+            </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showTokenInput('token')">
+        <div class="input-margin" *ngIf="showTokenInput('token')" [ngClass]="{'customtokenblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Token <span aria-hidden="true">*</span></span>
@@ -168,7 +172,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showUserPassInput('username')">
+        <div class="input-margin" *ngIf="showUserPassInput('username')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Username <span aria-hidden="true">*</span></span>
@@ -190,7 +194,7 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showUserPassInput('password')">
+        <div class="input-margin" *ngIf="showUserPassInput('password')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Password <span aria-hidden="true">*</span></span>
@@ -227,6 +231,30 @@
             <chef-error
               *ngIf="(createForm.get('bucketName').hasError('required') || createForm.get('bucketName').hasError('pattern')) && createForm.get('bucketName').dirty">
               Bucket Name is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div *ngIf="showFields.useHeaders" class="input-margin" [ngClass]="{'error' : !flagHeaders}">
+          <chef-form-field>
+            <label>
+              <chef-checkbox id="headers-checkbox" (change)="updateHeaderCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
+                <div *ngIf="headerChecked">
+                  <textarea
+                    class="chef-inputtextarea"
+                    formControlName="headers"
+                    data-cy="add-headers"
+                    type="text"
+                    id="headers-input"
+                    placeholder="key:value"
+                    autocomplete="off"
+                    (input)="validateHeaders($event.target.value)"
+                    rows="5"
+                    ></textarea>
+                </div>
+            </label>
+            <chef-error
+              *ngIf="!flagHeaders && headerChecked">
+              Headers are invalid.
             </chef-error>
           </chef-form-field>
         </div>

@@ -88,6 +88,7 @@ describe('DataFeedCreateComponent', () => {
     const secretKey = 'test123';
     const userName = 'test123';
     const password = 'test123';
+    const header = '{“test”:”123”}';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -147,6 +148,30 @@ describe('DataFeedCreateComponent', () => {
       component.createForm.controls['bucketName'].setValue(bucketName);
       component.createForm.controls['accessKey'].setValue(accessKey);
       component.createForm.controls['secretKey'].setValue(secretKey);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for custom with Access token', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue(token);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for custom with UsernamePassword', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.selectChangeHandlers('Username and Password');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      component.createForm.controls['headers'].setValue(header);
       expect(component.validateForm()).toBeTruthy();
     });
 
