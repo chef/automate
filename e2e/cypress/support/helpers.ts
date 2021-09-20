@@ -22,41 +22,1326 @@ export function eventExist(entityName: string, events: any[]): boolean {
 
 export const nodejson = [
   {
-    name: "109node-0.0.9.9",
-    manager: "automate",
+    name: '100node-0.0.9.9',
+    manager: 'automate',
     target_config: {
-      backend: "ssh",
+      backend: 'ssh',
       secrets: [],
       port: 22,
       sudo: false,
-      hosts: ["0.0.9.9"],
+      hosts: ['0.0.9.9']
     },
-    tags: [],
+    tags: []
   },
   {
-    name: "108node-0.0.9.9",
-    manager: "automate",
+    name: '101node-0.0.9.9',
+    manager: 'automate',
     target_config: {
-      backend: "ssh",
+      backend: 'ssh',
       secrets: [],
       port: 22,
       sudo: false,
-      hosts: ["0.0.9.9"],
+      hosts: ['0.0.9.9']
     },
-    tags: [],
+    tags: []
   },
   {
-    name: "107node-0.0.9.9",
-    manager: "automate",
+    name: '102node-0.0.9.9',
+    manager: 'automate',
     target_config: {
-      backend: "ssh",
+      backend: 'ssh',
       secrets: [],
       port: 22,
       sudo: false,
-      hosts: ["0.0.9.9"],
+      hosts: ['0.0.9.9']
     },
-    tags: [],
+    tags: []
   },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+
+  {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '101node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '102node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '103node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '104node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '105node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '106node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '107node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '108node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  },
+  {
+    name: '109node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+      backend: 'ssh',
+      secrets: [],
+      port: 22,
+      sudo: false,
+      hosts: ['0.0.9.9']
+    },
+    tags: []
+  }
 ];
 
 
