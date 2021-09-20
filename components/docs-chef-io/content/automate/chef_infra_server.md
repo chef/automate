@@ -155,11 +155,11 @@ Select a specific role to view the details of that particular role. Its contains
 
 {{< figure src="/images/automate/view-role-details.png" alt="View Role Details">}}
 
-The _Details_ contains the Run List, whereas the attributes tab displays the *default* and the *override* attributes of the role.
+The _Details_ contains the Run List, whereas the attributes tab displays the _default_ and the _override_ attributes of the role.
 
 {{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
 
-You can edit the *default* and *override* attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
+You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
 
 #### Delete a Role
 
@@ -484,7 +484,7 @@ Select a specific Policyfile from the _Included Policies_ to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
-In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
+In the above image, the slider tab shows the _Details_ of the selected policyfile. To view the _Revision ID_ select the **Revisions** option in the tab.
 
 **Run List**
 
@@ -496,7 +496,7 @@ To view the cookbook details of the item, select **Go to Cookbook Details** opti
 
 ##### Attributes Tab
 
-The **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
+The **Attributes** tab displays the _default_ and the _override_ attributes of a Policyfile.
 
 {{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
