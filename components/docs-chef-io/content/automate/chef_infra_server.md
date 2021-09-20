@@ -15,11 +15,11 @@ gh_repo = "automate"
 
 ## Overview
 
-The _Chef Infra Server_ page (**Infrastructure > Chef Servers**) lets you connect existing Chef Infra Servers to Chef Automate, view all of the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
+The _Chef Infra Server_ page (**Infrastructure > Chef Servers**) lets you connect existing Chef Infra Servers to Chef Automate, view all the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
 
-The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Server stores _cookbooks_, the policies that are applied to _nodes_, and metadata that describes each registered node that is being managed by Chef Infra Client.
+The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Server stores _cookbooks_, the policies that are applied to _nodes_, and metadata that describes each registered node managed by Chef Infra Client.
 
-Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much of the configuration work as possible on the nodes themselves (and not on the Chef Infra Server).
+Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much configuration work as possible on the nodes themselves (and not on the Chef Infra Server).
 
 This scalable approach distributes the configuration effort throughout the organization.
 
@@ -38,9 +38,9 @@ The objects that you can manage from the Chef Infra Server are:
 
 ## Connect Chef Infra Servers to Chef Automate
 
-The _Chef Infra Server_ panel starts out with an empty list of servers.
+The _Chef Infra Server_ panel starts with an empty list of servers.
 
-To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server** which will request the name, FQDN, and IP address of your Chef Infra Server:
+To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN, and IP address of your Chef Infra Server:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
@@ -48,7 +48,7 @@ Chef Automate will warn you if you enter an invalid FQDN or IP address:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
-Once you are finished, select **Add Chef Server** and you will see your server in the list of Chef Infra Servers.
+Once done, select **Add Chef Server** and you will see your server in the list of Chef Infra Servers.
 
 ## Connect a Chef Organization to a Chef Infra Server
 
@@ -63,12 +63,12 @@ To add an existing organization, select **Add Chef Organization**, which opens a
 
 {{< figure src="/images/automate/add-chef-organization-popup-menu.png" width="500" alt="Add Chef Organization Form">}}
 
-Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values that were provided when the organization was configured using _Knife_.
+Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values provided when the organization gets configured using _Knife_.
 Copy the contents of the `~/.chef/USER.pem` file and paste it into the **Admin Key** field. Then select **Add Chef Organization** to add the organization to the Chef Infra Server.
 
 ## Access Chef Infra Server Components
 
-The following Chef Infra Server components for an organization can be managed using Chef Automate:
+Manage the following Chef Infra Server components for an organization using Chef Automate:
 
 - Cookbooks
 - Roles
@@ -116,7 +116,7 @@ Select the **Content** tab to view the recipes and other components of a cookboo
 
 #### Details of a Cookbook
 
-Select the **Details** tab to view the requirements, usage, resources, and license of a cookbook.
+Select the **Details** tab to view the requirements, usage, resources, and license.
 
 {{< figure src="/images/automate/details-of-a-cookbook.png" alt="Details of a Cookbook">}}
 
@@ -140,7 +140,7 @@ To create a new role, select **Create Role**:
 
 {{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
 
-Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
+Selecting the **Create Role** button opens a dialog box. The dialog box contains four sections: _Details_, _Run List_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
 
 {{< figure src="/images/automate/create-role-popup.png" alt="Create Roles Dialog Box">}}
 
@@ -187,13 +187,13 @@ To create a new Environment, select **Create Environment**, as shown below:
 
 {{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
 
-Selecting the **Create Environment** button opens a dialog box. The dialog box contains four different sections: _Details_, _Constraints_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new environment.
+Selecting the **Create Environment** button opens a dialog box. The dialog box contains four sections: _Details_, _Constraints_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections, and select **Create** to create a new environment.
 
 {{< figure src="/images/automate/create-environment-popup.png" alt="Create Environment Dialog Box">}}
 
 #### Search for an Environment
 
-Use the **Search environments** bar to find an existing environment from the list of environments.
+Use the **Search environments** bar to find an existing environment from the list.
 Entering the name of an environment in the search box returns environments matching your search criteria.
 
 {{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
@@ -249,7 +249,7 @@ Selecting the **Create Data Bag** button opens a dialog box. Enter the name and 
 
 #### Create a Data Bag Item
 
-To create a data bag item, select the data bag from the list of created data bags and follow the steps given below:
+To create a data bag item, select the data bag from the list of data bags and follow the steps given below:
 
 Select **Create Item**, as shown below:
 
@@ -271,13 +271,13 @@ Select a specific data bag item to view the details. The details contain an *id*
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
-To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, select **Save Item**.
 
 {{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
 
 #### Delete a Data Bag Item
 
-Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
+Select a specific data bag item to view the details. The details contain an _id_ and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
@@ -332,7 +332,7 @@ The Chef Infra Server lets you reset the _Public Key_ using the _Reset Key_ opti
 
 {{< figure src="/images/automate/reset-key-in-client-details.png" alt="Reset Key Option of a Client" width="400" height="300">}}
 
-Selecting the _Reset Key_ shown in the above image opens a new dialog box that contains the new _Private Key_ of that client. To download the new _Private Key_, select **Download**.
+Selecting the _Reset Key_ shown in the above image opens a new dialog box containing the client's new _Private Key_. To download the new _Private Key_, select **Download**.
 
 {{< figure src="/images/automate/reset-public-key-of-a-client.png" alt="Reset Public Key of a Clients">}}
 
@@ -344,7 +344,7 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 ### Nodes
 
-A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node will be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
+A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node can be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
 
 The Chef Infra Server integration lets you:
 
@@ -365,7 +365,7 @@ Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a 
 
 #### Details of a Node
 
-Select a specific node to view the node information, metadata, and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group`, and `Policy Name`. You can also view the **Metadata** for the node that contains the name of the `Chef Server`, and the name of the `Chef Organization`.
+Select a specific node to view the node information, metadata, and details of the node's environment. The first section of the page has the **Node Information** like `Environment`, `Policy Group`, and `Policy Name`. You can also view the **Metadata** for the node that contains the name of the `Chef Server`, and the name of the `Chef Organization`.
 
 The above information looks like as shown below:
 
@@ -436,7 +436,7 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 #### Reset a Client Key
 
-Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
+Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning _The current key will no longer be accepted_. Select **Reset Key** once again to confirm.
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Client Key">}}
 
