@@ -59,6 +59,7 @@
             <chef-td></chef-td>
             <chef-td></chef-td>
             <chef-td class="three-dot-column">
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}', 'delete', [serverId, orgId, environment.name]]">
               <mat-select panelClass="chef-control-menu" id="menu-{{environment.id}}">
                 <mat-option data-cy="delete" (onSelectionChange)="startEnvironmentDelete(environment)">Delete</mat-option>
               </mat-select>
