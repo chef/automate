@@ -189,7 +189,6 @@ describe('chef server details', () => {
     it('can check save button is disabled until server details input value is not changed', () => {
       cy.get('[data-cy=update-server-name]').clear().type(serverName);
       cy.get('[data-cy=update-server-fqdn]').clear().type(serverFQDN);
-      cy.get('[data-cy=update-server-ip-address]').clear().type(serverIP);
 
       // check for disabled save button
       cy.get('[data-cy=save-button]')
@@ -202,7 +201,6 @@ describe('chef server details', () => {
     it('can check save button is disabled until all inputs are filled in', () => {
       cy.get('[data-cy=update-server-name]').clear().type(serverName);
       cy.get('[data-cy=update-server-fqdn]').clear().type(serverFQDN);
-      cy.get('[data-cy=update-server-ip-address]').clear();
 
       // check for disabled save button
       cy.get('[data-cy=save-button]')
@@ -218,6 +216,16 @@ describe('chef server details', () => {
     it('can update the server', () => {
       cy.get('[data-cy=update-server-name]').clear().type(updatedServerName);
       cy.get('[data-cy=update-server-fqdn]').clear().type(serverFQDN);
+      cy.get('[data-cy=save-button]').click();
+
+      cy.get('app-notification.info').contains('Successfully updated server');
+      cy.get('app-notification.info chef-icon').click();
+    });
+
+    it('can update the server', () => {
+      cy.get('[data-cy=update-server-name]').clear().type(updatedServerName);
+      cy.get('chef-select').contains('FQDN').click();
+      cy.get('chef-select chef-option').contains('IP Address').click();
       cy.get('[data-cy=update-server-ip-address]').clear().type(serverIP);
       cy.get('[data-cy=save-button]').click();
 

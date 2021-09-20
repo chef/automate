@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Revision } from 'app/entities/revisions/revision.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 export enum WebhookIntegrationTypes {
   SERVICENOW = 'ServiceNow',
@@ -43,6 +44,7 @@ export class DataFeedCreateComponent {
   @Input() createForm: FormGroup;
   @Output() saveDestinationEvent = new EventEmitter<any>();
   @Output() testDestinationEvent = new EventEmitter<any>();
+  @Output() checkEvent = new EventEmitter<any>();
 
   public revisions: Revision[] = [];
   public revisionsListLoading = true;
@@ -56,11 +58,15 @@ export class DataFeedCreateComponent {
   public hideNotification = true;
   public authSelected: string = AuthTypes.ACCESSTOKEN;
   public showSelect = false;
+  public flagHeaders = true;
+  public validHeadersValue = false;
+
+  private saveInProgress = false;
+  private testInProgress = false;
+  public headerChecked = false;
   public notificationShow = false;
   public notificationMessage = '';
   public notificationType = 'error';
-  private saveInProgress = false;
-  private testInProgress = false;
 
   public integrations = {
     webhook: [
@@ -88,7 +94,9 @@ export class DataFeedCreateComponent {
     headers: false,
     bucketName: false,
     accessKey: false,
-    secretKey: false
+    secretKey: false,
+    useHeaders: false,
+    customToken: false
   };
 
   set saveDone(done: boolean) {
@@ -166,6 +174,12 @@ export class DataFeedCreateComponent {
     }};
   }
 
+  updateHeaderCheckbox(event: boolean): void {
+    this.checkEvent.emit(event);
+    this.headerChecked = event;
+    this.createForm.controls.headerChecked.setValue(true);
+  }
+
   showFieldStorage() {
     Object.keys(this.showFields).forEach(v => this.showFields[v] = false);
     this.showFields = {...this.showFields, ...{
@@ -183,6 +197,8 @@ export class DataFeedCreateComponent {
     this.showFields.headers = false;
     this.integTitle = integration;
     this.createForm.reset();
+    this.headerChecked = false;
+    this.flagHeaders = true;
     setTimeout(() => {
       this.showSelect = true;
       this.name.nativeElement.focus();
@@ -200,6 +216,15 @@ export class DataFeedCreateComponent {
         this.showFieldWebhook();
         this.authSelected = AuthTypes.ACCESSTOKEN;
         this.createForm.controls['tokenType'].setValue('Splunk');
+        this.integrationSelected = true;
+        break;
+      }
+      case WebhookIntegrationTypes.CUSTOM: {
+        this.showFieldWebhook();
+        this.showFields.customToken = true;
+        this.showFields.useHeaders = true;
+        this.authSelected = AuthTypes.ACCESSTOKEN;
+        this.createForm.controls['tokenType'].setValue('');
         this.integrationSelected = true;
         break;
       }
@@ -236,29 +261,41 @@ export class DataFeedCreateComponent {
     switch (this.integTitle) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
+      case WebhookIntegrationTypes.ELK_KIBANA:
+      case WebhookIntegrationTypes.CUSTOM: {
         // handling access token and user pass auth
-        // for servicenow, splunk and elk
+        // for servicenow, splunk, elk and custom
         switch (this.authSelected) {
           case AuthTypes.ACCESSTOKEN: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('tokenType').valid && this.createForm.get('token').valid) {
-              return true;
+                if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                  this.validHeadersValue && this.flagHeaders) {
+                  return true;
+                } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                  !this.headerChecked && this.flagHeaders) {
+                  return true;
+                } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
+                  return true;
+                }
             }
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
             if (this.createForm.get('name').valid && this.createForm.get('url').valid &&
               this.createForm.get('username').valid && this.createForm.get('password').valid) {
-              return true;
+              if (this.integTitle === WebhookIntegrationTypes.CUSTOM && this.headerChecked &&
+                this.validHeadersValue && this.flagHeaders) {
+                return true;
+              } else if (this.integTitle === WebhookIntegrationTypes.CUSTOM &&
+                !this.headerChecked && this.flagHeaders) {
+                return true;
+              } else if (this.integTitle !== WebhookIntegrationTypes.CUSTOM) {
+                return true;
+              }
             }
           }
         }
-        break;
-      }
-      case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for webhooks
         break;
       }
       case StorageIntegrationTypes.MINIO: {
@@ -296,5 +333,19 @@ export class DataFeedCreateComponent {
   public showUserPassInput(field: string) {
     return this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD;
   }
-}
 
+  public validateHeaders(customHeaders: string): void {
+    const headersVal = customHeaders.split('\n');
+    for (const values in headersVal) {
+      if (this.headerChecked && headersVal[values]) {
+        this.flagHeaders = Regex.patterns.VALID_HEADER.test(headersVal[values]);
+        this.validHeadersValue = this.flagHeaders;
+        if (this.flagHeaders === false) {
+          break;
+        }
+      } else if (headersVal[values] === '') {
+        this.flagHeaders = true;
+      }
+    }
+  }
+}

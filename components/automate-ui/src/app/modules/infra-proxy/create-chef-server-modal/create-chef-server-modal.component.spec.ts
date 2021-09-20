@@ -13,6 +13,9 @@ describe('CreateChefServerModalComponent', () => {
   let fixture: ComponentFixture<CreateChefServerModalComponent>;
 
   let createForm: FormGroup;
+  let fqdnForm: FormGroup;
+  let ipForm: FormGroup;
+
   let errors = {};
 
   beforeEach( waitForAsync(() => {
@@ -23,6 +26,12 @@ describe('CreateChefServerModalComponent', () => {
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
+        MockComponent({ selector: 'chef-select' }),
+        MockComponent({ selector: 'chef-option' }),
+        MockComponent({ selector: 'chef-modal',
+          inputs: ['visible'],
+          outputs: ['close']
+        }),
         CreateChefServerModalComponent
       ],
       imports: [
@@ -40,18 +49,24 @@ describe('CreateChefServerModalComponent', () => {
     component.createForm = new FormBuilder().group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+    });
+    component.fqdnForm = new FormBuilder().group({
       fqdn: ['', [Validators.required,
-      Validators.pattern(Regex.patterns.NON_BLANK),
-      Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]],
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_FQDN)
+      ]]
+    });
+    component.ipForm = new FormBuilder().group({
       ip_address: ['', [Validators.required,
-      Validators.pattern(Regex.patterns.NON_BLANK),
-      Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
     });
     component.conflictErrorEvent = new EventEmitter();
     createForm = component.createForm;
+    fqdnForm = component.fqdnForm;
+    ipForm = component.ipForm;
     fixture.detectChanges();
   });
 
@@ -63,12 +78,14 @@ describe('CreateChefServerModalComponent', () => {
     describe('the form should be invalid', () => {
       it('when all inputs are empty', () => {
         expect(createForm.valid).toBeFalsy();
+        expect(fqdnForm.valid).toBeFalsy();
+        expect(ipForm.valid).toBeFalsy();
       });
 
       it('when name is missing', () => {
         createForm.controls['id'].setValue('test');
-        createForm.controls['fqdn'].setValue('test.net');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
+        fqdnForm.controls['fqdn'].setValue('test.net');
+        ipForm.controls['ip_address'].setValue('1.2.3.4');
 
         errors = createForm.controls['name'].errors || {};
 
@@ -78,8 +95,8 @@ describe('CreateChefServerModalComponent', () => {
 
       it('when id is missing', () => {
         createForm.controls['name'].setValue('test');
-        createForm.controls['fqdn'].setValue('test.net');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
+        fqdnForm.controls['fqdn'].setValue('test.net');
+        ipForm.controls['ip_address'].setValue('1.2.3.4');
 
         errors = createForm.controls['id'].errors || {};
 
@@ -90,34 +107,34 @@ describe('CreateChefServerModalComponent', () => {
       it('when fqdn is missing', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
+        ipForm.controls['ip_address'].setValue('1.2.3.4');
 
-        errors = createForm.controls['fqdn'].errors || {};
+        errors = fqdnForm.controls['fqdn'].errors || {};
 
-        expect(createForm.valid).toBeFalsy();
+        expect(fqdnForm.valid).toBeFalsy();
         expect(errors['required']).toBeTruthy();
       });
 
       it('when ip_address is missing', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
-        createForm.controls['fqdn'].setValue('test.net');
+        fqdnForm.controls['fqdn'].setValue('test.net');
 
-        errors = createForm.controls['ip_address'].errors || {};
+        errors = ipForm.controls['ip_address'].errors || {};
 
-        expect(createForm.valid).toBeFalsy();
+        expect(ipForm.valid).toBeFalsy();
         expect(errors['required']).toBeTruthy();
       });
 
       it('when the ip_address in invalid', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
-        createForm.controls['fqdn'].setValue('chef.internal');
+        fqdnForm.controls['fqdn'].setValue('chef.internal');
 
-        createForm.controls['ip_address'].setValue('1.2234.3.4');
-        errors = createForm.controls['ip_address'].errors || {};
+        ipForm.controls['ip_address'].setValue('1.2234.3.4');
+        errors = ipForm.controls['ip_address'].errors || {};
 
-        expect(createForm.valid).toBeFalsy();
+        expect(ipForm.valid).toBeFalsy();
         expect(errors['pattern']).toBeTruthy();
       });
 
@@ -144,12 +161,12 @@ describe('CreateChefServerModalComponent', () => {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
           createForm.controls['id'].setValue('test');
-          createForm.controls['ip_address'].setValue('1.2.3.4');
+          ipForm.controls['ip_address'].setValue('1.2.3.4');
 
-          createForm.controls['fqdn'].setValue(input);
-          errors = createForm.controls['fqdn'].errors || {};
+          fqdnForm.controls['fqdn'].setValue(input);
+          errors = fqdnForm.controls['fqdn'].errors || {};
 
-          expect(createForm.valid).toBeFalsy();
+          expect(fqdnForm.valid).toBeFalsy();
           expect(errors['pattern']).toBeTruthy();
         });
       });
@@ -162,8 +179,8 @@ describe('CreateChefServerModalComponent', () => {
         expect(createForm.valid).toBeFalsy();
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
-        createForm.controls['fqdn'].setValue('chef.internal');
-        createForm.controls['ip_address'].setValue('1.2.3.4');
+        fqdnForm.controls['fqdn'].setValue('chef.internal');
+        ipForm.controls['ip_address'].setValue('1.2.3.4');
         expect(createForm.valid).toBeTruthy();
       });
 
@@ -184,12 +201,12 @@ describe('CreateChefServerModalComponent', () => {
         it(('when the fqdn ' + description), () => {
           createForm.controls['name'].setValue('test');
           createForm.controls['id'].setValue('test');
-          createForm.controls['ip_address'].setValue('1.2.3.4');
+          ipForm.controls['ip_address'].setValue('1.2.3.4');
 
-          createForm.controls['fqdn'].setValue(input);
-          errors = createForm.controls['fqdn'].errors || {};
+          fqdnForm.controls['fqdn'].setValue(input);
+          errors = fqdnForm.controls['fqdn'].errors || {};
 
-          expect(createForm.valid).toBeTruthy();
+          expect(fqdnForm.valid).toBeTruthy();
           expect(errors['pattern']).toBeFalsy();
         });
       });

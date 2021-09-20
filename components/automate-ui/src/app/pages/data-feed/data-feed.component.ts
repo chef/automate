@@ -35,7 +35,7 @@ import {
   WebhookIntegrationTypes
 } from '../data-feed-create/data-feed-create.component';
 
-enum UrlTestState {
+export enum UrlTestState {
   Inactive,
   Loading,
   Success,
@@ -59,6 +59,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public sendingDataFeed = false;
   private isDestroyed = new Subject<boolean>();
+  public checkedHeaders = false;
 
   @ViewChild(DataFeedCreateComponent) createChild: DataFeedCreateComponent;
 
@@ -160,38 +161,72 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public setCheck(event) {
+    this.checkedHeaders = event;
+  }
+
+  public addHeadersforCustomDataFeed(customHeaders: string): {} {
+        const headersJson = {};
+        const headersVal = customHeaders.split('\n');
+        for (const values in headersVal) {
+          if (headersVal[values]) {
+            const word = headersVal[values].split(':');
+            headersJson[word[0]] = word[1];
+          }
+        }
+        return headersJson;
+  }
+
   public sendTestForDataFeed(event: {name: string, auth: string}): void {
     let testConnectionObservable: Observable<Object> = null;
 
     switch (event.name) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
+      case WebhookIntegrationTypes.ELK_KIBANA:
+      case WebhookIntegrationTypes.CUSTOM: {
         switch (event.auth) {
           case AuthTypes.ACCESSTOKEN: {
             const targetUrl: string = this.createDataFeedForm.controls['url'].value;
             const tokenType: string = this.createDataFeedForm.controls['tokenType'].value;
             const token: string = this.createDataFeedForm.controls['token'].value;
-            const value = JSON.stringify({
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
+            const userToken = JSON.stringify({
               Authorization: tokenType + ' ' + token
             });
-            testConnectionObservable = this.datafeedRequests.testDestinationWithHeaders(targetUrl,
-              value);
+            let value;
+            if (headerVal && this.checkedHeaders) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
+              const headers = {...headersJson, ...JSON.parse(userToken)};
+              value = JSON.stringify(headers);
+            } else {
+              value = userToken;
+            }
+            testConnectionObservable = this.datafeedRequests.
+                testDestinationWithHeaders(targetUrl, value);
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
             const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
             const targetUsername: string = this.createDataFeedForm.controls['username'].value;
             const targetPassword: string = this.createDataFeedForm.controls['password'].value;
-            testConnectionObservable = this.datafeedRequests.testDestinationWithUsernamePassword(
-              targetUrl, targetUsername, targetPassword);
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
+            const userToken = JSON.stringify({
+              Authorization: 'Basic ' + btoa(targetUsername + ':' + targetPassword)
+            });
+            let value;
+            if (headerVal && this.checkedHeaders) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
+              const headers = {...headersJson, ...JSON.parse(userToken)};
+              value = JSON.stringify(headers);
+            } else {
+              value = userToken;
+            }
+            testConnectionObservable = this.datafeedRequests.
+            testDestinationWithHeaders(targetUrl, value);
+            break;
           }
         }
-        break;
-      }
-      case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for custom webhooks
         break;
       }
       case StorageIntegrationTypes.MINIO: {
@@ -216,7 +251,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  private revealUrlStatus(status: UrlTestState) {
+  revealUrlStatus(status: UrlTestState) {
     this.createChild.testDoneSetter = false;
     if (status === UrlTestState.Success) {
       this.createChild.testSuccessSetter = true;
@@ -241,43 +276,50 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     switch (event.name) {
       case WebhookIntegrationTypes.SERVICENOW:
       case WebhookIntegrationTypes.SPLUNK:
-      case WebhookIntegrationTypes.ELK_KIBANA: {
+      case WebhookIntegrationTypes.ELK_KIBANA:
+      case WebhookIntegrationTypes.CUSTOM: {
+        destinationObj = {
+          name: this.createDataFeedForm.controls['name'].value.trim(),
+          url: this.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: IntegrationTypes.WEBHOOK,
+          services: event.name
+        };
         switch (event.auth) {
           case AuthTypes.ACCESSTOKEN: {
-            destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
             const tokenType: string = this.createDataFeedForm.controls['tokenType'].value.trim();
             const token: string = this.createDataFeedForm.controls['token'].value.trim();
-            headers = JSON.stringify({
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
+            const userToken = JSON.stringify({
               Authorization: tokenType + ' ' + token
             });
+            if (headerVal && this.checkedHeaders) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
+              const value = {...headersJson, ...JSON.parse(userToken)};
+              headers = JSON.stringify(value);
+            } else {
+              headers = userToken;
+            }
             storage = null;
             break;
           }
           case AuthTypes.USERNAMEANDPASSWORD: {
-            destinationObj = {
-              name: this.createDataFeedForm.controls['name'].value.trim(),
-              url: this.createDataFeedForm.controls['url'].value.trim(),
-              integration_types: IntegrationTypes.WEBHOOK,
-              services: event.name
-            };
             const username: string = this.createDataFeedForm.controls['username'].value.trim();
             const password: string = this.createDataFeedForm.controls['password'].value.trim();
-            headers = JSON.stringify({
+            const headerVal: string = this.createDataFeedForm.controls['headers'].value;
+            const userToken = JSON.stringify({
               Authorization: 'Basic ' + btoa(username + ':' + password)
             });
+            if (headerVal && this.checkedHeaders) {
+              const headersJson = this.addHeadersforCustomDataFeed(headerVal);
+              const value = {...headersJson, ...JSON.parse(userToken)};
+              headers = JSON.stringify(value);
+            } else {
+              headers = userToken;
+            }
             storage = null;
+            break;
           }
         }
-        break;
-      }
-      case WebhookIntegrationTypes.CUSTOM: {
-        // handling access token and user pass auth
-        // with headers for custom webhooks
         break;
       }
       case StorageIntegrationTypes.MINIO: {
@@ -305,4 +347,3 @@ export class DataFeedComponent implements OnInit, OnDestroy {
     }
   }
 }
-

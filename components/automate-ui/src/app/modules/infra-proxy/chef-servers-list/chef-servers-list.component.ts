@@ -33,6 +33,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   public creatingChefServer = false;
   public chefServersLoading = true;
   public conflictErrorEvent = new EventEmitter<boolean>();
+  public fqdnForm: FormGroup;
+  public ipForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
@@ -50,11 +52,15 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       // and updateServerForm in chef-server-details.component.ts
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+    this.fqdnForm = this.fb.group({
       fqdn: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]],
+      ]]
+    });
+    this.ipForm = this.fb.group({
       ip_address: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
@@ -127,8 +133,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     const server = {
       id: this.createChefServerForm.controls['id'].value,
       name: this.createChefServerForm.controls['name'].value.trim(),
-      fqdn: this.createChefServerForm.controls['fqdn'].value.trim(),
-      ip_address: this.createChefServerForm.controls['ip_address'].value.trim()
+      fqdn: this.fqdnForm.controls['fqdn'].value?.trim() || '',
+      ip_address: this.ipForm.controls['ip_address'].value?.trim() || ''
     };
     this.store.dispatch(new CreateServer(server));
     this.creatingChefServer = false;
@@ -138,6 +144,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   private resetCreateModal(): void {
     this.creatingChefServer = false;
     this.createChefServerForm.reset();
+    this.fqdnForm.reset();
+    this.ipForm.reset();
     this.conflictErrorEvent.emit(false);
   }
 

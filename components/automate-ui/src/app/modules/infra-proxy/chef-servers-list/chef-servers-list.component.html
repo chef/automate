@@ -10,7 +10,9 @@
         #server
         [visible]="createModalVisible" 
         [creating]="creatingChefServer"
-        [createForm]="createChefServerForm" 
+        [createForm]="createChefServerForm"
+        [fqdnForm]="fqdnForm"
+        [ipForm]="ipForm"
         (close)="closeCreateModal()" 
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">

@@ -15,11 +15,14 @@ export class CreateChefServerModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
   @Input() createForm: FormGroup;
+  @Input() fqdnForm: FormGroup;
+  @Input() ipForm: FormGroup;
   @HostBinding('class.active') isSlideOpen = false;
 
   public modifyID = false; // Whether the edit ID form is open or not.
 
   public conflictError = false;
+  public selected = 'fqdn';
 
   ngOnInit() {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
@@ -35,6 +38,10 @@ export class CreateChefServerModalComponent implements OnInit {
       this.createForm.controls.id.setValue(
         IdMapper.transform(this.createForm.controls.name.value.trim()));
     }
+  }
+
+  updateFormDisplay(id: string): void {
+    this.selected = id;
   }
 
   public handleInput(event: KeyboardEvent): void {

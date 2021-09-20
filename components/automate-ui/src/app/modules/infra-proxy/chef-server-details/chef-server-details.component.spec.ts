@@ -199,8 +199,8 @@ describe('ChefServerDetailsComponent', () => {
 
     it('when all details are valid, it should update successfully', () => {
       component.updateServerForm.controls['name'].setValue(VALID_NAME);
-      component.updateServerForm.controls['fqdn'].setValue(VALID_FQDN);
-      component.updateServerForm.controls['ip_address'].setValue(VALID_IP);
+      component.fqdnForm.controls['fqdn'].setValue(VALID_FQDN);
+      component.ipForm.controls['ip_address'].setValue(VALID_IP);
 
       expect(component.updateServerForm.valid).toBeTrue();
       component.saveServer();
@@ -227,12 +227,12 @@ describe('ChefServerDetailsComponent', () => {
       ], function (description: string, input: string) {
         it(('when the fqdn ' + description), () => {
           component.updateServerForm.controls['name'].setValue('test');
-          component.updateServerForm.controls['ip_address'].setValue('1.2.3.4');
+          component.ipForm.controls['ip_address'].setValue('1.2.3.4');
 
-          component.updateServerForm.controls['fqdn'].setValue(input);
-          errors = component.updateServerForm.controls['fqdn'].errors || {};
+          component.fqdnForm.controls['fqdn'].setValue(input);
+          errors = component.fqdnForm.controls['fqdn'].errors || {};
 
-          expect(component.updateServerForm.valid).toBeFalsy();
+          expect(component.fqdnForm.valid).toBeFalsy();
           expect(errors['pattern']).toBeTruthy();
         });
       });
@@ -248,12 +248,12 @@ describe('ChefServerDetailsComponent', () => {
       ], function (description: string, input: string) {
         it(('when the ip address ' + description), () => {
           component.updateServerForm.controls['name'].setValue('test');
-          component.updateServerForm.controls['fqdn'].setValue('chef.internal');
+          component.fqdnForm.controls['fqdn'].setValue('chef.internal');
 
-          component.updateServerForm.controls['ip_address'].setValue(input);
-          errors = component.updateServerForm.controls['ip_address'].errors || {};
+          component.ipForm.controls['ip_address'].setValue(input);
+          errors = component.ipForm.controls['ip_address'].errors || {};
 
-          expect(component.updateServerForm.valid).toBeFalsy();
+          expect(component.ipForm.valid).toBeFalsy();
           expect(errors['pattern']).toBeTruthy();
         });
       });
