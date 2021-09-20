@@ -171,12 +171,12 @@ service InfraProxy {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClients:create";
   };
   rpc DeleteClient (infra_proxy.request.Client) returns (infra_proxy.response.Client) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsClients:delete";
   };
   rpc ResetClientKey (infra_proxy.request.ClientKey) returns (infra_proxy.response.ResetClient) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset";
