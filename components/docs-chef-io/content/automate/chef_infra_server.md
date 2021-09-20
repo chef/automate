@@ -93,7 +93,7 @@ The Chef Infra Server lets you view:
 
 #### List of Cookbooks
 
-In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks are mentioned in the list.
+In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks is mentioned in the list.
 
 {{< figure src="/images/automate/list-of-cookbooks.png" alt="List of Cookbooks">}}
 
@@ -140,7 +140,7 @@ To create a new role, select **Create Role**:
 
 {{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
 
-Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
+Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
 
 {{< figure src="/images/automate/create-role-popup.png" alt="Create Roles Dialog Box">}}
 
@@ -152,7 +152,7 @@ Use the **Search Roles** bar to find the existing role from the list of roles. E
 
 #### View Role Details
 
-Select a specific role to view the details of that particular role. Its contains two tabs, _Details_ and _Attributes_.
+Select a specific role to view the details of that particular role. It contains two tabs, _Details_ and _Attributes_.
 
 {{< figure src="/images/automate/view-role-details.png" alt="View Role Details">}}
 
@@ -160,7 +160,7 @@ The _Details_ contains the Run List, whereas the attributes tab displays the _de
 
 {{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
 
-You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
+You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a pop-up window where you can make the changes and click **Save**.
 
 #### Delete a Role
 
@@ -187,7 +187,7 @@ To create a new Environment, select **Create Environment**, as shown below:
 
 {{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
 
-Selecting the **Create Environment** button opens a dialog box. The dialog box contains four different sections: _Details_, _Constraints_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new environment.
+Selecting the **Create Environment** button opens a dialog box. The dialog box contains four different sections: _Details_, _Constraints_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new environment.
 
 {{< figure src="/images/automate/create-environment-popup.png" alt="Create Environment Dialog Box">}}
 
@@ -311,13 +311,13 @@ The **Create Client** button opens a dialog box. Enter the _Client Name_ and sel
 
 {{< figure src="/images/automate/create-client-popup.png" alt="Create Client Dialog Box">}}
 
-Selecting **Create** opens a dialog box which contains the _Private Key_ of that particular client. Select **Download** to download the _Private Key_.
+Selecting **Create** opens a dialog box that contains the _Private Key_ of that particular client. Select **Download** to download the _Private Key_.
 
 {{< figure src="/images/automate/client-private-key.png" alt="Create Private Key of a Client">}}
 
 #### Search for a Client
 
-Use the **Search Clients** bar to find an client from the list of clients.
+Use the **Search Clients** bar to find a client from the list of clients.
 Entering the name of a client in the search bar returns clients matching your search criteria.
 
 {{< figure src="/images/automate/create-client-button.png" alt="Create Client Button">}}
@@ -332,7 +332,7 @@ The Chef Infra Server lets you reset the _Public Key_ using the _Reset Key_ opti
 
 {{< figure src="/images/automate/reset-key-in-client-details.png" alt="Reset Key Option of a Client" width="400" height="300">}}
 
-Selecting the _Reset Key_ shown in the above image opens a new dialog box which contains the new _Private Key_ of that client. To download the new _Private Key_, select **Download**.
+Selecting the _Reset Key_ shown in the above image opens a new dialog box that contains the new _Private Key_ of that client. To download the new _Private Key_, select **Download**.
 
 {{< figure src="/images/automate/reset-public-key-of-a-client.png" alt="Reset Public Key of a Clients">}}
 
@@ -365,7 +365,7 @@ Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a 
 
 #### Details of a Node
 
-Select a specific node to view the node information, metadata and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group` and `Policy Name`. You can also view the **Metadata** for the node which contains the name of the `Chef Server`, and name of the `Chef Organization`.
+Select a specific node to view the node information, metadata, and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group`, and `Policy Name`. You can also view the **Metadata** for the node that contains the name of the `Chef Server`, and the name of the `Chef Organization`.
 
 The above information looks like as shown below:
 
@@ -386,9 +386,9 @@ To select the environment:
 - Click on the dropdown menu and select the name of the environment.
 
 - You can add tags to the environment from the text bar below the dropdown menu.
-**Note:** To add multiple tags at a time, use comma separator. Example: Tag1, Tag2, Tag3.
+**Note:** To add multiple tags at a time, use a comma separator. Example: Tag1, Tag2, Tag3.
 
-- Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
+- Selecting an environment will open a pop-up to save the node environment. Select **Save** to change the node environment.
 
 {{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
@@ -400,7 +400,7 @@ You can edit, expand or collapse a node's run list.
 
 Edit a run list by:
 
-1. Select **edit**. A popup window opens.
+1. Select **edit**. A pop-up window opens.
 
 2. The left side of the window contains the list of environments. Select an environment from the list.
 
@@ -448,11 +448,11 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 ### Policyfiles
 
-[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote code with simpler interface.
+[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote codes with a simpler interface.
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific Policyfiles
+- Search for specific Policyfiles
 - View all the Policyfiles
 - View the details of Policyfiles:
   - Content
@@ -493,7 +493,7 @@ Select a specific Run Item from the Run List to view the details in a slider tab
 
 {{< figure src="/images/automate/runlist-tab-for-policyfiles.png" alt="Runlist Tab under Policyfiles">}}
 
-To view the cookbook details of the item, select **Go to Cookbook Details** option in the tab.
+To view the cookbook details of the item, select the **Go to Cookbook Details** option in the tab.
 
 ##### Attributes Tab
 
@@ -515,7 +515,7 @@ The slider tab contains the `Operator` and `Version` of the cookbooks.
 {{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
 {{< note >}}
-You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
+You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up that contains the detailed revision ID.
 {{< /note >}}
 
 {{< figure src="/images/automate/revision-id-of-policyfiles.png" alt="Revision id of Policyfiles">}}
