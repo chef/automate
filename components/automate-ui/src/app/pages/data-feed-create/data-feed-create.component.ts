@@ -376,7 +376,7 @@ export class DataFeedCreateComponent {
   }
 
   public showUserPassInput(field: string) {
-    return (this.showFields[field] &&this.authSelected === AuthTypes.USERNAMEANDPASSWORD);
+    return (this.showFields[field] && this.authSelected === AuthTypes.USERNAMEANDPASSWORD);
   }
 
   public validateHeaders(customHeaders: string): void {
