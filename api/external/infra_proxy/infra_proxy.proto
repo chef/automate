@@ -15,6 +15,7 @@ import "external/infra_proxy/request/environments.proto";
 import "external/infra_proxy/request/nodes.proto";
 import "external/infra_proxy/request/policyfiles.proto";
 import "external/infra_proxy/request/users.proto";
+import "external/infra_proxy/request/automate_infra_server_users.proto";
 
 import "external/infra_proxy/response/orgs.proto";
 import "external/infra_proxy/response/servers.proto";
@@ -26,6 +27,7 @@ import "external/infra_proxy/response/environments.proto";
 import "external/infra_proxy/response/nodes.proto";
 import "external/infra_proxy/response/policyfiles.proto";
 import "external/infra_proxy/response/users.proto";
+import "external/infra_proxy/response/automate_infra_server_users.proto";
 
 import "external/annotations/iam/annotations.proto";
 
@@ -347,6 +349,12 @@ service InfraProxy {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/users";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:users";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
+
+  rpc GetAutomateInfraServerUsersList (infra_proxy.request.AutomateInfraServerUsers) returns (infra_proxy.response.AutomateInfraServerUsers) {
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/automateinfraserverusers";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:automateinfraserverusers";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
   };
 }
