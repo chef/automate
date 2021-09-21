@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+# Usage: automate-cluster-ctl ssh
+# Summary: Access cluster resources via SSH
+# Built-in help
+
+$LOAD_PATH.unshift File.join(ENV["_CLUSTER_CTL_ROOT"], "lib")
+
+require 'cluster/command'
+require 'cluster/terraform'
+
+class AutomateClusterSSH < AutomateCluster::Command
+
+  option ['-o', '--ssh-options'], 'OPTIONS', 'Additional options to pass to ssh'
+  option ['-l', '--list'], :flag, 'List available servers for ssh'
+  option ['-i', '--index'], 'INDEX', 'Number of the avaialble item to access', default: 1, hidden: true do |i|
+    Integer(i)
+  end
+
+  parameter "NAME", "Name of the server type to access, for example automate, chef_server, elasticsearch or postgresql", attribute_name: :name
+  parameter "[COMMAND]", "Command to run on the remote server", attribute_name: :remote_command
+  def execute
+    ssh_commands = AutomateCluster.terraform.output.ssh_commands(name, ssh_options)
+    if ssh_commands.nil? || ssh_commands.empty?
+      signal_usage_error term.red("No servers where found for #{name}, please ensure that a deploy has completed successfully.")
+    end
+
+    if list?
+      ssh_commands.each_with_index do |cmd, index|
+        puts "#{index+1}: #{cmd}"
+      end
+      exit(0)
+    end
+
+    if name.nil?
+      signal_usage_error "Missing name of server type to access"
+    end
+
+    # server = ssh_commands[index - 1]
+    server = if ssh_commands.length > 1
+      prompt.select("Which Server?", ssh_commands)
+    else
+      ssh_commands.first
+    end
+
+    cmd = [server, remote_command].compact.join(' ')
+    prompt.ok "Running '#{cmd}'"
+    exec cmd
+  end
+end
+
+AutomateClusterSSH.run

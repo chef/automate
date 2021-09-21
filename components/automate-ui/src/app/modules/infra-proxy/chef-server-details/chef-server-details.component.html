@@ -63,52 +63,75 @@
               Name is required.
             </chef-error>
           </chef-form-field>
-          <chef-form-field>
+        </form>
+        <div class="input-margin">
+          <chef-form-field id="create-type">
             <label>
-              <span class="label">FQDN <span aria-hidden="true">*</span></span>
-              <input
-                chefInput
-                formControlName="fqdn"
-                type="text"
-                [resetOrigin]="saveSuccessful"
-                autocomplete="off"
-                data-cy="update-server-fqdn">
+              <span class="label">Type <span aria-hidden="true">*</span></span>
+              <div class="version-dropdown">
+                <chef-select #li [value]="selected" (change)="updateFormDisplay(li.value)" data-cy="type">
+                  <chef-option value="fqdn">FQDN</chef-option>
+                  <chef-option value="ip">IP Address</chef-option>
+                </chef-select>
+              </div>
             </label>
-            <chef-error
-              *ngIf="updateServerForm.get('fqdn').hasError('required') && updateServerForm.get('fqdn').dirty">
-              FQDN is required.
-            </chef-error>
-            <chef-error
-              *ngIf="updateServerForm.get('fqdn').hasError('pattern') && updateServerForm.get('fqdn').dirty">
-              FQDN is invalid.
-            </chef-error>
           </chef-form-field>
-          <chef-form-field>
-            <label>
-              <span class="label">IP Address <span aria-hidden="true">*</span></span>
-              <input
-                chefInput
-                formControlName="ip_address"
-                type="text"
-                [resetOrigin]="saveSuccessful"
-                autocomplete="off"
-                data-cy="update-server-ip-address">
-            </label>
-            <chef-error
-              *ngIf="updateServerForm.get('ip_address').hasError('required') && updateServerForm.get('ip_address').dirty">
-              IP Address is required.
-            </chef-error>
-            <chef-error
-              *ngIf="updateServerForm.get('ip_address').hasError('pattern') && updateServerForm.get('ip_address').dirty">
-              IP Address is invalid.
-            </chef-error>
-          </chef-form-field>
+        </div>
+        <form [formGroup]="fqdnForm">
+          <div class="input-margin" *ngIf="selected === 'fqdn'">
+            <chef-form-field>
+              <label>
+                <span class="label">FQDN <span aria-hidden="true">*</span></span>
+                <input
+                  chefInput
+                  formControlName="fqdn"
+                  type="text"
+                  [resetOrigin]="saveSuccessful"
+                  autocomplete="off"
+                  data-cy="update-server-fqdn"
+                  placeholder="FQDN">
+              </label>
+              <chef-error
+                *ngIf="selected === 'fqdn' && fqdnForm.get('fqdn').hasError('required') && fqdnForm.get('fqdn').dirty">
+                FQDN is required.
+              </chef-error>
+              <chef-error
+                *ngIf="fqdnForm.get('fqdn').hasError('pattern') ">
+                FQDN is invalid.
+              </chef-error>
+            </chef-form-field>
+          </div>
+        </form>
+        <form [formGroup]="ipForm">
+          <div class="input-margin" *ngIf="selected === 'ip'">
+            <chef-form-field>
+              <label>
+                <span class="label">IP Address <span aria-hidden="true">*</span></span>
+                <input
+                  chefInput
+                  formControlName="ip_address"
+                  type="text"
+                  [resetOrigin]="saveSuccessful"
+                  autocomplete="off"
+                  data-cy="update-server-ip-address"
+                  placeholder="IP Address">
+              </label>
+              <chef-error
+                *ngIf="ipForm.get('ip_address').hasError('required') && ipForm.get('ip_address').dirty">
+                IP Address is required.
+              </chef-error>
+              <chef-error
+                *ngIf="ipForm.get('ip_address').hasError('pattern')">
+                IP Address is invalid.
+              </chef-error>
+            </chef-form-field>
+          </div>
           <div id="button-bar">
             <chef-button
               primary
               inline
               data-cy="save-button"
-              [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty || saveInProgress"
+              [disabled]="isLoading || !updateServerForm.valid || saveInProgress || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
               (click)="saveServer()">
               <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
               <span *ngIf="saveInProgress">Saving...</span>

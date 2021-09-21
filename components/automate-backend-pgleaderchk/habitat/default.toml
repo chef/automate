@@ -1,0 +1,13 @@
+[database]
+port = 5432
+username = "admin"
+password = "admin"
+dbname = "postgres"
+sslmode = "require"
+
+[httpd]
+bind = "0.0.0.0"
+port = 6432
+
+[log]
+level = "info"

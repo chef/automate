@@ -4,43 +4,101 @@ chef-page-header {
   padding-bottom: 0;
 }
 
-.detail-row {
+.btn-alignleft {
+  margin-bottom: 3em;
+}
+
+.details-border {
+  margin-top: 4em;
+  border: .12em solid #CFD2D2;
+  border-radius: 4px;
+}
+
+.is-disable {
+  color: $sirocco;
+  background-color: #FFF;
+  border-radius: 0%;
+}
+
+.btn-alignright {
   display: flex;
+  float: right;
+  margin-bottom: 3em;
+
+  .btn-data-feed {
+    margin: -0.4em 2em 0 0;
+    font-size: 14px;
+  }
+
+  .btn-Delete {
+    color: $pink;
+  }
+}
+
+.alignright {
+  float: right;
+}
+
+.alignleft {
+  float: left;
+}
+
+.detail-row {
   color: $chef-primary-dark;
 }
 
 thead {
   font-size: 14px;
-  letter-spacing: 0.2px;
   color: $chef-primary-dark;
+  letter-spacing: 0.2px;
 }
 
 th {
+  padding: 0;
   text-align: left;
-  padding: 0px;
 }
 
 tbody > .detail-row {
-  padding-top: 0px;
+  padding-top: 0;
   padding-bottom: 15px;
 }
 
+table th {
+  padding: 2em 2em;
+}
+
+table td {
+  padding: 0 2em 3em;
+}
+
 .header-column {
-  padding-top: 0px;
-  padding-left: 0px;
   width: 33%;
+  padding-top: 0;
+  padding-left: 0;
 }
 
 chef-tab-selector {
+
   chef-option {
     margin-right: 16px;
     color: $chef-primary-dark;
+
+    &::before {
+      height: 4px;
+    }
+
   }
 }
 
+chef-card {
+  width: 38em;
+  transition: width 0.5s;
+}
+
 chef-form-field {
-  width: 310px;
+  width: 45em;
   padding-bottom: 30px;
+  transition: width 0.5s;
 }
 
 chef-radio chef-option {
@@ -53,23 +111,25 @@ section {
   }
 
   chef-button {
-    margin: 0;
+    margin-top: -7px;
 
     chef-loading-spinner {
       position: relative;
       top: 2px;
       margin-right: 5px;
     }
+
   }
 
   #saved-note {
-    font-size: 0.75em;
     padding-left: 12px;
+    font-size: 0.75em;
   }
 
   chef-button[primary] {
     margin-left: 15px;
   }
+
 }
 
 chef-modal {
@@ -84,12 +144,16 @@ chef-modal {
   }
 }
 
+.config-details {
+  padding-top: 3.7em;
+}
+
 .status-icon {
   margin: 0 auto 10px;
-  padding: 10px;
+  border-radius: 50%;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  padding: 10px;
 
   &.failure {
     background: $chef-critical;
@@ -114,4 +178,85 @@ chef-modal {
   &.success {
     color: $chef-success;
   }
+}
+
+.disable-main-body {
+  pointer-events: none;
+  opacity:  0.6;
+  transition: .5s;
+}
+
+@media screen and (max-width: 1668px) {
+
+  chef-form-field {
+    width: 35em;
+  }
+
+  chef-card {
+    width: 35em;
+  }
+
+}
+
+@media screen and (max-width: 1460px) {
+  chef-form-field {
+    width: 25em;
+  }
+
+  chef-card {
+    width: 30em;
+  }
+
+}
+
+@media screen and (max-width: 1220px) {
+  chef-form-field {
+    width: 20em;
+  }
+
+  chef-card {
+    width: 25em;
+  }
+
+}
+
+@media screen and (max-width: 1220px) {
+
+  chef-form-field {
+    width: 18em;
+  }
+
+  chef-card {
+    width: 25em;
+  }
+
+}
+@media screen and (max-width: 898px) {
+
+  chef-form-field {
+    width: 100%;
+  }
+
+  chef-card {
+    width: 100%;
+  }
+
+  .page-body.alignleft {
+    float: none;
+  }
+
+  .page-body.alignright.config-details {
+    float: none;
+  }
+
+}
+
+.config-details-note {
+  padding-top: 1em;
+  font-family: var(--chef-font-family, "Muli", Helvetica, Arial, sans-serif);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: normal;
+  line-height: 18px;
+  letter-spacing: 0.2px;
 }

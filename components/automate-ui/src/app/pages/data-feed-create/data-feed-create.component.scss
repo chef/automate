@@ -10,10 +10,10 @@ main {
     padding: 54px 54px;
 
     .flex-child {
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 186px);
+      grid-column-gap: 66px;
       column-gap: 66px;
-      flex-wrap: wrap;
 
       .card {
         display: flex;
@@ -93,8 +93,9 @@ main {
     }
 
     .input-margin {
-      display: flex;
+      display: inline-block;
       margin: 15px 0;
+      vertical-align: top;
       width: 70%;
       flex-direction: row-reverse;
 
@@ -154,6 +155,42 @@ main {
         }
       }
     }
+
+    .customtokenblock {
+      width: 40%;
+    }
+
+    .customtokentypeblock {
+      width: calc(30% - 16px);
+      margin-right: 16px;
+    }
+
+    .custompasswordblock {
+      width: 34%;
+      margin-right: 16px;
+    }
+  }
+}
+
+.chef-inputtextarea {
+  width: 100%;
+  height: auto;
+  background-color: #FFFFFF;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid #E6EBEE;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+}
+
+.error {
+  .chef-inputtextarea {
+    border-color: #DC267F;
+    border-radius: 4px 4px 0 0;
+    outline: none;
+    margin-bottom: -7px;
   }
 }
 
@@ -173,7 +210,6 @@ app-notification {
   margin: 15px 32px 0 32px;
   flex-direction: row;
   border-bottom: 0.5px solid $chef-key-tab;
-  line-height: 3;
 
   h1 {
     margin: .40em 0;

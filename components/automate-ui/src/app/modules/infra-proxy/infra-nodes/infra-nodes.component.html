@@ -36,7 +36,8 @@
     [openEvent]="openAttributeModal"
     [orgId]="orgId"
     [node]="node"
-    [serverId]="serverId">
+    [serverId]="serverId"
+    [isGetNode]="isGetNode">
   </app-edit-infra-node-attribute-modal>
   <app-empty-state *ngIf="authFailure" moduleTitle="nodes" (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>

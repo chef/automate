@@ -2,6 +2,11 @@
 # here and not in the public verify pipeline. The more jobs we have in
 # this pipeline, the harder it is for external contributors.
 
+env:
+  DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
+  HAB_BLDR_CHANNEL: "stable2021-q2"
+  HAB_STUDIO_SECRET_HAB_FALLBACK_CHANNEL: "stable2021-q2"
+
 expeditor:
   defaults:
     executor:
@@ -32,7 +37,6 @@ steps:
       # here we reuse the license_scout.sh script used by expeditor to publish the manifest
       - .expeditor/license_scout.sh
     timeout_in_minutes: 20
-    soft_fail: true
     retry:
       automatic:
         limit: 1

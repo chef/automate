@@ -1,0 +1,339 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+// Table list styles
+.node-list {
+  margin-top: 16px;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+a, a:visited {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+chef-th,
+chef-td {
+
+  &[hidden] {
+    display: none;
+  }
+
+  &.sort:hover {
+    cursor: pointer;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  &.delete {
+    max-width: 40px;
+    padding-right: 0;
+  }
+
+  &.node-name {
+    flex-basis: 240%;
+  }
+
+  &.check-in {
+    min-width: 140px;
+  }
+
+  &.node-environment {
+    white-space: normal;
+  }
+
+  &.has-runs {
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &.view-more {
+    max-width: 60px;
+
+    chef-button {
+      margin: -.5em 0;
+    }
+  }
+}
+
+chef-td {
+
+  &.has-runs {
+    & > a {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+  }
+
+  &:first-child {
+    position: relative;
+  }
+
+  &.node-name chef-icon {
+    margin-right: 1em;
+  }
+}
+
+chef-tr.row {
+  & > chef-td:first-child:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    transition: width 0.2s;
+    background: $chef-success;
+    border-top-left-radius: $global-radius;
+    border-bottom-left-radius: $global-radius;
+  }
+
+  &:hover > chef-td:first-child:before {
+    width: 7px;
+  }
+
+  & > chef-td.failure:first-child:before {
+    background: $chef-critical;
+  }
+
+  & > chef-td.missing:first-child:before {
+    background: $chef-dark-grey;
+  }
+}
+
+.column-dropdown {
+  position: relative;
+
+  ::ng-deep .mat-select-trigger {
+    background: initial;
+    border: solid 1px blue;
+    margin-right: 3px;
+}
+
+
+  chef-checkbox {
+    margin-bottom: 7px;
+  }
+}
+
+chef-dropdown {
+  top: 47px;
+  right: 11px;
+  padding: 11px 15px 6px;
+}
+
+.sort-icon {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  position: relative;
+  margin-left: 16px;
+
+  &:before, &:after {
+    border: 4px solid transparent;
+    content: "";
+    height: 0;
+    right: 5px;
+    top: 50%;
+    position: absolute;
+    width: 0;
+    opacity: 0.8;
+  }
+
+  &:before {
+    border-bottom-color: $chef-dark-grey;
+    margin-top: -11px;
+  }
+
+  &:after {
+    border-top-color: $chef-dark-grey;
+    margin-top: 3px;
+  }
+
+  &.sort-asc {
+    &:before {
+      border-bottom-color: $chef-dark-grey;
+    }
+
+    &:after {
+      border-top-color: $chef-primary-dark;
+      opacity: 1;
+    }
+  }
+
+  &.sort-desc {
+    &:before {
+      border-bottom-color: $chef-primary-dark;
+      opacity: 1;
+    }
+
+    &:after {
+      border-top-color: $chef-dark-grey;
+    }
+  }
+}
+
+.no-data {
+  border: 1px dashed $chef-dark-grey;
+  background: $chef-lightest-grey;
+  border-radius: 16px;
+  padding: 6px 12px 6px 14px;
+  font-size: 12px;
+  cursor: default;
+
+  & > chef-icon {
+    color: $chef-primary-bright;
+    vertical-align: -2px;
+    margin-left: 18px;
+  }
+}
+
+chef-tooltip {
+  width: 300px;
+  font-size: 12px;
+  padding: 22px;
+  line-height: 1.2;
+}
+
+.empty-checkbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid $chef-grey;
+  border-radius: 5px;
+}
+
+.delete-checkbox {
+  ::ng-deep {
+    .mat-checkbox-layout {
+      padding-bottom: 0;
+    }
+  }
+}
+
+chef-loading-spinner {
+  position: fixed;
+  top: 106px;
+  left: 200px;
+}
+
+.header-background {
+  background-color: unset;
+}
+
+.remove_overlap {
+  z-index: 1;
+}
+
+.empty-section {
+  margin-top: 130px;
+  text-align: center;
+}
+
+img {
+  width: 70px;
+}
+
+a, a:visited {
+  color: #3864F2;
+  cursor: pointer;
+  text-decoration: underline;
+  background-color: transparent;
+}
+
+.btn-data-feed {
+  margin: -0.4em 2em 0em 0em;
+  font-size: 14px;
+}
+
+.disable-main-body {
+  opacity:  0.6;
+  transition: .5s;
+}
+
+.disable-body {
+  background: #E7E9E9;
+}
+
+.pointer-none {
+  pointer-events: none;
+}
+
+.button_css {
+  background: white;
+  color: black;
+}
+
+.eyeIcon {
+  width: 1em;
+  float: right;
+  height: auto;
+  padding: 1em 0em 0em 0em;
+}
+
+.binIcon {
+  width: 1em;
+  float: right;
+  height: auto;
+  padding: 1em 0em 0em 0em;
+}
+
+
+.chef-control-menu {
+  width: 8.5em;
+}
+
+.three-dot-column {
+  ::ng-deep .mat-select-trigger {
+    background: initial;
+  }
+  }
+
+::ng-deep .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
+  background: #3864F2;
+}
+
+::ng-deep .mat-option {
+  width: 171px;
+}
+
+.eyeChange:hover {
+  img {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(31deg) brightness(103%) contrast(101%);
+  }
+}
+
+.border_enable {
+  border: solid 1px;
+  border-color: #CFD2D2;
+  border-radius: 5px 5px 0 0;
+}
+
+.border_delete {
+  border: solid 1px;
+  border-color: #CFD2D2;
+  border-radius: 0 0 5px 5px;
+
+}
+
+chef-th {
+  border-bottom: transparent;
+  border-top: transparent;
+}
+
+chef-th:first-child {
+  border-left: transparent;
+}
+
+chef-th:last-child {
+  border-right: transparent;
+}
