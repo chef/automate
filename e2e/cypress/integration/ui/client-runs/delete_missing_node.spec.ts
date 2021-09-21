@@ -25,7 +25,7 @@ describe('delete missing node from UI', () => {
       node.end_time = runEndDate.toISOString();
       cy.sendToDataCollector(node);
     });
-    
+
     cy.waitForClientRunsNode(clientRunsNodeId);
 
     // Update the mark nodes missing job to mark the nodes missing
@@ -75,4 +75,4 @@ describe('delete missing node from UI', () => {
     // wait until all nodes are delete API check
     cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId);
   });
-}));
+});
