@@ -19,9 +19,7 @@
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments by name..."></app-infra-search-bar>
-      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments', 'post', [serverId, orgId]]">
-        <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
-      </app-authorized>
+      <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
     <div *ngIf="!authFailure">
@@ -52,11 +50,9 @@
           <chef-td></chef-td>
           <chef-td></chef-td>
             <chef-td class="three-dot-column">
-            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}', 'delete', [serverId, orgId, environment.name]]">
               <mat-select panelClass="chef-control-menu" id="menu-{{environment.id}}">
                 <mat-option data-cy="delete" (onSelectionChange)="startEnvironmentDelete(environment)">Delete</mat-option>
               </mat-select>
-            </app-authorized>
           </chef-td>
         </chef-tr>
       </chef-tbody>
