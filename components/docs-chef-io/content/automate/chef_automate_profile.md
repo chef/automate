@@ -22,7 +22,7 @@ Select **Profile** to view the details. The **Details** tab lets you update your
 
 ### Change a Display Name
 
-Change your display name by entering your preferred name. The display name gets updated as soon as you change the name in the bar and click **Save**.
+Change your display name by entering your preferred name. Select **Save** to update your name.
 
 {{< figure src="/images/automate/display-name-in-profile.png" alt="Display Name of Chef Automate">}}
 
