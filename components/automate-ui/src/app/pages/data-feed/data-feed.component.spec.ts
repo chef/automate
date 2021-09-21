@@ -412,7 +412,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
       component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
 
-      spyOn(component['datafeedRequests'], 'testDestinationForMinio');
+      spyOn(component['datafeedRequests'], 'testDestinationForStorage');
       component.sendTestForDataFeed({
         auth: null,
         name: StorageIntegrationTypes.MINIO,
@@ -420,7 +420,7 @@ describe('DataFeedComponent', () => {
       });
 
       expect(
-        component['datafeedRequests'].testDestinationForMinio
+        component['datafeedRequests'].testDestinationForStorage
       ).toHaveBeenCalledWith({
         url: destination.url,
         aws: {
@@ -626,7 +626,7 @@ describe('DataFeedComponent', () => {
       component.createDataFeedForm.controls['accessKey'].setValue(accessKey);
       component.createDataFeedForm.controls['secretKey'].setValue(secretKey);
 
-      spyOn(component['datafeedRequests'], 'testDestinationForMinio');
+      spyOn(component['datafeedRequests'], 'testDestinationForStorage');
       component.sendTestForDataFeed({
         auth: null,
         name: StorageIntegrationTypes.AMAZON_S3,
@@ -634,7 +634,7 @@ describe('DataFeedComponent', () => {
       });
 
       expect(
-        component['datafeedRequests'].testDestinationForMinio
+        component['datafeedRequests'].testDestinationForStorage
       ).toHaveBeenCalledWith({
         url: 'null',
         aws: {

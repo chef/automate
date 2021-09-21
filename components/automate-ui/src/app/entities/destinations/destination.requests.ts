@@ -166,7 +166,7 @@ export class DestinationRequests {
       { url, 'header': {value} });
   }
 
-  public testDestinationForMinio(data: any): Observable<Object> {
+  public testDestinationForStorage(data: any): Observable<Object> {
     return this.http.post(encodeURI(
       this.joinToDataFeedUrl(['destinations', 'test'])),
       { ...data });

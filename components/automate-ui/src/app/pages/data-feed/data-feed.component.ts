@@ -242,7 +242,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             bucket: this.createDataFeedForm.controls['bucketName'].value.trim()
           }
         };
-        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+        testConnectionObservable = this.datafeedRequests.testDestinationForStorage(data);
           break;
       }
       case StorageIntegrationTypes.AMAZON_S3: {
@@ -255,7 +255,7 @@ export class DataFeedComponent implements OnInit, OnDestroy {
             region: event.region
           }
         };
-        testConnectionObservable = this.datafeedRequests.testDestinationForMinio(data);
+        testConnectionObservable = this.datafeedRequests.testDestinationForStorage(data);
       }
     }
     if (testConnectionObservable != null) {
