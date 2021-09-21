@@ -13,6 +13,7 @@ import "interservice/infra_proxy/request/environments.proto";
 import "interservice/infra_proxy/request/nodes.proto";
 import "interservice/infra_proxy/request/policyfiles.proto";
 import "interservice/infra_proxy/request/users.proto";
+import "interservice/infra_proxy/request/automate_infra_server_users.proto";
 
 import "interservice/infra_proxy/response/servers.proto";
 import "interservice/infra_proxy/response/orgs.proto";
@@ -24,6 +25,7 @@ import "interservice/infra_proxy/response/environments.proto";
 import "interservice/infra_proxy/response/nodes.proto";
 import "interservice/infra_proxy/response/policyfiles.proto";
 import "interservice/infra_proxy/response/users.proto";
+import "interservice/infra_proxy/response/automate_infra_server_users.proto";
 
 service InfraProxyService {
     rpc CreateServer    (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
@@ -93,5 +95,5 @@ service InfraProxyService {
 
     rpc GetOrgUsersList (chef.automate.domain.infra_proxy.request.OrgUsers) returns (chef.automate.domain.infra_proxy.response.OrgUsers) {};
     rpc GetServerUsersList (chef.automate.domain.infra_proxy.request.ServerUsers) returns (chef.automate.domain.infra_proxy.response.ServerUsers) {};
-
+    rpc GetAutomateInfraServerUsersList (chef.automate.domain.infra_proxy.request.AutomateInfraServerUsers) returns (chef.automate.domain.infra_proxy.response.AutomateInfraServerUsers) {};
 }
