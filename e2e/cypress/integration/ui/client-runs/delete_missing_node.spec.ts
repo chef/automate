@@ -59,7 +59,7 @@ describe('delete missing node from UI', () => {
   });
 
   it('from client runs page delete nodes', () => {
-    // cy.get('app-welcome-modal').invoke('hide');
+    cy.get('app-welcome-modal').invoke('hide');
     // });
 
     // Check the check box to delete all missing nodes
@@ -69,7 +69,7 @@ describe('delete missing node from UI', () => {
     // Click the delete all button
     cy.get('chef-button.delete-button').click();
 
-    // Click the confim delete button
+    // Click the confirm delete button
     cy.get('chef-modal chef-button.delete-button-confirm').click();
 
     // wait until all nodes are delete API check
