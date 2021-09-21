@@ -21,7 +21,7 @@ export enum WebhookIntegrationTypes {
 
 export enum StorageIntegrationTypes {
   MINIO = 'Minio',
-  AMAZON_S3 = 'Amazon S3'
+  AMAZON_S3 = 'S3'
 }
 
 export enum AuthTypes {

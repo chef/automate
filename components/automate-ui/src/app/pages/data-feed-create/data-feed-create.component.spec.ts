@@ -253,7 +253,7 @@ describe('DataFeedCreateComponent', () => {
     it('should be valid when all fields are filled out for S3', () => {
       component.name = jasmine.createSpyObj('name', ['nativeElement']);
       component.name.nativeElement = { focus: () => {} };
-      component.selectIntegration('Amazon S3');
+      component.selectIntegration('S3');
       component.createForm.controls['name'].setValue(destination.name);
       component.createForm.controls['bucketName'].setValue(bucketName);
       component.createForm.controls['accessKey'].setValue(accessKey);
