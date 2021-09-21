@@ -82,7 +82,11 @@
                           <chef-icon class="material-icons">delete</chef-icon>
                           <span>Delete</span>
                         </chef-button>
-                        <chef-button tertiary class="action right-button-box" (click)="startUpdateDataBagItem(item, selectedItemDetails)">
+                        <chef-button
+                          tertiary
+                          class="action right-button-box"
+                          (click)="startUpdateDataBagItem(item, selectedItemDetails)"
+                          [disabled]="editDisable">
                           <chef-icon class="material-icons">mode_edit</chef-icon>
                           <span>Edit</span>
                         </chef-button>
