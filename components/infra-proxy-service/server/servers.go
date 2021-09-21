@@ -40,6 +40,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
 	}
 
+	// commenting this code because sometimes chef-services are down that time we can't able to check the server status and not able to add or update the server.
 	/*
 		serverHost := req.GetFqdn()
 		if serverHost == "" {
@@ -152,6 +153,7 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 		return nil, errors.New("FQDN or IP required to update the server.")
 	}
 
+	// commenting this code because sometimes chef-services are down that time we can't able to check the server status and not able to add or update the server.
 	/*
 		serverHost := req.GetFqdn()
 		if serverHost == "" {
