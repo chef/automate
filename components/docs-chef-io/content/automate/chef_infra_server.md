@@ -44,11 +44,11 @@ To add existing Chef Infra Servers to the Chef Automate infrastructure, select *
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
-Chef Automate will warn you if you enter an invalid FQDN or IP address:
+Chef Automate warns you if you enter an invalid FQDN or IP address:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
-Once done, select **Add Chef Server** and you will see your server in the list of Chef Infra Servers.
+Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
 ## Connect a Chef Organization to a Chef Infra Server
 
@@ -160,7 +160,7 @@ The _Details_ contains the Run List, whereas the attributes tab displays the _de
 
 {{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
 
-You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a pop-up window where you can make the changes and click **Save**.
+You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a pop-up window where you can make the changes and select **Save**.
 
 #### Delete a Role
 
@@ -383,12 +383,12 @@ The **Details** section lets you view and update the node environment. The drop-
 
 To select the environment:
 
-- Click on the dropdown menu and select the name of the environment.
+- Select the dropdown menu and the name of the environment.
 
 - You can add tags to the environment from the text bar below the dropdown menu.
 **Note:** To add multiple tags at a time, use a comma separator. Example: Tag1, Tag2, Tag3.
 
-- Selecting an environment will open a pop-up to save the node environment. Select **Save** to change the node environment.
+- Selecting an environment opens a pop-up to save the node environment. Select **Save** to change the node environment.
 
 {{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
@@ -404,7 +404,7 @@ Edit a run list by:
 
 2. The left side of the window contains the list of environments. Select an environment from the list.
 
-3. The right side of the window will show the run list for the selected environment.
+3. The right side of the window shows the run list for the selected environment.
 
 4. Select the run list for a specific environment.
 
@@ -507,7 +507,7 @@ You can **Expand** and **Collapse** the *default* and *override* attributes by s
 
 Select the **Cookbook Dependencies** button to view all the _Dependencies Rules_ and _Cookbook_ of the policyfile in table format. Select a specific cookbook from the list to view the details of the cookbook.
 
-{{< note >}} Selecting a specific cookbook will redirect you to the audit section of the **Cookbook** main tab.
+{{< note >}} Selecting a specific cookbook redirects you to the audit section of the **Cookbook** main tab.
 {{< /note >}}
 
 The slider tab contains the `Operator` and `Version` of the cookbooks.
@@ -538,7 +538,7 @@ The Chef Infra Server integration lets you:
 
 #### Search for a Policy Group
 
-Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) to find a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
+The search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) finds a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
 
 {{< figure src="/images/automate/search-for-a-policygroup.png" alt="Search for a Policy Group">}}
 
@@ -550,13 +550,13 @@ Select a Policy Group to view the Policy Group Information and METADATA of that 
 
 ##### Policyfiles Tab
 
-The details page of the policy group lets you view the list of **Policyfiles**.
+The details page of the policy group view the list of **Policyfiles**.
 
 {{< figure src="/images/automate/policyfiles-under-policygroup.png" alt="Policyfiles under Policy Group">}}
 
 Select a Policyfile from the list to view its details.
 
-{{< note >}} Selecting a specific policyfile will redirect you to the details section of the **Policyfiles** main tab.
+{{< note >}} Selecting a specific policyfile redirects you to the details section of the **Policyfiles** main tab.
 {{< /note >}}
 
 ##### Nodes Tab
