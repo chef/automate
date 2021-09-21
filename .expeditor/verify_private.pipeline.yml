@@ -478,3 +478,13 @@ steps:
       executor:
         linux:
           privileged: true
+
+  - label: "security"
+    command:
+      - integration/run_test integration/tests/security.sh
+    timeout_in_minutes: 20
+    soft_fail: true
+    expeditor:
+      executor:
+        linux:
+          privileged: true
