@@ -25,6 +25,7 @@ type Storage interface {
 	GetUser(ctx context.Context, id string) (User, error)
 	EditUser(ctx context.Context, id, serverID, infraServerUsername, credentialID, Connector, automateUserID string, IsServerAdmin bool) (User, error)
 	DeleteUser(ctx context.Context, id string) (User, error)
+	GetAutomateInfraServerUsers(ctx context.Context, serverId string) ([]User, error)
 }
 
 // Resetter is, if exposed, used for tests to reset the storage backend to a
