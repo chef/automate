@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message AutomateInfraServerUsers {
+    // Automate infra server users list
+    repeated AutomateInfraServerUsersListItem users=1;
+}
+
+message AutomateInfraServerUsersListItem {
+    // User id
+    string id=1;
+    // User server id
+    string server_id=2;
+    // User infra server username
+    string infra_server_username=3;
+    // User credential id
+    string credential_id=4;
+    // User connector
+    string connector=5;
+    // User automate user id
+    string automate_user_id=6;
+    // User is server admin or not
+    bool is_server_admin=7;
+}
