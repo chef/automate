@@ -24,13 +24,12 @@ let x = 0;
         method: 'POST',
         url: 'api/v0/nodes/bulk-create',
         body: {
-          nodes: nodejson
+          nodes: nodejson()
         }
       }).then((response) => {
         expect(response.body.ids).to.have.length(110);
       });
-
-   });
+  });
 
    it('check total node count displayed on automate manager', () => {
       cy.request({
@@ -38,16 +37,13 @@ let x = 0;
       method: 'POST',
       url: 'api/v0/nodemanagers/id/e69dc612-7e67-43f2-9b19-256afd385820/search-nodes',
       body: {
-
-          query: {
+              query: {
               filter_map: []
           }
-
       }
     }).then((response) => {
           expect(response.body.nodes).to.have.length(x + 110);
         });
-
    });
 
 });
