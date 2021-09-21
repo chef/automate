@@ -483,7 +483,7 @@ function LoginHelper(username: string) {
   cy.get('[type=submit]').click().then(() => {
 
     // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
+    // cy.get('app-welcome-modal').invoke('hide');
     cy.get('[data-cy=close-x]').click();
     cy.saveStorage();
 
