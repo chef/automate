@@ -88,6 +88,7 @@ describe('DataFeedDetailsComponent', () => {
         expect(component.destination.name).toEqual(updatedDestination.name);
         expect(component.destination.url).toEqual(updatedDestination.url);
       });
+
       it('check sendTestForDataFeedUrl func', () => {
         component.destination = destination;
         component.testInProgress = true;
@@ -95,18 +96,21 @@ describe('DataFeedDetailsComponent', () => {
         buttonElement.triggerEventHandler('click', null);
         expect(component.testInProgress).toEqual(true);
       });
+
       it('check deleteModalVisible func', () => {
         component.deleteModalVisible = true;
         // tslint:disable-next-line:no-unused-expression
         component.closeDeleteModal;
         expect(component.deleteModalVisible).toEqual(true);
       });
+
       it('check openDeleteModal func', () => {
         component.deleteModalVisible = false;
         // tslint:disable-next-line:no-unused-expression
         component.openDeleteModal;
         expect(component.deleteModalVisible).toEqual(false);
       });
+
       it('disableOnsave for S3', () => {
         component.regionSelected = 'Hello';
         component.regionName = 'World';
@@ -115,6 +119,7 @@ describe('DataFeedDetailsComponent', () => {
         component.regionName = 'Hello World';
         expect(component.disableOnsave('S3')).toEqual(true);
       });
+
       it('metaDataValue fuc for S3', () => {
         const destinationValue = <Destination> {
           id: '1',
@@ -131,6 +136,7 @@ describe('DataFeedDetailsComponent', () => {
         expect(component.metaDataValue()[0]['value']).toEqual('s3-bucket');
         expect(component.metaDataValue()[1]['value']).toEqual('us-east-1');
       });
+
       it('metaDataValue fuc for Minio', () => {
         const destinationValue = <Destination> {
           id: '1',

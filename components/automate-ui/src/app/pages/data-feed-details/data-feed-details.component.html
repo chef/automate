@@ -85,7 +85,7 @@
             <chef-form-field *ngIf="destination?.services === 'S3'">
               <label for="region">Region <span aria-hidden="true">*</span></label>
                   <chef-select #ty [value]="regionSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-region-type" class="select-region">
-                    <chef-option *ngFor="let region of regionList" [value]="region.code"  data-cy="select-username-password">{{ region.name }}</chef-option>
+                    <chef-option *ngFor="let region of regionList" [value]="region.code"  [attr.data-cy]=" region.code ">{{ region.name }}</chef-option>
                   </chef-select>
             </chef-form-field>
             <chef-form-field *ngIf="destination?.services === 'Minio'">
