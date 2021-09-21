@@ -422,7 +422,6 @@ describe('DataFeedComponent', () => {
 
     it('on success, closes slider and adds new custom data feed with access token', () => {
       spyOnProperty(component.createChild, 'saveDone', 'set');
-
       component.createDataFeedForm.controls['name'].setValue(destination.name);
       component.createDataFeedForm.controls['url'].setValue(destination.url);
       component.createDataFeedForm.controls['username'].setValue(username);
@@ -483,6 +482,52 @@ describe('DataFeedComponent', () => {
       .testDestinationWithHeaders).toHaveBeenCalledWith(
         destination.url,
         JSON.stringify(headersVal)
+      );
+    });
+
+    it('on success, adds new data feed ELK and check dispatched store dat', () => {
+      spyOnProperty(component.createChild, 'saveDone', 'set');
+
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+
+      spyOn(component['store'], 'dispatch');
+      component.saveDestination({
+        auth: AuthTypes.USERNAMEANDPASSWORD,
+        name: WebhookIntegrationTypes.ELK_KIBANA
+      });
+
+      expect(component['store'].dispatch).toHaveBeenCalledWith(
+        new CreateDestination({
+          name: component.createDataFeedForm.controls['name'].value.trim(),
+          url: component.createDataFeedForm.controls['url'].value.trim(),
+          integration_types: IntegrationTypes.WEBHOOK,
+          services: WebhookIntegrationTypes.ELK_KIBANA
+        }, JSON.stringify({
+          Authorization: 'Basic ' + btoa(username + ':' + password)
+        }), null)
+      );
+    });
+
+    it('on test success for ELK and check dispatched store data', () => {
+      component.createDataFeedForm.controls['name'].setValue(destination.name);
+      component.createDataFeedForm.controls['url'].setValue(destination.url);
+      component.createDataFeedForm.controls['username'].setValue(username);
+      component.createDataFeedForm.controls['password'].setValue(password);
+      spyOn(component['datafeedRequests'], 'testDestinationWithHeaders');
+      component.sendTestForDataFeed({
+      auth: AuthTypes.USERNAMEANDPASSWORD,
+      name: WebhookIntegrationTypes.ELK_KIBANA
+      });
+      const userToken = JSON.stringify({
+      Authorization: 'Basic ' + btoa(username + ':' + password)
+      });
+      expect(component['datafeedRequests']
+      .testDestinationWithHeaders).toHaveBeenCalledWith(
+      destination.url,
+      userToken
       );
     });
   });

@@ -37,7 +37,6 @@ steps:
       # here we reuse the license_scout.sh script used by expeditor to publish the manifest
       - .expeditor/license_scout.sh
     timeout_in_minutes: 20
-    soft_fail: true
     retry:
       automatic:
         limit: 1
