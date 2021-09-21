@@ -83,7 +83,7 @@
                 <div class="item-details">
                   <div data-cy="empty-list" class="empty-section" *ngIf="!included_policy_locks.length">
                     <img alt="No preview" src="/assets/img/no_preview.gif" />
-                    <p>No policy files available</p>
+                    <p>No Included Policyfiles</p>
                   </div>
                   <div id="included-policy-table-container" *ngIf="included_policy_locks.length" data-cy="included-policy-table-container">
                     <chef-table>
@@ -127,7 +127,7 @@
                 <div class="item-details">
                   <div data-cy="empty-list" class="empty-section" *ngIf="!cookbook_locks.length">
                     <img alt="No preview" src="/assets/img/no_preview.gif" />
-                    <p>No policy files available</p>
+                    <p>No Policyfiles available</p>
                   </div>
                   <div id="run-list-table-container" *ngIf="cookbook_locks.length" data-cy="run-list-table-container">
                     <chef-table>
