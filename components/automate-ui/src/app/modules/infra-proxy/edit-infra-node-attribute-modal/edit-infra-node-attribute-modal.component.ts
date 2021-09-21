@@ -27,6 +27,7 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
   @Input() label: string;
   @Input() name: string;
   @Input() node: InfraNodeAttribute;
+  @Input() isGetNode: boolean;
 
   public creating = false;
   public conflictError = false;
@@ -89,7 +90,9 @@ export class EditInfraNodeAttributeModalComponent implements OnChanges, OnInit, 
   closeEditModal(): void {
     this.resetEditModal();
     this.visible = false;
-    this.getNode();
+    if (this.isGetNode === true) {
+      this.getNode();
+    }
   }
 
   handleNameInput(event: KeyboardEvent): void {
