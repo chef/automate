@@ -10,10 +10,19 @@ describe('delete missing node from UI', () => {
     cy.fixture('converge/avengers1.json').then((node) => {
       const runEndDate = Cypress.moment().subtract(1, 'month');
       node.entity_uuid = clientRunsNodeId;
-      node.node_name = nodeName;
+      node.nodeme = nodeName;
       node.start_time = runEndDate.subtract(5, 'minute').toISOString();
       node.end_time = runEndDate.toISOString();
       cy.sendToDataCollector(node);
+    });
+      cy.adminLogin(''/infrastructure/client-runs');
+    });
+    beforeEach(() => {
+      // cypress clears local storage between tests
+      cy.restoreStorage();
+    });
+    afterEach(() => {
+      cy.saveStorage();
     });
 
     cy.waitForClientRunsNode(clientRunsNodeId);
@@ -49,7 +58,6 @@ describe('delete missing node from UI', () => {
   });
 
   it('from client runs page delete nodes', () => {
-    cy.adminLogin('/infrastructure/client-runs').then(() => {
       cy.get('app-welcome-modal').invoke('hide');
     });
 
