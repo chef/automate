@@ -32,7 +32,7 @@ Every user needs a display name. An empty display name causes an error.
 
 ### Change the Date/Time Format
 
-You can select one of five date and time formats from the drop-down. The date/time format will get updated as soon as you choose anyone and click **Save**.
+Select one of the five date and time formats from the drop-down menu. Select **Save** to change the appearance of the date and time across Chef Automate.
 
 {{< figure src="/images/automate/date-time-format-in-profile.png" alt="Date/Time Format">}}
 
