@@ -194,6 +194,37 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/automateinfraserverusers": {
+      "get": {
+        "operationId": "InfraProxy_GetAutomateInfraServerUsersList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsers"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Automate Infra Server ID.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "InfraProxy_GetOrgs",
@@ -3182,6 +3213,52 @@ func init() {
         "ip_address": {
           "type": "string",
           "description": "Chef Infra Server IP address."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerUsers": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerUsersListItem"
+          },
+          "title": "Automate infra server users list"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerUsersListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "User id"
+        },
+        "server_id": {
+          "type": "string",
+          "title": "User server id"
+        },
+        "infra_server_username": {
+          "type": "string",
+          "title": "User infra server username"
+        },
+        "credential_id": {
+          "type": "string",
+          "title": "User credential id"
+        },
+        "connector": {
+          "type": "string",
+          "title": "User connector"
+        },
+        "automate_user_id": {
+          "type": "string",
+          "title": "User automate user id"
+        },
+        "is_server_admin": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "User is server admin or not"
         }
       }
     },
