@@ -1,6 +1,16 @@
 import { uuidv4 } from '../../../support/helpers';
 
 describe('delete missing node from UI', () => {
+  before(() => {
+    cy.adminLogin('/infrastructure/client-runs');
+  });
+  beforeEach(() => {
+    // cypress clears local storage between tests
+    cy.restoreStorage();
+  });
+  afterEach(() => {
+    cy.saveStorage();
+  });
   const cypressPrefix = 'ui-delete-missing-node';
   const clientRunsNodeId = uuidv4();
   const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmmss.sss')}`;
@@ -10,21 +20,12 @@ describe('delete missing node from UI', () => {
     cy.fixture('converge/avengers1.json').then((node) => {
       const runEndDate = Cypress.moment().subtract(1, 'month');
       node.entity_uuid = clientRunsNodeId;
-      node.nodeme = nodeName;
+      node.node_name = nodeName;
       node.start_time = runEndDate.subtract(5, 'minute').toISOString();
       node.end_time = runEndDate.toISOString();
       cy.sendToDataCollector(node);
     });
-      cy.adminLogin(''/infrastructure/client-runs');
-    });
-    beforeEach(() => {
-      // cypress clears local storage between tests
-      cy.restoreStorage();
-    });
-    afterEach(() => {
-      cy.saveStorage();
-    });
-
+    
     cy.waitForClientRunsNode(clientRunsNodeId);
 
     // Update the mark nodes missing job to mark the nodes missing
@@ -58,8 +59,8 @@ describe('delete missing node from UI', () => {
   });
 
   it('from client runs page delete nodes', () => {
-      cy.get('app-welcome-modal').invoke('hide');
-    });
+    // cy.get('app-welcome-modal').invoke('hide');
+    // });
 
     // Check the check box to delete all missing nodes
     cy.get('chef-checkbox.header').click();
@@ -74,4 +75,4 @@ describe('delete missing node from UI', () => {
     // wait until all nodes are delete API check
     cy.waitUntilConfigMgmtNodeIsDeleted(clientRunsNodeId);
   });
-});
+}));
