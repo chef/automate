@@ -273,7 +273,6 @@ export class DataFeedCreateComponent {
 
   public dropDownChangeHandlers(val: string) {
     this.dropDownVal = val;
-    console.log(val);
   }
 
   public testConnection() {
@@ -373,16 +372,11 @@ export class DataFeedCreateComponent {
   }
 
   public showTokenInput(field: string) {
-    return (
-      this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN
-    );
+    return (this.showFields[field] && this.authSelected === AuthTypes.ACCESSTOKEN);
   }
 
   public showUserPassInput(field: string) {
-    return (
-      this.showFields[field] &&
-      this.authSelected === AuthTypes.USERNAMEANDPASSWORD
-    );
+    return (this.showFields[field] &&this.authSelected === AuthTypes.USERNAMEANDPASSWORD);
   }
 
   public validateHeaders(customHeaders: string): void {
