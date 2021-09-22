@@ -11,7 +11,7 @@ Parameters:
 Options:
     -o, --ssh-options OPTIONS        Additional options to pass to ssh
     -l, --list                       List available servers for ssh
-    -h, --help                       print help
+    -h, --help                       Print help
     -v, --verbose                    Enable verbose output
     -c, --config-file CONFIG_FILE    Load settings from config file (default: "/src/a2ha.rb")
 `

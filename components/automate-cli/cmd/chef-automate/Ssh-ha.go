@@ -18,8 +18,8 @@ func init() {
 
 var SshCmd = &cobra.Command{
 	Use:   "ssh",
-	Short: "set Ssh env for automate HA.",
-	Long:  "set up automate ha clusterSsh",
+	Short: "Set Ssh env for automate HA.",
+	Long:  "Set up automate ha clusterSsh",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
