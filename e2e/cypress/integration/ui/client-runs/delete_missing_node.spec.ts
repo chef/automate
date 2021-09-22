@@ -1,16 +1,6 @@
 import { uuidv4 } from '../../../support/helpers';
 
 describe('delete missing node from UI', () => {
-  before(() => {
-    cy.adminLogin('/infrastructure/client-runs');
-  });
-  beforeEach(() => {
-    // cypress clears local storage between tests
-    cy.restoreStorage();
-  });
-  afterEach(() => {
-    cy.saveStorage();
-  });
   const cypressPrefix = 'ui-delete-missing-node';
   const clientRunsNodeId = uuidv4();
   const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmmss.sss')}`;
@@ -59,8 +49,16 @@ describe('delete missing node from UI', () => {
   });
 
   it('from client runs page delete nodes', () => {
-    cy.get('app-welcome-modal').invoke('hide');
-    // });
+    before(() => {
+      cy.adminLogin('/infrastructure/client-runs');
+    });
+    beforeEach(() => {
+      // cypress clears local storage between tests
+      cy.restoreStorage();
+    });
+    afterEach(() => {
+      cy.saveStorage();
+    });
 
     // Check the check box to delete all missing nodes
     cy.get('chef-checkbox.header').click();
@@ -69,7 +67,7 @@ describe('delete missing node from UI', () => {
     // Click the delete all button
     cy.get('chef-button.delete-button').click();
 
-    // Click the confirm delete button
+    // Click the confim delete button
     cy.get('chef-modal chef-button.delete-button-confirm').click();
 
     // wait until all nodes are delete API check
