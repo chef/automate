@@ -6,7 +6,7 @@
     <div class="search-create-container">
       <app-infra-search-bar
         (searchButtonClick)="searchPolicyFiles($event)"
-        placeHolder="policy group by name...">
+        placeHolder="policy groups by name...">
       </app-infra-search-bar>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!groupList.length">

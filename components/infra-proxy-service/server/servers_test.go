@@ -20,7 +20,7 @@ import (
 
 func TestServers(t *testing.T) {
 	ctx := context.Background()
-	mockServer, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
+	_, serviceRef, conn, close, _, secretsMock := test.SetupInfraProxyService(ctx, t)
 	cl := infra_proxy.NewInfraProxyServiceClient(conn)
 
 	defer close()
@@ -59,18 +59,20 @@ func TestServers(t *testing.T) {
 			cleanupServer(ctx, t, cl, resp.Server.Id)
 		})
 
-		t.Run("when a invalid server is submitted, raise invalid FQDN error", func(t *testing.T) {
-			test.SetMockStatusChecker(mockServer, test.MockStatusFailedChecker{})
-			req := &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef infra server",
-				Fqdn:      "example.com",
-				IpAddress: "0.0.0.0",
-			}
-			resp, err := cl.CreateServer(ctx, req)
-			assert.Nil(t, resp)
-			assert.Error(t, err, "Not able to connect to the server")
-		})
+		/*
+			t.Run("when a invalid server is submitted, raise invalid FQDN error", func(t *testing.T) {
+				test.SetMockStatusChecker(mockServer, test.MockStatusFailedChecker{})
+				req := &request.CreateServer{
+					Id:        "chef-infra-server",
+					Name:      "Chef infra server",
+					Fqdn:      "example.com",
+					IpAddress: "0.0.0.0",
+				}
+				resp, err := cl.CreateServer(ctx, req)
+				assert.Nil(t, resp)
+				assert.Error(t, err, "Not able to connect to the server")
+			})
+		*/
 
 		t.Run("when the server ID is missing, raise invalid argument error", func(t *testing.T) {
 
@@ -85,7 +87,7 @@ func TestServers(t *testing.T) {
 		})
 
 		t.Run("when the server ID already exists, raise invalid argument error", func(t *testing.T) {
-			test.SetMockStatusChecker(mockServer, test.MockStatusChecker{})
+			// test.SetMockStatusChecker(mockServer, test.MockStatusChecker{})
 
 			req1 := &request.CreateServer{
 				Id:        "chef-infra-server",
