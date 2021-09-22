@@ -82,7 +82,7 @@ do_install() {
   cp -r $PLAN_CONTEXT/../../../scripts/airgap_bundle.sh $pkg_prefix/workspace/scripts/
   cp -r $PLAN_CONTEXT/../../../scripts/cert.sh $pkg_prefix/workspace/scripts/
   cp -r $PLAN_CONTEXT/../../../certs $pkg_prefix/workspace/ 
-  cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/Makefile $pkg_prefix/workspace/
+  cp -r $PLAN_CONTEXT/../../../terraform/a2ha-terraform/deployment-makefile/Makefile $pkg_prefix/workspace/
 
   # make sure no state is copied over
   rm -f $pkg_prefix/workspace/terraform/*.tfstate
