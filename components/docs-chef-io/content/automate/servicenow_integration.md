@@ -14,9 +14,9 @@ gh_repo = "automate"
 
 [ServiceNow](https://www.servicenow.com/) provides cloud-based services that automate enterprise IT operations. ServiceNow specializes in IT service management (ITSM) applications and provides forms-based workflow application development. It supports third-party application and data integrations. The most common integrations are for configuration management, incident management, problem management, change management, user administration, and single sign-on authentication.
 
-The Chef Automate Integration App for ServiceNow integrates Chef Automate with ServiceNow. This app is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time.
+The Chef Automate Integration App for ServiceNow, also called the Integration App, integrates Chef Automate with ServiceNow. This app is a ServiceNow-certified scoped application available from the ServiceNow store. It integrates existing Chef Automate infrastructure and compliance functionality with ServiceNow enterprise services. Once installed and configured, this integration enables Chef Automate to create and update a ServiceNow Configuration Management Database (CMDB) with data from nodes managed by Chef Automate. Chef Automate aggregates information about infrastructure nodes, the Chef Infra Client runs, and Chef Compliance scans, helping you monitor your infrastructure in real time.
 
-The Chef Automate Integration App works by exposing the REST API endpoints for communication between Chef Automate and ServiceNow. Chef Automate sends HTTPS JSON data feeds to the app in ServiceNow to create and update the _ServiceNow CMDB_, client run, and compliance report tables.
+The Integration App works by exposing the REST API endpoints for communication between Chef Automate and ServiceNow. Chef Automate sends HTTPS JSON data feeds to the app in ServiceNow to create and update the _ServiceNow CMDB_, client run, and compliance report tables.
 
 {{< figure src="/images/automate/snow_integration_dataflow_diagram.png" alt="Data Flow Diagram" >}}
 
@@ -24,15 +24,15 @@ The Chef Automate Integration App works by exposing the REST API endpoints for c
 
 ### User Requirements
 
-- You must have the `x_chef_automate.api` role to set up ServiceNow to receive data from Chef Automate. Your ServiceNow administrator can enable this for you.
 - Your unique ServiceNow URL. It has the format: `https://ven12345.service-now.com`.
+- Once the Integration app is installed, you will need to have the `x_chef_automate.api` role to configure it. Your ServiceNow administrator can enable this for you.
 
 ### System and User Requirements
 
 - A running [Chef Automate](https://www.chef.io/automate/) instance.
-- Chef Automate must be provisioned with a valid SSL/TLS certificate from a trusted certificate authority (CA).
+- Chef Automate has a valid SSL/TLS certificate from a trusted certificate authority (CA).
 - A running [ServiceNow](https://www.servicenow.com/) instance.
-- The ServiceNow instance must be reachable on port 443 from Chef Automate.
+- The ServiceNow is reachable on port 443.
 
 ### Required ServiceNow Plugins
 
@@ -43,9 +43,9 @@ Install following ServiceNow plugins from the Service Management dashboard:
 - Configuration Management for Scoped Apps (com.snc.cmdb.scoped) 1.0.0.
 
 {{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins" >}}
-## Install the Chef Automate Integration App
+## Install the Integration App
 
-Install the Chef Automate Integration App from the [ServiceNow Store](https://store.servicenow.com)
+Install the Integration App from the [ServiceNow Store](https://store.servicenow.com)
 
 1. Navigate to the ServiceNow store at <https://store.servicenow.com>.
 2. Search for **Chef Automate**.
@@ -59,8 +59,9 @@ Install the Chef Automate Integration App from the [ServiceNow Store](https://st
 
 ## Setup
 
-You can set up a connection between Chef Automate and the Integration App in ServiceNow by creating a data feed in from Chef Automate or a connection in Service Now.
-### Create a Data Feed
+Connect the Integration App in ServiceNow to Chef Automate by creating a data feed in from Chef Automate or a connection in Service Now. Setting up and configuring the Integration App requires the `x_chef_automate.api` role to configure it. If you are not a ServiceNow administrator, ask one to enable it for you.
+
+### Create a Data Feed in Chef Automate
 
 Set up a data feed to send data from Chef Automate to the Integration App:
 
@@ -123,7 +124,7 @@ The **Automate Instances** module allows the user to configure the integration w
 
 ### Server Module
 
-Chef Automate Integration App updates the CMDB file systems and software tables. It adds associated data from Chef Automate to the servers for:
+Integration App updates the CMDB file systems and software tables. It adds associated data from Chef Automate to the servers for:
 
 - Client Runs
 - Attributes
@@ -131,7 +132,7 @@ Chef Automate Integration App updates the CMDB file systems and software tables.
 
 #### Discovery Source
 
-The Chef Automate Integration App augments the existing CMDB servers and inserts new servers into the ServiceNow CMDB. The Chef Automate Integration App uses the ServiceNow Discovery IRE (Identification and Reconciliation Engine) to insert or update servers.
+The Integration App augments the existing CMDB servers and inserts new servers into the ServiceNow CMDB. The Integration App uses the ServiceNow Discovery IRE (Identification and Reconciliation Engine) to insert or update servers.
 
 The Integration App distinguishes between discovered Configuration Items (CIs) and imported CIs. CIs discovered by the Integration App have a default value of **Chef Automate** in the **Discovery Source** field in the `cmdb_servers` table.
 
@@ -211,26 +212,11 @@ The Integration App has nine configurable **Application Properties**. Changing t
 `x_chef_automate.enable.system.app`
 : Used to enable software installed mappings. Valid Values: `Yes`, `No`. Default: `No`.
 
-## Benchmarking
-
-The Chef Automate Installation team has tested the integration of the ServiceNow app with 10K nodes of Chef Infra Client Run data. Infrastructure with more than 10K nodes may have performance issues. The system performance will decrease with other applications running in your environment.
-
-The typical production instance of ServiceNow can have between 8-12K nodes, and will perform at +10K nodes per hour processed with Chef Infra Client run data. Benchmarking indicates that the increase in the number of nodes in the ServiceNow instance reduces the processing time.
-
-| Client Nodes  | Total Time Taken (Dev 1 Node)  | Total Time Taken (Vendor 2 Node)  |
-|---------------|--------------------------------|-----------------------------------|
-| 200           | 7m48s                          | 4m4s                              |
-| 500           | 17m47s                         | 10m16s                            |
-| 2000          | 1h15m                          | 45m                               |
-| 10,000        | 5h40m                          | 3h3m                              |
-
 ## Uninstallation
 
-To uninstall the Chef Automate Integration App:
+To uninstall the Integration App:
 
-1. In the ServiceNow instance, navigate to the **System Applications** > **Applications** menu.
-1. Open the **Downloads** tab and select the **Chef Automate** link.
-1. Navigate to the **Related Links** section.
-1. select **Uninstall**.
-
-Refer to the [ServiceNow Integration Reference]({{< relref "servicenow_integration_reference" >}}) page to find information on the topics that will help you while installing and configuring Chef Automate in ServiceNow.
+1. Navigate to the **System Applications** > **Applications** in ServiceNow.
+1. Open the **Downloads** tab and select the **Chef Automate Incident Creation**.
+1. Navigate to **Related Links**.
+1. Select **Uninstall**.
