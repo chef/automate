@@ -26,6 +26,14 @@ variable "automate_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
+variable "automate_private_ips" {
+  default = []
+}
+
+variable "automate_public_ips" {
+  default = []
+}
+
 variable "automate_server_instance_type" {
   default = "t3a.medium"
 }
@@ -71,6 +79,14 @@ variable "chef_server_lb_certificate_arn" {
   default = "arn:aws:acm:us-west-2:446539779517:certificate/e98235a7-ba3d-4900-9c55-4b35bb8b56c7"
 }
 
+variable "chef_server_private_ips" {
+  default = []
+}
+
+variable "chef_server_public_ips" {
+  default = []
+}
+
 variable "elasticsearch_ebs_volume_iops" {
   default = 300
 }
@@ -81,6 +97,14 @@ variable "elasticsearch_ebs_volume_size" {
 
 variable "elasticsearch_ebs_volume_type" {
   default = "gp2"
+}
+
+variable "elasticsearch_private_ips" {
+  default = []
+}
+
+variable "elasticsearch_public_ips" {
+  default = []
 }
 
 variable "elasticsearch_server_instance_type" {
@@ -99,6 +123,14 @@ variable "postgresql_ebs_volume_type" {
   default = "gp2"
 }
 
+variable "postgresql_private_ips" {
+  default = []
+}
+
+variable "postgresql_public_ips" {
+  default = []
+}
+
 variable "postgresql_server_instance_type" {
   default = "t3a.medium"
 }
@@ -112,36 +144,4 @@ variable "ssh_user" {
 
 variable "sudo_cmd" {
   default = "sudo"
-}
-
-variable "chef_server_private_ips" {
-  default = []
-}
-
-variable "postgresql_private_ips" {
-  default = []
-}
-
-variable "elasticsearch_private_ips" {
-  default = []
-}
-
-variable "automate_private_ips" {
-  default = []
-}
-
-variable "chef_server_public_ips" {
-  default = []
-}
-
-variable "postgresql_public_ips" {
-  default = []
-}
-
-variable "elasticsearch_public_ips" {
-  default = []
-}
-
-variable "automate_public_ips" {
-  default = []
 }
