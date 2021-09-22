@@ -4,12 +4,12 @@ title = "Chef Automate Integration App Reference"
 draft = false
 
 gh_repo = "automate"
-
+aliases = "servicenow_integration_reference"
 [menu]
   [menu.automate]
-    title = "Chef Automate Integration App Reference"
+    title = "ServiceNow Administrator Reference"
     parent = "automate/integrations/servicenow"
-    identifier = "automate/integrations/servicenow/servicenow_integration_reference.md ServiceNow Integration Reference"
+    identifier = "automate/integrations/servicenow/servicenow_integration_reference.md ServiceNow Administrator Reference"
     weight = 30
 +++
 
