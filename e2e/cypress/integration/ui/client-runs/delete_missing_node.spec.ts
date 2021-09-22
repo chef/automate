@@ -54,7 +54,7 @@ describe('delete missing node from UI', () => {
     }
     cy.adminLogin('/infrastructure/client-runs').then(() => {
       // cy.get('app-welcome-modal').invoke('hide');
-      cy.get('[data-cy=close-x]').click();
+      // cy.get('[data-cy=close-x]').click();
     });
 
     // Check the check box to delete all missing nodes
