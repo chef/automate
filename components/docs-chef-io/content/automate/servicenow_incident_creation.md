@@ -49,7 +49,7 @@ You can setup automatic incident creation for:
 
 {{% servicenow_incidents %}}
 
-## Configuration
+## Setup
 
 The Chef Automate Incident App has nine configurable **Application Properties**. You must have the `admin` or `x_chef_incident.admin` roles to change the default values in the **Application Properties**.
 
