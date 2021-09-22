@@ -23,7 +23,6 @@ var infoCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	//Args: cobra.RangeArgs(0, 2),
 	RunE: runInfoConfigCmd,
 }
 
@@ -33,7 +32,6 @@ func runInfoConfigCmd(cmd *cobra.Command, args []string) error {
 
 func executeInfoCommand() error {
 	writer.Printf("Automate HA info \n")
-	//args = append([]string{"info"})
 	c := exec.Command("automate-cluster-ctl", "info")
 	c.Dir = "/hab/a2_deploy_workspace"
 	c.Stdin = os.Stdin
@@ -47,6 +45,5 @@ func executeInfoCommand() error {
 		return status.Wrap(err, status.CommandExecutionError, "please refer \n"+infoHelpDocs)
 	}
 	writer.Print(out.String())
-	//writer.Printf("A2HA new secret set. %d, exiting\n", c.Process.Pid)
 	return err
 }
