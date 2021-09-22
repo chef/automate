@@ -467,6 +467,9 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
 }
 
 function LoginHelper(username: string) {
+  if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+    cy.get('[data-cy=close-x]').click();
+  }
   cy.url().should('include', '/dex/auth/local');
   cy.server();
   // the global permissions for the user that populates the initial permissions cache
@@ -479,7 +482,8 @@ function LoginHelper(username: string) {
   cy.get('[type=submit]').click().then(() => {
 
     // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
+    // cy.get('app-welcome-modal').invoke('hide');
+    cy.get('[data-cy=close-x]').click();
     cy.saveStorage();
 
     cy.wait(['@getAuthPopulateCache']);
