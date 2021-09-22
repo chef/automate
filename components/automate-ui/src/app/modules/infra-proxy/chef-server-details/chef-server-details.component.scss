@@ -5,6 +5,51 @@ chef-page-header {
   padding-bottom: 0;
 }
 
+.meta-box {
+  display: flex;
+  border: 0.5px solid $chef-key-tab;
+  border-radius: 4px;
+  margin-bottom: 4em;
+  padding: 1em 0 4em;
+  background: $chef-white;
+
+  .summary-body {
+    width: 50%;
+    font-size: 14px;
+    padding: 0 1em;
+
+    .meta-head {
+      text-transform: uppercase;
+      font-size: 15px;
+      font-weight: 600;
+      color: $chef-black;
+    }
+
+    ul {
+      color: $chef-primary-dark;
+      list-style: none;
+      padding: 0;
+
+      li {
+        display: flex;
+        margin-bottom: 5px;
+
+        span {
+          font-size: 14px;
+          line-height: 21px;
+          letter-spacing: 0.2px;
+
+          &.heading {
+            display: inline-block;
+            font-weight: bold;
+            width: 45%;
+          }
+        }
+      }
+    }
+  }
+}
+
 chef-toolbar {
   display: block;
   position: relative;
