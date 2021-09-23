@@ -63,7 +63,22 @@ enum UrlTestState {
   Success,
   Failure
 }
+export enum WebhookIntegrationTypes {
+  SERVICENOW = 'ServiceNow',
+  SPLUNK = 'Splunk',
+  ELK_KIBANA = 'ELK',
+  CUSTOM = 'Custom'
+}
 
+export enum StorageIntegrationTypes {
+  MINIO = 'Minio',
+  AMAZON_S3 = 'S3'
+}
+
+export enum IntegrationTypes {
+  WEBHOOK = 'Webhook',
+  STORAGE = 'Storage'
+}
 @Component({
   selector: 'app-data-feed-details',
   templateUrl: './data-feed-details.component.html',
@@ -85,7 +100,16 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   public regionSelected: string;
   public regionList = regions;
   public regionName: string;
+  public serviceIntegrations = {
+    webhook: {
+      WebhookIntegrationTypes
+    },
+    storage: {
+      StorageIntegrationTypes
+    }
+  };
 
+  public integrations = {IntegrationTypes};
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -115,7 +139,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
         this.destination = destination;
         this.updateForm.controls.name.setValue(this.destination.name);
         this.updateForm.controls.url.setValue(this.destination.url);
-        if (this.destination.integration_types === 'Storage') {
+        if (this.destination.integration_types === IntegrationTypes.STORAGE) {
           this.destination.meta_data.forEach((v) => {
             if (v.key === 'bucket') {
               this.updateForm.controls.bucket.setValue(v.value);
@@ -133,7 +157,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       // Note that URL here may be FQDN -or- IP!
       url: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      bucket: this.destination?.services === 'S3' ?
+      bucket: this.destination?.services === StorageIntegrationTypes.AMAZON_S3 ?
         ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]] : null
     });
 
@@ -153,8 +177,8 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     this.regionSelected = region;
   }
   metaDataValue(): Array<KVData> {
-    if (this.destination.integration_types === 'Storage') {
-      if (this.destination.services === 'S3') {
+    if (this.destination.integration_types === IntegrationTypes.STORAGE ) {
+      if (this.destination.services === StorageIntegrationTypes.AMAZON_S3 ) {
         console.log(this.destination);
         return Array<KVData>(
           {
@@ -165,7 +189,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
           }
         );
       }
-      if (this.destination.services === 'Minio') {
+      if (this.destination.services === StorageIntegrationTypes.MINIO ) {
         return Array<KVData>(
           {
             key: 'bucket', value: this.updateForm.controls['bucket'].value.trim()
@@ -186,7 +210,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       enable: this.destination.enable,
       integration_types: this.destination.integration_types,
       meta_data:
-        this.destination.integration_types === 'Storage' ?
+        this.destination.integration_types === IntegrationTypes.STORAGE ?
           this.metaDataValue() : this.destination.meta_data,
       services: this.destination.services
     };
@@ -204,7 +228,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
       enable: this.destination.enable,
       integration_types: this.destination.integration_types,
       meta_data:
-        this.destination.integration_types === 'Storage' ?
+        this.destination.integration_types === IntegrationTypes.STORAGE ?
           this.metaDataValue() : this.destination.meta_data,
       services: this.destination.services
     };
@@ -277,7 +301,7 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
     || !this.updateForm.valid
     || !this.updateForm.dirty
     || !this.destination?.enable;
-    if (service === 'S3') {
+    if (service === StorageIntegrationTypes.AMAZON_S3 ) {
       return isDisable && this.regionSelected === this.regionName;
     } else {
       return isDisable ;
