@@ -264,3 +264,68 @@ DOC
 function infra_service_psql() {
   chef-automate dev psql chef_infra_proxy
 }
+
+document "infra_service_load_sample_users" <<DOC
+  Adds the sample data of server users
+  Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
+  
+  -N No of records Default: 50
+
+  Example:
+  -----------------------------
+  infra_service_load_sample_users -N 100
+DOC
+function infra_service_load_sample_users() {
+  install_if_missing core/jq-static jq
+  install_if_missing core/grpcurl grpcurl
+
+  local OPTIND opt
+  local records=50
+
+  log_line "Total number of records: $records"
+
+  while getopts ":N:" opt; do
+    case $opt in
+      N) records="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
+
+  local timestamp=$(date +%s%N)
+  local server_prefix="chef-server-${timestamp}"
+  local server_id="${server_prefix}-id"
+  local fqdn="api.chef.io"
+  local ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+  # Add server in automate
+  chef-automate dev grpcurl infra-proxy-service -- -d \
+    "$(cat << EOF
+      {"id": "${server_id}", "name": "${server_prefix}", "ip_address": "${ip_address}", "fqdn": "${fqdn}"}
+EOF
+  )" chef.automate.domain.infra_proxy.service.InfraProxyService.CreateServer >/dev/null
+
+  # Add users in automate
+  local user_prefix="automate-user"
+  for _ in $(seq 1 ${records}); do
+    timestamp=$(date +%s%N)
+    local userId="${user_prefix}-${timestamp}-id"
+    local infraServerUsername="infra-user-${timestamp}"
+    local credentialId="${user_prefix}-${timestamp}-secrets"
+    local automateUserId="${user_prefix}-${timestamp}"
+    chef-automate dev psql -d chef_infra_proxy << EOF
+      INSERT INTO users (
+		  id, server_id, 
+		  infra_server_username, 
+		  credential_id, 
+  		automate_user_id,
+		  created_at,updated_at)
+      VALUES ('${userId}', '${server_id}', '${infraServerUsername}', '${credentialId}','${automateUserId}',now(), now())
+EOF
+  done  
+  log_line "Sample data loaded of $records users for server with server name '$server_prefix' and server id '$server_id'"
+}
