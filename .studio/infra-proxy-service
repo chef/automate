@@ -266,7 +266,7 @@ function infra_service_psql() {
 }
 
 document "infra_service_load_sample_users" <<DOC
-  Adds the sample data of server users
+  Adds the sample data of automate infra server users
   Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
   
   -N No of records Default: 50
