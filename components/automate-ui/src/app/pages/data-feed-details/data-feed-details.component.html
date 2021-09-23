@@ -74,7 +74,7 @@
                 Name is required.
               </chef-error>
             </chef-form-field>
-            <chef-form-field *ngIf="!(destination?.integration_types === integrations.IntegrationTypes.STORAGE) || destination?.services === serviceIntegrations.storage.StorageIntegrationTypes.MINIO ">
+            <chef-form-field *ngIf="showUrl() ">
               <label for="url" *ngIf="!(destination?.integration_types === integrations.IntegrationTypes.STORAGE )">Data Feed URL <span aria-hidden="true">*</span></label>
               <label for="url" *ngIf="destination?.services === serviceIntegrations.storage.StorageIntegrationTypes.MINIO ">End Point <span aria-hidden="true">*</span></label>
               <input chefInput id="url" formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
