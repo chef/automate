@@ -54,6 +54,10 @@ var (
 )
 
 func runStatusCmd(cmd *cobra.Command, args []string) error {
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommand("status", args, statusHAHelpDocs)
+		//return executeHAStatus(args)
+	}
 	writeStatus := func(res *api.StatusResponse) {
 		writer.Titlef(
 			"Status from deployment with channel [%s] and type [%s]",

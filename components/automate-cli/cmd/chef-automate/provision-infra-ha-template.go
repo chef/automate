@@ -3,6 +3,8 @@ package main
 var provisionInfraHelpDocs = `
 Usage:
 
+*** this command will only work with automate HA mode with AWS deployment ***
+
 chef-automate provision-infra <config toml file path> [OPTIONS]
 
 config file path:	

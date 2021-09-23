@@ -3,7 +3,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -18,13 +17,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/lib/version"
-)
-
-const (
-	AWS_MODE            = "AWS_MODE"
-	EXISTING_INFRA_MODE = "EXISTING_INFRA_MODE"
-	AUTOMATE            = "AUTOMATE"
-	HA_MODE             = "HA_MODE"
 )
 
 var deployLong = `Deploy a new Chef Automate instance using the supplied configuration.
@@ -199,8 +191,9 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	if isA2ha, mode := isA2HADeployment(args); isA2ha {
-		return a2haDeploy(args, mode)
+	deployer := getDeployer(args)
+	if deployer != nil {
+		return newDeployDirector(deployer).executeDeployemnt(args)
 	} else {
 		writer.Printf("Automate deployment non HA mode proceeding...")
 		if !deployCmdFlags.acceptMLSA {
@@ -299,50 +292,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func a2haDeploy(args []string, mode string) error {
-	writer.Println(mode)
-	if len(args) == 0 {
-		return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
-	}
-	if mode == EXISTING_INFRA_MODE {
-		if !deployCmdFlags.acceptMLSA {
-			agree, err := writer.Confirm(promptMLSA)
-			if err != nil {
-				return status.Wrap(err, status.InvalidCommandArgsError, errMLSA)
-			}
-
-			if !agree {
-				return status.New(status.InvalidCommandArgsError, errMLSA)
-			}
-		}
-		conf := new(dc.AutomateConfig)
-		manifestProvider := manifest.NewLocalHartManifestProvider(
-			mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
-			conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
-			conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
-		err := client.DeployHA(writer, manifestProvider)
-		if err != nil && !status.IsStatusError(err) {
-			return status.Annotate(err, status.DeployError)
-		}
-		err = readConfigAndWriteToFile(args[0])
-		if err != nil {
-			return status.Annotate(err, status.DeployError)
-		}
-		err = deployA2HA()
-		return err
-	} else if mode == AWS_MODE {
-		if checkIfFileExist(initConfigHabA2HAPathFlag.a2haDirPath + "a2ha.rb") {
-			err := deployA2HA()
-			return err
-		} else {
-			return status.New(status.InvalidCommandArgsError, errProvisonInfra)
-		}
-	} else {
-		return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
-	}
-
-}
-
 func generatedConfig() (*dc.AutomateConfig, error) {
 	cfg, err := dc.GenerateInitConfig(
 		deployCmdFlags.channel,
@@ -350,11 +299,9 @@ func generatedConfig() (*dc.AutomateConfig, error) {
 		dc.InitialTLSCerts(deployCmdFlags.keyPath, deployCmdFlags.certPath),
 		dc.InitialFQDN(deployCmdFlags.fqdn),
 	)
-
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "Generating initial default configuration failed")
 	}
-
 	return cfg.AutomateConfig(), nil
 }
 

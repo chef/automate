@@ -128,7 +128,7 @@ aws do
   ### AWS Credentials profile to use when deploying AWS infrastructure
   profile "{{ .Aws.Config.Profile }}"
   region "{{ .Aws.Config.Region }}"
-  # ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### Filter settings default to CentOS if left blank
   # ami_filter_name "{{ .Aws.Config.AmiFilterName }}"
   ### Filter settings default to CentOS if left blank
