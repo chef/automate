@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
@@ -21,10 +19,14 @@ func (a *awsDeployment) doDeployWork(args []string) error {
 	}
 }
 
-func checkIfFileExist(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	} else {
-		return true
+func (a *awsDeployment) doProvisionJob(args []string) error {
+	writer.Print("AWS Provision")
+	err := bootstrapEnv(args)
+	if err != nil {
+		return err
 	}
+	writer.Printf("provisioning infra for automate HA \n\n\n\n")
+	args = args[1:]
+	args = append([]string{"-y"}, args...)
+	return executeAutomateClusterCtlCommand("provision", args, provisionInfraHelpDocs)
 }

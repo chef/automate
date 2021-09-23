@@ -14,3 +14,7 @@ func newHaWithoutConfig() *haWithoutConfig {
 func (h *haWithoutConfig) doDeployWork(args []string) error {
 	return status.Annotate(errors.New("config.toml file path expected as argument."), status.DeployError)
 }
+
+func (h *haWithoutConfig) doProvisionJob(args []string) error {
+	return status.Annotate(errors.New("config.toml file path expected as argument to run chef-atomate provision-infra"), status.DeployError)
+}

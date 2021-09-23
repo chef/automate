@@ -17,3 +17,7 @@ func (d *deployDirector) setDeployManager(m deployManager) {
 func (d *deployDirector) executeDeployemnt(args []string) error {
 	return d.manager.doDeployWork(args)
 }
+
+func (d *deployDirector) executeProvisionInfra(args []string) error {
+	return d.manager.doProvisionJob(args)
+}

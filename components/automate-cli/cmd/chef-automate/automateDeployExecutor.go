@@ -2,6 +2,7 @@ package main
 
 type deployManager interface {
 	doDeployWork(args []string) error
+	doProvisionJob(args []string) error
 }
 
 func getDeployer(args []string) deployManager {

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
-	"io"
 	"os"
 	"os/exec"
 
@@ -22,13 +21,35 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	args = append([]string{command}, args...)
 	c := exec.Command("automate-cluster-ctl", args...)
 	c.Dir = "/hab/a2_deploy_workspace"
-	c.Stdin = os.Stdin
+	//stdIn, _ := c.StdinPipe()
+	stdOut, _ := c.StdoutPipe()
+	stdErr, _ := c.StderrPipe()
+	/* c.Stdin = io.MultiReader(os.Stdin)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	c.Stdout = io.MultiWriter(os.Stdout, &out)
 	c.Stderr = io.MultiWriter(os.Stderr, &stderr)
-	err := c.Run()
-	if err != nil {
+	err := c.Run()*/
+	c.Start()
+
+	scanner := bufio.NewScanner(stdErr)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		m := scanner.Text()
+		writer.Println(m)
+	}
+
+	scanner = bufio.NewScanner(stdOut)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+		m := scanner.Text()
+		writer.Println(m)
+	}
+
+	c.Wait()
+	return nil
+
+	/* if err != nil {
 		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, helpDocs)
 	} else {
@@ -42,7 +63,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
 	writer.Printf("%s command execution done, exiting\n", command)
-	return err
+	return err */
 }
 
 func bootstrapEnv(args []string) error {
@@ -77,5 +98,13 @@ func isA2HARBFileExist() bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+func checkIfFileExist(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	} else {
+		return true
 	}
 }

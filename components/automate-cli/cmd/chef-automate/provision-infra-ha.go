@@ -18,9 +18,9 @@ func newProvisionInfraCmd() *cobra.Command {
 }
 
 func runProvisionInfraCmd(cmd *cobra.Command, args []string) error {
-	provisioner := getProvisioner(args)
-	if provisioner != nil {
-		return newProvisionInfraDirector(provisioner).executeProvisionInfra(args)
+	deployer := getDeployer(args)
+	if deployer != nil {
+		return newDeployDirector(deployer).executeProvisionInfra(args)
 	} else {
 		return status.New(status.InvalidCommandArgsError, provisionInfraHelpDocs)
 	}
