@@ -41,8 +41,8 @@
           </fieldset>
           <fieldset id="wizard-step-2" formGroupName="wizardStep2">
             <div class="fields">
-              <h3>Add credentials to connect to your nodes</h3>
-              <div class="field">
+              <!-- <h3>Add credentials to connect to your nodes</h3> -->
+              <!-- <div class="field">
                 <label>Select SSH or WinRM <span class="required">*</span></label>
                 <div class="checkbox-field">
                   <input type="radio" id="backend-ssh" formControlName="backend" name="backend" value="ssh" />
@@ -65,30 +65,40 @@
                   At least one credential selection is required.
                 </chef-alert>
                 <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
-              </div>
-
-              <chef-form-field class="field">
-                <label for="port">Enter optional port access</label>
-                <input id="port" type="number" chefInput formControlName="port" name="port" />
-                <div>
-                  <ng-container *ngIf="backendControl.value === 'ssh'">
-                    <div class="radio-field">
-                      <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
-                      <label for="sudo">Enable Sudo</label>
-                    </div>
-                  </ng-container>
-                  <ng-container *ngIf="backendControl.value === 'winrm'">
-                    <div class="radio-field">
-                      <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
-                      <label for="ssl">SSL</label>
-                    </div>
-                    <div class="radio-field">
-                      <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
-                      <label for="self_signed">Self Signed</label>
-                    </div>
-                  </ng-container>
-                </div>
-              </chef-form-field>
+              </div> -->
+              <!-- <app-accordion 
+                [title]="accordionTitle">
+                <h1>hello world</h1>
+                <app-select-box
+                [list]="availablelist"
+                >
+                </app-select-box>
+                <chef-form-field class="field">
+                  <label for="port">Enter optional port access</label>
+                  <input id="port" type="number" chefInput formControlName="port" name="port" />
+                  <div>
+                    <ng-container *ngIf="backendControl.value === 'ssh'">
+                      <div class="radio-field">
+                        <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
+                        <label for="sudo">Enable Sudo</label>
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="backendControl.value === 'winrm'">
+                      <div class="radio-field">
+                        <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
+                        <label for="ssl">SSL</label>
+                      </div>
+                      <div class="radio-field">
+                        <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
+                        <label for="self_signed">Self Signed</label>
+                      </div>
+                    </ng-container>
+                  </div>
+                </chef-form-field>
+              </app-accordion> -->
+              <app-accordion>
+                <app-accordion-item title="Add credentials to connect to your nodes">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas fugiat dolores, voluptates atque error quisquam doloremque veniam excepturi, expedita quaerat eveniet vitae, explicabo qui reprehenderit optio odit quibusdam veritatis eaque.</app-accordion-item>
+              </app-accordion>
             </div>
           </fieldset>
           <fieldset id="tags" formArrayName="tags">

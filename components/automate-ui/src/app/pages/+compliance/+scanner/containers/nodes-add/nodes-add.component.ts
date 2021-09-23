@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { environment as env } from '../../../../../../environments/environment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { AvailableType } from 'app/modules/infra-proxy/infra-roles/infra-roles.component';
 
 @Component({
   templateUrl: './nodes-add.component.html',
@@ -19,9 +20,11 @@ export class NodesAddComponent implements OnInit {
     private layoutFacade: LayoutFacadeService
   ) {}
 
+  public availablelist: AvailableType[] = [];
   form: FormGroup;
   activeStep = 1;
   isLoading = false;
+  accordionTitle = 'Add credentials to connect to your nodes';
 
   addTypeControl: FormGroup;
   backendControl: FormGroup;
@@ -37,6 +40,7 @@ export class NodesAddComponent implements OnInit {
   nodesToAdd$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
   ngOnInit() {
+    // this.availablelist = [{name: 'a', type: 2}];
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.form = this.createForm();
 

@@ -13,6 +13,8 @@ import { JobScansListComponent } from './containers/job-scans-list/job-scans-lis
 import { NodesListComponent } from './containers/nodes-list/nodes-list.component';
 import { NodesAddComponent } from './containers/nodes-add/nodes-add.component';
 import { NodesEditComponent } from './containers/nodes-edit/nodes-edit.component';
+import { AccordionComponent } from '../../../page-components/accordion/accordion.component';
+import { AccordionItemComponent } from '../../../page-components/accordion/accordion-item/accordion-item.component';
 
 @NgModule({
   imports: [
@@ -33,7 +35,9 @@ import { NodesEditComponent } from './containers/nodes-edit/nodes-edit.component
     JobScansListComponent,
     NodesListComponent,
     NodesAddComponent,
-    NodesEditComponent
+    NodesEditComponent,
+    AccordionComponent,
+    AccordionItemComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
