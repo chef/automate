@@ -209,7 +209,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       if (getUsersSt === EntityStatus.loadingSuccess && !isNil(UsersState)) {
         this.users = UsersState;
         this.usersListLoading = false;
-        this.isUserLoaded = true;
+        this.users.users.length > 0 ? this.isUserLoaded = true : this.isUserLoaded = false;
       } else if (getUsersSt === EntityStatus.loadingFailure) {
         this.usersListLoading = false;
         this.authFailure = true;

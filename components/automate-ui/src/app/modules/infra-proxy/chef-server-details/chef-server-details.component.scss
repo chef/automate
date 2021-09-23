@@ -14,7 +14,6 @@ chef-page-header {
   background: $chef-white;
 
   .summary-body {
-    width: 50%;
     font-size: 14px;
     padding: 0 1em;
 
@@ -42,7 +41,7 @@ chef-page-header {
           &.heading {
             display: inline-block;
             font-weight: bold;
-            width: 45%;
+            width: 30%;
           }
         }
       }
