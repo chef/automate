@@ -101,6 +101,15 @@ chef-form-field {
   transition: width 0.5s;
 }
 
+.select-region {
+  width: 45em;
+
+  ::ng-deep chef-dropdown {
+    height: 15em;
+    overflow: auto;
+  }
+}
+
 chef-radio chef-option {
   display: inline-block;
 }
@@ -188,7 +197,8 @@ chef-modal {
 
 @media screen and (max-width: 1668px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 35em;
   }
 
@@ -199,7 +209,8 @@ chef-modal {
 }
 
 @media screen and (max-width: 1460px) {
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 25em;
   }
 
@@ -210,7 +221,8 @@ chef-modal {
 }
 
 @media screen and (max-width: 1220px) {
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 20em;
   }
 
@@ -222,7 +234,8 @@ chef-modal {
 
 @media screen and (max-width: 1220px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 18em;
   }
 
@@ -233,7 +246,8 @@ chef-modal {
 }
 @media screen and (max-width: 898px) {
 
-  chef-form-field {
+  chef-form-field,
+  .select-region {
     width: 100%;
   }
 
@@ -259,4 +273,54 @@ chef-modal {
   font-weight: normal;
   line-height: 18px;
   letter-spacing: 0.2px;
+}
+
+chef-dropdown {
+  display: block;
+}
+
+.version-dropdown {
+  color: $chef-primary-dark;
+
+  ::ng-deep label {
+    display: inline;
+    margin-right: 15px;
+    color: $chef-primary-dark;
+    font-size: 15px;
+  }
+
+  chef-select {
+    width: 100%;
+    font-size: 12px;
+
+    ::ng-deep .selected-value {
+      line-height: 10px;
+      font-size: 14px;
+
+      chef-icon {
+        color: $chef-primary-bright;
+      }
+    }
+
+    chef-option {
+      line-height: 15px;
+    }
+  }
+}
+
+::ng-deep [panelClass="chef-dropdown"] {
+  font-size: inherit;
+  font-weight: 100;
+}
+
+.dropdown-menu {
+
+  ::ng-deep chef-dropdown {
+    max-height: 256px;
+    overflow: scroll;
+  }
+}
+
+input {
+  height: 35px;
 }
