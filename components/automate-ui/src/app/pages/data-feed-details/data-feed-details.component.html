@@ -84,8 +84,8 @@
             </chef-form-field>
             <chef-form-field *ngIf="destination?.services === serviceIntegrations.storage.StorageIntegrationTypes.AMAZON_S3">
               <label for="region">Region <span aria-hidden="true">*</span></label>
-                  <div class="version-dropdown dropdown-menu select-region">
-                    <chef-select #ty [value]="regionSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-region-type">
+                  <div class="select-region version-dropdown dropdown-menu">
+                    <chef-select #ty [value]="regionSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-region-type" panelClass="select-region-type">
                       <chef-option *ngFor="let region of regionList" [value]="region.code"  [attr.data-cy]=" region.code " class="select-region-option">{{ region.name }}</chef-option>
                     </chef-select>
                   </div>
