@@ -28,29 +28,4 @@ func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 	return executeAutomateClusterCtlCommand("secrets", args, secretsHelpDocs)
-	//return executeSecretCommand(args)
 }
-
-/* func executeSecretCommand(args []string) error {
-	if len(args) == 0 {
-		writer.Print("please refer \n" + secretsHelpDocs)
-		return nil
-	}
-	writer.Printf("setting A2HA secrets \n")
-	args = append([]string{"secrets"}, args...)
-	c := exec.Command("automate-cluster-ctl", args...)
-	c.Dir = "/hab/a2_deploy_workspace"
-	c.Stdin = os.Stdin
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	c.Stdout = &out
-	c.Stderr = &stderr
-	err := c.Run()
-	if err != nil {
-		writer.Printf(stderr.String())
-		return status.Wrap(err, status.CommandExecutionError, "please refer \n"+secretsHelpDocs)
-	}
-	writer.Print(out.String())
-	writer.Printf("A2HA new secret set. %d, exiting\n", c.Process.Pid)
-	return err
-} */

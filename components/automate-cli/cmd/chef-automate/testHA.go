@@ -29,23 +29,6 @@ func newTestCmd() *cobra.Command {
 func runTestCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		return executeAutomateClusterCtlCommand("test", args, testHAHelpDocs)
-
-		/* writer.Printf("executing smoke test for automate HA \n")
-		args = append([]string{"test"}, args...)
-		c := exec.Command("automate-cluster-ctl", args...)
-		c.Dir = "/hab/a2_deploy_workspace"
-		c.Stdin = os.Stdin
-		var out bytes.Buffer
-		var stderr bytes.Buffer
-		c.Stdout = &out
-		c.Stderr = &stderr
-		err := c.Run()
-		if err != nil {
-			writer.Printf(stderr.String())
-			return status.Wrap(err, status.CommandExecutionError, testHAHelpDocs)
-		}
-		writer.Print(out.String())
-		return err */
 	} else {
 		return status.Wrap(errors.New("Test command only work with HA mode of automate"), status.ConfigError, testHAHelpDocs)
 	}

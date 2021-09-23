@@ -18,7 +18,6 @@ func newProvisionInfraCmd() *cobra.Command {
 }
 
 func runProvisionInfraCmd(cmd *cobra.Command, args []string) error {
-	//fmt.Print(args)
 	provisioner := getProvisioner(args)
 	if provisioner != nil {
 		return newProvisionInfraDirector(provisioner).executeProvisionInfra(args)
