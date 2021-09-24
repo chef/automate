@@ -23,6 +23,8 @@ export CHEF_AUTOMATE_BIN_PATH="/tmp/chef-automate"
 export WORKSPACE_PATH="/tmp/workspace"
 # These are required args so we ensure they are not given a default value
 export BUNDLE_TYPE=
+export BACKENDAIB_TFVARS=
+export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
 export MANIFEST_PATH="manifest.json"
 TEMP_DIR=/tmp
@@ -105,10 +107,10 @@ airgap_bundle_create() {
     bname=$(basename "${outfile}")
     if [[ "${BUNDLE_TYPE}" == "frontend" ]]; then
       echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""
-      echo "frontend_aib_local_file = \"${bname}\""
+      echo "frontend_aib_local_file = \"${bname}\"" 
     else
-      echo "backend_aib_dest_file = \"/var/tmp/${bname}\""
-      echo "backend_aib_local_file = \"${bname}\""
+      echo "backend_aib_dest_file = \"/var/tmp/${bname}\"" 
+      echo "backend_aib_local_file = \"${bname}\"" 
     fi
   else
     echo "✘ ERROR"
@@ -123,21 +125,35 @@ new_airgap_bundle_create() {
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
-    cat "${original_aib_path}" > ${TARBALL_PATH}
-    # this removes the magic header from the .aib
-    # making it usable with the tar command
-    tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
-    rm -f ${TEMP_TAR_FILE}
+    if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+          cat "${original_aib_path}" > ${TARBALL_PATH}
+    fi
+
+    if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+          # this removes the magic header from the .aib
+          # making it usable with the tar command
+          rm -f ${TEMP_TAR_FILE}    
+    fi
+
     rm -f "${original_aib_path}"
-    outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
-    outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
-    bname=$(basename "${outfile}")
-    backend_name=$(basename "${outfile_backend}")
-    echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""
-    echo "frontend_aib_local_file = \"${bname}\""
-    echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\""
-    echo "backend_aib_local_file = \"${backend_name}\""
-    
+    if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+        outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
+        bname=$(basename "${outfile}")
+        echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
+        echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
+    fi
+
+    if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+        outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
+        backend_name=$(basename "${outfile_backend}")
+        echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
+        echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+    fi
   else
     echo "✘ ERROR"
     cat /tmp/thelog.log
@@ -225,7 +241,7 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h" opt; do
+while getopts ":b:d:t:w:o:h:v:q:" opt; do
   case "${opt}" in
     d)
       export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
@@ -241,6 +257,12 @@ while getopts ":b:d:t:w:o:h" opt; do
       ;;  
     t)
       export BUNDLE_TYPE=${OPTARG}
+      ;;
+    v)
+      export FRONTENDAIB_TFVARS=${OPTARG}
+      ;;
+    q)
+      export BACKENDAIB_TFVARS=${OPTARG}
       ;;
     h)
       usage
@@ -261,10 +283,10 @@ if [[ -z ${BUNDLE_TYPE} ]]; then
   echo "ERROR: required option -t not specified!"
   usage
 fi
-if [[ -z ${TARBALL_PATH} ]]; then
-  echo "ERROR: required option -o not specified!"
-  usage
-fi
+# if [[ -z ${TARBALL_PATH} ]]; then
+#   echo "ERROR: required option -o not specified!"
+#   usage
+# fi
 # Set up some path context variables
 ABSOLUTE_PATH=$(abs_path "${0}")
 export ABSOLUTE_PATH
