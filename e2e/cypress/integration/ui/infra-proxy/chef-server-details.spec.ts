@@ -198,7 +198,7 @@ describe('chef server details', () => {
       });
     });
 
-    it('can check save button is disabled until all inputs are filled in', () => {
+    xit('can check save button is disabled until all inputs are filled in', () => {
       cy.get('[data-cy=update-server-name]').clear().type(serverName);
       cy.get('[data-cy=update-server-fqdn]').clear().type(serverFQDN);
 
