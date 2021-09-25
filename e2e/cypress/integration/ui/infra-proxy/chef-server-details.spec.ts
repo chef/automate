@@ -219,7 +219,7 @@ describe('chef server details', () => {
       cy.get('[data-cy=save-button]').click();
 
       cy.get('app-notification.info').contains('Successfully updated server');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({ multiple: true });
     });
 
     it('can update the server', () => {
@@ -230,7 +230,7 @@ describe('chef server details', () => {
       cy.get('[data-cy=save-button]').click();
 
       cy.get('app-notification.info').contains('Successfully updated server');
-      cy.get('app-notification.info chef-icon').click();
+      cy.get('app-notification.info chef-icon').click({ multiple: true })
     });
   });
 });
