@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate Incident Creation App"
+title = "ServiceNow Incident App"
 
 draft = false
 
@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Chef Automate Incident Creation App"
-    parent = "automate/reference"
-    identifier = "automate/reference/servicenow_incident_creation.md Chef Automate Incident Creation"
-    weight = 40
+    title = "Incident App"
+    identifier = "automate/integrations/servicenow/servicenow_incident_creation.md Chef Automate Incident Creation"
+    parent = "automate/integrations/servicenow"
+    weight = 20
 +++
 
 The Chef Automate Incident Creation app for ServiceNow, also called the Incident App, integrates Chef Automate with ServiceNow. This app is a ServiceNow-certified app available from the [ServiceNow](https://store.servicenow.com) store that enables you to automatically generate incidents in the ServiceNow Incident Management environment whenever you have any failures in your Chef-managed platform. These failures are due to either infrastructure automation updates or automated compliance check failures. This integration with ServiceNow allows you to capture all failures across your automated infrastructure for resolution and tracking purposes by improving the effectiveness of both ServiceNow and Chef Automate applications and help reduce the entire repercussions of any failure scenarios.
@@ -35,59 +35,19 @@ The Incident App exposes the REST API endpoint for communication between Chef Au
 
 ## Installation
 
-Get the app from the [ServiceNow](https://store.servicenow.com) store and install it to your account from the ServiceNow Service Management dashboard. If you cannot find an application, you may have to request it from the ServiceNow Store.
+Get the app from the [ServiceNow](https://store.servicenow.com) store and then install it to your account from the **Service Management** dashboard.
 
 ## Setup
 
-You can setup notifications for:
+You can setup automatic incident creation for:
 
-* Chef Infra Client failures `/api/x_chef_incident/client_run`
-* Chef InSpec scan failures `/api/x_chef_incident/inspec_scan`
+* Chef Infra Client failures
+* Chef InSpec scan failures
 
-### Chef Infra Client Incidents
+`/api/x_chef_incident/inspec_scan`
+`/api/x_chef_incident/client_run`
 
-Follow these steps to report the failed client runs on nodes managed by Chef Automate:
-
-1. Confirm that you have the `x_chef_automate.api` role.
-2. Navigate to **Settings** from the **Chef Automate** menu.
-3. Select the **Notifications** link from **General Settings** section on the left.
-4. Select the **Create Notification** button.
-5. Enter the following information, which are mandatory:
-   * **Name**: a unique name for the failed client run notification.
-   * **Webhook Type**: ServiceNow notification type. Possible values are **Slack**, **Webhook**, and **ServiceNow**.
-   * **Failure Type**: select **Chef Infra Client run failures**.
-   * **Webhook URL**: ServiceNow client run API address.
-   * **Username** and **Password**: a ServiceNow user credentials with `x_chef_automate.api` role. When you select **Webhook** type as **ServiceNow**, the app displays the **Username** and **Password** fields.
-6. Select the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes.
-
-   A successful test displays the **Notification test connected successfully for cl** message for client run failures. Else, an error message shows detailing the connectivity or credentials issues and helps you resolve the error.
-
-   ![Chef Automate Notification for CCR Failures](/images/automate/SNOW_CCR_Setup.png)
-
-7. Select **Create Notification**. The app saves the configuration details for the Chef Automate client runs notifications.
-
-### Chef InSpec Scan Incidents
-
-Follow these steps to report the failed Chef InSpec scans on node managed by Chef Automate:
-
-1. Confirm that you have the `x_chef_automate.api` role.
-2. Navigate to **Settings** from the **Chef Automate** menu.
-3. Select the **Notifications** link from **General Settings** section on the left.
-4. Select the **Create Notification** button.
-5. Enter the following information, which are mandatory:
-   * **Name**: a unique name for the failed client run notification.
-   * **Webhook Type**: ServiceNow notification type. Possible values are **Slack**, **Webhook**, and **ServiceNow**.
-   * **Failure Type**: select **InSpec compliance scan failures**.
-   * **Webhook URL**: ServiceNow Chef InSpec scan API address.
-   * **Username** and **Password**: a ServiceNow user credentials with `x_chef_automate.api` role. When you select **Webhook** type as **ServiceNow**, the app displays the **Username** and **Password** fields.
-6. Select the checkbox to send the compliance scan notification only when critical control failures occurs.
-7. Select the **Test Connectivity** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes.
-
-   A successful test displays the **Notification test connected successfully for com** message for compliance scan failures. Else, an error message shows detailing the connectivity or credentials issues and helps you resolve the error.
-
-   ![Chef Automate Notification for InSpec Scan Failures](/images/automate/SNOW_Scan_Setup.png)
-
-8. Select **Create Notification**. The app saves the configuration for the Chef Automate InSpec scans notifications.
+{{% servicenow_incidents %}}
 
 ## Configuration
 
@@ -100,8 +60,6 @@ To change the Incident App properties:
 1. Enter your changes in the **Chef Incident Properties** form.
 1. Select **Save**.
 
-   {{< figure src="/images/automate/snow_incident_appproperties.png" alt="Chef Automate Incident Properties">}}
-
    ![ServiceNow Configuration Page](/images/automate/SNOW_config_page.png)
 
 ### Incident App Properties
@@ -109,25 +67,25 @@ To change the Incident App properties:
 `x_chef_incident.association`
 : Used to associate a Chef Infra Client run record with an Incident record. The possible values are: `cookbook` and `node`. Default: `cookbook`.
 
-Setting the value to `cookbook` creates an incident for the failed cookbook. All failing Chef Infra Client runs on nodes associates with the corresponding incident. `cookbook` is the default value as the number of nodes exceeds the number of cookbooks. The short description of the incident indicates the failed cookbook:
+   Setting the value to `cookbook` creates an incident for the failed cookbook. All failing Chef Infra Client runs on nodes associates with the corresponding incident. `cookbook` is the default value as the number of nodes exceeds the number of cookbooks. The short description of the incident indicates the failed cookbook:
 
-![CCR Failed Cookbook Description](/images/automate/SNOW_Failed_Cookbook.png)
+   ![CCR Failed Cookbook Description](/images/automate/SNOW_Failed_Cookbook.png)
 
-The **Chef Infra Client runs** tab of the incident displays the associated client runs. Setting the value to `node` creates an incident for each failed node. All failing Chef Infra Client runs for a node associates with the corresponding incident. The short description of the incident indicates the failed node.
+   The **Chef Infra Client runs** tab of the incident displays the associated client runs. Setting the value to `node` creates an incident for each failed node. All failing Chef Infra Client runs for a node associates with the corresponding incident. The short description of the incident indicates the failed node.
 
-![CCR Failed Node Description](/images/automate/SNOW_Failed_Node_CCR.png)
+   ![CCR Failed Node Description](/images/automate/SNOW_Failed_Node_CCR.png)
 
 `x_chef_incident.scan_association`
 
 : Used to associate the Chef InSpec scan record with an incident record. The possible values are: `profile` and `node`. Deault: `profile`.
 
-Setting the value to `profile` creates an incident for the failed Chef InSpec compliance profile. All Chef InSpec scans on failing nodes associates with the corresponding incident. `profile` is the default value as the number of nodes exceeds the number of profiles. The short description of the incident indicates the failed profile.
+   Setting the value to `profile` creates an incident for the failed Chef InSpec compliance profile. All Chef InSpec scans on failing nodes associates with the corresponding incident. `profile` is the default value as the number of nodes exceeds the number of profiles. The short description of the incident indicates the failed profile.
 
-![Scan Failed Profile Description](/images/automate/SNOW_Failed_Profile_Scan.png)
+   ![Scan Failed Profile Description](/images/automate/SNOW_Failed_Profile_Scan.png)
 
-The **Chef InSpec scans** tab of the incident displays the associated Chef InSpec scans. Setting the value to `node` creates an incident for each failed node. All Chef InSpec scans failing for a node associates with the corresponding incident. The short description of the incident indicates the failed node.
+   The **Chef InSpec scans** tab of the incident displays the associated Chef InSpec scans. Setting the value to `node` creates an incident for each failed node. All Chef InSpec scans failing for a node associates with the corresponding incident. The short description of the incident indicates the failed node.
 
-![Scan Failed Node Description](/images/automate/SNOW_Failed_Node_Scan.png)
+   ![Scan Failed Node Description](/images/automate/SNOW_Failed_Node_Scan.png)
 
 `x_chef_incident.assigned_to`
 
@@ -149,7 +107,7 @@ The **Chef InSpec scans** tab of the incident displays the associated Chef InSpe
 
 : Used to define number of days to maintain the Chef Infra Client run and Chef InSpec scan records in ServiceNow. Default: `30`.
 
-The ServiceNow app deletes these records of the corresponding closed incidents, deleted incidents, and the removed incidents from the Chef Infra Client run or Chef InSpec scan record by a user update.
+   The ServiceNow app deletes these records of the corresponding closed incidents, deleted incidents, and the removed incidents from the Chef Infra Client run or Chef InSpec scan record by a user update.
 
 `x_chef_incident.logging.enabled`
 

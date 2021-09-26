@@ -7,7 +7,7 @@ gh_repo = "automate"
 aliases = "servicenow_integration_reference"
 [menu]
   [menu.automate]
-    title = "ServiceNow Administrator Reference"
+    title = "Administrator Reference"
     parent = "automate/integrations/servicenow"
     identifier = "automate/integrations/servicenow/servicenow_integration_reference.md ServiceNow Administrator Reference"
     weight = 30

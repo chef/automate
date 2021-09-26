@@ -6,7 +6,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "ServiceNow Integration App"
+    title = "Integration App"
     parent = "automate/integrations/servicenow"
     identifier = "automate/integrations/servicenow/servicenow_integration.md ServiceNow Integration App"
     weight = 10
@@ -30,7 +30,7 @@ The Integration App works by exposing the REST API endpoints for communication b
 ### System and User Requirements
 
 - A running [Chef Automate](https://www.chef.io/automate/) instance.
-- Chef Automate has a valid SSL/TLS certificate from a trusted certificate authority (CA).
+- Chef Automate is provisioned with a valid SSL/TLS certificate from a trusted certificate authority (CA).
 - A running [ServiceNow](https://www.servicenow.com/) instance.
 - The ServiceNow is reachable on port 443.
 
@@ -118,7 +118,8 @@ When you install and setup the Integration App, the **Chef Automate** appears in
 
 {{< figure src="/images/automate/snow_integration_navigation.png" alt="Navigation">}}
 
-The **Automate Instances** module allows the user to configure the integration with Chef Automate. The **Server** module displays a list of servers in the **CMDB** module.
+- **Automate Instances** module allows the user to configure the integration with Chef Automate.
+- **Server** module displays a list of servers in the **CMDB** module.
 
 {{< figure src="/images/automate/snow_integration_discovery.png" alt="Discovery Source">}}
 
