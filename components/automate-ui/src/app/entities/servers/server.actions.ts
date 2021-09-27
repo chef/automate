@@ -20,7 +20,7 @@ export enum ServerActionTypes {
   DELETE_SUCCESS                 = 'SERVER::CREATE::DELETE::SUCCESS',
   DELETE_FAILURE                 = 'SERVER::CREATE::DELETE::FAILURE',
   GET_USERS                      = 'SERVER::GET_USERS',
-  GET_USERS_SUCCESS              = 'SERVER::GET_USERS::FAILURE',
+  GET_USERS_SUCCESS              = 'SERVER::GET_USERS::SUCCESS',
   GET_USERS_FAILURE              = 'SERVER::GET_USERS::FAILURE'
 }
 

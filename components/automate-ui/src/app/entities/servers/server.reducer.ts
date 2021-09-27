@@ -12,9 +12,7 @@ export interface ServerEntityState extends EntityState<Server> {
   getStatus: EntityStatus;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
-  getUsers: {
-    users: User[];
-  };
+  getUsers: User[];
   getUsersStatus: EntityStatus;
 }
 
