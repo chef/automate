@@ -7,8 +7,10 @@ func newExistingInfa() *existingInfra {
 }
 
 func (e *existingInfra) doDeployWork(args []string) error {
-	err := bootstrapEnv(args)
-	err = deployA2HA(args)
+	var err = bootstrapEnv(args)
+	if err != nil {
+		err = deployA2HA(args)
+	}
 	return err
 }
 
