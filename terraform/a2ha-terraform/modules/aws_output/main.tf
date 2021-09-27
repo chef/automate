@@ -27,4 +27,17 @@ resource "null_resource" "output" {
     provisioner "local-exec" {
         command = "mv ${path.root}/terraform.tfvars ${path.root}/aws.auto.tfvars;sed  -i 's/aws/deployment/' ${path.root}/.tf_arch;sed  -i 's/architecture \"aws\"/architecture \"deployment\"/' ${path.root}/../a2ha.rb"
     }
+
+    depends_on = [local_file.output]
+}
+
+#This resource will execute bash script to set up the destroy directory. Because we are maintaining single parent dir for terraform apply for provision and deployment. So just after provison, deploy command will be executed and for deployment diff terraform script will be executed. So we have to maintain destroy directory for aws resource deletion in future if needed.
+resource "null_resource" "bash" {
+    count = 1
+    
+    provisioner "local-exec" {
+        command = "cp /hab/a2_deploy_workspace/terraform/reference_architectures/aws/variables.tf /hab/a2_deploy_workspace/terraform/destroy/aws;cp /hab/a2_deploy_workspace/terraform/a2ha_habitat.auto.tfvars /hab/a2_deploy_workspace/terraform/destroy/aws/;cp /hab/a2_deploy_workspace/terraform/aws.auto.tfvars /hab/a2_deploy_workspace/terraform/destroy/aws;cp /hab/a2_deploy_workspace/terraform/variables_common.tf /hab/a2_deploy_workspace/terraform/destroy/aws"
+    }
+
+    depends_on = [null_resource.output]
 }
