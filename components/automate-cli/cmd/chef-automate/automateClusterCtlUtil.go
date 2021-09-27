@@ -52,7 +52,10 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 		return errors.New("Invalid or empty command")
 	}
 	if _, err := os.Stat(AUTOMATE_HA_RUN_LOG_DIR); os.IsNotExist(err) {
-		os.Mkdir(AUTOMATE_HA_RUN_LOG_DIR, os.ModeDir)
+		err = os.Mkdir(AUTOMATE_HA_RUN_LOG_DIR, os.ModeDir)
+		if err != nil {
+			panic(err)
+		}
 	}
 	writer.Printf("%s command execution started \n\n\n", command)
 	args = append([]string{command}, args...)
