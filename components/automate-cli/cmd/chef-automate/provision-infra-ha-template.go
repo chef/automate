@@ -17,7 +17,7 @@ Options:
     -y, --accept-changes             Automatically accept and apply terraform changes
     -n, --skip-changes               Only show what changes are needed, don't apply them
     -t, --timeout MINUTES            Set timeout value for commands to finish running (default: 10)
-    -h, --help                       print help
+    -h, --help                       Print help
     -v, --verbose                    Enable verbose output
     -c, --config-file CONFIG_FILE    Load settings from config file a2ha.rb"
 `

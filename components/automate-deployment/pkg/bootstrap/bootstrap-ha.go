@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"context"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
@@ -10,6 +11,7 @@ import (
 
 func FullBootstrapHA(ctx context.Context,
 	b target.Bootstrapper,
+	config *dc.ConfigRequest,
 	devM manifest.ReleaseManifest,
 	currentM manifest.ReleaseManifest,
 	writer cli.FormatWriter) error {
@@ -21,7 +23,7 @@ func FullBootstrapHA(ctx context.Context,
 	}
 
 	writer.Body("Installing the Chef Automate backend deployment")
-	err = b.InstallAutomateBackendDeployment(ctx, devM)
+	err = b.InstallAutomateBackendDeployment(ctx, config, devM)
 	if err != nil {
 		writer.Printf("Some error occurred %s\n", err.Error())
 		return err

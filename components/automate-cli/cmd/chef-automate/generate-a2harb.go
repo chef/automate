@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net"
+	"path/filepath"
 	"strings"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -49,7 +50,7 @@ func readConfigAndWriteToFile(configPath string) error {
 			return status.Wrap(getSingleErrorFromList(errList), status.ConfigError, "config is invalid.")
 		}
 		finalTemplate := renderSettingsToA2HARBFile(awsA2harbTemplate, AwsConfig)
-		writeToA2HARBFile(finalTemplate, initConfigHabA2HAPathFlag.a2haDirPath+"a2ha.rb")
+		writeToA2HARBFile(finalTemplate, filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb"))
 	} else if config.Get("architecture.existing_infra") != nil {
 		ExitiingInfraConfig := ExistingInfraConfigToml{}
 		err := ptoml.Unmarshal(templateBytes, &ExitiingInfraConfig)

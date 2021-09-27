@@ -1,6 +1,10 @@
 package main
 
-import ptoml "github.com/pelletier/go-toml"
+import (
+	"path/filepath"
+
+	ptoml "github.com/pelletier/go-toml"
+)
 
 func getModeFromConfig(configPath []string) string {
 	initConfigHAPath := initConfigHAPathFlags.path
@@ -20,7 +24,7 @@ func getModeFromConfig(configPath []string) string {
 		} else {
 			return AUTOMATE
 		}
-	} else if checkIfFileExist(initConfigHabA2HAPathFlag.a2haDirPath + "a2ha.rb") {
+	} else if checkIfFileExist(filepath.Join(initConfigHabA2HAPathFlag.a2haDirPath, "a2ha.rb")) {
 		return HA_MODE
 	} else {
 		return AUTOMATE

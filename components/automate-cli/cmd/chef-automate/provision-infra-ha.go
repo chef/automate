@@ -20,7 +20,7 @@ func newProvisionInfraCmd() *cobra.Command {
 func runProvisionInfraCmd(cmd *cobra.Command, args []string) error {
 	deployer := getDeployer(args)
 	if deployer != nil {
-		return newDeployDirector(deployer).executeProvisionInfra(args)
+		return deployer.doProvisionJob(args)
 	} else {
 		return status.New(status.InvalidCommandArgsError, provisionInfraHelpDocs)
 	}

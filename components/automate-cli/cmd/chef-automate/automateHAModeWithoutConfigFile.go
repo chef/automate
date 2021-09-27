@@ -16,5 +16,5 @@ func (h *haWithoutConfig) doDeployWork(args []string) error {
 }
 
 func (h *haWithoutConfig) doProvisionJob(args []string) error {
-	return status.Annotate(errors.New("config.toml file path expected as argument to run chef-atomate provision-infra"), status.DeployError)
+	return status.Annotate(errors.New("config.toml file path expected as argument to run chef-automate provision-infra"), status.DeployError)
 }

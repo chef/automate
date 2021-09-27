@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +24,12 @@ var secretsCmd = &cobra.Command{
 }
 
 func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {
-	if len(args) == 0 {
-		writer.Print("please refer \n" + secretsHelpDocs)
-		return nil
+	if isA2HARBFileExist() {
+		if len(args) == 0 {
+			writer.Print("please refer \n" + secretsHelpDocs)
+			return nil
+		}
+		return executeAutomateClusterCtlCommand("secrets", args, secretsHelpDocs)
 	}
-	return executeAutomateClusterCtlCommand("secrets", args, secretsHelpDocs)
+	return status.New(status.InvalidCommandArgsError, secretsHelpDocs)
 }

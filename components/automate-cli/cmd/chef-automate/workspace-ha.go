@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +24,12 @@ var workspaceCmd = &cobra.Command{
 }
 
 func runWorkspaceCmd(cmd *cobra.Command, args []string) error {
-	if len(args) == 0 {
-		writer.Print("please refer \n" + workspaceCommandHelpDocs)
-		return nil
+	if isA2HARBFileExist() {
+		if len(args) == 0 {
+			writer.Print("please refer \n" + workspaceCommandHelpDocs)
+			return nil
+		}
+		return executeAutomateClusterCtlCommand("workspace", args, workspaceCommandHelpDocs)
 	}
-	return executeAutomateClusterCtlCommand("workspace", args, workspaceCommandHelpDocs)
+	return status.New(status.InvalidCommandArgsError, workspaceCommandHelpDocs)
 }

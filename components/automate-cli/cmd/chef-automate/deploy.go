@@ -33,7 +33,7 @@ https://www.chef.io/online-master-agreement
 I agree to the Terms of Service and the Master License and Services Agreement
 `
 var errMLSA = "Chef Software Terms of Service and Master License and Services Agreement were not accepted"
-var errProvisonInfra = `Architecture does not match with requested one. 
+var errProvisonInfra = `Architecture does not match with the requested one. 
 If you want to provision cluster then you have to first run provision command.
 
 		chef-automate provision-infra
@@ -191,9 +191,9 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	deployer := getDeployer(args)
+	var deployer = getDeployer(args)
 	if deployer != nil {
-		return newDeployDirector(deployer).executeDeployemnt(args)
+		return deployer.doDeployWork(args)
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")
 	if !deployCmdFlags.acceptMLSA {

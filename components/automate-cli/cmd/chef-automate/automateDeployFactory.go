@@ -8,13 +8,13 @@ type deployManager interface {
 func getDeployer(args []string) deployManager {
 	deployerType := getModeFromConfig(args)
 	if deployerType == AWS_MODE {
-		return &awsDeployment{}
+		return newAwsDeployemnt()
 	}
 	if deployerType == EXISTING_INFRA_MODE {
-		return &existingInfra{}
+		return newExistingInfa()
 	}
 	if deployerType == HA_MODE {
-		return &haWithoutConfig{}
+		return newHaWithoutConfig()
 	}
 	return nil
 }
