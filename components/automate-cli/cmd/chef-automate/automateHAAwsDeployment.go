@@ -27,6 +27,6 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	}
 	writer.Printf("provisioning infra for automate HA \n\n\n\n")
 	args = args[1:]
-	args = append([]string{"-y"}, args...)
+	args = append(args, "-y")
 	return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
 }
