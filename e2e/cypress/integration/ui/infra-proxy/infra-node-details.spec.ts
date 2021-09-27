@@ -270,7 +270,7 @@ describe('infra node detail', () => {
       }
     });
 
-    it('can remove the node tags', () => {
+    xit('can remove the node tags', () => {
       if (nodeName !== '') {
         cy.get('[data-cy=remove-tag]').eq(0).click();
 
@@ -470,7 +470,7 @@ describe('infra node detail', () => {
       cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
     });
 
-    it('edit attribute and show empty data', () => {
+    xit('edit attribute and show empty data', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', nullJson)
