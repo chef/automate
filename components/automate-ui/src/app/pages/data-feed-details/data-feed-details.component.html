@@ -74,11 +74,32 @@
                 Name is required.
               </chef-error>
             </chef-form-field>
-            <chef-form-field>
-              <label for="url">Data Feed URL <span aria-hidden="true">*</span></label>
+            <chef-form-field *ngIf="showUrl() ">
+              <label for="url" *ngIf="!(destination?.integration_types === integrations.IntegrationTypes.STORAGE )">Data Feed URL <span aria-hidden="true">*</span></label>
+              <label for="url" *ngIf="destination?.services === serviceIntegrations.storage.StorageIntegrationTypes.MINIO ">End Point <span aria-hidden="true">*</span></label>
               <input chefInput id="url" formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
               <chef-error *ngIf="(urlCtrl.hasError('required') || urlCtrl.hasError('pattern')) && urlCtrl.dirty">
                 Data Feed URL is required.
+              </chef-error>
+            </chef-form-field>
+            <chef-form-field *ngIf="destination?.services === serviceIntegrations.storage.StorageIntegrationTypes.AMAZON_S3">
+              <label for="region">Region <span aria-hidden="true">*</span></label>
+                  <div class="select-region version-dropdown dropdown-menu">
+                    <chef-select #ty [value]="regionSelected" (change)="selectChangeHandlers(ty.value)" data-cy="select-region-type" panelClass="select-region-type">
+                      <chef-option *ngFor="let region of regionList" [value]="region.code"  [attr.data-cy]=" region.code " class="select-region-option">{{ region.name }}</chef-option>
+                    </chef-select>
+                  </div>
+            </chef-form-field>
+            <chef-form-field *ngIf="destination?.integration_types === integrations.IntegrationTypes.STORAGE">
+              <label for="name">Bucket <span aria-hidden="true">*</span></label>
+              <input
+                chefInput
+                id="bucket"
+                formControlName="bucket"
+                type="text"
+                [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="bucket-input"/>
+              <chef-error *ngIf="(bucketCtrl.hasError('required') || bucketCtrl.hasError('pattern')) && bucketCtrl.dirty">
+                Bucket is required.
               </chef-error>
             </chef-form-field>
           </form>
@@ -98,7 +119,7 @@
             <span >Cancel</span>
           </chef-button>
           <chef-button primary 
-            [disabled]="disableOnsave()" 
+            [disabled]="disableOnsave(destination?.services)" 
             (click)="saveDataFeed()" 
             class="alignright save-connection" 
             data-cy="save-connection">
@@ -128,4 +149,3 @@
   (deleteClicked)="deleteDataFeed()"
   objectAction="Delete">
 </app-delete-object-modal>
-

@@ -18,3 +18,25 @@ export function eventExist(entityName: string, events: any[]): boolean {
 
   return false;
 }
+
+export function nodejson() {
+  const nodeArray = [];
+  const oneNode = {
+    name: '100node-0.0.9.9',
+    manager: 'automate',
+    target_config: {
+    backend: 'ssh',
+    secrets: [],
+    port: 22,
+    sudo: false,
+    hosts: ['0.0.9.9']
+    },
+    tags: []
+  };
+  for (let i = 0; i < 110; i++) {
+    nodeArray.push(oneNode);
+  }
+  return nodeArray;
+}
+
+
