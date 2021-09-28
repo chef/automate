@@ -150,7 +150,6 @@ export class GetUsers implements Action {
 
 export class GetUsersSuccess implements Action {
   readonly type = ServerActionTypes.GET_USERS_SUCCESS;
-
   constructor(public payload: UsersSuccessPayload) { }
 }
 

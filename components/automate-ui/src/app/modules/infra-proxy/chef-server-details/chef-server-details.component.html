@@ -10,6 +10,7 @@
       </chef-breadcrumbs>
       <chef-page-header>
         <div class="meta-box">
+<<<<<<< HEAD
           <p class="chef-server-info-text">CHEF SERVER INFORMATION</p>
           <div class="summary-body first">
             <ul>
@@ -111,6 +112,26 @@
             <!-- <chef-option value='users' data-cy="users-tab">Users</chef-option> -->
             <chef-option value='details' data-cy="details-tab">Details</chef-option>
           </app-authorized>
+=======
+          <div class="summary-body">
+            <chef-heading data-cy="page-title">{{ server?.name }}</chef-heading>
+            <ul>
+              <li>
+                <span class="heading">FQDN</span>
+                <span data-cy="node-env">{{ server?.fqdn }}</span>
+              </li>
+              <li>
+                <span class="heading">IP Address</span>
+                <span>{{ server?.ip_address }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
+          <chef-option value='users' data-cy="users-tab">Users</chef-option>
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+>>>>>>> f4f1ece86 (Added users tab in server details page (#5802))
         </chef-tab-selector>
       </chef-page-header>
       <app-create-org-modal
