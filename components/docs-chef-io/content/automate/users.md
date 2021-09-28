@@ -45,10 +45,3 @@ All local users can also reset their own passwords from the _Profile_ menu.
 ### Deleting Local Users
 
 Navigate to _Users_ in the **Settings** tab. Then open the menu at the end of the table row and select **Delete User**.
-
-## User Self-Maintenance
-
-Local Automate users can manage their own display name and password.
-Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
-
-![Navigate to user profile](/images/automate/user-profile-navigation.png)
