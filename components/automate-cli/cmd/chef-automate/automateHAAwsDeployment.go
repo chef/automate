@@ -12,7 +12,7 @@ func newAwsDeployemnt() *awsDeployment {
 
 func (a *awsDeployment) doDeployWork(args []string) error {
 	if isA2HARBFileExist() {
-		err := deployA2HA(args)
+		err := deployA2HA()
 		return err
 	} else {
 		return status.New(status.InvalidCommandArgsError, errProvisonInfra)
