@@ -3,7 +3,7 @@ describe('Infra servers list api', () => {
     let withInfraServersListActionToken = '';
     let withoutInfraServersListActionToken = '';
 
-    const cypressPrefix = 'infra-server-actions';
+    const cypressPrefix = 'infra-server-actions-list';
     const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
     const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
     const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
