@@ -1,4 +1,4 @@
-// these tests are best read sequentially, as they share state
+// these tests are best read sequentially, as they share state.
 describe('Infra servers list api', () => {
     let withInfraServersListActionToken = '';
     let withoutInfraServersListActionToken = '';
