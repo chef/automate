@@ -1,46 +1,48 @@
-// these tests are best read sequentially, as they share state
-describe('Infra server list', () => {
-    let withInfraServersListActionToken = '';
-    let withoutInfraServersListActionToken = '';
+let withInfraServersListActionToken = '';
+let withoutInfraServersListActionToken = '';
 
-    const cypressPrefix = 'infra-server-action-list';
-    const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const objectsToCleanUp = ['tokens', 'policies'];
+const cypressPrefix = 'infra-server-actions';
+const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+const objectsToCleanUp = ['tokens', 'policies'];
 
-    const withInfraServersListPolicy = {
-    id: policyId1,
-    name: tokenId1,
+const withInfraServersListPolicy = {
+  id: policyId1,
+  name: tokenId1,
+  projects: [],
+  members: [`token:${tokenId1}`],
+  statements: [
+    {
+        effect: "ALLOW",
+        actions: [
+            "infra:infraServers:list",
+            "infra:nodes:list"
+        ],
+        projects: ["*"]
+    }]
+};
+
+
+const withoutInfraServersListPolicy = {
+    id: policyId2,
+    name: tokenId2,
     projects: [],
-    members: [`token:${tokenId1}`],
+    members: [`token:${tokenId2}`],
     statements: [
-        {
-            effect: 'ALLOW',
-            actions: [
-                'infra:infraServers:list'
-            ],
-            projects: ['*']
-        }]
-    };
+      {
+          effect: "DENY",
+          actions: [
+            "infra:infraServers:list",
+            "infra:nodes:list"
+          ],
+          projects: ["*"]
+      }]
+  };
 
-
-    const withoutInfraServersListPolicy = {
-        id: policyId2,
-        name: tokenId2,
-        projects: [],
-        members: [`token:${tokenId2}`],
-        statements: [
-        {
-            effect: 'DENY',
-            actions: [
-                'infra:infraServers:list'
-            ],
-            projects: ['*']
-        }]
-    };
-
+// these tests are best read sequentially, as they share state
+describe('Infra servers list api', () => {
     before(() => {
         // TODO cleanup projects in before block (can't do now bc we have a project
         // limit and cereal runs async to delete policies)
