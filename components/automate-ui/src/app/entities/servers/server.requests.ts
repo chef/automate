@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
 import { environment as env } from 'environments/environment';
-import { Server } from './server.model';
+import { Server, User } from './server.model';
 import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
 
 export interface ServersResponse {
@@ -13,6 +13,10 @@ export interface ServersResponse {
 
 export interface ServerResponse {
   server: Server;
+}
+
+export interface UserResponse {
+  users: User[];
 }
 
 @Injectable()
@@ -40,5 +44,9 @@ export class ServerRequests {
 
   public deleteServer(id: string): Observable<ServerResponse> {
     return this.http.delete<ServerResponse>(`${env.infra_proxy_url}/servers/${id}`);
+  }
+
+  public getUser(payload): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${env.infra_proxy_url}/servers/${payload.server_id}/automateinfraserverusers`);
   }
 }
