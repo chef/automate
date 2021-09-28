@@ -6,7 +6,6 @@ Specify the action to restrict user access to the specific action.
 
  *  Make a `post` request to `https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies`
     with body as 
-
     ```
     {
     "name": "username",
