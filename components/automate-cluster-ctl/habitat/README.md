@@ -1,6 +1,6 @@
 # automate-backend-ctl
 
-This is a utility pkg to provide the `automate-cluster-ctl` command.
+This is a utility pkg to provide the `automate-cluster-ctl` command. This provides command line utilities.
 
 ## Maintainers
 
