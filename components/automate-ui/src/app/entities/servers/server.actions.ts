@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Server } from './server.model';
+import { Server , User } from './server.model';
 
 export enum ServerActionTypes {
   GET_ALL                        = 'SERVER::GET_ALL',
@@ -18,7 +18,10 @@ export enum ServerActionTypes {
   UPDATE_FAILURE                 = 'SERVER::UPDATE::FAILURE',
   DELETE                         = 'SERVER::CREATE::DELETE',
   DELETE_SUCCESS                 = 'SERVER::CREATE::DELETE::SUCCESS',
-  DELETE_FAILURE                 = 'SERVER::CREATE::DELETE::FAILURE'
+  DELETE_FAILURE                 = 'SERVER::CREATE::DELETE::FAILURE',
+  GET_USERS                      = 'SERVER::GET_USERS',
+  GET_USERS_SUCCESS              = 'SERVER::GET_USERS::SUCCESS',
+  GET_USERS_FAILURE              = 'SERVER::GET_USERS::FAILURE'
 }
 
 
@@ -118,6 +121,25 @@ export class UpdateServerFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface UsersSuccessPayload {
+  users: User[];
+}
+
+export class GetUsers implements Action {
+  readonly type = ServerActionTypes.GET_USERS;
+  constructor(public payload: {server_id: string} ) { }
+}
+
+export class GetUsersSuccess implements Action {
+  readonly type = ServerActionTypes.GET_USERS_SUCCESS;
+  constructor(public payload: UsersSuccessPayload) { }
+}
+
+export class GetUsersFailure implements Action {
+  readonly type = ServerActionTypes.GET_USERS_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServerActions =
   | GetServers
   | GetServersSuccess
@@ -133,4 +155,7 @@ export type ServerActions =
   | UpdateServerFailure
   | DeleteServer
   | DeleteServerSuccess
-  | DeleteServerFailure;
+  | DeleteServerFailure
+  | GetUsers
+  | GetUsersSuccess
+  | GetUsersFailure;
