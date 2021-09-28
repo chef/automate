@@ -9,23 +9,24 @@
         {{ server?.name }}
       </chef-breadcrumbs>
       <chef-page-header>
-        <chef-heading>{{ server?.name }}</chef-heading>
-        <table>
-          <thead>
-            <tr class="detail-row">
-              <th class="id-column">FQDN</th>
-              <th class="id-column">IP Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="detail-row">
-              <td class="id-column">{{ server?.fqdn }}</td>
-              <td class="id-column">{{ server?.ip_address }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="meta-box">
+          <div class="summary-body">
+            <chef-heading data-cy="page-title">{{ server?.name }}</chef-heading>
+            <ul>
+              <li>
+                <span class="heading">FQDN</span>
+                <span data-cy="node-env">{{ server?.fqdn }}</span>
+              </li>
+              <li>
+                <span class="heading">IP Address</span>
+                <span>{{ server?.ip_address }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
+          <chef-option value='users' data-cy="users-tab">Users</chef-option>
           <chef-option value='details' data-cy="details-tab">Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
@@ -139,6 +140,34 @@
             </chef-button>
           </div>
         </form>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'users'">
+        <div id="user-table-container" *ngIf="isUserLoaded">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="no-border">Chef Server User Name</chef-th>
+                <chef-th class="no-border">Automate Name</chef-th>
+                <chef-th class="three-dot-column no-border"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody *ngFor = "let users of users.users">
+              <chef-tr>
+                <chef-td class="userName-column">{{users.infra_server_username}}</chef-td>
+                <chef-td class="automate-column">{{users.automate_user_id}}</chef-td>
+                <chef-td class="three-dot-column">
+                    <mat-select panelClass="chef-control-menu">
+                    <mat-option data-cy="delete-org">Fetch PEM Key</mat-option>
+                    </mat-select>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </div>
+        <div data-cy="empty-list" class="empty-section"  *ngIf="!isUserLoaded">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p data-cy="no-records">No users available.</p>
+        </div>
       </section>
       <section class="page-body" *ngIf="tabValue === 'orgs'">
         <chef-toolbar>
