@@ -1,5 +1,5 @@
 // these tests are best read sequentially, as they share state.
-describe('Infra servers list', () => {
+describe('Infra server list', () => {
     let withInfraServersListActionToken = '';
     let withoutInfraServersListActionToken = '';
 
