@@ -280,11 +280,6 @@ if [[ -z ${BUNDLE_TYPE} ]]; then
   echo "ERROR: required option -t not specified!"
   usage
 fi
-# if [[ -z ${TARBALL_PATH} ]]; then
-#   echo "ERROR: required option -o not specified!"
-#   usage
-# fi
-# Set up some path context variables
 ABSOLUTE_PATH=$(abs_path "${0}")
 export ABSOLUTE_PATH
 REPO_PATH=$(dirname "$(dirname "${ABSOLUTE_PATH}")")
