@@ -5,7 +5,7 @@ Specify the action to restrict user access to the specific action.
 ### How to assign IAM Actions to user/teams/api-token
 
  *  Make a `post` request to `https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies`
-    with body
+    with body as
     ```
     {
     "name": "username",
