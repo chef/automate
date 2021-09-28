@@ -17,12 +17,12 @@ describe('Infra servers list api', () => {
     members: [`token:${tokenId1}`],
     statements: [
         {
-            effect: "ALLOW",
+            effect: 'ALLOW',
             actions: [
-                "infra:infraServers:list",
-                "infra:nodes:list"
+                'infra:infraServers:list',
+                'infra:nodes:list'
             ],
-            projects: ["*"]
+            projects: ['*']
         }]
     };
 
@@ -34,12 +34,12 @@ describe('Infra servers list api', () => {
         members: [`token:${tokenId2}`],
         statements: [
         {
-            effect: "DENY",
+            effect: 'DENY',
             actions: [
-                "infra:infraServers:list",
-                "infra:nodes:list"
+                'infra:infraServers:list',
+                'infra:nodes:list'
             ],
-            projects: ["*"]
+            projects: ['*']
         }]
     };
 
@@ -92,30 +92,31 @@ describe('Infra servers list api', () => {
           }).then((resp) => {
             expect(resp.status).to.equal(200);
           });
-        })
+        });
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
           });
-    
+
         it('infra servers list returns 200 when infraServers list actions is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraServersListActionToken, 'content-type': 'application/json+lax' },
+            headers: { 'api-token': withInfraServersListActionToken,
+            'content-type': 'application/json+lax' },
             method: 'GET',
             url: '/api/v0/infra/servers'
         }).then((resp) => {
             assert.equal(resp.status, 200);
             });
-        }); 
-    
+        });
+
         it('infra servers list returns 403 when infraServers list actions is deneyed', () => {
             cy.request({
-                headers: { 'api-token': withoutInfraServersListActionToken, 'content-type': 'application/json+lax' },
+                headers: { 'api-token': withoutInfraServersListActionToken,
+                'content-type': 'application/json+lax' },
                 method: 'GET',
                 failOnStatusCode: false,
                 url: '/api/v0/infra/servers'
             }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
-        }); 
-    }) 
-    
+        });
+    });
