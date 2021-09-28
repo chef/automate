@@ -495,7 +495,7 @@ describe('infra node detail', () => {
       });
     });
 
-    it('edit attribute and show updated data', () => {
+    xit('edit attribute and show updated data', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', validJson)
@@ -520,7 +520,7 @@ describe('infra node detail', () => {
       });
     });
 
-    it('fails to edit attribute with a invalid json', () => {
+    xit('fails to edit attribute with a invalid json', () => {
       cy.get('[data-cy=node-edit-attributes').contains('Edit').click();
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', invalidJson).trigger('change');
@@ -531,7 +531,7 @@ describe('infra node detail', () => {
       cy.get('app-infra-node-details chef-modal').should('not.be.visible');
     });
 
-    it('can cancel edit attributes', () => {
+    xit('can cancel edit attributes', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click();
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=cancel-attribute-button]').contains('Cancel').should('be.visible').click();
