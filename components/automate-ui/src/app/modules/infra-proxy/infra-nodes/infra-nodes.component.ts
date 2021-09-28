@@ -30,6 +30,7 @@ import { AvailableType } from '../infra-roles/infra-roles.component';
 import { ListItem } from '../select-box/src/lib/list-item.domain';
 import { NodeList, NodeRunlist } from 'app/entities/nodeRunlists/nodeRunlists.model';
 import { TimeFromNowPipe } from 'app/pipes/time-from-now.pipe';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-infra-nodes',
@@ -132,8 +133,13 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.searching = true;
     this.searchValue = currentText;
-
-    this.getNodesData();
+    if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
+      this.searching = false;
+      this.nodes.length = 0;
+      this.total = 0;
+    } else {
+      this.getNodesData();
+    }
   }
 
   onPageChange(event: number): void {
