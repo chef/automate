@@ -94,7 +94,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 // ReadReport returns a report based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
 	formattedFilters := formatFilters(in.Filters)
-	logrus.Debugf("ReadReport called with filters %+v", formattedFilters)
+	logrus.Info("ReadReport called with filters %+v", formattedFilters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
 	if len(formattedFilters["profile_id"]) > 1 {
 		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_id' filter is allowed")
@@ -182,6 +182,24 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return controlListItems, nil
+}
+
+// ListControlInfo returns a list of controlListItems based on query
+func (srv *Server) ListControlInfo(ctx context.Context, in *reporting.Query) (*reporting.ControlElements, error) {
+	var nodeControls *reporting.ControlElements
+
+	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("ListControlInfo called with filters %+v", formattedFilters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	nodeControls, err = srv.es.GetNodeControlListItems(ctx, formattedFilters, in.Id)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return nodeControls, nil
 }
 
 type exportHandler func(*reporting.Report) error

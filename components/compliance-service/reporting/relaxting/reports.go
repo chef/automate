@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -476,6 +477,7 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 							reportControlMin.Tags = controlFromMap.Tags
 							// store controls to returned report
 							convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
+							logrus.Info(convertedControl)
 							if convertedControl != nil {
 								convertedControls = append(convertedControls, convertedControl)
 							}
@@ -905,6 +907,97 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
+}
+
+
+func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters map[string][]string, reportID string) (*reportingapi.ControlElements, error){
+	
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return nil, err
+	}
+
+	filters["start_time"] = []string{}
+	// Get the index based on the filters passed.
+	esIndex, err := GetEsIndex(filters, false)
+	if err != nil {
+		return nil, errors.Wrap(err, "GetNodeControlListItems")
+	}
+
+	from, size, err := paginatedParams(filters)
+	if err != nil {
+		logrus.Info("failed to parse paginated params provided, will use default value of from:0 and size:10")
+		from, size = 0, 10
+	}
+
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"profiles.name",
+		"profiles.controls.id")
+
+	matchQuery := elastic.NewMatchAllQuery()
+	nestedQuery := elastic.NewNestedQuery("profiles.controls", matchQuery)
+	nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().Size(size).From(from))
+
+	nodequery := elastic.NewMatchQuery("report_uuid", reportID)
+
+	queryInfo := elastic.NewBoolQuery()
+	queryInfo = queryInfo.Must(nodequery)
+	queryInfo = queryInfo.Must(nestedQuery)
+
+	searchSource := elastic.NewSearchSource().
+	FetchSourceContext(fsc).
+	Query(queryInfo)
+
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(ctx)
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	esInSpecReport := ESInSpecReport{}
+
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		for _, hit := range searchResult.Hits.Hits {
+			err = json.Unmarshal(*hit.Source, &esInSpecReport)
+			if err != nil {
+				logrus.Errorf("error unmarshalling the search response, err", err)
+				return nil, err
+			}
+		}
+		totalProfiles := make([]string, len(esInSpecReport.Profiles))
+		for idx, profile := range esInSpecReport.Profiles{
+			totalProfiles[idx] = profile.Name
+		}
+		var listControls = make([]*reportingapi.ControlElement,0)
+		for _, hit := range searchResult.Hits.Hits {
+			for _, innerht := range hit.InnerHits["profiles.controls"].Hits.Hits{
+				var control *reportingapi.Control
+				tempElement := &reportingapi.ControlElement{}
+				json.Unmarshal(*innerht.Source, &control)
+
+				profileID := innerht.Nested.Offset
+				tempElement.Id = control.Id
+				tempElement.Impact = control.Impact
+				tempElement.Results = int32(len(control.Results))
+				tempElement.Title = control.Title
+				tempElement.Profile = totalProfiles[profileID]
+				logrus.Info(tempElement)
+				listControls = append(listControls, tempElement)
+			}
+		}
+		contNodeList := &reportingapi.ControlElements{ControlElements: listControls}
+		return contNodeList, nil	
+	}
+	return nil, errorutils.ProcessNotFound(nil, reportID)	
 }
 
 func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
@@ -1454,4 +1547,19 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 		nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
 	}
 	return nestedQuery
+}
+
+
+func paginatedParams(filters map[string][]string)(int, int, error){
+	var from, size int
+	var err error
+	for key, value := range filters{
+		if key == "from"{
+			from, err = strconv.Atoi(value[0])
+		}
+		if key == "size"{
+			size, err = strconv.Atoi(value[0])
+		}
+	}
+	return from, size, err
 }
