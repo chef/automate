@@ -83,7 +83,8 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	if len(errStr) > 0 {
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
-	writer.Printf("%s command execution done, exiting\n", command)
+	writer.Printf("%s command execution inprogress with proces id : %s,"+
+		"\n please trace log tail -f /hab/a2_deploy_workspace/logs/a2ha-run.log ", command, c.Process.Pid)
 	return err
 }
 
