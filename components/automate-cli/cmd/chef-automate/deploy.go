@@ -40,6 +40,8 @@ If you want to provision cluster then you have to first run provision command.
 
 After that you can run this command`
 
+var invalidConfig = "Invalid toml config file, please check your toml file."
+
 var deployCmdFlags = struct {
 	channel                         string
 	upgradeStrategy                 string
@@ -191,7 +193,10 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	var deployer = getDeployer(args)
+	var deployer, derr = getDeployer(args)
+	if derr != nil {
+		return status.Wrap(derr, status.ConfigError, invalidConfig)
+	}
 	if deployer != nil {
 		return deployer.doDeployWork(args)
 	}

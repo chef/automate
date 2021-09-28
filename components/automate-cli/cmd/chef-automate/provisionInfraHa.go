@@ -18,7 +18,10 @@ func newProvisionInfraCmd() *cobra.Command {
 }
 
 func runProvisionInfraCmd(cmd *cobra.Command, args []string) error {
-	deployer := getDeployer(args)
+	deployer, err := getDeployer(args)
+	if err != nil {
+		return status.Wrap(err, status.ConfigError, invalidConfig)
+	}
 	if deployer != nil {
 		return deployer.doProvisionJob(args)
 	} else {

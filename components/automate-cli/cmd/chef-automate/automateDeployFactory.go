@@ -5,16 +5,19 @@ type deployManager interface {
 	doProvisionJob(args []string) error
 }
 
-func getDeployer(args []string) deployManager {
-	deployerType := getModeFromConfig(args)
+func getDeployer(args []string) (deployManager, error) {
+	deployerType, err := getModeFromConfig(args)
+	if err != nil {
+		return nil, err
+	}
 	if deployerType == AWS_MODE {
-		return newAwsDeployemnt()
+		return newAwsDeployemnt(), nil
 	}
 	if deployerType == EXISTING_INFRA_MODE {
-		return newExistingInfa()
+		return newExistingInfa(), nil
 	}
 	if deployerType == HA_MODE {
-		return newHaWithoutConfig()
+		return newHaWithoutConfig(), nil
 	}
-	return nil
+	return nil, nil
 }
