@@ -44,7 +44,6 @@ To download and bundle the software included in the most recent Chef Automate re
 ./chef-automate airgap bundle create
 ```
 
-
 To download and bundle the software included in a specific Chef Automate release, run
 
 ```shell
@@ -58,7 +57,7 @@ These commands produce an Airgap Installation Bundle named:
 ## Deploy the Airgap Installation Bundle
 
 Transfer the `chef-automate` binary and the Airgap Installation Bundle to the airgapped host.
-Save the Chef Automate command-line tool in a directory that is NOT in $PATH. The Chef Automate installation process puts a copy of `chef-automate` into `/bin` and manages it.
+Save the Chef Automate command-line tool in a directory that is not in your `$PATH`. The Chef Automate installation process puts a copy of `chef-automate` into `/bin` and manages it.
 
 ### Create Default Configuration
 
@@ -105,13 +104,11 @@ See [Configure Data Collection]({{< relref "data_collection.md" >}}) for more in
 
 ### Upgrades
 
-We've committed to ensuring the stability of the upgrade and to supporting Chef Automate's automatic upgrades.
-To upgrade an airgapped install, you must supply an airgap bundle.
+Chef is committed to ensuring the stability of the upgrade and to supporting Chef Automate automatic upgrades.
 
-On an internet-connected host, follow the steps in [Create an Airgap
-Installation Bundle]({{< relref "#create-an-airgap-installation-bundle" >}}) to upgrade your
-Chef Automate command-line tool and prepare an Airgap Installation Bundle. Transfer the
-bundle and Chef Automate command-line tool to the airgapped host and run:
+To upgrade an airgapped installation, you must first create an airgap bundle.
+
+Follow the steps in [Create an Airgap Installation Bundle]({{< relref "#create-an-airgap-installation-bundle" >}}) on a machine that connects to the internet to upgrade your Chef Automate command-line tool and prepare an Airgap Installation Bundle. Transfer the bundle and Chef Automate command-line tool to the airgapped host and run:
 
 ```shell
 sudo chef-automate upgrade run --airgap-bundle </path/to/bundle>
@@ -119,7 +116,7 @@ sudo chef-automate upgrade run --airgap-bundle </path/to/bundle>
 
 ### Common Problems
 
-If you are unable to open Chef Automate, check that the `config.toml` contains the host's public DNS name as the FQDN.
+If you are unable to open Chef Automate, check that the `config.toml` lists the host's public DNS name as the FQDN.
 
 ```shell
 # This is a default Chef Automate configuration file. You can run
