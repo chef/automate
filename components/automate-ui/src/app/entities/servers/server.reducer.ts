@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { pipe, set, unset } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { ServerActionTypes, ServerActions } from './server.actions';
-import { Server } from './server.model';
+import { Server, User } from './server.model';
 
 export interface ServerEntityState extends EntityState<Server> {
   getAllStatus: EntityStatus;
@@ -12,6 +12,8 @@ export interface ServerEntityState extends EntityState<Server> {
   getStatus: EntityStatus;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  getUsers: User[];
+  getUsersStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -20,6 +22,7 @@ const SAVE_ERROR = 'saveError';
 const UPDATE_STATUS = 'updateStatus';
 const GET_STATUS = 'getStatus';
 const DELETE_STATUS = 'deleteStatus';
+const GET_USERS_STATUS = 'getUsersStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
 
@@ -30,7 +33,9 @@ export const ServerEntityInitialState: ServerEntityState =
     saveError: null,
     updateStatus: EntityStatus.notLoaded,
     getStatus: EntityStatus.notLoaded,
-    deleteStatus: EntityStatus.notLoaded
+    deleteStatus: EntityStatus.notLoaded,
+    getUsers: null,
+    getUsersStatus: EntityStatus.notLoaded
   });
 
 export function serverEntityReducer(
@@ -119,6 +124,22 @@ export function serverEntityReducer(
     case ServerActionTypes.UPDATE_FAILURE:
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
+    case ServerActionTypes.GET_USERS:
+      return set(
+        GET_USERS_STATUS,
+        EntityStatus.loading,
+        serverEntityAdapter.removeAll(state)
+      ) as ServerEntityState;
+
+    case ServerActionTypes.GET_USERS_SUCCESS:
+      return pipe(
+        set(GET_USERS_STATUS, EntityStatus.loadingSuccess),
+        set('getUsers', action.payload || [])
+      )(state) as ServerEntityState;
+
+    case ServerActionTypes.GET_USERS_FAILURE:
+      return set(
+        GET_USERS_STATUS, EntityStatus.loadingFailure, state);
   }
 
   return state;

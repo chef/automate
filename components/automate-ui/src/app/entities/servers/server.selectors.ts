@@ -46,3 +46,13 @@ export const deleteStatus = createSelector(
   serverState,
   (state) => state.deleteStatus
 );
+
+export const getUsers = createSelector(
+  serverState,
+  (state) => state.getUsers
+);
+
+export const getUsersStatus = createSelector(
+  serverState,
+  (state) => state.getUsersStatus
+);
