@@ -270,8 +270,8 @@ Prerequisites:
 * Public Chef Habitat Builder account
 * Public Chef Habitat Builder personal access token
 
-Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/master/package_seed_lists/README.md) to populate your on-premises Chef Habitat Builder installation with the packages required by your builds.
-[Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/master/package_seed_lists) exist for the following scenarios:
+Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/main/package_seed_lists/README.md) to populate your on-premises Chef Habitat Builder installation with the packages required by your builds.
+[Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/main/package_seed_lists) exist for the following scenarios:
 
 * Full `core`: the full contents of the upstream `core` origin. The x86_64 Linux set expands to 12GB, the Linux kernel2 set to 1GB, and the Windows set to 3.5GB.
 * Core dependencies: a subset of `core` consisting of commonly-used buildtime dependencies.
