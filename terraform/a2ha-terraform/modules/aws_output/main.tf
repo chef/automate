@@ -11,6 +11,16 @@ locals {
       automate_fqdn             = var.automate_fqdn
       automate_frontend_urls    = var.automate_frontend_urls
     })
+
+    copy_files = [
+    "/src/terraform/reference_architectures/aws/variables.tf",
+    "/src/terraform/a2ha_habitat.auto.tfvars",
+    "/src/terraform/aws.auto.tfvars",
+    "/src/terraform/variables_common.tf"
+    ]
+
+    destination_path = "/src/terraform/destroy/aws"
+ 
 }
 
 #This will create auto.tfvars with using aws's content. Because dusing deployment time we will need some aws info like public and private ips.
@@ -31,13 +41,13 @@ resource "null_resource" "output" {
     depends_on = [local_file.output]
 }
 
-#This resource will execute bash script to set up the destroy directory. Because we are maintaining single parent dir for terraform apply for provision and deployment. So just after provison, deploy command will be executed and for deployment diff terraform script will be executed. So we have to maintain destroy directory for aws resource deletion in future if needed.
-resource "null_resource" "bash" {
-    count = 1
-    
-    provisioner "local-exec" {
-        command = "cp /hab/a2_deploy_workspace/terraform/reference_architectures/aws/variables.tf /hab/a2_deploy_workspace/terraform/destroy/aws;cp /hab/a2_deploy_workspace/terraform/a2ha_habitat.auto.tfvars /hab/a2_deploy_workspace/terraform/destroy/aws/;cp /hab/a2_deploy_workspace/terraform/aws.auto.tfvars /hab/a2_deploy_workspace/terraform/destroy/aws;cp /hab/a2_deploy_workspace/terraform/variables_common.tf /hab/a2_deploy_workspace/terraform/destroy/aws"
-    }
+resource "null_resource" "setup_destroy_directory" {
+  for_each = toset(local.copy_files)
 
-    depends_on = [null_resource.output]
+  provisioner "local-exec" {
+    command = "cp ${each.value} ${local.destination_path}"
+  }
+
+  depends_on = [null_resource.output]
+
 }
