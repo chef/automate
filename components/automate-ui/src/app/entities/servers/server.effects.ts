@@ -25,7 +25,11 @@ import {
   UpdateServerFailure,
   DeleteServer,
   DeleteServerSuccess,
-  DeleteServerFailure
+  DeleteServerFailure,
+  GetUsers,
+  GetUsersSuccess,
+  GetUsersFailure,
+  UsersSuccessPayload
 } from './server.actions';
 
 import {
@@ -166,4 +170,22 @@ export class ServerEffects {
       });
     })));
 
+  getUsers$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(ServerActionTypes.GET_USERS),
+    mergeMap((action: GetUsers) =>
+      this.requests.getUser(action.payload).pipe(
+        map((resp: UsersSuccessPayload) => new GetUsersSuccess(resp)),
+        catchError((error: HttpErrorResponse) => observableOf(new GetUsersFailure(error)))))));
+
+  getUsersFailure$ = createEffect(() =>
+    this.actions$.pipe(
+    ofType(ServerActionTypes.GET_USERS_FAILURE),
+    map(({ payload: {error} }: GetUsersFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get users: ${msg || error}`
+      });
+    })));
 }
