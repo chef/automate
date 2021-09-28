@@ -1,19 +1,19 @@
 # Global defaults
-TERRAFORM_PATH = $(shell pwd)
-SORT_PY = $(shell pwd)/../../scripts/tf_var_sort.py
-AIRGAP_SH = $(shell pwd)/../../scripts/bundle_creation.sh
-SUP_KEY_SH = $(shell pwd)/../../scripts/sup-keys.sh
+TERRAFORM_PATH = $(shell pwd)/terraform
+SORT_PY = $(shell pwd)/scripts/tf_var_sort.py
+AIRGAP_SH = $(shell pwd)/scripts/bundle_creation.sh
+SUP_KEY_SH = $(shell pwd)/scripts/sup-keys.sh
 TMPOUT = '/tmp/make.out'
 REPO_ROOT = $(shell pwd)
 DATESTAMP := $(shell date +"%Y%m%d%H%M%S")
 BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle-$(DATESTAMP).aib
 BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend-$(DATESTAMP).aib
-BACKENDAIB_TFVARS = $(shell pwd)/a2ha_aib_be.auto.tfvars
+BACKENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_be.auto.tfvars
 FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
-FRONTENDAIB_TFVARS = $(shell pwd)/a2ha_aib_fe.auto.tfvars
+FRONTENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_fe.auto.tfvars
 TMPFILE := $(shell mktemp)
 VARFILES := $(shell find $(TERRAFORM_PATH) -name variables.tf -o -name inputs.tf)
-HABITAT_TFVARS = $(shell pwd)/a2ha_habitat.auto.tfvars
+HABITAT_TFVARS = $(shell pwd)/terraform/a2ha_habitat.auto.tfvars
 
 # Help menu colors
 GREEN  := $(shell tput -Txterm setaf 2)
