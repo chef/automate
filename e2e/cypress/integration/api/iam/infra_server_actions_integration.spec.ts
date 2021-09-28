@@ -17,12 +17,12 @@ describe('Infra servers list api', () => {
     members: [`token:${tokenId1}`],
     statements: [
         {
-            effect: "ALLOW",
+            effect: 'ALLOW',
             actions: [
-                "infra:infraServers:list",
-                "infra:nodes:list"
+                'infra:infraServers:list',
+                'infra:nodes:list'
             ],
-            projects: ["*"]
+            projects: ['*']
         }]
     };
 
@@ -34,12 +34,12 @@ describe('Infra servers list api', () => {
         members: [`token:${tokenId2}`],
         statements: [
         {
-            effect: "DENY",
+            effect: 'DENY',
             actions: [
-                "infra:infraServers:list",
-                "infra:nodes:list"
+                'infra:infraServers:list',
+                'infra:nodes:list'
             ],
-            projects: ["*"]
+            projects: ['*']
         }]
     };
 
