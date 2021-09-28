@@ -13,11 +13,11 @@ import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
-  getStatus, serverFromRoute, updateStatus
+  getStatus, serverFromRoute, updateStatus, getUsers, getUsersStatus
 } from 'app/entities/servers/server.selectors';
 
 import { Server } from 'app/entities/servers/server.model';
-import { GetServer, UpdateServer } from 'app/entities/servers/server.actions';
+import { GetServer, UpdateServer, GetUsers } from 'app/entities/servers/server.actions';
 import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -29,7 +29,7 @@ import {
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
-export type ChefServerTabName = 'orgs' | 'details';
+export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
   selector: 'app-chef-server-details',
   templateUrl: './chef-server-details.component.html',
@@ -59,6 +59,10 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public selected = 'fqdn';
+  public isUserLoaded = false;
+  public users;
+  public usersListLoading;
+  public authFailure = false;
 
   constructor(
     private fb: FormBuilder,
@@ -85,7 +89,17 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'details') ? 'details' : 'orgs';
+      switch (fragment) {
+        case 'details':
+          this.tabValue = 'details';
+          break;
+        case 'users':
+          this.tabValue = 'users';
+          break;
+        case 'attributes':
+          this.tabValue = 'orgs';
+          break;
+      }
     });
 
     this.updateServerForm = this.fb.group({
@@ -113,6 +127,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.id = id;
         this.store.dispatch(new GetServer({ id }));
         this.store.dispatch(new GetOrgs({ server_id: id }));
+        this.store.dispatch(new GetUsers({ server_id: id }));
       });
 
     combineLatest([
@@ -183,6 +198,22 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.updateServerForm.markAsPristine();
         this.fqdnForm.markAsPristine();
         this.ipForm.markAsPristine();
+      }
+    });
+
+    combineLatest([
+      this.store.select(getUsersStatus),
+      this.store.select(getUsers)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([getUsersSt, UsersState]) => {
+      if (getUsersSt === EntityStatus.loadingSuccess && !isNil(UsersState)) {
+        this.users = UsersState;
+        this.usersListLoading = false;
+        this.users.users.length > 0 ? this.isUserLoaded = true : this.isUserLoaded = false;
+      } else if (getUsersSt === EntityStatus.loadingFailure) {
+        this.usersListLoading = false;
+        this.authFailure = true;
+        this.isUserLoaded = false;
       }
     });
   }
