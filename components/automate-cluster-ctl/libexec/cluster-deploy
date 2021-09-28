@@ -43,11 +43,11 @@ class AutomateClusterSetup < AutomateCluster::Command
   end
   
   def need_FE_upgrade?
-    !valid_bundle?
+    !valid_fe_bundle?
   end
 
   def need_BE_upgrade?
-    !valid_bundle?
+    !valid_be_bundle?
   end
 
   def need_fe_bundle?
@@ -177,13 +177,10 @@ class AutomateClusterSetup < AutomateCluster::Command
     end
 
     if upgrade_frontends? 
-        print "feeeee bundle"
         upgrade_FE_bundle
     elsif upgrade_backends?
-        print "beeeeee bundle"
         upgrade_BE_bundle
-    else
-        print "alllllllllllllllllllll" 
+    else 
         generate_bundle
     end
 
