@@ -8,14 +8,11 @@ all packages therein including their transitive dependencies. It accomplishes
 this by wrapping the 'chef-automate' cli utility.
 The following arguments are available:
  [REQUIRED]
- -t [frontend]            Generate an Air Gap Bundle for either frontend.
+ -t [frontend|backend|all]            Generate an Air Gap Bundle for either frontend or backend or both
  -o [output tarball]              Output file for archive (.tar.gz)
  [OPTIONS]
- -d [download path]               Download path for chef-automate binary (default: /tmp/chef-automate)
- -w [workspace]                   Workspace where packages will be downloaded (default: /tmp/workspace)
  -h                               Print this help message
- ex. $0 -t backend -m /path/to/manifest.json -o /tmp/bundle.tar.gz
- ex. $0 -t frontend -c current -o /tmp/bundle.tar.gz -o /tmp/bundle.tar.gz
+ ex. $0 -t upgradebackends  -o /tmp/bundle.tar.gz
 "
 export DOCKER_IMAGE="chefes/lita-worker"
 # Some sane defaults

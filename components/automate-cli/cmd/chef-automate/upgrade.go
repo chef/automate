@@ -23,6 +23,7 @@ var upgradeRunCmdFlags = struct {
 	version string
 	upgradefrontends bool	
 	upgradebackends bool
+	upgradeairgapbundles bool
 	skipDeploy bool
 }{}
 
@@ -76,22 +77,10 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
-
-	// if isA2HARBFileExist() {
-	// 	return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
-	// 	}
-    
-    // if upgradeRunCmd.upgradefrontends {
-	// 	if isA2HARBFileExist() {
-	// 		return executeAutomateClusterCtlCommand("deploy", "upgrade-frontends", upgradeHaHelpDoc)
-	// 		}
-	// }
-
-	// if upgradeRunCmd.upgradebackends {
-	// 	if isA2HARBFileExist() {
-	// 		return executeAutomateClusterCtlCommand("deploy", "upgrade-backends", upgradeHaHelpDoc)
-	// 		}
-	// }
+	// check if it is in HA mode
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
+	}
 
 	if offlineMode {
 		writer.Title("Installing airgap install bundle")
@@ -254,7 +243,12 @@ func init() {
 		&upgradeRunCmdFlags.upgradebackends,
 		"upgrade-backends",
 		false,
-		"The Chef Automate backends version to install")
+		"Update Chef Automate backends version to install")
+	upgradeRunCmd.PersistentFlags().BoolVar(
+		&upgradeRunCmdFlags.upgradeairgapbundles,
+		"upgrade-airgap-bundles",
+		false,
+		"Update Chef Automate both frontend and backend version to install")
 	upgradeRunCmd.PersistentFlags().BoolVar(
 		&upgradeRunCmdFlags.skipDeploy,
 		"skip-deploy",
