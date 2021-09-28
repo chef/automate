@@ -34,3 +34,7 @@ chef-loading-spinner {
   background-color: $chef-white;
   opacity: 0.7;
 }
+
+app-create-chef-server-modal {
+  z-index: 999;
+}
