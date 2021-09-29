@@ -26,8 +26,10 @@
         </div>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
-          <chef-option value='users' data-cy="users-tab">Users</chef-option>
-          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}', 'put', [server?.id]]">
+            <chef-option value='users' data-cy="users-tab">Users</chef-option>
+            <chef-option value='details' data-cy="details-tab">Details</chef-option>
+          </app-authorized>
         </chef-tab-selector>
       </chef-page-header>
       <app-create-org-modal
