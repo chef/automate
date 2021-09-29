@@ -173,7 +173,7 @@ describe('Infra servers get api', () => {
             url: '/api/v0/infra/servers',
             body: {
                 fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test`,
+                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                 ip_address: '127.0.0.1',
                 name: 'test'
             }
@@ -351,13 +351,13 @@ describe('Infra servers post api to create infra servers', () => {
                 url: '/api/v0/infra/servers',
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
                 }).then((resp) => {
                     assert.equal(resp.status, 200);
-                });    
+                });
         });
 
         it('infra servers post returns 403 when infraServers create actions is deneyed', () => {
@@ -368,7 +368,7 @@ describe('Infra servers post api to create infra servers', () => {
                 failOnStatusCode: false,
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
@@ -470,7 +470,6 @@ describe('Infra servers put api to update infra server', () => {
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
-        });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -478,13 +477,14 @@ describe('Infra servers put api to update infra server', () => {
             url: '/api/v0/infra/servers',
             body: {
                 fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test`,
+                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                 ip_address: '127.0.0.1',
                 name: 'test'
             }
             }).then((resp) => {
                 server = resp.body.server;
             });
+        });
 
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
@@ -496,7 +496,7 @@ describe('Infra servers put api to update infra server', () => {
                 headers: { 'api-token': withoutInfraServersUpdateActionToken },
                 method: 'PUT',
                 url: `/api/v0/infra/servers/${server.id}`,
-                failOnStatusCode: false,
+                failOnStatusCode: false
                 }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
@@ -509,13 +509,13 @@ describe('Infra servers put api to update infra server', () => {
                 url: `/api/v0/infra/servers/${server.id}`,
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
                 }).then((resp) => {
                     assert.equal(resp.status, 200);
-                });    
+                });
         });
     });
 
@@ -611,7 +611,6 @@ describe('Infra servers delete api to delete infra server', () => {
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
-        });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -619,13 +618,15 @@ describe('Infra servers delete api to delete infra server', () => {
             url: '/api/v0/infra/servers',
             body: {
                 fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test`,
+                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                 ip_address: '127.0.0.1',
                 name: 'test'
             }
             }).then((resp) => {
                 server = resp.body.server;
             });
+        });
+
 
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
@@ -635,9 +636,9 @@ describe('Infra servers delete api to delete infra server', () => {
         it('infra servers delete returns 403 when infraServers delete actions is deneyed', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersDeleteActionToken },
-                method: 'POST',
+                method: 'DELETE',
                 url: `/api/v0/infra/servers/${server.id}`,
-                failOnStatusCode: false,
+                failOnStatusCode: false
                 }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
@@ -646,18 +647,16 @@ describe('Infra servers delete api to delete infra server', () => {
         it('infra servers delete returns 200 when infraServers delete actions is allowed', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersDeleteActionToken },
-                method: 'POST',
+                method: 'DELETE',
                 url: `/api/v0/infra/servers/${server.id}`,
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
                 }).then((resp) => {
                     assert.equal(resp.status, 200);
-                });    
+                });
         });
     });
-    
-    
