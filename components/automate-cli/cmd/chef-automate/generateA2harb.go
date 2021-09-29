@@ -109,9 +109,6 @@ func validateAwsFields(awsConfig AwsConfigToml) *list.List {
 	if len(awsConfig.Architecture.ConfigInitials.SSHUser) < 1 {
 		errorList.PushBack("Invalid or empty ssh_user")
 	}
-	if len(awsConfig.Architecture.ConfigInitials.SSHUser) < 1 {
-		errorList.PushBack("Invalid or empty ssh_user")
-	}
 	if len(awsConfig.Architecture.ConfigInitials.SSHKeyFile) < 1 {
 		errorList.PushBack("Invalid or empty ssh_key_file")
 	}
@@ -151,12 +148,10 @@ func validateExistingInfraFields(exitingInfra ExistingInfraConfigToml) *list.Lis
 	if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
 		errorList.PushBack("Invalid or empty ssh_user")
 	}
-	if len(exitingInfra.Architecture.ConfigInitials.SSHUser) < 1 {
-		errorList.PushBack("Invalid or empty ssh_user")
-	}
 	if len(exitingInfra.Architecture.ConfigInitials.SSHKeyFile) < 1 {
 		errorList.PushBack("Invalid or empty ssh_key_file")
-	} else if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
+	}
+	if len(exitingInfra.Architecture.ConfigInitials.BackupMount) < 1 {
 		errorList.PushBack("Invalid or empty backup_mount")
 	}
 	if len(exitingInfra.Automate.Config.InstanceCount) < 1 {
@@ -268,52 +263,53 @@ func validateAwsConfigFields(awsConfig AwsConfigToml) *list.List {
 }
 
 func validateIPs(exitingInfra ExistingInfraConfigToml) *list.List {
+	const notValidErrorString = "is not valid"
 	errorList := list.New()
 	for _, element := range exitingInfra.ExistingInfra.Config.AutomateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("Automate Ip " + element + "is not valid")
+			errorList.PushBack("Automate Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.AutomatePrivateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("Automate private Ip " + element + "is not valid")
+			errorList.PushBack("Automate private Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.ChefServerIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("chef server Ip " + element + "is not valid")
+			errorList.PushBack("chef server Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.ChefServerPrivateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("chef server private Ip " + element + "is not valid")
+			errorList.PushBack("chef server private Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("elastic search Ip " + element + "is not valid")
+			errorList.PushBack("elastic search Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.ElasticsearchPrivateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("elastic search private Ip " + element + "is not valid")
+			errorList.PushBack("elastic search private Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("postgresql Ip " + element + "is not valid")
+			errorList.PushBack("postgresql Ip " + element + notValidErrorString)
 		}
 	}
 
 	for _, element := range exitingInfra.ExistingInfra.Config.PostgresqlPrivateIps {
 		if checkIPAddress(element) != nil {
-			errorList.PushBack("Postgresql private Ip " + element + "is not valid")
+			errorList.PushBack("Postgresql private Ip " + element + notValidErrorString)
 		}
 	}
 	return errorList
