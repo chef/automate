@@ -175,7 +175,7 @@ describe('Infra servers get api', () => {
             url: '/api/v0/infra/servers',
             body: {
                 fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test`,
+                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                 ip_address: '127.0.0.1',
                 name: 'test'
             }
@@ -353,7 +353,7 @@ describe('Infra servers post api to create infra servers', () => {
                 url: '/api/v0/infra/servers',
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
@@ -370,7 +370,7 @@ describe('Infra servers post api to create infra servers', () => {
                 failOnStatusCode: false,
                 body: {
                     fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test`,
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
                     ip_address: '127.0.0.1',
                     name: 'test'
                 }
