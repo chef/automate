@@ -50,7 +50,9 @@ Specify the action to restrict user access to the specific action.
 - Note: members array may have single item like `"user:local:username"` to add specific actions to only one user also actions array mentioned above are minimal set of actions required to view InfraServer tab.
 
 {{% responsive-table %}}
-|  Task           | Browser Tab     | IAM Action       | API endpoint  | URL       |
+|  Task           | Method     | IAM Action       | API endpoint  | URL       |
 | --------------- | --------------- | ---------------- | ------------- | --------- |
-| List Infra Servers | Infra Servers | infra:infraServers:list | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
+| List Infra Servers | GET | infra:infraServers:list | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
+| Get Infra Server | GET | infra:infraServers:get | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
+| Create Infra Server | POST | infra:infraServers:create | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
 {{% /responsive-table %}}
