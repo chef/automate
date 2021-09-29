@@ -130,3 +130,33 @@ chef-form-field {
     align-items: flex-start;
   }
 }
+
+.integration-services {
+  .logo {
+    width: 100px;
+  }
+
+  .aws,
+  .gcp,
+  .automate {
+    height: 45px;
+    padding-top: 5px;
+  }
+
+  .gcp {
+    width: 120px;
+  }
+}
+.nodeOptions{
+    display: flex;
+    justify-content: space-between;
+}
+
+.searchWidth{
+      width: 36%;
+}
+
+.searchDiv{
+  vertical-align: bottom;
+}
+

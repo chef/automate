@@ -42,9 +42,11 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     case ManagerActionTypes.SEARCH:
       return set('status', EntityStatus.loading, state);
 
-    case ManagerActionTypes.SEARCH_SUCCESS:
+    case ManagerActionTypes.SEARCH_SUCCESS: {
+      managerEntityAdapter.removeAll(state);
       return set('status', EntityStatus.loadingSuccess,
                  managerEntityAdapter.setAll(action.payload.managers, state));
+    }
 
     case ManagerActionTypes.SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);

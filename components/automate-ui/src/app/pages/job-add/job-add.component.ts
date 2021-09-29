@@ -20,8 +20,8 @@ import {
   ManagersSearch,
   ManagerSearchFields,
   ManagerSearchNodes,
-  ManagerAllNodes
-} from '../../entities/managers/manager.actions';
+  ManagerAllNodes,
+} from "../../entities/managers/manager.actions";
 import { ProfilesSearch } from '../../entities/profiles/profile.actions';
 import { JobCreate } from '../../entities/jobs/job.actions';
 
