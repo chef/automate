@@ -55,4 +55,6 @@ Specify the action to restrict user access to the specific action.
 | List Infra Servers | GET | infra:infraServers:list | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
 | Get Infra Server | GET | infra:infraServers:get | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | Create Infra Server | POST | infra:infraServers:create | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
+| Update Infra Server | PUT | infra:infraServers:update | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
+| Delete Infra Server | DELETE | infra:infraServers:delete | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 {{% /responsive-table %}}
