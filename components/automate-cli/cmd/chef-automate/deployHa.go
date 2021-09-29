@@ -2,7 +2,7 @@
 
 package main
 
-func deployA2HA() error {
+func executeDeployment() error {
 	writer.Printf("A2HA deployment started \n\n\n")
 	args := []string{"-y"}
 	return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs)
