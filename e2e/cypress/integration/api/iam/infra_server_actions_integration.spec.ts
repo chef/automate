@@ -19,8 +19,7 @@ describe('Infra servers list api', () => {
         {
             effect: 'ALLOW',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
@@ -36,8 +35,7 @@ describe('Infra servers list api', () => {
         {
             effect: 'DENY',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
@@ -628,7 +626,6 @@ describe('Infra servers delete api to delete infra server', () => {
                 server = resp.body.server;
             });
         });
-
 
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
