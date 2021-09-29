@@ -6,26 +6,26 @@
         <chef-heading>Chef Infra Servers</chef-heading>
         <chef-subheading>Manage Chef Infra Servers with Chef Automate.</chef-subheading>
       </chef-page-header>
-      <app-create-chef-server-modal 
-        [visible]="createModalVisible" 
+      <app-create-chef-server-modal
+        [visible]="createModalVisible"
         [creating]="creatingChefServer"
         [createForm]="createChefServerForm"
         [fqdnForm]="fqdnForm"
         [ipForm]="ipForm"
-        (close)="closeCreateModal()" 
+        (close)="closeCreateModal()"
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
       </app-create-chef-server-modal>
-      <app-delete-infra-object-modal 
-        [visible]="deleteModalVisible" 
-        objectNoun="server" 
+      <app-delete-infra-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="server"
         [objectName]="serverToDelete?.name"
-        (close)="closeDeleteModal()" 
-        (deleteClicked)="deleteServer()" 
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteServer()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
-      <app-message-modal 
-        [title]="'Could Not Delete Server'" 
+      <app-message-modal
+        [title]="'Could Not Delete Server'"
         [visible]="messageModalVisible"
         (close)="closeMessageModal()">
         Before you can delete this server, delete all organizations attached to it.
@@ -56,11 +56,11 @@
                 <chef-td>{{ server.ip_address }}</chef-td>
                 <chef-td>{{ server.orgs_count }}</chef-td>
                 <chef-td class="three-dot-column">
-                  <!-- <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', server.id]"> -->
+                  <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', server.id]">
                     <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
                       <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="delete-server">Delete</mat-option>
                     </mat-select>
-                  <!-- </app-authorized>   -->
+                  </app-authorized>
                 </chef-td>
               </chef-tr>
             </chef-tbody>
