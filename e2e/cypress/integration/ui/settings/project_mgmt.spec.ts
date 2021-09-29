@@ -64,7 +64,7 @@ describe('project management', () => {
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
     if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
-      cy.get('app-welcome-modal').invoke('hide');
+      cy.get('[data-cy=close-x]').click();
     }
 
     cy.get('[data-cy=create-name]').focus()
