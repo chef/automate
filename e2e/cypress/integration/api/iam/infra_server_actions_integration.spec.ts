@@ -19,8 +19,7 @@ describe('Infra servers list', () => {
         {
             effect: 'ALLOW',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
@@ -36,8 +35,7 @@ describe('Infra servers list', () => {
         {
             effect: 'DENY',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
