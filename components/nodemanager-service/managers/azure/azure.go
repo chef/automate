@@ -8,8 +8,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-12-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-11-01/network"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2016-06-01/subscriptions"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2017-05-10/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2021-01-01/subscriptions"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
@@ -98,7 +98,11 @@ func (creds *Creds) ListSubscriptions(ctx context.Context) ([]*manager.ManagerNo
 			return subs, errors.Wrap(err, "ListSubscriptions unable to list subscriptions")
 		}
 		for _, val := range res.Values() {
-			subs = append(subs, &manager.ManagerNode{Id: *val.SubscriptionID, Name: *val.DisplayName})
+			var tags = []*common.Kv{}
+			for key, value := range val.Tags {
+				tags = append(tags, &common.Kv{Key: key, Value: *value})
+			}
+			subs = append(subs, &manager.ManagerNode{Id: *val.SubscriptionID, Name: *val.DisplayName, Tags: tags})
 		}
 	}
 	return subs, nil
@@ -126,7 +130,7 @@ func (creds *Creds) ListLocations(ctx context.Context, subs []*manager.ManagerNo
 	client := subscriptions.NewClient()
 	client.Authorizer = getAuthorizer(creds.Token)
 	for _, sub := range subs {
-		res, err := client.ListLocations(ctx, sub.Id)
+		res, err := client.ListLocations(ctx, sub.Id, nil)
 		if err != nil {
 			return locations, errors.Wrap(err, "ListLocations unable to list locations")
 		}
@@ -723,8 +727,67 @@ func removeExcludedSubsFromList(list []*manager.ManagerNode, exclude []string) [
 	return returnList
 }
 
+func handleTagFilters(filters []*common.Filter) (map[string][]string, map[string][]string) {
+	includeTags := map[string][]string{}
+	excludeTags := map[string][]string{}
+	for _, filter := range filters {
+		if filter.Key != "subscription_id" {
+			if !filter.Exclude {
+				for _, val := range filter.Values {
+					includeTags[filter.Key] = append(includeTags[filter.Key], val)
+				}
+			} else {
+				for _, val := range filter.Values {
+					excludeTags[filter.Key] = append(excludeTags[filter.Key], val)
+				}
+			}
+		}
+	}
+	return includeTags, excludeTags
+}
+
+func filterIncludeTags(includeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
+	if len(includeTags) > 0 {
+		var filteredsubsList = []*manager.ManagerNode{}
+		for _, val := range subsList {
+			for _, v := range val.Tags {
+				if _, ok := includeTags[v.Key]; ok {
+					if contains(includeTags[v.Key], v.Value) {
+						filteredsubsList = append(filteredsubsList, val)
+					}
+				}
+			}
+		}
+		return filteredsubsList
+	}
+	return subsList
+}
+
+func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
+	if len(excludeTags) > 0 {
+		var filteredsubsList = []*manager.ManagerNode{}
+		for _, val := range subsList {
+			if len(val.Tags) > 0 {
+				for _, v := range val.Tags {
+					if _, ok := excludeTags[v.Key]; ok {
+						if !contains(excludeTags[v.Key], v.Value) {
+							filteredsubsList = append(filteredsubsList, val)
+						}
+					}
+				}
+			} else {
+				filteredsubsList = append(filteredsubsList, val)
+			}
+		}
+		return filteredsubsList
+	}
+	return subsList
+}
+
 func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filter) ([]*manager.ManagerNode, error) {
 	subs, excludedSubs := handleSubscriptionFilters(filters)
+	includeTags, excludeTags := handleTagFilters(filters)
+
 	if len(subs) > 0 {
 		return subs, nil
 	}
@@ -732,10 +795,26 @@ func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filt
 	if err != nil {
 		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
 	}
-	if len(excludedSubs) == 0 {
-		return subsList, nil
+	filteredsubsList := filterIncludeTags(includeTags, subsList)
+	if len(includeTags) > 0 {
+		filteredsubsList = filterExcludeTags(excludeTags, filteredsubsList)
+	} else {
+		filteredsubsList = filterExcludeTags(excludeTags, subsList)
 	}
-	return removeExcludedSubsFromList(subsList, excludedSubs), nil
+
+	if len(excludedSubs) == 0 {
+		return filteredsubsList, nil
+	}
+	return removeExcludedSubsFromList(filteredsubsList, excludedSubs), nil
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 // QueryVMs returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
