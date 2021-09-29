@@ -88,7 +88,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	return err
 }
 
-func bootstrapEnv(args []string) error {
+func bootstrapEnv(dm deployManager) error {
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -109,7 +109,7 @@ func bootstrapEnv(args []string) error {
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
-	err = readConfigAndWriteToFile(args[0])
+	err = dm.generateConfig()
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}

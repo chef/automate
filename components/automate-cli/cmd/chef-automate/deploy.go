@@ -193,7 +193,11 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	var deployer, derr = getDeployer(args)
+	var configPath = ""
+	if len(args) > 0 {
+		configPath = args[0]
+	}
+	var deployer, derr = getDeployer(configPath)
 	if derr != nil {
 		return status.Wrap(derr, status.ConfigError, invalidConfig)
 	}

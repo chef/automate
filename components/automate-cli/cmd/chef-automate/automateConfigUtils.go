@@ -1,15 +1,17 @@
 package main
 
 import (
+	"net"
 	"path/filepath"
 
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 )
 
-func getModeFromConfig(configPath []string) (string, error) {
+func getModeFromConfig(configPath string) (string, error) {
 	initConfigHAPath := initConfigHAPathFlags.path
 	if len(configPath) > 0 {
-		initConfigHAPath = configPath[0]
+		initConfigHAPath = configPath
 	}
 	if checkIfFileExist(initConfigHAPath) {
 		config, err := ptoml.LoadFile(initConfigHAPath)
@@ -28,5 +30,13 @@ func getModeFromConfig(configPath []string) (string, error) {
 		return HA_MODE, nil
 	} else {
 		return AUTOMATE, nil
+	}
+}
+
+func checkIPAddress(ip string) error {
+	if net.ParseIP(ip) == nil {
+		return errors.New("Ip Address is invalid.")
+	} else {
+		return nil
 	}
 }
