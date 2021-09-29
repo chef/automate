@@ -344,7 +344,7 @@ describe('Infra servers post api to create infra servers', () => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
         });
 
-        it('infra servers get returns 200 when infraServers post actions is allowed', () => {
+        it('infra servers post returns 200 when infraServers create actions is allowed', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersPostActionToken },
                 method: 'POST',
@@ -360,7 +360,7 @@ describe('Infra servers post api to create infra servers', () => {
                 });    
         });
 
-        it('infra servers get returns 403 when infraServers post actions is deneyed', () => {
+        it('infra servers post returns 403 when infraServers create actions is deneyed', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersPostActionToken },
                 method: 'POST',
@@ -378,3 +378,286 @@ describe('Infra servers post api to create infra servers', () => {
         });
     });
 
+describe('Infra servers put api to update infra server', () => {
+    let withInfraServersUpdateActionToken = '';
+    let withoutInfraServersUpdateActionToken = '';
+    let server = {
+        fqdn: '',
+        id: '',
+        ip_address: '',
+        name: ''
+    };
+    const cypressPrefix = 'infra-server-actions-update';
+    const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const objectsToCleanUp = ['tokens', 'policies'];
+
+
+    const withInfraServersUpdatePolicy = {
+    id: policyId1,
+    name: tokenId1,
+    projects: [],
+    members: [`token:${tokenId1}`],
+    statements: [
+        {
+            effect: 'ALLOW',
+            actions: [
+                'infra:infraServers:update'
+            ],
+            projects: ['*']
+        }]
+    };
+
+
+    const withoutInfraServersUpdatePolicy = {
+        id: policyId2,
+        name: tokenId2,
+        projects: [],
+        members: [`token:${tokenId2}`],
+        statements: [
+        {
+            effect: 'DENY',
+            actions: [
+                'infra:infraServers:update'
+            ],
+            projects: ['*']
+        }]
+    };
+
+    before(() => {
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId1,
+                name: tokenId1
+            }
+            }).then((resp) => {
+                withInfraServersUpdateActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withInfraServersUpdatePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId2,
+                name: tokenId2
+            }
+            }).then((resp) => {
+                withoutInfraServersUpdateActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withoutInfraServersUpdatePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+        });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/api/v0/infra/servers',
+            body: {
+                fqdn: 'a2-dev.test',
+                id: `${cypressPrefix}-test`,
+                ip_address: '127.0.0.1',
+                name: 'test'
+            }
+            }).then((resp) => {
+                server = resp.body.server;
+            });
+
+        after(() => {
+            cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+        });
+
+
+        it('infra servers put returns 403 when infraServers update actions is deneyed', () => {
+            cy.request({
+                headers: { 'api-token': withoutInfraServersUpdateActionToken },
+                method: 'PUT',
+                url: `/api/v0/infra/servers/${server.id}`,
+                failOnStatusCode: false,
+                }).then((resp) => {
+                assert.equal(resp.status, 403);
+            });
+        });
+
+        it('infra servers put returns 200 when infraServers update actions is allowed', () => {
+            cy.request({
+                headers: { 'api-token': withInfraServersUpdateActionToken },
+                method: 'PUT',
+                url: `/api/v0/infra/servers/${server.id}`,
+                body: {
+                    fqdn: 'a2-dev.test',
+                    id: `${cypressPrefix}-test`,
+                    ip_address: '127.0.0.1',
+                    name: 'test'
+                }
+                }).then((resp) => {
+                    assert.equal(resp.status, 200);
+                });    
+        });
+    });
+
+describe('Infra servers delete api to delete infra server', () => {
+    let withInfraServersDeleteActionToken = '';
+    let withoutInfraServersDeleteActionToken = '';
+    let server = {
+        fqdn: '',
+        id: '',
+        ip_address: '',
+        name: ''
+    };
+    const cypressPrefix = 'infra-server-actions-delete';
+    const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const objectsToCleanUp = ['tokens', 'policies'];
+
+
+    const withInfraServersDeletePolicy = {
+    id: policyId1,
+    name: tokenId1,
+    projects: [],
+    members: [`token:${tokenId1}`],
+    statements: [
+        {
+            effect: 'ALLOW',
+            actions: [
+                'infra:infraServers:delete'
+            ],
+            projects: ['*']
+        }]
+    };
+
+
+    const withoutInfraServersDeletePolicy = {
+        id: policyId2,
+        name: tokenId2,
+        projects: [],
+        members: [`token:${tokenId2}`],
+        statements: [
+        {
+            effect: 'DENY',
+            actions: [
+                'infra:infraServers:delete'
+            ],
+            projects: ['*']
+        }]
+    };
+
+    before(() => {
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId1,
+                name: tokenId1
+            }
+            }).then((resp) => {
+                withInfraServersDeleteActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withInfraServersDeletePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId2,
+                name: tokenId2
+            }
+            }).then((resp) => {
+                withoutInfraServersDeleteActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withoutInfraServersDeletePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+        });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/api/v0/infra/servers',
+            body: {
+                fqdn: 'a2-dev.test',
+                id: `${cypressPrefix}-test`,
+                ip_address: '127.0.0.1',
+                name: 'test'
+            }
+            }).then((resp) => {
+                server = resp.body.server;
+            });
+
+        after(() => {
+            cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+        });
+
+
+        it('infra servers delete returns 403 when infraServers delete actions is deneyed', () => {
+            cy.request({
+                headers: { 'api-token': withoutInfraServersDeleteActionToken },
+                method: 'POST',
+                url: `/api/v0/infra/servers/${server.id}`,
+                failOnStatusCode: false,
+                }).then((resp) => {
+                assert.equal(resp.status, 403);
+            });
+        });
+
+        it('infra servers delete returns 200 when infraServers delete actions is allowed', () => {
+            cy.request({
+                headers: { 'api-token': withInfraServersDeleteActionToken },
+                method: 'POST',
+                url: `/api/v0/infra/servers/${server.id}`,
+                body: {
+                    fqdn: 'a2-dev.test',
+                    id: `${cypressPrefix}-test`,
+                    ip_address: '127.0.0.1',
+                    name: 'test'
+                }
+                }).then((resp) => {
+                    assert.equal(resp.status, 200);
+                });    
+        });
+    });
+    
+    
