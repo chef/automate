@@ -4,7 +4,7 @@
       <chef-button class="arrow-btn" secondary (click)="returnToMenu()" data-cy="close-data-feed-button">
         <chef-icon>arrow_back</chef-icon>
       </chef-button>
-    </div>  
+    </div>
     <h1 slot="title" class="bolder-font" *ngIf="!integrationSelected">Choose a Data Feed Integration</h1>
     <h1 slot="title" class="bolder-font" data-cy="title-integration" *ngIf="integrationSelected">{{integTitle}}</h1>
     <chef-button class="close" secondary (click)="closeCreateSlider()" data-cy="close-feed-button">
@@ -25,10 +25,7 @@
           <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.webhook" [attr.data-cy]="item.name">
             <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
             <div class="container image-footer">
-              <h3 class="bolder-font">{{item.name}}</h3> 
-            </div>
-            <div class="overlay" *ngIf="item.name !== 'ServiceNow' && item.name !== 'Splunk'">
-              <div class="text">Coming Soon</div>
+              <h3 class="bolder-font">{{item.name}}</h3>
             </div>
           </div>
         </div>
@@ -39,10 +36,7 @@
           <div class="card" (click)="selectIntegration(item.name)" *ngFor="let item of integrations.storage" [attr.data-cy]="item.name">
             <img src="/assets/img/{{item.asset}}.png" alt="Avatar">
             <div class="container image-footer">
-              <h3 class="bolder-font">{{item.name}}</h3> 
-            </div>
-            <div class="overlay" *ngIf="item.name !== 'Minio'">
-              <div class="text">Coming Soon</div>
+              <h3 class="bolder-font">{{item.name}}</h3>
             </div>
           </div>
         </div>
@@ -126,33 +120,47 @@
             </div>
           </div>
         </div>
-        <div class="input-margin" *ngIf="showTokenInput('tokenType')">
+        <div class="input-margin" *ngIf="showFields.region && showSelect">
+          <div class="name-margin">
+            <label for="version">Region *</label>
+            <div class="version-dropdown dropdown-menu">
+              <chef-select #reg [value]="dropDownVal" (change)="dropDownChangeHandlers(reg.value)" data-cy="select-auth-type">
+                <chef-option *ngFor="let region of awsRegions" value="{{region.code}}"  data-cy="select-access-token">{{region.name}}</chef-option>
+              </chef-select>
+            </div>
+          </div>
+        </div>
+        <div class="input-margin" *ngIf="showTokenInput('tokenType')" [ngClass]="{'customtokentypeblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Token Type (Prefix)<span aria-hidden="true">*</span></span>
               <div class="input-and-btn">
                 <input
                   chefInput
-                  formControlName="tokenType" 
+                  formControlName="tokenType"
                   type="text"
                   data-cy="add-token-type"
                   id="token-type-input"
                   autocomplete="off"
-                  [readonly]="tokenToggle"/>
-                <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()">
+                  [readonly]="tokenToggle && !showFields.customToken"/>
+                <chef-button secondary data-cy="toggle-type" (click)="toggleTokenType()" *ngIf="!showFields.customToken">
                   Edit
                 </chef-button>
               </div>
             </label>
+            <chef-error
+              *ngIf="createForm.get('tokenType').hasError('required') && createForm.get('tokenType').dirty">
+              token type is required.
+            </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showTokenInput('token')">
+        <div class="input-margin" *ngIf="showTokenInput('token')" [ngClass]="{'customtokenblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Token <span aria-hidden="true">*</span></span>
               <input
                 chefInput
-                formControlName="token" 
+                formControlName="token"
                 type="text"
                 data-cy="add-token"
                 id="token-input"
@@ -168,13 +176,13 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showUserPassInput('username')">
+        <div class="input-margin" *ngIf="showUserPassInput('username')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Username <span aria-hidden="true">*</span></span>
               <input
                 chefInput
-                formControlName="username" 
+                formControlName="username"
                 type="text"
                 data-cy="add-username"
                 id="username-input"
@@ -190,13 +198,13 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div class="input-margin" *ngIf="showUserPassInput('password')">
+        <div class="input-margin" *ngIf="showUserPassInput('password')" [ngClass]="{'custompasswordblock' : showFields.customToken}">
           <chef-form-field>
             <label>
               <span class="label">Password <span aria-hidden="true">*</span></span>
               <input
                 chefInput
-                formControlName="password" 
+                formControlName="password"
                 type="password"
                 data-cy="add-password"
                 id="password-input"
@@ -230,13 +238,37 @@
             </chef-error>
           </chef-form-field>
         </div>
+        <div *ngIf="showFields.useHeaders" class="input-margin" [ngClass]="{'error' : !flagHeaders}">
+          <chef-form-field>
+            <label>
+              <chef-checkbox id="headers-checkbox" (change)="updateHeaderCheckbox($event.detail)" [checked]="headerChecked"> Use Headers?</chef-checkbox>
+                <div *ngIf="headerChecked">
+                  <textarea
+                    class="chef-inputtextarea"
+                    formControlName="headers"
+                    data-cy="add-headers"
+                    type="text"
+                    id="headers-input"
+                    placeholder="key:value"
+                    autocomplete="off"
+                    (input)="validateHeaders($event.target.value)"
+                    rows="5"
+                    ></textarea>
+                </div>
+            </label>
+            <chef-error
+              *ngIf="!flagHeaders && headerChecked">
+              Headers are invalid.
+            </chef-error>
+          </chef-form-field>
+        </div>
         <div class="input-margin" *ngIf="showFields.accessKey">
           <chef-form-field>
             <label>
               <span class="label">Access Key <span aria-hidden="true">*</span></span>
               <input
                 chefInput
-                formControlName="accessKey" 
+                formControlName="accessKey"
                 type="password"
                 data-cy="add-access-key"
                 id="accessKey-input"
@@ -258,7 +290,7 @@
               <span class="label">Secret Key <span aria-hidden="true">*</span></span>
               <input
                 chefInput
-                formControlName="secretKey" 
+                formControlName="secretKey"
                 type="password"
                 data-cy="add-secret-key"
                 id="secretKey-input"
@@ -273,7 +305,7 @@
               Secret Key is invalid.
             </chef-error>
           </chef-form-field>
-        </div>    
+        </div>
         <div class="input-margin">
           <div class="button-bar">
             <chef-button data-cy="test-button" id="testConnection" (click)="testConnection()" primary [disabled]="!validateForm()">
@@ -283,7 +315,7 @@
             </chef-button>
           </div>
         </div>
-        <hr>      
+        <hr>
         <div class="button-bar">
           <chef-button id="cancel-server-popup" (click)="returnToMenu()" tertiary>Cancel</chef-button>
           <chef-button [disabled]="!validateForm()"

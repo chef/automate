@@ -49,6 +49,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagItemToDelete: DataBagItems;
   public deleteModalVisible = false;
   public deleting = false;
+  public editDisable = false;
   public openDataBagModal = new EventEmitter<void>();
   public openEditDataBagItemModal = new EventEmitter<void>();
   public openDataBagItemModal = new EventEmitter<void>();
@@ -117,6 +118,16 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       .subscribe(([_getDataBagItemDetailsSt, dataBagItemDetailsState]) => {
         this.selectedItemDetails = JSON.parse(dataBagItemDetailsState.data);
         delete this.selectedItemDetails['id'];
+        this.editDisable = false;
+        for (const item in this.selectedItemDetails) {
+          if (this.selectedItemDetails[item]) {
+            for (const property in this.selectedItemDetails[item]) {
+              if (property === 'encrypted_data' || property === 'cipher') {
+                this.editDisable = true;
+              }
+            }
+          }
+        }
         this.dataBagsItemDetailsLoading = false;
       });
   }

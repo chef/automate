@@ -442,4 +442,5 @@ breaking:
     - external/infra_proxy/response/roles.proto
     - external/compliance/reporting/reporting.proto
     - config/ui/config_request.proto
+    - external/compliance/reporting/stats/stats.proto
 

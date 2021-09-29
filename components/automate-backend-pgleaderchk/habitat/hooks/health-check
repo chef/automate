@@ -1,0 +1,22 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+rc=0
+
+url="http://{{sys.ip}}:{{cfg.httpd.port}}"
+health=$({{pkgPathFor "core/curl"}}/bin/curl --max-time 2 --noproxy {{sys.ip}} ${url}/healthz 2>/dev/null)
+status=$(echo $health | {{pkgPathFor "core/jq-static"}}/bin/jq -r '.Status')
+
+# Example message:
+# {
+#   "Status": "ok"
+#   "Body": "the service is running"
+# }
+
+case $status in
+  "ok")
+    rc=0 ;; # Golden
+  *)
+    rc=2 ;; # Critical
+esac
+
+exit $rc

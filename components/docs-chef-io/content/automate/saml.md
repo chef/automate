@@ -35,7 +35,7 @@ If you need to change your configured IdP, you will need to replace
 your existing configuration by following these steps:
 
 1. Run `chef-automate config show config.toml`.
-2. Edit `config.toml` to replace the `dex.sys.connectors` section with the config values for your new identity provider.
+2. Edit `config.toml` to replace the `dex.v1.sys.connectors` section with the config values for your new identity provider.
 3. Run `chef-automate config set config.toml` to set your updated config.
 
 {{< note >}}

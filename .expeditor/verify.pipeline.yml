@@ -66,6 +66,27 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  #A2ha pipeline
+  - label: ":terraform: :buildkite: a2-ha-backend/terraform"
+    commands:
+      - tfenv install 0.14.11
+      - tfenv use 0.14.11
+      - cd terraform/a2ha-terraform
+      - make check
+    expeditor:
+      executor:
+        docker:
+          
+  - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
+    commands:
+      - gem install bundler:1.16.6
+      - cd components/automate-cluster-ctl/; bundle install --jobs=3 --retry=3
+      - bundle exec rspec
+    expeditor:
+      executor:
+        docker:
+          image: rubydistros/ubuntu-18.04
+
   #
   # Static & Unit tests
   #
@@ -634,7 +655,7 @@ steps:
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
-      - sudo -E  PATH=\$(hab pkg path core/ruby26)/bin:\$PATH make test-integration-scanner
+      - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
       - cd ../.. && sudo git clean -fxd
     artifact_paths:
       - /tmp/secrets-service.log

@@ -88,6 +88,8 @@ describe('DataFeedCreateComponent', () => {
     const secretKey = 'test123';
     const userName = 'test123';
     const password = 'test123';
+    const header = '{“test”:”123”}';
+    const region = 'region1';
     const destination = <Destination> {
       id: '1',
       name: 'new data feed',
@@ -125,6 +127,18 @@ describe('DataFeedCreateComponent', () => {
       expect(component.validateForm()).toBeTruthy();
     });
 
+    it('should be valid when all fields are filled out for ELK', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ELK');
+      // component.selectChangeHandlers('Access Token');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
     it('should be valid when all fields are filled out for splunk', () => {
       component.name = jasmine.createSpyObj('name', ['nativeElement']);
       component.name.nativeElement = { focus: () => { }};
@@ -147,6 +161,30 @@ describe('DataFeedCreateComponent', () => {
       component.createForm.controls['bucketName'].setValue(bucketName);
       component.createForm.controls['accessKey'].setValue(accessKey);
       component.createForm.controls['secretKey'].setValue(secretKey);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for custom with Access token', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue(token);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('should be valid when all fields are filled out for custom with UsernamePassword', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('Custom');
+      component.selectChangeHandlers('Username and Password');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['url'].setValue(destination.url);
+      component.createForm.controls['username'].setValue(userName);
+      component.createForm.controls['password'].setValue(password);
+      component.createForm.controls['headers'].setValue(header);
       expect(component.validateForm()).toBeTruthy();
     });
 
@@ -180,6 +218,21 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['token'].value).toBe(null);
     });
 
+    it('slider resets name, url, username and password to empty string for ELK', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['url'].setValue('any');
+      component.createForm.controls['tokenType'].setValue(tokenType);
+      component.createForm.controls['token'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => { }};
+      component.selectIntegration('ELK');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['url'].value).toBe(null);
+      expect(component.createForm.controls['tokenType'].value).toBe('Bearer');
+      expect(component.createForm.controls['token'].value).toBe(null);
+    });
+
     it('slider resets name, url, username and password to empty string for Minio', () => {
       component.createForm.controls['name'].setValue('any');
       component.createForm.controls['endpoint'].setValue('any');
@@ -196,6 +249,41 @@ describe('DataFeedCreateComponent', () => {
       expect(component.createForm.controls['accessKey'].value).toBe(null);
       expect(component.createForm.controls['secretKey'].value).toBe(null);
     });
+
+    it('should be valid when all fields are filled out for S3', () => {
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => {} };
+      component.selectIntegration('S3');
+      component.createForm.controls['name'].setValue(destination.name);
+      component.createForm.controls['bucketName'].setValue(bucketName);
+      component.createForm.controls['accessKey'].setValue(accessKey);
+      component.createForm.controls['secretKey'].setValue(secretKey);
+      expect(component.validateForm()).toBeTruthy();
+    });
+
+    it('Dropdown is populated for S3', () => {
+      expect(component.dropDownVal).toBe(null);
+      component.dropDownChangeHandlers(region);
+      expect(component.dropDownVal).toBe(region);
+    });
+
+    it('slider resets name, bucketname , accessKey and secretkey to empty string for S3', () => {
+      component.createForm.controls['name'].setValue('any');
+      component.createForm.controls['bucketName'].setValue('any');
+      component.createForm.controls['accessKey'].setValue('any');
+      component.createForm.controls['secretKey'].setValue('any');
+      component.slidePanel();
+      component.name = jasmine.createSpyObj('name', ['nativeElement']);
+      component.name.nativeElement = { focus: () => {} };
+      component.selectIntegration('Amazon S3');
+      expect(component.createForm.controls['name'].value).toBe(null);
+      expect(component.createForm.controls['bucketName'].value).toBe(null);
+      expect(component.createForm.controls['accessKey'].value).toBe(null);
+      expect(component.createForm.controls['secretKey'].value).toBe(null);
+    });
+
+
+
   });
 
   describe('create data feed form validation', () => {

@@ -15,11 +15,11 @@ gh_repo = "automate"
 
 ## Overview
 
-The _Chef Infra Server_ page (**Infrastructure > Chef Servers**) lets you connect existing Chef Infra Servers to Chef Automate, view all of the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
+The _Chef Infra Server_ page (**Infrastructure > Chef Servers**) lets you connect existing Chef Infra Servers to Chef Automate, view all the connected Chef Infra Servers, and manage all of the objects on your connected Chef Infra Servers.
 
-The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Server stores _cookbooks_, the policies that are applied to _nodes_, and metadata that describes each registered node that is being managed by Chef Infra Client.
+The _Chef Infra Server_ acts as a hub for configuration data. The Chef Infra Server stores _cookbooks_, the policies that are applied to _nodes_, and metadata that describes each registered node managed by Chef Infra Client.
 
-Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much of the configuration work as possible on the nodes themselves (and not on the Chef Infra Server).
+Nodes use Chef Infra Client to ask the Chef Infra Server for configuration details, such as recipes, templates, and file distributions. Chef Infra Client then does as much configuration work as possible on the nodes themselves (and not on the Chef Infra Server).
 
 This scalable approach distributes the configuration effort throughout the organization.
 
@@ -34,20 +34,21 @@ The objects that you can manage from the Chef Infra Server are:
 - Clients
 - Nodes
 - Policyfiles
+- PolicyGroup
 
 ## Connect Chef Infra Servers to Chef Automate
 
-The _Chef Infra Server_ panel starts out with an empty list of servers.
+The _Chef Infra Server_ panel starts with an empty list of servers.
 
-To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server** which will request the name, FQDN, and IP address of your Chef Infra Server:
+To add existing Chef Infra Servers to the Chef Automate infrastructure, select **Add Chef Server**, which will request the name, FQDN, and IP address of your Chef Infra Server:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu.png" width="500" alt="Add Chef Server Form">}}
 
-Chef Automate will warn you if you enter an invalid FQDN or IP address:
+Chef Automate warns you if you enter an invalid FQDN or IP address:
 
 {{< figure src="/images/automate/add-chef-server-popup-menu-with-error.png" width="500" alt="Add Chef Server Form">}}
 
-Once you are finished, select **Add Chef Server** and you will see your server in the list of Chef Infra Servers.
+Once done, select **Add Chef Server** and see the server in the list of Chef Infra Servers.
 
 ## Connect a Chef Organization to a Chef Infra Server
 
@@ -62,12 +63,12 @@ To add an existing organization, select **Add Chef Organization**, which opens a
 
 {{< figure src="/images/automate/add-chef-organization-popup-menu.png" width="500" alt="Add Chef Organization Form">}}
 
-Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values that were provided when the organization was configured using _Knife_.
+Enter the _Name_, _Projects_, _Admin User_, and _Admin Key_ fields using the same values provided when the organization gets configured using _Knife_.
 Copy the contents of the `~/.chef/USER.pem` file and paste it into the **Admin Key** field. Then select **Add Chef Organization** to add the organization to the Chef Infra Server.
 
 ## Access Chef Infra Server Components
 
-The following Chef Infra Server components for an organization can be managed using Chef Automate:
+Manage the following Chef Infra Server components for an organization using Chef Automate:
 
 - Cookbooks
 - Roles
@@ -92,7 +93,7 @@ The Chef Infra Server lets you view:
 
 #### List of Cookbooks
 
-In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks are mentioned in the list.
+In Chef Infra Server, you can view all the cookbooks of an organization. The latest version of the cookbooks is mentioned in the list.
 
 {{< figure src="/images/automate/list-of-cookbooks.png" alt="List of Cookbooks">}}
 
@@ -115,7 +116,7 @@ Select the **Content** tab to view the recipes and other components of a cookboo
 
 #### Details of a Cookbook
 
-Select the **Details** tab to view the requirements, usage, resources, and license of a cookbook.
+Select the **Details** tab to view the requirements, usage, resources, and license.
 
 {{< figure src="/images/automate/details-of-a-cookbook.png" alt="Details of a Cookbook">}}
 
@@ -139,7 +140,7 @@ To create a new role, select **Create Role**:
 
 {{< figure src="/images/automate/create-role-button.png" alt="Create Roles Button">}}
 
-Selecting the **Create Role** button opens a dialog box. The dialog box contains four different sections: _Details_, _Run List_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
+Selecting the **Create Role** button opens a dialog box. The dialog box contains four sections: _Details_, _Run List_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new role.
 
 {{< figure src="/images/automate/create-role-popup.png" alt="Create Roles Dialog Box">}}
 
@@ -151,15 +152,15 @@ Use the **Search Roles** bar to find the existing role from the list of roles. E
 
 #### View Role Details
 
-Select a specific role to view the details of that particular role. Its contains two tabs, _Details_ and _Attributes_.
+Select a specific role to view the details of that particular role. It contains two tabs, _Details_ and _Attributes_.
 
 {{< figure src="/images/automate/view-role-details.png" alt="View Role Details">}}
 
-The _Details_ contains the Run List, whereas the attributes tab displays the *default* and the *override* attributes of the role.
+The _Details_ contains the Run List, whereas the attributes tab displays the _default_ and the _override_ attributes of the role.
 
 {{< figure src="/images/automate/view-attributes-details.png" alt="View Attributes Details">}}
 
-You can edit the *default* and *override* attributes by selecting the **Edit** option. It opens a popup window where you can make the changes and click **Save**.
+You can edit the _default_ and _override_ attributes by selecting the **Edit** option. It opens a pop-up window where you can make the changes and select **Save**.
 
 #### Delete a Role
 
@@ -186,13 +187,13 @@ To create a new Environment, select **Create Environment**, as shown below:
 
 {{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
 
-Selecting the **Create Environment** button opens a dialog box. The dialog box contains four different sections: _Details_, _Constraints_, _Default Attributes_ and _Override Attributes_. Enter the details in the possible sections and select **Create** to create a new environment.
+Selecting the **Create Environment** button opens a dialog box. The dialog box contains four sections: _Details_, _Constraints_, _Default Attributes_, and _Override Attributes_. Enter the details in the possible sections, and select **Create** to create a new environment.
 
 {{< figure src="/images/automate/create-environment-popup.png" alt="Create Environment Dialog Box">}}
 
 #### Search for an Environment
 
-Use the **Search environments** bar to find an existing environment from the list of environments.
+Use the **Search environments** bar to find an existing environment from the list.
 Entering the name of an environment in the search box returns environments matching your search criteria.
 
 {{< figure src="/images/automate/create-environment-button.png" alt="Create Environment Button">}}
@@ -248,7 +249,7 @@ Selecting the **Create Data Bag** button opens a dialog box. Enter the name and 
 
 #### Create a Data Bag Item
 
-To create a data bag item, select the data bag from the list of created data bags and follow the steps given below:
+To create a data bag item, select the data bag from the list of data bags and follow the steps given below:
 
 Select **Create Item**, as shown below:
 
@@ -270,13 +271,13 @@ Select a specific data bag item to view the details. The details contain an *id*
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
-To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, Select **Save Item**.
+To edit the details of the data bag items, select **Edit**. In the dialog box, you can edit the details for the specific data bag item. Once done, select **Save Item**.
 
 {{< figure src="/images/automate/edit-data-bag-item.png" alt="Edit a Data Bag Item">}}
 
 #### Delete a Data Bag Item
 
-Select a specific data bag item to view the details. The details contain an *id*, and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
+Select a specific data bag item to view the details. The details contain an _id_ and a couple of _key values_. Chef Infra Server lets you **delete** a data bag item.
 
 {{< figure src="/images/automate/edit-and-delete-data-bag-item.png" alt="Edit and Delete a Data Bag Item">}}
 
@@ -310,13 +311,13 @@ The **Create Client** button opens a dialog box. Enter the _Client Name_ and sel
 
 {{< figure src="/images/automate/create-client-popup.png" alt="Create Client Dialog Box">}}
 
-Selecting **Create** opens a dialog box which contains the _Private Key_ of that particular client. Select **Download** to download the _Private Key_.
+Selecting **Create** opens a dialog box that contains the _Private Key_ of that particular client. Select **Download** to download the _Private Key_.
 
 {{< figure src="/images/automate/client-private-key.png" alt="Create Private Key of a Client">}}
 
 #### Search for a Client
 
-Use the **Search Clients** bar to find an client from the list of clients.
+Use the **Search Clients** bar to find a client from the list of clients.
 Entering the name of a client in the search bar returns clients matching your search criteria.
 
 {{< figure src="/images/automate/create-client-button.png" alt="Create Client Button">}}
@@ -331,7 +332,7 @@ The Chef Infra Server lets you reset the _Public Key_ using the _Reset Key_ opti
 
 {{< figure src="/images/automate/reset-key-in-client-details.png" alt="Reset Key Option of a Client" width="400" height="300">}}
 
-Selecting the _Reset Key_ shown in the above image opens a new dialog box which contains the new _Private Key_ of that client. To download the new _Private Key_, select **Download**.
+Selecting the _Reset Key_ shown in the above image opens a new dialog box containing the client's new _Private Key_. To download the new _Private Key_, select **Download**.
 
 {{< figure src="/images/automate/reset-public-key-of-a-client.png" alt="Reset Public Key of a Clients">}}
 
@@ -343,7 +344,7 @@ Chef Infra Server lets you delete the existing clients one at a time. To delete 
 
 ### Nodes
 
-A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node will be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
+A [node]({{< relref "/nodes" >}}) is a device that is managed by Chef Infra. During the Chef Infra Client run, the Infra Client retrieves [attributes](/nodes#attributes) that defines the expected state of the node and a [run-list](/nodes#run-lists) that defines how a node can be configured to that state from the Infra Server. The Infra Client then uses that information to update the node to its expected state.
 
 The Chef Infra Server integration lets you:
 
@@ -364,7 +365,7 @@ Use the search bar on the Nodes tab (**Chef Infra Servers > Nodes**)  to find a 
 
 #### Details of a Node
 
-Select a specific node to view the node information, metadata and details of the environment of the node. The first section of the page has the **Node Information** like `Environment`, `Policy Group` and `Policy Name`. You can also view the **Metadata** for the node which contains the name of the `Chef Server`, and name of the `Chef Organization`.
+Select a specific node to view the node information, metadata, and details of the node's environment. The first section of the page has the **Node Information** like `Environment`, `Policy Group`, and `Policy Name`. You can also view the **Metadata** for the node that contains the name of the `Chef Server`, and the name of the `Chef Organization`.
 
 The above information looks like as shown below:
 
@@ -382,12 +383,12 @@ The **Details** section lets you view and update the node environment. The drop-
 
 To select the environment:
 
-- Click on the dropdown menu and select the name of the environment.
+- Select the dropdown menu and the name of the environment.
 
 - You can add tags to the environment from the text bar below the dropdown menu.
-**Note:** To add multiple tags at a time, use comma separator. Example: Tag1, Tag2, Tag3.
+**Note:** To add multiple tags at a time, use a comma separator. Example: Tag1, Tag2, Tag3.
 
-- Selecting an environment will open a popup to save the node environment. Select **Save** to change the node environment.
+- Selecting an environment opens a pop-up to save the node environment. Select **Save** to change the node environment.
 
 {{< figure src="/images/automate/update-node-environment.png" alt="Update Node Environment">}}
 
@@ -399,11 +400,11 @@ You can edit, expand or collapse a node's run list.
 
 Edit a run list by:
 
-1. Select **edit**. A popup window opens.
+1. Select **edit**. A pop-up window opens.
 
 2. The left side of the window contains the list of environments. Select an environment from the list.
 
-3. The right side of the window will show the run list for the selected environment.
+3. The right side of the window shows the run list for the selected environment.
 
 4. Select the run list for a specific environment.
 
@@ -435,7 +436,7 @@ Chef Infra allows you to manage tags of the environment. You can add or remove m
 
 #### Reset a Client Key
 
-Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning that the current key will no longer be accepted. Select **Reset Key** once again to confirm.
+Reset a client key by selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} and then **Reset Key** of a specific node in the node list. Selecting **Reset Key** opens a warning _The current key will no longer be accepted_. Select **Reset Key** once again to confirm.
 
 {{< figure src="/images/automate/reset-the-node-key.png" alt="Reset the Client Key">}}
 
@@ -447,11 +448,11 @@ Delete individual existing nodes by selecting the ellipses icon {{< fontawesome 
 
 ### Policyfiles
 
-[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote code with simpler interface.
+[Policyfiles]({{< relref "/policyfile" >}}) are preferred way of managing roles, environments, and community cookbooks data with a single document that is uploaded to the Chef Infra Server. Policyfiles lets you test and promote codes with a simpler interface.
 
 The Chef Infra Server integration lets you:
 
-- Search for a specific Policyfiles
+- Search for specific Policyfiles
 - View all the Policyfiles
 - View the details of Policyfiles:
   - Content
@@ -473,15 +474,30 @@ Select a Policyfile to view the **METADATA**, **Content**, **Attributes**, **Rev
 
 ##### Content Tab
 
-The **Content** tab contains the list of all the *Included Policies* and *Run Lists*. Select a specific Policyfile from the *Included Policies* to view the details.
+The **Content** tab contains the list of all:
+
+- Included Policies
+- Run Lists
+
+###### Included Policies
+
+Select a specific Policyfile from the _Included Policies_ to view the details.
 
 {{< figure src="/images/automate/content-scroller-tab-for-policyfiles.png" alt="Content Scroller in Policyfiles Details">}}
 
-In the above image, the slider tab shows the *Details* of the selected policyfile. To view the *Revision ID* select the **Revisions** option in the tab.
+In the above image, the slider tab shows the _Details_ of the selected policyfile. To view the _Revision ID_ select the **Revisions** option in the tab.
+
+###### Run List
+
+Select a specific Run Item from the Run List to view the details in a slider tab.
+
+{{< figure src="/images/automate/runlist-tab-for-policyfiles.png" alt="Runlist Tab under Policyfiles">}}
+
+To view the cookbook details of the item, select the **Go to Cookbook Details** option in the tab.
 
 ##### Attributes Tab
 
-The **Attributes** tab displays the *default* and the *override* attributes of a Policyfile.
+The **Attributes** tab displays the _default_ and the _override_ attributes of a Policyfile.
 
 {{< figure src="/images/automate/attributes-tab-of-policyfiles.png" alt="Attributes tab of Policyfiles">}}
 
@@ -489,12 +505,17 @@ You can **Expand** and **Collapse** the *default* and *override* attributes by s
 
 ##### Cookbook Dependencies
 
-Select the **Cookbook Dependencies** button to view all the *Dependencies Rules* and *Cookbook* of the policyfile in table format. The slider tab also contains the `Operator` and `Version` of the cookbooks.
+Select the **Cookbook Dependencies** button to view all the _Dependencies Rules_ and _Cookbook_ of the policyfile in table format. Select a specific cookbook from the list to view the details of the cookbook.
+
+{{< note >}} Selecting a specific cookbook redirects you to the audit section of the **Cookbook** main tab.
+{{< /note >}}
+
+The slider tab contains the `Operator` and `Version` of the cookbooks.
 
 {{< figure src="/images/automate/cookbook-dependencies-from-policyfiles.png" alt="Cookbook Dependencies Button">}}
 
 {{< note >}}
-You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up which contains the detailed revision ID.
+You can find the **Revision ID** window directly by selecting the ellipses icon of a Policyfile. Selecting the option opens a pop-up that contains the detailed revision ID.
 {{< /note >}}
 
 {{< figure src="/images/automate/revision-id-of-policyfiles.png" alt="Revision id of Policyfiles">}}
@@ -512,10 +533,12 @@ The Chef Infra Server integration lets you:
 - Search for a Policy Group
 - View all the Policy Groups
 - View the details of a Policy Group
+  - Policyfiles
+  - Nodes
 
 #### Search for a Policy Group
 
-Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) to find a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
+The search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups**) finds a policy group from the list. Enter the name of a policy group in the search bar to view matching Policy Groups.
 
 {{< figure src="/images/automate/search-for-a-policygroup.png" alt="Search for a Policy Group">}}
 
@@ -524,6 +547,28 @@ Use the search bar on the Policy Groups tab (**Chef Infra Server > Policy Groups
 Select a Policy Group to view the Policy Group Information and METADATA of that Policy Group.
 
 {{< figure src="/images/automate/details-of-the-policygroup.png" alt="Details of a Policy Group">}}
+
+##### Policyfiles Tab
+
+The details page of the policy group view the list of **Policyfiles**.
+
+{{< figure src="/images/automate/policyfiles-under-policygroup.png" alt="Policyfiles under Policy Group">}}
+
+Select a Policyfile from the list to view its details.
+
+{{< note >}} Selecting a specific policyfile redirects you to the details section of the **Policyfiles** main tab.
+{{< /note >}}
+
+##### Nodes Tab
+
+The details page of the policy group lets you view the list of **Nodes**.
+
+{{< figure src="/images/automate/nodes-tab-in-policygroup.png" alt="Nodes Tab in Policy Group">}}
+
+Select a node from the list to view its details
+
+{{< note >}} Selecting a specific node opens details section of the **Nodes** tab.
+{{< /note >}}
 
 ## Troubleshoot
 
