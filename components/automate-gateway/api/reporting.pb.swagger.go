@@ -48,6 +48,47 @@ func init() {
         ]
       }
     },
+    "/api/v0/compliance/reporting/nodecontrols/id/{id}": {
+      "post": {
+        "summary": "List Control info",
+        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering and pagination.\nLimited to 10 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:ControlElements:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_ListControlInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElements"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/nodeheader/id/{id}": {
       "post": {
         "summary": "Show Node Header Info From Report ID",
@@ -454,6 +495,45 @@ func init() {
         "removed_results_counts": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.RemovedResultsCounts",
           "description": "When the control results are removed to reduce the size of the report, this summarize the status of the trimmed results."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ControlElement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The control's unique ID."
+        },
+        "title": {
+          "type": "string",
+          "description": "The control's compact description."
+        },
+        "profile": {
+          "type": "string",
+          "description": "Profile name."
+        },
+        "impact": {
+          "type": "number",
+          "format": "float",
+          "description": "The severity of the control."
+        },
+        "results": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of results."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.ControlElements": {
+      "type": "object",
+      "properties": {
+        "control_elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElement"
+          },
+          "title": "List of control elements"
         }
       }
     },

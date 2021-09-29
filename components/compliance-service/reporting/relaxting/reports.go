@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -1059,6 +1060,114 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	return contListItemList, nil
 }
 
+// GetNodeControlListItems returns the paginated control list response.
+func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters map[string][]string, reportID string) (*reportingapi.ControlElements, error) {
+
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return nil, err
+	}
+
+	// Get the latest report only
+	filters["start_time"] = []string{}
+	// Get the index based on the filters passed.
+	esIndex, err := GetEsIndex(filters, false)
+	if err != nil {
+		return nil, errors.Wrap(err, "GetNodeControlListItems")
+	}
+
+	// convert the string from/to fields in the the filterquery. If there is an issue or no pagination query passed default
+	// value from 0 and size 10 will be used.
+	from, size, err := paginatedParams(filters)
+	if err != nil {
+		logrus.Debug("failed to parse paginated params provided, will use default value of from:0 and size:10")
+	}
+
+	// From each search hit we only need the profile name.
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"profiles.name")
+
+	// query for fetching report id with paginated response.
+	matchQuery := elastic.NewMatchAllQuery()
+	nestedQuery := elastic.NewNestedQuery("profiles.controls", matchQuery)
+	nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().Size(size).From(from))
+
+	nodequery := elastic.NewMatchQuery("report_uuid", reportID)
+
+	queryInfo := elastic.NewBoolQuery()
+	queryInfo = queryInfo.Must(nodequery)
+	queryInfo = queryInfo.Must(nestedQuery)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(queryInfo)
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(ctx)
+	if err != nil {
+		logrus.Errorf("error in the getting response of search query: ", err)
+		return nil, err
+	}
+
+	// check if there is a response for the query send.
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		numProfiles := make([]string, 0)
+		for _, hit := range searchResult.Hits.Hits {
+			esInSpecReport := ESInSpecReport{}
+			err = json.Unmarshal(*hit.Source, &esInSpecReport)
+			if err != nil {
+				logrus.Errorf("error unmarshalling the search response: %+v", err)
+				return nil, err
+			}
+			for _, profile := range esInSpecReport.Profiles {
+				numProfiles = append(numProfiles, profile.Name)
+			}
+		}
+
+		var listControls = make([]*reportingapi.ControlElement, 0)
+		for _, hit := range searchResult.Hits.Hits {
+			for _, innerhit := range hit.InnerHits["profiles.controls"].Hits.Hits {
+				tempControl := struct {
+					ID      string
+					Impact  float32
+					Results []*reportingapi.Result
+					Title   string
+				}{
+					ID:      "",
+					Impact:  0.0,
+					Results: []*reportingapi.Result{},
+					Title:   "",
+				}
+				control := &reportingapi.ControlElement{}
+				err = json.Unmarshal(*innerhit.Source, &tempControl)
+				if err != nil {
+					logrus.Errorf("error unmarshalling the search control response: %+v", err)
+					return nil, err
+				}
+				// store the control result to temporary control element
+				profileID := innerhit.Nested.Offset
+				control.Id = tempControl.ID
+				control.Impact = tempControl.Impact
+				control.Results = int32(len(tempControl.Results))
+				control.Title = tempControl.Title
+				control.Profile = numProfiles[profileID]
+				listControls = append(listControls, control)
+			}
+		}
+		contNodeList := &reportingapi.ControlElements{ControlElements: listControls}
+		return contNodeList, nil
+	}
+	return nil, errorutils.ProcessNotFound(nil, reportID)
+}
+
 func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
 	contListItem := reportingapi.ControlItem{}
 	id, ok := controlBucket.Key.(string)
@@ -1606,4 +1715,18 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 		nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
 	}
 	return nestedQuery
+}
+
+func paginatedParams(filters map[string][]string) (int, int, error) {
+	var from, size = 0, 10
+	var err error
+	for key, value := range filters {
+		if key == "from" {
+			from, err = strconv.Atoi(value[0])
+		}
+		if key == "size" {
+			size, err = strconv.Atoi(value[0])
+		}
+	}
+	return from, size, err
 }

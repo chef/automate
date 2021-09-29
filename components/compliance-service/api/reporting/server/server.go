@@ -199,6 +199,24 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlIt
 	return controlListItems, nil
 }
 
+// ListControlInfo returns a list of controlListItems based on query
+func (srv *Server) ListControlInfo(ctx context.Context, in *reporting.Query) (*reporting.ControlElements, error) {
+	var nodeControls *reporting.ControlElements
+
+	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("ListControlInfo called with filters %+v", formattedFilters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	nodeControls, err = srv.es.GetNodeControlListItems(ctx, formattedFilters, in.Id)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return nodeControls, nil
+}
+
 type exportHandler func(*reporting.Report) error
 
 // Export streams a json or csv export
