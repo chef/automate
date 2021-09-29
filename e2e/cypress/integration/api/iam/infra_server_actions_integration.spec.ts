@@ -19,8 +19,7 @@ describe('Infra servers list api', () => {
         {
             effect: 'ALLOW',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
@@ -36,8 +35,7 @@ describe('Infra servers list api', () => {
         {
             effect: 'DENY',
             actions: [
-                'infra:infraServers:list',
-                'infra:nodes:list'
+                'infra:infraServers:list'
             ],
             projects: ['*']
         }]
@@ -144,8 +142,7 @@ describe('Infra servers get api', () => {
         {
             effect: 'ALLOW',
             actions: [
-                'infra:infraServers:get',
-                'infra:nodes:get'
+                'infra:infraServers:get'
             ],
             projects: ['*']
         }]
@@ -161,8 +158,7 @@ describe('Infra servers get api', () => {
         {
             effect: 'DENY',
             actions: [
-                'infra:infraServers:get',
-                'infra:nodes:get'
+                'infra:infraServers:get'
             ],
             projects: ['*']
         }]
@@ -256,15 +252,10 @@ describe('Infra servers get api', () => {
         });
     });
 
-describe('Infra servers post api', () => {
-    let withInfraServersGetActionToken = '';
-    let withoutInfraServersGetActionToken = '';
-    let server = {
-        fqdn: '',
-        id: '',
-        ip_address: '',
-        name: ''
-    };
+describe('Infra servers post api to create infra servers', () => {
+    let withInfraServersPostActionToken = '';
+    let withoutInfraServersPostActionToken = '';
+
     const cypressPrefix = 'infra-server-actions-post';
     const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
     const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
@@ -272,7 +263,7 @@ describe('Infra servers post api', () => {
     const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
     const objectsToCleanUp = ['tokens', 'policies'];
 
-    const withInfraServersGetPolicy = {
+    const withInfraServersPostPolicy = {
     id: policyId1,
     name: tokenId1,
     projects: [],
@@ -281,15 +272,14 @@ describe('Infra servers post api', () => {
         {
             effect: 'ALLOW',
             actions: [
-                'infra:infraServers:create',
-                'infra:nodes:get'
+                'infra:infraServers:create'
             ],
             projects: ['*']
         }]
     };
 
 
-    const withoutInfraServersGetPolicy = {
+    const withoutInfraServersPostPolicy = {
         id: policyId2,
         name: tokenId2,
         projects: [],
@@ -298,8 +288,7 @@ describe('Infra servers post api', () => {
         {
             effect: 'DENY',
             actions: [
-                'infra:infraServers:get',
-                'infra:nodes:get'
+                'infra:infraServers:create'
             ],
             projects: ['*']
         }]
@@ -311,34 +300,20 @@ describe('Infra servers post api', () => {
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
-            url: '/api/v0/infra/servers',
-            body: {
-                fqdn: 'a2-dev.test',
-                id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
-                ip_address: '127.0.0.1',
-                name: 'test'
-            }
-            }).then((resp) => {
-                server = resp.body.server;
-            });
-
-        cy.request({
-            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-            method: 'POST',
             url: '/apis/iam/v2/tokens',
             body: {
                 id: tokenId1,
                 name: tokenId1
             }
             }).then((resp) => {
-                withInfraServersGetActionToken = resp.body.token.value;
+                withInfraServersPostActionToken = resp.body.token.value;
             });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: withInfraServersGetPolicy
+            body: withInfraServersPostPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
@@ -352,42 +327,52 @@ describe('Infra servers post api', () => {
                 name: tokenId2
             }
             }).then((resp) => {
-                withoutInfraServersGetActionToken = resp.body.token.value;
+                withoutInfraServersPostActionToken = resp.body.token.value;
             });
-
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: withoutInfraServersGetPolicy
+            body: withoutInfraServersPostPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
         });
+
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
         });
 
-        it('infra servers get returns 200 when infraServers get actions is allowed', () => {
-        cy.request({
-            headers: { 'api-token': withInfraServersGetActionToken,
-            'content-type': 'application/json+lax' },
-            method: 'GET',
-            url: `/api/v0/infra/servers/${server.id}`
-        }).then((resp) => {
-                assert.equal(resp.status, 200);
-            });
+        it('infra servers get returns 200 when infraServers post actions is allowed', () => {
+            cy.request({
+                headers: { 'api-token': withInfraServersPostActionToken },
+                method: 'POST',
+                url: '/api/v0/infra/servers',
+                body: {
+                    fqdn: 'a2-dev.test',
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
+                    ip_address: '127.0.0.1',
+                    name: 'test'
+                }
+                }).then((resp) => {
+                    assert.equal(resp.status, 200);
+                });    
         });
 
-        it('infra servers get returns 403 when infraServers get actions is deneyed', () => {
+        it('infra servers get returns 403 when infraServers post actions is deneyed', () => {
             cy.request({
-                headers: { 'api-token': withoutInfraServersGetActionToken,
-                'content-type': 'application/json+lax' },
-                method: 'GET',
+                headers: { 'api-token': withoutInfraServersPostActionToken },
+                method: 'POST',
+                url: '/api/v0/infra/servers',
                 failOnStatusCode: false,
-                url: `/api/v0/infra/servers/${server.id}`
-            }).then((resp) => {
+                body: {
+                    fqdn: 'a2-dev.test',
+                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
+                    ip_address: '127.0.0.1',
+                    name: 'test'
+                }
+                }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
         });
