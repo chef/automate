@@ -12,7 +12,7 @@ locals {
       automate_frontend_urls    = var.automate_frontend_urls
     })
 
-    copy_files = [
+    copy_terraform_files_for_destroy = [
     "/src/terraform/reference_architectures/aws/variables.tf",
     "/src/terraform/a2ha_habitat.auto.tfvars",
     "/src/terraform/aws.auto.tfvars",
@@ -42,7 +42,7 @@ resource "null_resource" "output" {
 }
 
 resource "null_resource" "setup_destroy_directory" {
-  for_each = toset(local.copy_files)
+  for_each = toset(local.copy_terraform_files_for_destroy)
 
   provisioner "local-exec" {
     command = "cp ${each.value} ${local.destination_path}"
