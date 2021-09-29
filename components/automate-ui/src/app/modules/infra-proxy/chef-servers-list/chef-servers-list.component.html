@@ -56,7 +56,7 @@
                 <chef-td>{{ server.ip_address }}</chef-td>
                 <chef-td>{{ server.orgs_count }}</chef-td>
                 <chef-td class="three-dot-column">
-                  <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', server.id]">
+                  <app-authorized [allOf]="['/api/v0/infra/servers/{id}', 'delete', [server.id]]">
                     <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
                       <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="delete-server">Delete</mat-option>
                     </mat-select>
