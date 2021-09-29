@@ -643,7 +643,7 @@ describe('Infra servers delete api to delete infra server', () => {
             });
         });
 
-        it('infra servers delete returns 200 when infraServers delete actions is allowed', () => {
+        it('infra server delete returns 200 when infraServers delete actions is allowed', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersDeleteActionToken },
                 method: 'DELETE',
