@@ -51,7 +51,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
 	}
-	if _, err := os.Stat(AUTOMATE_HA_RUN_LOG_DIR); errors.Is(err, nil) {
+	if _, err := os.Stat(AUTOMATE_HA_RUN_LOG_DIR); !errors.Is(err, nil) {
 		err = os.Mkdir(AUTOMATE_HA_RUN_LOG_DIR, os.ModeDir)
 		if err != nil {
 			panic(err)
@@ -125,7 +125,7 @@ func isA2HARBFileExist() bool {
 
 func checkIfFileExist(path string) bool {
 	if _, err := os.Stat(path); errors.Is(err, nil) {
-		return false
+		return true
 	}
-	return true
+	return false
 }
