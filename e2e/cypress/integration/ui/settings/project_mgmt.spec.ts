@@ -59,8 +59,13 @@ describe('project management', () => {
   });
 
   it('can create a project without adding a custom ID', () => {
+    
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
+
+    if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+      cy.get('app-welcome-modal').invoke('hide');
+    }
 
     cy.get('[data-cy=create-name]').focus()
       .type(projectName).should('have.value', projectName);
