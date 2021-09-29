@@ -13,10 +13,6 @@ gh_repo = "automate"
     weight = 20
 +++
 
-{{< note >}}
-Data Feed is a beta feature in active development. To enable Data Feed, first select anywhere on the Chef Automate interface and enter 'feat' to open the feature flags window and then toggle "Chef Automate Data Feed" to the "ON" position.
-{{< /note >}}
-
 The Data Feed service sends node data to a 3rd party service.
 This can be useful when updating configuration management databases, external security dashboards and IT service management platforms.
 The following types of information are sent:
