@@ -12,10 +12,10 @@ Subcommands:
     show                             Show existing secrets: for more info use 'secrets show --help'
     delete                           Delete existing secrets: for more info use 'secrets delete --help'
 Args:
-	automate_admin_password			Set automate admin password
-	sudo_password					Set sudo password to login in machines
-	fe_sudo_password				Set different sudo password for frontend machines
-	be_sudo_password				Set different sudo password for bacend machines
+automate_admin_password			Set automate admin password
+    sudo_password					Set sudo password to login in machines
+    fe_sudo_password				Set different sudo password for frontend machines
+    be_sudo_password				Set different sudo password for bacend machines
 Options:
     -h, --help                       print help
     -v, --verbose                    Enable verbose output
