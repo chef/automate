@@ -52,7 +52,3 @@ module "aws-output" {
   automate_fqdn             = module.aws.automate_fqdn
   automate_frontend_urls    = module.aws.automate_frontend_urls
 }
-
-module "aws-destroy" {
-  source = "../../modules/aws_destroy"
-}
