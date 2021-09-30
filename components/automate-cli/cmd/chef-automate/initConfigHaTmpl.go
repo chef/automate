@@ -7,9 +7,9 @@ const haAwsConfigTemplate = `
 
 [architecture.aws]
 secrets_key_file = "secrets.json"
-secrets_store_file = "/etc/chef-automate/secrets.key"
+secrets_store_file = "/hab/a2_deploy_workspace/secrets.key"
 architecture = "aws"
-workspace_path = "/src"
+workspace_path = "/hab/a2_deploy_workspace"
 # ssh user name for ssh login to instance like default user for centos will centos or for red-hat will be ec2-user
 ssh_user = "centos"
 # private ssh key file path to access instances
@@ -79,10 +79,10 @@ const haExistingNodesConfigTemplate = `
 # successfully create a new Chef Automate HA instances with default settings.
 
 [architecture.existing_infra]
-secrets_key_file = "/etc/chef-automate/secrets.key"
+secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "secrets.json"
 architecture = "aws"
-workspace_path = "/src"
+workspace_path = "/hab/a2_deploy_workspace"
 ssh_user = "existing_infra"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"

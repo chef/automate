@@ -15,17 +15,12 @@ var argsSomeThingElse = []string{"something_else"}
 var argsEmpty = []string{}
 
 func Test_runInitConfigHACmd(t *testing.T) {
-	type args struct {
-		cmd  *cobra.Command
-		args []string
-	}
 	tests := []struct {
 		testName string
 		cmd      *cobra.Command
 		args     []string
 		wantErr  bool
 	}{
-		// TODO: Add test cases.
 		{"aws mode of deployment", stubCmd, argsAws, false},
 		{"existing node mode of deployment", stubCmd, argsExistingNodes, false},
 		{"Invalid mode of deployment", stubCmd, argsSomeThingElse, true},

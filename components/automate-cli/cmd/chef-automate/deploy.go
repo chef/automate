@@ -33,6 +33,14 @@ https://www.chef.io/online-master-agreement
 I agree to the Terms of Service and the Master License and Services Agreement
 `
 var errMLSA = "Chef Software Terms of Service and Master License and Services Agreement were not accepted"
+var errProvisonInfra = `Architecture does not match with the requested one. 
+If you want to provision cluster then you have to first run provision command.
+
+		chef-automate provision-infra
+
+After that you can run this command`
+
+var invalidConfig = "Invalid toml config file, please check your toml file."
 
 var deployCmdFlags = struct {
 	channel                         string
@@ -185,11 +193,18 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd(cmd *cobra.Command, args []string) error {
-	if isA2HADeployment() {
-		//TODO need to implement full a2ha deplopyment steps
-		//generation of a2ha.rb file based on config.toml
-		return readConfigAndWriteToFile()
+	var configPath = ""
+	if len(args) > 0 {
+		configPath = args[0]
 	}
+	var deployer, derr = getDeployer(configPath)
+	if derr != nil {
+		return status.Wrap(derr, status.ConfigError, invalidConfig)
+	}
+	if deployer != nil {
+		return deployer.doDeployWork(args)
+	}
+	writer.Printf("Automate deployment non HA mode proceeding...")
 	if !deployCmdFlags.acceptMLSA {
 		agree, err := writer.Confirm(promptMLSA)
 		if err != nil {
@@ -282,7 +297,6 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}
-
 	return err
 }
 
@@ -293,11 +307,9 @@ func generatedConfig() (*dc.AutomateConfig, error) {
 		dc.InitialTLSCerts(deployCmdFlags.keyPath, deployCmdFlags.certPath),
 		dc.InitialFQDN(deployCmdFlags.fqdn),
 	)
-
 	if err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "Generating initial default configuration failed")
 	}
-
 	return cfg.AutomateConfig(), nil
 }
 

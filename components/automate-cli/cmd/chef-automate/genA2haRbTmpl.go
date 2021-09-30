@@ -57,14 +57,14 @@ end
 ### Only applies when using an existing node architecture   ###
 ###############################################################
 existing_nodes do
-  automate_ips {{ .ExistingInfra.Config.AutomateIps }}
-  automate_private_ips {{ .ExistingInfra.Config.AutomatePrivateIps }}
-  chef_server_ips {{ .ExistingInfra.Config.ChefServerIps }}
-  chef_server_private_ips {{ .ExistingInfra.Config.ChefServerPrivateIps }}
-  elasticsearch_ips {{ .ExistingInfra.Config.ElasticsearchIps }}
-  elasticsearch_private_ips {{ .ExistingInfra.Config.ElasticsearchPrivateIps }}
-  postgresql_ips {{ .ExistingInfra.Config.PostgresqlIps }}
-  postgresql_private_ips {{ .ExistingInfra.Config.PostgresqlPrivateIps }}
+  automate_ips [{{ range $index, $element := .ExistingInfra.Config.AutomateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  automate_private_ips [{{ range $index, $element := .ExistingInfra.Config.AutomatePrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  chef_server_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  chef_server_private_ips [{{ range $index, $element := .ExistingInfra.Config.ChefServerPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  elasticsearch_ips [{{ range $index, $element := .ExistingInfra.Config.ElasticsearchIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  elasticsearch_private_ips [{{ range $index, $element := .ExistingInfra.Config.ElasticsearchPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  postgresql_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
+  postgresql_private_ips [{{ range $index, $element := .ExistingInfra.Config.PostgresqlPrivateIps}}{{if $index}},{{end}}"{{$element}}"{{end}}]
 end
 `
 
@@ -128,7 +128,7 @@ aws do
   ### AWS Credentials profile to use when deploying AWS infrastructure
   profile "{{ .Aws.Config.Profile }}"
   region "{{ .Aws.Config.Region }}"
-  # ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
+  ssh_key_pair_name "{{ .Aws.Config.SSHKeyPairName }}"
   ### Filter settings default to CentOS if left blank
   # ami_filter_name "{{ .Aws.Config.AmiFilterName }}"
   ### Filter settings default to CentOS if left blank
