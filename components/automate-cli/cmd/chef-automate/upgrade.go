@@ -19,12 +19,12 @@ var upgradeCmd = &cobra.Command{
 }
 
 var upgradeRunCmdFlags = struct {
-	airgap  string
-	version string
-	upgradefrontends bool	
-	upgradebackends bool
+	airgap               string
+	version              string
+	upgradefrontends     bool
+	upgradebackends      bool
 	upgradeairgapbundles bool
-	skipDeploy bool
+	skipDeploy           bool
 }{}
 
 var upgradeRunCmd = &cobra.Command{
@@ -254,7 +254,7 @@ func init() {
 		"skip-deploy",
 		false,
 		"will only upgrade and not deploy the bundle")
-	
+
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
