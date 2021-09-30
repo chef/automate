@@ -25,14 +25,14 @@ The Integration App works by exposing the REST API endpoints for communication b
 ### User Requirements
 
 - Your unique ServiceNow URL. It has the format: `https://ven12345.service-now.com`.
-- Once the Integration app is installed, you will need to have the `x_chef_automate.api` role to configure it. Your ServiceNow administrator can enable this for you.
+- Once the Integration App requires the `x_chef_automate.api` role to configure it. Your ServiceNow administrator can enable this for you.
 
-### System and User Requirements
+### System Requirements
 
 - A running [Chef Automate](https://www.chef.io/automate/) instance.
 - Chef Automate is provisioned with a valid SSL/TLS certificate from a trusted certificate authority (CA).
 - A running [ServiceNow](https://www.servicenow.com/) instance.
-- The ServiceNow is reachable on port 443.
+- The ServiceNow instance is reachable on port 443.
 
 ### Required ServiceNow Plugins
 
@@ -42,47 +42,30 @@ Install following ServiceNow plugins from the Service Management dashboard:
 - Configuration Management (CMDB) 1.1.
 - Configuration Management for Scoped Apps (com.snc.cmdb.scoped) 1.0.0.
 
-{{< figure src="/images/automate/snow_integration_plugins.png" alt="Plugins" >}}
-## Install the Integration App
+## Installatopm
 
-Install the Integration App from the [ServiceNow Store](https://store.servicenow.com)
-
-1. Navigate to the ServiceNow store at <https://store.servicenow.com>.
-2. Search for **Chef Automate**.
-3. Select the **Chef Automate Integration App**.
-4. Select **Get** and follow the instructions by specifying your ServiceNow credentials.
-5. Open your **ServiceNow Service Management** application.
-6. Select **System Applications** > **All Available Applications** > **All** menu.
-7. Find the application using the filter criteria and search bar.
-   You can search for the application by its `Name` or `ID`. If you cannot find an application, you may have to request it from the ServiceNow Store.
-8. Select **Install**.
+Get the app from the [ServiceNow](https://store.servicenow.com) store and then install it to your account from the **Service Management** dashboard.
 
 ## Setup
 
-Connect the Integration App in ServiceNow to Chef Automate by creating a data feed in from Chef Automate or a connection in Service Now. Setting up and configuring the Integration App requires the `x_chef_automate.api` role to configure it. If you are not a ServiceNow administrator, ask one to enable it for you.
+To see your data in ServiceNow, you need to create a data feed for Chef Automate. You can set up the data feed either in Chef Automate or in ServiceNow.
+
+Setting up the data feed requires the `x_chef_automate.api` role permissions. Your ServiceNow administrator can enable this for you.
 
 ### Create a Data Feed in Chef Automate
 
-Set up a data feed to send data from Chef Automate to the Integration App:
+Set up a data feed to send data from Chef Automate:
 
 1. Confirm that you have the `x_chef_automate.api` role.
-1. Navigate to **Settings** from the **Chef Automate** menu.
-1. Select the **Data Feeds** link from **Settings**.
-1. Select the **Create Data Feed** button.
-1. Enter the following information:
-
+1. Navigate to **Settings** > **Data Feeds** > **Create Data Feed**.
+1. Enter or select:
    - **Name**: A unique name for this integration.
-   - **Data Feed URL**: ServiceNow application Datafeed API URL ending with `api/x_chef_automate/asset`.
-   - **Username**: The ServiceNow user.
-   - **Password**: The Chef Automate user password.
+   - **Data Feed URL**:The API address that the notification uses. It has the format: `https://ven12345.service-now.com/api/x_chef_automate/asset`.
+   - **Username**: The name you use to sign in to ServiceNow.
+   - **Password**: The password you use to sign in to ServiceNow.
+1. Select **Test Data Feed**. A successful test displays **service-now automate connectivity passed**. An unsuccessful test returns a message with infomation for the connectivity or credentials issues to helps resolve the error.
 
-   You must specify the fully qualified domain name (FQDN) of the ServiceNow instance to configure the **Data Feed URL** in Chef Automate, which has the format: `FQDN/api/x_chef_automate/asset` . For example, <https://venxxx.service-now.com/api/x_chef_automate/asset>.
-
-1. Select the **Test Data Feed** button. The application checks that the values specified are correct and the connectivity between Chef Automate and the application establishes.
-
-   A successful test displays the **service-now automate connectivity passed** message. Else, an error message displays detailing the connectivity or credentials issues and helps you in resolving the error.
-
-1. Select **Create Data Feed**.
+1. Select **Create Data Feed** to save the setup.
 
 {{< figure src="/images/automate/snow_integration_create_data_feed.png" alt="Create Data Feed">}}
 
@@ -100,8 +83,8 @@ Follow these steps connect the Integration App to Chef Automate:
    - **Name**: A unique name for this integration.
    - **Instance URL**: The Chef Automate URL.
    - **Automate API token**: A Chef Automate API token with data-feed-service authorization.
-   - **ServiceNow user**: The ServiceNow user name.
-   - **ServiceNow password**: The ServiceNow user password.
+   - **ServiceNow user**: The name you use to sign in to ServiceNow.
+   - **ServiceNow password**: The password you use to sign in to ServiceNow.
 
 1. Select the **Test Connectivity** button. The Integration App checks that the values are correct and test the connection with Chef Automate.
 
