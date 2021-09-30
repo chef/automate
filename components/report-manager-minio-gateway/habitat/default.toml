@@ -1,0 +1,9 @@
+[service]
+host = "localhost"
+port = 10197
+
+[tls]
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
