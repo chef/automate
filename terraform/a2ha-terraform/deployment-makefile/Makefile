@@ -6,6 +6,7 @@ SUP_KEY_SH = $(shell pwd)/scripts/sup-keys.sh
 TMPOUT = '/tmp/make.out'
 REPO_ROOT = $(shell pwd)
 DATESTAMP := $(shell date +"%Y%m%d%H%M%S")
+BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle-$(DATESTAMP).aib
 BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend-$(DATESTAMP).aib
 BACKENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_be.auto.tfvars
 FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
@@ -52,21 +53,37 @@ help:
 	@printf "  ${YELLOW}%-20s${RESET} ${GREEN}%s${RESET}\n" "BEVERSION|FEVERSION" "Semver of Backend|Frontend Components to pull ex. BEVERSION=0.1.63 make airgap"
 	@echo ''
 
-$(FRONTENDAIB):
-	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
-		$(AIRGAP_SH) -t frontend -o $(FRONTENDAIB) -b $(BACKENDAIB) > $(FRONTENDAIB_TFVARS) && \
+$(BUNDLEAIB):
+	@echo "# Updating FE and BE component package versions" && \
+		$(AIRGAP_SH) -t all -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)  && \
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
+
+$(FRONTENDAIB):
+	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
+		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS) && \
+	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 
+
+$(BACKENDAIB):
+	@echo "# Updating BE component package versions: $(BACKENDAIB_TFVARS)" && \
+		$(AIRGAP_SH) -t upgradebackends -b $(BACKENDAIB) -q $(BACKENDAIB_TFVARS) && \
+	    $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
 
 $(HABITAT_TFVARS):
 	@echo -e "# Generating habitat encryption keys in $(HABITAT_TFVARS)" && \
 	  $(SUP_KEY_SH) > $(HABITAT_TFVARS)
 
+## Create both frontend and backend .aib
+bundle: $(BUNDLEAIB)
+
 ## Create a frontend .aib
 fe-bundle: $(FRONTENDAIB)
 
+## Create a backend .aib
+be-bundle: $(BACKENDAIB)
+
 ## Create Airgap bundles
-airgap: fe-bundle
+airgap: bundle
 
 .PHONY: clean help
 
@@ -74,6 +91,10 @@ airgap: fe-bundle
 clean:
 	@rm -f $(MANIFESTJSON) $(MANIFEST_TFVARS) $(BACKENDAIB_TFVARS) $(FRONTENDAIB_TFVARS) $(HABITAT_TFVARS) \
 		$(TERRAFORM_PATH)/transfer_files/*.aib $(TERRAFORM_PATH)/transfer_files/*.md5
+
+## Deprecated - run ./scripts/smoke-test --help
+smoke-test:
+	@echo "make smoke-test has been deprecated. Instead, run ./scripts/smoke-test --help"
 
 ## Generate random Habitat Supervisor ring key and HTTP gateway bearer token
 sup-keys: $(HABITAT_TFVARS)
@@ -83,4 +104,4 @@ bump-aib:
 	bash scripts/bumpaib.sh $(TERRAFORM_PATH)/terraform.tfvars
 
 ## Setup habitat keys and airgap bundles
-setup: sup-keys fe-bundle
+setup: sup-keys bundle
