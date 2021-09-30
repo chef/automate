@@ -29,37 +29,81 @@ A Data Feed operates by doing the following:
 
 By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
-## Adding a Data Feed Instance
+## Data Feed Integration
 
-A single Data Feed instance connects to one 3rd party endpoint.
-Create as many Data Feed instances as needed.
-
-To add a Data Feed instance in Chef Automate:
-
-![Setup Data Feed Page](/images/automate/filled_form_create_data_feed.png)
+Data Feed instance sends client run and compliance scan data to the 3rd party integrations available. To add a Data Feed instance in Chef Automate:
 
 1. In the **Settings** tab, navigate to _Data Feeds_ in the sidebar
-1. Select **Create Data Feed**
-1. Enter a unique Data Feed name
-1. Enter the URL for your Data Feed endpoint, including any specific port details
-1. Enter the Username and Password that your 3rd party endpoint requires for authentication
-1. Select **Test Data Feed** to begin validating the connection details
-1. Once the test is successful, select **Create Data Feed** to save your Data Feed configuration
+1. Select **New Integration**
 
-## Edit a Data Feed Instance
+Currently, the data feed has two types of integrations:
 
-To edit a Data Feed instance in Chef Automate:
+- Webhook Integration
+  - ServiceNow
+  - Splunk
+  - ELK
+  - Custom
+- Storage Integration
+  - Minio
+  - Amazon S3
 
-1. In _Data Feeds_, select the Data Feed name to open its detail page
-1. Edit the Data Feed name or URL
-1. Use the **Save** button to save your changes
+{{< figure src="/images/automate/choose-a-data-feed-integration.png" alt="Choose a Data Feed Integration">}}
 
-## Delete a Data Feed Instance
+## Webhook Integration
 
-To delete a Data Feed instance in Chef Automate:
+Create a data feed instance using any webhook integration.
 
-1. In _Data Feeds_, select **Delete Data Feed** from the menu at the end of the table row
-1. Select **Delete Data Feed** to confirm permanent deletion of this Data Feed
+### ServiceNow
+
+To add a Data Feed instance in Chef Automate using ServiceNow integration:
+
+1. Select **New Integration**.
+
+1. Select the **ServiceNow** icon under Webhook Integration.
+
+1. In the form, enter a unique **Data Feed name**.
+
+1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
+
+1. Select an **authentication** from the drop-down. (For example, we are using _Username and Password_)
+
+1. Enter the **Username** and **Password** that your 3rd party endpoint requires for authentication.
+
+1. Select **Test Connection** to start validating the connection details.
+
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
+
+{{< figure src="/images/automate/data-feed-instance-using-servicenow-integration.png" alt="Data Feed Instance using ServiceNow Integration">}}
+
+#### Edit a Data Feed Instance
+
+To edit a Data Feed instance of ServiceNow Integration:
+
+1. Select the data feed instance name to open its detail page.
+
+1. Edit the Data Feed **Name** or **URL**.
+
+1. Select **Test Data Feed** button to test the URL.
+
+1. Select **Save** to save your changes.
+
+{{< figure src="/images/automate/details-of-data-feed-instance-using-servicenow-integration.png" alt="Details of Data Feed Instance using ServiceNow Integration">}}
+
+You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+
+#### Delete a Data Feed Instance
+
+To delete an individual instance:
+
+1. Selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+
+1. Select **Delete**.
+
+{{< figure src="/images/automate/delete-the-data-feed-instance-using-servicenow-integration.png" alt="Delete the Data Feed Instance using ServiceNow Integration">}}
+
+1. In the popup, select **Delete Data Feed**.
+
+{{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-servicenow-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using ServiceNow Integration">}}
 
 ## Configuring Global Data Feed Behavior
 
