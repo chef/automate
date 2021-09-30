@@ -48,6 +48,47 @@ func init() {
         ]
       }
     },
+    "/api/v0/compliance/reporting/nodeheader/id/{id}": {
+      "post": {
+        "summary": "Show Node Header Info From Report ID",
+        "description": "Show specific details about node, report and metadate provided the report ID.\nSupports filtering, but not pagination or sorting.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:nodeheader:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_ReadNodeHeader",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderInfo"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/nodes/id/{id}": {
       "get": {
         "summary": "Show Node by ID",
@@ -709,6 +750,75 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
           "description": "A minimal representation of the compliance profiles run against the node."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderInfo": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "The reporting node's unique ID."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "The reporting node name."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time that the report was completed."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the run the report was made from."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The environment of the node making the report."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the report."
+        },
+        "platform": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
+          "description": "Intentionally blank."
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo"
+          },
+          "description": "The profiles run as part of this report."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The Roles associated with the node."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "The status message of the report."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the profile. Must be unique."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the profile in the generated report."
+        },
+        "status_message": {
+          "type": "string",
+          "description": "A message to detail the reason why a profile is skipped or failed in the generated report."
         }
       }
     },
