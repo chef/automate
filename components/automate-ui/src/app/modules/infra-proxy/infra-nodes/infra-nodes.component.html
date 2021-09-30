@@ -47,10 +47,12 @@
       </app-infra-search-bar>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading || deleting" size="50" fixed></chef-loading-spinner>
-    <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !nodes.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>
-      <p data-cy="no-records" *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+    <div *ngIf="!authFailure">
+      <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !nodes.length">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p data-cy="no-nodes" *ngIf="searchValue === ''">No nodes available.</p>
+        <p data-cy="no-records" *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+      </div>
     </div>
     <div id="nodes-table-container" *ngIf="nodes.length" data-cy="nodes-table-container">
       <chef-table>
