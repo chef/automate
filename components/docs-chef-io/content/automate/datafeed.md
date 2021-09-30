@@ -65,9 +65,10 @@ To add a Data Feed instance in Chef Automate using ServiceNow integration:
 
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
 
-1. Select an **authentication** from the drop-down. (For example, we are using _Username and Password_)
-
-1. Enter the **Username** and **Password** that your 3rd party endpoint requires for authentication.
+1. Select an **authentication** from the couple of options in the drop-down.
+  
+  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
 
 1. Select **Test Connection** to start validating the connection details.
 
