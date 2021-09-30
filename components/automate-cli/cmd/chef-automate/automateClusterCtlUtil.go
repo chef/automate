@@ -91,16 +91,16 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	return err
 }
 
-func tailFile(logFilePath string) error {
+func tailFile(logFilePath string) {
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
 	if err != nil {
-		return err
+		writer.Printf(err.Error())
+		return
 	}
 	for line := range t.Lines {
 		writer.Println(line.Text)
 	}
-	return nil
 }
 
 func bootstrapEnv(dm deployManager) error {
