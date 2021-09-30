@@ -1,0 +1,2 @@
+{{cfg.tls.cert_contents}}
+{{cfg.tls.root_cert_contents}}
