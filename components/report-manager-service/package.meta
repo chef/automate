@@ -1,0 +1,4 @@
+{
+  "name": "chef/report-manager-service",
+  "uses_platform_scaffolding": true
+}
