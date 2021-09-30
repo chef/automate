@@ -123,6 +123,28 @@ service ReportingService {
 	};
 
 	/*
+	Show Node Header Info From Report ID
+
+	Show specific details about node, report and metadate provided the report ID.
+	Supports filtering, but not pagination or sorting.
+
+	Authorization Action:
+	```
+	compliance:nodeheader:get
+	```
+	*/
+	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/nodeheader/id/{id}"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:nodeheader:{id}"
+			action: "compliance:nodeheader:get"
+		};
+	};
+
+	/*
 	List Reporting Suggestions
 
 	Get suggestions for compliance reporting resources based on matching text substrings.
@@ -493,6 +515,29 @@ message Report {
 	string status_message = 21;
 }
 
+message NodeHeaderInfo {
+	// The reporting node's unique ID.
+	string node_id = 1;
+	// The reporting node name.
+	string node_name = 2;
+	// The time that the report was completed.
+	google.protobuf.Timestamp end_time = 3;
+	// The status of the run the report was made from.
+	string status = 4;
+	// The environment of the node making the report.
+	string environment = 5;
+	// The version of the report.
+	string version = 6;
+	// Intentionally blank.
+	Platform platform = 7;
+	// The profiles run as part of this report.
+	repeated NodeHeaderProfileInfo profiles = 8;
+	// The Roles associated with the node.
+	repeated string roles = 9;
+	// The status message of the report.
+	string status_message = 10;
+}
+
 message ReportIds {
 	// The list of unique report identifiers found matching the query.
 	repeated string ids = 1;
@@ -506,8 +551,6 @@ message ReportData{
 	// The time in UTC that the scan was completed
 	google.protobuf.Timestamp end_time = 2;
 }
-
-
 
 message Profile {
 	// The name of the profile. Must be unique.
@@ -550,6 +593,15 @@ message Profile {
 	string skip_message = 24;
 	// A message to detail the reason why a profile is skipped or failed in the generated report.
 	string status_message = 25;
+}
+
+message NodeHeaderProfileInfo {
+	// The name of the profile. Must be unique.
+	string name = 1;
+	// The status of the profile in the generated report.
+	string status = 2;
+	// A message to detail the reason why a profile is skipped or failed in the generated report.
+	string status_message = 3;
 }
 
 message Ref {
