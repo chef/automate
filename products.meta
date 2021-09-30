@@ -56,6 +56,8 @@
     "chef/automate-ha-opensearch",
     "chef/automate-opensearch",
     "chef/automate-elasticsearch",
+    "chef/report-manager-service",
+    "chef/report-manager-minio-gateway",
     "core/rsync"
   ],
 
@@ -162,6 +164,8 @@
       "services": [
         "chef/automate-cds",
         "chef/automate-opensearch",
+        "chef/report-manager-service",
+        "chef/report-manager-minio-gateway",
         "chef/user-settings-service"
       ]
     },

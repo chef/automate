@@ -51,6 +51,8 @@ import "config/builder_memcached/config_request.proto";
 import "config/sample_data/config_request.proto";
 import "config/user_settings/config_request.proto";
 import "config/elasticsearch/config_request.proto";
+import "config/report_manager/config_request.proto";
+import "config/report_manager_minio/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
@@ -106,4 +108,6 @@ message AutomateConfig {
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
 	chef.automate.infra.opensearch.ConfigRequest opensearch = 49;
+	chef.automate.domain.report_manager.ConfigRequest report_manager = 50;
+	chef.automate.infra.report_manager_minio.ConfigRequest report_manager_minio = 51;
 }
