@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -14,6 +15,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	mc "github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 	"github.com/chef/automate/lib/version"
+	"github.com/hpcloud/tail"
 )
 
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
@@ -48,6 +50,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 }
 
 func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
+	var logFilePath = filepath.Join(AUTOMATE_HA_RUN_LOG_DIR, "/a2ha-run.log")
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
 	}
@@ -64,7 +67,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	c.Stdin = os.Stdin
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-	outfile, err := os.Create(filepath.Join(AUTOMATE_HA_RUN_LOG_DIR, "/a2ha-run.log"))
+	outfile, err := os.Create(logFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -83,9 +86,21 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	if len(errStr) > 0 {
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
-	writer.Printf("%s command execution inprogress with process id : %d,"+
-		"\n please trace log tail -f /hab/a2_deploy_workspace/logs/a2ha-run.log ", command, c.Process.Pid)
+	writer.Printf("%s command execution inprogress with process id : %d, + \n please trace log tail -f %s \n", command, c.Process.Pid, logFilePath)
+	tailFile(logFilePath)
 	return err
+}
+
+func tailFile(logFilePath string) error {
+	time.Sleep(1 * time.Second)
+	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
+	if err != nil {
+		return err
+	}
+	for line := range t.Lines {
+		writer.Println(line.Text)
+	}
+	return nil
 }
 
 func bootstrapEnv(dm deployManager) error {

@@ -55,6 +55,7 @@
     "chef/automate-backend-ctl",
     "chef/automate-backend-curator",
     "chef/automate-backend-haproxy",
+    "chef/automate-backend-pgleaderchk",
     "chef/automate-backend-postgresql",
     "core/rsync"
   ],
