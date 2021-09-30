@@ -1,0 +1,19 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+#curlOpts="-sS --fail --max-time 2"
+#curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/public.crt"
+#curlOpts="$curlOpts --key {{pkg.svc_config_path}}/private.key"
+#curlOpts="$curlOpts --cacert {{pkg.svc_config_path}}/root_ca.crt"
+curlOpts="$curlOpts --resolve report-manager-minio-gateway:{{cfg.service.port}}:127.0.0.1"
+curlOpts="$curlOpts --noproxy report-manager-minio-gateway"
+
+# shellcheck disable=SC2086
+output=$(curl $curlOpts http://report-manager-minio-gateway:{{cfg.service.port}}/minio/health/ready 2>&1)
+res=$?
+if [[ "$res" != "0" ]]; then
+    echo "health check curl command returned exit code $res:"
+    echo "$output"
+    exit 2
+fi
