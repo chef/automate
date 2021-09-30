@@ -86,7 +86,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	if len(errStr) > 0 {
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
-	writer.Printf("%s command execution inprogress with process id : %d, + \n please trace log tail -f %s \n", command, c.Process.Pid, logFilePath)
+	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
 	tailFile(logFilePath)
 	return err
 }
