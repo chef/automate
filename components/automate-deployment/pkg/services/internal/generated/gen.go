@@ -485,6 +485,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-backend-pgleaderchk",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }
