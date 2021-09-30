@@ -17,6 +17,7 @@ service ReportingService {
 	rpc ReadNode(Id) returns (Node) {};
 	rpc ListNodes(Query) returns (Nodes) {};
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
+	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {};
 }
 message ExportData {
 	bytes content = 1;
@@ -129,6 +130,19 @@ message Report {
 	string status_message = 21;
 }
 
+message NodeHeaderInfo {
+	string node_id = 1;
+	string node_name = 2;
+	google.protobuf.Timestamp end_time = 3;
+	string status = 4;
+	string environment = 5;
+	string version = 6;
+	Platform platform = 7;
+	repeated NodeHeaderProfileInfo profiles= 8;
+	repeated string roles = 9;
+	string status_message = 10;
+}
+
 message ReportIds {
 	repeated string ids = 1;
 	repeated ReportData report_data = 2;
@@ -161,6 +175,13 @@ message Profile {
 	string skip_message = 24;
 	string status_message = 25;
 }
+
+message NodeHeaderProfileInfo {
+	string name = 1;
+	string status = 2;
+	string status_message = 3;
+}
+
 message Ref {
 	string url = 1;
 	string ref = 2;
