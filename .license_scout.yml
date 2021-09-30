@@ -52,7 +52,6 @@ directories:
   - ./components/session-service
   - ./components/teams-service
   - ./components/trial-license-service
-  - ./components/automate-backend-ctl
   - ./components/automate-backend-curator
   - ./components/automate-backend-elasticsearch
   - ./components/automate-backend-elasticsidecar
@@ -63,8 +62,7 @@ directories:
   - ./components/automate-backend-postgresql
   - ./components/automate-backend-deployment
   - ./components/automate-backend-pgleaderchk
-  - ./components/automate-cluster-ctl
-  
+   
 habitat:
   channel_for_origin:
     - origin: chef
