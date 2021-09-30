@@ -47,6 +47,8 @@ type CurrentBackend interface {
 	GetLicense(context.Context) (string, keys.LicenseMetadata, error)
 	// SetLicense stores the given license in the backend.
 	SetLicense(context.Context, string) error
+	//  StoreDeployment stores the deployment info in the backend
+	StoreDeployment(context.Context, string) error
 }
 
 // An UpgradeableBackend is an old backend that can no longer be used
@@ -61,6 +63,36 @@ type UpgradeableBackend interface {
 	// Cleanup is called, GetLicense should return a
 	// NoLicenseError.
 	Cleanup(context.Context) error
+}
+
+type DBTrans struct {
+	*sql.Tx
+}
+
+// Transact wraps your calls in a transaction. If the call should fail with an error it will
+// perform a rollback. Otherwise the transaction will be committed.
+func Transact(pg *PGBackend, txFunc func(*DBTrans) error) error {
+	trans, err := pg.db.Begin()
+	if err != nil {
+		return errors.Wrap(err, "Unable to start transaction.")
+	}
+	tx := DBTrans{
+		trans,
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback() // nolint: errcheck
+		} else {
+			err = tx.Commit()
+			if err != nil {
+				tx.Rollback() // nolint: errcheck
+				err = errors.Wrap(err, "Transaction failed and will be rolled back.")
+			}
+		}
+	}()
+
+	err = txFunc(&tx)
+	return err
 }
 
 var _ CurrentBackend = (*PGBackend)(nil)
@@ -247,5 +279,40 @@ func (m *MemBackend) SetLicense(ctx context.Context, s string) error {
 
 	m.configuredAt = time.Now()
 	m.licenseData = s
+	return nil
+}
+
+//StoreDeployment stores the deployment info in the DB
+func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
+	err := Transact(p, func(tx *DBTrans) error {
+		var count int
+		rows := tx.QueryRow("select count(*) from deployment")
+		err := rows.Scan(&count)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to get row count")
+		}
+		nowTime := time.Now()
+		if count > 0 {
+			_, err := tx.Exec(
+				`UPDATE deployment
+				SET id = $1, updated_at = $2`,
+				id, nowTime)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to update deployment")
+			}
+		} else {
+			_, err := tx.Exec(
+				`INSERT INTO deployment (id, created_at, updated_at)
+				VALUES ($1, $2, $2)`,
+				id, nowTime)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to insert deployment")
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
