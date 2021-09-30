@@ -50,6 +50,8 @@ import "config/minio/config_request.proto";
 import "config/builder_memcached/config_request.proto";
 import "config/sample_data/config_request.proto";
 import "config/user_settings/config_request.proto";
+import "config/report_manager/config_request.proto";
+import "config/report_manager_minio/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
@@ -104,4 +106,6 @@ message AutomateConfig {
 	chef.automate.domain.cds.ConfigRequest cds = 46;
 	chef.automate.domain.sample_data.ConfigRequest sample_data = 47;
 	chef.automate.domain.user_settings.ConfigRequest user_settings = 48;
+	chef.automate.domain.report_manager.ConfigRequest report_manager = 49;
+	chef.automate.infra.report_manager_minio.ConfigRequest report_manager_minio = 50;
 }

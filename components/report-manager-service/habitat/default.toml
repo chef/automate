@@ -1,0 +1,14 @@
+[mlsa]
+accept = false
+
+[service]
+port = 10152
+
+[log]
+level = "info"
+format = "json"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
