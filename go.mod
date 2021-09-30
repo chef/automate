@@ -68,6 +68,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
+	github.com/minio/minio-go/v7 v7.0.14
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.1
 	github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
@@ -93,7 +94,7 @@ require (
 	github.com/russellhaering/goxmldsig v1.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.1-0.20170908204616-19d3b334fdfc+incompatible
 	github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c // indirect
-	github.com/sirupsen/logrus v1.6.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/afero v1.3.4 // indirect
 	github.com/spf13/cobra v1.0.1-0.20200713175500-884edc58ad08
 	github.com/spf13/pflag v1.0.5
@@ -110,7 +111,7 @@ require (
 	go.uber.org/multierr v1.5.0
 	go.uber.org/zap v1.15.0
 	gocloud.dev v0.19.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20201216223049-8b5274cf687f
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
