@@ -1209,6 +1209,125 @@ func (x *Report) GetStatusMessage() string {
 	return ""
 }
 
+type NodeHeaderInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NodeId        string                   `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty" toml:"node_id,omitempty" mapstructure:"node_id,omitempty"`
+	NodeName      string                   `protobuf:"bytes,2,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty" toml:"node_name,omitempty" mapstructure:"node_name,omitempty"`
+	EndTime       *timestamp.Timestamp     `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" toml:"end_time,omitempty" mapstructure:"end_time,omitempty"`
+	Status        string                   `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty" toml:"status,omitempty" mapstructure:"status,omitempty"`
+	Environment   string                   `protobuf:"bytes,5,opt,name=environment,proto3" json:"environment,omitempty" toml:"environment,omitempty" mapstructure:"environment,omitempty"`
+	Version       string                   `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty" toml:"version,omitempty" mapstructure:"version,omitempty"`
+	Platform      *Platform                `protobuf:"bytes,7,opt,name=platform,proto3" json:"platform,omitempty" toml:"platform,omitempty" mapstructure:"platform,omitempty"`
+	Profiles      []*NodeHeaderProfileInfo `protobuf:"bytes,8,rep,name=profiles,proto3" json:"profiles,omitempty" toml:"profiles,omitempty" mapstructure:"profiles,omitempty"`
+	Roles         []string                 `protobuf:"bytes,9,rep,name=roles,proto3" json:"roles,omitempty" toml:"roles,omitempty" mapstructure:"roles,omitempty"`
+	StatusMessage string                   `protobuf:"bytes,10,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty" toml:"status_message,omitempty" mapstructure:"status_message,omitempty"`
+}
+
+func (x *NodeHeaderInfo) Reset() {
+	*x = NodeHeaderInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NodeHeaderInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeHeaderInfo) ProtoMessage() {}
+
+func (x *NodeHeaderInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeHeaderInfo.ProtoReflect.Descriptor instead.
+func (*NodeHeaderInfo) Descriptor() ([]byte, []int) {
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *NodeHeaderInfo) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *NodeHeaderInfo) GetNodeName() string {
+	if x != nil {
+		return x.NodeName
+	}
+	return ""
+}
+
+func (x *NodeHeaderInfo) GetEndTime() *timestamp.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *NodeHeaderInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *NodeHeaderInfo) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+func (x *NodeHeaderInfo) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *NodeHeaderInfo) GetPlatform() *Platform {
+	if x != nil {
+		return x.Platform
+	}
+	return nil
+}
+
+func (x *NodeHeaderInfo) GetProfiles() []*NodeHeaderProfileInfo {
+	if x != nil {
+		return x.Profiles
+	}
+	return nil
+}
+
+func (x *NodeHeaderInfo) GetRoles() []string {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *NodeHeaderInfo) GetStatusMessage() string {
+	if x != nil {
+		return x.StatusMessage
+	}
+	return ""
+}
+
 type ReportIds struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1221,7 +1340,7 @@ type ReportIds struct {
 func (x *ReportIds) Reset() {
 	*x = ReportIds{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[15]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1234,7 +1353,7 @@ func (x *ReportIds) String() string {
 func (*ReportIds) ProtoMessage() {}
 
 func (x *ReportIds) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[15]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1247,7 +1366,7 @@ func (x *ReportIds) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportIds.ProtoReflect.Descriptor instead.
 func (*ReportIds) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{15}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ReportIds) GetIds() []string {
@@ -1276,7 +1395,7 @@ type ReportData struct {
 func (x *ReportData) Reset() {
 	*x = ReportData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[16]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1289,7 +1408,7 @@ func (x *ReportData) String() string {
 func (*ReportData) ProtoMessage() {}
 
 func (x *ReportData) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[16]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1302,7 +1421,7 @@ func (x *ReportData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportData.ProtoReflect.Descriptor instead.
 func (*ReportData) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{16}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ReportData) GetId() string {
@@ -1349,7 +1468,7 @@ type Profile struct {
 func (x *Profile) Reset() {
 	*x = Profile{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[17]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1362,7 +1481,7 @@ func (x *Profile) String() string {
 func (*Profile) ProtoMessage() {}
 
 func (x *Profile) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[17]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1375,7 +1494,7 @@ func (x *Profile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Profile.ProtoReflect.Descriptor instead.
 func (*Profile) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{17}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *Profile) GetName() string {
@@ -1518,6 +1637,69 @@ func (x *Profile) GetStatusMessage() string {
 	return ""
 }
 
+type NodeHeaderProfileInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty" toml:"name,omitempty" mapstructure:"name,omitempty"`
+	Status        string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty" toml:"status,omitempty" mapstructure:"status,omitempty"`
+	StatusMessage string `protobuf:"bytes,3,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty" toml:"status_message,omitempty" mapstructure:"status_message,omitempty"`
+}
+
+func (x *NodeHeaderProfileInfo) Reset() {
+	*x = NodeHeaderProfileInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NodeHeaderProfileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeHeaderProfileInfo) ProtoMessage() {}
+
+func (x *NodeHeaderProfileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeHeaderProfileInfo.ProtoReflect.Descriptor instead.
+func (*NodeHeaderProfileInfo) Descriptor() ([]byte, []int) {
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *NodeHeaderProfileInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *NodeHeaderProfileInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *NodeHeaderProfileInfo) GetStatusMessage() string {
+	if x != nil {
+		return x.StatusMessage
+	}
+	return ""
+}
+
 type Ref struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1530,7 +1712,7 @@ type Ref struct {
 func (x *Ref) Reset() {
 	*x = Ref{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[18]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1543,7 +1725,7 @@ func (x *Ref) String() string {
 func (*Ref) ProtoMessage() {}
 
 func (x *Ref) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[18]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1556,7 +1738,7 @@ func (x *Ref) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ref.ProtoReflect.Descriptor instead.
 func (*Ref) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{18}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Ref) GetUrl() string {
@@ -1589,7 +1771,7 @@ type Result struct {
 func (x *Result) Reset() {
 	*x = Result{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[19]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1602,7 +1784,7 @@ func (x *Result) String() string {
 func (*Result) ProtoMessage() {}
 
 func (x *Result) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[19]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1615,7 +1797,7 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Result.ProtoReflect.Descriptor instead.
 func (*Result) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{19}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *Result) GetStatus() string {
@@ -1672,7 +1854,7 @@ type SourceLocation struct {
 func (x *SourceLocation) Reset() {
 	*x = SourceLocation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[20]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1685,7 +1867,7 @@ func (x *SourceLocation) String() string {
 func (*SourceLocation) ProtoMessage() {}
 
 func (x *SourceLocation) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[20]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1698,7 +1880,7 @@ func (x *SourceLocation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SourceLocation.ProtoReflect.Descriptor instead.
 func (*SourceLocation) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{20}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *SourceLocation) GetRef() string {
@@ -1727,7 +1909,7 @@ type Option struct {
 func (x *Option) Reset() {
 	*x = Option{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[21]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1740,7 +1922,7 @@ func (x *Option) String() string {
 func (*Option) ProtoMessage() {}
 
 func (x *Option) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[21]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1753,7 +1935,7 @@ func (x *Option) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Option.ProtoReflect.Descriptor instead.
 func (*Option) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{21}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *Option) GetDescription() string {
@@ -1785,7 +1967,7 @@ type Support struct {
 func (x *Support) Reset() {
 	*x = Support{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[22]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1798,7 +1980,7 @@ func (x *Support) String() string {
 func (*Support) ProtoMessage() {}
 
 func (x *Support) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[22]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1811,7 +1993,7 @@ func (x *Support) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Support.ProtoReflect.Descriptor instead.
 func (*Support) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{22}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Support) GetOsName() string {
@@ -1872,7 +2054,7 @@ type Dependency struct {
 func (x *Dependency) Reset() {
 	*x = Dependency{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[23]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1885,7 +2067,7 @@ func (x *Dependency) String() string {
 func (*Dependency) ProtoMessage() {}
 
 func (x *Dependency) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[23]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1898,7 +2080,7 @@ func (x *Dependency) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Dependency.ProtoReflect.Descriptor instead.
 func (*Dependency) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{23}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *Dependency) GetName() string {
@@ -2005,7 +2187,7 @@ type Group struct {
 func (x *Group) Reset() {
 	*x = Group{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[24]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2018,7 +2200,7 @@ func (x *Group) String() string {
 func (*Group) ProtoMessage() {}
 
 func (x *Group) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[24]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2031,7 +2213,7 @@ func (x *Group) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Group.ProtoReflect.Descriptor instead.
 func (*Group) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{24}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *Group) GetId() string {
@@ -2078,7 +2260,7 @@ type Control struct {
 func (x *Control) Reset() {
 	*x = Control{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[25]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2091,7 +2273,7 @@ func (x *Control) String() string {
 func (*Control) ProtoMessage() {}
 
 func (x *Control) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[25]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2104,7 +2286,7 @@ func (x *Control) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Control.ProtoReflect.Descriptor instead.
 func (*Control) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{25}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *Control) GetId() string {
@@ -2215,7 +2397,7 @@ type OrigWaiverData struct {
 func (x *OrigWaiverData) Reset() {
 	*x = OrigWaiverData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[26]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2228,7 +2410,7 @@ func (x *OrigWaiverData) String() string {
 func (*OrigWaiverData) ProtoMessage() {}
 
 func (x *OrigWaiverData) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[26]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2241,7 +2423,7 @@ func (x *OrigWaiverData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OrigWaiverData.ProtoReflect.Descriptor instead.
 func (*OrigWaiverData) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{26}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *OrigWaiverData) GetExpirationDate() string {
@@ -2292,7 +2474,7 @@ type RemovedResultsCounts struct {
 func (x *RemovedResultsCounts) Reset() {
 	*x = RemovedResultsCounts{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[27]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2305,7 +2487,7 @@ func (x *RemovedResultsCounts) String() string {
 func (*RemovedResultsCounts) ProtoMessage() {}
 
 func (x *RemovedResultsCounts) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[27]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2318,7 +2500,7 @@ func (x *RemovedResultsCounts) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemovedResultsCounts.ProtoReflect.Descriptor instead.
 func (*RemovedResultsCounts) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{27}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *RemovedResultsCounts) GetFailed() int32 {
@@ -2353,7 +2535,7 @@ type TagValues struct {
 func (x *TagValues) Reset() {
 	*x = TagValues{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[28]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2366,7 +2548,7 @@ func (x *TagValues) String() string {
 func (*TagValues) ProtoMessage() {}
 
 func (x *TagValues) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[28]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2379,7 +2561,7 @@ func (x *TagValues) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagValues.ProtoReflect.Descriptor instead.
 func (*TagValues) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{28}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *TagValues) GetValues() []string {
@@ -2401,7 +2583,7 @@ type Attribute struct {
 func (x *Attribute) Reset() {
 	*x = Attribute{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[29]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2414,7 +2596,7 @@ func (x *Attribute) String() string {
 func (*Attribute) ProtoMessage() {}
 
 func (x *Attribute) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[29]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2427,7 +2609,7 @@ func (x *Attribute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Attribute.ProtoReflect.Descriptor instead.
 func (*Attribute) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{29}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *Attribute) GetName() string {
@@ -2457,7 +2639,7 @@ type Platform struct {
 func (x *Platform) Reset() {
 	*x = Platform{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[30]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2470,7 +2652,7 @@ func (x *Platform) String() string {
 func (*Platform) ProtoMessage() {}
 
 func (x *Platform) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[30]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2483,7 +2665,7 @@ func (x *Platform) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Platform.ProtoReflect.Descriptor instead.
 func (*Platform) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{30}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *Platform) GetName() string {
@@ -2518,7 +2700,7 @@ type Statistics struct {
 func (x *Statistics) Reset() {
 	*x = Statistics{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[31]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2531,7 +2713,7 @@ func (x *Statistics) String() string {
 func (*Statistics) ProtoMessage() {}
 
 func (x *Statistics) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[31]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2544,7 +2726,7 @@ func (x *Statistics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Statistics.ProtoReflect.Descriptor instead.
 func (*Statistics) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{31}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *Statistics) GetDuration() float32 {
@@ -2569,7 +2751,7 @@ type SuggestionRequest struct {
 func (x *SuggestionRequest) Reset() {
 	*x = SuggestionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[32]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2582,7 +2764,7 @@ func (x *SuggestionRequest) String() string {
 func (*SuggestionRequest) ProtoMessage() {}
 
 func (x *SuggestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[32]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2595,7 +2777,7 @@ func (x *SuggestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SuggestionRequest.ProtoReflect.Descriptor instead.
 func (*SuggestionRequest) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{32}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *SuggestionRequest) GetType() string {
@@ -2647,7 +2829,7 @@ type Suggestion struct {
 func (x *Suggestion) Reset() {
 	*x = Suggestion{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[33]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2660,7 +2842,7 @@ func (x *Suggestion) String() string {
 func (*Suggestion) ProtoMessage() {}
 
 func (x *Suggestion) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[33]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2673,7 +2855,7 @@ func (x *Suggestion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Suggestion.ProtoReflect.Descriptor instead.
 func (*Suggestion) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{33}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *Suggestion) GetText() string {
@@ -2715,7 +2897,7 @@ type Suggestions struct {
 func (x *Suggestions) Reset() {
 	*x = Suggestions{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[34]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2728,7 +2910,7 @@ func (x *Suggestions) String() string {
 func (*Suggestions) ProtoMessage() {}
 
 func (x *Suggestions) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[34]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2741,7 +2923,7 @@ func (x *Suggestions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Suggestions.ProtoReflect.Descriptor instead.
 func (*Suggestions) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{34}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *Suggestions) GetSuggestions() []*Suggestion {
@@ -2763,7 +2945,7 @@ type ProfileMins struct {
 func (x *ProfileMins) Reset() {
 	*x = ProfileMins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[35]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2776,7 +2958,7 @@ func (x *ProfileMins) String() string {
 func (*ProfileMins) ProtoMessage() {}
 
 func (x *ProfileMins) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[35]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2789,7 +2971,7 @@ func (x *ProfileMins) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileMins.ProtoReflect.Descriptor instead.
 func (*ProfileMins) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{35}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ProfileMins) GetProfiles() []*ProfileMin {
@@ -2821,7 +3003,7 @@ type ProfileCounts struct {
 func (x *ProfileCounts) Reset() {
 	*x = ProfileCounts{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[36]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2834,7 +3016,7 @@ func (x *ProfileCounts) String() string {
 func (*ProfileCounts) ProtoMessage() {}
 
 func (x *ProfileCounts) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[36]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2847,7 +3029,7 @@ func (x *ProfileCounts) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileCounts.ProtoReflect.Descriptor instead.
 func (*ProfileCounts) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{36}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ProfileCounts) GetTotal() int32 {
@@ -2900,7 +3082,7 @@ type ProfileMin struct {
 func (x *ProfileMin) Reset() {
 	*x = ProfileMin{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[37]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2913,7 +3095,7 @@ func (x *ProfileMin) String() string {
 func (*ProfileMin) ProtoMessage() {}
 
 func (x *ProfileMin) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[37]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2926,7 +3108,7 @@ func (x *ProfileMin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileMin.ProtoReflect.Descriptor instead.
 func (*ProfileMin) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{37}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *ProfileMin) GetName() string {
@@ -2981,7 +3163,7 @@ type Node struct {
 func (x *Node) Reset() {
 	*x = Node{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[38]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2994,7 +3176,7 @@ func (x *Node) String() string {
 func (*Node) ProtoMessage() {}
 
 func (x *Node) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[38]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3007,7 +3189,7 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Node.ProtoReflect.Descriptor instead.
 func (*Node) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{38}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *Node) GetId() string {
@@ -3075,7 +3257,7 @@ type Nodes struct {
 func (x *Nodes) Reset() {
 	*x = Nodes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[39]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3088,7 +3270,7 @@ func (x *Nodes) String() string {
 func (*Nodes) ProtoMessage() {}
 
 func (x *Nodes) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[39]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3101,7 +3283,7 @@ func (x *Nodes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Nodes.ProtoReflect.Descriptor instead.
 func (*Nodes) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{39}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *Nodes) GetNodes() []*Node {
@@ -3158,7 +3340,7 @@ type Kv struct {
 func (x *Kv) Reset() {
 	*x = Kv{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[40]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3171,7 +3353,7 @@ func (x *Kv) String() string {
 func (*Kv) ProtoMessage() {}
 
 func (x *Kv) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[40]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3184,7 +3366,7 @@ func (x *Kv) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Kv.ProtoReflect.Descriptor instead.
 func (*Kv) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{40}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *Kv) GetKey() string {
@@ -3215,7 +3397,7 @@ type LatestReportSummary struct {
 func (x *LatestReportSummary) Reset() {
 	*x = LatestReportSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[41]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3228,7 +3410,7 @@ func (x *LatestReportSummary) String() string {
 func (*LatestReportSummary) ProtoMessage() {}
 
 func (x *LatestReportSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[41]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3241,7 +3423,7 @@ func (x *LatestReportSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LatestReportSummary.ProtoReflect.Descriptor instead.
 func (*LatestReportSummary) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{41}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *LatestReportSummary) GetId() string {
@@ -3287,7 +3469,7 @@ type ProfileMeta struct {
 func (x *ProfileMeta) Reset() {
 	*x = ProfileMeta{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[42]
+		mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3300,7 +3482,7 @@ func (x *ProfileMeta) String() string {
 func (*ProfileMeta) ProtoMessage() {}
 
 func (x *ProfileMeta) ProtoReflect() protoreflect.Message {
-	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[42]
+	mi := &file_interservice_compliance_reporting_reporting_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3313,7 +3495,7 @@ func (x *ProfileMeta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileMeta.ProtoReflect.Descriptor instead.
 func (*ProfileMeta) Descriptor() ([]byte, []int) {
-	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{42}
+	return file_interservice_compliance_reporting_reporting_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ProfileMeta) GetName() string {
@@ -3995,7 +4177,7 @@ func file_interservice_compliance_reporting_reporting_proto_rawDescGZIP() []byte
 }
 
 var file_interservice_compliance_reporting_reporting_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_interservice_compliance_reporting_reporting_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
+var file_interservice_compliance_reporting_reporting_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
 var file_interservice_compliance_reporting_reporting_proto_goTypes = []interface{}{
 	(Query_OrderType)(0),           // 0: chef.automate.domain.compliance.reporting.Query.OrderType
 	(*ExportData)(nil),             // 1: chef.automate.domain.compliance.reporting.ExportData
@@ -4013,36 +4195,38 @@ var file_interservice_compliance_reporting_reporting_proto_goTypes = []interface
 	(*ReportSummaryLevelOne)(nil),  // 13: chef.automate.domain.compliance.reporting.ReportSummaryLevelOne
 	(*Reports)(nil),                // 14: chef.automate.domain.compliance.reporting.Reports
 	(*Report)(nil),                 // 15: chef.automate.domain.compliance.reporting.Report
-	(*ReportIds)(nil),              // 16: chef.automate.domain.compliance.reporting.ReportIds
-	(*ReportData)(nil),             // 17: chef.automate.domain.compliance.reporting.ReportData
-	(*Profile)(nil),                // 18: chef.automate.domain.compliance.reporting.Profile
-	(*Ref)(nil),                    // 19: chef.automate.domain.compliance.reporting.Ref
-	(*Result)(nil),                 // 20: chef.automate.domain.compliance.reporting.Result
-	(*SourceLocation)(nil),         // 21: chef.automate.domain.compliance.reporting.SourceLocation
-	(*Option)(nil),                 // 22: chef.automate.domain.compliance.reporting.Option
-	(*Support)(nil),                // 23: chef.automate.domain.compliance.reporting.Support
-	(*Dependency)(nil),             // 24: chef.automate.domain.compliance.reporting.Dependency
-	(*Group)(nil),                  // 25: chef.automate.domain.compliance.reporting.Group
-	(*Control)(nil),                // 26: chef.automate.domain.compliance.reporting.Control
-	(*OrigWaiverData)(nil),         // 27: chef.automate.domain.compliance.reporting.OrigWaiverData
-	(*RemovedResultsCounts)(nil),   // 28: chef.automate.domain.compliance.reporting.RemovedResultsCounts
-	(*TagValues)(nil),              // 29: chef.automate.domain.compliance.reporting.TagValues
-	(*Attribute)(nil),              // 30: chef.automate.domain.compliance.reporting.Attribute
-	(*Platform)(nil),               // 31: chef.automate.domain.compliance.reporting.Platform
-	(*Statistics)(nil),             // 32: chef.automate.domain.compliance.reporting.Statistics
-	(*SuggestionRequest)(nil),      // 33: chef.automate.domain.compliance.reporting.SuggestionRequest
-	(*Suggestion)(nil),             // 34: chef.automate.domain.compliance.reporting.Suggestion
-	(*Suggestions)(nil),            // 35: chef.automate.domain.compliance.reporting.Suggestions
-	(*ProfileMins)(nil),            // 36: chef.automate.domain.compliance.reporting.ProfileMins
-	(*ProfileCounts)(nil),          // 37: chef.automate.domain.compliance.reporting.ProfileCounts
-	(*ProfileMin)(nil),             // 38: chef.automate.domain.compliance.reporting.ProfileMin
-	(*Node)(nil),                   // 39: chef.automate.domain.compliance.reporting.Node
-	(*Nodes)(nil),                  // 40: chef.automate.domain.compliance.reporting.Nodes
-	(*Kv)(nil),                     // 41: chef.automate.domain.compliance.reporting.Kv
-	(*LatestReportSummary)(nil),    // 42: chef.automate.domain.compliance.reporting.LatestReportSummary
-	(*ProfileMeta)(nil),            // 43: chef.automate.domain.compliance.reporting.ProfileMeta
-	nil,                            // 44: chef.automate.domain.compliance.reporting.Control.StringTagsEntry
-	(*timestamppb.Timestamp)(nil),  // 45: google.protobuf.Timestamp
+	(*NodeHeaderInfo)(nil),         // 16: chef.automate.domain.compliance.reporting.NodeHeaderInfo
+	(*ReportIds)(nil),              // 17: chef.automate.domain.compliance.reporting.ReportIds
+	(*ReportData)(nil),             // 18: chef.automate.domain.compliance.reporting.ReportData
+	(*Profile)(nil),                // 19: chef.automate.domain.compliance.reporting.Profile
+	(*NodeHeaderProfileInfo)(nil),  // 20: chef.automate.domain.compliance.reporting.NodeHeaderProfileInfo
+	(*Ref)(nil),                    // 21: chef.automate.domain.compliance.reporting.Ref
+	(*Result)(nil),                 // 22: chef.automate.domain.compliance.reporting.Result
+	(*SourceLocation)(nil),         // 23: chef.automate.domain.compliance.reporting.SourceLocation
+	(*Option)(nil),                 // 24: chef.automate.domain.compliance.reporting.Option
+	(*Support)(nil),                // 25: chef.automate.domain.compliance.reporting.Support
+	(*Dependency)(nil),             // 26: chef.automate.domain.compliance.reporting.Dependency
+	(*Group)(nil),                  // 27: chef.automate.domain.compliance.reporting.Group
+	(*Control)(nil),                // 28: chef.automate.domain.compliance.reporting.Control
+	(*OrigWaiverData)(nil),         // 29: chef.automate.domain.compliance.reporting.OrigWaiverData
+	(*RemovedResultsCounts)(nil),   // 30: chef.automate.domain.compliance.reporting.RemovedResultsCounts
+	(*TagValues)(nil),              // 31: chef.automate.domain.compliance.reporting.TagValues
+	(*Attribute)(nil),              // 32: chef.automate.domain.compliance.reporting.Attribute
+	(*Platform)(nil),               // 33: chef.automate.domain.compliance.reporting.Platform
+	(*Statistics)(nil),             // 34: chef.automate.domain.compliance.reporting.Statistics
+	(*SuggestionRequest)(nil),      // 35: chef.automate.domain.compliance.reporting.SuggestionRequest
+	(*Suggestion)(nil),             // 36: chef.automate.domain.compliance.reporting.Suggestion
+	(*Suggestions)(nil),            // 37: chef.automate.domain.compliance.reporting.Suggestions
+	(*ProfileMins)(nil),            // 38: chef.automate.domain.compliance.reporting.ProfileMins
+	(*ProfileCounts)(nil),          // 39: chef.automate.domain.compliance.reporting.ProfileCounts
+	(*ProfileMin)(nil),             // 40: chef.automate.domain.compliance.reporting.ProfileMin
+	(*Node)(nil),                   // 41: chef.automate.domain.compliance.reporting.Node
+	(*Nodes)(nil),                  // 42: chef.automate.domain.compliance.reporting.Nodes
+	(*Kv)(nil),                     // 43: chef.automate.domain.compliance.reporting.Kv
+	(*LatestReportSummary)(nil),    // 44: chef.automate.domain.compliance.reporting.LatestReportSummary
+	(*ProfileMeta)(nil),            // 45: chef.automate.domain.compliance.reporting.ProfileMeta
+	nil,                            // 46: chef.automate.domain.compliance.reporting.Control.StringTagsEntry
+	(*timestamp.Timestamp)(nil),    // 47: google.protobuf.Timestamp
 }
 var file_interservice_compliance_reporting_reporting_proto_depIdxs = []int32{
 	4,  // 0: chef.automate.domain.compliance.reporting.Query.filters:type_name -> chef.automate.domain.compliance.reporting.ListFilter
@@ -4053,72 +4237,77 @@ var file_interservice_compliance_reporting_reporting_proto_depIdxs = []int32{
 	5,  // 5: chef.automate.domain.compliance.reporting.ControlSummary.waived:type_name -> chef.automate.domain.compliance.reporting.Total
 	4,  // 6: chef.automate.domain.compliance.reporting.ControlItemRequest.filters:type_name -> chef.automate.domain.compliance.reporting.ListFilter
 	7,  // 7: chef.automate.domain.compliance.reporting.WaiverData.waiver_summary:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
-	38, // 8: chef.automate.domain.compliance.reporting.ControlItem.profile:type_name -> chef.automate.domain.compliance.reporting.ProfileMin
-	45, // 9: chef.automate.domain.compliance.reporting.ControlItem.end_time:type_name -> google.protobuf.Timestamp
+	40, // 8: chef.automate.domain.compliance.reporting.ControlItem.profile:type_name -> chef.automate.domain.compliance.reporting.ProfileMin
+	47, // 9: chef.automate.domain.compliance.reporting.ControlItem.end_time:type_name -> google.protobuf.Timestamp
 	7,  // 10: chef.automate.domain.compliance.reporting.ControlItem.control_summary:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
 	9,  // 11: chef.automate.domain.compliance.reporting.ControlItem.waivers:type_name -> chef.automate.domain.compliance.reporting.WaiverData
 	10, // 12: chef.automate.domain.compliance.reporting.ControlItems.control_items:type_name -> chef.automate.domain.compliance.reporting.ControlItem
 	7,  // 13: chef.automate.domain.compliance.reporting.ControlItems.control_summary_totals:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
 	13, // 14: chef.automate.domain.compliance.reporting.ReportsSummaryLevelOne.reports:type_name -> chef.automate.domain.compliance.reporting.ReportSummaryLevelOne
-	45, // 15: chef.automate.domain.compliance.reporting.ReportSummaryLevelOne.end_time:type_name -> google.protobuf.Timestamp
+	47, // 15: chef.automate.domain.compliance.reporting.ReportSummaryLevelOne.end_time:type_name -> google.protobuf.Timestamp
 	7,  // 16: chef.automate.domain.compliance.reporting.ReportSummaryLevelOne.controls:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
 	15, // 17: chef.automate.domain.compliance.reporting.Reports.reports:type_name -> chef.automate.domain.compliance.reporting.Report
-	45, // 18: chef.automate.domain.compliance.reporting.Report.end_time:type_name -> google.protobuf.Timestamp
+	47, // 18: chef.automate.domain.compliance.reporting.Report.end_time:type_name -> google.protobuf.Timestamp
 	7,  // 19: chef.automate.domain.compliance.reporting.Report.controls:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
-	31, // 20: chef.automate.domain.compliance.reporting.Report.platform:type_name -> chef.automate.domain.compliance.reporting.Platform
-	32, // 21: chef.automate.domain.compliance.reporting.Report.statistics:type_name -> chef.automate.domain.compliance.reporting.Statistics
-	18, // 22: chef.automate.domain.compliance.reporting.Report.profiles:type_name -> chef.automate.domain.compliance.reporting.Profile
-	17, // 23: chef.automate.domain.compliance.reporting.ReportIds.report_data:type_name -> chef.automate.domain.compliance.reporting.ReportData
-	45, // 24: chef.automate.domain.compliance.reporting.ReportData.end_time:type_name -> google.protobuf.Timestamp
-	23, // 25: chef.automate.domain.compliance.reporting.Profile.supports:type_name -> chef.automate.domain.compliance.reporting.Support
-	24, // 26: chef.automate.domain.compliance.reporting.Profile.depends:type_name -> chef.automate.domain.compliance.reporting.Dependency
-	25, // 27: chef.automate.domain.compliance.reporting.Profile.groups:type_name -> chef.automate.domain.compliance.reporting.Group
-	26, // 28: chef.automate.domain.compliance.reporting.Profile.controls:type_name -> chef.automate.domain.compliance.reporting.Control
-	30, // 29: chef.automate.domain.compliance.reporting.Profile.attributes:type_name -> chef.automate.domain.compliance.reporting.Attribute
-	21, // 30: chef.automate.domain.compliance.reporting.Control.source_location:type_name -> chef.automate.domain.compliance.reporting.SourceLocation
-	20, // 31: chef.automate.domain.compliance.reporting.Control.results:type_name -> chef.automate.domain.compliance.reporting.Result
-	19, // 32: chef.automate.domain.compliance.reporting.Control.refs:type_name -> chef.automate.domain.compliance.reporting.Ref
-	44, // 33: chef.automate.domain.compliance.reporting.Control.string_tags:type_name -> chef.automate.domain.compliance.reporting.Control.StringTagsEntry
-	27, // 34: chef.automate.domain.compliance.reporting.Control.waiver_data:type_name -> chef.automate.domain.compliance.reporting.OrigWaiverData
-	28, // 35: chef.automate.domain.compliance.reporting.Control.removed_results_counts:type_name -> chef.automate.domain.compliance.reporting.RemovedResultsCounts
-	22, // 36: chef.automate.domain.compliance.reporting.Attribute.options:type_name -> chef.automate.domain.compliance.reporting.Option
-	4,  // 37: chef.automate.domain.compliance.reporting.SuggestionRequest.filters:type_name -> chef.automate.domain.compliance.reporting.ListFilter
-	34, // 38: chef.automate.domain.compliance.reporting.Suggestions.suggestions:type_name -> chef.automate.domain.compliance.reporting.Suggestion
-	38, // 39: chef.automate.domain.compliance.reporting.ProfileMins.profiles:type_name -> chef.automate.domain.compliance.reporting.ProfileMin
-	37, // 40: chef.automate.domain.compliance.reporting.ProfileMins.counts:type_name -> chef.automate.domain.compliance.reporting.ProfileCounts
-	31, // 41: chef.automate.domain.compliance.reporting.Node.platform:type_name -> chef.automate.domain.compliance.reporting.Platform
-	42, // 42: chef.automate.domain.compliance.reporting.Node.latest_report:type_name -> chef.automate.domain.compliance.reporting.LatestReportSummary
-	41, // 43: chef.automate.domain.compliance.reporting.Node.tags:type_name -> chef.automate.domain.compliance.reporting.Kv
-	43, // 44: chef.automate.domain.compliance.reporting.Node.profiles:type_name -> chef.automate.domain.compliance.reporting.ProfileMeta
-	39, // 45: chef.automate.domain.compliance.reporting.Nodes.nodes:type_name -> chef.automate.domain.compliance.reporting.Node
-	45, // 46: chef.automate.domain.compliance.reporting.LatestReportSummary.end_time:type_name -> google.protobuf.Timestamp
-	7,  // 47: chef.automate.domain.compliance.reporting.LatestReportSummary.controls:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
-	29, // 48: chef.automate.domain.compliance.reporting.Control.StringTagsEntry.value:type_name -> chef.automate.domain.compliance.reporting.TagValues
-	3,  // 49: chef.automate.domain.compliance.reporting.ReportingService.ListReports:input_type -> chef.automate.domain.compliance.reporting.Query
-	3,  // 50: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:input_type -> chef.automate.domain.compliance.reporting.Query
-	3,  // 51: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:input_type -> chef.automate.domain.compliance.reporting.Query
-	33, // 52: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:input_type -> chef.automate.domain.compliance.reporting.SuggestionRequest
-	3,  // 53: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:input_type -> chef.automate.domain.compliance.reporting.Query
-	3,  // 54: chef.automate.domain.compliance.reporting.ReportingService.Export:input_type -> chef.automate.domain.compliance.reporting.Query
-	3,  // 55: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:input_type -> chef.automate.domain.compliance.reporting.Query
-	2,  // 56: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:input_type -> chef.automate.domain.compliance.reporting.Id
-	3,  // 57: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:input_type -> chef.automate.domain.compliance.reporting.Query
-	8,  // 58: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:input_type -> chef.automate.domain.compliance.reporting.ControlItemRequest
-	12, // 59: chef.automate.domain.compliance.reporting.ReportingService.ListReports:output_type -> chef.automate.domain.compliance.reporting.ReportsSummaryLevelOne
-	16, // 60: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:output_type -> chef.automate.domain.compliance.reporting.ReportIds
-	15, // 61: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:output_type -> chef.automate.domain.compliance.reporting.Report
-	35, // 62: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:output_type -> chef.automate.domain.compliance.reporting.Suggestions
-	36, // 63: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:output_type -> chef.automate.domain.compliance.reporting.ProfileMins
-	1,  // 64: chef.automate.domain.compliance.reporting.ReportingService.Export:output_type -> chef.automate.domain.compliance.reporting.ExportData
-	1,  // 65: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:output_type -> chef.automate.domain.compliance.reporting.ExportData
-	39, // 66: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:output_type -> chef.automate.domain.compliance.reporting.Node
-	40, // 67: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:output_type -> chef.automate.domain.compliance.reporting.Nodes
-	11, // 68: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:output_type -> chef.automate.domain.compliance.reporting.ControlItems
-	59, // [59:69] is the sub-list for method output_type
-	49, // [49:59] is the sub-list for method input_type
-	49, // [49:49] is the sub-list for extension type_name
-	49, // [49:49] is the sub-list for extension extendee
-	0,  // [0:49] is the sub-list for field type_name
+	33, // 20: chef.automate.domain.compliance.reporting.Report.platform:type_name -> chef.automate.domain.compliance.reporting.Platform
+	34, // 21: chef.automate.domain.compliance.reporting.Report.statistics:type_name -> chef.automate.domain.compliance.reporting.Statistics
+	19, // 22: chef.automate.domain.compliance.reporting.Report.profiles:type_name -> chef.automate.domain.compliance.reporting.Profile
+	47, // 23: chef.automate.domain.compliance.reporting.NodeHeaderInfo.end_time:type_name -> google.protobuf.Timestamp
+	33, // 24: chef.automate.domain.compliance.reporting.NodeHeaderInfo.platform:type_name -> chef.automate.domain.compliance.reporting.Platform
+	20, // 25: chef.automate.domain.compliance.reporting.NodeHeaderInfo.profiles:type_name -> chef.automate.domain.compliance.reporting.NodeHeaderProfileInfo
+	18, // 26: chef.automate.domain.compliance.reporting.ReportIds.report_data:type_name -> chef.automate.domain.compliance.reporting.ReportData
+	47, // 27: chef.automate.domain.compliance.reporting.ReportData.end_time:type_name -> google.protobuf.Timestamp
+	25, // 28: chef.automate.domain.compliance.reporting.Profile.supports:type_name -> chef.automate.domain.compliance.reporting.Support
+	26, // 29: chef.automate.domain.compliance.reporting.Profile.depends:type_name -> chef.automate.domain.compliance.reporting.Dependency
+	27, // 30: chef.automate.domain.compliance.reporting.Profile.groups:type_name -> chef.automate.domain.compliance.reporting.Group
+	28, // 31: chef.automate.domain.compliance.reporting.Profile.controls:type_name -> chef.automate.domain.compliance.reporting.Control
+	32, // 32: chef.automate.domain.compliance.reporting.Profile.attributes:type_name -> chef.automate.domain.compliance.reporting.Attribute
+	23, // 33: chef.automate.domain.compliance.reporting.Control.source_location:type_name -> chef.automate.domain.compliance.reporting.SourceLocation
+	22, // 34: chef.automate.domain.compliance.reporting.Control.results:type_name -> chef.automate.domain.compliance.reporting.Result
+	21, // 35: chef.automate.domain.compliance.reporting.Control.refs:type_name -> chef.automate.domain.compliance.reporting.Ref
+	46, // 36: chef.automate.domain.compliance.reporting.Control.string_tags:type_name -> chef.automate.domain.compliance.reporting.Control.StringTagsEntry
+	29, // 37: chef.automate.domain.compliance.reporting.Control.waiver_data:type_name -> chef.automate.domain.compliance.reporting.OrigWaiverData
+	30, // 38: chef.automate.domain.compliance.reporting.Control.removed_results_counts:type_name -> chef.automate.domain.compliance.reporting.RemovedResultsCounts
+	24, // 39: chef.automate.domain.compliance.reporting.Attribute.options:type_name -> chef.automate.domain.compliance.reporting.Option
+	4,  // 40: chef.automate.domain.compliance.reporting.SuggestionRequest.filters:type_name -> chef.automate.domain.compliance.reporting.ListFilter
+	36, // 41: chef.automate.domain.compliance.reporting.Suggestions.suggestions:type_name -> chef.automate.domain.compliance.reporting.Suggestion
+	40, // 42: chef.automate.domain.compliance.reporting.ProfileMins.profiles:type_name -> chef.automate.domain.compliance.reporting.ProfileMin
+	39, // 43: chef.automate.domain.compliance.reporting.ProfileMins.counts:type_name -> chef.automate.domain.compliance.reporting.ProfileCounts
+	33, // 44: chef.automate.domain.compliance.reporting.Node.platform:type_name -> chef.automate.domain.compliance.reporting.Platform
+	44, // 45: chef.automate.domain.compliance.reporting.Node.latest_report:type_name -> chef.automate.domain.compliance.reporting.LatestReportSummary
+	43, // 46: chef.automate.domain.compliance.reporting.Node.tags:type_name -> chef.automate.domain.compliance.reporting.Kv
+	45, // 47: chef.automate.domain.compliance.reporting.Node.profiles:type_name -> chef.automate.domain.compliance.reporting.ProfileMeta
+	41, // 48: chef.automate.domain.compliance.reporting.Nodes.nodes:type_name -> chef.automate.domain.compliance.reporting.Node
+	47, // 49: chef.automate.domain.compliance.reporting.LatestReportSummary.end_time:type_name -> google.protobuf.Timestamp
+	7,  // 50: chef.automate.domain.compliance.reporting.LatestReportSummary.controls:type_name -> chef.automate.domain.compliance.reporting.ControlSummary
+	31, // 51: chef.automate.domain.compliance.reporting.Control.StringTagsEntry.value:type_name -> chef.automate.domain.compliance.reporting.TagValues
+	3,  // 52: chef.automate.domain.compliance.reporting.ReportingService.ListReports:input_type -> chef.automate.domain.compliance.reporting.Query
+	3,  // 53: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:input_type -> chef.automate.domain.compliance.reporting.Query
+	3,  // 54: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:input_type -> chef.automate.domain.compliance.reporting.Query
+	35, // 55: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:input_type -> chef.automate.domain.compliance.reporting.SuggestionRequest
+	3,  // 56: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:input_type -> chef.automate.domain.compliance.reporting.Query
+	3,  // 57: chef.automate.domain.compliance.reporting.ReportingService.Export:input_type -> chef.automate.domain.compliance.reporting.Query
+	3,  // 58: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:input_type -> chef.automate.domain.compliance.reporting.Query
+	2,  // 59: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:input_type -> chef.automate.domain.compliance.reporting.Id
+	3,  // 60: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:input_type -> chef.automate.domain.compliance.reporting.Query
+	8,  // 61: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:input_type -> chef.automate.domain.compliance.reporting.ControlItemRequest
+	3,  // 62: chef.automate.domain.compliance.reporting.ReportingService.ReadNodeHeader:input_type -> chef.automate.domain.compliance.reporting.Query
+	12, // 63: chef.automate.domain.compliance.reporting.ReportingService.ListReports:output_type -> chef.automate.domain.compliance.reporting.ReportsSummaryLevelOne
+	17, // 64: chef.automate.domain.compliance.reporting.ReportingService.ListReportIds:output_type -> chef.automate.domain.compliance.reporting.ReportIds
+	15, // 65: chef.automate.domain.compliance.reporting.ReportingService.ReadReport:output_type -> chef.automate.domain.compliance.reporting.Report
+	37, // 66: chef.automate.domain.compliance.reporting.ReportingService.ListSuggestions:output_type -> chef.automate.domain.compliance.reporting.Suggestions
+	38, // 67: chef.automate.domain.compliance.reporting.ReportingService.ListProfiles:output_type -> chef.automate.domain.compliance.reporting.ProfileMins
+	1,  // 68: chef.automate.domain.compliance.reporting.ReportingService.Export:output_type -> chef.automate.domain.compliance.reporting.ExportData
+	1,  // 69: chef.automate.domain.compliance.reporting.ReportingService.ExportNode:output_type -> chef.automate.domain.compliance.reporting.ExportData
+	41, // 70: chef.automate.domain.compliance.reporting.ReportingService.ReadNode:output_type -> chef.automate.domain.compliance.reporting.Node
+	42, // 71: chef.automate.domain.compliance.reporting.ReportingService.ListNodes:output_type -> chef.automate.domain.compliance.reporting.Nodes
+	11, // 72: chef.automate.domain.compliance.reporting.ReportingService.ListControlItems:output_type -> chef.automate.domain.compliance.reporting.ControlItems
+	16, // 73: chef.automate.domain.compliance.reporting.ReportingService.ReadNodeHeader:output_type -> chef.automate.domain.compliance.reporting.NodeHeaderInfo
+	63, // [63:74] is the sub-list for method output_type
+	52, // [52:63] is the sub-list for method input_type
+	52, // [52:52] is the sub-list for extension type_name
+	52, // [52:52] is the sub-list for extension extendee
+	0,  // [0:52] is the sub-list for field type_name
 }
 
 func init() { file_interservice_compliance_reporting_reporting_proto_init() }
@@ -4308,7 +4497,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ReportIds); i {
+			switch v := v.(*NodeHeaderInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4320,7 +4509,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ReportData); i {
+			switch v := v.(*ReportIds); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4332,7 +4521,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Profile); i {
+			switch v := v.(*ReportData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4344,7 +4533,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Ref); i {
+			switch v := v.(*Profile); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4356,7 +4545,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Result); i {
+			switch v := v.(*NodeHeaderProfileInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4368,7 +4557,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SourceLocation); i {
+			switch v := v.(*Ref); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4380,7 +4569,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Option); i {
+			switch v := v.(*Result); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4392,7 +4581,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Support); i {
+			switch v := v.(*SourceLocation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4404,7 +4593,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Dependency); i {
+			switch v := v.(*Option); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4416,7 +4605,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Group); i {
+			switch v := v.(*Support); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4428,7 +4617,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Control); i {
+			switch v := v.(*Dependency); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4440,7 +4629,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*OrigWaiverData); i {
+			switch v := v.(*Group); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4452,7 +4641,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RemovedResultsCounts); i {
+			switch v := v.(*Control); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4464,7 +4653,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TagValues); i {
+			switch v := v.(*OrigWaiverData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4476,7 +4665,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Attribute); i {
+			switch v := v.(*RemovedResultsCounts); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4488,7 +4677,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Platform); i {
+			switch v := v.(*TagValues); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4500,7 +4689,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Statistics); i {
+			switch v := v.(*Attribute); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4512,7 +4701,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SuggestionRequest); i {
+			switch v := v.(*Platform); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4524,7 +4713,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Suggestion); i {
+			switch v := v.(*Statistics); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4536,7 +4725,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Suggestions); i {
+			switch v := v.(*SuggestionRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4548,7 +4737,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProfileMins); i {
+			switch v := v.(*Suggestion); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4560,7 +4749,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProfileCounts); i {
+			switch v := v.(*Suggestions); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4572,7 +4761,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProfileMin); i {
+			switch v := v.(*ProfileMins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4584,7 +4773,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Node); i {
+			switch v := v.(*ProfileCounts); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4596,7 +4785,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Nodes); i {
+			switch v := v.(*ProfileMin); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4608,7 +4797,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Kv); i {
+			switch v := v.(*Node); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4620,7 +4809,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LatestReportSummary); i {
+			switch v := v.(*Nodes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -4632,6 +4821,30 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			}
 		}
 		file_interservice_compliance_reporting_reporting_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Kv); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_compliance_reporting_reporting_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LatestReportSummary); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_interservice_compliance_reporting_reporting_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProfileMeta); i {
 			case 0:
 				return &v.state
@@ -4650,7 +4863,7 @@ func file_interservice_compliance_reporting_reporting_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_compliance_reporting_reporting_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   44,
+			NumMessages:   46,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -4687,6 +4900,7 @@ type ReportingServiceClient interface {
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	ListNodes(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
+	ReadNodeHeader(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeHeaderInfo, error)
 }
 
 type reportingServiceClient struct {
@@ -4833,6 +5047,15 @@ func (c *reportingServiceClient) ListControlItems(ctx context.Context, in *Contr
 	return out, nil
 }
 
+func (c *reportingServiceClient) ReadNodeHeader(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeHeaderInfo, error) {
+	out := new(NodeHeaderInfo)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.compliance.reporting.ReportingService/ReadNodeHeader", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportingServiceServer is the server API for ReportingService service.
 type ReportingServiceServer interface {
 	ListReports(context.Context, *Query) (*ReportsSummaryLevelOne, error)
@@ -4845,6 +5068,7 @@ type ReportingServiceServer interface {
 	ReadNode(context.Context, *Id) (*Node, error)
 	ListNodes(context.Context, *Query) (*Nodes, error)
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
+	ReadNodeHeader(context.Context, *Query) (*NodeHeaderInfo, error)
 }
 
 // UnimplementedReportingServiceServer can be embedded to have forward compatible implementations.
@@ -4880,6 +5104,9 @@ func (*UnimplementedReportingServiceServer) ListNodes(context.Context, *Query) (
 }
 func (*UnimplementedReportingServiceServer) ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListControlItems not implemented")
+}
+func (*UnimplementedReportingServiceServer) ReadNodeHeader(context.Context, *Query) (*NodeHeaderInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadNodeHeader not implemented")
 }
 
 func RegisterReportingServiceServer(s *grpc.Server, srv ReportingServiceServer) {
@@ -5072,6 +5299,24 @@ func _ReportingService_ListControlItems_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportingService_ReadNodeHeader_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Query)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportingServiceServer).ReadNodeHeader(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.compliance.reporting.ReportingService/ReadNodeHeader",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportingServiceServer).ReadNodeHeader(ctx, req.(*Query))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ReportingService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.compliance.reporting.ReportingService",
 	HandlerType: (*ReportingServiceServer)(nil),
@@ -5107,6 +5352,10 @@ var _ReportingService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListControlItems",
 			Handler:    _ReportingService_ListControlItems_Handler,
+		},
+		{
+			MethodName: "ReadNodeHeader",
+			Handler:    _ReportingService_ReadNodeHeader_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
