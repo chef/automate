@@ -138,6 +138,8 @@ describe('infra node detail', () => {
       if(response.body.run_list.length === 0) {
         cy.get('[data-cy=empty-runlist]').scrollIntoView().should('be.visible');
       } else {
+        cy.get('.details-tab').scrollIntoView();
+        
         cy.get('[data-cy=node-expand-runlist]').contains('Expand All');
         cy.get('[data-cy=node-collapse-runlist]').contains('Collapse All');
         cy.get('[data-cy=node-edit-runlist]').contains('Edit');
@@ -150,138 +152,6 @@ describe('infra node detail', () => {
       cy.get('[data-cy=error-runlist]').scrollIntoView().should('be.visible');
     }
   }
-
-  describe('infra node list page', () => {
-    it('displays org details', () => {
-      cy.get('.page-title').contains(orgName);
-    });
-
-    // node tabs specs
-    it('can switch to node tab', () => {
-      cy.get('.nav-tab').contains('Nodes').click();
-    });
-
-    it('can check if node has list or not', () => {
-      getNodes('', 1).then((response) => {
-        checkNodesResponse(response);
-      });
-    });
-
-    it('can go to details page', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=nodes-table-container] chef-td').contains(nodeName).click();
-      }
-    });
-
-    // details tab specs
-    it('displays infra node details', () => {
-      if (nodeName !== '') {
-        cy.get('.page-title').contains(nodeName);
-        cy.get('[data-cy=infra-node-head]').contains(nodeName);
-        cy.get('[data-cy=node-server]').contains(serverID);
-        cy.get('[data-cy=node-org]').contains(orgID);
-      }
-    });
-
-    it('can check environments list available or not in dropdown', () => {
-      if (nodeName !== '') {
-        cy.request({
-          auth: { bearer: adminIdToken },
-          method: 'GET',
-          url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/environments`
-        }).then((environmentResponse) => {
-          if (environmentResponse.status === 200 && environmentResponse.body.ok === true) {
-            expect(environmentResponse.status).to.equal(200);
-          }
-          if (environmentResponse.body.environments.length === 0) {
-            cy.get('.ng-dropdown-panel-items').should('not.be.visible');
-          } else {
-            cy.get('.ng-arrow-wrapper').click();
-            cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-            cy.get('.ng-arrow-wrapper').click();
-          }
-        });
-      }
-    });
-
-    it('can select environment and display the confirmation box', () => {
-      if (nodeName !== '') {
-        cy.get('.ng-arrow-wrapper').click();
-        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.ng-option.ng-option-marked').click();
-        cy.get('[data-cy=change-confirm]').should(('be.visible'));
-      }
-    });
-
-    xit('can cancel the environemnt update', () => {
-      if (nodeName !== '') {
-        cy.get('.ng-arrow-wrapper').click();
-        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.get('.scrollable-content .ng-option').contains('chef-environment-88').click();
-        cy.get('[data-cy=change-confirm]').should(('be.visible'));
-        cy.get('#button-env [data-cy=cancel-button]').click();
-        cy.get('[data-cy=change-confirm]').should(('not.be.visible'));
-      }
-    });
-
-    xit('can update the environemnt', () => {
-      if (nodeName !== '') {
-        cy.get('.ng-arrow-wrapper').click();
-        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-
-        cy.get('.scrollable-content .ng-option').contains('chef-environment-47').click();
-        cy.get('[data-cy=change-confirm]').should(('be.visible'));
-        cy.get('[data-cy=save-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node environment.');
-        cy.get('app-notification.info chef-icon').click();
-      }
-    });
-
-    it('can add the node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=add-tag]').clear().type('tag1');
-        cy.get('[data-cy=add-tag-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-      }
-    });
-
-    it('can show the node tags box', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-      }
-    });
-
-    it('can add the multiple node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3');
-        cy.get('[data-cy=add-tag-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-        cy.get('.display-node-tags').find('span').should('have.length', 3);
-      }
-    });
-
-    xit('can remove the node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=remove-tag]').eq(0).click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-        cy.get('.display-node-tags').find('span').should('have.length', 2);
-      }
-    });
-  });
 
   describe('inside run list tab ', () => {
 
@@ -421,6 +291,146 @@ describe('infra node detail', () => {
     });
   });
 
+  describe('infra node list page', () => {
+    it('displays org details', () => {
+      cy.get('.page-title').contains(orgName);
+    });
+
+    // node tabs specs
+    it('can switch to node tab', () => {
+      cy.get('.nav-tab').contains('Nodes').click();
+    });
+
+    it('can check if node has list or not', () => {
+      getNodes('', 1).then((response) => {
+        checkNodesResponse(response);
+      });
+    });
+
+    it('can go to details page', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=nodes-table-container] chef-td').contains(nodeName).click();
+      }
+    });
+
+    // details tab specs
+    it('displays infra node details', () => {
+      if (nodeName !== '') {
+        cy.get('.page-title').contains(nodeName);
+        cy.get('[data-cy=infra-node-head]').contains(nodeName);
+        cy.get('[data-cy=node-server]').contains(serverID);
+        cy.get('[data-cy=node-org]').contains(orgID);
+      }
+    });
+
+    it('can check environments list available or not in dropdown', () => {
+      if (nodeName !== '') {
+        cy.request({
+          auth: { bearer: adminIdToken },
+          method: 'GET',
+          url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/environments`
+        }).then((environmentResponse) => {
+          if (environmentResponse.status === 200 && environmentResponse.body.ok === true) {
+            expect(environmentResponse.status).to.equal(200);
+          }
+          if (environmentResponse.body.environments.length === 0) {
+            cy.get('.ng-dropdown-panel-items').should('not.be.visible');
+          } else {
+            cy.get('.ng-arrow-wrapper').click();
+            cy.get('.ng-dropdown-panel-items').should(('be.visible'));
+            cy.get('.ng-arrow-wrapper').click();
+          }
+        });
+      }
+    });
+
+    it('can select environment and display the confirmation box', () => {
+      if (nodeName !== '') {
+        cy.get('.ng-arrow-wrapper').click();
+        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
+        cy.get('.ng-option').contains('_default').then(option => {
+          option[0].click();  // this is jquery click() not cypress click()
+        });
+        cy.get('[data-cy=change-confirm]').should(('be.visible'));
+      }
+    });
+
+    it('can cancel the environemnt update', () => {
+      if (nodeName !== '') {
+        cy.get('.ng-arrow-wrapper').click();
+        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
+        cy.get('.ng-option').contains('google').then(option => {
+          option[0].click();  // this is jquery click() not cypress click()
+        });
+        cy.get('[data-cy=change-confirm]').should(('be.visible'));
+        cy.get('#button-env [data-cy=cancel-button]').click();
+        cy.get('[data-cy=change-confirm]').should(('not.be.visible'));
+        
+      }
+    });
+
+    it('can update the environemnt', () => {
+      if (nodeName !== '') {
+        cy.get('.ng-arrow-wrapper').click();
+        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
+
+        cy.get('.ng-option').contains('Google').then(option => {
+          option[0].click();  // this is jquery click() not cypress click()
+        });
+        cy.get('[data-cy=change-confirm]').should(('be.visible'));
+        cy.get('[data-cy=save-button]').click();
+
+        cy.get('app-notification.info').contains('Successfully updated node environment.');
+        cy.get('app-notification.info chef-icon').click();
+      }
+    });
+
+    it('can add the node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=add-tag]').clear().type('tag1');
+        cy.get('[data-cy=add-tag-button]').click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+      }
+    });
+
+    it('can show the node tags box', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+      }
+    });
+
+    it('can add the multiple node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3');
+        cy.get('[data-cy=add-tag-button]').click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+        cy.get('.display-node-tags').find('span').should('have.length', 3);
+      }
+    });
+
+    it('can remove the node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=remove-tag]').eq(0).click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+        cy.get('.display-node-tags').find('span').should('have.length', 2);
+      }
+    });
+  });
+
   describe('inside attributes tab ', () => {
 
     function updateAttributes(attribute: string) {
@@ -470,7 +480,7 @@ describe('infra node detail', () => {
       cy.get('app-infra-node-details  chef-modal').should('not.be.visible');
     });
 
-    xit('edit attribute and show empty data', () => {
+    it('edit attribute and show empty data', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', nullJson)
@@ -495,7 +505,7 @@ describe('infra node detail', () => {
       });
     });
 
-    xit('edit attribute and show updated data', () => {
+    it('edit attribute and show updated data', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click({force: true});
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', validJson)
@@ -520,7 +530,7 @@ describe('infra node detail', () => {
       });
     });
 
-    xit('fails to edit attribute with a invalid json', () => {
+    it('fails to edit attribute with a invalid json', () => {
       cy.get('[data-cy=node-edit-attributes').contains('Edit').click();
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=attributes]').clear().invoke('val', invalidJson).trigger('change');
@@ -531,7 +541,7 @@ describe('infra node detail', () => {
       cy.get('app-infra-node-details chef-modal').should('not.be.visible');
     });
 
-    xit('can cancel edit attributes', () => {
+    it('can cancel edit attributes', () => {
       cy.get('[data-cy=node-edit-attributes]').contains('Edit').click();
       cy.get('app-infra-node-details chef-modal').should('exist');
       cy.get('[data-cy=cancel-attribute-button]').contains('Cancel').should('be.visible').click();
