@@ -1,0 +1,4 @@
+{
+  "name": "chef/report-manager-minio-gateway",
+  "data_service": true
+}
