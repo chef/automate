@@ -42,6 +42,9 @@ describe('project management', () => {
 
   after(() => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+      cy.get('[data-cy=close-x]').click();
+    }
   });
 
   it('displays a list of projects', () => {
@@ -62,10 +65,6 @@ describe('project management', () => {
     
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
-
-    if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
-      cy.get('[data-cy=close-x]').click();
-    }
 
     cy.get('[data-cy=create-name]').focus()
       .type(projectName).should('have.value', projectName);
