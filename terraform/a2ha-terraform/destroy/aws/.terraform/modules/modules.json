@@ -14,11 +14,6 @@
             "Key": "aws-destroy",
             "Source": "../../modules/aws_destroy",
             "Dir": "../../modules/aws_destroy"
-        },
-        {
-            "Key": "aws-output",
-            "Source": "../../modules/aws_output",
-            "Dir": "../../modules/aws_output"
         }
     ]
 }
