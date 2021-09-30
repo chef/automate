@@ -76,7 +76,7 @@ To add a Data Feed instance in Chef Automate using ServiceNow integration:
 
 {{< figure src="/images/automate/data-feed-instance-using-servicenow-integration.png" alt="Data Feed Instance using ServiceNow Integration">}}
 
-#### Edit a Data Feed Instance
+#### Edit a ServiceNow Data Feed Instance
 
 To edit a Data Feed instance of ServiceNow Integration:
 
@@ -92,7 +92,7 @@ To edit a Data Feed instance of ServiceNow Integration:
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
 
-#### Delete a Data Feed Instance
+#### Delete a ServiceNow Data Feed Instance
 
 To delete an individual instance:
 
@@ -105,6 +105,165 @@ To delete an individual instance:
 1. In the popup, select **Delete Data Feed**.
 
 {{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-servicenow-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using ServiceNow Integration">}}
+
+### Splunk
+
+To add a Data Feed instance in Chef Automate using Splunk integration:
+
+1. Selection **New Integration**.
+
+1. Select the **Splunk** icon under Webhook Integration.
+
+1. In the form, enter a unique **Data Feed name**.
+
+1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
+
+1. Select an **authentication** from the couple of options in the drop-down.
+  
+  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
+
+1. Select **Test Connection** to start validating the connection details.
+
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
+
+{{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using splunk Integration">}}
+
+#### Edit a Splunk Data Feed Instance
+
+To edit a Data Feed instance of Splunk Integration:
+
+1. Select the data feed instance name to open its detail page.
+
+1. Edit the Data Feed **Name** or **URL**.
+
+1. Select **Test Data Feed** button to test the URL.
+
+1. Select **Save** to save your changes.
+
+{{< figure src="/images/automate/details-of-data-feed-instance-using-splunk-integration.png" alt="Details of Data Feed Instance using Splunk Integration">}}
+
+You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+
+#### Delete a Splunk Data Feed Instance
+
+To delete an individual instance:
+
+1. Selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+
+1. Select **Delete**.
+
+{{< figure src="/images/automate/delete-the-data-feed-instance-using-splunk-integration.png" alt="Delete the Data Feed Instance using Splunk Integration">}}
+
+1. In the popup, select **Delete Data Feed**.
+
+{{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-splunk-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using Splunk Integration">}}
+
+### ELK
+
+To add a Data Feed instance in Chef Automate using ELK integration:
+
+1. Selection **New Integration**.
+
+1. Select the **ELK** icon under Webhook Integration.
+
+1. In the form, enter a unique **Data Feed name**.
+
+1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
+
+1. Select an **authentication** from the couple of options in the drop-down.
+  
+  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
+
+1. Select **Test Connection** to start validating the connection details.
+
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
+
+IMAGE
+
+#### Edit a ELK Data Feed Instance
+
+To edit a Data Feed instance of ELK Integration:
+
+1. Select the data feed instance name to open its detail page.
+
+1. Edit the Data Feed **Name** or **URL**.
+
+1. Select **Test Data Feed** button to test the URL.
+
+1. Select **Save** to save your changes.
+
+IMAGE
+
+You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+
+#### Delete a ELK Data Feed Instance
+
+To delete an individual instance:
+
+1. Selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+
+1. Select **Delete**.
+
+IMAGE
+
+1. In the popup, select **Delete Data Feed**.
+
+IMAGE
+
+### Custom
+
+To add a Data Feed instance in Chef Automate using Custom integration:
+
+1. Selection **New Integration**.
+
+1. Select the **Custom** icon under Webhook Integration.
+
+1. In the form, enter a unique **Data Feed name**.
+
+1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
+
+1. Select an **authentication** from the couple of options in the drop-down.
+  
+  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
+
+1. Select **Test Connection** to start validating the connection details.
+
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
+
+IMAGE
+
+#### Edit a Custom Data Feed Instance
+
+To edit a Data Feed instance of Custom Integration:
+
+1. Select the data feed instance name to open its detail page.
+
+1. Edit the Data Feed **Name** or **URL**.
+
+1. Select **Test Data Feed** button to test the URL.
+
+1. Select **Save** to save your changes.
+
+IMAGE
+
+You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+
+#### Delete a Custom Data Feed Instance
+
+To delete an individual instance:
+
+1. Selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+
+1. Select **Delete**.
+
+IMAGE
+
+1. In the popup, select **Delete Data Feed**.
+
+IMAGE
 
 ## Configuring Global Data Feed Behavior
 
