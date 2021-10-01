@@ -13,6 +13,7 @@ export interface NodeCredentialEntityState extends EntityState<NodeCredential> {
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
   status: EntityStatus;
+  total: number;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -35,7 +36,8 @@ nodeCredentialEntityAdapter.getInitialState(<NodeCredentialEntityState>{
   getAllStatus: EntityStatus.notLoaded,
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
-  status: EntityStatus.notLoaded
+  status: EntityStatus.notLoaded,
+  total: 0
 });
 
 export function nodeCredentialEntityReducer(
@@ -47,8 +49,9 @@ export function nodeCredentialEntityReducer(
       return set('status', EntityStatus.loading, state);
 
     case NodeCredentialActionTypes.SEARCH_SUCCESS:
+      const totalCountState = set('total', action.payload.total, state);
       return set('status', EntityStatus.loadingSuccess,
-        nodeCredentialEntityAdapter.setAll(action.payload.secrets, state));
+        nodeCredentialEntityAdapter.setAll(action.payload.secrets, totalCountState));
 
     case NodeCredentialActionTypes.SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
