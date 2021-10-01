@@ -42,7 +42,10 @@ describe('project management', () => {
 
   after(() => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
-    cy.get('app-welcome-modal').invoke('hide');
+    // cy.get('app-welcome-modal').invoke('hide');
+    if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
+      cy.get('[data-cy=close-x]').click();
+    }
   });
 
   it('displays a list of projects', () => {
@@ -60,7 +63,8 @@ describe('project management', () => {
   });
 
   it('can create a project without adding a custom ID', () => {
-    
+    cy.wait(2000);
+
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 

@@ -134,13 +134,10 @@ describe('infra node detail', () => {
   }
 
   function checkResponse(response: any) {
-    if (response.status === 200 && response.body.ok === true) {
-      debugger
+    if (response.status === 200) {
       if(response.body.run_list.length === 0) {
-        debugger
         cy.get('[data-cy=empty-runlist]').scrollIntoView().should('be.visible');
       } else {
-        debugger
         cy.get('.details-tab').scrollIntoView();
         
         cy.get('[data-cy=node-expand-runlist]').contains('Expand All');
@@ -238,8 +235,12 @@ describe('infra node detail', () => {
       if (nodeName !== '') {
         cy.get('.ng-arrow-wrapper').click();
         cy.get('.ng-dropdown-panel-items').should(('be.visible'));
-        cy.wait(500);
         cy.get('.ng-option').contains('chef-environment-609823800').then(option => {
+          option[0].click();  // this is jquery click() not cypress click()
+        });
+        cy.get('.ng-arrow-wrapper').click();
+        cy.get('.ng-dropdown-panel-items').should(('be.visible'));
+        cy.get('.ng-option').contains('_default').then(option => {
           option[0].click();  // this is jquery click() not cypress click()
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
@@ -306,7 +307,7 @@ describe('infra node detail', () => {
     });
 
     it('can check if node has run list or not', () => {
-      if (nodeName !== '') {
+      if (nodeName !== '' && environment == '_default') {
         getRunlist(environment).then((response) => {
           checkResponse(response);
         });
