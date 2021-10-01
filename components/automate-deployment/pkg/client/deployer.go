@@ -282,16 +282,12 @@ func DeployHA(writer cli.FormatWriter,
 	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
 	d.genMergedConfig()
 	ctx := context.Background()
-	devM, err := manifestProvider.GetCurrentManifest(ctx, "dev")
-	if err != nil {
-		logrus.Debug("Failed to get manifest for dev channel")
-	}
-	currentM, err := manifestProvider.GetCurrentManifest(ctx, "current")
+	currentM, err := manifestProvider.GetCurrentManifest(ctx, d.mergedCfg.Deployment.V1.Svc.Channel.GetValue())
 	if err != nil {
 		logrus.Debug("Failed to get manifest for current channel")
 	}
 	b := bootstrap.NewCompatBootstrapper(target.NewLocalTarget(false))
-	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, devM, currentM, writer)
+	err = bootstrap.FullBootstrapHA(context.Background(), b, d.mergedCfg.Deployment, currentM, writer)
 	return err
 }
 
