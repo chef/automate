@@ -272,7 +272,7 @@ describe('infra node detail', () => {
 
     it('can add the multiple node tags', () => {
       if (nodeName !== '') {
-        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3');
+        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3, tag4, tag5');
         cy.get('[data-cy=add-tag-button]').click();
 
         cy.get('app-notification.info').contains('Successfully updated node tags.');
