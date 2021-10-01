@@ -1520,3 +1520,21 @@ func (t *LocalTarget) IPs() []net.IP {
 func (t *LocalTarget) HabCache() depot.HabCache {
 	return depot.FromLocalCache()
 }
+
+func (t *LocalTarget) InstallAutomateBackendDeployment(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+	pkg := manifest.InstallableFromManifest(m, "automate-backend-deployment")
+	if pkg == nil {
+		logrus.Info("(HA) unable to find automate-backend-deployment package in manifest")
+		return errors.New("automate-backend-deployment (HA) was not found in the manifest")
+	}
+	output, err := t.InstallPackage(ctx, pkg, c.GetV1().GetSvc().GetChannel().GetValue())
+	if err != nil {
+		logrus.WithError(err).WithFields(logrus.Fields{
+			"package": pkg.InstallIdent(),
+			"output":  output,
+		}).Error("install failed")
+		return errors.Wrapf(err, "msg=\"failed to install\" package=%s output=%s", pkg.InstallIdent(), output)
+	}
+	logrus.Info("Chef Automate backend deployment Installed")
+	return nil
+}

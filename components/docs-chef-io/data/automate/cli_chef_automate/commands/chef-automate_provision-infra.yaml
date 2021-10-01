@@ -1,0 +1,21 @@
+name: chef-automate provision-infra
+synopsis: Provison automate HA infra.
+usage: chef-automate provision-infra [flags]
+description: Provison automate HA infra for automate HA deployment.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for provision-infra
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

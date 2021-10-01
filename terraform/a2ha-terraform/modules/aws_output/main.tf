@@ -11,6 +11,16 @@ locals {
       automate_fqdn             = var.automate_fqdn
       automate_frontend_urls    = var.automate_frontend_urls
     })
+
+    copy_terraform_files_for_destroy = [
+    "/src/terraform/reference_architectures/aws/variables.tf",
+    "/src/terraform/a2ha_habitat.auto.tfvars",
+    "/src/terraform/aws.auto.tfvars",
+    "/src/terraform/variables_common.tf"
+    ]
+
+    destination_path = "/src/terraform/destroy/aws"
+ 
 }
 
 #This will create auto.tfvars with using aws's content. Because dusing deployment time we will need some aws info like public and private ips.
@@ -27,4 +37,17 @@ resource "null_resource" "output" {
     provisioner "local-exec" {
         command = "mv ${path.root}/terraform.tfvars ${path.root}/aws.auto.tfvars;sed  -i 's/aws/deployment/' ${path.root}/.tf_arch;sed  -i 's/architecture \"aws\"/architecture \"deployment\"/' ${path.root}/../a2ha.rb"
     }
+
+    depends_on = [local_file.output]
+}
+
+resource "null_resource" "setup_destroy_directory" {
+  for_each = toset(local.copy_terraform_files_for_destroy)
+
+  provisioner "local-exec" {
+    command = "cp ${each.value} ${local.destination_path}"
+  }
+
+  depends_on = [null_resource.output]
+
 }

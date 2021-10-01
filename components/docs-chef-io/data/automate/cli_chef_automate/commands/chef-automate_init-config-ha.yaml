@@ -11,6 +11,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for init-config-ha
+- name: path
+  default_value: /hab/a2_deploy_workspace/
+  usage: a2ha hab workspace dir path
 inherited_options:
 - name: debug
   shorthand: d

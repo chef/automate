@@ -21,7 +21,7 @@ openssl x509 -req -in admin.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreatese
 
 # root pem cert that signed the below cert/key pairs below
 # Used for hab_sup_http_gateway_ca_cert 
-cat <<EOF >> ../terraform/a2ha-terraform/variables_common.tf
+cat <<EOF >> ../terraform/variables_common.tf
 
 variable "hab_sup_http_gateway_ca_cert" {
   default = <<CERT
@@ -32,7 +32,7 @@ CERT
   description = "Issuer of the TLS cert used for the HTTP gateway in PEM format."
 }
 
-variable "hab_sup_http_gateway_ca_cert" {
+variable "hab_sup_http_gateway_priv_key" {
   default = <<CERT
 $(cat admin.pem)
 CERT
@@ -41,7 +41,7 @@ CERT
   description = "Issuer of the TLS cert used for the HTTP gateway in PEM format."
 }
 
-variable "hab_sup_http_gateway_ca_cert" {
+variable "hab_sup_http_gateway_pub_cert" {
   default = <<CERT
 $(cat admin.key)
 CERT

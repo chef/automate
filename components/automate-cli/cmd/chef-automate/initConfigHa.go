@@ -13,6 +13,10 @@ var initConfigHAPathFlags = struct {
 	path string
 }{}
 
+var initConfigHabA2HAPathFlag = struct {
+	a2haDirPath string
+}{}
+
 type AwsConfigToml struct {
 	Architecture struct {
 		ConfigInitials struct {
@@ -139,14 +143,14 @@ type ExistingInfraConfigToml struct {
 	} `toml:"postgresql"`
 	ExistingInfra struct {
 		Config struct {
-			AutomateIps             []interface{} `toml:"automate_ips"`
-			AutomatePrivateIps      []interface{} `toml:"automate_private_ips"`
-			ChefServerIps           []interface{} `toml:"chef_server_ips"`
-			ChefServerPrivateIps    []interface{} `toml:"chef_server_private_ips"`
-			ElasticsearchIps        []interface{} `toml:"elasticsearch_ips"`
-			ElasticsearchPrivateIps []interface{} `toml:"elasticsearch_private_ips"`
-			PostgresqlIps           []interface{} `toml:"postgresql_ips"`
-			PostgresqlPrivateIps    []interface{} `toml:"postgresql_private_ips"`
+			AutomateIps             []string `toml:"automate_ips"`
+			AutomatePrivateIps      []string `toml:"automate_private_ips"`
+			ChefServerIps           []string `toml:"chef_server_ips"`
+			ChefServerPrivateIps    []string `toml:"chef_server_private_ips"`
+			ElasticsearchIps        []string `toml:"elasticsearch_ips"`
+			ElasticsearchPrivateIps []string `toml:"elasticsearch_private_ips"`
+			PostgresqlIps           []string `toml:"postgresql_ips"`
+			PostgresqlPrivateIps    []string `toml:"postgresql_private_ips"`
 		} `toml:"config"`
 	} `toml:"existing_infra"`
 }
@@ -157,6 +161,13 @@ func init() {
 		"file",
 		"config.toml",
 		"File path to write the config")
+	initConfigHACmd.SetUsageTemplate(UsageTemplate)
+
+	initConfigHACmd.PersistentFlags().StringVar(
+		&initConfigHabA2HAPathFlag.a2haDirPath,
+		"path",
+		"/hab/a2_deploy_workspace/",
+		"a2ha hab workspace dir path")
 	initConfigHACmd.SetUsageTemplate(UsageTemplate)
 	RootCmd.AddCommand(initConfigHACmd)
 }
