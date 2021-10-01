@@ -4,7 +4,6 @@ describe('login the app', () => {
   let connector = '';
   describe('load and update user preference', () => {
     let timeformat = 'ddd, DD MMM YYYY';
-    let count = 0;
     let attrSelector = '';
     const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
     let selectTimeformat = '';
@@ -49,9 +48,9 @@ describe('login the app', () => {
     it('timeformat updated in user detail page', function () {
       cy.get('app-user-details').should('exist').then(() =>  {
           cy.get('[data-cy=timeformat-dropdown]').should('exist');
-          cy.get('[data-cy=timeformat-dropdown] .selected-value .option-content')
-          .then(($element) => {
-              cy.get('[data-cy=timeformat-dropdown] .selected-value .option-content')
+          cy.get('[data-cy=timeformat-dropdown] .mat-select-min-line')
+          .then(() => {
+              cy.get('[data-cy=timeformat-dropdown] .mat-select-min-line')
               .contains(timeformat);
           });
 
@@ -70,21 +69,16 @@ describe('login the app', () => {
       cy.get('[data-cy=timeformat-dropdown]').then((dropdown) => {
         selectTimeformat = '';
         for (let i = 0; i < timeformatList.length; i++) {
-            if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
-                selectTimeformat = timeformatList[i];
-                break;
-            }
+          if (timeformat.indexOf(timeformatList[i]) === -1) {
+              selectTimeformat = timeformatList[i];
+              break;
+          }
         }
-        attrSelector = '[value=' + selectTimeformat + ']';
+        attrSelector = '[ng-reflect-value=' + selectTimeformat + ']';
         cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
           cy.get(attrSelector).click({force: true}).then(() => {
-            count = 0;
-            while (dropdown[0].innerText.indexOf(selectTimeformat) !== 0 && count < 10) {
-                cy.get(attrSelector).click({force: true});
-                count++;
-            }
-            cy.get('[data-cy=timeformat-dropdown]')
-              .should('have.value', selectTimeformat)
+            cy.get('[data-cy=timeformat-dropdown]  .mat-select-min-line')
+              .contains(selectTimeformat)
               .then(() => {
                 cy.server();
                 cy.route({
