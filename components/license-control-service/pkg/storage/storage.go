@@ -282,6 +282,10 @@ func (m *MemBackend) SetLicense(ctx context.Context, s string) error {
 	return nil
 }
 
+func (m *MemBackend) StoreDeployment(context.Context, string) error {
+	return nil
+}
+
 //StoreDeployment stores the deployment info in the DB
 func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 	err := Transact(p, func(tx *DBTrans) error {
