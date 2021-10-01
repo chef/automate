@@ -4,8 +4,8 @@ describe('login the app', () => {
   let connector = '';
   describe('load and update user preference', () => {
     let timeformat = 'ddd, DD MMM YYYY';
-    let count = 0;
-    let attrSelector = '';
+    const count = 0;
+    const attrSelector = '';
     const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
     let selectTimeformat = '';
     let telemetryEnabled = false;
@@ -48,8 +48,9 @@ describe('login the app', () => {
 
     it('timeformat value presenent on user detail page', function () {
       cy.get('app-user-details').should('exist').then(() =>  {
-          cy.get('[data-cy=timeformat-dropdown]').should('exist');          
-          cy.get('[data-cy=timeformat-dropdown]').click().get('mat-option').contains(timeformat).click();
+          cy.get('[data-cy=timeformat-dropdown]').should('exist');
+          cy.get('[data-cy=timeformat-dropdown]').click()
+            .get('mat-option').contains(timeformat).click();
       });
     });
 
@@ -65,12 +66,12 @@ describe('login the app', () => {
       cy.get('[data-cy=timeformat-dropdown]').then((dropdown) => {
         selectTimeformat = '';
         for (let i = 0; i < timeformatList.length; i++) {
-            if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
-                selectTimeformat = timeformatList[i];
-                break;
-            }
+          if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
+            selectTimeformat = timeformatList[i];
+            break;
+          }
         }
-        
+
         cy.get('mat-select').first().click(); // opens the drop down
 
         // simulate click event on the drop down item (mat-option)

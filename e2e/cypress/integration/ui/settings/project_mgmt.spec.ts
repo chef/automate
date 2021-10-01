@@ -34,20 +34,20 @@ describe('project management', () => {
 
   beforeEach(() => {
     cy.restoreStorage();
-    cy.get("body").then($body => {
-      if ($body.find('[data-cy=close-x]').length > 0) {   
-      //evaluates as true if button exists at all
-          cy.get('[data-cy=close-x]').then($btn => {
-            if ($btn.is(':visible')){
-              //you get here only if button EXISTS and is VISIBLE
-              cy.get('[data-cy=close-x]').click();
-            } else {
-              //you get here only if button EXISTS but is INVISIBLE
-            }
-          });
+    cy.get('body').then($body => {
+      if ($body.find('[data-cy=close-x]').length > 0) {
+        // evaluates as true if button exists at all
+        cy.get('[data-cy=close-x]').then($btn => {
+          if ($btn.is(':visible')) {
+            // you get here only if button EXISTS and is VISIBLE
+            cy.get('[data-cy=close-x]').click();
+          } else {
+            // you get here only if button EXISTS but is INVISIBLE
+          }
+        });
       } else {
-         //you get here if the button DOESN'T EXIST
-         assert.isOk('everything','everything is OK');
+        // you get here if the button DOESN'T EXIST
+        assert.isOk('everything', 'everything is OK');
       }
     });
   });
@@ -58,8 +58,6 @@ describe('project management', () => {
 
   after(() => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
-    // cy.get('app-welcome-modal').invoke('hide');
-    
   });
 
   it('displays a list of projects', () => {

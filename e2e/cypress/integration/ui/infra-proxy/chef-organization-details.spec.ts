@@ -9,7 +9,7 @@ describe('chef server', () => {
   const serverFQDN = 'api.chef.io';
   const serverIP = '50.21.221.24';
   const adminUser = 'viveksingh_msys';
-  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');  
+  const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
   const tabNames = ['Roles', 'Environments', 'Data Bags', 'Clients', 'Cookbooks'];
 
   before(() => {

@@ -318,8 +318,8 @@ describe('infra role detail', () => {
       cy.get('app-infra-role-details chef-modal').should('exist');
       cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
         .contains('audit::inspec').click();
-      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]').contains('chef-client')
-        .click();
+      cy.get('.cdk-virtual-scroll-content-wrapper [data-cy=select-run-list]')
+        .contains('chef-client').click();
 
       cy.get('[data-cy=drag-right]').click();
       cy.get('[data-cy=update-run-list]').click();

@@ -1,7 +1,9 @@
 describe('infra node detail', () => {
   let adminIdToken = '';
-  let tags: string[];
+  let nodeName = '';
+  let runlist = '';
 
+  const environment = '';
   const serverID = 'chef-manage';
   const serverName = 'chef manage';
   const orgID = 'viveksingh_msys';
@@ -10,9 +12,6 @@ describe('infra node detail', () => {
   const serverIP = '50.21.221.24';
   const adminUser = 'viveksingh_msys';
   const adminKey = Cypress.env('AUTOMATE_INFRA_ADMIN_KEY').replace(/\\n/g, '\n');
-  let nodeName = '';
-  let environment = '';
-  let runlist = '';
   const nullJson = '{}';
   const validJson = '{"test":"test"}';
   const invalidJson = '{"invalid "test"';
@@ -135,11 +134,10 @@ describe('infra node detail', () => {
 
   function checkResponse(response: any) {
     if (response.status === 200) {
-      if(response.body.run_list.length === 0) {
+      if (response.body.run_list.length === 0) {
         cy.get('[data-cy=empty-runlist]').scrollIntoView().should('be.visible');
       } else {
         cy.get('.details-tab').scrollIntoView();
-        
         cy.get('[data-cy=node-expand-runlist]').contains('Expand All');
         cy.get('[data-cy=node-collapse-runlist]').contains('Collapse All');
         cy.get('[data-cy=node-edit-runlist]').contains('Edit');
@@ -271,7 +269,6 @@ describe('infra node detail', () => {
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
         cy.get('#button-env [data-cy=cancel-button]').click();
         cy.get('[data-cy=change-confirm]').should(('not.be.visible'));
-        
       }
     });
 
@@ -307,7 +304,7 @@ describe('infra node detail', () => {
     });
 
     it('can check if node has run list or not', () => {
-      if (nodeName !== '' && environment == '_default') {
+      if (nodeName !== '' && environment !== '' && environment === '_default') {
         getRunlist(environment).then((response) => {
           checkResponse(response);
         });

@@ -172,7 +172,7 @@ describe('infra node list', () => {
       cy.get('[data-cy=nodes-table-container]').contains(seachableNode)
         .should('exist');
       cy.get('app-infra-nodes [data-cy=nodes-table-container] chef-td a')
-        .contains(seachableNode).parent().parent().find('.mat-select-trigger')
+        .contains(seachableNode).parent().parent().find('.mat-select-trigger');
 
       cy.get('[data-cy=update-tag] span').contains('Manage Tags').should('be.visible')
         .click();
