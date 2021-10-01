@@ -42,7 +42,6 @@ Specify the action to restrict user access to the specific action.
 | Create Infra Server | POST | infra:infraServers:create | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
 | Update Infra Server | PUT | infra:infraServers:update | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | Delete Infra Server | DELETE | infra:infraServers:delete | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
-<<<<<<< HEAD
 | List Orgs | GET | infra:infraServersOrgs:list | /api/v0/infra/servers/{server_id}/orgs | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs |
 | Get Org | GET | infra:infraServersOrgs:get | /api/v0/infra/servers/{server_id}/orgs/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
 | Create Org | POST | infra:infraServersOrgs:create,iam:projects:assign | /api/v0/infra/servers/{server_id}/orgs | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs |
@@ -79,6 +78,3 @@ example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | Get Node | GET | infra:infraServersOrgsNodes:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Update Node | POST | infra:infraServersOrgsNodes:update | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Delete PolicyFiles | DELETE | infra:infraServersOrgsNodes:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name} |
-=======
-{{% /responsive-table %}}
->>>>>>> infra server put and delete test case added
