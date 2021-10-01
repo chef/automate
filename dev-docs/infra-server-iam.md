@@ -6,6 +6,7 @@ Specify the action to restrict user access to the specific action.
 
  *  Make a `post` request to `https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies`
     with body as 
+
     ```
     {
     "name": "username",
@@ -47,4 +48,3 @@ Specify the action to restrict user access to the specific action.
 | Create Org | POST | infra:infraServersOrgs:create,iam:projects:assign | /api/v0/infra/servers/{server_id}/orgs | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs |
 | Update Org | PUT | infra:infraServersOrgs:update | /api/v0/infra/servers/{server_id}/orgs/{id}  | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
 | Delete Org | DELETE | infra:infraServersOrgs:delete | /api/v0/infra/servers/{server_id}/orgs/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
-{{% /responsive-table %}}
