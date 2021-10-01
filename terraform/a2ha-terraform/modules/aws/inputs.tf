@@ -36,6 +36,12 @@ variable "automate_server_instance_type" {
   default = "t3a.medium"
 }
 
+variable "aws_vpc_id" {
+}
+
+variable "aws_cidr_block_addr" {
+}
+
 variable "aws_ami_id" {
   default     = ""
   description = "Setting this value overrides ami search features"

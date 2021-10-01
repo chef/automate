@@ -19,7 +19,7 @@ resource "null_resource" "system_base_provisioning" {
   connection {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
-    host        = var.public_ips[count.index]
+    host        = var.private_ips[count.index]
     script_path = "${var.tmp_path}/tf_inline_script_system.sh"
   }
 

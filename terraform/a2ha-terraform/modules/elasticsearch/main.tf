@@ -33,7 +33,6 @@ module "journalbeat" {
   journalbeat_svc_binds     = "--bind elasticsearch:automate-backend-elasticsearch.default"
   journalbeat_tags          = ["elasticsearch"]
   private_ips               = var.private_ips
-  public_ips                = var.public_ips
   source                    = "../journalbeat"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user
@@ -51,7 +50,6 @@ module "metricbeat" {
   metricbeat_svc_binds      = "--bind elasticsearch:automate-backend-elasticsearch.default"
   metricbeat_tags           = ["elasticsearch"]
   private_ips               = var.private_ips
-  public_ips                = var.public_ips
   source                    = "../metricbeat"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user
@@ -68,7 +66,6 @@ module "kibana" {
   kibana_pkg_ident          = var.kibana_pkg_ident
   kibana_svc_binds          = "--bind elasticsearch:automate-backend-elasticsearch.default"
   private_ips               = var.private_ips
-  public_ips                = var.public_ips
   source                    = "../kibana"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user
@@ -85,7 +82,6 @@ module "curator" {
   curator_pkg_ident         = var.curator_pkg_ident
   curator_svc_binds         = "--bind elasticsearch:automate-backend-elasticsearch.default"
   private_ips               = var.private_ips
-  public_ips                = var.public_ips
   source                    = "../curator"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user
@@ -104,7 +100,7 @@ resource "null_resource" "elasticsearch" {
   connection {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
-    host        = var.public_ips[count.index]
+    host        = var.private_ips[count.index]
     script_path = "${var.tmp_path}/tf_inline_script_system_elasticsearch.sh"
   }
 

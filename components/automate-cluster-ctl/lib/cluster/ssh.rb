@@ -33,7 +33,7 @@ module AutomateCluster
 
       tfoutput.ssh_node_types.each do |type|
         next unless service.nil? || type == service
-        tfoutput.fetch("#{type}_public_ips").each do |ip|
+        tfoutput.fetch("#{type}_private_ips").each do |ip|
           begin
             logger.debug "Connecting to #{ip}"
             ssh = connect(ip, options)

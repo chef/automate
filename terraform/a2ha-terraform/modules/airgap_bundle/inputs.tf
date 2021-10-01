@@ -13,6 +13,10 @@ variable "public_ips" {
   default = []
 }
 
+variable "private_ips" {
+  default = []
+}
+
 variable "ssh_key_file" {
 }
 

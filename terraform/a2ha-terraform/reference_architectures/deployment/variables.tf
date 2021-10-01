@@ -2,6 +2,12 @@ variable "ami_filter_name" {
   default = "chef-highperf-centos7-*"
 }
 
+variable "aws_vpc_id" {
+}
+
+variable "aws_cidr_block_addr" {
+}
+
 variable "ami_filter_owner" {
   default = "446539779517"
 }

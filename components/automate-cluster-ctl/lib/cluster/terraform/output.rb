@@ -43,10 +43,10 @@ module AutomateCluster
       end
 
       def ssh_commands(name, ssh_options = nil)
-        return [] unless include?("#{name}_public_ips")
+        return [] unless include?("#{name}_private_ips")
 
-        logger.debug "Fetching data for '#{name}_public_ips'"
-        fetch("#{name}_public_ips").map do |ip|
+        logger.debug "Fetching data for '#{name}_private_ips'"
+        fetch("#{name}_private_ips").map do |ip|
           [
             'ssh',
             ssh_options,

@@ -25,7 +25,7 @@ resource "null_resource" "rsync" {
   connection {
     user        = var.ssh_user
     private_key = file(var.ssh_key_file)
-    host        = var.public_ips[count.index]
+    host        = var.private_ips[count.index]
   }
 
   triggers = {
@@ -39,6 +39,6 @@ resource "null_resource" "rsync" {
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/files/rsync_wrapper.sh -k ${var.ssh_key_file} -u ${var.ssh_user} -i ${var.public_ips[count.index]} -l ${join(",", local.rsync_files)} -p ${path.module}"
+    command = "${path.module}/files/rsync_wrapper.sh -k ${var.ssh_key_file} -u ${var.ssh_user} -i ${var.private_ips[count.index]} -l ${join(",", local.rsync_files)} -p ${path.module}"
   }
 }
