@@ -49,6 +49,7 @@ type CurrentBackend interface {
 	SetLicense(context.Context, string) error
 	//  StoreDeployment stores the deployment info in the backend
 	StoreDeployment(context.Context, string) error
+	GetDeployment(context.Context) (Deployment, error)
 }
 
 // An UpgradeableBackend is an old backend that can no longer be used
@@ -319,4 +320,26 @@ func (p *PGBackend) StoreDeployment(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+
+func (m *MemBackend) GetDeployment(context.Context) (Deployment, error) {
+	return Deployment{}, nil
+}
+
+type Deployment struct {
+	ID        string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+//GetDeployment: fetches the deployment data
+func (p *PGBackend) GetDeployment(ctx context.Context) (Deployment, error) {
+	var d Deployment
+	err := p.db.QueryRowContext(ctx,
+		`SELECT * FROM deployment`).
+		Scan(&d.ID, &d.CreatedAt, &d.UpdatedAt)
+	if err != nil {
+		return Deployment{}, errors.Wrapf(err, "Failed to get deployment")
+	}
+	return d, nil
 }
