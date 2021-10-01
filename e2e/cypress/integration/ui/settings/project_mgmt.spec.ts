@@ -35,10 +35,9 @@ describe('project management', () => {
   beforeEach(() => {
     cy.restoreStorage();
     cy.get("body").then($body => {
-      if ($body.find("[data-cy=close-x]").length > 0) {   
+      if ($body.find('[data-cy=close-x]').length > 0) {   
       //evaluates as true if button exists at all
-        debugger
-          cy.get("[data-cy=close-x]']").then($btn => {
+          cy.get('[data-cy=close-x]').then($btn => {
             if ($btn.is(':visible')){
               //you get here only if button EXISTS and is VISIBLE
               cy.get('[data-cy=close-x]').click();
