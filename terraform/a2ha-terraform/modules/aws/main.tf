@@ -103,7 +103,7 @@ resource "aws_instance" "chef_automate_postgresql" {
     iops                  = var.postgresql_ebs_volume_type == "io1" ? var.postgresql_ebs_volume_iops : 0
     volume_size           = var.postgresql_ebs_volume_size
     volume_type           = var.postgresql_ebs_volume_type
-    root_block_device.encrypted = true
+    encrypted             = true
   }
 
   tags = merge(var.tags,
@@ -153,7 +153,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
     iops                  = var.elasticsearch_ebs_volume_type == "io1" ? var.elasticsearch_ebs_volume_iops : 0
     volume_size           = var.elasticsearch_ebs_volume_size
     volume_type           = var.elasticsearch_ebs_volume_type
-    root_block_device.encrypted = true
+    encrypted             = true
   }
 
   tags  = merge(
@@ -201,7 +201,7 @@ resource "aws_instance" "chef_automate" {
     iops                  = var.automate_ebs_volume_type == "io1" ? var.automate_ebs_volume_iops : 0
     volume_size           = var.automate_ebs_volume_size
     volume_type           = var.automate_ebs_volume_type
-    root_block_device.encrypted = true 
+    encrypted             = true 
   }
 
   tags  = merge(
@@ -249,7 +249,7 @@ resource "aws_instance" "chef_server" {
     iops                  = var.chef_ebs_volume_type == "io1" ? var.chef_ebs_volume_iops : 0
     volume_size           = var.chef_ebs_volume_size
     volume_type           = var.chef_ebs_volume_type
-    root_block_device.encrypted = true
+    encrypted = true
   }
 
   tags  = merge(
