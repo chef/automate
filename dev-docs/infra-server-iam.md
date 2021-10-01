@@ -6,7 +6,6 @@ Specify the action to restrict user access to the specific action.
 
  *  Make a `post` request to `https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies`
     with body as 
-
     ```
     {
     "name": "username",
@@ -43,3 +42,9 @@ Specify the action to restrict user access to the specific action.
 | Create Infra Server | POST | infra:infraServers:create | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
 | Update Infra Server | PUT | infra:infraServers:update | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | Delete Infra Server | DELETE | infra:infraServers:delete | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
+| List Orgs | GET | infra:infraServersOrgs:list | /api/v0/infra/servers/{server_id}/orgs | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs |
+| Get Org | GET | infra:infraServersOrgs:get | /api/v0/infra/servers/{server_id}/orgs/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
+| Create Org | POST | infra:infraServersOrgs:create,iam:projects:assign | /api/v0/infra/servers/{server_id}/orgs | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs |
+| Update Org | PUT | infra:infraServersOrgs:update | /api/v0/infra/servers/{server_id}/orgs/{id}  | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
+| Delete Org | DELETE | infra:infraServersOrgs:delete | /api/v0/infra/servers/{server_id}/orgs/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
+{{% /responsive-table %}}
