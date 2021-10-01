@@ -185,6 +185,50 @@ describe('infra node detail', () => {
       }
     });
 
+    it('can add the node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=add-tag]').clear().type('tag1');
+        cy.get('[data-cy=add-tag-button]').click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+      }
+    });
+
+    it('can show the node tags box', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+      }
+    });
+
+    it('can add the multiple node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3, tag4, tag5');
+        cy.get('[data-cy=add-tag-button]').click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+        cy.get('.display-node-tags').find('span').should('have.length', 5);
+      }
+    });
+
+    it('can remove the node tags', () => {
+      if (nodeName !== '') {
+        cy.get('[data-cy=remove-tag]').eq(0).click();
+
+        cy.get('app-notification.info').contains('Successfully updated node tags.');
+        cy.get('app-notification.info chef-icon').click();
+        cy.get('[data-cy=tag-box]').scrollIntoView();
+        cy.get('[data-cy=tag-box]').should(('be.visible'));
+        cy.get('.display-node-tags').find('span').should('have.length', 4);
+      }
+    });
+
     it('can check environments list available or not in dropdown', () => {
       if (nodeName !== '') {
         cy.request({
@@ -248,50 +292,6 @@ describe('infra node detail', () => {
 
         cy.get('app-notification.info').contains('Successfully updated node environment.');
         cy.get('app-notification.info chef-icon').click();
-      }
-    });
-
-    it('can add the node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=add-tag]').clear().type('tag1');
-        cy.get('[data-cy=add-tag-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-      }
-    });
-
-    it('can show the node tags box', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-      }
-    });
-
-    it('can add the multiple node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=add-tag]').clear().type('tag2, tag3, tag4, tag5');
-        cy.get('[data-cy=add-tag-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-        cy.get('.display-node-tags').find('span').should('have.length', 3);
-      }
-    });
-
-    it('can remove the node tags', () => {
-      if (nodeName !== '') {
-        cy.get('[data-cy=remove-tag]').eq(0).click();
-
-        cy.get('app-notification.info').contains('Successfully updated node tags.');
-        cy.get('app-notification.info chef-icon').click();
-        cy.get('[data-cy=tag-box]').scrollIntoView();
-        cy.get('[data-cy=tag-box]').should(('be.visible'));
-        cy.get('.display-node-tags').find('span').should('have.length', 2);
       }
     });
   });
