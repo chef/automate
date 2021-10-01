@@ -22,10 +22,19 @@ chef-loading-spinner {
   .details-tab {
     .spinner {
       chef-loading-spinner {
-        width: auto;
-        z-index: 199;
+        display: flex;
+        margin: auto;
         background-color: $chef-white;
         opacity: 0.7;
+        height: 136vh;
+        padding-bottom: 40vh;
+        width: calc(100% + 10px);
+        margin-top: -20px;
+        position: absolute;
+        top: 0;
+        left: -35px;
+        bottom: 0;
+        right: 0;
       }
     }
 
