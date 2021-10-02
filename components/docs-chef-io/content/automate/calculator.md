@@ -12,7 +12,14 @@ gh_repo = "automate"
     weight = 15
 +++
 
-Use this calculator to determine the storage capacity you need to support your Chef Automate installation.
+Estimating storage requirements is an important part of setting up Chef Automate.
+Setting up Chef Automate with adequate storage prevents disk failures because the disk is full.
+Several factors impact your storage needs
+
+1. The number of nodes on your system
+1. The amount of Chef data on each node
+1. The frequency of Chef Infra Client runs and Chef InSpec compliance scans
+1. The length of time that you need to retain these results.
 
 TODO:
 
@@ -58,7 +65,7 @@ Node data size: ??
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
-              <input type="number" placeholder="0.25">
+              <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
               <input type="number" placeholder="1">
@@ -92,7 +99,7 @@ Node data size: ??
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
-              <input type="number" placeholder="0.25">
+              <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
               <input type="number" placeholder="1">
@@ -126,7 +133,7 @@ Node data size: ??
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
-              <input type="number" placeholder="0.25">
+              <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
               <input type="number" placeholder="1">
@@ -160,7 +167,7 @@ Node data size: ??
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
-              <input type="number" placeholder="0.25">
+              <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
               <input type="number" placeholder="1">
