@@ -1,0 +1,45 @@
+<main>
+  <div class="selectbox-main-section">
+    <div class="list-item">
+      <chef-input #search placeholder='Search...' autocomplete="on" class="Search" (change)=emitData(search.value) *ngIf="searchFlag"></chef-input>
+      <ul>
+        <li 
+          *ngFor="let data of listData;let i=index;"
+          (click)="selectItem(data)" 
+          [ngClass]="{'active': highlightElement(data)}">
+          {{ data.name}}
+        </li>
+      </ul>
+    </div>
+    <div class="button-group">
+      <chef-button secondary (click)="moveRight()">
+        <div class="arrow-right"></div>
+      </chef-button>
+      <chef-button secondary (click)="moveLeft()">
+        <div class="arrow-left"></div>
+      </chef-button>
+    </div>
+    <div class="select-item">
+      <label>Your Credentials</label>
+      <div class="select-item-list-block">
+        <ul class="select-item-list">
+          <li 
+            *ngFor="let data of selectedListData"
+            [hidden]="!(data.type === type)"
+            (click)="selectItem(data)" 
+            [ngClass]="{'active': highlightElement(data)}"
+            >
+            {{ data.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="overview-details">
+    <label>
+      Total: <span class=""> {{selectedListData.length}}</span>  SSH:  <span class="">{{selectedListData.length.valueOf}}</span> WinRM:  <span class=""></span>
+    </label>
+  </div>
+</main>
+
+

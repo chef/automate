@@ -8,7 +8,8 @@
 .nodes-form {
   flex-basis: 50%;
   margin-right: 0.5em;
-
+  width: calc(100%/2);
+  
   fieldset {
     margin: 0;
     padding: 1em 0;
@@ -106,4 +107,8 @@
 
 .add-tag-btn {
   margin-bottom: 1em;
+}
+
+.wizard{
+  display: contents;
 }

@@ -39,40 +39,8 @@
               <input id="custom-prefix" type="text" chefInput formControlName="customPrefix" placeholder="eg: my-node-prefix-, my-node-name-" />
             </chef-form-field>
           </fieldset>
-          <fieldset id="wizard-step-2" formGroupName="wizardStep2">
-            <div class="fields">
-              <!-- <h3>Add credentials to connect to your nodes</h3> -->
-              <!-- <div class="field">
-                <label>Select SSH or WinRM <span class="required">*</span></label>
-                <div class="checkbox-field">
-                  <input type="radio" id="backend-ssh" formControlName="backend" name="backend" value="ssh" />
-                  <label for="backend-ssh">SSH</label>
-                </div>
-                <div class="checkbox-field">
-                  <input type="radio" id="backend-winrm" formControlName="backend" name="backend" value="winrm" />
-                  <label for="backend-winrm">WinRM</label>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="secrets">Select your credentials <span class="required">*</span></label>
-                <select name="secrets" id="secrets" formControlName="secrets" multiple>
-                  <option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</option>
-                </select>
-                <chef-alert
-                  *ngIf="form.get('wizardStep2.secrets').touched && form.get('wizardStep2.secrets').invalid"
-                  type='error'>
-                  At least one credential selection is required.
-                </chef-alert>
-                <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
-              </div> -->
-              <!-- <app-accordion 
-                [title]="accordionTitle">
-                <h1>hello world</h1>
-                <app-select-box
-                [list]="availablelist"
-                >
-                </app-select-box>
+          <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
+              <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
                 <chef-form-field class="field">
                   <label for="port">Enter optional port access</label>
                   <input id="port" type="number" chefInput formControlName="port" name="port" />
@@ -95,13 +63,21 @@
                     </ng-container>
                   </div>
                 </chef-form-field>
-              </app-accordion> -->
               <app-accordion>
                 <app-accordion-item title="Add credentials to connect to your nodes">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas fugiat dolores, voluptates atque error quisquam doloremque veniam excepturi, expedita quaerat eveniet vitae, explicabo qui reprehenderit optio odit quibusdam veritatis eaque.
+                  <chef-select #ty (change)="onSelectedTab(ty.value)" >
+                    <chef-option value={{credential.asset}} *ngFor="let credential of credentialType">{{credential.name}}</chef-option>                    
+                    <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->
+                  </chef-select>
+                  <app-selectbox
+                  [data]="secrets$ | async"
+                  [searchFlag]=false
+                  (searchData)="search($event)"
+                  (selectData)="selected($event)"
+                  [type]="secretType">
+                  </app-selectbox>
                 </app-accordion-item>
               </app-accordion>
-            </div>
           </fieldset>
           <fieldset id="tags" formArrayName="tags">
             <h3>Specify tags (optional)</h3>

@@ -13,6 +13,7 @@ import { AvailableType } from 'app/modules/infra-proxy/infra-roles/infra-roles.c
   styleUrls: ['./nodes-add.component.scss']
 })
 export class NodesAddComponent implements OnInit {
+  secretType: string;
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -21,6 +22,10 @@ export class NodesAddComponent implements OnInit {
   ) {}
 
   public availablelist: AvailableType[] = [];
+  public credentialType = [
+     {name: 'SSH', asset: 'ssh'},
+     {name: 'WinRM', asset: 'winrm'}
+    ];
   form: FormGroup;
   activeStep = 1;
   isLoading = false;
@@ -75,12 +80,13 @@ export class NodesAddComponent implements OnInit {
 
     // Switch selectable secrets based on selected "backend" value (ssh, winrm)
     this.secrets$ = combineLatest([
-      this.fetchSecrets(),
+      this.fetchSecrets({}),
       this.backendValue$
     ]).pipe(
       map(([secrets, backend]: [{ type: string }[], string]) =>
         secrets.filter(s => s.type === backend || s.type === 'sudo'))
     );
+    this.secretType = 'ssh';
   }
 
   setWinRmPort(): void {
@@ -95,6 +101,28 @@ export class NodesAddComponent implements OnInit {
     });
   }
 
+  search(data: any) {
+    // Switch selectable secrets based on selected "backend" value (ssh, winrm)
+    this.secrets$ = combineLatest([
+      this.fetchSecrets({
+        'filters':
+        [
+            {
+                'key': 'name',
+                'values': [data]
+            }
+        ]
+    }),
+      this.backendValue$
+    ]).pipe(
+      map(([secrets, backend]: [{ type: string }[], string]) =>
+        secrets.filter(s => s.type === backend || s.type === 'sudo'))
+    );
+  }
+
+  selected(data: any) {
+    console.log(data);
+  }
   private createForm(): FormGroup {
     const wizardStep1 = this.fb.group({
       hosts: ['', Validators.required],
@@ -189,9 +217,16 @@ export class NodesAddComponent implements OnInit {
       });
   }
 
+
+
+  onSelectedTab(type: string) {
+    this.secretType = type;
+    this.form.controls['wizardStep2']['controls']['backend'].setValue(this.secretType);
+  }
+
   // TODO move to ngrx/effects
-  fetchSecrets(): Observable<any[]> {
-    return this.httpClient.post<any>(`${env.secrets_url}/search`, {}).pipe(
+  fetchSecrets(body: any): Observable<any[]> {
+    return this.httpClient.post<any>(`${env.secrets_url}/search`, body).pipe(
       map(({secrets}) => secrets));
   }
 

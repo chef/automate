@@ -15,6 +15,7 @@ import { NodesAddComponent } from './containers/nodes-add/nodes-add.component';
 import { NodesEditComponent } from './containers/nodes-edit/nodes-edit.component';
 import { AccordionComponent } from '../../../page-components/accordion/accordion.component';
 import { AccordionItemComponent } from '../../../page-components/accordion/accordion-item/accordion-item.component';
+import { SelectboxComponent } from '../../../page-components/selectbox/selectbox.component';
 
 @NgModule({
   imports: [
@@ -37,7 +38,8 @@ import { AccordionItemComponent } from '../../../page-components/accordion/accor
     NodesAddComponent,
     NodesEditComponent,
     AccordionComponent,
-    AccordionItemComponent
+    AccordionItemComponent,
+    SelectboxComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
