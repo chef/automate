@@ -1,3 +1,13 @@
+const serverID = `chef-server-dev-test-${Cypress.moment().format('MMDDYYhhmm')}`;
+const serverName = 'chef server dev';
+const orgID = `chef-org-dev-${Cypress.moment().format('MMDDYYhhmm')}`;
+const orgName = '4thcoffee';
+const serverFQDN = 'ec2-34-219-25-251.us-west-2.compute.amazonaws.com';
+const serverIP = '34.219.25.251';
+const adminUser = 'chefadmin';
+// using dummy admin key value for creating the org
+const adminKey = 'Dummy--admin--key';
+
 describe('Infra servers post api to create infra servers', () => {
     let withInfraServersPostActionToken = '';
     let withoutInfraServersPostActionToken = '';
