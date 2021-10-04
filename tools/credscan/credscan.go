@@ -100,10 +100,9 @@ var a2Config = config{
 		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.pem`},
 		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/.*\.key`},
 
-
 		// Test data for cypress; only removing the beg and end of pem key
 		{regex: `e2e/cypress/integration/api/iam/projects_api_scanjob_ingestion.spec.ts`},
-                
+
 		// A2HA Component sample keys and certificates
 		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
 		{regex: `test/lib/certificate_store.rb`},
@@ -128,6 +127,9 @@ var a2Config = config{
 		{regex: `vendor/github.com/nats-io/nkeys/README.md`},
 
 		{regex: `vendor/google.golang.org/api/internal/service-account.json`},
+
+		// Workaround for DST Root certificate expiry
+		{regex: `components/automate-load-balancer/habitat/cacert.pem`},
 	},
 	contentInclude: []pattern{
 		{
