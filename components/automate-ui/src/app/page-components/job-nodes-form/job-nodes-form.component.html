@@ -5,22 +5,26 @@
             chefInput
             type="text"
             aria-label="Search profiles"
-            placeholder="Search profiles..."
+            placeholder="Search nodes management services"
+            (input)="onSearchInput($event)"
             />
-    <div class="integration-services form-field">
-      <div class="form-field">
-        <chef-checkbox (click)="search($event)"><img src="/assets/img/logos/AutomateLogo-default.svg" alt="Automate" class="logo automate"/></chef-checkbox>
+    <div class="nodemanager">
+      <div>
+        <chef-checkbox [checked]=automateCheck (change)="onclickCheckbox($event,'automate')">
+          <img src="/assets/img/logos/AutomateLogo-default.svg" alt="Automate" class="logo automate"/>
+        </chef-checkbox>
+      </div>
+      <div>
+          <chef-checkbox [checked]=awsCheck (change)="onclickCheckbox($event,'aws')">
+            <img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws"/>
+          </chef-checkbox>
+          <chef-checkbox [checked]=azureCheck (change)="onclickCheckbox($event,'azure')">
+            <img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure"/>
+          </chef-checkbox>
+          <chef-checkbox [checked]=gcpCheck (change)="onclickCheckbox($event,'gcp')">
+            <img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp"/>
+          </chef-checkbox>
         </div>
-      <chef-phat-radio ngDefaultControl formControlName="type">
-        <chef-option value="automate"><img src="/assets/img/logos/AutomateLogo-default.svg" alt="Automate" class="logo automate" />
-        </chef-option>
-        <chef-option value="aws"><img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws" />
-        </chef-option>
-        <chef-option value="azure"><img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure" />
-        </chef-option>
-        <chef-option value="gcp"><img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp" />
-        </chef-option>
-      </chef-phat-radio>
     </div>
   </div>
 

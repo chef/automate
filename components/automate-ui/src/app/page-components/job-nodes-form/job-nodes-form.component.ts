@@ -16,11 +16,16 @@ import * as selectors from '../../entities/managers/manager.selectors';
 })
 export class JobNodesFormComponent {
   @Input() form: FormGroup;
+  public automateCheck = false;
+  public awsCheck = false;
+  public azureCheck = false;
+  public gcpCheck = false;
+  public nodeSource = [];
+
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder,
-    //private managerRequests: ManagerRequests
+    private fb: FormBuilder //private managerRequests: ManagerRequests
   ) {}
 
   addRegionValue(regionsGroup: FormGroup, index: number) {
@@ -127,6 +132,110 @@ export class JobNodesFormComponent {
   }
 
   supportsFilterByTag(managerType: string): boolean {
-    return ['automate', 'aws-ec2', 'azure-vm', 'azure-api'].includes(managerType);
+    return ["automate", "aws-ec2", "azure-vm"].includes(managerType);
+  }
+
+  search(searchName: string[]) {
+    console.log('Search value is',searchName);
+    var payload = {};
+    if(searchName === null && this.nodeSource.length ===0 )
+    {
+      this.store.dispatch(new ManagersSearch({}));
+    }else{
+    if (searchName === null) {
+      payload = {
+        filter_map: [
+          {
+            key: "manager_type",
+            values: this.nodeSource,
+          },
+        ],
+        page: 1,
+        per_page: 5,
+      };
+    } else if (searchName && this.nodeSource.length > 0) {
+      payload = {
+        filter_map: [
+          {
+            key: "manager_type",
+            values: this.nodeSource,
+          },
+          {
+            key: "name",
+            values: searchName,
+          },
+        ],
+      };
+    } else if (searchName && this.nodeSource.length === 0) {
+      payload = {
+        filter_map: [
+          {
+            key: "name",
+            values: searchName,
+          },
+        ],
+      };
+    }
+
+    console.log("payload is", payload);
+    this.store.dispatch(new ManagersSearch(payload));
+  }
+
+  }
+
+  onclickCheckbox(e: any, val: string) {
+    switch (val) {
+      case "automate": {
+        this.automateCheck = e.target.checked;
+        if (e.target.checked) {
+          this.nodeSource.push("automate");
+        } else {
+          this.nodeSource.splice(this.nodeSource.indexOf("automate"), 1);
+        }
+        break;
+      }
+      case "aws": {
+        this.awsCheck = e.target.checked;
+        if (e.target.checked) {
+          this.nodeSource.push("aws-ec2");
+          this.nodeSource.push("aws-api");
+        } else {
+          this.nodeSource.splice(this.nodeSource.indexOf("aws-ec2"), 1);
+          this.nodeSource.splice(this.nodeSource.indexOf("aws-api"), 1);
+        }
+        break;
+      }
+      case "azure": {
+        this.azureCheck = e.target.checked;
+        if (e.target.checked) {
+          this.nodeSource.push("azure-api");
+          this.nodeSource.push("azure-vm");
+        } else {
+          this.nodeSource.splice(this.nodeSource.indexOf("azure-api"), 1);
+          this.nodeSource.splice(this.nodeSource.indexOf("azure-vm"), 1);
+        }
+        break;
+      }
+      case "gcp": {
+        this.gcpCheck = e.target.checked;
+        if (e.target.checked) {
+          this.nodeSource.push("gcp-api");
+        } else {
+          this.nodeSource.splice(this.nodeSource.indexOf("gcp-api"), 1);
+        }
+        break;
+      }
+    }
+    console.log(val, e.target.checked);
+    console.log("final array is ", this.nodeSource);
+    this.search(null);
+  }
+
+  onSearchInput(event) {
+    const nameArray =[];
+    const value = event.target.value;
+    console.log(value);
+    nameArray.push(value);
+    this.search(nameArray);
   }
 }

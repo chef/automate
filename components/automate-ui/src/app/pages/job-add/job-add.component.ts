@@ -143,7 +143,7 @@ export class JobAddComponent implements OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(managers => {
         const managersArray = nodesGroup.controls['managers'] as FormArray;
-
+        managersArray.clear();
         managers.forEach((manager, i) => {
           const managerId = manager.id;
           const namesGroup = this.fb.group({
