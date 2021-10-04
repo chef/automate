@@ -7,6 +7,7 @@ import (
 	"time"
 
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -138,7 +139,10 @@ func Configure() (*DataFeedConfig, error) {
 		var err error
 		log.Infof("Database %s", config.PostgresConfig.Database)
 		config.PostgresConfig.ConnectionString, err = platform_config.PGURIFromEnvironment(config.PostgresConfig.Database)
-		log.Infof("Database connection string %s", config.PostgresConfig.ConnectionString)
+		maskedDBConnString := fmt.Sprint(stringutils.TrimAfter(config.PostgresConfig.ConnectionString, "//"),
+			"<USER>:<PASSWORD>",
+			stringutils.TrimBefore(config.PostgresConfig.ConnectionString, "@"))
+		log.Infof("Database connection string %s", maskedDBConnString)
 		if err != nil {
 			log.WithError(err).Error("Failed to get pg uri")
 			return nil, err
