@@ -121,8 +121,15 @@ export class NodesAddComponent implements OnInit {
   }
 
   selected(data: any) {
-    console.log(data);
+    const secrets: string[] = [];
+    data.forEach((listOfSecrets) => {
+      secrets.push(listOfSecrets.id);
+    });
+    if (secrets.length === data.length) {
+      this.form.controls['wizardStep2']['controls']['secrets'].setValue(secrets);
+    }
   }
+
   private createForm(): FormGroup {
     const wizardStep1 = this.fb.group({
       hosts: ['', Validators.required],

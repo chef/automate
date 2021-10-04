@@ -40,29 +40,6 @@
             </chef-form-field>
           </fieldset>
           <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
-              <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
-                <chef-form-field class="field">
-                  <label for="port">Enter optional port access</label>
-                  <input id="port" type="number" chefInput formControlName="port" name="port" />
-                  <div>
-                    <ng-container *ngIf="backendControl.value === 'ssh'">
-                      <div class="radio-field">
-                        <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
-                        <label for="sudo">Enable Sudo</label>
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="backendControl.value === 'winrm'">
-                      <div class="radio-field">
-                        <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
-                        <label for="ssl">SSL</label>
-                      </div>
-                      <div class="radio-field">
-                        <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
-                        <label for="self_signed">Self Signed</label>
-                      </div>
-                    </ng-container>
-                  </div>
-                </chef-form-field>
               <app-accordion>
                 <app-accordion-item title="Add credentials to connect to your nodes">
                   <chef-select #ty (change)="onSelectedTab(ty.value)" >
@@ -71,11 +48,36 @@
                   </chef-select>
                   <app-selectbox
                   [data]="secrets$ | async"
-                  [searchFlag]=false
+                  [searchFlag]=true
                   (searchData)="search($event)"
                   (selectData)="selected($event)"
-                  [type]="secretType">
+                  [type]="secretType"
+                  [combination]=false
+                  >
                   </app-selectbox>
+                  <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>
+                  <chef-form-field class="field">
+                    <label for="port">Enter optional port access</label>
+                    <input id="port" type="number" chefInput formControlName="port" name="port" />
+                    <div>
+                      <ng-container *ngIf="backendControl.value === 'ssh'">
+                        <div class="radio-field">
+                          <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
+                          <label for="sudo">Enable Sudo</label>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="backendControl.value === 'winrm'">
+                        <div class="radio-field">
+                          <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
+                          <label for="ssl">SSL</label>
+                        </div>
+                        <div class="radio-field">
+                          <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
+                          <label for="self_signed">Self Signed</label>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </chef-form-field>
                 </app-accordion-item>
               </app-accordion>
           </fieldset>

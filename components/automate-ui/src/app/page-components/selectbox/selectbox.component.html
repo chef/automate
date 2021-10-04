@@ -1,21 +1,24 @@
 <main>
   <div class="selectbox-main-section">
     <div class="list-item">
-      <chef-input #search placeholder='Search...' autocomplete="on" class="Search" (change)=emitData(search.value) *ngIf="searchFlag"></chef-input>
+      <chef-input #search placeholder='Search...' autocomplete="on" class="Search" (change)=emitData(search.value) *ngIf="searchFlag">
+        <chef-icon class="search-Icon">search</chef-icon>
+      </chef-input>
       <ul>
         <li 
           *ngFor="let data of listData;let i=index;"
-          (click)="selectItem(data)" 
+          (click)="moveLeftOrRight !== 'right'  ? selectItem(data, 'left', data.type) : null" 
+          [ngStyle]="{'cursor': moveLeftOrRight !== 'right' ? 'pointer' : 'no-drop'}"
           [ngClass]="{'active': highlightElement(data)}">
           {{ data.name}}
         </li>
       </ul>
     </div>
     <div class="button-group">
-      <chef-button secondary (click)="moveRight()">
+      <chef-button [attr.disabled]="moveLeftOrRight === 'right'" secondary (click)="moveRight()">
         <div class="arrow-right"></div>
       </chef-button>
-      <chef-button secondary (click)="moveLeft()">
+      <chef-button [attr.disabled]="moveLeftOrRight === 'left'" secondary (click)="moveLeft()">
         <div class="arrow-left"></div>
       </chef-button>
     </div>
@@ -25,8 +28,10 @@
         <ul class="select-item-list">
           <li 
             *ngFor="let data of selectedListData"
+            [attr.disabled]="moveLeftOrRight === 'right'"
             [hidden]="!(data.type === type)"
-            (click)="selectItem(data)" 
+            (click)="moveLeftOrRight !== 'left' ? selectItem(data, 'right', data.type) : null" 
+            [ngStyle]="{'cursor': moveLeftOrRight !== 'left' ? 'pointer' : 'no-drop'}"
             [ngClass]="{'active': highlightElement(data)}"
             >
             {{ data.name }}
@@ -37,7 +42,7 @@
   </div>
   <div class="overview-details">
     <label>
-      Total: <span class=""> {{selectedListData.length}}</span>  SSH:  <span class="">{{selectedListData.length.valueOf}}</span> WinRM:  <span class=""></span>
+      Total: <span class=""> {{selectedListData.length}}</span>
     </label>
   </div>
 </main>

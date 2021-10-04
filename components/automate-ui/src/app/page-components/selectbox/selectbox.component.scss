@@ -39,6 +39,7 @@ ul{
   margin: 1em;
   margin-bottom: 0;
   width: stretch;
+
 }
 
 .list-item,
@@ -46,6 +47,11 @@ ul{
   border: 1px solid #DEE6F7;
   margin: 1em 0 1em 0;
   border-radius: 4px;
+
+  chef-input ::ng-deep input {
+    padding: 1em 1em 1em 3em;
+  }
+
 }
 
 .list-item,
@@ -93,4 +99,15 @@ ul{
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent; 
   border-right: 5px solid #3864F2; 
+}
+
+
+.search-Icon {
+  font-size: 1.5em;
+  /* color: red; */
+  float: left;
+  /* display: inline; */
+  position: absolute;
+  top: 12px;
+  margin: 0em .5em 0em .5em;
 }
