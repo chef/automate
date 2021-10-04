@@ -54,6 +54,7 @@ pkg_binds_optional=(
 )
 
 do_download() {
+  cp -f cacert.pem /hab/pkgs/core/cacerts/2020.01.01/20200306005234/ssl/certs/cacert.pem
   do_default_download
   pushd "${HAB_CACHE_SRC_PATH}" || return 1
   download_file "${headers_more_source}" "${headers_more_filename}" "${headers_more_shasum}"
