@@ -18,7 +18,7 @@ describe('chef datafeed', () => {
 
 
   before(() => {
-    cy.adminLogin('/settings').then(() => {
+      cy.adminLogin('/settings').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       cy.get('app-welcome-modal').invoke('hide');
       cy.restoreStorage();
@@ -29,7 +29,6 @@ describe('chef datafeed', () => {
       cy.reload();
       cy.contains('know').click();
       cy.contains('Data Feeds').click();
-      // cy.get('app-notification.error chef-icon').click({ multiple: true });
     });
   });
 
