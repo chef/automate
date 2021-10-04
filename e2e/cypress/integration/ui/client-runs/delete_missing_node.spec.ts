@@ -49,9 +49,11 @@ describe('delete missing node from UI', () => {
   });
 
   it('from client runs page delete nodes', () => {
-    cy.adminLogin('/infrastructure/client-runs').then(() => {
+    if (Cypress.$('app-welcome-modal').length) {  // zero length means not found
       cy.get('app-welcome-modal').invoke('hide');
-    });
+    }
+
+    cy.adminLogin('/infrastructure/client-runs');
 
     // Check the check box to delete all missing nodes
     cy.get('chef-checkbox.header').click();
