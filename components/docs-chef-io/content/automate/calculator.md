@@ -61,21 +61,37 @@ Node data size: ??
           Chef Infra Client Run Data
         </div>
         <div class="card-section">
-            <label>Number of Nodes
+            <label>
+              Number of Nodes
+              <span data-tooltip tabindex="1" title="The number of nodes managed by Chef Infra.">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
+              <span data-tooltip tabindex="1" title="Our estimate of the average Chef Infra run data stored on each node.">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1">
             </label>
             <label> Data Retention (Days)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="30">
             </label>
         </div>
         <div class="card-divider margin-0">
-          <p class="font-bold padding-right-1">HA</p>
+          <p class="font-bold padding-right-1">HA
+          <span data-tooltip tabindex="1" title="">
+            <i class="fas fa-info-circle" style="color:69ADDB"></i>
+          </span></p>
           <div class="switch small rounded">
             <input class="switch-input" id="exampleSwitch" type="checkbox" name="exampleSwitch">
             <label class="switch-paddle" for="exampleSwitch">
@@ -96,15 +112,27 @@ Node data size: ??
         </div>
         <div class="card-section">
             <label>Number of Nodes
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1">
             </label>
             <label> Data Retention (Days)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="30">
             </label>
         </div>
@@ -118,7 +146,10 @@ Node data size: ??
         </div>
         <div class="card-section">
           <label> # of ES Nodes
-          <input type="number" placeholder="3">
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
+              <input type="number" placeholder="3">
           </label>
         </div>
       </div>
@@ -130,15 +161,27 @@ Node data size: ??
         </div>
         <div class="card-section">
             <label>Number of Nodes
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1">
             </label>
             <label> Data Retention (Days)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="30">
             </label>
         </div>
@@ -152,6 +195,9 @@ Node data size: ??
         </div>
         <div class="card-section">
           <label> # of ES Nodes
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
           <input type="number" placeholder="3">
           </label>
         </div>
@@ -164,15 +210,27 @@ Node data size: ??
         </div>
         <div class="card-section">
             <label>Number of Nodes
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1000">
             </label>
             <label>Node Data Size (MB)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="0.25" style="background-color:#EBEBE4" readonly>
             </label>
             <label>Run Interval (HR)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="1">
             </label>
             <label> Data Retention (Days)
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
               <input type="number" placeholder="30">
             </label>
         </div>
@@ -186,6 +244,9 @@ Node data size: ??
         </div>
         <div class="card-section">
           <label> # of ES Nodes
+              <span data-tooltip tabindex="1" title="">
+                <i class="fas fa-info-circle" style="color:69ADDB"></i>
+              </span>
           <input type="number" placeholder="3">
           </label>
         </div>
