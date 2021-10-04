@@ -40,46 +40,46 @@
             </chef-form-field>
           </fieldset>
           <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
-              <app-accordion>
-                <app-accordion-item title="Add credentials to connect to your nodes">
-                  <chef-select #ty (change)="onSelectedTab(ty.value)" >
-                    <chef-option value={{credential.asset}} *ngFor="let credential of credentialType">{{credential.name}}</chef-option>                    
-                    <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->
-                  </chef-select>
-                  <app-selectbox
-                  [data]="secrets$ | async"
-                  [searchFlag]=true
-                  (searchData)="search($event)"
-                  (selectData)="selected($event)"
-                  [type]="secretType"
-                  [combination]=false
-                  >
-                  </app-selectbox>
-                  <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>
-                  <chef-form-field class="field">
-                    <label for="port">Enter optional port access</label>
-                    <input id="port" type="number" chefInput formControlName="port" name="port" />
-                    <div>
-                      <ng-container *ngIf="backendControl.value === 'ssh'">
-                        <div class="radio-field">
-                          <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
-                          <label for="sudo">Enable Sudo</label>
-                        </div>
-                      </ng-container>
-                      <ng-container *ngIf="backendControl.value === 'winrm'">
-                        <div class="radio-field">
-                          <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
-                          <label for="ssl">SSL</label>
-                        </div>
-                        <div class="radio-field">
-                          <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
-                          <label for="self_signed">Self Signed</label>
-                        </div>
-                      </ng-container>
-                    </div>
-                  </chef-form-field>
-                </app-accordion-item>
-              </app-accordion>
+            <app-accordion>
+              <app-accordion-item title="Add credentials to connect to your nodes">
+                <chef-select #ty (change)="onSelectedTab(ty.value)" >
+                  <chef-option value={{credential.asset}} *ngFor="let credential of credentialType">{{credential.name}}</chef-option>                    
+                  <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->
+                </chef-select>
+                <app-selectbox
+                [data]="secrets$ | async"
+                [searchFlag]=true
+                (searchData)="search($event)"
+                (selectData)="selected($event)"
+                [type]="secretType"
+                [combination]=false
+                >
+                </app-selectbox>
+                <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>
+                <chef-form-field class="field">
+                  <label for="port">Enter optional port access</label>
+                  <input id="port" type="number" chefInput formControlName="port" name="port" />
+                  <div>
+                    <ng-container *ngIf="backendControl.value === 'ssh'">
+                      <div class="radio-field">
+                        <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
+                        <label for="sudo">Enable Sudo</label>
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="backendControl.value === 'winrm'">
+                      <div class="radio-field">
+                        <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
+                        <label for="ssl">SSL</label>
+                      </div>
+                      <div class="radio-field">
+                        <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
+                        <label for="self_signed">Self Signed</label>
+                      </div>
+                    </ng-container>
+                  </div>
+                </chef-form-field>
+              </app-accordion-item>
+            </app-accordion>
           </fieldset>
           <fieldset id="tags" formArrayName="tags">
             <h3>Specify tags (optional)</h3>
