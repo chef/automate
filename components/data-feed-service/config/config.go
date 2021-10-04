@@ -139,10 +139,8 @@ func Configure() (*DataFeedConfig, error) {
 		var err error
 		log.Infof("Database %s", config.PostgresConfig.Database)
 		config.PostgresConfig.ConnectionString, err = platform_config.PGURIFromEnvironment(config.PostgresConfig.Database)
-		maskedDBConnString := fmt.Sprint(stringutils.TrimAfter(config.PostgresConfig.ConnectionString, "//"),
-			"<USER>:<PASSWORD>",
-			stringutils.TrimBefore(config.PostgresConfig.ConnectionString, "@"))
-		log.Infof("Database connection string %s", maskedDBConnString)
+		maskedDBConnString := stringutils.MaskPGCredInURI(config.PostgresConfig.ConnectionString)
+		log.Infof("Masked Database connection string %s", maskedDBConnString)
 		if err != nil {
 			log.WithError(err).Error("Failed to get pg uri")
 			return nil, err
