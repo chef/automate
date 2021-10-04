@@ -9,8 +9,8 @@ const adminUser = 'chefadmin';
 const adminKey = 'Dummy--admin--key';
 
 describe('Infra servers post api to create infra servers', () => {
-    let withInfraServersPostActionToken = '';
-    let withoutInfraServersPostActionToken = '';
+    let withInfraServersCookbooksListActionToken = '';
+    let withoutInfraServersCookbooksListActionToken = '';
 
     const cypressPrefix = 'infra-server-cookbooks-actions-list';
     const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
@@ -19,7 +19,7 @@ describe('Infra servers post api to create infra servers', () => {
     const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
     const objectsToCleanUp = ['tokens', 'policies'];
 
-    const withInfraServersPostPolicy = {
+    const withInfraServersCookbooksListPolicy = {
     id: policyId1,
     name: tokenId1,
     projects: [],
@@ -35,7 +35,7 @@ describe('Infra servers post api to create infra servers', () => {
     };
 
 
-    const withoutInfraServersPostPolicy = {
+    const withoutInfraServersCookbooksListPolicy = {
         id: policyId2,
         name: tokenId2,
         projects: [],
@@ -62,14 +62,14 @@ describe('Infra servers post api to create infra servers', () => {
                 name: tokenId1
             }
             }).then((resp) => {
-                withInfraServersPostActionToken = resp.body.token.value;
+                withInfraServersCookbooksListActionToken = resp.body.token.value;
             });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: withInfraServersPostPolicy
+            body: withInfraServersCookbooksListPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
@@ -83,47 +83,66 @@ describe('Infra servers post api to create infra servers', () => {
                 name: tokenId2
             }
             }).then((resp) => {
-                withoutInfraServersPostActionToken = resp.body.token.value;
+                withoutInfraServersCookbooksListActionToken = resp.body.token.value;
             });
 
         cy.request({
             headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
             method: 'POST',
             url: '/apis/iam/v2/policies',
-            body: withoutInfraServersPostPolicy
+            body: withoutInfraServersCookbooksListPolicy
             }).then((resp) => {
                 expect(resp.status).to.equal(200);
             });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/api/v0/infra/servers',
+            body: {
+              id: serverID,
+              name: serverName,
+              fqdn: serverFQDN,
+              ip_address: serverIP
+            }
+          });
+
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'POST',
+          url: `/api/v0/infra/servers/${serverID}/orgs`,
+          body: {
+            id: orgID,
+            server_id: serverID,
+            name: orgName,
+            admin_user: adminUser,
+            admin_key: adminKey
+          }
+        });
         });
 
-        after(() => {
-            cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
-        });
+    after(() => {
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    });
 
-        it('infra servers cookbooks get returns 200 when infraServersOrgsCookbooks list actions is allowed', () => {
-            cy.request({
-                headers: { 'api-token': withInfraServersPostActionToken },
-                method: 'GET',
-                url: `/api/v0/infra/servers/${server_id}/orgs/${org_id}/cookbooks`,
-                }).then((resp) => {
-                    assert.equal(resp.status, 200);
-                });
-        });
-
-        it('infra servers post returns 403 when infraServers create actions is deneyed', () => {
-            cy.request({
-                headers: { 'api-token': withoutInfraServersPostActionToken },
-                method: 'POST',
-                url: '/api/v0/infra/servers',
-                failOnStatusCode: false,
-                body: {
-                    fqdn: 'a2-dev.test',
-                    id: `${cypressPrefix}-test-${Cypress.moment().format('MMDDYYhhmm')}`,
-                    ip_address: '127.0.0.1',
-                    name: 'test'
-                }
-                }).then((resp) => {
-                assert.equal(resp.status, 403);
+    it('cookbooks get returns 200 when infraServersOrgsCookbooks list actions is allowed', () => {
+        cy.request({
+            headers: { 'api-token': withInfraServersCookbooksListActionToken },
+            method: 'GET',
+            url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/cookbooks`
+            }).then((resp) => {
+                assert.equal(resp.status, 200);
             });
+    });
+
+    it('cookbooks get returns 403 when infraServersOrgsCookbooks list actions is deneyed', () => {
+        cy.request({
+            headers: { 'api-token': withoutInfraServersCookbooksListActionToken },
+            method: 'GET',
+            url: `/api/v0/infra/servers/${serverID}/orgs/${orgID}/cookbooks`,
+            failOnStatusCode: false
+            }).then((resp) => {
+            assert.equal(resp.status, 403);
         });
     });
+});
