@@ -38,14 +38,14 @@ Data Feed instance sends client run and compliance scan data to the 3rd party in
 
 Currently, the data feed has two types of integrations:
 
-- Webhook Integration
-  - ServiceNow
-  - Splunk
-  - ELK
-  - Custom
-- Storage Integration
-  - Minio
-  - Amazon S3
+* Webhook Integration
+  * ServiceNow
+  * Splunk
+  * ELK
+  * Custom
+* Storage Integration
+  * Minio
+  * Amazon S3
 
 {{< figure src="/images/automate/choose-a-data-feed-integration.png" alt="Choose a Data Feed Integration">}}
 
@@ -67,8 +67,8 @@ To add a ServiceNow data feed:
 
 1. Select an **authentication**  method:
   
-  -  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
-  - For **Access Token**, set the **Token Type** and **Token** for your integration.
+  *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
+  * For **Access Token**, set the **Token Type** and **Token** for your integration.
 
 1. Select **Test Connection** to start validating the connection details.
 
@@ -120,8 +120,8 @@ To add a Splunk data feed:
 
 1. Select an **authentication** from the couple of options in the drop-down.
   
-  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
-  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
+  * If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  * If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
 
 1. Select **Test Connection** to start validating the connection details.
 
@@ -226,8 +226,8 @@ To add a Data Feed instance in Chef Automate using Custom integration:
 
 1. Select an **authentication** from the couple of options in the drop-down.
   
-  - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
-  - If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
+  * If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
+  * If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
 
 1. Select **Test Connection** to start validating the connection details.
 
