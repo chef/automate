@@ -56,6 +56,7 @@ require (
 	github.com/hashicorp/go-hclog v0.12.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.1.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/hpcloud/tail v1.0.0
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365 // indirect
 	github.com/jaswdr/faker v1.0.2
 	github.com/jhump/protoreflect v1.7.1-0.20200723220026-11eaaf73e0ec

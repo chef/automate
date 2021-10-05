@@ -4,8 +4,8 @@ describe('login the app', () => {
   let connector = '';
   describe('load and update user preference', () => {
     let timeformat = 'ddd, DD MMM YYYY';
-    let count = 0;
-    let attrSelector = '';
+    const count = 0;
+    const attrSelector = '';
     const timeformatList = ['YYYY-M-D', 'YYYY-MM-DD'];
     let selectTimeformat = '';
     let telemetryEnabled = false;
@@ -46,15 +46,11 @@ describe('login the app', () => {
       cy.restoreStorage();
     });
 
-    it('timeformat updated in user detail page', function () {
+    it('timeformat value presenent on user detail page', function () {
       cy.get('app-user-details').should('exist').then(() =>  {
           cy.get('[data-cy=timeformat-dropdown]').should('exist');
-          cy.get('[data-cy=timeformat-dropdown] .selected-value .option-content')
-          .then(($element) => {
-              cy.get('[data-cy=timeformat-dropdown] .selected-value .option-content')
-              .contains(timeformat);
-          });
-
+          cy.get('[data-cy=timeformat-dropdown]').click()
+            .get('mat-option').contains(timeformat).click();
       });
     });
 
@@ -70,35 +66,32 @@ describe('login the app', () => {
       cy.get('[data-cy=timeformat-dropdown]').then((dropdown) => {
         selectTimeformat = '';
         for (let i = 0; i < timeformatList.length; i++) {
-            if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
-                selectTimeformat = timeformatList[i];
-                break;
-            }
+          if (dropdown[0].innerText.indexOf(timeformatList[i]) === -1) {
+            selectTimeformat = timeformatList[i];
+            break;
+          }
         }
-        attrSelector = '[value=' + selectTimeformat + ']';
-        cy.get('[data-cy=timeformat-dropdown]').click().then(() => {
-          cy.get(attrSelector).click({force: true}).then(() => {
-            count = 0;
-            while (dropdown[0].innerText.indexOf(selectTimeformat) !== 0 && count < 10) {
-                cy.get(attrSelector).click({force: true});
-                count++;
-            }
-            cy.get('[data-cy=timeformat-dropdown]')
-              .should('have.value', selectTimeformat)
-              .then(() => {
-                cy.server();
-                cy.route({
-                    method: 'PUT',
-                    url: 'api/v0/user-settings/' + username + '/' + connector
-                }).as('updateUserPreference');
-                cy.get('[data-cy=user-details-submit-button]')
-                  .click({force: true}).then(() => {
-                    cy.wait('@updateUserPreference')
-                      .its('status')
-                      .should('be', 200);
+
+        cy.get('mat-select').first().click(); // opens the drop down
+
+        // simulate click event on the drop down item (mat-option)
+        cy.get('.mat-option-text').contains(selectTimeformat).then(option => {
+          option[0].click();  // this is jquery click() not cypress click()
+          cy.get('[data-cy=timeformat-dropdown]')
+            .contains(selectTimeformat)
+            .then(() => {
+              cy.server();
+              cy.route({
+                  method: 'PUT',
+                  url: 'api/v0/user-settings/' + username + '/' + connector
+              }).as('updateUserPreference');
+              cy.get('[data-cy=user-details-submit-button]')
+                .click({force: true}).then(() => {
+                  cy.wait('@updateUserPreference')
+                    .its('status')
+                    .should('be', 200);
                 });
             });
-          });
         });
       });
     });
@@ -110,7 +103,6 @@ describe('login the app', () => {
         });
       });
     });
-
   });
 
   describe('api testing', () => {
@@ -171,5 +163,4 @@ describe('login the app', () => {
 
     });
   });
-
 });

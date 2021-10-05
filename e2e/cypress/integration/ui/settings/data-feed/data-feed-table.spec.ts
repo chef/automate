@@ -20,7 +20,6 @@ describe('chef datafeed', () => {
       cy.reload();
       cy.contains('know').click();
       cy.contains('Data Feeds').click();
-      cy.get('app-notification.error chef-icon').click({ multiple: true });
     });
   });
 

@@ -1,0 +1,21 @@
+name: chef-automate ssh
+synopsis: Set Ssh env for automate HA.
+usage: chef-automate ssh [flags]
+description: Set up automate ha clusterSsh
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for ssh
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI
