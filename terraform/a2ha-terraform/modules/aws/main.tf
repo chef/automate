@@ -168,7 +168,7 @@ resource "aws_instance" "chef_automate_elasticsearch" {
   ami                         = local.ami
   instance_type               = var.elasticsearch_server_instance_type
   key_name                    = var.aws_ssh_key_pair_name
-  subnet_id                   = element(aws_subnet.default.*.id, count.index)
+  subnet_id                   = element(aws_subnet.public.*.id, count.index)
   vpc_security_group_ids      = [aws_security_group.base_linux.id, aws_security_group.habitat_supervisor.id, aws_security_group.chef_automate.id]
   associate_public_ip_address = true
   ebs_optimized               = true
