@@ -51,7 +51,7 @@ Currently, the data feed has two types of integrations:
 
 ## Webhook Integration
 
-Create a data feed instance using any webhook integration.
+Create a data feed using a webhook integration.
 
 ### ServiceNow
 
