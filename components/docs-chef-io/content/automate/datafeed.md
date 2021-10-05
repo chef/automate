@@ -163,7 +163,7 @@ To delete an individual instance:
 
 To add a Data Feed instance in Chef Automate using ELK integration:
 
-1. Selection **New Integration**.
+1. Select **New Integration**.
 
 1. Select the **ELK** icon under Webhook Integration.
 
