@@ -854,6 +854,7 @@ describe('infra role detail', () => {
       cy.get('[data-cy=search-filter]').type(roleName);
       cy.get('[data-cy=search-entity]').click();
 
+      cy.wait(2000);
       cy.get('[data-cy=roles-table-container]').contains(roleName).should('exist');
       cy.get('app-infra-roles [data-cy=roles-table-container] chef-td a').contains(roleName)
         .parent().parent().find('.mat-select-trigger').as('controlMenu');
