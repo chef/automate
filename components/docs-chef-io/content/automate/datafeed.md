@@ -110,7 +110,7 @@ To delete an individual instance:
 
 To add a Splunk data feed:
 
-1. Selection **New Integration**.
+1. Select **New Integration**.
 
 1. Select the **Splunk** icon under Webhook Integration.
 
