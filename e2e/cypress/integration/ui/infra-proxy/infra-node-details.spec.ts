@@ -285,9 +285,6 @@ describe('infra node detail', () => {
         });
         cy.get('[data-cy=change-confirm]').should(('be.visible'));
         cy.get('[data-cy=save-button]').click();
-
-        cy.get('app-notification.info').contains('Successfully updated node environment.');
-        cy.get('app-notification.info chef-icon').click();
       }
     });
   });
