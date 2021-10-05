@@ -36,15 +36,12 @@ variable "automate_server_instance_type" {
   default = "t3a.medium"
 }
 
-variable "aws_vpc_id" {
-}
-
-variable "aws_cidr_block_addr" {
-}
-
 variable "aws_ami_id" {
   default     = ""
   description = "Setting this value overrides ami search features"
+}
+
+variable "aws_cidr_block_addr" {
 }
 
 variable "aws_profile" {
@@ -65,6 +62,9 @@ variable "aws_ssh_key_pair_name" {
 
 variable "aws_ssh_user" {
   default = "centos"
+}
+
+variable "aws_vpc_id" {
 }
 
 variable "chef_ebs_volume_iops" {
