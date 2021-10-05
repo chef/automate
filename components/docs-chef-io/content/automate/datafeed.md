@@ -255,7 +255,7 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 To delete an individual instance:
 
-1. Selecting the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 
 1. Select **Delete**.
 
