@@ -10,7 +10,7 @@ do_before() {
 }
 
 pkg_deps=(
-  core/ruby26
+  core/ruby30
   core/libffi
   chef/mlsa
   core/bash
