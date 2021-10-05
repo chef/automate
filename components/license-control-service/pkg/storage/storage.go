@@ -74,7 +74,6 @@ type DBTrans struct {
 // Transact wraps your calls in a transaction. If the call should fail with an error it will
 // perform a rollback. Otherwise the transaction will be committed.
 func Transact(pg *PGBackend, txFunc func(*DBTrans) error) error {
-	fmt.Println("################pg.db#############", pg.db)
 	trans, err := pg.db.Begin()
 	if err != nil {
 		return errors.Wrap(err, "Unable to start transaction.")

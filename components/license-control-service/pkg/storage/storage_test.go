@@ -95,7 +95,9 @@ func TestPGBackend(t *testing.T) {
 	t.Run("Should insert and return the deployment id", func(t *testing.T) {
 		defer resetDB(t)
 		backend := storage.NewCurrentBackend(pgURL, "", "")
-		err := backend.StoreDeployment(context.Background(), "bd5e86a4-78a0-48e8-a7de-45150fbb433e")
+		err := backend.Init(context.Background(), keys.NewLicenseParser(keys.BuiltinKeyData))
+		require.NoError(t, err)
+		err = backend.StoreDeployment(context.Background(), "bd5e86a4-78a0-48e8-a7de-45150fbb433e")
 		require.NoError(t, err)
 		deployment, err := backend.GetDeployment(context.Background())
 		require.NoError(t, err)
