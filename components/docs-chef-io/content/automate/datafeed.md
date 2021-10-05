@@ -88,10 +88,9 @@ To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 1. Select **Delete**.
+1. Select **Delete Data Feed** to confirm the action.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance-using-servicenow-integration.png" alt="Delete the Data Feed Instance using ServiceNow Integration">}}
-
-1. Select **Delete Data Feed** to confirm the action.
 
 {{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-servicenow-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using ServiceNow Integration">}}
 
@@ -130,10 +129,9 @@ To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 1. Select **Delete**.
+1. In the popup, select **Delete Data Feed**.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance-using-splunk-integration.png" alt="Delete the Data Feed Instance using Splunk Integration">}}
-
-1. In the popup, select **Delete Data Feed**.
 
 {{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-splunk-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using Splunk Integration">}}
 
@@ -172,10 +170,9 @@ To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 1. Select **Delete**.
+1. In the popup, select **Delete Data Feed**.
 
 IMAGE
-
-1. In the popup, select **Delete Data Feed**.
 
 IMAGE
 
@@ -214,10 +211,9 @@ To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 1. Select **Delete**.
+1. In the popup, select **Delete Data Feed**.
 
 IMAGE
-
-1. In the popup, select **Delete Data Feed**.
 
 IMAGE
 
