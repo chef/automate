@@ -17,7 +17,6 @@ import { Profile } from '../../entities/profiles/profile.model';
 import { allManagers } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
-  ManagersSearch,
   ManagerSearchFields,
   ManagerSearchNodes,
   ManagerAllNodes,
@@ -80,7 +79,7 @@ export class JobAddComponent implements OnDestroy {
 
     this.setupForm();
 
-    this.store.dispatch(new ManagersSearch({}));
+   // this.store.dispatch(new ManagersSearch({}));
     this.store.dispatch(new ProfilesSearch({ owner: this.chefSession.username }));
   }
 

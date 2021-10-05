@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -14,7 +14,7 @@ import * as selectors from '../../entities/managers/manager.selectors';
   templateUrl: "./job-nodes-form.component.html",
   styleUrls: ["./job-nodes-form.component.scss"],
 })
-export class JobNodesFormComponent {
+export class JobNodesFormComponent implements OnInit {
   @Input() form: FormGroup;
   public automateCheck = false;
   public awsCheck = false;
@@ -22,11 +22,19 @@ export class JobNodesFormComponent {
   public gcpCheck = false;
   public nodeSource = [];
 
-
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder //private managerRequests: ManagerRequests
   ) {}
+
+  ngOnInit() {
+    this.store.dispatch(
+      new ManagersSearch({
+        page: 1,
+        per_page: 10,
+      })
+    );
+  }
 
   addRegionValue(regionsGroup: FormGroup, index: number) {
     const valuesArray = regionsGroup.controls["values"] as FormArray;
@@ -136,51 +144,47 @@ export class JobNodesFormComponent {
   }
 
   search(searchName: string[]) {
-    console.log('Search value is',searchName);
+    console.log("Search value is", searchName);
     var payload = {};
-    if(searchName === null && this.nodeSource.length ===0 )
-    {
+    if (searchName === null && this.nodeSource.length === 0) {
       this.store.dispatch(new ManagersSearch({}));
-    }else{
-    if (searchName === null) {
-      payload = {
-        filter_map: [
-          {
-            key: "manager_type",
-            values: this.nodeSource,
-          },
-        ],
-        page: 1,
-        per_page: 5,
-      };
-    } else if (searchName && this.nodeSource.length > 0) {
-      payload = {
-        filter_map: [
-          {
-            key: "manager_type",
-            values: this.nodeSource,
-          },
-          {
-            key: "name",
-            values: searchName,
-          },
-        ],
-      };
-    } else if (searchName && this.nodeSource.length === 0) {
-      payload = {
-        filter_map: [
-          {
-            key: "name",
-            values: searchName,
-          },
-        ],
-      };
+    } else {
+      if (searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeSource,
+            },
+          ]
+        };
+      } else if (searchName && this.nodeSource.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeSource,
+            },
+            {
+              key: "name",
+              values: searchName,
+            },
+          ],
+        };
+      } else if (searchName && this.nodeSource.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "name",
+              values: searchName,
+            },
+          ],
+        };
+      }
+
+      console.log("payload is", payload);
+      this.store.dispatch(new ManagersSearch(payload));
     }
-
-    console.log("payload is", payload);
-    this.store.dispatch(new ManagersSearch(payload));
-  }
-
   }
 
   onclickCheckbox(e: any, val: string) {
@@ -232,10 +236,10 @@ export class JobNodesFormComponent {
   }
 
   onSearchInput(event) {
-    const nameArray =[];
+    const nameArray = [];
     const value = event.target.value;
     console.log(value);
     nameArray.push(value);
-    this.search(nameArray);
+    //this.search(nameArray);
   }
 }
