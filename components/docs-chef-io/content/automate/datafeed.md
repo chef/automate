@@ -216,7 +216,7 @@ IMAGE
 
 To add a Data Feed instance in Chef Automate using Custom integration:
 
-1. Selection **New Integration**.
+1. Select **New Integration**.
 
 1. Select the **Custom** icon under Webhook Integration.
 
