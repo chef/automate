@@ -18,17 +18,17 @@ describe('chef datafeed', () => {
 
 
   before(() => {
-      cy.adminLogin('/settings').then(() => {
-      const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.get('app-welcome-modal').invoke('hide');
-      cy.restoreStorage();
-      cy.get('body').type('feat');
-      cy.get('.title').contains('Chef Automate Data Feed').parent().parent()
-        .find('.onoffswitch').click();
-      cy.get('chef-button').contains('Close').click();
-      cy.reload();
-      cy.contains('know').click();
-      cy.contains('Data Feeds').click();
+    cy.adminLogin('/settings').then(() => {
+    const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
+    cy.get('app-welcome-modal').invoke('hide');
+    cy.restoreStorage();
+    cy.get('body').type('feat');
+    cy.get('.title').contains('Chef Automate Data Feed').parent().parent()
+      .find('.onoffswitch').click();
+    cy.get('chef-button').contains('Close').click();
+    cy.reload();
+    cy.contains('know').click();
+    cy.contains('Data Feeds').click();
     });
   });
 
