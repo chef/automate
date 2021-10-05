@@ -102,7 +102,7 @@ To delete an individual instance:
 
 {{< figure src="/images/automate/delete-the-data-feed-instance-using-servicenow-integration.png" alt="Delete the Data Feed Instance using ServiceNow Integration">}}
 
-1. In the popup, select **Delete Data Feed**.
+1. Select **Delete Data Feed** to confirm the action.
 
 {{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-servicenow-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using ServiceNow Integration">}}
 
