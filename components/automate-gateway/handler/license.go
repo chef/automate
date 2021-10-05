@@ -133,7 +133,7 @@ func (t *LicenseServer) RequestLicense(ctx context.Context,
 }
 
 func (t *LicenseServer) getDeploymentID(ctx context.Context) (string, error) {
-	// Get deployment id from license control service
+
 	deployIDResponse, err := t.client.GetDeploymentID(ctx, &license_control.DeploymentIDRequest{})
 	if err != nil {
 		return "", err
