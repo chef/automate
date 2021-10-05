@@ -249,7 +249,7 @@ To edit a Data Feed instance of Custom Integration:
 
 IMAGE
 
-You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
 
 #### Delete a Custom Data Feed Instance
 
