@@ -65,7 +65,7 @@ To add a ServiceNow data feed:
 
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
 
-1. Select an **authentication** from the couple of options in the drop-down.
+1. Select an **authentication**  method:
   
   - If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
   - For **Access Token**, set the **Token Type** and **Token** for your integration.
