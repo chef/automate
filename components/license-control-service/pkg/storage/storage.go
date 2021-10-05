@@ -47,8 +47,9 @@ type CurrentBackend interface {
 	GetLicense(context.Context) (string, keys.LicenseMetadata, error)
 	// SetLicense stores the given license in the backend.
 	SetLicense(context.Context, string) error
-	//  StoreDeployment stores the deployment info in the backend
+	// StoreDeployment stores the deployment info in the backend
 	StoreDeployment(context.Context, string) error
+	// GetDeployment returns the deployment info from backend
 	GetDeployment(context.Context) (Deployment, error)
 }
 
