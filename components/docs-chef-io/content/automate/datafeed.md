@@ -108,7 +108,7 @@ To delete an individual instance:
 
 ### Splunk
 
-To add a Data Feed instance in Chef Automate using Splunk integration:
+To add a Splunk data feed:
 
 1. Selection **New Integration**.
 
