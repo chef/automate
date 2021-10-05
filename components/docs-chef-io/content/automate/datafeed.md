@@ -58,19 +58,13 @@ Create a data feed using a webhook integration.
 To add a ServiceNow data feed:
 
 1. Select **New Integration**.
-
 1. Select the **ServiceNow** icon under Webhook Integration.
-
 1. In the form, enter a unique **Data Feed name**.
-
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-
 1. Select an **authentication**  method:
   *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
   * For **Access Token**, set the **Token Type** and **Token** for your integration.
-
 1. Select **Test Connection** to start validating the connection details.
-
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-servicenow-integration.png" alt="Data Feed Instance using ServiceNow Integration">}}
@@ -80,11 +74,8 @@ To add a ServiceNow data feed:
 To edit a Data Feed instance of ServiceNow Integration:
 
 1. Select the data feed instance name to open its detail page.
-
 1. Edit the Data Feed **Name** or **URL**.
-
 1. Select **Test Data Feed** button to test the URL.
-
 1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-servicenow-integration.png" alt="Details of Data Feed Instance using ServiceNow Integration">}}
@@ -96,7 +87,6 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-
 1. Select **Delete**.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance-using-servicenow-integration.png" alt="Delete the Data Feed Instance using ServiceNow Integration">}}
@@ -110,19 +100,13 @@ To delete an individual instance:
 To add a Splunk data feed:
 
 1. Select **New Integration**.
-
 1. Select the **Splunk** icon under Webhook Integration.
-
 1. In the form, enter a unique **Data Feed name**.
-
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-
 1. Select an **authentication** from the couple of options in the drop-down.
   * If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
   * If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
-
 1. Select **Test Connection** to start validating the connection details.
-
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using splunk Integration">}}
@@ -132,11 +116,8 @@ To add a Splunk data feed:
 To edit a Data Feed instance of Splunk Integration:
 
 1. Select the data feed instance name to open its detail page.
-
 1. Edit the Data Feed **Name** or **URL**.
-
 1. Select **Test Data Feed** button to test the URL.
-
 1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-splunk-integration.png" alt="Details of Data Feed Instance using Splunk Integration">}}
@@ -148,7 +129,6 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-
 1. Select **Delete**.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance-using-splunk-integration.png" alt="Delete the Data Feed Instance using Splunk Integration">}}
@@ -162,19 +142,13 @@ To delete an individual instance:
 To add a Data Feed instance in Chef Automate using ELK integration:
 
 1. Select **New Integration**.
-
 1. Select the **ELK** icon under Webhook Integration.
-
 1. In the form, enter a unique **Data Feed name**.
-
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-
 1. Select an **authentication** from the couple of options in the drop-down.
   * If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
   * If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
-
 1. Select **Test Connection** to start validating the connection details.
-
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 IMAGE
@@ -184,11 +158,8 @@ IMAGE
 To edit a Data Feed instance of ELK Integration:
 
 1. Select the data feed instance name to open its detail page.
-
 1. Edit the Data Feed **Name** or **URL**.
-
 1. Select **Test Data Feed** button to test the URL.
-
 1. Select **Save** to save your changes.
 
 IMAGE
@@ -200,7 +171,6 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-
 1. Select **Delete**.
 
 IMAGE
@@ -214,19 +184,13 @@ IMAGE
 To add a Data Feed instance in Chef Automate using Custom integration:
 
 1. Select **New Integration**.
-
 1. Select the **Custom** icon under Webhook Integration.
-
 1. In the form, enter a unique **Data Feed name**.
-
 1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-
 1. Select an **authentication** from the couple of options in the drop-down.
   * If you select the **Username and Password** authentication, enter the **Username** and **Password** that your 3rd party endpoint requires for authentication. OR
   * If the authentication is set to **Access Token**, set the **Token Type** and **Token** for the 3rd party authentication.
-
 1. Select **Test Connection** to start validating the connection details.
-
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 IMAGE
@@ -236,11 +200,8 @@ IMAGE
 To edit a Data Feed instance of Custom Integration:
 
 1. Select the data feed instance name to open its detail page.
-
 1. Edit the Data Feed **Name** or **URL**.
-
 1. Select **Test Data Feed** button to test the URL.
-
 1. Select **Save** to save your changes.
 
 IMAGE
@@ -252,7 +213,6 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-
 1. Select **Delete**.
 
 IMAGE
@@ -270,17 +230,13 @@ The Data Feed configuration settings apply across all configured Data Feed insta
 To modify Data Feed behavior with the available configuration settings:
 
 1. Create a configuration patch file to update the configuration settings. Save this file in the `.toml` file format and name your file as desired. For example, `data-feed-patch.toml`
-
 1. Include one or more configuration settings and their updated value(s) in your configuration patch `.toml` file to reflect the desired global Data Feed behavior:
-
   * Use the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
   * Use the `node_batch_size` setting to change the number of sets of node data sent in each individual batch to your endpoint. The default value is 50 nodes
   * Use the `updated_nodes_only` setting to determine what data to include in each export. The default setting is `true`, which causes the aggregation of only the *changed* data of updated nodes since the last export. Set `updated_nodes_only` to `false` and it aggregates *all* data of updated nodes since the last export
   * To reduce the IP address range for the collected and processed node data, update the `disable_cidr_filter` setting to `false` **and** update the `cidr_filter` setting to cover the required IP address range. For example, you may wish to send only production or test node traffic
   * Use the `accepted_status_codes` setting to define an array of HTTP status codes that the Data Feed Service will treat as `success` if returned by the 3rd party endpoint. If the status code is not in the `accepted_status_codes` list, then an error will be logged
-
 1. Save your configuration patch file changes before continuing to the next step.
-
 1. Apply your configuration changes with the Chef Automate command-line tool:
 
 ```bash
