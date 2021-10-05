@@ -49,6 +49,10 @@ output "postgresql_private_ips" {
   value = aws_instance.chef_automate_postgresql.*.private_ip
 }
 
+output "elasticsearch_public_ips" {
+  value = aws_instance.chef_automate_elasticsearch.*.public_ip
+}
+
 output "elasticsearch_private_ips" {
   value = aws_instance.chef_automate_elasticsearch.*.private_ip
 }

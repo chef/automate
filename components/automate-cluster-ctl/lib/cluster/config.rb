@@ -98,7 +98,7 @@ module AutomateCluster
       default :profile, 'default'
       default :region, 'us-east-1'
       default :vpc_id, " "
-      default :cidr_block, " "
+      default :cidr_block_addr, " "
       default :ssh_key_pair_name
       default :ami_filter_name
       default :ami_filter_virt_type
