@@ -55,7 +55,7 @@ Create a data feed instance using any webhook integration.
 
 ### ServiceNow
 
-To add a Data Feed instance in Chef Automate using ServiceNow integration:
+To add a ServiceNow data feed:
 
 1. Select **New Integration**.
 
