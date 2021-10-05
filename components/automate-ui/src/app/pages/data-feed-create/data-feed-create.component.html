@@ -124,7 +124,7 @@
           <div class="name-margin">
             <label for="version">Region *</label>
             <div class="version-dropdown dropdown-menu">
-              <chef-select #reg [value]="dropDownVal" (change)="dropDownChangeHandlers(reg.value)" data-cy="select-auth-type">
+              <chef-select #reg [value]="dropDownVal" (change)="dropDownChangeHandlers(reg.value)" data-cy="select-region-type">
                 <chef-option *ngFor="let region of awsRegions" value="{{region.code}}"  data-cy="select-access-token">{{region.name}}</chef-option>
               </chef-select>
             </div>
@@ -317,7 +317,7 @@
         </div>
         <hr>
         <div class="button-bar">
-          <chef-button id="cancel-server-popup" (click)="returnToMenu()" tertiary>Cancel</chef-button>
+          <chef-button id="cancel-server-popup" (click)="returnToMenu()" data-cy="cancel-button" tertiary>Cancel</chef-button>
           <chef-button [disabled]="!validateForm()"
             primary
             data-cy="add-button"

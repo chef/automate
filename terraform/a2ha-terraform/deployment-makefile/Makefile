@@ -99,9 +99,14 @@ smoke-test:
 ## Generate random Habitat Supervisor ring key and HTTP gateway bearer token
 sup-keys: $(HABITAT_TFVARS)
 
+## Generate habitat certificate for cluster internal secure communication 
+habitat-sup-cert:
+	bash scripts/cert.sh
+
 ## Force a re-push of the .aib files by changing their destination filename.
 bump-aib:
 	bash scripts/bumpaib.sh $(TERRAFORM_PATH)/terraform.tfvars
 
 ## Setup habitat keys and airgap bundles
-setup: sup-keys bundle
+setup: sup-keys bundle habitat-sup-cert
+
