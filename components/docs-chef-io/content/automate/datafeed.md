@@ -154,7 +154,7 @@ To add a Data Feed instance in Chef Automate using Custom integration:
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
-IMAGE
+{{< figure src="/images/automate/data-feed-instance-using-custom-integration.png" alt="Data Feed Instance using Custom Integration">}}
 
 #### Edit a Custom Data Feed Instance
 
@@ -165,7 +165,7 @@ To edit a Data Feed instance of Custom Integration:
 1. Select **Test Data Feed** button to test the URL.
 1. Select **Save** to save your changes.
 
-IMAGE
+{{< figure src="/images/automate/details-of-data-feed-instance-using-custom-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
 
 You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
 
