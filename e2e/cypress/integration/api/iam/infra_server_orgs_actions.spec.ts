@@ -136,7 +136,7 @@ it('infra server orgs list returns 200 when infraServers orgs list action is all
         });
     });
 
-    it('infra server orgs list returns 403 when infraServers orgs list actions is deneyed', () => {
+    it('infra server orgs list returns 403 when infraServers orgs list actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersOrgsListActionToken,
             'content-type': 'application/json+lax' },
@@ -252,7 +252,7 @@ after(() => {
             });
         });
 
-    it('infra server orgs get returns 403 when infraServers orgs get actions is deneyed', () => {
+    it('infra server orgs get returns 403 when infraServers orgs get actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersOrgsGetActionToken,
             'content-type': 'application/json+lax' },
@@ -377,7 +377,7 @@ it('infra server orgs post returns 200 when infraServers orgs create action is a
         });
     });
 
-it('infra server orgs post returns 403 when infraServers orgs create actions is deneyed', () => {
+it('infra server orgs post returns 403 when infraServers orgs create actions is denied', () => {
     cy.request({
         headers: { 'api-token': withoutInfraServersOrgsCreateActionToken,
         'content-type': 'application/json+lax' },
@@ -506,7 +506,7 @@ it('infra server orgs put returns 200 when infraServers orgs update action is al
         });
     });
 
-it('infra server orgs put returns 403 when infraServers orgs update actions is deneyed', () => {
+it('infra server orgs put returns 403 when infraServers orgs update actions is denied', () => {
     cy.request({
         headers: { 'api-token': withoutInfraServersOrgsUpdateActionToken,
         'content-type': 'application/json+lax' },
@@ -628,7 +628,7 @@ it('infra server orgs delete returns 200 when infraServers orgs delete action is
         });
     });
 
-it('infra server orgs delete returns 403 when infraServers orgs delete actions is deneyed', () => {
+it('infra server orgs delete returns 403 when infraServers orgs delete actions is denied', () => {
     cy.request({
         headers: { 'api-token': withoutInfraServersOrgsDeleteActionToken,
         'content-type': 'application/json+lax' },
