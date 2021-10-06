@@ -16,15 +16,15 @@ gh_repo = "automate"
 The Data Feed service sends node data to a 3rd party service. This can be useful when updating configuration management databases, external security dashboards, and IT service management platforms.
 The following types of information are sent:
 
-- Ohai data gathered from each managed node - This data includes hardware, operating system, and installed program information. Some variation depends on the managed operating system.
-- Configuration information about each managed node - This information includes Chef Client Run status, Runlists, Cookbooks, and Recipes running against each node.
-- Compliance information about each node that shows the compliance state - This information includes passed and failed controls for each profile executed against that node.
+* Ohai data gathered from each managed node - This data includes hardware, operating system, and installed program information. Some variation depends on the managed operating system.
+* Configuration information about each managed node - This information includes Chef Client Run status, Runlists, Cookbooks, and Recipes running against each node.
+* Compliance information about each node that shows the compliance state - This information includes passed and failed controls for each profile executed against that node.
 
 A Data Feed operates by doing the following:
 
-- Every 4 hours, the data-feed-service will aggregate the client runs and compliance reports from the previous 4 hours and send this information to the registered destinations. This time interval is 4 hours by default but is configurable.
-- If there are no destinations, the aggregation will not occur.
-- The data aggregates and sends in batches of 50 nodes at a time. The batch amount is 50 by default but is configurable.
+* Every 4 hours, the data-feed-service will aggregate the client runs and compliance reports from the previous 4 hours and send this information to the registered destinations. This time interval is 4 hours by default but is configurable.
+* If there are no destinations, the aggregation will not occur.
+* The data aggregates and sends in batches of 50 nodes at a time. The batch amount is 50 by default but is configurable.
 
 By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
@@ -32,8 +32,8 @@ By default, only Admin users of Chef Automate may create and manage Data Feeds.
 
 Data Feed instance sends client run and compliance scan data to the 3rd party integrations available. To add a Data Feed instance in Chef Automate:
 
-1. In the **Settings** tab, navigate to _Data Feeds_ in the sidebar
-1. Select **New Integration**
+* In the **Settings** tab, navigate to _Data Feeds_ in the sidebar
+* Select **New Integration**
 
 Currently, the data feed has two types of integrations:
 
@@ -56,15 +56,15 @@ Create a data feed using a webhook integration.
 
 To add a ServiceNow data feed:
 
-1. Select **New Integration**.
-1. Select the **ServiceNow** icon under Webhook Integration.
-1. In the form, enter a unique **Data Feed name**.
-1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-1. Select an **authentication**  method:
+* Select **New Integration**.
+* Select the **ServiceNow** icon under Webhook Integration.
+* In the form, enter a unique **Data Feed name**.
+* Enter a **URL** for the Data Feed endpoint, including any specific port details.
+* Select an **authentication**  method:
   *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
   * For **Access Token**, set the **Token Type** and **Token** for your integration.
-1. Select **Test Connection** to start validating the connection details.
-1. Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-servicenow-integration.png" alt="Data Feed Instance using ServiceNow Integration">}}
 
@@ -72,10 +72,10 @@ To add a ServiceNow data feed:
 
 To edit a Data Feed instance of ServiceNow Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name** or **URL**.
-1. Select the **Test Data Feed** button to test the URL.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name** or **URL**.
+* Select the **Test Data Feed** button to test the URL.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-servicenow-integration.png" alt="Details of Data Feed Instance using ServiceNow Integration">}}
 
@@ -85,15 +85,15 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 To add a Splunk data feed:
 
-1. Select **New Integration**.
-1. Select the **Splunk** icon under Webhook Integration.
-1. In the form, enter a unique **Data Feed name**.
-1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-1. Select an **authentication** from a couple of options in the drop-down.
+* Select **New Integration**.
+* Select the **Splunk** icon under Webhook Integration.
+* In the form, enter a unique **Data Feed name**.
+* Enter a **URL** for the Data Feed endpoint, including any specific port details.
+* Select an **authentication** from a couple of options in the drop-down.
   *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
   * For **Access Token**, set the **Token Type** and **Token** for your integration.
-1. Select **Test Connection** to start validating the connection details.
-1. Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using Splunk Integration">}}
 
@@ -101,10 +101,10 @@ To add a Splunk data feed:
 
 To edit a Data Feed instance of Splunk Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name** or **URL**.
-1. Select the **Test Data Feed** button to test the URL.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name** or **URL**.
+* Select the **Test Data Feed** button to test the URL.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-splunk-integration.png" alt="Details of Data Feed Instance using Splunk Integration">}}
 
@@ -114,15 +114,15 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 To add a Data Feed instance in Chef Automate using ELK integration:
 
-1. Select **New Integration**.
-1. Select the **ELK** icon under Webhook Integration.
-1. In the form, enter a unique **Data Feed name**.
-1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-1. Select an **authentication** from a couple of options in the drop-down.
+* Select **New Integration**.
+* Select the **ELK** icon under Webhook Integration.
+* In the form, enter a unique **Data Feed name**.
+* Enter a **URL** for the Data Feed endpoint, including any specific port details.
+* Select an **authentication** from a couple of options in the drop-down.
   *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
   * For **Access Token**, set the **Token Type** and **Token** for your integration.
-1. Select the **Test Connection** to start validating the connection details.
-1. Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select the **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-elk-integration.png" alt="Data Feed Instance using ELK Integration">}}
 
@@ -130,10 +130,10 @@ To add a Data Feed instance in Chef Automate using ELK integration:
 
 To edit a Data Feed instance of ELK Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name** or **URL**.
-1. Select the **Test Data Feed** button to test the URL.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name** or **URL**.
+* Select the **Test Data Feed** button to test the URL.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-elk-integration.png" alt="Details of Data Feed Instance using ELK Integration">}}
 
@@ -143,15 +143,15 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 To add a Data Feed instance in Chef Automate using Custom integration:
 
-1. Select **New Integration**.
-1. Select the **Custom** icon under Webhook Integration.
-1. In the form, enter a unique **Data Feed name**.
-1. Enter a **URL** for the Data Feed endpoint, including any specific port details.
-1. Select an **authentication** from a couple of options in the drop-down.
+* Select **New Integration**.
+* Select the **Custom** icon under Webhook Integration.
+* In the form, enter a unique **Data Feed name**.
+* Enter a **URL** for the Data Feed endpoint, including any specific port details.
+* Select an **authentication** from a couple of options in the drop-down.
   *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
   * For **Access Token**, set the **Token Type** and **Token** for your integration.
-1. Select **Test Connection** to start validating the connection details.
-1. Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-custom-integration.png" alt="Data Feed Instance using Custom Integration">}}
 
@@ -159,10 +159,10 @@ To add a Data Feed instance in Chef Automate using Custom integration:
 
 To edit a Data Feed instance of Custom Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name** or **URL**.
-1. Select the **Test Data Feed** button to test the URL.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name** or **URL**.
+* Select the **Test Data Feed** button to test the URL.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-custom-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
 
@@ -176,13 +176,13 @@ Create a data feed using a storage integration.
 
 To add a Minio data feed:
 
-- Select **New Integration**.
-- Select the **Minio** icon under Storage Integration.
-- In the form, enter a unique **Data Feed Name**.
-- Enter a Data Feed **Endpoint**, including any specific port details.
-- Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
-- Select **Test Connection** to start validating the connection details.
-- Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select **New Integration**.
+* Select the **Minio** icon under Storage Integration.
+* In the form, enter a unique **Data Feed Name**.
+* Enter a Data Feed **Endpoint**, including any specific port details.
+* Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
+* Select **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using Minio Integration">}}
 
@@ -190,10 +190,10 @@ To add a Minio data feed:
 
 To edit a Data Feed instance of Minio Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name**, **End Point**, or the **Bucket**.
-1. Select the **Test Data Feed** button to test the Endpoint.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name**, **End Point**, or the **Bucket**.
+* Select the **Test Data Feed** button to test the Endpoint.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Minio Integration">}}
 
@@ -203,13 +203,13 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 To add an S3 data feed:
 
-- Select **New Integration**.
-- Select the **S3** icon under Storage Integration.
-- In the form, enter a unique **Data Feed Name**.
-- Select your **Region** from the drop-down list.
-- Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
-- Select **Test Connection** to start validating the connection details.
-- Once the test is successful, select **Save** to save the Data Feed configuration.
+* Select **New Integration**.
+* Select the **S3** icon under Storage Integration.
+* In the form, enter a unique **Data Feed Name**.
+* Select your **Region** from the drop-down list.
+* Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
+* Select **Test Connection** to start validating the connection details.
+* Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-s3-integration.png" alt="Data Feed Instance using S3 Integration">}}
 
@@ -217,10 +217,10 @@ To add an S3 data feed:
 
 To edit a Data Feed instance of S3 Integration:
 
-1. Select the data feed instance name to open its detail page.
-1. Edit the Data Feed **Name**, **Region** or the **Bucket**.
-1. Select the **Test Data Feed** button to test the Endpoint.
-1. Select **Save** to save your changes.
+* Select the data feed instance name to open its detail page.
+* Edit the Data Feed **Name**, **Region** or the **Bucket**.
+* Select the **Test Data Feed** button to test the Endpoint.
+* Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-s3-integration.png" alt="Details of Data Feed Instance using S3 Integration">}}
 
@@ -232,17 +232,17 @@ Chef Automate suggests sending node data to only five feeds at a time. This keep
 
 The data feed instances are by default enabled when created. To disable a feed:
 
-- Select **Disable** from the top left corner of the details page. OR
+* Select **Disable** from the top left corner of the details page. OR
 
-- Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Disable**.
+* Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Disable**.
 
 {{< figure src="/images/automate/disable-a-data-feed-from-chef-automate.png" alt="Disable a Data Feed Instance">}}
 
 To enable a disabled data feed:
 
-- Select **Enable** from the top left corner of the details page. OR
+* Select **Enable** from the top left corner of the details page. OR
 
-- Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Enable**.
+* Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Enable**.
 
 {{< figure src="/images/automate/enable-a-data-feed-from-chef-automate.png" alt="Enable a Data Feed Instance">}}
 
@@ -254,9 +254,9 @@ The **Enable** option gets active only if the data feed is disabled previously.
 
 To delete an individual instance:
 
-1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-1. Select **Delete**.
-1. Select **Delete Data Feed** to confirm the action.
+* Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+* Select **Delete**.
+* Select **Delete Data Feed** to confirm the action.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance.png" alt="Delete the Data Feed Instance">}}
 
@@ -270,15 +270,15 @@ The Data Feed configuration settings apply across all configured Data Feed insta
 
 To modify Data Feed behavior with the available configuration settings:
 
-1. Create a configuration patch file to update the configuration settings. Save this file in the `.toml` file format and name your file as desired. For example, `data-feed-patch.toml`
-1. Include one or more configuration settings and their updated value(s) in your configuration patch `.toml` file to reflect the desired global Data Feed behavior:
+* Create a configuration patch file to update the configuration settings. Save this file in the `.toml` file format and name your file as desired. For example, `data-feed-patch.toml`
+* Include one or more configuration settings and their updated value(s) in your configuration patch `.toml` file to reflect the desired global Data Feed behavior:
   * Use the `feed_interval` setting to change the interval for the Data Feed collection. The default value is four hours
   * Use the `node_batch_size` setting to change the number of sets of node data sent in each batch to your endpoint. The default value is 50 nodes
   * Use the `updated_nodes_only` setting to determine what data to include in each export. The default setting is `true`, which causes the aggregation of only the *changed* data of updated nodes since the last export. Set `updated_nodes_only` to `false`, and it aggregates *all* data of updated nodes since the last export
   * To reduce the IP address range for the collected and processed node data, update the `disable_cidr_filter` setting to `false` **and** update the `cidr_filter` setting to cover the required IP address range. For example, you may wish to send only production or test node traffic
   * Use the `accepted_status_codes` setting to define an array of HTTP status codes that the Data Feed Service will treat as `success` if returned by the 3rd party endpoint. If the status code is not in the `accepted_status_codes` list, then an error will be logged
-1. Save your configuration patch file changes before continuing to the next step.
-1. Apply your configuration changes with the Chef Automate command-line tool:
+* Save your configuration patch file changes before continuing to the next step.
+* Apply your configuration changes with the Chef Automate command-line tool:
 
 ```bash
     chef-automate config patch data-feed-patch.toml
