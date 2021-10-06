@@ -79,6 +79,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 	// check if it is in HA mode
 	if isA2HARBFileExist() {
+	 
+		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
+			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
+		}
+
 		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 	}
 
