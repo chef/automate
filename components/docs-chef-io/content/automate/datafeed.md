@@ -82,18 +82,6 @@ To edit a Data Feed instance of ServiceNow Integration:
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
 
-#### Delete a ServiceNow Data Feed Instance
-
-To delete an individual instance:
-
-1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-1. Select **Delete**.
-1. Select **Delete Data Feed** to confirm the action.
-
-{{< figure src="/images/automate/delete-the-data-feed-instance-using-servicenow-integration.png" alt="Delete the Data Feed Instance using ServiceNow Integration">}}
-
-{{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-servicenow-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using ServiceNow Integration">}}
-
 ### Splunk
 
 To add a Splunk data feed:
@@ -123,18 +111,6 @@ To edit a Data Feed instance of Splunk Integration:
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
 
-#### Delete a Splunk Data Feed Instance
-
-To delete an individual instance:
-
-1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-1. Select **Delete**.
-1. In the popup, select **Delete Data Feed**.
-
-{{< figure src="/images/automate/delete-the-data-feed-instance-using-splunk-integration.png" alt="Delete the Data Feed Instance using Splunk Integration">}}
-
-{{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance-using-splunk-integration.png" alt="Delete Data Feed Popup of Data Feed Instance using Splunk Integration">}}
-
 ### ELK
 
 To add a Data Feed instance in Chef Automate using ELK integration:
@@ -163,14 +139,6 @@ To edit a Data Feed instance of ELK Integration:
 IMAGE
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
-
-#### Delete a ELK Data Feed Instance
-
-To delete an individual instance:
-
-1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-1. Select **Delete**.
-1. In the popup, select **Delete Data Feed**.
 
 IMAGE
 
@@ -205,17 +173,21 @@ IMAGE
 
 You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
 
-#### Delete a Custom Data Feed Instance
+## Storage Integration
+
+Create a data feed using a storage integration.
+
+## Delete a Data Feed Instance
 
 To delete an individual instance:
 
 1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
 1. Select **Delete**.
-1. In the popup, select **Delete Data Feed**.
+1. Select **Delete Data Feed** to confirm the action.
 
-IMAGE
+{{< figure src="/images/automate/delete-the-data-feed-instance.png" alt="Delete the Data Feed Instance">}}
 
-IMAGE
+{{< figure src="/images/automate/delete-data-feed-popup-of-data-feed-instance.png" alt="Delete Data Feed Popup of Data Feed Instance">}}
 
 ## Configuring Global Data Feed Behavior
 
