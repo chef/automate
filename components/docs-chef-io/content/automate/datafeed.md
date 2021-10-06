@@ -177,6 +177,30 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 Create a data feed using a storage integration.
 
+## Enable/Disable a Data Feed Instance
+
+Chef Automate suggests to send node data to only 5 feeds at a time. This keeps your backend server smooth and with less cluster. Now, if you have more than 5 data feeds but you only want to send node data to 5 feeds, you can simply disable the remaining feeds.
+
+The data feed instances are by default enabled when created. To disable a feed:
+
+- Select **Disable** from the top left corner of the details page. OR
+
+- Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Disable**.
+
+{{< figure src="/images/automate/disable-a-data-feed-from-chef-automate.png" alt="Disable a Data Feed Instance">}}
+
+To enable a disabled data feed:
+
+- Select **Enable** from the top left corner of the details page. OR
+
+- Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}} from the list of data feeds and select **Enable**.
+
+{{< figure src="/images/automate/enable-a-data-feed-from-chef-automate.png" alt="Enable a Data Feed Instance">}}
+
+{{< note >}}
+The **Enable** option gets active only if the data feed is disabled previously.
+{{< /note >}}
+
 ## Delete a Data Feed Instance
 
 To delete an individual instance:
