@@ -104,7 +104,7 @@ describe('Infra servers list api', () => {
             });
         });
 
-        it('infra servers list returns 403 when infraServers list actions is deneyed', () => {
+        it('infra servers list returns 403 when infraServers list actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersListActionToken,
                 'content-type': 'application/json+lax' },
@@ -239,7 +239,7 @@ describe('Infra servers get api', () => {
             });
         });
 
-        it('infra servers get returns 403 when infraServers get actions is deneyed', () => {
+        it('infra servers get returns 403 when infraServers get actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersGetActionToken,
                 'content-type': 'application/json+lax' },
@@ -360,7 +360,7 @@ describe('Infra servers post api to create infra servers', () => {
                 });
         });
 
-        it('infra servers post returns 403 when infraServers create actions is deneyed', () => {
+        it('infra servers post returns 403 when infraServers create actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersPostActionToken },
                 method: 'POST',
@@ -491,7 +491,7 @@ describe('Infra servers put api to update infra server', () => {
         });
 
 
-        it('infra servers put returns 403 when infraServers update actions is deneyed', () => {
+        it('infra servers put returns 403 when infraServers update actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersUpdateActionToken },
                 method: 'PUT',
@@ -633,7 +633,7 @@ describe('Infra servers delete api to delete infra server', () => {
         });
 
 
-        it('infra servers delete returns 403 when infraServers delete actions is deneyed', () => {
+        it('infra servers delete returns 403 when infraServers delete actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersDeleteActionToken },
                 method: 'DELETE',
