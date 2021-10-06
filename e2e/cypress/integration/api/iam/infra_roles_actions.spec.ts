@@ -100,7 +100,7 @@ describe('Roles list', () => {
             });
     });
 
-    it('Roles get returns 403 when infraServersOrgsRoles list actions is deneyed', () => {
+    it('Roles get returns 403 when infraServersOrgsRoles list actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersRolesListActionToken },
             method: 'GET',
@@ -214,7 +214,7 @@ describe('Roles get', () => {
             });
     });
 
-    it('roles get returns 403 when infraServersOrgsRoles get actions is deneyed', () => {
+    it('roles get returns 403 when infraServersOrgsRoles get actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersRolesGetActionToken },
             method: 'GET',
