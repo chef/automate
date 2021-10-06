@@ -185,7 +185,7 @@ To add a Minio data feed:
 - Select **Test Connection** to start validating the connection details.
 - Once the test is successful, select **Save** to save the Data Feed configuration.
 
-{{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using minio Integration">}}
+{{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using Minio Integration">}}
 
 #### Edit a Minio Data Feed Instance
 
@@ -196,7 +196,34 @@ To edit a Data Feed instance of Minio Integration:
 1. Select **Test Data Feed** button to test the End point.
 1. Select **Save** to save your changes.
 
-{{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
+{{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Minio Integration">}}
+
+You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
+
+### S3
+
+To add a S3 data feed:
+
+- Select **New Integration**.
+- Select the **S3** icon under Storage Integration.
+- In the form, enter a unique **Data Feed Name**.
+- Select your **Region** from the drop-down list.
+- Enter a **Bucket Name**, **Access Key** and the **Secret Key** of the instance.
+- Select **Test Connection** to start validating the connection details.
+- Once the test is successful, select **Save** to save the Data Feed configuration.
+
+{{< figure src="/images/automate/data-feed-instance-using-s3-integration.png" alt="Data Feed Instance using S3 Integration">}}
+
+#### Edit a S3 Data Feed Instance
+
+To edit a Data Feed instance of S3 Integration:
+
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name**, **Region** or the **Bucket**.
+1. Select **Test Data Feed** button to test the End point.
+1. Select **Save** to save your changes.
+
+{{< figure src="/images/automate/details-of-data-feed-instance-using-s3-integration.png" alt="Details of Data Feed Instance using S3 Integration">}}
 
 You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
 
