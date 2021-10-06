@@ -48,7 +48,6 @@ export class DataFeedTableComponent  {
   checkValue(e: any, val: string) {
     if (val === 'serviceShow') {
       this.serviceShow = e.target.checked;
-      console.log(e);
     } else if (val === 'integration_typeShow') {
       this.integration_typeShow = e.target.checked;
     }
@@ -78,9 +77,7 @@ export class DataFeedTableComponent  {
   }
 
   onToggleSort(field: string) {
-    const fieldDirection = this.sortval;
     this.selectedSortField = field;
-    console.log(fieldDirection);
     this.sortval = this.sortval === 'ASC' ? 'DESC' : 'ASC';
     if (this.sortval === 'ASC') {
        this.destinations = this.destinations.sort((a, b) =>  (a[field] > b[field] ? 1 : -1));
