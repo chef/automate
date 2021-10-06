@@ -632,7 +632,7 @@ describe('Infra servers delete api to delete infra server', () => {
         });
 
 
-        it('infra servers delete returns 403 when infraServer delete actions is denied', () => {
+        it('infra servers delete returns 403 when infraServers delete actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersDeleteActionToken },
                 method: 'DELETE',
