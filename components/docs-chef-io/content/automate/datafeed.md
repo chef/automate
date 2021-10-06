@@ -136,7 +136,7 @@ To edit a Data Feed instance of ELK Integration:
 1. Select **Test Data Feed** button to test the URL.
 1. Select **Save** to save your changes.
 
-IMAGE
+{{< figure src="/images/automate/details-of-data-feed-instance-using-elk-integration.png" alt="Details of Data Feed Instance using ELK Integration">}}
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
 
