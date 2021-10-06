@@ -56,6 +56,6 @@ output "elasticsearch_ssh" {
 output "ops_dashboard_addresses" {
   value = formatlist(
     "https://%s:5601/app/kibana#/dashboards?_g=()",
-    var.elasticsearch_private_ips,
+    var.elasticsearch_public_ips,
   )
 }
