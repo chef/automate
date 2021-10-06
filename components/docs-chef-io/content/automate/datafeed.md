@@ -96,7 +96,7 @@ To add a Splunk data feed:
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
-{{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using splunk Integration">}}
+{{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using Splunk Integration">}}
 
 #### Edit a Splunk Data Feed Instance
 
@@ -125,7 +125,7 @@ To add a Data Feed instance in Chef Automate using ELK integration:
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
-IMAGE
+{{< figure src="/images/automate/data-feed-instance-using-elk-integration.png" alt="Data Feed Instance using ELK Integration">}}
 
 #### Edit a ELK Data Feed Instance
 
@@ -139,10 +139,6 @@ To edit a Data Feed instance of ELK Integration:
 IMAGE
 
 You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
-
-IMAGE
-
-IMAGE
 
 ### Custom
 
