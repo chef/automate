@@ -173,6 +173,33 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 Create a data feed using a storage integration.
 
+### Minio
+
+To add a Minio data feed:
+
+- Select **New Integration**.
+- Select the **Minio** icon under Storage Integration.
+- In the form, enter a unique **Data Feed Name**.
+- Enter a Data Feed **Endpoint**, including any specific port details.
+- Enter a **Bucket Name**, **Access Key** and the **Secret Key** of the instance.
+- Select **Test Connection** to start validating the connection details.
+- Once the test is successful, select **Save** to save the Data Feed configuration.
+
+{{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using minio Integration">}}
+
+#### Edit a Minio Data Feed Instance
+
+To edit a Data Feed instance of Minio Integration:
+
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name**, **End Point** or the **Bucket**.
+1. Select **Test Data Feed** button to test the End point.
+1. Select **Save** to save your changes.
+
+{{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
+
+You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
+
 ## Enable/Disable a Data Feed Instance
 
 Chef Automate suggests to send node data to only 5 feeds at a time. This keeps your backend server smooth and with less cluster. Now, if you have more than 5 data feeds but you only want to send node data to 5 feeds, you can simply disable the remaining feeds.
