@@ -16,65 +16,56 @@ gh_repo = "automate"
 
 ## What is High Availability (HA)?
 
-High availability (HA) refers to a system (such as a network, a server array, or cluster) that offers a high level of operational performance and quality over a relevant time. They are designed to avoid loss of service by reducing or managing failures and minimizing planned downtime.
+High availability (HA) refers to a system or application (such as a network, a server array, or cluster) that offers a high level of operational performance and quality over a relevant time with maximum potential uptime and accessibility for the content stored on it. 
 
-*This para required* \-- ? "Availability" includes two periods of time: how much time a service is accessible and how much time the system needs
-to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods.
+While a more basic system will be adequate to serve content to a low or medium number of users, it may include a single point of failure. This means that if one server goes down, whether due to traffic overload or any number of other issues, the entire site or application could become unavailable.
 
-Typically, availability as a whole is expressed as a percentage of uptime defined by service level agreements (SLAs). A score of 100
-percent characterizes a system that never fails.
+Thus HA are designed to avoid loss of service by reducing or managing failures and minimizing unscheduled downtime (when your system (or network) is not available for use, or is unresponsive) that happens due to power outages or failure of a component.
 
-## What are HA clusters?
+*This para required* \-- ? "Availability" includes two periods of time: how much time a service is accessible and how much time the system needs to respond to user requests. When it comes to measuring availability, several factors are salient. These include recovery time and both scheduled and unscheduled maintenance periods. Typically, availability as a whole is expressed as a percentage of uptime defined by service level agreements (SLAs). A score of 100 percent characterizes a system that never fails.
 
-HA clusters are servers grouped to operate as a single, unified system. They are called failover clusters as they share the same storage but use
-a different network and can run the same workloads of the primary system they support. HA clusters are tested regularly to confirm nodes are always in operational mode.
+## What are High Availability (HA) clusters?
 
-If a server in the cluster fails, another server or node can take over immediately to help ensure the application or service supported by the
-cluster remains operational. HA clusters help ensure there is no single point of failure for critical IT and reduces or eliminates downtime.
+A cluster is a group of inter-connected computers that work together to perform intensive tasks.  In a cluster, each computer is referred to as a "node".
 
-# Chef Automate High Availability (HA) 
+HA clusters are servers grouped to operate as a single, unified system. They are also called as failover clusters as they share the same storage but use a different network and can run the same workloads of the primary system they support. HA clusters are tested regularly to confirm nodes are always in operational mode.
 
-## What is Chef Automate Cluster?
+If a server in the cluster fails, another server or node can take over immediately to help ensure the application or service supported by the cluster remains operational. HA clusters help ensure there is no single point of failure for critical IT and reduces or eliminates downtime.
 
-Chef Automate Cluster is provided as a professional services solution offering installation, high availability, system uptime/ scale-out
-performance, maintenance, and disaster recovery capabilities. It includes the Chef Server API to simplify the Chef Infrastructure.
+## What Chef Automate High Availability (HA) Brings to you?
 
-These clusters are designed for those customers who have more than 10,000 chef client-nodes. You can configure it in the private data
-center or preferred cloud.
+The Chef Automate HA equates to reliability with the goal to increase functionality, efficiency, and productivity. It is built on the following three characteristics, **Redundancy**, **Monitoring**, and **Failover**. The Chef Automate HA architecture is an approach of defining the components, modules or implementation of services of a system which ensures optimal operational performance, even at times of high loads.
 
-The Chef Automate clusters comprise **four** different servers with HA mode, which are as follows:
-
-1.  Chef-automate
-2.  Chef-server
-3.  Elasticsearch
-4.  PostgreSQL
-
-## What Chef Automate HA Brings to you?
-
-The following architecture diagram shows the components involved in the Chef Automate HA.
-
-![Graphical user interface, application Description automatically
-generated](media/image1.png){width="4.730109361329834in"
-height="2.495544619422572in"}
+The following Chef Automate HA architecture diagram shows the components involved in the Chef Automate HA that works on **Leader-Follower** strategy.
 
 ![High Availability Architecture](/images/automate/HA_Architecture.png)
 
-Load balancer aids in identifying possible failure points and thereby helps in reducing downtime. Typically, availability as a whole is
-expressed as a percentage of uptime. A highly available load balancer can achieve optimal operational performance through either a single-node deployment or through a deployment across a cluster. In a single-node deployment, a single load-balancing controller performs all administrative functions, and all analytics data gathering and processing. In a high availability load balancing cluster, additional nodes provide node-level redundancy for the load-balancing controller and maximize performance for CPU-intensive analytics functions.
+The Chef Automate HA architecture involves two different clusters part of the main cluster, which are:
 
-In Chef Automate HA involves two different clusters in the main cluster, which are:
+- Automate Backend Cluster and Nodes
 
--   Automate Backend Cluster
+The backend components connects into the same habitat supervisor cluster. In the habitat supervisor, **postgres** and **elasticsearch** instances runs. A minimum of three nodes is required for **Postgres** and **Elasticsearch** databases, where .one becomes a leader, and others are followers.
 
-The backend components are connected into the same habitat supervisor cluster. In the habitat supervisor, **postgres** and **elasticsearch** instances are running. Chef Automate HA model works on **Leader-Follower** strategy. For **Postgres** and **Elasticsearch** databases, a minimum of three nodes is required. Among these three, one is a leader, and another is a follower.
+- Automate Frontend Cluster and Nodes
 
--   Automate Frontend Cluster
+Chef Automate and Chef Server are considered as frontend nodes and serve as a web UI. These components individually are configured with a load balancer.
 
-Chef Automate and Chef Server are considered as frontend nodes and serve a web UI. These components individually are configured with a load balancer.
+These clusters comprise **four** different servers with HA mode, which are as follows:
 
-**Journalbeat** and **metricbeat** are common for all database instances. **Journalbeat** collects all the services logs while
-**metricbeat** collects system logs and sends them to the **Kibana**. **Kibana** runs in an **elasticsearch** server, and the related metrics
-is viewed from the **Kibana** **Dashboard**.
+1. Chef-automate
+2. Chef-server
+3. Elasticsearch - a open-source search and analytics engine based on Apache Lucene and built with Java. It is a NoSQL database that stores data in an unstructured way.
+4. PostgreSQL - a open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
+
+**JournalBeat** and **MetricBeat** are common for all database instances. **JournalBeat** installed as an agent on the servers, collects all the services logs, and forwards them to Elasticsearch. **MetricBeat** installed on the servers, periodically collects metrics from the operating system and from services running on the server, and sends them to the **Kibana**. 
+
+**Kibana** is a data visualization dashboard software for **Elasticsearch** providing search and data visualization capabilities for data indexed in Elasticsearch. It acts as the user interface for monitoring, managing, and securing an Elastic Stack cluster. The **Kibana** **Dashboard** is a collection of charts, graphs, metrics, searches, and maps that have been collected together onto a single pane. Dashboards provide at-a-glance insights into data from multiple perspectives and enable you to drill down into the details.
+
+## What are Chef Automate Clusters?
+
+The Chef Automate Clusters is a professional services solution offering installation, high availability, system uptime/ scale-out performance, maintenance, and disaster recovery capabilities. 
+
+It includes the Chef Server API to simplify the Chef Infrastructure and built for those customers who have more than 10,000 chef client-nodes. You can configure it in the private data center or preferred cloud.
 
 ## Performance and Scalability of Chef Automate
 
@@ -217,27 +208,27 @@ the nodes in a cluster. For **ElasticSearch** and **postgres-sql**, a minimum o
 
 This section lists the various Chef Automate HA components and its purpose.
 
-### Automate-cluster-ctl 
+### Automate-cluster-ctl
 
 Provides commands such as '*automate-cluster-ctl provision/deploy'*, which is installed via automate-backend-deployment.
 
-### Automate-backend-ctl 
+### Automate-backend-ctl
 
 Aids in connecting the backend (**postgres** and **elasticsearch**) databases using an automate configuration file and **Terraform** without
 any manual intervention.
 
-### Automate-backend-curator 
+### Automate-backend-curator
 
 Elasticsearch curator aids in curating and managing the Elasticsearch indices and snapshots by obtaining the entire actionable list of indices
 (or snapshots) from the cluster. This component is same as the default curator. Its written in a **hab** package to merge application in a hab
 environment.
 
-### Automate-backend-deployment 
+### Automate-backend-deployment
 
 Aids in setting up a workspace for a2ha environment. For example, */hab/a2_deploy_workspace*. It also includes **terraform** code, some
 necessary **scripts**, **inspecs**, **tests**, **Makefile** and so on.
 
-###  Automate-backend-elasticsearch 
+###  Automate-backend-elasticsearch
 
 Includes the **elasticsearch** configuration and builds the **elasticsearch** package. It is installed in the backend nodes.
 
@@ -246,31 +237,31 @@ Includes the **elasticsearch** configuration and builds the **elasticsearch** pa
 Provides a sidecar service for **automate-backend-elasticsearch** that reads users credentials and passwords of the **elasticsearch** binding
 and applies it to Elasticsearch using the **odfe** tooling.
 
-### Automate-backend-haproxy 
+### Automate-backend-haproxy
 
 Aids in sending a request to the leader node and is placed on **postgres** cluster.
 
-### Automate-backend-kibana 
+### Automate-backend-kibana
 
 Aids in viewing logs at a central place. The **Kibana** **Dashboard** displays the **postgres** and **elasticsearch** nodes system metrics,
 and services logs.
 
-### Automate-backend-journalbeat 
+### Automate-backend-journalbeat
 
 Aids in collecting **journalctl** logs like all the service logs. It is placed on all **postgres** and **elasticsearch** nodes. It collects and
 sends the log information to **elasticsearch** and the **Kibana** **Dashboard** displays the respective log information..
 
-### Automate-backend-metricbeat 
+### Automate-backend-metricbeat
 
 This component is placed on all **postgres** and **elasticsearch** nodes. It collects all related metrics and sends them to
 **elasticsearch.** The **Kibana** **Dashboard** displays the respective log information.
 
-### Automate-backend-pgleaderchk 
+### Automate-backend-pgleaderchk
 
 This component is used in a proxy health check to determine where to route SQL requests. A **golang** service that checks the local
 **PostgreSQL** instance to view if it\'s a *Leader*.
 
-### Automate-backend-postgresql 
+### Automate-backend-postgresql
 
 This component is a wrapper package of *core/postgresql11* for Chef Automate that provides a backend **HA PostgreSQL**.
 
@@ -287,11 +278,11 @@ Currently, Chef Automate HA supports two types of deployment, which are
 
 2.  Bare Infrastructure Deployment (existing_node) 
 
-### AWS Deployment 
+### AWS Deployment
 
 In AWS deployment, the entire a2ha infrastructure is created into the AWS cloud. If you choose AWS as a reference architecture, there is a standard **terraform** script that takes care of AWS deployment. This deployment terraform script first sets up all the prerequisites like creating a VPC, EC2, Load Balancer, Security Groups. After that, configuration and installation takes place like installing automate into the automate instances, installing chef server in all chef-server instances, installing and configuring **postgresql** into the **postres** instances, and lastly, configuring and installing **elasticsearch** into **elasticsearch** instances. There are many other installation and configurations happens during deployment like installing a habitat and creation of a supervisor network.
 
-### Bare Infrastructure Deployment / On premises (existing_node) 
+### Bare Infrastructure Deployment / On premises (existing_node)
 
 Some customers already have basic network infrastructure with VMs, network, load balancer in their environment. Sometimes it can be on-premises or in the cloud. Some organizations don't want to provide access to create items like VMs and in such cases IPs of their instances are used.
 
@@ -305,3 +296,6 @@ Balancer. If you don't let terraform create them, or the customer have already c
 ## Creation and details
 
 # Topology (Details on components- introduction and details around that)
+
+
+Load balancer aids in identifying possible failure points and thereby helps in reducing downtime. Typically, availability as a whole is expressed as a percentage of uptime. A highly available load balancer can achieve optimal operational performance through either a single-node deployment or through a deployment across a cluster. In a single-node deployment, a single load-balancing controller performs all administrative functions, and all analytics data gathering and processing. In a high availability load balancing cluster, additional nodes provide node-level redundancy for the load-balancing controller and maximize performance for CPU-intensive analytics functions.
