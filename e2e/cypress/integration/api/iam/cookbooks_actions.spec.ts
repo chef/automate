@@ -100,7 +100,7 @@ describe('Cookbooks list', () => {
             });
     });
 
-    it('cookbooks get returns 403 when infraServersOrgsCookbooks list actions is deneyed', () => {
+    it('cookbooks get returns 403 when infraServersOrgsCookbooks list actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersCookbooksListActionToken },
             method: 'GET',
@@ -214,7 +214,7 @@ describe('Cookbooks get', () => {
             });
     });
 
-    it('cookbooks get returns 403 when infraServersOrgsCookbooks get actions is deneyed', () => {
+    it('cookbooks get returns 403 when infraServersOrgsCookbooks get actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersCookbooksGetActionToken },
             method: 'GET',
