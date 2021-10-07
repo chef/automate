@@ -63,8 +63,8 @@ To create a data feed select **ServiceNow** from **Settings > Data Feed > New In
       * **Username**: The name you use to sign in to ServiceNow.
       * **Password**: The password you use to sign in to ServiceNow.
    1. **Access Token**:
-      * **Token Type**:
-      * **Token**:
+      * **Token Type**: The prefix for the authorization used to access ServiceNow endpoints.
+      * **Token**: The authorization used to access ServiceNow endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -95,8 +95,8 @@ To create a data feed select **Splunk** from **Settings > Data Feed > New Integr
       * **Username**: The name you use to sign in to Splunk.
       * **Password**: The password you use to sign in to Splunk.
    1. **Access Token**:
-      * **Token Type**:
-      * **Token**:
+      * **Token Type**: The prefix for the authorization used to access Splunk endpoints.
+      * **Token**: The authorization used to access Splunk endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -127,8 +127,8 @@ To create a data feed select **ELK** from **Settings > Data Feed > New Integrati
       * **Username**: The name you use to sign in to ELK.
       * **Password**: The password you use to sign in to ELK.
    1. **Access Token**:
-      * **Token Type**:
-      * **Token**:
+      * **Token Type**: The prefix for the authorization used to access ELK endpoints.
+      * **Token**: The authorization used to access ELK endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -159,8 +159,8 @@ To create a data feed select **Custom** from **Settings > Data Feed > New Integr
       * **Username**: The name you use to sign in to Custom Integration.
       * **Password**: The password you use to sign in to Custom Integration.
    1. **Access Token**:
-      * **Token Type**:
-      * **Token**:
+      * **Token Type**: The prefix for the authorization used to access Custom Integration endpoints.
+      * **Token**: The authorization used to access Custom Integration endpoints.
 
 1. Select **Use Headers** checkbox to add custom headers.
 1. Select **Test Connection** to start validating the connection details.
@@ -187,15 +187,13 @@ Create a data feed using a storage integration.
 
 ### Minio
 
-To add a Minio data feed:
+To create a data feed select **Minio** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **Minio** icon under Storage Integration.
-* In the form, enter a unique **Data Feed Name**.
-* Enter a Data Feed **Endpoint**, including any specific port details.
-* Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
-* Select **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **Endpoint**: The endpoint for the data feed integration, including any specific port details.
+1. Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-minio-integration.png" alt="Data Feed Instance using Minio Integration">}}
 
@@ -203,10 +201,10 @@ To add a Minio data feed:
 
 To edit a Data Feed instance of Minio Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name**, **End Point**, or the **Bucket**.
-* Select the **Test Data Feed** button to test the Endpoint.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name**, **End Point**, or the **Bucket**.
+1. Select the **Test Data Feed** button to test the Endpoint.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Minio Integration">}}
 
@@ -214,15 +212,14 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 ### Amazon S3
 
-To add an S3 data feed:
+To create a data feed select **S3** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **S3** icon under Storage Integration.
-* In the form, enter a unique **Data Feed Name**.
-* Select your **Region** from the drop-down list.
-* Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
-* Select **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **URL**: The endpoint for the data feed integration, including any specific port details.
+1. Select your **Region** from the drop-down list.
+1. Enter a **Bucket Name**, **Access Key**, and the **Secret Key** of the instance.
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-s3-integration.png" alt="Data Feed Instance using S3 Integration">}}
 
@@ -230,10 +227,10 @@ To add an S3 data feed:
 
 To edit a Data Feed instance of S3 Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name**, **Region** or the **Bucket**.
-* Select the **Test Data Feed** button to test the Endpoint.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name**, **Region** or the **Bucket**.
+1. Select the **Test Data Feed** button to test the Endpoint.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-s3-integration.png" alt="Details of Data Feed Instance using S3 Integration">}}
 
@@ -241,7 +238,7 @@ You can also **Enable**, **Disable**, and **Delete** the instance from the detai
 
 ## Enable/Disable a Data Feed Instance
 
-Chef Automate suggests sending node data to only five feeds at a time. This keeps your backend server smooth and with fewer clusters. If you have more than 5 data feeds but only want to send node data to 5 feeds, you can simply disable the remaining feeds.
+Chef Automate lets you temporarily disable the data feed. It can be helpful if the data feed is going under maintenance or you don't want to send the node data to a data feed.
 
 The data feed instances are by default enabled when created. To disable a feed:
 
@@ -263,13 +260,15 @@ To enable a disabled data feed:
 The **Enable** option gets active only if the data feed is disabled previously.
 {{< /note >}}
 
+{{< warning >}} We suggestion no more than five feed, depending on your fleet size. Please check the reference matrix on recommended feed counts. {{< /warning >}}
+
 ## Delete a Data Feed Instance
 
 To delete an individual instance:
 
-* Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
-* Select **Delete**.
-* Select **Delete Data Feed** to confirm the action.
+1. Select the ellipses icon {{< fontawesome class="fas fa-ellipsis-h" >}}.
+1. Select **Delete**.
+1. Select **Delete Data Feed** to confirm the action.
 
 {{< figure src="/images/automate/delete-the-data-feed-instance.png" alt="Delete the Data Feed Instance">}}
 
