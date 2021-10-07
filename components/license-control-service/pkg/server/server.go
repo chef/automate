@@ -184,6 +184,17 @@ func (s *LicenseControlServer) Telemetry(ctx context.Context, req *lc.TelemetryR
 	return &lc.TelemetryResponse{TelemetryEnabled: s.TelemetryEnabled, TelemetryUrl: s.TelemetryURL}, nil
 }
 
+//GetDeploymentID fetches the deployment id from license control service
+func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.DeploymentIDRequest) (*lc.DeploymentIDResponse, error) {
+	deployment, err := s.storage.GetDeployment(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &lc.DeploymentIDResponse{
+		DeploymentId: deployment.ID,
+	}, nil
+}
+
 func (s *LicenseControlServer) persistLicenseToken(ctx context.Context, licenseToken string) error {
 	span, ctx := tracing.StartSpanFromContext(ctx, "persist_license_token")
 	defer span.Finish()
