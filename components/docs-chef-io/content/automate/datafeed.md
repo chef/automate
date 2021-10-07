@@ -82,7 +82,7 @@ To edit a Data Feed instance of ServiceNow Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-servicenow-integration.png" alt="Details of Data Feed Instance using ServiceNow Integration">}}
 
-You can also [**Enable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), **Disable** and **Delete** the instance from the buttons provided on the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ### Splunk
 
