@@ -788,6 +788,21 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 
 func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filter) ([]*manager.ManagerNode, error) {
 	subs, excludedSubs := handleSubscriptionFilters(filters)
+	if len(subs) > 0 {
+		return subs, nil
+	}
+	subsList, err := creds.ListSubscriptions(ctx)
+	if err != nil {
+		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
+	}
+	if len(excludedSubs) == 0 {
+		return subsList, nil
+	}
+	return removeExcludedSubsFromList(subsList, excludedSubs), nil
+}
+
+func (creds *Creds) GetSubscriptionsForApi(ctx context.Context, filters []*common.Filter) ([]*manager.ManagerNode, error) {
+	subs, excludedSubs := handleSubscriptionFilters(filters)
 	includeTags, excludeTags := handleTagFilters(filters)
 
 	if len(subs) > 0 {

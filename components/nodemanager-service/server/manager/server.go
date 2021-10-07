@@ -490,7 +490,7 @@ func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.Nod
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
-	subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
+	subs, err := myazure.GetSubscriptionsForApi(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -828,7 +828,7 @@ func (srv *Server) SearchManagerNodes(ctx context.Context, in *manager.NodeQuery
 		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to get credentials for azure node manager: %s", in.GetNodeManagerId())
 		}
-		subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
+		subs, err := myazure.GetSubscriptionsForApi(ctx, in.GetQuery().GetFilterMap())
 		if err != nil {
 			return nil, fmt.Errorf("Failed to query all nodes for job manager %s: %s", in.GetNodeManagerId(), err)
 		}
