@@ -1,34 +1,36 @@
 <section class="cookbooks">
   <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
   <app-empty-state data-cy="empty-state-wrapper" *ngIf="authFailure" moduleTitle="cookbooks" (resetKeyRedirection)="resetKeyTabRedirection($event)"></app-empty-state>
-  <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
-    <div class="empty-section" *ngIf="!cookbooks.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p>No cookbooks available</p>
-    </div>
-    <div id="cookbooks-table-container" *ngIf="cookbooks.length" data-cy="cookbooks-table-container">
-      <chef-table>
-        <chef-thead>
-          <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Name</chef-th>
-            <chef-th class="no_border_th">Cookbook Version</chef-th>
-            <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th"></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <chef-tr *ngFor="let cookbook of cookbooks">
-            <chef-td>
-              <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
-            </chef-td>
-            <chef-td>{{ cookbook.version }}</chef-td>
-            <chef-td></chef-td>
-            <chef-td></chef-td>
-            <chef-td></chef-td>
-          </chef-tr>
-        </chef-tbody>
-      </chef-table>
-    </div>
-  </ng-container>
+  <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks', 'get', [serverId, orgId]]">
+    <ng-container  *ngIf="!cookbooksListLoading && !authFailure">
+      <div class="empty-section" *ngIf="!cookbooks.length">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p>No cookbooks available</p>
+      </div>
+      <div id="cookbooks-table-container" *ngIf="cookbooks.length" data-cy="cookbooks-table-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr class="no_border_tr">
+              <chef-th class="no_border_th">Name</chef-th>
+              <chef-th class="no_border_th">Cookbook Version</chef-th>
+              <chef-th class="no_border_th"></chef-th>
+              <chef-th class="no_border_th"></chef-th>
+              <chef-th class="no_border_th"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let cookbook of cookbooks">
+              <chef-td>
+                <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
+              </chef-td>
+              <chef-td>{{ cookbook.version }}</chef-td>
+              <chef-td></chef-td>
+              <chef-td></chef-td>
+              <chef-td></chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+    </ng-container>
+  </app-authorized>
 </section>
