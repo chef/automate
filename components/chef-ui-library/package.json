@@ -35,6 +35,7 @@
     "redux": "^4.0.4",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
+    "set-value": "^4.1.0",
     "tar": "^4.4.15"
   },
   "devDependencies": {
