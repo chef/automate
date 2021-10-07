@@ -750,6 +750,16 @@ func filterIncludeTags(includeTags map[string][]string, subsList []*manager.Mana
 	if len(includeTags) > 0 {
 		var filteredsubsList = []*manager.ManagerNode{}
 		for _, val := range subsList {
+			if sArray, ok := includeTags["name"]; ok {
+				for _, v := range sArray {
+					if strings.Contains(
+						strings.ToLower(val.Name),
+						strings.ToLower(v),
+					) {
+						filteredsubsList = append(filteredsubsList, val)
+					}
+				}
+			}
 			for _, v := range val.Tags {
 				if _, ok := includeTags[v.Key]; ok {
 					if contains(includeTags[v.Key], v.Value) {
@@ -767,6 +777,13 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 	if len(excludeTags) > 0 {
 		var filteredsubsList = []*manager.ManagerNode{}
 		for _, val := range subsList {
+			if sArray, ok := excludeTags["name"]; ok {
+				for _, v := range sArray {
+					if val.Name != v {
+						filteredsubsList = append(filteredsubsList, val)
+					}
+				}
+			}
 			if len(val.Tags) > 0 {
 				for _, v := range val.Tags {
 					if _, ok := excludeTags[v.Key]; ok {
@@ -812,13 +829,17 @@ func (creds *Creds) GetSubscriptionsForApi(ctx context.Context, filters []*commo
 	if err != nil {
 		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
 	}
+	logrus.Println("::::::includeTags", includeTags, subsList, filters)
 	filteredsubsList := filterIncludeTags(includeTags, subsList)
 	filteredsubsList = UniqueManager(filteredsubsList)
+	logrus.Println("::::::UniqueManager", filteredsubsList)
 	if len(includeTags) > 0 {
 		filteredsubsList = filterExcludeTags(excludeTags, filteredsubsList)
 	} else {
 		filteredsubsList = filterExcludeTags(excludeTags, subsList)
 	}
+
+	logrus.Println("::::::exclude", filteredsubsList)
 
 	if len(excludedSubs) == 0 {
 		return filteredsubsList, nil
