@@ -36,8 +36,8 @@ export class Regex {
     // Allows valid IP Address only (ipv4)
     VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
 
-    // Allow valid versions only Eg: 1.2.3
-    VALID_VERSION: /^\d{1,9}\.\d{1,9}\.\d{1,9}$/,
+    // Allow valid versions only Eg: 1.2.3 or 1.2
+    VALID_VERSION: /^(0|[1-9]\d*)(\.(0|[1-9]\d*)){0,2}$/,
 
     // Allow valid header input for Custom webhook
     VALID_HEADER: /([a-zA-Z]):([a-zA-Z])[^\r\n]/

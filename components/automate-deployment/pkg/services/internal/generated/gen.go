@@ -481,6 +481,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-backend-pgleaderchk",
+      "metadata": null
+    },
+    {
       "name": "chef/automate-backend-postgresql",
       "metadata": null
     },

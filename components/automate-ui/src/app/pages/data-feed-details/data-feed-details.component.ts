@@ -179,7 +179,6 @@ export class DataFeedDetailsComponent implements OnInit, OnDestroy {
   metaDataValue(): Array<KVData> {
     if (this.destination.integration_types === IntegrationTypes.STORAGE ) {
       if (this.destination.services === StorageIntegrationTypes.AMAZON_S3 ) {
-        console.log(this.destination);
         return Array<KVData>(
           {
             key: 'bucket', value: this.updateForm.controls['bucket'].value.trim()

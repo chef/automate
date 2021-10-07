@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -117,6 +118,22 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 	cfg, err := dc.LoadUserOverrideConfigFile(args[0])
 	if err != nil {
 		return status.Annotate(err, status.ConfigError)
+	}
+	/*
+		incase of a2ha mode of deployment, config file will be copied to /hab/a2_deploy_workspace/configs/automate.toml file
+		then automate cluster ctl deploy will patch the config to automate
+	*/
+	if isA2HARBFileExist() {
+		input, err := ioutil.ReadFile(args[0])
+		if err != nil {
+			return nil
+		}
+		err = ioutil.WriteFile(AUTOMATE_HA_AUTOMATE_CONFIG_FILE, input, 0644)
+		if err != nil {
+			writer.Printf("error in patching automate config to automate HA")
+			return err
+		}
+		return executeDeployment()
 	}
 
 	if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {

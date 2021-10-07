@@ -70,11 +70,11 @@
       </app-edit-infra-node-attribute-modal>
 
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <chef-loading-spinner class="top-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
+        <chef-loading-spinner class="full-screen-spinner" *ngIf="nodeDetailsLoading" size="50"></chef-loading-spinner>
         <div class="details-tab" *ngIf="!nodeDetailsLoading">
           <div class="spinner">
-            <chef-loading-spinner *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
-            <chef-loading-spinner *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner class="full-screen-spinner" *ngIf="nodeDetailsLoading" size="50" fixed></chef-loading-spinner>
+            <chef-loading-spinner class="full-screen-spinner" *ngIf="updatingTags" size="50" fixed></chef-loading-spinner>
           </div>
           <ng-container *ngIf="!nodeDetailsLoading">
             <div class="node-details-section">
