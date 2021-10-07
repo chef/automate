@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"time"
 
+	reportmanager "github.com/chef/automate/components/report-manager-service"
 	"github.com/chef/automate/components/report-manager-service/config"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,6 +59,13 @@ func initConfig() error {
 		logrus.Error(logrus.ErrorLevel)
 	}
 
+	if conf.Service.Host == "" {
+		conf.Service.Host = "127.0.0.1"
+	}
+	if conf.Service.Port == 0 {
+		conf.Service.Port = 10152
+	}
+
 	return nil
 }
 
@@ -71,9 +77,6 @@ func init() {
 
 func serve(*cobra.Command, []string) error {
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	if err := initConfig(); err != nil {
 		return errors.Wrap(err, "failed to load config")
 	}
@@ -81,38 +84,16 @@ func serve(*cobra.Command, []string) error {
 	//Wait till report-manager-minio-gateway is up and running
 	time.Sleep(30 * time.Second)
 
-	endpoint := "127.0.0.1:10197"
-	accessKeyID := "minioadmin"
-	secretAccessKey := "minioadmin"
-	useSSL := false
-
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
-	})
+	conf.FixupRelativeTLSPaths(cfgFile)
+	serviceCerts, err := conf.ReadCerts()
 	if err != nil {
-		fmt.Println("Error in establishing a connection to minio", err)
-	} else {
-		fmt.Println("Minio connection established")
+		return errors.Wrap(err, "Could not read certs")
 	}
+	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	// temperory code to print the log
-
-	//TODO: Remove the below loop
-	for {
-		fmt.Println("Printing from Report Manager", conf.Service.Message)
-		time.Sleep(5 * time.Second)
-
-		//Test Minio setup
-		buckets, err := minioClient.ListBuckets(ctx)
-		if err != nil {
-			fmt.Println("Error in getting the buckets list:", err)
-		}
-
-		fmt.Println("Buckets Count:", len(buckets))
-		for _, bucket := range buckets {
-			fmt.Println("Buckets: ", bucket.Name)
-		}
-
+	err = reportmanager.Serve(conf, connFactory)
+	if err != nil {
+		return errors.Wrap(err, "Unable to serve the backend")
 	}
+	return nil
 }
