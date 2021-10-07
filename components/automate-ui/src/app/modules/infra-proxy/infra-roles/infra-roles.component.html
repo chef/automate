@@ -26,6 +26,7 @@
         (searchButtonClick)="searchRoles($event)"
         placeHolder="roles by name...">
       </app-infra-search-bar>
+      <app-paginator></app-paginator>
       <chef-button
         id="role-create"
         primary
@@ -85,5 +86,6 @@
       [page]="currentPage"
       (pageChanged)="onPageChange($event)">
     </app-page-picker>
+
   </ng-container>
 </section>

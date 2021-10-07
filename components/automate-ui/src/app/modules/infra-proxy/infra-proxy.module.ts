@@ -54,13 +54,15 @@ import { ResetClientKeyComponent } from './reset-client-key/reset-client-key.com
 import { ResetNodeKeyComponent } from './reset-node-key/reset-node-key.component';
 import { RevisionIdComponent } from './revision-id/revision-id.component';
 import { UpdateNodeTagModalComponent } from './update-node-tag-modal/update-node-tag-modal.component';
-import { TreeTableModule } from './tree-table/tree-table.module';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatInputModule } from '@angular/material/input';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { SelectBoxModule } from './select-box/src/public_api';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTabsModule } from '@angular/material/tabs';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PaginatorComponent } from './paginator/paginator.component';
+import { SelectBoxModule } from './select-box/src/public_api';
+import { TreeTableModule } from './tree-table/tree-table.module';
 
 @NgModule({
   declarations: [
@@ -112,7 +114,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ResetClientKeyComponent,
     ResetNodeKeyComponent,
     RevisionIdComponent,
-    UpdateNodeTagModalComponent
+    UpdateNodeTagModalComponent,
+    PaginatorComponent
   ],
   imports: [
     CommonModule,
@@ -128,7 +131,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatPaginatorModule,
     NgSelectModule
+    
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
