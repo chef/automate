@@ -344,7 +344,7 @@ func (backend *ES2Backend) GetReport(reportId string, filters map[string][]strin
 	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
 	// query builder. we need to do this because this variation of filter query provides this func with deeper
 	// information about the report being retrieved.
-	queryInfo.filtQuery = backend.getFiltersQueryForDeepReport(reportId, filters)
+	queryInfo.filtQuery = getFiltersQueryForDeepReport(reportId, filters)
 
 	logrus.Debugf("GetReport will retrieve report %s based on filters %+v", reportId, filters)
 
@@ -562,16 +562,16 @@ func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[
 	var report *reportingapi.NodeHeaderInfo
 	depth, err := backend.NewDepth(filters, false)
 	if err != nil {
-		return report, errors.Wrap(err, "GetNodeReport unable to get depth level for report")
+		return report, errors.Wrap(err, "GetNodeInfoFromReportID unable to get depth level for report")
 	}
 	queryInfo := depth.getQueryInfo()
 
 	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
 	// query builder. we need to do this because this variation of filter query provides this func with deeper
 	// information about the report being retrieved.
-	queryInfo.filtQuery = backend.getFiltersQueryForDeepReport(reportId, filters)
+	queryInfo.filtQuery = getFiltersQueryForDeepReport(reportId, filters)
 
-	logrus.Debugf("GetNodeReport will retrieve report %s based on filters %+v", reportId, filters)
+	logrus.Debugf("GetNodeInfoFromReportID will retrieve report %s based on filters %+v", reportId, filters)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"node_uuid",
@@ -588,7 +588,7 @@ func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[
 	if queryInfo.level != ReportLevel {
 		fsc.Exclude("profiles")
 	}
-	logrus.Debugf("GetNodeReport for reportid=%s, filters=%+v", reportId, filters)
+	logrus.Debugf("GetNodeInfoFromReportID for reportid=%s, filters=%+v", reportId, filters)
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
@@ -597,9 +597,9 @@ func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return report, errors.Wrap(err, "GetNodeReport unable to get Source")
+		return report, errors.Wrap(err, "GetNodeInfoFromReportID unable to get Source")
 	}
-	LogQueryPartMin(queryInfo.esIndex, source, "GetNodeReport query searchSource")
+	LogQueryPartMin(queryInfo.esIndex, source, "GetNodeInfoFromReportID query searchSource")
 
 	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
@@ -608,14 +608,14 @@ func (backend *ES2Backend) GetNodeInfoFromReportID(reportId string, filters map[
 			"took",
 			"hits.total",
 			"hits.hits._source",
-		).
+			"hits.hits.inner_hits").
 		Do(context.Background())
 
 	if err != nil {
-		return report, errors.Wrap(err, "GetNodeReport unable to complete search")
+		return report, errors.Wrap(err, "GetNodeInfoFromReportID unable to complete search")
 	}
 
-	logrus.Debugf("GetNodeReport got %d reports in %d milliseconds\n", searchResult.TotalHits(),
+	logrus.Debugf("GetNodeInfoFromReportID got %d reports in %d milliseconds\n", searchResult.TotalHits(),
 		searchResult.TookInMillis)
 
 	// we should only receive one value
@@ -638,7 +638,7 @@ func populateNodeReport(searchResult *elastic.SearchResult, backend *ES2Backend,
 			}
 			err := json.Unmarshal(*hit.Source, &esInSpecReport)
 			if err != nil {
-				logrus.Errorf("GetNodeReport unmarshal error: %s", err.Error())
+				logrus.Errorf("GetNodeInfoFromReportID unmarshal error: %s", err.Error())
 				return report, errors.New("cannot unmarshal the search hits")
 			}
 			var esInspecProfiles []ESInSpecReportProfile //`json:"profiles"`
@@ -651,7 +651,7 @@ func populateNodeReport(searchResult *elastic.SearchResult, backend *ES2Backend,
 			case ProfileLevel, ControlLevel:
 				esInspecProfiles, status, err = getDeepInspecProfiles(hit, queryInfo)
 				if err != nil {
-					logrus.Errorf("GetNodeReport time error: %s", err.Error())
+					logrus.Errorf("GetNodeInfoFromReportID time error: %s", err.Error())
 				}
 			}
 			esInSpecReport.Status = status
@@ -660,8 +660,8 @@ func populateNodeReport(searchResult *elastic.SearchResult, backend *ES2Backend,
 				logrus.Debugf("Determine profile: %s", esInSpecReportProfileMin.Name)
 				esInSpecProfile, err := backend.GetProfile(esInSpecReportProfileMin.SHA256)
 				if err != nil {
-					logrus.Errorf("GetNodeReport - Could not get profile '%s' error: %s", esInSpecReportProfileMin.SHA256, err.Error())
-					logrus.Debug("GetNodeReport - Making the most from the profile information in esInSpecReportProfileMin")
+					logrus.Errorf("GetNodeInfoFromReportID - Could not get profile '%s' error: %s", esInSpecReportProfileMin.SHA256, err.Error())
+					logrus.Debug("GetNodeInfoFromReportID - Making the most from the profile information in esInSpecReportProfileMin")
 					esInSpecProfile.Name = esInSpecReportProfileMin.Name
 				}
 
@@ -1493,7 +1493,7 @@ func containsWildcardChar(value string) bool {
 //			reportId - the id of the report we are querying for.
 //			filters - is a map of filters that serve as the source for generated es query filters
 //    return *elastic.BoolQuery
-func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
+func getFiltersQueryForDeepReport(reportId string,
 	filters map[string][]string) *elastic.BoolQuery {
 
 	utils.DeDupFilters(filters)
