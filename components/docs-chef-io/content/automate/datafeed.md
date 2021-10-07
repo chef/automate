@@ -54,17 +54,20 @@ Create a data feed using a webhook integration.
 
 ### ServiceNow
 
-To add a ServiceNow data feed:
+To create a data feed select **ServiceNow** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **ServiceNow** icon under Webhook Integration.
-* In the form, enter a unique **Data Feed name**.
-* Enter a **URL** for the Data Feed endpoint, including any specific port details.
-* Select an **authentication**  method:
-  *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
-  * For **Access Token**, set the **Token Type** and **Token** for your integration.
-* Select **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **URL**: The endpoint for the data feed integration, including any specific port details.
+1. **Authentication**: Select an authentication method.
+   1. **Username and Password**
+      * **Username**: The name you use to sign in to ServiceNow.
+      * **Password**: The password you use to sign in to ServiceNow.
+   1. **Access Token**:
+      * **Token Type**:
+      * **Token**:
+
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-servicenow-integration.png" alt="Data Feed Instance using ServiceNow Integration">}}
 
@@ -72,10 +75,10 @@ To add a ServiceNow data feed:
 
 To edit a Data Feed instance of ServiceNow Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name** or **URL**.
-* Select the **Test Data Feed** button to test the URL.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name** or **URL**.
+1. Select the **Test Data Feed** button to test the URL.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-servicenow-integration.png" alt="Details of Data Feed Instance using ServiceNow Integration">}}
 
@@ -83,17 +86,20 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 ### Splunk
 
-To add a Splunk data feed:
+To create a data feed select **Splunk** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **Splunk** icon under Webhook Integration.
-* In the form, enter a unique **Data Feed name**.
-* Enter a **URL** for the Data Feed endpoint, including any specific port details.
-* Select an **authentication** from a couple of options in the drop-down.
-  *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
-  * For **Access Token**, set the **Token Type** and **Token** for your integration.
-* Select **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **URL**: The endpoint for the data feed integration, including any specific port details.
+1. **Authentication**: Select an authentication method.
+   1. **Username and Password**
+      * **Username**: The name you use to sign in to Splunk.
+      * **Password**: The password you use to sign in to Splunk.
+   1. **Access Token**:
+      * **Token Type**:
+      * **Token**:
+
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-splunk-integration.png" alt="Data Feed Instance using Splunk Integration">}}
 
@@ -101,10 +107,10 @@ To add a Splunk data feed:
 
 To edit a Data Feed instance of Splunk Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name** or **URL**.
-* Select the **Test Data Feed** button to test the URL.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name** or **URL**.
+1. Select the **Test Data Feed** button to test the URL.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-splunk-integration.png" alt="Details of Data Feed Instance using Splunk Integration">}}
 
@@ -112,17 +118,20 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 ### ELK
 
-To add a Data Feed instance in Chef Automate using ELK integration:
+To create a data feed select **ELK** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **ELK** icon under Webhook Integration.
-* In the form, enter a unique **Data Feed name**.
-* Enter a **URL** for the Data Feed endpoint, including any specific port details.
-* Select an **authentication** from a couple of options in the drop-down.
-  *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
-  * For **Access Token**, set the **Token Type** and **Token** for your integration.
-* Select the **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **URL**: The endpoint for the data feed integration, including any specific port details.
+1. **Authentication**: Select an authentication method.
+   1. **Username and Password**
+      * **Username**: The name you use to sign in to ELK.
+      * **Password**: The password you use to sign in to ELK.
+   1. **Access Token**:
+      * **Token Type**:
+      * **Token**:
+
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-elk-integration.png" alt="Data Feed Instance using ELK Integration">}}
 
@@ -130,10 +139,10 @@ To add a Data Feed instance in Chef Automate using ELK integration:
 
 To edit a Data Feed instance of ELK Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name** or **URL**.
-* Select the **Test Data Feed** button to test the URL.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name** or **URL**.
+1. Select the **Test Data Feed** button to test the URL.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-elk-integration.png" alt="Details of Data Feed Instance using ELK Integration">}}
 
@@ -141,17 +150,21 @@ You can also **Enable**, **Disable** and **Delete** the instance from the button
 
 ### Custom
 
-To add a Data Feed instance in Chef Automate using Custom integration:
+To create a data feed select **Custom** from **Settings > Data Feed > New Integration**.
 
-* Select **New Integration**.
-* Select the **Custom** icon under Webhook Integration.
-* In the form, enter a unique **Data Feed name**.
-* Enter a **URL** for the Data Feed endpoint, including any specific port details.
-* Select an **authentication** from a couple of options in the drop-down.
-  *  For **Username and Password** authentication, enter the **Username** and **Password** for your integration.
-  * For **Access Token**, set the **Token Type** and **Token** for your integration.
-* Select **Test Connection** to start validating the connection details.
-* Once the test is successful, select **Save** to save the Data Feed configuration.
+1. **Data Feed Name**: A unique name for this notification.
+1. **URL**: The endpoint for the data feed integration, including any specific port details.
+1. **Authentication**: Select an authentication method.
+   1. **Username and Password**
+      * **Username**: The name you use to sign in to Custom Integration.
+      * **Password**: The password you use to sign in to Custom Integration.
+   1. **Access Token**:
+      * **Token Type**:
+      * **Token**:
+
+1. Select **Use Headers** checkbox to add custom headers.
+1. Select **Test Connection** to start validating the connection details.
+1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
 {{< figure src="/images/automate/data-feed-instance-using-custom-integration.png" alt="Data Feed Instance using Custom Integration">}}
 
@@ -159,10 +172,10 @@ To add a Data Feed instance in Chef Automate using Custom integration:
 
 To edit a Data Feed instance of Custom Integration:
 
-* Select the data feed instance name to open its detail page.
-* Edit the Data Feed **Name** or **URL**.
-* Select the **Test Data Feed** button to test the URL.
-* Select **Save** to save your changes.
+1. Select the data feed instance name to open its detail page.
+1. Edit the Data Feed **Name** or **URL**.
+1. Select the **Test Data Feed** button to test the URL.
+1. Select **Save** to save your changes.
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-custom-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
 
