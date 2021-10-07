@@ -88,13 +88,13 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 }
 
 func (t *TelemetryServer) getDeploymentID(ctx context.Context) (string, error) {
-	deployIDResponse, err := t.deploy_client.DeployID(ctx, &deployment_service.DeployIDRequest{})
+	deployIDResponse, err := t.client.GetDeploymentID(ctx, &license_control.DeploymentIDRequest{})
 	if err != nil {
 		if isServiceDownError(err) {
 			log.WithFields(log.Fields{
 				"err":  err,
 				"func": "getDeploymentID",
-			}).Error("connecting to the deployment client")
+			}).Error("connecting to the license client")
 			return "", nil
 		}
 		return "", err
