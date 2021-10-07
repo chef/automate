@@ -1,6 +1,6 @@
 *IAM Action* lists the associated action or actions required to access that page in the browser. 
 Use `*` in these actions to give broad permissions to perform all associated actions such as get, list, create, delete, etc.
-Specify the action to restrict user access to the specific action.
+Specify the action to restrict user access to the specific action
 
 ### How to assign IAM Actions to user/teams/api-token
 
