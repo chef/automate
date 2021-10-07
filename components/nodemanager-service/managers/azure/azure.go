@@ -98,7 +98,7 @@ func (creds *Creds) ListSubscriptions(ctx context.Context) ([]*manager.ManagerNo
 			return subs, errors.Wrap(err, "ListSubscriptions unable to list subscriptions")
 		}
 		for _, val := range res.Values() {
-			var tags = []*common.Kv{}
+			tags := []*common.Kv{}
 			for key, value := range val.Tags {
 				tags = append(tags, &common.Kv{Key: key, Value: *value})
 			}
@@ -770,6 +770,7 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 			if len(val.Tags) > 0 {
 				for _, v := range val.Tags {
 					if _, ok := excludeTags[v.Key]; ok {
+						logrus.Println("::::::ex", filteredsubsList, excludeTags[v.Key], v.Value)
 						if !contains(excludeTags[v.Key], v.Value) {
 							filteredsubsList = append(filteredsubsList, val)
 						}
@@ -779,6 +780,7 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 				filteredsubsList = append(filteredsubsList, val)
 			}
 		}
+		logrus.Println("::::::ex", filteredsubsList)
 		return filteredsubsList
 	}
 	return subsList
@@ -796,6 +798,7 @@ func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filt
 		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
 	}
 	filteredsubsList := filterIncludeTags(includeTags, subsList)
+	filteredsubsList = UniqueManager(filteredsubsList)
 	if len(includeTags) > 0 {
 		filteredsubsList = filterExcludeTags(excludeTags, filteredsubsList)
 	} else {
@@ -806,6 +809,18 @@ func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filt
 		return filteredsubsList, nil
 	}
 	return removeExcludedSubsFromList(filteredsubsList, excludedSubs), nil
+}
+
+func UniqueManager(a []*manager.ManagerNode) []*manager.ManagerNode {
+	seen := map[string]bool{}
+	var b []*manager.ManagerNode
+	for _, v := range a {
+		if _, ok := seen[v.Id]; !ok {
+			seen[v.Id] = true
+			b = append(b, v)
+		}
+	}
+	return b
 }
 
 func contains(s []string, e string) bool {
