@@ -405,8 +405,10 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 	switch mgr.Type {
 	case "aws-ec2", "aws-api":
 		return srv.searchAwsFields(ctx, in)
-	case "azure-vm", "azure-api":
+	case "azure-vm":
 		return srv.searchAzureFields(ctx, in)
+	case "azure-api":
+		return srv.searchAzureApiFields(ctx, in)
 	case "gcp-api":
 		return srv.searchGenericNodesFields(ctx, in, in.NodeManagerId)
 	case "automate":
@@ -425,6 +427,21 @@ func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery
 		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	results, err := myazure.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return &manager.Fields{Fields: results}, nil
+}
+
+func (srv *Server) searchAzureApiFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
+	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
+	}
+	if in.Query == nil {
+		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
+	}
+	results, err := myazure.QueryFieldApi(ctx, in.GetQuery().GetFilterMap(), in.Field)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}

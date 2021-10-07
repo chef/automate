@@ -909,6 +909,31 @@ func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map
 	return vmList, nil
 }
 
+// QueryApis returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
+func (creds *Creds) QueryApis(ctx context.Context, filters []*common.Filter) (map[string][]*manager.ManagerNode, error) {
+	var err error
+	vmList := make(map[string][]*manager.ManagerNode, 0)
+	subs := make([]*manager.ManagerNode, 0)
+	for _, filter := range filters {
+		if filter.Key == "subscription_id" {
+			subs = make([]*manager.ManagerNode, 0)
+			for _, subID := range filter.Values {
+				subs = append(subs, &manager.ManagerNode{Id: subID})
+			}
+		}
+	}
+	if len(subs) == 0 {
+		subs, err = creds.GetSubscriptionsForApi(ctx, filters)
+		if err != nil {
+			return vmList, errors.Wrap(err, "QueryVMs unable to list subscriptions")
+		}
+	}
+	for _, v := range subs {
+		vmList[v.Id] = []*manager.ManagerNode{v}
+	}
+	return vmList, nil
+}
+
 // QueryVMState returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
 func (creds *Creds) QueryVMState(ctx context.Context) ([]pgdb.InstanceState, error) {
 	var err error
@@ -1005,6 +1030,83 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 		}
 	}
 
+	return resultArray, nil
+}
+
+func UniqueString(a []string) []string {
+	seen := map[string]bool{}
+	var b []string
+	for _, v := range a {
+		if _, ok := seen[v]; !ok {
+			seen[v] = true
+			b = append(b, v)
+		}
+	}
+	return b
+}
+
+func (creds *Creds) QueryFieldApi(ctx context.Context, filters []*common.Filter, field string) ([]string, error) {
+	var err error
+	resultArray := make([]string, 0)
+	subs := make([]*manager.ManagerNode, 0)
+	for _, filter := range filters {
+		if filter.Key == "subscription_id" {
+			subs = make([]*manager.ManagerNode, 0)
+			for _, subID := range filter.Values {
+				subs = append(subs, &manager.ManagerNode{Id: subID})
+			}
+		}
+	}
+	if len(subs) == 0 {
+		subs, err = creds.ListSubscriptions(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "QueryField unable to list subscriptions")
+		}
+	}
+	switch field {
+	case "regions":
+		resultArray, err = creds.ListLocations(ctx, subs)
+		if err != nil {
+			return nil, errors.Wrap(err, "QueryField unable to list locations")
+		}
+	case "names", "tags:name", "tags:Name":
+		for _, sub := range subs {
+			resultArray = append(resultArray, sub.Name)
+		}
+	case "tags":
+		tags, err := creds.ListTags(ctx, subs)
+		if err != nil {
+			return nil, errors.Wrap(err, "QueryField unable to list tags")
+		}
+		for k := range tags {
+			resultArray = append(resultArray, k)
+		}
+
+		resultArray = append(resultArray, "name")
+	case "subscriptions":
+		for _, sub := range subs {
+			resultArray = append(resultArray, fmt.Sprintf("%s:%s", sub.Name, sub.Id))
+		}
+	default:
+		if strings.HasPrefix(field, "tags:") {
+			logrus.Println("::::::kkey", subs)
+			// tags, err := creds.ListTags(ctx, subs)
+			if err != nil {
+				return nil, errors.Wrap(err, "QueryField unable to list tags")
+			}
+			key := strings.TrimPrefix(field, "tags:")
+			for _, v := range subs {
+				for _, val := range v.Tags {
+					if val.Key == key {
+						resultArray = append(resultArray, val.Value)
+					}
+				}
+			}
+		} else {
+			return resultArray, errorutils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
+		}
+	}
+	resultArray = UniqueString(resultArray)
 	return resultArray, nil
 }
 
