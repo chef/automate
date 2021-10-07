@@ -114,7 +114,7 @@ To edit a Data Feed instance of Splunk Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-splunk-integration.png" alt="Details of Data Feed Instance using Splunk Integration">}}
 
-You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ### ELK
 
@@ -146,7 +146,7 @@ To edit a Data Feed instance of ELK Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-elk-integration.png" alt="Details of Data Feed Instance using ELK Integration">}}
 
-You can also **Enable**, **Disable** and **Delete** the instance from the buttons provided on the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ### Custom
 
@@ -179,7 +179,7 @@ To edit a Data Feed instance of Custom Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-custom-integration.png" alt="Details of Data Feed Instance using Custom Integration">}}
 
-You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ## Storage Integration
 
@@ -208,7 +208,7 @@ To edit a Data Feed instance of Minio Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-minio-integration.png" alt="Details of Data Feed Instance using Minio Integration">}}
 
-You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ### Amazon S3
 
@@ -234,7 +234,7 @@ To edit a Data Feed instance of S3 Integration:
 
 {{< figure src="/images/automate/details-of-data-feed-instance-using-s3-integration.png" alt="Details of Data Feed Instance using S3 Integration">}}
 
-You can also **Enable**, **Disable**, and **Delete** the instance from the details page.
+You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instance" >}}), and [**Delete**]({{< relref "#delete-a-data-feed-instance" >}}) the instance from the buttons provided on the details page.
 
 ## Enable/Disable a Data Feed Instance
 
