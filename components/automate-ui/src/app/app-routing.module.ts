@@ -44,6 +44,7 @@ import { PolicyListComponent } from './modules/policy/list/policy-list.component
 import { PolicyDetailsComponent } from './modules/policy/details/policy-details.component';
 import { PolicyAddMembersComponent } from './modules/policy/add-members/policy-add-members.component';
 import { PolicyFileDetailsComponent } from './modules/infra-proxy/policy-file-details/policy-file-details.component';
+import { PolicyGroupDetailsComponent } from './modules/infra-proxy/policy-group-details/policy-group-details.component';
 import { ProjectDetailsComponent } from './pages/project/details/project-details.component';
 import { ProjectListComponent } from './pages/project/list/project-list.component';
 import { ProjectRulesComponent } from './pages/project/rules/project-rules.component';
@@ -289,6 +290,10 @@ const routes: Routes = [
             {
               path: ':id/organizations/:org-id/policyfiles/:name/revision/:revision',
               component: PolicyFileDetailsComponent
+            },
+            {
+              path: ':id/organizations/:org-id/policyGroups/:name',
+              component: PolicyGroupDetailsComponent
             }
           ]
         }
