@@ -115,6 +115,10 @@ func (srv *Server) ReadNodeHeader(ctx context.Context, in *reporting.Query) (*re
 	formattedFilters := formatFilters(in.Filters)
 	logrus.Debugf("ReadNodeInfo called with filters %+v", formattedFilters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
+	if len(formattedFilters["profile_id"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_id' filter is allowed")
+	}
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
@@ -205,6 +209,10 @@ func (srv *Server) ListControlInfo(ctx context.Context, in *reporting.Query) (*r
 
 	formattedFilters := formatFilters(in.Filters)
 	logrus.Debugf("ListControlInfo called with filters %+v", formattedFilters)
+	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
+	if len(formattedFilters["profile_id"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_id' filter is allowed")
+	}
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
