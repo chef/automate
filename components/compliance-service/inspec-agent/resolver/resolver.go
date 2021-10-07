@@ -168,7 +168,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch credential id:%s %s", m.CredentialId, err.Error())
 	}
-	clientID, clientSecret, tenantID, subscriptionID := managers.GetAzureCreds(secret)
+	clientID, clientSecret, tenantID, _ := managers.GetAzureCreds(secret)
 
 	jobArray := []*types.InspecJob{}
 	for _, group := range nodeCollections {
@@ -195,7 +195,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				AzureClientID:       clientID,
 				AzureClientSecret:   clientSecret,
 				AzureTenantID:       tenantID,
-				AzureSubscriptionID: subscriptionID,
+				AzureSubscriptionID: node.ID,
 			}
 			inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
 			if err != nil {

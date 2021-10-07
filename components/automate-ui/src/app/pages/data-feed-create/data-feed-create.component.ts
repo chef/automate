@@ -182,7 +182,6 @@ export class DataFeedCreateComponent {
   updateHeaderCheckbox(event: boolean): void {
     this.checkEvent.emit(event);
     this.headerChecked = event;
-    this.createForm.controls.headerChecked.setValue(true);
   }
 
   showFieldStorage() {

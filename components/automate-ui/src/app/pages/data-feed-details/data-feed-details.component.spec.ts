@@ -130,7 +130,6 @@ describe('DataFeedDetailsComponent', () => {
           services: 'S3'
         };
         component.destination = destinationValue;
-        console.log(component.destination);
         component.updateForm.controls['bucket'].setValue('s3-bucket');
         component.regionSelected = 'us-east-1';
         expect(component.metaDataValue()[0]['value']).toEqual('s3-bucket');
@@ -147,7 +146,6 @@ describe('DataFeedDetailsComponent', () => {
           services: 'Minio'
         };
         component.destination = destinationValue;
-        console.log(component.destination);
         component.updateForm.controls['bucket'].setValue('s3-bucket');
         component.regionSelected = 'us-east-1';
         expect(component.metaDataValue()[0]['value']).toEqual('s3-bucket');

@@ -57,7 +57,7 @@ describe('InfraNodesComponent', () => {
         }),
         MockComponent({
           selector: 'app-edit-infra-node-attribute-modal',
-          inputs: ['openEvent', 'serverId', 'orgId', 'node', 'jsonText']
+          inputs: ['openEvent', 'serverId', 'orgId', 'node', 'jsonText', 'isGetNode']
         }),
         InfraNodesComponent
       ],
