@@ -91,6 +91,20 @@ func TestPGBackend(t *testing.T) {
 		require.NoError(t, err, "GetLicense")
 		assert.Equal(t, "test-content", license)
 	})
+
+	t.Run("Should insert and return the deployment id", func(t *testing.T) {
+		defer resetDB(t)
+		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")
+		err := backend.Init(context.Background(), keys.NewLicenseParser(keys.BuiltinKeyData))
+		require.NoError(t, err, "Init")
+
+		err = backend.StoreDeployment(context.Background(), "bd5e86a4-78a0-48e8-a7de-45150fbb433e")
+		require.NoError(t, err)
+		deployment, err := backend.GetDeployment(context.Background())
+		require.NoError(t, err)
+		assert.NotNil(t, deployment.ID, "deployment should include an ID")
+		assert.Equal(t, "bd5e86a4-78a0-48e8-a7de-45150fbb433e", deployment.ID)
+	})
 }
 
 func TestFileBackend(t *testing.T) {
