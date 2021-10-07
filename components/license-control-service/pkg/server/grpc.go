@@ -34,7 +34,6 @@ func NewGRPC(ctx context.Context, config *Config) (*grpc.Server, error) {
 	// Create deployment id and save it in DB
 	err = storeDeploymentID(backend)
 	if err != nil {
-		// TODO: ask to return error or not
 		return nil, err
 	}
 	srv := NewLicenseControlServer(ctx, backend, licenseParser, config)
