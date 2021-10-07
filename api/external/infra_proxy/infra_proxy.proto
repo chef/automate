@@ -101,22 +101,22 @@ service InfraProxy {
   rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:list";
   };
   rpc GetCookbookVersions (infra_proxy.request.CookbookVersions) returns (infra_proxy.response.CookbookVersions) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
   };
   rpc GetCookbook (infra_proxy.request.Cookbook) returns (infra_proxy.response.Cookbook) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
   };
   rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsCookbooks:get";
   };
 
   rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
