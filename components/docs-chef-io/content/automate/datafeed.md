@@ -238,7 +238,7 @@ You can also [**Enable/Disable**]({{< relref "#enabledisable-a-data-feed-instanc
 
 ## Enable/Disable a Data Feed Instance
 
-Chef Automate lets you temporarily disable the data feed. It can be helpful if the data feed is going under maintenance or you don't want to send the node data to a data feed.
+Chef Automate lets you temporarily disable the data feed. It can be helpful if the data feed is going under maintenance or you don't want to send the node or compliance data to a data feed.
 
 The data feed instances are by default enabled when created. To disable a feed:
 
