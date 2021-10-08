@@ -96,7 +96,7 @@ To create a data feed select **Splunk** from **Settings > Data Feed > New Integr
       * **Password**: The password you use to sign in to Splunk.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access Splunk endpoints.
-      * **Token**: The authorization used to access Splunk endpoints.
+      * **Token**: The authorization token used to access Splunk endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
