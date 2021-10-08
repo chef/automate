@@ -162,7 +162,7 @@ To create a data feed select **Custom** from **Settings > Data Feed > New Integr
       * **Token Type**: The prefix for the authorization used to access Custom Integration endpoints.
       * **Token**: The authorization used to access Custom Integration endpoints.
 
-1. Select **Use Headers** checkbox to add custom headers.
+1. Select **Use Headers** checkbox to add custom headers (For example: `key:value`).
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
 
