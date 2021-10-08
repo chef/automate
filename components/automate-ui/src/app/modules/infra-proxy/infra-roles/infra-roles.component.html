@@ -26,13 +26,15 @@
         (searchButtonClick)="searchRoles($event)"
         placeHolder="roles by name...">
       </app-infra-search-bar>
-      <chef-button
-        id="role-create"
-        primary
-        (click)="openCreateModal()"
-        data-cy="create-role-button">
-        Create Role
-      </chef-button>
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'post', [serverId, orgId]]">
+        <chef-button
+          id="role-create"
+          primary
+          (click)="openCreateModal()"
+          data-cy="create-role-button">
+          Create Role
+        </chef-button>
+      </app-authorized>
     </div>
     <chef-loading-spinner
       class="full-screen-spinner"
@@ -69,9 +71,11 @@
               <chef-td>{{ role.environments.join(", ") }}</chef-td>
               <chef-td></chef-td>
               <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu">
-                  <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
-                </mat-select>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'delete', [serverId, orgId, role.name]]">
+                  <mat-select panelClass="chef-control-menu">
+                    <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
+                  </mat-select>
+                </app-authorized>
               </chef-td>
             </chef-tr>
           </chef-tbody>
