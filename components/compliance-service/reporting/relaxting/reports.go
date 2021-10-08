@@ -1072,7 +1072,7 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	queryInfo := depth.getQueryInfo()
 
 	// create query for fetching paginated response with the passed filters
-	queryInfo.filtQuery, err = backend.getFilterQuerWithPagination(reportID, filters)
+	queryInfo.filtQuery, err = backend.getFilterQueryWithPagination(reportID, filters)
 	if err != nil {
 		return controlNodeList, nil
 	}
@@ -1797,29 +1797,17 @@ func populateControlElements(searchHits *elastic.SearchHit, profiles []string) (
 
 // createPaginatedControl creates a nested query with pagination and control filter
 func createPaginatedControl(query elastic.Query, filters map[string][]string) (*elastic.NestedQuery, error) {
-	pageFrom := len(filters["from"])
-	pageSize := len(filters["size"])
 	from, size, err := paginatedParams(filters)
 	if err != nil {
 		return nil, err
 	}
 	nestedQuery := elastic.NewNestedQuery("profiles.controls", query)
-	if pageFrom > 0 && pageSize > 0 {
-		nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().Size(size).From(from))
-		return nestedQuery, nil
-	} else if pageFrom > 0 {
-		nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().From(from))
-		return nestedQuery, nil
-	} else if pageSize > 0 {
-		nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().Size(size))
-		return nestedQuery, nil
-	}
-	nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit())
+	nestedQuery = nestedQuery.InnerHit(elastic.NewInnerHit().From(from).Size(size))
 	return nestedQuery, nil
 }
 
 func paginatedParams(filters map[string][]string) (int, int, error) {
-	var from, size int
+	var from, size = 0, 10
 	var err error
 	if len(filters["from"]) > 0 {
 		from, err = strconv.Atoi(filters["from"][0])

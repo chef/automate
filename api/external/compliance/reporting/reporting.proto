@@ -99,14 +99,12 @@ service ReportingService {
 		};
 	};
 
-
 	/*
 	List Control info
-
 	Lists controls from the last run, with optional filtering.
-	Supports filtering and pagination.
-	Limited to 10 results by default.
-
+	Supports filtering and pagination. Maximum 100 search can be 
+	made when specifying the pagination from and size. Sum of from+size
+	should be less that 100. By default 10 results will be returned.
 	Authorization Action:
 	```
 	compliance:ControlElements:list
@@ -114,12 +112,12 @@ service ReportingService {
 	*/
 	rpc ListControlInfo(Query) returns (ControlElements) {
 		option (google.api.http) = {
-			post: "/api/v0/compliance/reporting/nodecontrols/id/{id}"
+			post: "/api/v0/compliance/reporting/reportcontrols/id/{id}"
 			body: "*"
 		};
 		option (chef.automate.api.iam.policy) = {
-			resource: "compliance:reporting:nodecontrols:{id}"
-			action: "compliance:nodecontrols:list"
+			resource: "compliance:reporting:reportcontrols:{id}"
+			action: "compliance:reportcontrols:list"
 		};
 	};
 
@@ -369,24 +367,6 @@ message RemovedResultsCounts {
 	int32 skipped = 2;
 	// The number of results with status of `passed` that have been trimmed (removed) from a control
 	int32 passed = 3;
-}
-
-message ControlElement {
-	// The control's unique ID.
-	string id = 1;
-	// The control's compact description.
-	string title= 2;
-	// Profile name.
-	string profile = 3;
-	// The severity of the control.
-	float impact = 4;
-	// The total number of results.
-	int32 results = 5;
-}
-
-message ControlElements {
-	// List of control elements
-	repeated ControlElement control_elements = 1;
 }
 
 message ControlItem {
@@ -919,4 +899,22 @@ message ProfileMeta {
 	string status = 4;
 	// The combined name and version of the profile.
 	string full = 5;
+}
+
+message ControlElement {
+	// The control's unique ID.
+	string id = 1;
+	// The control's compact description.
+	string title= 2;
+	// Profile name.
+	string profile = 3;
+	// The severity of the control.
+	float impact = 4;
+	// The total number of results.
+	int32 results = 5;
+}
+
+message ControlElements {
+	// List of control elements
+	repeated ControlElement control_elements = 1;
 }

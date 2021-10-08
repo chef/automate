@@ -113,7 +113,7 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 // ReadNodeHeader takes the report Id as input and returns a report showing specific header details of report.
 func (srv *Server) ReadNodeHeader(ctx context.Context, in *reporting.Query) (*reporting.NodeHeaderInfo, error) {
 	formattedFilters := formatFilters(in.Filters)
-	logrus.Debugf("ReadNodeInfo called with filters %+v", formattedFilters)
+	logrus.Debugf("ReadNodeHeader called with filters %+v", formattedFilters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
 	if len(formattedFilters["profile_id"]) > 1 {

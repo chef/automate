@@ -48,47 +48,6 @@ func init() {
         ]
       }
     },
-    "/api/v0/compliance/reporting/nodecontrols/id/{id}": {
-      "post": {
-        "summary": "List Control info",
-        "description": "Lists controls from the last run, with optional filtering.\nSupports filtering and pagination.\nLimited to 10 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:ControlElements:list\n` + "`" + `` + "`" + `` + "`" + `",
-        "operationId": "ReportingService_ListControlInfo",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElements"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/grpc.gateway.runtime.Error"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Unique identifier.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
-            }
-          }
-        ],
-        "tags": [
-          "ReportingService"
-        ]
-      }
-    },
     "/api/v0/compliance/reporting/nodeheader/id/{id}": {
       "post": {
         "summary": "Show Node Header Info From Report ID",
@@ -251,6 +210,46 @@ func init() {
           }
         },
         "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/reportcontrols/id/{id}": {
+      "post": {
+        "summary": "List Control info\nLists controls from the last run, with optional filtering.\nSupports filtering and pagination. Maximum 100 search can be \nmade when specifying the pagination from and size. Sum of from+size\nshould be less that 100. By default 10 results will be returned.\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:ControlElements:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_ListControlInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlElements"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",

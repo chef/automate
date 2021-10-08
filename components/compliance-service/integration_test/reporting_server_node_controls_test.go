@@ -135,7 +135,7 @@ func TestNodeControl(t *testing.T) {
 				},
 			},
 			expectedTitles:      []string{"a2-prod", "a2-test", "a2-dev"},
-			expectedResultCount: 3,
+			expectedResultCount: 10,
 		},
 		{
 			description: "ListControlInfo: check for paginated response from multiple profiles",

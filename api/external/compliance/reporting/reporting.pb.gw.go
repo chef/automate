@@ -1014,7 +1014,7 @@ var (
 
 	pattern_ReportingService_ListControlItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v0", "compliance", "reporting", "controls"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ReportingService_ListControlInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "compliance", "reporting", "nodecontrols", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ReportingService_ListControlInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "compliance", "reporting", "reportcontrols", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ReportingService_ReadReport_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 5}, []string{"api", "v0", "compliance", "reporting", "reports", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 

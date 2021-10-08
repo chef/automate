@@ -48,7 +48,7 @@ func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.ControlI
 	return out, nil
 }
 
-// should cover /nodecontrols/:reportid
+// should cover /reportcontrols/:reportid
 func (a *Reporting) ListControlInfo(ctx context.Context, in *reporting.Query) (*reporting.ControlElements, error) {
 	inDomain := &reportingService.Query{}
 	out := &reporting.ControlElements{}
