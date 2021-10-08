@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "HA - Reference Architecture"
     parent = "automate/High_Availability"
     identifier = "automate/reference/HA_architecture_reference.md HA - Reference Architecture"
-    weight = 40
+    weight = 20
 +++
 
 ## Reference Architecture

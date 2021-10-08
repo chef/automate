@@ -9,7 +9,7 @@ gh_repo = "automate"
     title = "HA Components"
     parent = "automate/High_Availability"
     identifier = "automate/reference/HA_components.md HA Components"
-    weight = 40
+    weight = 30
 +++
 
 ## A2HA Components -- need to clarify and browse for more description

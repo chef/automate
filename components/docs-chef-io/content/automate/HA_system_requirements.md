@@ -40,22 +40,22 @@ This section lists the operating systems requirements, virtual machine instances
 |  :----------------: |   :----------------:    |         :----------------:             |  :---------------:  |
 +=====================+=========================+========================================+=====================+
 | PostgreSQL          | t3.medium               | 4 GB RAM for test and 8 GB for         | 50 GB (dedicated    |
-|                     |                         | production                             | hard disk space     |
+|                     |                         | production. vCPU - 2.                  | hard disk space     |
 |                     |                         |                                        | need to be assigned |
 |                     |                         |                                        | assigned to '/').   |
 +---------------------+-------------------------+----------------------------------------+---------------------+
 | Elasticsearch       | m5.large                | 8 GB RAM for test and 16 GB for        | 50 GB (dedicated    |
-|                     |                         | for production                         | hard disk space     |
+|                     |                         | production. vCPU - 2.                  | hard disk space     |
 |                     |                         |                                        | need to be assigned |
 |                     |                         |                                        | to '/').            |
 +---------------------+-------------------------+----------------------------------------+---------------------+
 | Automate            | t3.medium               | 4 GB RAM for test and 8 GB for         | 50 GB (dedicated    |
-|                     |                         | for production                         | hard disk space     |
+|                     |                         | production. vCPU - 2.                  | hard disk space     |
 |                     |                         |                                        | need to be assigned |
 |                     |                         |                                        | to '/').            |
 +---------------------+-------------------------+----------------------------------------+---------------------+
 | Chef Server         | t3.medium               | 4 GB RAM for test and 8 GB for         | 50 GB (dedicated    |
-|                     |                         |                                        | hard disk space     |
+|                     |                         | production. vCPU - 2.                  | hard disk space     |
 |                     |                         |                                        | need to be assigned |
 |                     |                         |                                        | to '/').            |
 +---------------------+-------------------------+-----------------------------------------+--------------------+
@@ -64,8 +64,6 @@ This section lists the operating systems requirements, virtual machine instances
 
 ES volume size also depends on the number of nodes and frequency of client runs and compliance scans. The above table includes AWS instances types. However, for Bare-infra deployment or In-premises deployment types, you can choose the above requirements for VM like RAM.
 
+For **ElasticSearch** and **postgres-sql**, a minimum of three node clusters is required.
+
 {{< /note >}}
-
-### VPC Limit
-
-The default limit to create a VPC in a region is 5. AWS Deployment creates two VPC, one for the Bastion host and another for the rest of the nodes in a cluster. For **ElasticSearch** and **postgres-sql**, a minimum of three node clusters is required.
