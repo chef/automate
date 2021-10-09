@@ -66,6 +66,8 @@ type AwsConfigToml struct {
 		Config struct {
 			Profile                         string `toml:"profile"`
 			Region                          string `toml:"region"`
+			AwsVpcId                        string `toml:"aws_vpc_id"`
+			AwsCidrBlockAddr                string `toml:"aws_cidr_block_addr"`
 			SSHKeyPairName                  string `toml:"ssh_key_pair_name"`
 			AmiFilterName                   string `toml:"ami_filter_name"`
 			AmiFilterVirtType               string `toml:"ami_filter_virt_type"`
