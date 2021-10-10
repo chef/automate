@@ -63,7 +63,7 @@ Install Chef Automate and Chef Infra Server on the same host with this command:
 sudo chef-automate deploy --product automate --product infra-server
 ```
 
-Then, [set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
+Then, [set up knife]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 ### Configuration File Install of Chef Automate and Infra Server
 
@@ -91,7 +91,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate deploy config.toml
     ```
 
-1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
+1. [Set up knife]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 ## Install A Standalone Chef Infra Server
 
@@ -124,7 +124,7 @@ Installations require elevated privileges, so run the commands as the superuser 
        sudo chef-automate deploy --product infra-server <configuration_file>
     ```
 
-1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
+1. [Set up knife]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
@@ -177,7 +177,7 @@ Installations require elevated privileges, so run the commands as the superuser 
       sudo chef-automate deploy config.toml
     ```
 
-1. [Set up `knife`]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
+1. [Set up knife]({{< relref "workstation/knife_setup.md" >}}) for use with Chef Infra Server.
 
 1. To send data from the Chef Infra Server to an external Chef Automate installation, first create a `patch.toml` file that contains the configuration stanza:
 
