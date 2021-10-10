@@ -8,14 +8,11 @@ all packages therein including their transitive dependencies. It accomplishes
 this by wrapping the 'chef-automate' cli utility.
 The following arguments are available:
  [REQUIRED]
- -t [frontend]            Generate an Air Gap Bundle for either frontend.
+ -t [frontend|backend|all]            Generate an Air Gap Bundle for either frontend or backend or both
  -o [output tarball]              Output file for archive (.tar.gz)
  [OPTIONS]
- -d [download path]               Download path for chef-automate binary (default: /tmp/chef-automate)
- -w [workspace]                   Workspace where packages will be downloaded (default: /tmp/workspace)
  -h                               Print this help message
- ex. $0 -t backend -m /path/to/manifest.json -o /tmp/bundle.tar.gz
- ex. $0 -t frontend -c current -o /tmp/bundle.tar.gz -o /tmp/bundle.tar.gz
+ ex. $0 -t upgradebackends  -o /tmp/bundle.tar.gz
 "
 export DOCKER_IMAGE="chefes/lita-worker"
 # Some sane defaults
@@ -23,6 +20,8 @@ export CHEF_AUTOMATE_BIN_PATH="/tmp/chef-automate"
 export WORKSPACE_PATH="/tmp/workspace"
 # These are required args so we ensure they are not given a default value
 export BUNDLE_TYPE=
+export BACKENDAIB_TFVARS=
+export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
 export MANIFEST_PATH="manifest.json"
 TEMP_DIR=/tmp
@@ -79,83 +78,50 @@ clean_up() {
   exit "${1:-0}"
 }
 trap clean_up SIGHUP SIGINT SIGTERM ERR
+
 airgap_bundle_create() {
   original_aib_path="${TEMP_BUNDLE_FILE}"
   args=('airgap' 'bundle' 'create')
-  if [[ "${BUNDLE_TYPE}" == "frontend" ]]; then
-    args+=('-c' "${CHANNEL}")
-  else
-    args+=('-m' "${MANIFEST_PATH}")
-  fi
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
-    if [[ "${BUNDLE_TYPE}" == "backend" ]]; then
-      # this removes the magic header from the .aib
-      # making it usable with the tar command
-      # https://github.com/chef/a2/blob/4c51540f822d7ddcb32d192bc7dbf33803789a8e/components/automate-deployment/pkg/airgap/bundle_creator.go#L3
-      tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${TARBALL_PATH}
-      rm -f ${TEMP_TAR_FILE}
-    else
-      cat "${original_aib_path}" > ${TARBALL_PATH}
+    if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+          cat "${original_aib_path}" > ${TARBALL_PATH}
+          outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
+          bname=$(basename "${outfile}")
+          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
+          echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
     fi
-    rm -f "${original_aib_path}"
-    outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
-    # echo "Airgap Bundle: ${outfile}"
-    bname=$(basename "${outfile}")
-    if [[ "${BUNDLE_TYPE}" == "frontend" ]]; then
-      echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""
-      echo "frontend_aib_local_file = \"${bname}\""
-    else
-      echo "backend_aib_dest_file = \"/var/tmp/${bname}\""
-      echo "backend_aib_local_file = \"${bname}\""
-    fi
-  else
-    echo "✘ ERROR"
-    cat /tmp/thelog.log
-    exit 1
-  fi
-}
 
-new_airgap_bundle_create() {
-  original_aib_path="${TEMP_BUNDLE_FILE}"
-  args=('airgap' 'bundle' 'create')
-  args+=("${original_aib_path}")
-  # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
-  if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
-    cat "${original_aib_path}" > ${TARBALL_PATH}
-    # this removes the magic header from the .aib
-    # making it usable with the tar command
-    tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
-    rm -f ${TEMP_TAR_FILE}
+    if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
+    then
+          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+          # this removes the magic header from the .aib
+          # making it usable with the tar command
+          rm -f ${TEMP_TAR_FILE}    
+          outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
+          backend_name=$(basename "${outfile_backend}")
+          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
+          echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+    fi
     rm -f "${original_aib_path}"
-    outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
-    outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
-    bname=$(basename "${outfile}")
-    backend_name=$(basename "${outfile_backend}")
-    echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""
-    echo "frontend_aib_local_file = \"${bname}\""
-    echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\""
-    echo "backend_aib_local_file = \"${backend_name}\""
-    
   else
     echo "✘ ERROR"
     cat /tmp/thelog.log
     exit 1
   fi
   
-
   if [ -f "${MANIFEST_PATH}" ]; then
     create_manifest_auto_tfvars
   else
     hardcode_manifest_auto_tfvars
   fi
-
 }
 
 exec_linux() {
   download_automate_cli
-  new_airgap_bundle_create
+  airgap_bundle_create
 }
 
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
@@ -188,8 +154,6 @@ hardcode_manifest_auto_tfvars(){
     curator_pkg_ident        = \"chef/automate-backend-curator/1.0.22/20201118193951\"
    " > ${MANIFEST_TFVARS}
 }
-
-  
 
 exec_docker() {
   # in Docker mode we hard code various arguments
@@ -225,7 +189,7 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h" opt; do
+while getopts ":b:d:t:w:o:h:v:q:" opt; do
   case "${opt}" in
     d)
       export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
@@ -241,6 +205,12 @@ while getopts ":b:d:t:w:o:h" opt; do
       ;;  
     t)
       export BUNDLE_TYPE=${OPTARG}
+      ;;
+    v)
+      export FRONTENDAIB_TFVARS=${OPTARG}
+      ;;
+    q)
+      export BACKENDAIB_TFVARS=${OPTARG}
       ;;
     h)
       usage
@@ -261,11 +231,6 @@ if [[ -z ${BUNDLE_TYPE} ]]; then
   echo "ERROR: required option -t not specified!"
   usage
 fi
-if [[ -z ${TARBALL_PATH} ]]; then
-  echo "ERROR: required option -o not specified!"
-  usage
-fi
-# Set up some path context variables
 ABSOLUTE_PATH=$(abs_path "${0}")
 export ABSOLUTE_PATH
 REPO_PATH=$(dirname "$(dirname "${ABSOLUTE_PATH}")")

@@ -38,8 +38,16 @@ class AutomateClusterSetup < AutomateCluster::Command
     tf_manifest_exist? && tf_be_aib_valid?
   end
 
-  def new_bundle?
-    !valid_bundle? || upgrade_frontends? || upgrade_airgap_bundles?
+  def need_bundle?
+    !valid_bundle? || upgrade_airgap_bundles?
+  end
+  
+  def need_FE_upgrade?
+    !valid_fe_bundle?
+  end
+
+  def need_BE_upgrade?
+    !valid_be_bundle?
   end
 
   def need_fe_bundle?
@@ -56,14 +64,14 @@ class AutomateClusterSetup < AutomateCluster::Command
   end
   
   def generate_bundle
-    wait_while 'Generating FE airgap bundle', true do |spin|
-      status = run_make_cmd('fe-bundle', command_opts)
+    wait_while 'Generating airgap bundles', true do |spin|
+      status = run_make_cmd('bundle', command_opts)
 
       if status.error? || !valid_bundle?
         logger.error "Error encountered generating FE airgap bundles"
         logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
         logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
-        spin.error "Failed to generate FE airgap bundles"
+        spin.error "Failed to generate airgap bundles"
         exit 1
       end
 
@@ -71,6 +79,42 @@ class AutomateClusterSetup < AutomateCluster::Command
     end if need_bundle?
  
   end
+
+  def upgrade_FE_bundle
+    wait_while 'upgrading FE airgap bundle', true do |spin|
+      status = run_make_cmd('fe-bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating FE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to upgrade FE airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_FE_upgrade?
+ 
+  end
+
+  def upgrade_BE_bundle
+    wait_while 'upgrading BE airgap bundle', true do |spin|
+      status = run_make_cmd('be-bundle', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating BE airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to upgrade FE airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_BE_upgrade?
+ 
+  end
+
+
 
   def generate_airgap_bundle
     wait_while 'Generating FE airgap bundle', true do |spin|
@@ -132,7 +176,13 @@ class AutomateClusterSetup < AutomateCluster::Command
       exit 1
     end
 
-    generate_bundle
+    if upgrade_frontends? 
+        upgrade_FE_bundle
+    elsif upgrade_backends?
+        upgrade_BE_bundle
+    else 
+        generate_bundle
+    end
 
     wait_while 'Logging into AWS using okta_aws' do |spinner|
       so = login_with_okta
