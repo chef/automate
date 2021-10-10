@@ -1,4 +1,4 @@
-lib = File.expand_path("../lib", __FILE__)
+lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require_relative "lib/automate/backend/elasticsidecar/version"
 
@@ -14,9 +14,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = ">= 2.6.0"
-  
-  spec.add_runtime_dependency 'toml-rb'
-  spec.add_runtime_dependency 'mixlib-shellout'
-  spec.add_runtime_dependency 'pry'
+
+  spec.add_runtime_dependency "toml-rb"
+  spec.add_runtime_dependency "mixlib-shellout"
+  spec.add_runtime_dependency "pry"
 
 end
