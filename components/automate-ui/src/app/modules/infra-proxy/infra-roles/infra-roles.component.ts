@@ -41,6 +41,7 @@ export interface AvailableType {
 export class InfraRolesComponent implements OnInit, OnDestroy {
   @Input() serverId: string;
   @Input() orgId: string;
+  @Input() pagesize: Number;
   @Output() resetKeyRedirection = new EventEmitter<boolean>();
 
   public availablelist: AvailableType[] = [];
@@ -50,8 +51,8 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public searching = false;
   public searchValue = '';
-  public currentPage = 1;
-  public per_page = 9;
+  public currentPage = 6;
+  public per_page = 1;
   public total: number;
   public roleToDelete: InfraRole;
   public deleteModalVisible = false;
@@ -181,5 +182,11 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.currentPage = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.getRolesData();
   }
 }
