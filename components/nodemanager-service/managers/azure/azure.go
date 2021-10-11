@@ -787,7 +787,6 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 			if len(val.Tags) > 0 {
 				for _, v := range val.Tags {
 					if _, ok := excludeTags[v.Key]; ok {
-						logrus.Println("::::::ex", filteredsubsList, excludeTags[v.Key], v.Value)
 						if !contains(excludeTags[v.Key], v.Value) {
 							filteredsubsList = append(filteredsubsList, val)
 						}
@@ -797,7 +796,6 @@ func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.Mana
 				filteredsubsList = append(filteredsubsList, val)
 			}
 		}
-		logrus.Println("::::::ex", filteredsubsList)
 		return filteredsubsList
 	}
 	return subsList
@@ -829,17 +827,13 @@ func (creds *Creds) GetSubscriptionsForApi(ctx context.Context, filters []*commo
 	if err != nil {
 		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
 	}
-	logrus.Println("::::::includeTags", includeTags, subsList, filters)
 	filteredsubsList := filterIncludeTags(includeTags, subsList)
 	filteredsubsList = UniqueManager(filteredsubsList)
-	logrus.Println("::::::UniqueManager", filteredsubsList)
 	if len(includeTags) > 0 {
 		filteredsubsList = filterExcludeTags(excludeTags, filteredsubsList)
 	} else {
 		filteredsubsList = filterExcludeTags(excludeTags, subsList)
 	}
-
-	logrus.Println("::::::exclude", filteredsubsList)
 
 	if len(excludedSubs) == 0 {
 		return filteredsubsList, nil
@@ -1089,11 +1083,6 @@ func (creds *Creds) QueryFieldApi(ctx context.Context, filters []*common.Filter,
 		}
 	default:
 		if strings.HasPrefix(field, "tags:") {
-			logrus.Println("::::::kkey", subs)
-			// tags, err := creds.ListTags(ctx, subs)
-			if err != nil {
-				return nil, errors.Wrap(err, "QueryField unable to list tags")
-			}
 			key := strings.TrimPrefix(field, "tags:")
 			for _, v := range subs {
 				for _, val := range v.Tags {
