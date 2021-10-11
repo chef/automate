@@ -256,12 +256,6 @@ To enable a disabled data feed:
 
 {{< figure src="/images/automate/enable-a-data-feed-from-chef-automate.png" alt="Enable a Data Feed Instance">}}
 
-{{< note >}}
-The **Enable** option gets active only if the data feed is disabled previously.
-{{< /note >}}
-
-{{< warning >}} We suggestion no more than five feed, depending on your fleet size. Please check the reference matrix on recommended feed counts. {{< /warning >}}
-
 ## Delete a Data Feed Instance
 
 To delete an individual instance:
