@@ -2,7 +2,5 @@
 CREATE TABLE IF NOT EXISTS telemetry (
   id                         text PRIMARY KEY,
   last_telemetry_reported_at TIMESTAMPTZ NOT NULL,
-  created_at                 TIMESTAMPTZ NOT NULL,
-  updated_at                 TIMESTAMPTZ NOT NULL,
-  UNIQUE(last_telemetry_reported_at)
+  created_at                 TIMESTAMPTZ NOT NULL
 );
