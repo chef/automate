@@ -25,6 +25,9 @@ export class SelectboxComponent implements OnInit, OnChanges {
   @Input() combination: boolean;
   @Output() searchData = new EventEmitter<string>();
   @Output() selectData = new EventEmitter<any[]>();
+  @Output() onScrollListData = new EventEmitter();
+  public scrollDistance = 2;
+
 
   public listData: any[] = [];
   public selectedListData: any[] = [];
@@ -33,10 +36,13 @@ export class SelectboxComponent implements OnInit, OnChanges {
   public moveLeftOrRight: string;
   nodeSuggestions$: any;
   public copyDataListFlags: boolean;
+  public scrollingLoader: boolean;
   newItemEvent: any;
+
   constructor(private store: Store<NgrxStateAtom>) { }
 
   ngOnInit() {
+    this.scrollingLoader = false;
     this.copyDataListFlags = false;
     this.moveLeftOrRight = '';
     this.selectedListTypeToMove = '';
@@ -64,6 +70,15 @@ export class SelectboxComponent implements OnInit, OnChanges {
 
   emitData(data: string) {
     this.searchData.emit(data);
+  }
+
+  appendItems() {
+
+  }
+
+  onScrollDown() {
+    this.onScrollListData.emit();
+    console.log('onScrollListData');
   }
 
   selectItem(listData: string, side: string, secretType: string): void {
@@ -98,7 +113,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
         this.selectedListData = [];
     }
     this.selectedListDataToMove.forEach(selectedListData => {
-      this.selectedListData.push(selectedListData);
+      this.selectedListData.unshift(selectedListData);
       this.listData.splice(this.listData.indexOf(selectedListData), 1);
     });
     this.selectedListDataToMove = [];

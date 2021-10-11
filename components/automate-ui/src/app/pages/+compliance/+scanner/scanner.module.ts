@@ -16,6 +16,7 @@ import { NodesEditComponent } from './containers/nodes-edit/nodes-edit.component
 import { AccordionComponent } from '../../../page-components/accordion/accordion.component';
 import { AccordionItemComponent } from '../../../page-components/accordion/accordion-item/accordion-item.component';
 import { SelectboxComponent } from '../../../page-components/selectbox/selectbox.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   imports: [
@@ -24,7 +25,8 @@ import { SelectboxComponent } from '../../../page-components/selectbox/selectbox
     ComplianceSharedModule,
     ReactiveFormsModule,
     RouterModule,
-    ScannerRoutingModule
+    ScannerRoutingModule,
+    InfiniteScrollModule
   ],
   providers: [
     ChefStatusIconPipe,

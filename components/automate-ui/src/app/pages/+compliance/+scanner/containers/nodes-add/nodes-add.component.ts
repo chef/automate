@@ -1,5 +1,5 @@
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { Observable, BehaviorSubject, Subject, combineLatest } from 'rxjs';
+import { map, startWith, takeUntil } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -7,6 +7,14 @@ import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@ang
 import { environment as env } from '../../../../../../environments/environment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { AvailableType } from 'app/modules/infra-proxy/infra-roles/infra-roles.component';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { select, Store } from '@ngrx/store';
+import { NodeCredentialsSearch } from 'app/entities/node-credentials/node-credential.actions';
+import { NodeCredentialOrder, SortParams } from 'app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.reducer';
+import { allCredentials, totalNodeCredential } from 'app/entities/node-credentials/node-credential.selectors';
+import { NodeCredential } from 'app/entities/node-credentials/node-credential.model';
+import { nodeCredentialListState } from 'app/pages/+compliance/+node-credentials/node-credentials-list/node-credential-list.selectors';
+import { get, pick, toUpper } from 'lodash/fp';
 
 @Component({
   templateUrl: './nodes-add.component.html',
@@ -14,11 +22,20 @@ import { AvailableType } from 'app/modules/infra-proxy/infra-roles/infra-roles.c
 })
 export class NodesAddComponent implements OnInit {
   secretType: string;
+  public params: SortParams;
+  private isDestroyed = new Subject<boolean>();
+  public secrets: NodeCredential[] = [];
+  public sortBy: string;
+  public orderBy: NodeCredentialOrder;
+  public total: number;
+
+  public instanceNodeCredentials$: Observable<NodeCredential[]>;
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private httpClient: HttpClient,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>
   ) {}
 
   public availablelist: AvailableType[] = [];
@@ -39,12 +56,14 @@ export class NodesAddComponent implements OnInit {
 
   // Array of secrets available for user to select
   // TODO make ngrx/store selection
-  secrets$: Observable<any[]>;
 
   // Array of nodes to add (nodesToAdd == POST request body)
   nodesToAdd$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  searchData: string;
+  pageNumber = 0;
 
   ngOnInit() {
+    this.searchData = '';
     // this.availablelist = [{name: 'a', type: 2}];
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.form = this.createForm();
@@ -58,7 +77,7 @@ export class NodesAddComponent implements OnInit {
     // Swap fields based on selected "backend" value (ssh, winrm)
     this.backendControl = this.form.get('wizardStep2').get('backend') as FormGroup;
     this.backendValue$ =
-      this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
+    this.backendControl.valueChanges.pipe(startWith(this.backendControl.value));
     this.backendValue$.subscribe(backend => {
       const step = this.form.get('wizardStep2') as FormGroup;
       step.get('secrets').setValue([]);
@@ -78,15 +97,49 @@ export class NodesAddComponent implements OnInit {
       }
     });
 
-    // Switch selectable secrets based on selected "backend" value (ssh, winrm)
-    this.secrets$ = combineLatest([
-      this.fetchSecrets({}),
+    this.instanceNodeCredentials$ = this.store.pipe(
+      takeUntil(this.isDestroyed),
+      select(allCredentials)
+    );
+
+    combineLatest([
+      this.instanceNodeCredentials$,
       this.backendValue$
     ]).pipe(
-      map(([secrets, backend]: [{ type: string }[], string]) =>
+      map(([secrets, backend]: [NodeCredential[], string]) =>
         secrets.filter(s => s.type === backend || s.type === 'sudo'))
-    );
-    this.secretType = 'ssh';
+    ).subscribe((results) => {
+        this.secrets = results;
+        console.log(results.length);
+        console.log(this.secrets);
+    });
+
+    this.instanceNodeCredentials$ = this.store.pipe(select(allCredentials));
+
+    this.store.select(nodeCredentialListState).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((state) => {
+      this.params = pick(['filters', 'page', 'per_page'], state);
+      this.sortBy = get('sort', state);
+      this.orderBy = get('order', state);
+      if (this.orderBy !== 'none') {
+        this.params = { ...this.params, order: toUpper(this.orderBy), sort: this.sortBy };
+      }
+    });
+
+    this.store.select(totalNodeCredential).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+    });
+    this.getNodeList();
+    console.log(this.instanceNodeCredentials$);
+
+  }
+
+
+  getNodeList(): void {
+    this.store.dispatch(new NodeCredentialsSearch(this.params));
   }
 
   setWinRmPort(): void {
@@ -102,22 +155,15 @@ export class NodesAddComponent implements OnInit {
   }
 
   search(data: any) {
-    // Switch selectable secrets based on selected "backend" value (ssh, winrm)
-    this.secrets$ = combineLatest([
-      this.fetchSecrets({
-        'filters':
-        [
-            {
-                'key': 'name',
-                'values': [data]
-            }
-        ]
-    }),
-      this.backendValue$
-    ]).pipe(
-      map(([secrets, backend]: [{ type: string }[], string]) =>
-        secrets.filter(s => s.type === backend || s.type === 'sudo'))
-    );
+    console.log(data);
+    this.params.filters = [
+      {
+          'key': 'name',
+          'values': [data]
+      }
+    ];
+    this.searchData = data;
+    this.getNodeList();
   }
 
   selected(data: any) {
@@ -127,6 +173,15 @@ export class NodesAddComponent implements OnInit {
     });
     if (secrets.length === data.length) {
       this.form.controls['wizardStep2']['controls']['secrets'].setValue(secrets);
+    }
+  }
+
+  scroll() {
+    this.params.page++;
+    if (this.secrets.length < this.total) {
+      console.log(this.secrets.length, this.total);
+      this.params.page++;
+      this.getNodeList();
     }
   }
 

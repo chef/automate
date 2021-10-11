@@ -47,11 +47,12 @@
                   <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->
                 </chef-select>
                 <app-selectbox
-                [data]="secrets$ | async"
+                [data]="secrets"
                 [searchFlag]=true
                 (searchData)="search($event)"
                 (selectData)="selected($event)"
                 [type]="secretType"
+                (onScrollListData)="scroll()"
                 [combination]=false
                 >
                 </app-selectbox>
