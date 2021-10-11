@@ -64,7 +64,7 @@ To create a data feed select **ServiceNow** from **Settings > Data Feed > New In
       * **Password**: The password you use to sign in to ServiceNow.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access ServiceNow endpoints.
-      * **Token**: The authorization used to access ServiceNow endpoints.
+      * **Token**: The authorization token value used to access ServiceNow endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -96,7 +96,7 @@ To create a data feed select **Splunk** from **Settings > Data Feed > New Integr
       * **Password**: The password you use to sign in to Splunk.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access Splunk endpoints.
-      * **Token**: The authorization token used to access Splunk endpoints.
+      * **Token**: The authorization token value used to access Splunk endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -128,7 +128,7 @@ To create a data feed select **ELK** from **Settings > Data Feed > New Integrati
       * **Password**: The password you use to sign in to ELK.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access ELK endpoints.
-      * **Token**: The authorization used to access ELK endpoints.
+      * **Token**: The authorization token value used to access ELK endpoints.
 
 1. Select **Test Connection** to start validating the connection details.
 1. Once the test is successful, select **Save** to save the Data Feed configuration.
@@ -160,7 +160,7 @@ To create a data feed select **Custom** from **Settings > Data Feed > New Integr
       * **Password**: The password you use to sign in to Custom Integration.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access Custom Integration endpoints.
-      * **Token**: The authorization used to access Custom Integration endpoints.
+      * **Token**: The authorization token value used to access Custom Integration endpoints.
 
 1. Select **Use Headers** checkbox to add custom headers (For example: `key:value`).
 1. Select **Test Connection** to start validating the connection details.
