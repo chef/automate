@@ -160,7 +160,7 @@ To create a data feed select **Custom** from **Settings > Data Feed > New Integr
       * **Password**: The password you use to sign in to Custom Integration.
    1. **Access Token**:
       * **Token Type**: The prefix for the authorization used to access Custom Integration endpoints.
-      * **Token**: The authorization used to access Custom Integration endpoints.
+      * **Token**: The authorization token value used to access Custom Integration endpoints.
 
 1. Select **Use Headers** checkbox to add custom headers (For example: `key:value`).
 1. Select **Test Connection** to start validating the connection details.
