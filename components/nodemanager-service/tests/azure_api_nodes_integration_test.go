@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var AzureAPIManagerID = ""
+
 func TestAzureAPINodes(t *testing.T) {
 	if !mgrtesthelpers.CheckForCreds("azure") {
 		t.Log("azure credentials missing; aborting")
@@ -40,12 +42,12 @@ func TestAzureAPINodes(t *testing.T) {
 	require.NoError(t, err)
 	require.NotZero(t, len(mgrID.Ids))
 
-	mgrIDVal := mgrID.GetIds()[0].Id
+	AzureAPIManagerID = mgrID.GetIds()[0].Id
 
 	t.Log("ensure a node was added")
 	query := nodes.Query{
 		Filters: []*common.Filter{
-			{Key: "manager_id", Values: []string{mgrIDVal}},
+			{Key: "manager_id", Values: []string{AzureAPIManagerID}},
 		},
 	}
 	list, err := nodesClient.List(ctx, &query)
@@ -77,7 +79,7 @@ func TestAzureApiSearchNodeFields(t *testing.T) {
 
 	t.Log("search node fields for list of subscriptions")
 	query := manager.FieldQuery{
-		NodeManagerId: AzureVMManagerID,
+		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{},
 		},
@@ -132,7 +134,7 @@ func TestAzureApiSearchNodes(t *testing.T) {
 
 	t.Log("search all nodes for this manager")
 	query := manager.NodeQuery{
-		NodeManagerId: AzureVMManagerID,
+		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{},
 		},
@@ -143,7 +145,7 @@ func TestAzureApiSearchNodes(t *testing.T) {
 
 	t.Log("search all nodes for this manager, filtered by name")
 	query = manager.NodeQuery{
-		NodeManagerId: AzureVMManagerID,
+		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
 				{Key: "name", Values: []string{"Chef Automate Managed Service for Azure Testing"}},
@@ -156,7 +158,7 @@ func TestAzureApiSearchNodes(t *testing.T) {
 
 	t.Log("search all nodes for this manager, filtered by region")
 	query = manager.NodeQuery{
-		NodeManagerId: AzureVMManagerID,
+		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
 				{Key: "name", Values: []string{"Engineering Dev/Test"}, Exclude: true},
@@ -169,7 +171,7 @@ func TestAzureApiSearchNodes(t *testing.T) {
 
 	t.Log("search all nodes for this manager, filtered by tags")
 	query = manager.NodeQuery{
-		NodeManagerId: AzureVMManagerID,
+		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
 				{Key: "owner", Values: []string{"owner"}},
