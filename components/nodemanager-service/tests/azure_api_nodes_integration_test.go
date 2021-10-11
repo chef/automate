@@ -59,3 +59,124 @@ func TestAzureAPINodes(t *testing.T) {
 	_, err = nodesClient.Update(ctx, node)
 	assert.Equal(t, "rpc error: code = InvalidArgument desc = invalid option. unable to update azure-api node", err.Error())
 }
+
+func TestAzureApiSearchNodeFields(t *testing.T) {
+	if !mgrtesthelpers.CheckForCreds("azure") {
+		t.Log("azure credentials missing; aborting")
+		t.FailNow()
+	}
+	t.Log("Running Azure-API search node fields test.")
+	ctx := context.Background()
+
+	mgrConn, err := mgrtesthelpers.GetManagerConn()
+	require.NoError(t, err)
+	defer mgrConn.Close()
+
+	// setup clients
+	mgrClient := manager.NewNodeManagerServiceClient(mgrConn)
+
+	t.Log("search node fields for list of subscriptions")
+	query := manager.FieldQuery{
+		NodeManagerId: AzureVMManagerID,
+		Query: &manager.Query{
+			FilterMap: []*common.Filter{},
+		},
+		Field: "subscriptions",
+	}
+
+	fields, err := mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+
+	t.Log("search node fields for list of names")
+	query.Field = "names"
+	fields, err = mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+
+	t.Log("search node fields for list of tags")
+	query.Field = "tags"
+	fields, err = mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+	t.Logf("fields found are %v", fields)
+	require.Equal(t, mgrtesthelpers.Contains(fields.GetFields(), "name"), true)
+
+	t.Log("search node fields for list of values for tags:Test")
+	query.Field = "tags:Test"
+	fields, err = mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+
+	t.Log("search node fields for list of values for names")
+	query.Field = "tags:name"
+	fields, err = mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+}
+
+func TestAzureApiSearchNodes(t *testing.T) {
+	if !mgrtesthelpers.CheckForCreds("azure") {
+		t.Log("azure credentials missing; aborting")
+		t.FailNow()
+	}
+	t.Log("Running Azure-API search nodes test.")
+	ctx := context.Background()
+
+	mgrConn, err := mgrtesthelpers.GetManagerConn()
+	require.NoError(t, err)
+	defer mgrConn.Close()
+
+	// setup clients
+	mgrClient := manager.NewNodeManagerServiceClient(mgrConn)
+
+	t.Log("search all nodes for this manager")
+	query := manager.NodeQuery{
+		NodeManagerId: AzureVMManagerID,
+		Query: &manager.Query{
+			FilterMap: []*common.Filter{},
+		},
+	}
+	nodes, err := mgrClient.SearchNodes(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(nodes.GetNodes()))
+
+	t.Log("search all nodes for this manager, filtered by name")
+	query = manager.NodeQuery{
+		NodeManagerId: AzureVMManagerID,
+		Query: &manager.Query{
+			FilterMap: []*common.Filter{
+				{Key: "name", Values: []string{"Chef Automate Managed Service for Azure Testing"}},
+			},
+		},
+	}
+	nodes, err = mgrClient.SearchNodes(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(nodes.GetNodes()))
+
+	t.Log("search all nodes for this manager, filtered by region")
+	query = manager.NodeQuery{
+		NodeManagerId: AzureVMManagerID,
+		Query: &manager.Query{
+			FilterMap: []*common.Filter{
+				{Key: "name", Values: []string{"Engineering Dev/Test"}, Exclude: true},
+			},
+		},
+	}
+	nodes, err = mgrClient.SearchNodes(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(nodes.GetNodes()))
+
+	t.Log("search all nodes for this manager, filtered by tags")
+	query = manager.NodeQuery{
+		NodeManagerId: AzureVMManagerID,
+		Query: &manager.Query{
+			FilterMap: []*common.Filter{
+				{Key: "owner", Values: []string{"owner"}},
+			},
+		},
+	}
+	nodes, err = mgrClient.SearchNodes(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(nodes.GetNodes()))
+}

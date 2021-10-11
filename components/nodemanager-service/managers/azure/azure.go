@@ -775,26 +775,35 @@ func filterIncludeTags(includeTags map[string][]string, subsList []*manager.Mana
 
 func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
 	if len(excludeTags) > 0 {
+		var rmSubsList = []string{}
 		var filteredsubsList = []*manager.ManagerNode{}
 		for _, val := range subsList {
-			if sArray, ok := excludeTags["name"]; ok {
+			sArray, ok := excludeTags["name"]
+			if ok {
 				for _, v := range sArray {
-					if val.Name != v {
-						filteredsubsList = append(filteredsubsList, val)
+					if val.Name == v {
+						rmSubsList = append(rmSubsList, val.Id)
 					}
 				}
 			}
 			if len(val.Tags) > 0 {
 				for _, v := range val.Tags {
 					if _, ok := excludeTags[v.Key]; ok {
-						if !contains(excludeTags[v.Key], v.Value) {
-							filteredsubsList = append(filteredsubsList, val)
+						if contains(excludeTags[v.Key], v.Value) {
+							rmSubsList = append(rmSubsList, val.Id)
 						}
 					}
 				}
-			} else {
-				filteredsubsList = append(filteredsubsList, val)
 			}
+		}
+		if len(rmSubsList) > 0 {
+			for _, val := range subsList {
+				if !contains(rmSubsList, val.Id) {
+					filteredsubsList = append(filteredsubsList, val)
+				}
+			}
+		} else {
+			filteredsubsList = subsList
 		}
 		return filteredsubsList
 	}
