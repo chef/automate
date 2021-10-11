@@ -9,6 +9,19 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for run
+- name: skip-deploy
+  default_value: "false"
+  usage: will only upgrade and not deploy the bundle
+- name: upgrade-airgap-bundles
+  default_value: "false"
+  usage: |
+    Update Chef Automate both frontend and backend version to install
+- name: upgrade-backends
+  default_value: "false"
+  usage: Update Chef Automate backends version to install
+- name: upgrade-frontends
+  default_value: "false"
+  usage: upgrade Chef Automate HA  frontends version to install
 - name: version
   usage: The exact Chef Automate version to install
 inherited_options:
