@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package chef.automate.domain.report_manager;
+package chef.automate.domain.report_manager.service;
 option go_package = "github.com/chef/automate/api/interservice/report_manager";
 
 import "google/protobuf/empty.proto";
 
 service ReportManagerService {
-	rpc StoreReport(stream ReportData) returns (google.protobuf.Empty) {};
+	rpc StoreReport(stream StoreReportRequest) returns (google.protobuf.Empty) {};
 }
 
-message ReportData {
+message StoreReportRequest {
 	bytes content = 1;
 }
