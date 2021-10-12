@@ -185,12 +185,12 @@ func (s *LicenseControlServer) Telemetry(ctx context.Context, req *lc.TelemetryR
 }
 
 //GetDeploymentID fetches the deployment id from license control service
-func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.DeploymentIDRequest) (*lc.DeploymentIDResponse, error) {
+func (s *LicenseControlServer) GetDeploymentID(ctx context.Context, req *lc.GetDeploymentIDRequest) (*lc.GetDeploymentIDResponse, error) {
 	deployment, err := s.storage.GetDeployment(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &lc.DeploymentIDResponse{
+	return &lc.GetDeploymentIDResponse{
 		DeploymentId: deployment.ID,
 	}, nil
 }
