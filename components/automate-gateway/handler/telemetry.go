@@ -88,7 +88,7 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 }
 
 func (t *TelemetryServer) getDeploymentID(ctx context.Context) (string, error) {
-	deployIDResponse, err := t.client.GetDeploymentID(ctx, &license_control.DeploymentIDRequest{})
+	deployIDResponse, err := t.client.GetDeploymentID(ctx, &license_control.GetDeploymentIDRequest{})
 	if err != nil {
 		if isServiceDownError(err) {
 			log.WithFields(log.Fields{
