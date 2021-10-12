@@ -2,6 +2,7 @@ package secureconn
 
 import (
 	"context"
+	"os"
 	"path"
 	"testing"
 
@@ -60,6 +61,7 @@ func TestSecureConnFactory(t *testing.T) {
 		require.NoError(t, err)
 
 		client := pb.NewGreeterClient(conn)
+		t.Log("::::::env", os.Getenv("GODEBUG"))
 		resp, err := client.SayHello(context.Background(), &pb.HelloRequest{})
 		require.NoError(t, err)
 		assert.Equal(t, "Hello", resp.Message)
