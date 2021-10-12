@@ -157,6 +157,7 @@ lint:
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
       - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -223,6 +224,7 @@ lint:
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
       - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
@@ -289,6 +291,7 @@ lint:
       - interservice/pg_sidecar/service.proto
       - interservice/teams/teams.proto
       - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-gateway/api/deployment/deployment.proto
       - automate-gateway/api/event_feed/event_feed.proto
