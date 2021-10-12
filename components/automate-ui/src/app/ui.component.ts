@@ -27,13 +27,6 @@ export class UIComponent implements OnInit, AfterViewChecked {
     }
   ];
 
-
-  // If we need to any thing behind feature flags
-  // then we can add below eg in betaFeatures
-  // eg: {
-  //   key: 'servicenow_cmdb',
-  //   name: 'Chef Automate Data Feed'
-  // }
   betaFeatures: Array<Feature> = [];
 
   legacyFeatures: Array<Feature> = [];
