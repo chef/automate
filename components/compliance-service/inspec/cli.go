@@ -172,7 +172,11 @@ func sanitizeEnv(env map[string]string) map[string]string {
 }
 
 func run(args []string, conf *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, error) {
+
+	env["https_proxy"] = os.Getenv("https_proxy")
 	env["http_proxy"] = os.Getenv("http_proxy")
+	env["no_proxy"] = os.Getenv("no_proxy")
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
