@@ -112,6 +112,7 @@ func initTables(db *gorp.DbMap) {
 	db.AddTableWithName(profile{}, "profiles")
 	db.AddTableWithName(JobProfile{}, "jobs_profiles")
 	db.AddTableWithName(ResultsRow{}, "results")
+	db.AddTableWithName(Telemetry{}, "telemetry")
 }
 
 func createUUID() string {
