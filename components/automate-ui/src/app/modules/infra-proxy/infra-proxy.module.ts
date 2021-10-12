@@ -133,7 +133,6 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     MatInputModule,
     MatPaginatorModule,
     NgSelectModule
-    
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

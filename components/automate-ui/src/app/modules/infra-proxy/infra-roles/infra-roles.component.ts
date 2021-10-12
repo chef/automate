@@ -51,8 +51,8 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public searching = false;
   public searchValue = '';
-  public currentPage = 6;
-  public per_page = 1;
+  public currentPage = 1;
+  public per_page = 10;
   public total: number;
   public roleToDelete: InfraRole;
   public deleteModalVisible = false;

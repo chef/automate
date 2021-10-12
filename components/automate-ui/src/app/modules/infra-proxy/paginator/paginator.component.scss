@@ -4,7 +4,6 @@
   .mat-paginator {
     background-color: transparent;
     width: 280px;
-    font-family: var(--chef-font-family,"Muli",Helvetica,Arial,sans-serif);
     font-size: 14px;
 
     .mat-paginator-container {
@@ -25,13 +24,14 @@
           width: auto;
         }
       }
+
       .mat-paginator-range-actions {
         color: $chef-primary-bright;
 
         .mat-paginator-range-label {
-          border-radius: 4px;
-          padding: 10px;        
           margin: 0;
+          border-radius: 4px;
+          padding: 10px;
 
           &.active,
           &:hover {
@@ -45,4 +45,9 @@
 
 ::ng-deep .mat-option:hover:not(.mat-option-disabled):not(.mat-active) {
   background: $chef-primary-bright;
+}
+
+::ng-deep #mat-select-2-panel {
+  margin-top: 15px;
+  width: 200px;
 }
