@@ -17,12 +17,6 @@ describe('chef datafeed', () => {
       adminIdToken = admin.id_token;
       cy.get('app-welcome-modal').invoke('hide');
       cy.restoreStorage();
-      cy.get('body').type('feat');
-      cy.get('.title').contains('Chef Automate Data Feed').parent().parent()
-        .find('.onoffswitch').click();
-      cy.get('chef-button').contains('Close').click();
-      cy.reload();
-      cy.contains('know').click();
     });
     cy.restoreStorage();
   });

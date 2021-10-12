@@ -18,12 +18,6 @@ describe('chef datafeed', () => {
   describe ('chef data feed page', () => {
 
     it('show data feed', () => {
-      cy.get('body').type('feat');
-      cy.get('.title').contains('Chef Automate Data Feed').parent().parent()
-        .find('.onoffswitch').click();
-      cy.get('chef-button').contains('Close').click();
-      cy.reload();
-      cy.contains('know').click();
       cy.contains('Data Feeds').click();
       cy.get('[data-cy=create-data-feed]').should('exist');
     });
