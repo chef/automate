@@ -9,6 +9,10 @@ variable "bundle_files" {
 variable "instance_count" {
 }
 
+variable "private_ips" {
+  default = []
+}
+
 variable "public_ips" {
   default = []
 }

@@ -41,6 +41,9 @@ variable "aws_ami_id" {
   description = "Setting this value overrides ami search features"
 }
 
+variable "aws_cidr_block_addr" {
+}
+
 variable "aws_profile" {
   default     = "default"
   description = "The AWS profile to use from your ~/.aws/credentials file."
@@ -59,6 +62,9 @@ variable "aws_ssh_key_pair_name" {
 
 variable "aws_ssh_user" {
   default = "centos"
+}
+
+variable "aws_vpc_id" {
 }
 
 variable "chef_ebs_volume_iops" {

@@ -1,7 +1,7 @@
 resource "aws_security_group" "base_linux" {
   name        = "base_linux_${random_id.random.hex}"
   description = "base security rules for all linux nodes"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = data.aws_vpc.default.id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_linux_security_group"))
 }
@@ -9,7 +9,7 @@ resource "aws_security_group" "base_linux" {
 resource "aws_security_group" "base_windows" {
   name        = "base_windows_${random_id.random.hex}"
   description = "base security rules for all windows nodes"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = data.aws_vpc.default.id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_windows_security_group"))
 }
@@ -17,7 +17,7 @@ resource "aws_security_group" "base_windows" {
 resource "aws_security_group" "habitat_supervisor" {
   name        = "habitat_supervisor_${random_id.random.hex}"
   description = "Security rules for the Habitat supervisor"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = data.aws_vpc.default.id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_habsup_security_group"))
 }
@@ -25,7 +25,7 @@ resource "aws_security_group" "habitat_supervisor" {
 resource "aws_security_group" "chef_automate" {
   name        = "chef_automate_${random_id.random.hex}"
   description = "Chef Automate Server"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = data.aws_vpc.default.id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_automate_security_group"))
 }
@@ -33,7 +33,7 @@ resource "aws_security_group" "chef_automate" {
 resource "aws_security_group" "efs_mount" {
   name        = "efs_${random_id.random.hex}"
   description = "NFS for EFS"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = data.aws_vpc.default.id
 
   tags = merge(var.tags, map("Name", "${var.tag_name}_${random_id.random.hex}_efs_security_group"))
 }
@@ -169,6 +169,24 @@ resource "aws_security_group_rule" "linux_egress_allow_0-65535_all" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "linux_egress_allow_80" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.base_linux.id
+}
+
+resource "aws_security_group_rule" "linux_egress_allow_443" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.base_linux.id
 }

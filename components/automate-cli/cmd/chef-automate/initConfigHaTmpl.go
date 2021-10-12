@@ -44,6 +44,11 @@ instance_count = "3"
 [aws.config]
 profile = "default"
 region = "us-east-1"
+# Provide vpcid and cidr block
+# E.g. aws_vpc_id = "vpc12318h"
+# E.g. aws_cidr_block_addr = "172.31.64.0"
+aws_vpc_id  = ""
+aws_cidr_block_addr  = ""
 # ssh key pair name in AWS to access instances
 ssh_key_pair_name = "A2HA"
 ami_filter_name = ""

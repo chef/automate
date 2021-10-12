@@ -17,7 +17,7 @@ describe AutomateCluster::SSH do
   end
 
   it "should only return data for the specified service" do
-    expect(tfoutput).to receive(:fetch).with("automate_public_ips").and_return (["10.10.10.10"])
+    expect(tfoutput).to receive(:fetch).with("automate_private_ips").and_return (["10.10.10.10"])
     expect(connection).to receive(:wait_until_ready).and_return true
     expect(ssh).to receive(:connect).with("10.10.10.10", {}).and_return(connection)
 
