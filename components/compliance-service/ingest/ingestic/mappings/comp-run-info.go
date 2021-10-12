@@ -1,7 +1,7 @@
 package mappings
 
 // ComplianceRunInfo mapping used to create the `compliance-run-info index
-var ComplianceRunInfo= Mapping{
+var ComplianceRunInfo = Mapping{
 	Index:      IndexNameComplianceRunInfo,
 	Type:       DocType,
 	Timeseries: false,
