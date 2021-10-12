@@ -116,7 +116,7 @@ func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 		}
 		assert.NoError(t, err)
 
-		req := &pb.ReportData{
+		req := &pb.StoreReportRequest{
 			Content: buffer[:n],
 		}
 
@@ -187,7 +187,7 @@ func TestReportManagerServer_StoreReport_Fail(t *testing.T) {
 				}
 				assert.NoError(t, err)
 
-				req := &pb.ReportData{
+				req := &pb.StoreReportRequest{
 					Content: buffer[:n],
 				}
 
