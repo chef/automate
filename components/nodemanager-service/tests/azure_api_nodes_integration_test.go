@@ -134,7 +134,6 @@ func TestAzureApiSearchNodes(t *testing.T) {
 		},
 	}
 	nodes, err := mgrClient.SearchNodes(ctx, &query)
-	t.Log(":::::::nodes:::::::::", nodes.GetNodes())
 	require.NoError(t, err)
 	require.NotEqual(t, 0, len(nodes.GetNodes()))
 
