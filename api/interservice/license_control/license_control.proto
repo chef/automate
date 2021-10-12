@@ -12,7 +12,7 @@ service LicenseControlService {
   rpc Status (StatusRequest) returns (StatusResponse);
   rpc Update (UpdateRequest) returns (UpdateResponse);
   rpc Telemetry (TelemetryRequest) returns (TelemetryResponse);
-  rpc GetDeploymentID(DeploymentIDRequest) returns (DeploymentIDResponse);
+  rpc GetDeploymentID(GetDeploymentIDRequest) returns (GetDeploymentIDResponse);
 }
 
 message LicenseRequest {
@@ -80,9 +80,9 @@ message TelemetryResponse {
   string telemetry_url = 2;
 }
 
-message DeploymentIDRequest {
+message GetDeploymentIDRequest {
 }
 
-message DeploymentIDResponse {
+message GetDeploymentIDResponse {
   string deployment_id = 1;
 }
