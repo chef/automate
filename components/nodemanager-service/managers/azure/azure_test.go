@@ -419,4 +419,10 @@ func TestHandlefilterIncludeAndExcludeTags(t *testing.T) {
 	filteredResources = filterExcludeTags(tags, filteredResources)
 	assert.Equal(t, 1, len(filteredResources))
 
+	tags = map[string][]string{
+		"name": {"test-1A", "test-2B", "test-3C", "test-4D"},
+	}
+	filteredResources = filterExcludeTags(tags, subList)
+	assert.Equal(t, 0, len(filteredResources))
+
 }
