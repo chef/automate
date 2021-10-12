@@ -104,12 +104,6 @@ func TestAzureApiSearchNodeFields(t *testing.T) {
 	t.Logf("fields found are %v", fields)
 	require.Equal(t, mgrtesthelpers.Contains(fields.GetFields(), "name"), true)
 
-	t.Log("search node fields for list of values for tags:Test")
-	query.Field = "tags:Test"
-	fields, err = mgrClient.SearchNodeFields(ctx, &query)
-	require.NoError(t, err)
-	require.NotEqual(t, 0, len(fields.GetFields()))
-
 	t.Log("search node fields for list of values for names")
 	query.Field = "tags:name"
 	fields, err = mgrClient.SearchNodeFields(ctx, &query)
@@ -149,7 +143,7 @@ func TestAzureApiSearchNodes(t *testing.T) {
 		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
-				{Key: "name", Values: []string{"Chef Automate Managed Service for Azure Testing"}},
+				{Key: "name", Values: []string{"Inspec"}},
 			},
 		},
 	}
@@ -162,24 +156,11 @@ func TestAzureApiSearchNodes(t *testing.T) {
 		NodeManagerId: AzureAPIManagerID,
 		Query: &manager.Query{
 			FilterMap: []*common.Filter{
-				{Key: "name", Values: []string{"Engineering Dev/Test"}, Exclude: true},
+				{Key: "name", Values: []string{"Inspec"}, Exclude: true},
 			},
 		},
 	}
 	nodes, err = mgrClient.SearchNodes(ctx, &query)
 	require.NoError(t, err)
-	require.NotEqual(t, 0, len(nodes.GetNodes()))
-
-	t.Log("search all nodes for this manager, filtered by tags")
-	query = manager.NodeQuery{
-		NodeManagerId: AzureAPIManagerID,
-		Query: &manager.Query{
-			FilterMap: []*common.Filter{
-				{Key: "owner", Values: []string{"owner"}},
-			},
-		},
-	}
-	nodes, err = mgrClient.SearchNodes(ctx, &query)
-	require.NoError(t, err)
-	require.NotEqual(t, 0, len(nodes.GetNodes()))
+	require.Equal(t, 0, len(nodes.GetNodes()))
 }
