@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"os"
 	"sync"
 	"time"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
-	"github.com/sirupsen/logrus"
 )
 
 // Factory is used to create secure service to service connections
@@ -60,15 +58,6 @@ func NewFactory(serviceCerts certs.ServiceCerts, opts ...FactoryOpt) *Factory {
 	}
 
 	return f
-}
-
-// required for supporting legacy certificated which does not contain SANs in go v1.15
-// this is deprecated in go v1.17
-func init() {
-	err := os.Setenv("GODEBUG", "x509ignoreCN=0")
-	if err != nil {
-		logrus.Error("Failed to set GODEBUG=x509ignoreCN=0 to the environment")
-	}
 }
 
 // Dial is a DialContext with context.Background. See (*Factory).DialContext.
