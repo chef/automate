@@ -8,7 +8,7 @@ module "system-tuning-automate" {
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
   instance_count                     = var.automate_instance_count
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.automate_public_ips
+  private_ips                        = var.automate_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.fe_sudo_password
@@ -21,7 +21,7 @@ module "system-tuning-chef_server" {
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
   instance_count                     = var.chef_server_instance_count
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.chef_server_public_ips
+  private_ips                        = var.chef_server_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.fe_sudo_password
@@ -34,7 +34,7 @@ module "system-tuning-elasticsearch" {
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
   instance_count                     = var.elasticsearch_instance_count
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.elasticsearch_public_ips
+  private_ips                        = var.elasticsearch_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.be_sudo_password
@@ -47,7 +47,7 @@ module "system-tuning-postgresql" {
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
   instance_count                     = var.postgresql_instance_count
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.postgresql_public_ips
+  private_ips                        = var.postgresql_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.be_sudo_password
@@ -58,7 +58,7 @@ module "airgap_bundle-elasticsearch" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-elasticsearch.archive_disk_info
   instance_count    = var.elasticsearch_instance_count
-  public_ips        = var.elasticsearch_public_ips
+  private_ips       = var.elasticsearch_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -72,7 +72,7 @@ module "airgap_bundle-postgresql" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-postgresql.archive_disk_info
   instance_count    = var.postgresql_instance_count
-  public_ips        = var.postgresql_public_ips
+  private_ips       = var.postgresql_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -86,7 +86,7 @@ module "airgap_bundle-automate" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-automate.archive_disk_info
   instance_count    = var.automate_instance_count
-  public_ips        = var.automate_public_ips
+  private_ips       = var.automate_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -103,7 +103,7 @@ module "airgap_bundle-chef_server" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-chef_server.archive_disk_info
   instance_count    = var.chef_server_instance_count
-  public_ips        = var.chef_server_public_ips
+  private_ips       = var.chef_server_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -130,7 +130,6 @@ module "habitat-elasticsearch" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.elasticsearch_private_ips
-  public_ips                      = var.elasticsearch_public_ips
   peer_ips = concat(
     var.elasticsearch_private_ips,
     var.postgresql_private_ips
@@ -156,7 +155,6 @@ module "habitat-postgresql" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.postgresql_private_ips
-  public_ips                      = var.postgresql_public_ips
   peer_ips = concat(
     var.elasticsearch_private_ips,
     var.postgresql_private_ips
@@ -182,7 +180,6 @@ module "habitat-automate" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.automate_private_ips
-  public_ips                      = var.automate_public_ips
   peer_ips                        = var.automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -205,7 +202,6 @@ module "habitat-chef_server" {
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.chef_server_private_ips
-  public_ips                      = var.chef_server_public_ips
   peer_ips                        = var.chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -231,7 +227,6 @@ module "elasticsearch" {
   kibana_pkg_ident             = var.kibana_pkg_ident
   metricbeat_pkg_ident         = var.metricbeat_pkg_ident
   private_ips                  = var.elasticsearch_private_ips
-  public_ips                   = var.elasticsearch_public_ips
   ssh_key_file                 = var.ssh_key_file
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
@@ -263,7 +258,6 @@ module "postgresql" {
   proxy_pkg_ident                 = var.proxy_pkg_ident
   proxy_svc_load_args             = var.proxy_svc_load_args
   private_ips                     = var.postgresql_private_ips
-  public_ips                      = var.postgresql_public_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -294,7 +288,6 @@ module "bootstrap_automate" {
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = slice(var.automate_private_ips, 0, 1)
   proxy_listen_port               = var.proxy_listen_port
-  public_ips                      = slice(var.automate_public_ips, 0, 1)
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.fe_sudo_password
@@ -329,12 +322,7 @@ module "automate" {
     1,
     length(var.automate_private_ips),
   )
-  proxy_listen_port = var.proxy_listen_port
-  public_ips = slice(
-    var.automate_public_ips,
-    1,
-    length(var.automate_public_ips),
-  )
+  proxy_listen_port      = var.proxy_listen_port
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
   ssh_user_sudo_password = local.fe_sudo_password
@@ -364,9 +352,8 @@ module "chef_server" {
   elasticsearch_private_ips       = var.elasticsearch_private_ips
   postgresql_private_ips          = var.postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
-  private_ips                     = var.automate_private_ips
+  private_ips                     = var.chef_server_private_ips
   proxy_listen_port               = var.proxy_listen_port
-  public_ips                      = var.chef_server_public_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.fe_sudo_password

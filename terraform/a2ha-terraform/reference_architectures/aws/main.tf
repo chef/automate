@@ -2,6 +2,8 @@ module "aws" {
   ami_filter_name                    = var.ami_filter_name
   ami_filter_owner                   = var.ami_filter_owner
   ami_filter_virt_type               = var.ami_filter_virt_type
+  aws_vpc_id                         = var.aws_vpc_id
+  aws_cidr_block_addr                = var.aws_cidr_block_addr
   automate_ebs_volume_iops           = var.automate_ebs_volume_iops
   automate_ebs_volume_size           = var.automate_ebs_volume_size
   automate_ebs_volume_type           = var.automate_ebs_volume_type
@@ -41,11 +43,8 @@ module "aws" {
 
 module "aws-output" {
   source                    = "./modules/aws_output"
-  automate_public_ips       = module.aws.automate_public_ips
   automate_private_ips      = module.aws.automate_private_ips
-  chef_server_public_ips    = module.aws.chef_server_public_ips
   chef_server_private_ips   = module.aws.chef_server_private_ips
-  postgresql_public_ips     = module.aws.postgresql_public_ips
   postgresql_private_ips    = module.aws.postgresql_private_ips
   elasticsearch_public_ips  = module.aws.elasticsearch_public_ips
   elasticsearch_private_ips = module.aws.elasticsearch_private_ips

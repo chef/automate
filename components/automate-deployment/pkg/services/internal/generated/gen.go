@@ -489,6 +489,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-cluster-ctl",
+      "metadata": null
+    },
+    {
       "name": "core/rsync",
       "metadata": null
     }

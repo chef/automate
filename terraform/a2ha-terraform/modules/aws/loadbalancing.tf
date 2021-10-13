@@ -5,7 +5,7 @@ resource "aws_alb" "automate_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.base_linux.id, aws_security_group.chef_automate.id]
-  subnets            = aws_subnet.default.*.id
+  subnets            = aws_subnet.public.*.id
   tags               = var.tags
 }
 
@@ -13,7 +13,7 @@ resource "aws_alb_target_group" "automate_tg" {
   name     = "${var.tag_name}-${random_id.random.hex}-automate-tg"
   port     = 443
   protocol = "HTTPS"
-  vpc_id   = aws_vpc.default.id
+  vpc_id   = data.aws_vpc.default.id
 }
 
 resource "aws_alb_target_group_attachment" "automate_tg_attachment" {
@@ -59,7 +59,7 @@ resource "aws_alb" "chef_server_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.base_linux.id, aws_security_group.chef_automate.id]
-  subnets            = aws_subnet.default.*.id
+  subnets            = aws_subnet.public.*.id
   tags               = var.tags
 }
 
@@ -67,7 +67,7 @@ resource "aws_alb_target_group" "chef_server_tg" {
   name     = "${var.tag_name}-${random_id.random.hex}-chef-server-tg"
   port     = 443
   protocol = "HTTPS"
-  vpc_id   = aws_vpc.default.id
+  vpc_id   = data.aws_vpc.default.id
 
   health_check {
     path                = "/_status"

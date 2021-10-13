@@ -130,27 +130,6 @@ To apply the changes, run:
 sudo chef-server-ctl reconfigure
 ```
 
-### Setting Up Data Collection on Chef Infra Server for Versions 12.11 through 12.13
-
-For Chef Infra Server versions between 12.11 and 12.13, simply add the `root_url` and `token` values in
-`/etc/opscode/chef-server.rb`:
-
-```ruby
-data_collector['root_url'] = 'https://{{< example_fqdn "automate" >}}/data-collector/v0/'
-data_collector['token'] = '<API_TOKEN_FROM_STEP_1>'
-# Add for Chef Infra Client run forwarding
-data_collector['proxy']= true
-# Add for compliance scanning
-profiles['root_url'] = 'https://{{< example_fqdn "automate" >}}'
-# Save and close the file
-```
-
-To apply the changes, run:
-
-```shell
-chef-server-ctl reconfigure
-```
-
 ### Setting Up Chef Infra Client to Send Compliance Scan Data Through the Chef Infra Server to Chef Automate
 
 Now that the Chef Infra Server is configured for data collection, you can also enable Compliance Scanning
@@ -271,6 +250,6 @@ Chef Automate. Please see the audit cookbook for an
 ## Troubleshooting: My Data Does Not Show Up in the User Interface
 
 Organizations without associated nodes will not show up on the Chef Automate _Nodes_ page. A node
-is not associated with automate until a Chef Infra Client run has completed. This is also true for roles,
+is not associated with Automate until a Chef Infra Client run has completed. This is also true for roles,
 cookbooks, recipes, attributes, resources, node names, and environments but does not highlight them
 in the UI. This is designed to keep the UI focused on the nodes in your cluster.

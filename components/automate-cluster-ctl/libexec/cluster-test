@@ -36,7 +36,7 @@ class AutomateClusterTest < AutomateCluster::Command
     INSPEC_PROFILES.each do |name, profiles|
       next unless service_name.nil? || name == service_name.to_sym
 
-      AutomateCluster.terraform.output["#{name}_public_ips"].each do |ip|
+      AutomateCluster.terraform.output["#{name}_private_ips"].each do |ip|
         profiles.each do |profile|
           results << [profile, ip, run_smoke_test(name, ip, profile)]
         end

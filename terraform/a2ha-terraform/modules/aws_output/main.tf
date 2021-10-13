@@ -13,13 +13,13 @@ locals {
     })
 
     copy_terraform_files_for_destroy = [
-    "/src/terraform/reference_architectures/aws/variables.tf",
-    "/src/terraform/a2ha_habitat.auto.tfvars",
-    "/src/terraform/aws.auto.tfvars",
-    "/src/terraform/variables_common.tf"
+    "/hab/a2_deploy_workspace/terraform/reference_architectures/aws/variables.tf",
+    "/hab/a2_deploy_workspace/terraform/a2ha_habitat.auto.tfvars",
+    "/hab/a2_deploy_workspace/terraform/aws.auto.tfvars",
+    "/hab/a2_deploy_workspace/terraform/variables_common.tf"
     ]
 
-    destination_path = "/src/terraform/destroy/aws"
+    destination_path = "/hab/a2_deploy_workspace/terraform/destroy/aws"
  
 }
 

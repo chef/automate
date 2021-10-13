@@ -1,0 +1,1 @@
+We are creating this duplicate make file here as this Makefile will be available in workspace for the generating airgap bundle and generating the tf vars file. And it does not have function regarding the pipelines.
