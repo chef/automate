@@ -74,6 +74,7 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
                 <chef-button
                   tertiary
                   class="float-right action"
@@ -82,6 +83,7 @@
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
                 </chef-button>
+              </app-authorized>
             </div>
             <div *ngIf="hasRun_List">
               <div class="expand-collapse">
@@ -101,6 +103,7 @@
                   <chef-icon>remove_circle</chef-icon>
                   <span>Collapse All</span>
                 </chef-button>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
                   <chef-button
                     tertiary
                     class="float-right action"
@@ -110,6 +113,7 @@
                     <span class="material-icons edit-item">mode_edit</span>
                     <span class="edit-text">Edit</span>
                   </chef-button>
+                </app-authorized>
               </div>
               <app-tree-table
                 [hidden]="hasRun_List ? false : true"
@@ -160,6 +164,7 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
                 <chef-button
                   tertiary
                   class="float-right"
@@ -168,6 +173,7 @@
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
                 </chef-button>
+              </app-authorized>
             </div>
             <app-json-tree-table class="json-container"
               [hidden]="hasDefaultJson ? false : true"
@@ -202,6 +208,7 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
                 <chef-button
                   tertiary
                   class="float-right action"
@@ -210,6 +217,7 @@
                   <span class="material-icons edit-item">mode_edit</span>
                   <span class="edit-text">Edit</span>
                 </chef-button>
+              </app-authorized>
             </div>
             <app-json-tree-table class="json-container"
               [hidden]="hasOverrideJson ? false : true"
