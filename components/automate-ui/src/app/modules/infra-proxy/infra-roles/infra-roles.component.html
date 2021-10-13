@@ -26,7 +26,7 @@
         (searchButtonClick)="searchRoles($event)"
         placeHolder="roles by name...">
       </app-infra-search-bar>
-      <app-paginator
+      <app-paginator *ngIf="roles.length"
         [length]= "total"
         [pageSize]= "per_page"
         [pageIndex]= "currentPage"

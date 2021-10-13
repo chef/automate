@@ -3,6 +3,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  OnInit,
   OnChanges,
   SimpleChanges,
   ViewChild,
@@ -17,20 +18,35 @@ import { MatPaginator } from '@angular/material/paginator';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PaginatorComponent implements OnChanges {
+export class PaginatorComponent implements OnInit, OnChanges {
   @Input() length: Number;
   @Input() pageSize: Number;
   @Input() pageIndex: number;
   @Output() changePage = new EventEmitter<any>(true);
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  pageSizeOptions: number[] = [1, 5, 10];
+  pageSizeOptions: number[] = [3, 5, 10];
   pageEvent: PageEvent;
+  public isPageAvailable = false;
+
+  ngOnInit() {
+    if (this.length > this.pageSizeOptions[0]) {
+      this.isPageAvailable = true;
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges) {
-    if ( changes.pageIndex.currentValue !== changes.pageIndex.previousValue
-      && !changes.pageIndex.firstChange) {
-      this.paginator.pageIndex = changes.pageIndex.currentValue - 1;
+    if (changes.pageIndex) {
+      if (changes.pageIndex.currentValue !== changes.pageIndex.previousValue
+        && !changes.pageIndex.firstChange) {
+        this.paginator.pageIndex = changes.pageIndex.currentValue - 1;
+      }
+    }
+    if (changes.length) {
+        if (this.paginator) {
+          this.paginator.length = changes.length.currentValue;
+        }
+      this.isPageAvailable = ( this.length > this.pageSizeOptions[0] ? true : false );
     }
   }
 

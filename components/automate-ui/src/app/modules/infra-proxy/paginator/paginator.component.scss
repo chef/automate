@@ -47,7 +47,7 @@
   background: $chef-primary-bright;
 }
 
-::ng-deep #mat-select-2-panel {
+::ng-deep .mat-select-panel.mat-primary[aria-label="Items per page:"] {
   margin-top: 15px;
   width: 200px;
 }
