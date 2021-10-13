@@ -26,13 +26,15 @@
         (searchButtonClick)="searchRoles($event)"
         placeHolder="roles by name...">
       </app-infra-search-bar>
-      <chef-button
-        id="role-create"
-        primary
-        (click)="openCreateModal()"
-        data-cy="create-role-button">
-        Create Role
-      </chef-button>
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'post', [serverId, orgId]]">
+        <chef-button
+          id="role-create"
+          primary
+          (click)="openCreateModal()"
+          data-cy="create-role-button">
+          Create Role
+        </chef-button>
+      </app-authorized>
     </div>
     <chef-loading-spinner
       class="full-screen-spinner"
@@ -45,37 +47,41 @@
       <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
       <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
     </div>
-    <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
-      <chef-table>
-        <chef-thead>
-          <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Name</chef-th>
-            <chef-th class="no_border_th">Description</chef-th>
-            <chef-th class="no_border_th">Environments</chef-th>
-            <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th three-dot-column"></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <chef-tr *ngFor="let role of roles">
-            <chef-td>
-              <a [routerLink]="['/infrastructure','chef-servers', serverId,
-              'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
-            </chef-td>
-            <chef-td>
-              {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
-            </chef-td>
-            <chef-td>{{ role.environments.join(", ") }}</chef-td>
-            <chef-td></chef-td>
-            <chef-td class="three-dot-column">
-              <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
-              </mat-select>
-            </chef-td>
-          </chef-tr>
-        </chef-tbody>
-      </chef-table>
-    </div>
+    <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'get', [serverId, orgId]]">
+      <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr class="no_border_tr">
+              <chef-th class="no_border_th">Name</chef-th>
+              <chef-th class="no_border_th">Description</chef-th>
+              <chef-th class="no_border_th">Environments</chef-th>
+              <chef-th class="no_border_th"></chef-th>
+              <chef-th class="no_border_th three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let role of roles">
+              <chef-td>
+                <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
+              </chef-td>
+              <chef-td>
+                {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
+              </chef-td>
+              <chef-td>{{ role.environments.join(", ") }}</chef-td>
+              <chef-td></chef-td>
+              <chef-td class="three-dot-column">
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'delete', [serverId, orgId, role.name]]">
+                  <mat-select panelClass="chef-control-menu">
+                    <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
+                  </mat-select>
+                </app-authorized>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+    </app-authorized>
 
     <app-page-picker
       *ngIf="!searching"
