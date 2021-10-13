@@ -48,6 +48,40 @@ func init() {
         ]
       }
     },
+    "/api/v0/compliance/reporting/stats/nodes/count/updated": {
+      "put": {
+        "summary": "UpdateTelemetryReported",
+        "description": "Acknowledge API  to updates the last complaince telemetry reported date in postgres\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "StatsService_UpdateTelemetryReported",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/stats/profiles": {
       "post": {
         "summary": "Read Profiles",
@@ -711,6 +745,18 @@ func init() {
           "description": "Set of statistics for passed/failed/skipped nodes or controls in a trendgraph friendly data format."
         }
       }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "lastTelemetryReportedAt": {
+          "type": "string",
+          "title": "last complaince telemetry reported date"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse": {
+      "type": "object"
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",

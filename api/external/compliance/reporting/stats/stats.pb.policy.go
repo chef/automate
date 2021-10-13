@@ -74,4 +74,17 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.compliance.reporting.stats.v1.StatsService/UpdateTelemetryReported", "iam:introspect", "iam:introspect:getAll", "PUT", "/api/v0/compliance/reporting/stats/nodes/count/updated", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*UpdateTelemetryReportedRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "lastTelemetryReportedAt":
+					return m.LastTelemetryReportedAt
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

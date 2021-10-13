@@ -5,12 +5,15 @@ option go_package = "github.com/chef/automate/api/interservice/compliance/stats"
 
 import "google/api/annotations.proto";
 import "interservice/compliance/reporting/reporting.proto";
+import "google/protobuf/timestamp.proto";
+
 
 service StatsService {
 	rpc ReadSummary(Query) returns (Summary) {};
 	rpc ReadTrend(Query) returns (Trends) {};
 	rpc ReadProfiles(Query) returns (Profile) {};
 	rpc ReadFailures(Query) returns (Failures) {};
+	rpc UpdateTelemetryReported(UpdateTelemetryReportedRequest) returns (UpdateTelemetryReportedResponse) {};
 }
 
 message ListFilter {
@@ -156,4 +159,11 @@ message FailureSummary {
 	int32 failures = 2;
 	string id = 3;
 	string profile = 4;
+}
+
+message UpdateTelemetryReportedRequest {
+	string lastTelemetryReportedAt = 1;
+}
+
+message UpdateTelemetryReportedResponse {
 }

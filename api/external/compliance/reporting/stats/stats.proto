@@ -6,6 +6,8 @@ option go_package = "github.com/chef/automate/api/external/compliance/reporting/
 import "google/api/annotations.proto";
 import "external/annotations/iam/annotations.proto";
 import "external/compliance/reporting/reporting.proto";
+import "google/protobuf/timestamp.proto";
+
 
 service StatsService {
 	/*
@@ -149,6 +151,27 @@ service StatsService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:stats:failures"
 			action: "compliance:reportFailures:get"
+		};
+	};
+
+	/*
+	UpdateTelemetryReported
+
+	Acknowledge API  to updates the last complaince telemetry reported date in postgres
+
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc UpdateTelemetryReported(UpdateTelemetryReportedRequest) returns (UpdateTelemetryReportedResponse) {
+		option (google.api.http) = {
+			put: "/api/v0/compliance/reporting/stats/nodes/count/updated"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
 		};
 	};
 }
@@ -406,4 +429,12 @@ message FailureSummary {
 	string id = 3;
 	// Not used.
 	string profile = 4;
+}
+
+message UpdateTelemetryReportedRequest {
+	// last complaince telemetry reported date
+	string lastTelemetryReportedAt = 1;
+}
+
+message UpdateTelemetryReportedResponse {
 }
