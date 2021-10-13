@@ -21,18 +21,12 @@
     (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
-    <div class="wrapper">
-      <div class="search-create-container">
-        <app-infra-search-bar
-          (searchButtonClick)="searchRoles($event)"
-          placeHolder="roles by name...">
-        </app-infra-search-bar>
-        <app-paginator *ngIf="roles.length"
-          [length]= "total"
-          [pageSize]= "per_page"
-          [pageIndex]= "currentPage"
-          (changePage)= "onUpdatePage($event)"
-        ></app-paginator>
+    <div class="search-create-container">
+      <app-infra-search-bar
+        (searchButtonClick)="searchRoles($event)"
+        placeHolder="roles by name...">
+      </app-infra-search-bar>
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'post', [serverId, orgId]]">
         <chef-button
           id="role-create"
           primary
@@ -40,18 +34,20 @@
           data-cy="create-role-button">
           Create Role
         </chef-button>
-      </div>
-      <chef-loading-spinner
-        class="full-screen-spinner"
-        *ngIf="loading || deleting"
-        size="50"
-        fixed>
-      </chef-loading-spinner>
-      <div data-cy="empty-list" class="empty-section" *ngIf="!loading && !roles.length">
-        <img alt="No preview" src="/assets/img/no_preview.gif" />
-        <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
-        <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
-      </div>
+      </app-authorized>
+    </div>
+    <chef-loading-spinner
+      class="full-screen-spinner"
+      *ngIf="searching || deleting"
+      size="50"
+      fixed>
+    </chef-loading-spinner>
+    <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !roles.length">
+      <img alt="No preview" src="/assets/img/no_preview.gif" />
+      <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
+      <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+    </div>
+    <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'get', [serverId, orgId]]">
       <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
         <chef-table>
           <chef-thead>
@@ -75,14 +71,26 @@
               <chef-td>{{ role.environments.join(", ") }}</chef-td>
               <chef-td></chef-td>
               <chef-td class="three-dot-column">
-                <mat-select panelClass="chef-control-menu">
-                  <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
-                </mat-select>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'delete', [serverId, orgId, role.name]]">
+                  <mat-select panelClass="chef-control-menu">
+                    <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
+                  </mat-select>
+                </app-authorized>
               </chef-td>
             </chef-tr>
           </chef-tbody>
         </chef-table>
       </div>
+    </app-authorized>
+
+    <app-page-picker
+      *ngIf="!searching"
+      class="roles-list-paging"
+      [total]="total"
+      [perPage]="per_page"
+      [page]="currentPage"
+      (pageChanged)="onPageChange($event)">
+    </app-page-picker>
 
       <app-page-picker
         *ngIf="!loading"
