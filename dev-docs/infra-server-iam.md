@@ -50,7 +50,6 @@ Specify the action to restrict user access to the specific action.
 | Delete Org | DELETE | infra:infraServersOrgs:delete | /api/v0/infra/servers/{server_id}/orgs/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{id} |
 | List Cookbooks | GET | infra:infraServersOrgsCookbooks:list | /api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks |
 | Get Cookbooks | GET | infra:infraServersOrgsCookbooks:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name} |
-<<<<<<< HEAD
 example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | List Roles | GET | infra:infraServersOrgsRoles:list | /api/v0/infra/servers/{id}/orgs/{org_id}/roles | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id}/orgs/{org_id}/roles |
 | Get Roles | GET | infra:infraServersOrgsRoles:get | /api/v0/infra/servers/{id}/orgs/{org_id}/roles/{name} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id}/orgs/{org_id}/roles/{name} |
@@ -73,5 +72,3 @@ example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
 | Get PolicyFiles | GET | infra:infraServersOrgsPolicyFiles:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles |
 | Delete PolicyFiles | DELETE | infra:infraServersOrgsPolicyFiles:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name} |
 | Get PolicyGroups | GET | infra:infraServersOrgsPolicyGroups:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name} |
-=======
->>>>>>> Abdul/cookbooks actions (#5848)
