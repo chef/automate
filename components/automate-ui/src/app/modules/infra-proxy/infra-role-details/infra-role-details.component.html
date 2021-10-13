@@ -74,14 +74,16 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right action"
-                (click)="openEditModal(role?.default_attributes, 'Run List')"
-                [disabled]="editDisabled">
-                <span class="material-icons edit-item">mode_edit</span>
-                <span class="edit-text">Edit</span>
-              </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
+                <chef-button
+                  tertiary
+                  class="float-right action"
+                  (click)="openEditModal(role?.default_attributes, 'Run List')"
+                  [disabled]="editDisabled">
+                  <span class="material-icons edit-item">mode_edit</span>
+                  <span class="edit-text">Edit</span>
+                </chef-button>
+              </app-authorized>
             </div>
             <div *ngIf="hasRun_List">
               <div class="expand-collapse">
@@ -101,15 +103,17 @@
                   <chef-icon>remove_circle</chef-icon>
                   <span>Collapse All</span>
                 </chef-button>
-                <chef-button
-                  tertiary
-                  class="float-right action"
-                  (click)="openEditModal(role?.default_attributes, 'Run List')"
-                  data-cy="edit-runlist"
-                  [disabled]="editDisabled">
-                  <span class="material-icons edit-item">mode_edit</span>
-                  <span class="edit-text">Edit</span>
-                </chef-button>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
+                  <chef-button
+                    tertiary
+                    class="float-right action"
+                    (click)="openEditModal(role?.default_attributes, 'Run List')"
+                    data-cy="edit-runlist"
+                    [disabled]="editDisabled">
+                    <span class="material-icons edit-item">mode_edit</span>
+                    <span class="edit-text">Edit</span>
+                  </chef-button>
+                </app-authorized>
               </div>
               <app-tree-table
                 [hidden]="hasRun_List ? false : true"
@@ -160,14 +164,16 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right"
-                (click)="openEditModal(role?.default_attributes, 'Default')"
-                data-cy="edit-default-attribute">
-                <span class="material-icons edit-item">mode_edit</span>
-                <span class="edit-text">Edit</span>
-              </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
+                <chef-button
+                  tertiary
+                  class="float-right"
+                  (click)="openEditModal(role?.default_attributes, 'Default')"
+                  data-cy="edit-default-attribute">
+                  <span class="material-icons edit-item">mode_edit</span>
+                  <span class="edit-text">Edit</span>
+                </chef-button>
+              </app-authorized>
             </div>
             <app-json-tree-table class="json-container"
               [hidden]="hasDefaultJson ? false : true"
@@ -202,14 +208,16 @@
                 <chef-icon>remove_circle</chef-icon>
                 <span>Collapse All</span>
               </chef-button>
-              <chef-button
-                tertiary
-                class="float-right action"
-                (click)="openEditModal(role?.override_attributes, 'Override')"
-                data-cy="edit-override-attribute">
-                <span class="material-icons edit-item">mode_edit</span>
-                <span class="edit-text">Edit</span>
-              </chef-button>
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles/{name}', 'put', [serverId, orgId, role.name]]">
+                <chef-button
+                  tertiary
+                  class="float-right action"
+                  (click)="openEditModal(role?.override_attributes, 'Override')"
+                  data-cy="edit-override-attribute">
+                  <span class="material-icons edit-item">mode_edit</span>
+                  <span class="edit-text">Edit</span>
+                </chef-button>
+              </app-authorized>
             </div>
             <app-json-tree-table class="json-container"
               [hidden]="hasOverrideJson ? false : true"
