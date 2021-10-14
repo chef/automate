@@ -433,7 +433,7 @@ message FailureSummary {
 
 message UpdateTelemetryReportedRequest {
 	// last complaince telemetry reported date
-	string lastTelemetryReportedAt = 1;
+	string last_telemetry_reported_at = 1;
 }
 
 message UpdateTelemetryReportedResponse {

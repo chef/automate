@@ -78,7 +78,7 @@ func init() {
 		if m, ok := input.(*UpdateTelemetryReportedRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
-				case "lastTelemetryReportedAt":
+				case "last_telemetry_reported_at":
 					return m.LastTelemetryReportedAt
 				default:
 					return ""

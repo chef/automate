@@ -9,10 +9,10 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="http://github.com/chef/automate/components/automate-gateway"
 pkg_version="0.1.0"
 pkg_deps=(
-  core/cacerts # communicate with license service over HTTPS
+  core/cacerts/2020.01.01/20200306005234 # communicate with license service over HTTPS
   core/curl
   core/jq-static
-  core/glibc # zoneinfo
+  core/glibc/2.29/20200305172459 # zoneinfo
   chef/mlsa
 )
 pkg_exports=(

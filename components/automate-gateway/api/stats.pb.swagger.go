@@ -749,7 +749,7 @@ func init() {
     "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest": {
       "type": "object",
       "properties": {
-        "lastTelemetryReportedAt": {
+        "last_telemetry_reported_at": {
           "type": "string",
           "title": "last complaince telemetry reported date"
         }

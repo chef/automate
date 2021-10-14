@@ -31,13 +31,13 @@ pkg_binds_optional=(
 )
 inspec_release="chef/inspec/4.24.32/20210112215549"
 pkg_deps=(
-  core/coreutils
+  core/coreutils/8.30/20200305231640
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   "${inspec_release}"
   chef/mlsa
   core/grpcurl              # Used in habitat/hooks/health_check
   core/jq-static            # Used in habitat/hooks/health_check
-  core/bash
+  core/bash/5.0.16/20200305233030
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
