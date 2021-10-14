@@ -62,7 +62,6 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
     this.instanceNodeCredentials$.subscribe((results) => {
       if (this.scrollingLoader) {
         this.credentialArray = [...this.credentialArray, ...results];
-        console.log(this.credentialArray.length, results.length);
         this.scrollingLoader = false;
       } else {
         this.credentialArray = results;

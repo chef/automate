@@ -1,11 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { Store, createSelector } from '@ngrx/store';
-import { clientRunsState } from 'app/entities/client-runs/client-runs.selectors';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import {
-  map
-} from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-selectbox',
@@ -19,10 +12,15 @@ export class SelectboxComponent implements OnInit, OnChanges {
   @Input() data: any;
   // It can be anything pass type in parent component
   // eg: type = "winrm"
-  @Input() type: any;
+  @Input() typeValue: string;
+  @Input() typeFieldName: string;
   // searchFlag is optional
   @Input() searchFlag: boolean;
   @Input() combination: boolean;
+  // if are pagination pass value from parent component in scrollloading
+  @Input() scrollLoadingRightSide: boolean;
+  @Input() uniqueFiledName: string;
+
   @Output() searchData = new EventEmitter<string>();
   @Output() selectData = new EventEmitter<any[]>();
   @Output() onScrollListData = new EventEmitter();
@@ -34,15 +32,12 @@ export class SelectboxComponent implements OnInit, OnChanges {
   public selectedListDataToMove: any[] = [];
   public selectedListTypeToMove: string;
   public moveLeftOrRight: string;
-  nodeSuggestions$: any;
   public copyDataListFlags: boolean;
-  public scrollingLoader: boolean;
   newItemEvent: any;
 
-  constructor(private store: Store<NgrxStateAtom>) { }
+  constructor() { }
 
   ngOnInit() {
-    this.scrollingLoader = false;
     this.copyDataListFlags = false;
     this.moveLeftOrRight = '';
     this.selectedListTypeToMove = '';
@@ -52,21 +47,28 @@ export class SelectboxComponent implements OnInit, OnChanges {
     if (!this.copyDataListFlags && this.data === this.listData || this.data !== null ) {
       this.listData = [...this.data];
       this.selectData.emit(this.selectedListData);
-      this.selectedListData.forEach((listDataValue) => {
-        if (listDataValue.type === this.type) {
-          this.listData.splice(this.listData.indexOf(listDataValue), 1);
+      this.selectedListData.forEach((selectedListValue) => {
+        if (selectedListValue[this.typeFieldName] === this.typeValue) {
+          this.listData.forEach(
+            (listDataValue, listDataIndex) => {
+              if (listDataValue[this.uniqueFiledName] === selectedListValue[this.uniqueFiledName]) {
+                this.listData.splice(listDataIndex, 1);
+              }
+            });
         }
       });
       this.copyDataListFlags = true;
     }
 
+
     if (!this.combination) {
-      if (this.type !== this.selectedListTypeToMove) {
+      if (this.typeValue !== this.selectedListTypeToMove) {
         this.selectedListDataToMove = [];
       }
     }
 
   }
+
 
   emitData(data: string) {
     this.searchData.emit(data);
@@ -77,17 +79,17 @@ export class SelectboxComponent implements OnInit, OnChanges {
   }
 
   onScrollDown() {
+    this.scrollLoadingRightSide = true;
     this.onScrollListData.emit();
-    console.log('onScrollListData');
   }
 
-  selectItem(listData: string, side: string, secretType: string): void {
+  selectItem(listData, side, secretType): void {
     this.selectedListTypeToMove = secretType;
     if (this.selectedListTypeToMove === secretType || this.selectedListTypeToMove === '' ) {
       if (this.selectedListDataToMove.includes(listData)) {
         this.selectedListDataToMove.splice(this.selectedListDataToMove.indexOf(listData), 1);
       } else {
-      this.selectedListDataToMove.push(listData);
+        this.selectedListDataToMove.push(listData);
       }
     }
 
@@ -100,6 +102,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
   }
 
 
+
   highlightElementLeft(listData: string): boolean {
     return this.selectedListDataToMove.includes(listData);
   }
@@ -109,8 +112,10 @@ export class SelectboxComponent implements OnInit, OnChanges {
 }
 
   moveRight() {
-    if (!this.combination) {
+    if (this.selectedListData.length !== 0) {
+      if (this.selectedListData[0][this.typeFieldName] !== this.typeValue) {
         this.selectedListData = [];
+      }
     }
     this.selectedListDataToMove.forEach(selectedListData => {
       this.selectedListData.unshift(selectedListData);
@@ -127,24 +132,6 @@ export class SelectboxComponent implements OnInit, OnChanges {
     });
     this.selectedListDataToMove = [];
     this.moveLeftOrRight = '';
-  }
-
-  onSuggestValues(event: any) {
-    console.log(event);
-  }
-
-  onFilterAdded(event: any) {
-    console.log(event);
-  }
-
-  toggleFilters() {
-    console.log('aaa');
-  }
-
-  suggestion() {
-    return this.nodeSuggestions$ = this.store.select(createSelector(clientRunsState,
-      (state) => state.nodeSuggestions)).pipe(map((nodeSuggestions: any[]) =>
-      nodeSuggestions.map(item => item.text)));
   }
 
 }

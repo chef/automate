@@ -42,7 +42,7 @@
           <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
             <app-accordion>
               <app-accordion-item title="Add credentials to connect to your nodes">
-                <chef-select #ty (change)="onSelectedTab(ty.value)" >
+                <chef-select #ty (change)="onTypeSelect(ty.value)" >
                   <chef-option value={{credential.asset}} *ngFor="let credential of credentialType">{{credential.name}}</chef-option>                    
                   <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->
                 </chef-select>
@@ -51,9 +51,12 @@
                 [searchFlag]=true
                 (searchData)="search($event)"
                 (selectData)="selected($event)"
-                [type]="secretType"
                 (onScrollListData)="scroll()"
                 [combination]=false
+                [scrollLoadingRightSide]="scrollLoadingValue"
+                [uniqueFiledName]="uniqueFiledName"
+                [typeValue]="secretType"
+                [typeFieldName]="typeFieldName"
                 >
                 </app-selectbox>
                 <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>

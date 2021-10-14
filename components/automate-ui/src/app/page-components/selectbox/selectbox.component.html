@@ -17,7 +17,7 @@
           [ngClass]="{'active': highlightElement(data)}">
           {{ data.name}}
         </li>
-        <chef-separator *ngIf="scrollingLoader">
+        <chef-separator *ngIf="scrollLoadingRightSide">
           <chef-pill>
             <chef-loading-spinner class="elementSpinner" size='14'></chef-loading-spinner>
             Loading...
@@ -40,8 +40,8 @@
           <li 
             *ngFor="let data of selectedListData"
             [attr.disabled]="moveLeftOrRight === 'right'"
-            [hidden]="!(data.type === type)"
-            (click)="moveLeftOrRight !== 'left' ? selectItem(data, 'right', data.type) : null" 
+            [hidden]="!(data[typeFieldName] === typeValue)"
+            (click)="moveLeftOrRight !== 'left' ? selectItem(data, 'right', data[typeFieldName]) : null" 
             [ngStyle]="{'cursor': moveLeftOrRight !== 'left' ? 'pointer' : 'no-drop'}"
             [ngClass]="{'active': highlightElement(data)}"
             >
@@ -57,5 +57,3 @@
     </label>
   </div>
 </main>
-
-{{listData.length}}

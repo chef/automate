@@ -16,3 +16,13 @@ export const instanceCredentials = createSelector(
   allCredentials,
   (credentials) => filter((cred) => includes(cred.type, ['ssh', 'winrm', 'sudo']), credentials)
 );
+
+export const credStatus = createSelector(
+  credentialState,
+  (state) => state.status
+);
+
+export const credtotal = createSelector(
+  credentialState,
+  (state) => state.total
+);
