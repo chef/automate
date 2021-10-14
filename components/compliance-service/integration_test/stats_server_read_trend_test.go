@@ -10,7 +10,6 @@ import (
 	apiReporting "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
-	"github.com/chef/automate/components/compliance-service/dao/pgdb/dbtest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +23,7 @@ func TestReadTrend(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
-	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, dbtest.Setup())
+	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
 
 	n := 5
