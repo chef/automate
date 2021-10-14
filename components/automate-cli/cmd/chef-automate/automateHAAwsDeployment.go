@@ -35,6 +35,10 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	if err != nil {
 		return err
 	}
+	err = executeSecretsInitCommand(a.config.Architecture.ConfigInitials.SecretsKeyFile)
+	if err != nil {
+		return err
+	}
 	writer.Printf("provisioning infra for automate HA \n\n\n\n")
 	args = args[1:]
 	args = append(args, "-y")

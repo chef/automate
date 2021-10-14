@@ -115,6 +115,13 @@ func bootstrapEnv(dm deployManager) error {
 		}
 	}
 	conf := new(dc.AutomateConfig)
+	if err := mergeFlagOverrides(conf); err != nil {
+		return status.Wrap(
+			err,
+			status.ConfigError,
+			"Merging command flag overrides into Chef Automate config failed",
+		)
+	}
 	manifestProvider := manifest.NewLocalHartManifestProvider(
 		mc.NewDefaultClient(conf.Deployment.GetV1().GetSvc().GetManifestDirectory().GetValue()),
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
@@ -143,4 +150,12 @@ func checkIfFileExist(path string) bool {
 		return true
 	}
 	return false
+}
+
+func executeSecretsInitCommand(secretsKeyFilePath string) error {
+	if !checkIfFileExist(secretsKeyFilePath) {
+		writer.Printf("doing secrets init  \n")
+		return executeSecretsCommand([]string{"init"})
+	}
+	return nil
 }
