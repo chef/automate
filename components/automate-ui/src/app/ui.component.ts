@@ -27,12 +27,7 @@ export class UIComponent implements OnInit, AfterViewChecked {
     }
   ];
 
-  betaFeatures: Array<Feature> = [
-    {
-      key: 'servicenow_cmdb',
-      name: 'Chef Automate Data Feed'
-    }
-  ];
+  betaFeatures: Array<Feature> = [];
 
   legacyFeatures: Array<Feature> = [];
   hideFullPage = true;
