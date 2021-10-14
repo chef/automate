@@ -3697,6 +3697,138 @@ func (x *ProfileMeta) GetFull() string {
 	return ""
 }
 
+type ControlElement struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The control's unique ID.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The control's compact description.
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Profile name.
+	Profile string `protobuf:"bytes,3,opt,name=profile,proto3" json:"profile,omitempty"`
+	// The severity of the control.
+	Impact float32 `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
+	// The total number of results.
+	Results int32 `protobuf:"varint,5,opt,name=results,proto3" json:"results,omitempty"`
+}
+
+func (x *ControlElement) Reset() {
+	*x = ControlElement{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_compliance_reporting_reporting_proto_msgTypes[44]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ControlElement) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ControlElement) ProtoMessage() {}
+
+func (x *ControlElement) ProtoReflect() protoreflect.Message {
+	mi := &file_external_compliance_reporting_reporting_proto_msgTypes[44]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ControlElement.ProtoReflect.Descriptor instead.
+func (*ControlElement) Descriptor() ([]byte, []int) {
+	return file_external_compliance_reporting_reporting_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *ControlElement) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ControlElement) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *ControlElement) GetProfile() string {
+	if x != nil {
+		return x.Profile
+	}
+	return ""
+}
+
+func (x *ControlElement) GetImpact() float32 {
+	if x != nil {
+		return x.Impact
+	}
+	return 0
+}
+
+func (x *ControlElement) GetResults() int32 {
+	if x != nil {
+		return x.Results
+	}
+	return 0
+}
+
+type ControlElements struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// List of control elements
+	ControlElements []*ControlElement `protobuf:"bytes,1,rep,name=control_elements,json=controlElements,proto3" json:"control_elements,omitempty"`
+}
+
+func (x *ControlElements) Reset() {
+	*x = ControlElements{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_external_compliance_reporting_reporting_proto_msgTypes[45]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ControlElements) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ControlElements) ProtoMessage() {}
+
+func (x *ControlElements) ProtoReflect() protoreflect.Message {
+	mi := &file_external_compliance_reporting_reporting_proto_msgTypes[45]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ControlElements.ProtoReflect.Descriptor instead.
+func (*ControlElements) Descriptor() ([]byte, []int) {
+	return file_external_compliance_reporting_reporting_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *ControlElements) GetControlElements() []*ControlElement {
+	if x != nil {
+		return x.ControlElements
+	}
+	return nil
+}
+
 var File_external_compliance_reporting_reporting_proto protoreflect.FileDescriptor
 
 var file_external_compliance_reporting_reporting_proto_rawDesc = []byte{
@@ -4420,7 +4552,7 @@ func file_external_compliance_reporting_reporting_proto_rawDescGZIP() []byte {
 }
 
 var file_external_compliance_reporting_reporting_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_external_compliance_reporting_reporting_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
+var file_external_compliance_reporting_reporting_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
 var file_external_compliance_reporting_reporting_proto_goTypes = []interface{}{
 	(Query_OrderType)(0),           // 0: chef.automate.api.compliance.reporting.v1.Query.OrderType
 	(*ControlItemRequest)(nil),     // 1: chef.automate.api.compliance.reporting.v1.ControlItemRequest
@@ -4467,21 +4599,23 @@ var file_external_compliance_reporting_reporting_proto_goTypes = []interface{}{
 	(*Kv)(nil),                     // 42: chef.automate.api.compliance.reporting.v1.Kv
 	(*LatestReportSummary)(nil),    // 43: chef.automate.api.compliance.reporting.v1.LatestReportSummary
 	(*ProfileMeta)(nil),            // 44: chef.automate.api.compliance.reporting.v1.ProfileMeta
-	(*timestamp.Timestamp)(nil),    // 45: google.protobuf.Timestamp
-	(*empty.Empty)(nil),            // 46: google.protobuf.Empty
-	(*common.ExportData)(nil),      // 47: chef.automate.api.common.ExportData
-	(*version.VersionInfo)(nil),    // 48: chef.automate.api.common.version.VersionInfo
+	(*ControlElement)(nil),         // 45: chef.automate.api.compliance.reporting.v1.ControlElement
+	(*ControlElements)(nil),        // 46: chef.automate.api.compliance.reporting.v1.ControlElements
+	(*timestamp.Timestamp)(nil),    // 47: google.protobuf.Timestamp
+	(*empty.Empty)(nil),            // 48: google.protobuf.Empty
+	(*common.ExportData)(nil),      // 49: chef.automate.api.common.ExportData
+	(*version.VersionInfo)(nil),    // 50: chef.automate.api.common.version.VersionInfo
 }
 var file_external_compliance_reporting_reporting_proto_depIdxs = []int32{
 	9,  // 0: chef.automate.api.compliance.reporting.v1.ControlItemRequest.filters:type_name -> chef.automate.api.compliance.reporting.v1.ListFilter
 	12, // 1: chef.automate.api.compliance.reporting.v1.WaiverData.waiver_summary:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
 	39, // 2: chef.automate.api.compliance.reporting.v1.ControlItem.profile:type_name -> chef.automate.api.compliance.reporting.v1.ProfileMin
-	45, // 3: chef.automate.api.compliance.reporting.v1.ControlItem.end_time:type_name -> google.protobuf.Timestamp
+	47, // 3: chef.automate.api.compliance.reporting.v1.ControlItem.end_time:type_name -> google.protobuf.Timestamp
 	12, // 4: chef.automate.api.compliance.reporting.v1.ControlItem.control_summary:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
 	2,  // 5: chef.automate.api.compliance.reporting.v1.ControlItem.waivers:type_name -> chef.automate.api.compliance.reporting.v1.WaiverData
 	4,  // 6: chef.automate.api.compliance.reporting.v1.ControlItems.control_items:type_name -> chef.automate.api.compliance.reporting.v1.ControlItem
 	12, // 7: chef.automate.api.compliance.reporting.v1.ControlItems.control_summary_totals:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
-	45, // 8: chef.automate.api.compliance.reporting.v1.TimeQuery.start_time:type_name -> google.protobuf.Timestamp
+	47, // 8: chef.automate.api.compliance.reporting.v1.TimeQuery.start_time:type_name -> google.protobuf.Timestamp
 	9,  // 9: chef.automate.api.compliance.reporting.v1.Query.filters:type_name -> chef.automate.api.compliance.reporting.v1.ListFilter
 	0,  // 10: chef.automate.api.compliance.reporting.v1.Query.order:type_name -> chef.automate.api.compliance.reporting.v1.Query.OrderType
 	10, // 11: chef.automate.api.compliance.reporting.v1.ControlSummary.passed:type_name -> chef.automate.api.compliance.reporting.v1.Total
@@ -4489,19 +4623,19 @@ var file_external_compliance_reporting_reporting_proto_depIdxs = []int32{
 	11, // 13: chef.automate.api.compliance.reporting.v1.ControlSummary.failed:type_name -> chef.automate.api.compliance.reporting.v1.Failed
 	10, // 14: chef.automate.api.compliance.reporting.v1.ControlSummary.waived:type_name -> chef.automate.api.compliance.reporting.v1.Total
 	14, // 15: chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne.reports:type_name -> chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne
-	45, // 16: chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne.end_time:type_name -> google.protobuf.Timestamp
+	47, // 16: chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne.end_time:type_name -> google.protobuf.Timestamp
 	12, // 17: chef.automate.api.compliance.reporting.v1.ReportSummaryLevelOne.controls:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
 	16, // 18: chef.automate.api.compliance.reporting.v1.Reports.reports:type_name -> chef.automate.api.compliance.reporting.v1.Report
-	45, // 19: chef.automate.api.compliance.reporting.v1.Report.end_time:type_name -> google.protobuf.Timestamp
+	47, // 19: chef.automate.api.compliance.reporting.v1.Report.end_time:type_name -> google.protobuf.Timestamp
 	12, // 20: chef.automate.api.compliance.reporting.v1.Report.controls:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
 	32, // 21: chef.automate.api.compliance.reporting.v1.Report.platform:type_name -> chef.automate.api.compliance.reporting.v1.Platform
 	33, // 22: chef.automate.api.compliance.reporting.v1.Report.statistics:type_name -> chef.automate.api.compliance.reporting.v1.Statistics
 	20, // 23: chef.automate.api.compliance.reporting.v1.Report.profiles:type_name -> chef.automate.api.compliance.reporting.v1.Profile
-	45, // 24: chef.automate.api.compliance.reporting.v1.NodeHeaderInfo.end_time:type_name -> google.protobuf.Timestamp
+	47, // 24: chef.automate.api.compliance.reporting.v1.NodeHeaderInfo.end_time:type_name -> google.protobuf.Timestamp
 	32, // 25: chef.automate.api.compliance.reporting.v1.NodeHeaderInfo.platform:type_name -> chef.automate.api.compliance.reporting.v1.Platform
 	21, // 26: chef.automate.api.compliance.reporting.v1.NodeHeaderInfo.profiles:type_name -> chef.automate.api.compliance.reporting.v1.NodeHeaderProfileInfo
 	19, // 27: chef.automate.api.compliance.reporting.v1.ReportIds.report_data:type_name -> chef.automate.api.compliance.reporting.v1.ReportData
-	45, // 28: chef.automate.api.compliance.reporting.v1.ReportData.end_time:type_name -> google.protobuf.Timestamp
+	47, // 28: chef.automate.api.compliance.reporting.v1.ReportData.end_time:type_name -> google.protobuf.Timestamp
 	26, // 29: chef.automate.api.compliance.reporting.v1.Profile.supports:type_name -> chef.automate.api.compliance.reporting.v1.Support
 	27, // 30: chef.automate.api.compliance.reporting.v1.Profile.depends:type_name -> chef.automate.api.compliance.reporting.v1.Dependency
 	28, // 31: chef.automate.api.compliance.reporting.v1.Profile.groups:type_name -> chef.automate.api.compliance.reporting.v1.Group
@@ -4522,39 +4656,42 @@ var file_external_compliance_reporting_reporting_proto_depIdxs = []int32{
 	42, // 46: chef.automate.api.compliance.reporting.v1.Node.tags:type_name -> chef.automate.api.compliance.reporting.v1.Kv
 	44, // 47: chef.automate.api.compliance.reporting.v1.Node.profiles:type_name -> chef.automate.api.compliance.reporting.v1.ProfileMeta
 	40, // 48: chef.automate.api.compliance.reporting.v1.Nodes.nodes:type_name -> chef.automate.api.compliance.reporting.v1.Node
-	45, // 49: chef.automate.api.compliance.reporting.v1.LatestReportSummary.end_time:type_name -> google.protobuf.Timestamp
+	47, // 49: chef.automate.api.compliance.reporting.v1.LatestReportSummary.end_time:type_name -> google.protobuf.Timestamp
 	12, // 50: chef.automate.api.compliance.reporting.v1.LatestReportSummary.controls:type_name -> chef.automate.api.compliance.reporting.v1.ControlSummary
-	8,  // 51: chef.automate.api.compliance.reporting.v1.ReportingService.ListReports:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	8,  // 52: chef.automate.api.compliance.reporting.v1.ReportingService.ListReportIds:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	1,  // 53: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlItems:input_type -> chef.automate.api.compliance.reporting.v1.ControlItemRequest
-	8,  // 54: chef.automate.api.compliance.reporting.v1.ReportingService.ReadReport:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	8,  // 55: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNodeHeader:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	34, // 56: chef.automate.api.compliance.reporting.v1.ReportingService.ListSuggestions:input_type -> chef.automate.api.compliance.reporting.v1.SuggestionRequest
-	8,  // 57: chef.automate.api.compliance.reporting.v1.ReportingService.ListProfiles:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	8,  // 58: chef.automate.api.compliance.reporting.v1.ReportingService.Export:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	8,  // 59: chef.automate.api.compliance.reporting.v1.ReportingService.ExportNode:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	7,  // 60: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNode:input_type -> chef.automate.api.compliance.reporting.v1.Id
-	8,  // 61: chef.automate.api.compliance.reporting.v1.ReportingService.ListNodes:input_type -> chef.automate.api.compliance.reporting.v1.Query
-	46, // 62: chef.automate.api.compliance.reporting.v1.ReportingService.GetVersion:input_type -> google.protobuf.Empty
-	6,  // 63: chef.automate.api.compliance.reporting.v1.ReportingService.LicenseUsageNodes:input_type -> chef.automate.api.compliance.reporting.v1.TimeQuery
-	13, // 64: chef.automate.api.compliance.reporting.v1.ReportingService.ListReports:output_type -> chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne
-	18, // 65: chef.automate.api.compliance.reporting.v1.ReportingService.ListReportIds:output_type -> chef.automate.api.compliance.reporting.v1.ReportIds
-	5,  // 66: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlItems:output_type -> chef.automate.api.compliance.reporting.v1.ControlItems
-	16, // 67: chef.automate.api.compliance.reporting.v1.ReportingService.ReadReport:output_type -> chef.automate.api.compliance.reporting.v1.Report
-	17, // 68: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNodeHeader:output_type -> chef.automate.api.compliance.reporting.v1.NodeHeaderInfo
-	36, // 69: chef.automate.api.compliance.reporting.v1.ReportingService.ListSuggestions:output_type -> chef.automate.api.compliance.reporting.v1.Suggestions
-	37, // 70: chef.automate.api.compliance.reporting.v1.ReportingService.ListProfiles:output_type -> chef.automate.api.compliance.reporting.v1.ProfileMins
-	47, // 71: chef.automate.api.compliance.reporting.v1.ReportingService.Export:output_type -> chef.automate.api.common.ExportData
-	47, // 72: chef.automate.api.compliance.reporting.v1.ReportingService.ExportNode:output_type -> chef.automate.api.common.ExportData
-	40, // 73: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNode:output_type -> chef.automate.api.compliance.reporting.v1.Node
-	41, // 74: chef.automate.api.compliance.reporting.v1.ReportingService.ListNodes:output_type -> chef.automate.api.compliance.reporting.v1.Nodes
-	48, // 75: chef.automate.api.compliance.reporting.v1.ReportingService.GetVersion:output_type -> chef.automate.api.common.version.VersionInfo
-	15, // 76: chef.automate.api.compliance.reporting.v1.ReportingService.LicenseUsageNodes:output_type -> chef.automate.api.compliance.reporting.v1.Reports
-	64, // [64:77] is the sub-list for method output_type
-	51, // [51:64] is the sub-list for method input_type
-	51, // [51:51] is the sub-list for extension type_name
-	51, // [51:51] is the sub-list for extension extendee
-	0,  // [0:51] is the sub-list for field type_name
+	45, // 51: chef.automate.api.compliance.reporting.v1.ControlElements.control_elements:type_name -> chef.automate.api.compliance.reporting.v1.ControlElement
+	8,  // 52: chef.automate.api.compliance.reporting.v1.ReportingService.ListReports:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	8,  // 53: chef.automate.api.compliance.reporting.v1.ReportingService.ListReportIds:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	1,  // 54: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlItems:input_type -> chef.automate.api.compliance.reporting.v1.ControlItemRequest
+	8,  // 55: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlInfo:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	8,  // 56: chef.automate.api.compliance.reporting.v1.ReportingService.ReadReport:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	8,  // 57: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNodeHeader:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	34, // 58: chef.automate.api.compliance.reporting.v1.ReportingService.ListSuggestions:input_type -> chef.automate.api.compliance.reporting.v1.SuggestionRequest
+	8,  // 59: chef.automate.api.compliance.reporting.v1.ReportingService.ListProfiles:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	8,  // 60: chef.automate.api.compliance.reporting.v1.ReportingService.Export:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	8,  // 61: chef.automate.api.compliance.reporting.v1.ReportingService.ExportNode:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	7,  // 62: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNode:input_type -> chef.automate.api.compliance.reporting.v1.Id
+	8,  // 63: chef.automate.api.compliance.reporting.v1.ReportingService.ListNodes:input_type -> chef.automate.api.compliance.reporting.v1.Query
+	48, // 64: chef.automate.api.compliance.reporting.v1.ReportingService.GetVersion:input_type -> google.protobuf.Empty
+	6,  // 65: chef.automate.api.compliance.reporting.v1.ReportingService.LicenseUsageNodes:input_type -> chef.automate.api.compliance.reporting.v1.TimeQuery
+	13, // 66: chef.automate.api.compliance.reporting.v1.ReportingService.ListReports:output_type -> chef.automate.api.compliance.reporting.v1.ReportsSummaryLevelOne
+	18, // 67: chef.automate.api.compliance.reporting.v1.ReportingService.ListReportIds:output_type -> chef.automate.api.compliance.reporting.v1.ReportIds
+	5,  // 68: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlItems:output_type -> chef.automate.api.compliance.reporting.v1.ControlItems
+	46, // 69: chef.automate.api.compliance.reporting.v1.ReportingService.ListControlInfo:output_type -> chef.automate.api.compliance.reporting.v1.ControlElements
+	16, // 70: chef.automate.api.compliance.reporting.v1.ReportingService.ReadReport:output_type -> chef.automate.api.compliance.reporting.v1.Report
+	17, // 71: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNodeHeader:output_type -> chef.automate.api.compliance.reporting.v1.NodeHeaderInfo
+	36, // 72: chef.automate.api.compliance.reporting.v1.ReportingService.ListSuggestions:output_type -> chef.automate.api.compliance.reporting.v1.Suggestions
+	37, // 73: chef.automate.api.compliance.reporting.v1.ReportingService.ListProfiles:output_type -> chef.automate.api.compliance.reporting.v1.ProfileMins
+	49, // 74: chef.automate.api.compliance.reporting.v1.ReportingService.Export:output_type -> chef.automate.api.common.ExportData
+	49, // 75: chef.automate.api.compliance.reporting.v1.ReportingService.ExportNode:output_type -> chef.automate.api.common.ExportData
+	40, // 76: chef.automate.api.compliance.reporting.v1.ReportingService.ReadNode:output_type -> chef.automate.api.compliance.reporting.v1.Node
+	41, // 77: chef.automate.api.compliance.reporting.v1.ReportingService.ListNodes:output_type -> chef.automate.api.compliance.reporting.v1.Nodes
+	50, // 78: chef.automate.api.compliance.reporting.v1.ReportingService.GetVersion:output_type -> chef.automate.api.common.version.VersionInfo
+	15, // 79: chef.automate.api.compliance.reporting.v1.ReportingService.LicenseUsageNodes:output_type -> chef.automate.api.compliance.reporting.v1.Reports
+	66, // [66:80] is the sub-list for method output_type
+	52, // [52:66] is the sub-list for method input_type
+	52, // [52:52] is the sub-list for extension type_name
+	52, // [52:52] is the sub-list for extension extendee
+	0,  // [0:52] is the sub-list for field type_name
 }
 
 func init() { file_external_compliance_reporting_reporting_proto_init() }
@@ -5091,6 +5228,30 @@ func file_external_compliance_reporting_reporting_proto_init() {
 				return nil
 			}
 		}
+		file_external_compliance_reporting_reporting_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ControlElement); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_external_compliance_reporting_reporting_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ControlElements); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -5098,7 +5259,7 @@ func file_external_compliance_reporting_reporting_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_external_compliance_reporting_reporting_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   44,
+			NumMessages:   46,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -5177,6 +5338,17 @@ type ReportingServiceClient interface {
 	//compliance:controlItems:list
 	//```
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
+	//
+	//List Control info
+	//Lists controls from the last run, with optional filtering.
+	//Supports filtering and pagination. Maximum 100 search can be
+	//made when specifying the pagination from and size. Sum of from+size
+	//should be less that 100. By default 10 results will be returned.
+	//Authorization Action:
+	//```
+	//compliance:ControlElements:list
+	//```
+	ListControlInfo(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ControlElements, error)
 	//
 	//Show Report by ID
 	//
@@ -5338,6 +5510,15 @@ func (c *reportingServiceClient) ListReportIds(ctx context.Context, in *Query, o
 func (c *reportingServiceClient) ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error) {
 	out := new(ControlItems)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlItems", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reportingServiceClient) ListControlInfo(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ControlElements, error) {
+	out := new(ControlElements)
+	err := c.cc.Invoke(ctx, "/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -5535,6 +5716,17 @@ type ReportingServiceServer interface {
 	//```
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
+	//List Control info
+	//Lists controls from the last run, with optional filtering.
+	//Supports filtering and pagination. Maximum 100 search can be
+	//made when specifying the pagination from and size. Sum of from+size
+	//should be less that 100. By default 10 results will be returned.
+	//Authorization Action:
+	//```
+	//compliance:ControlElements:list
+	//```
+	ListControlInfo(context.Context, *Query) (*ControlElements, error)
+	//
 	//Show Report by ID
 	//
 	//Show a specific report by ID. Supports filtering, but not pagination or sorting.
@@ -5679,6 +5871,9 @@ func (*UnimplementedReportingServiceServer) ListReportIds(context.Context, *Quer
 func (*UnimplementedReportingServiceServer) ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListControlItems not implemented")
 }
+func (*UnimplementedReportingServiceServer) ListControlInfo(context.Context, *Query) (*ControlElements, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListControlInfo not implemented")
+}
 func (*UnimplementedReportingServiceServer) ReadReport(context.Context, *Query) (*Report, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadReport not implemented")
 }
@@ -5764,6 +5959,24 @@ func _ReportingService_ListControlItems_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ReportingServiceServer).ListControlItems(ctx, req.(*ControlItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReportingService_ListControlInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Query)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportingServiceServer).ListControlInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportingServiceServer).ListControlInfo(ctx, req.(*Query))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -5969,6 +6182,10 @@ var _ReportingService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListControlItems",
 			Handler:    _ReportingService_ListControlItems_Handler,
+		},
+		{
+			MethodName: "ListControlInfo",
+			Handler:    _ReportingService_ListControlInfo_Handler,
 		},
 		{
 			MethodName: "ReadReport",
