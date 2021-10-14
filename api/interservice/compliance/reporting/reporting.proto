@@ -18,6 +18,7 @@ service ReportingService {
 	rpc ListNodes(Query) returns (Nodes) {};
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
 	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {};
+	rpc ListControlInfo(Query) returns (ControlElements) {};
 }
 message ExportData {
 	bytes content = 1;
@@ -343,4 +344,14 @@ message ProfileMeta {
 	string id = 3;
 	string status = 4;
 	string full = 5;
+}
+message ControlElement {
+	string id = 1;
+	string title= 2;
+	string profile = 3;
+	float impact = 4;
+	int32 results = 5;
+}
+message ControlElements {
+	repeated ControlElement control_elements = 1;
 }
