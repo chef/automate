@@ -1,7 +1,7 @@
 +++
 title = "Data Feeds"
 date = 2020-05-05T13:19:02-07:00
-draft = false
+draft = true
 
 gh_repo = "automate"
 
