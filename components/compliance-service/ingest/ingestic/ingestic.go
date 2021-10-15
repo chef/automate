@@ -45,7 +45,10 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 
 // This method will support adding a document with a specified id
 func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
-	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = %s", runDateTime))
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
+
 	_, err := backend.client.Update().
 		Index(mapping.Index).
 		Type(mapping.Type).
