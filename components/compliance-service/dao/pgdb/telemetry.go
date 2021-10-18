@@ -4,13 +4,47 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/pkg/errors"
 )
 
 type Telemetry struct {
-	ID                      string
-	LastTelemetryReportedAt time.Time
-	CreatedAt               time.Time
+	ID                      string    `db:"id" json:"id"`
+	LastTelemetryReportedAt time.Time `db:"last_telemetry_reported_at" json:"last_telemetry_reported_at"`
+	CreatedAt               time.Time `db:"created_at" json:"created_at"`
+}
+
+//UpdateLastTelemetryReported: Upsert the last compliance telemetry reported date in postgres
+func (db *DB) UpdateLastTelemetryReported(ctx context.Context, req *stats.UpdateTelemetryReportedRequest) error {
+	err := Transact(db, func(tx *DBTrans) error {
+		lastTelemetryReportedAt, err := time.Parse(time.RFC3339, req.LastTelemetryReportedAt)
+		if err != nil {
+			return err
+		}
+
+		count, err := db.DbMap.SelectInt("SELECT COUNT(*) FROM telemetry;")
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			updatetelemetryDate := `update telemetry set last_telemetry_reported_at=$1`
+			_, err := tx.Exec(updatetelemetryDate, lastTelemetryReportedAt)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = tx.StoreTelemetry(ctx, lastTelemetryReportedAt)
+			if err != nil {
+				return errors.Wrap(err, "Failed to insert telemetry reported date")
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // store last compliance telemetry reported timestamp
@@ -22,7 +56,7 @@ func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedA
 		LastTelemetryReportedAt: lastTelemetryReportedAt,
 		CreatedAt:               time.Now(),
 	}
-	telArr = append(telArr, tel)
+	telArr = append(telArr, &tel)
 	err := trans.Insert(telArr...)
 	if err != nil {
 		return err
@@ -49,7 +83,7 @@ func (trans *DBTrans) UpdateTelemetry(ctx context.Context, lastTelemetryReported
 	tel := Telemetry{
 		LastTelemetryReportedAt: lastTelemetryReportedAt,
 	}
-	_, err := trans.Update(tel)
+	_, err := trans.Update(&tel)
 	if err != nil {
 		return err
 	}
