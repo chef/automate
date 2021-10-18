@@ -232,34 +232,34 @@ service InfraProxy {
   rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:list";
   };
   rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
   };
   rpc CreateEnvironment (infra_proxy.request.CreateEnvironment) returns (infra_proxy.response.Environment) {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:create";
   };
   rpc DeleteEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:delete";
   };
   rpc UpdateEnvironment (infra_proxy.request.UpdateEnvironment) returns (infra_proxy.response.Environment) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:update";
   };
   rpc GetEnvironmentRecipes (infra_proxy.request.Environment) returns (infra_proxy.response.EnvironmentRecipesList) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/environments/{name}/recipes";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsEnvironments:get";
   };
 
   rpc GetNodes (infra_proxy.request.Nodes) returns (infra_proxy.response.Nodes) {
