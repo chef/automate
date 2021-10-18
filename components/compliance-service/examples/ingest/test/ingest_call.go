@@ -1,8 +1,11 @@
 package ingesttest
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -13,10 +16,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"path/filepath"
+
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
-	"path/filepath"
 )
 
 func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error {
@@ -138,10 +142,43 @@ func SendUniqueReport(iReport compliance.Report, onesie bool, threadNr int, repo
 		iReport.NodeUuid = uuid.Must(uuid.NewV4()).String()
 		iReport.EndTime = time.Now().UTC().Format(time.RFC3339)
 	}
+	var maxSize = 1 << 20
 	start := time.Now()
-	_, err := client.ProcessComplianceReport(ctx, &iReport)
-	elapsed := time.Since(start)
+	buf := new(bytes.Buffer)
+	marshaller := &jsonpb.Marshaler{EmitDefaults: true}
+	err := marshaller.Marshal(buf, &iReport)
 	if err != nil {
+		logrus.Errorf("Report unmarshal error, %v", err)
+		return
+	}
+
+	stream, err := client.ProcessComplianceReport(ctx)
+	if err != nil {
+		logrus.Errorf("Report processing error, %v", err)
+		return
+	}
+	reader := bufio.NewReader(bytes.NewBuffer(buf.Bytes()))
+	buffer := make([]byte, maxSize)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logrus.Error("cannot read chunk to buffer: ", err)
+			return
+		}
+		request := &ingest.ReportData{Content: buffer[:n]}
+		err = stream.Send(request)
+		if err != nil {
+			logrus.Errorf("Report processing error, %v", err)
+			return
+		}
+	}
+	_, err = stream.CloseAndRecv()
+	elapsed := time.Since(start)
+	if err != nil && err != io.EOF {
 		logrus.Errorf("ingest_call.go - Failed to send report %s, took %s, error: %s", iReport.ReportUuid, elapsed.Truncate(time.Millisecond), err)
 		return
 	}

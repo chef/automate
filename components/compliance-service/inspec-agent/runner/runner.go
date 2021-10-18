@@ -1,10 +1,12 @@
 package runner
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	neturl "net/url"
@@ -509,6 +511,7 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 
 func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
 	var report ingest_events_compliance_api.Report
+	var maxSize = 1 << 20
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
 		return errors.Wrap(err, "reportIt was unable to unmarshal the report output into a compliance.Report struct")
@@ -554,8 +557,38 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	}
 	stripProfilesMetadata(&report, profilesMissingMeta, RunTimeLimit)
 
-	_, err = t.ingestClient.ProcessComplianceReport(ctx, &report)
+	// send reports in chunks to compliance
+	buf := new(bytes.Buffer)
+	marshaller := &jsonpb.Marshaler{EmitDefaults: true}
+	err = marshaller.Marshal(buf, &report)
 	if err != nil {
+		return errors.Wrap(err, "Report processing error")
+	}
+	stream, err := t.ingestClient.ProcessComplianceReport(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Report processing error")
+	}
+	reader := bufio.NewReader(bytes.NewBuffer(buf.Bytes()))
+	buffer := make([]byte, maxSize)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logrus.Error("cannot read chunk to buffer: ", err)
+			return errors.Wrap(err, "Report processing error")
+		}
+		request := &ingest.ReportData{Content: buffer[:n]}
+		err = stream.Send(request)
+		if err != nil {
+			return errors.Wrap(err, "Report processing error")
+		}
+	}
+
+	_, err = stream.CloseAndRecv()
+	if err != nil && err != io.EOF {
 		return errors.Wrap(err, "Report processing error")
 	}
 	return nil
