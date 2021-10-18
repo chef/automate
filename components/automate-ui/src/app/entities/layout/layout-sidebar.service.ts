@@ -4,7 +4,6 @@ import { Observable, BehaviorSubject } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 import { UpdateSidebars } from './layout.actions';
@@ -22,10 +21,8 @@ export class LayoutSidebarService {
 
     constructor(
         private store: Store<NgrxStateAtom>,
-        private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
-        private featureFlagsService: FeatureFlagsService
+        private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>
     ) {
-        this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
         this.updateSidebars();
     }
@@ -132,8 +129,7 @@ export class LayoutSidebarService {
                 route: '/settings/data-feeds',
                 authorized: {
                   anyOf: ['/api/v0/datafeed/destinations', 'post']
-                },
-                visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
+                }
               },
               {
                 name: 'Data Lifecycle',
