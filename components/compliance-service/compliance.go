@@ -210,7 +210,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	profiles.RegisterProfilesServiceServer(s, ps)
 	profiles.RegisterProfilesAdminServiceServer(s, ps)
 
-	stats.RegisterStatsServiceServer(s, statsserver.New(&esr))
+	stats.RegisterStatsServiceServer(s, statsserver.New(&esr, db))
 	version.RegisterVersionServiceServer(s, versionserver.New())
 	status.RegisterComplianceStatusServiceServer(s, statusSrv)
 

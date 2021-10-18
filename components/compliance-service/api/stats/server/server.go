@@ -9,17 +9,22 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/stats"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
 // Server implementation for stats
 type Server struct {
 	es *relaxting.ES2Backend
+	pg *pgdb.DB
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend) *Server {
-	return &Server{es: es}
+func New(es *relaxting.ES2Backend, pg *pgdb.DB) *Server {
+	return &Server{
+		es: es,
+		pg: pg,
+	}
 }
 
 // ReadSummary returns summary, nodes-summary, or controls-summary information
@@ -151,6 +156,15 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return failures, nil
+}
+
+//UpdateTelemetryReported Updates the last compliance telemetry reported date in postgres after the telemetry data is sent
+func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
+	err := srv.pg.UpdateLastTelemetryReported(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return &stats.UpdateTelemetryReportedResponse{}, nil
 }
 
 func validateTrendData(in *stats.Query, filters map[string][]string) (err error) {
