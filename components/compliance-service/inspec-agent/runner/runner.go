@@ -36,6 +36,7 @@ import (
 )
 
 const maxSize = 1 << 20
+
 var ListenPort int = 2133
 
 // ControlResultsLimit used for configuring inspec exec command, passed in via config flag
@@ -510,7 +511,7 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 }
 
 func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
-	var report ingest_events_compliance_api.Report 
+	var report ingest_events_compliance_api.Report
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
 		return errors.Wrap(err, "reportIt was unable to unmarshal the report output into a compliance.Report struct")
