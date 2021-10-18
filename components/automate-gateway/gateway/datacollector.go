@@ -42,6 +42,8 @@ const (
 	ComplianceReportMsg
 )
 
+const maxSize = 1 << 20
+
 // Custom Unmarshaler
 var unmarshaler = jsonpb.Unmarshaler{AllowUnknownFields: true}
 
@@ -161,7 +163,6 @@ func (s *Server) processLivenessPing(ctx context.Context, w http.ResponseWriter,
 // processComplianceReport process a ComplianceReport message in chunks
 func (s *Server) processComplianceReport(ctx context.Context, w http.ResponseWriter, body []byte) {
 	// maximum allowed size of chunks
-	var maxSize = 1 << 20
 
 	complianceIngester, err := s.clientsFactory.ComplianceIngesterClient()
 	if err != nil {

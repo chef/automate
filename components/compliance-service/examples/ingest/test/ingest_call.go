@@ -23,6 +23,8 @@ import (
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 )
 
+const maxSize = 1 << 20
+
 func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error {
 	fileData, err := os.Open(file)
 	if err != nil {
@@ -142,7 +144,6 @@ func SendUniqueReport(iReport compliance.Report, onesie bool, threadNr int, repo
 		iReport.NodeUuid = uuid.Must(uuid.NewV4()).String()
 		iReport.EndTime = time.Now().UTC().Format(time.RFC3339)
 	}
-	var maxSize = 1 << 20
 	start := time.Now()
 
 	marshaller, err := json.Marshal(iReport)

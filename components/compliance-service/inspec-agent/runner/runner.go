@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -36,6 +35,7 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
+const maxSize = 1 << 20
 var ListenPort int = 2133
 
 // ControlResultsLimit used for configuring inspec exec command, passed in via config flag
@@ -510,8 +510,7 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 }
 
 func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
-	var report ingest_events_compliance_api.Report
-	var maxSize = 1 << 20
+	var report ingest_events_compliance_api.Report 
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
 		return errors.Wrap(err, "reportIt was unable to unmarshal the report output into a compliance.Report struct")
@@ -558,18 +557,17 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	stripProfilesMetadata(&report, profilesMissingMeta, RunTimeLimit)
 
 	// send reports in chunks to compliance
-	buf := new(bytes.Buffer)
-	marshaller := &jsonpb.Marshaler{EmitDefaults: true}
-	err = marshaller.Marshal(buf, &report)
+	marshaller, err := json.Marshal(report)
 	if err != nil {
 		return errors.Wrap(err, "Report processing error")
 	}
+
+	reader := bytes.NewReader(marshaller)
+	buffer := make([]byte, maxSize)
 	stream, err := t.ingestClient.ProcessComplianceReport(ctx)
 	if err != nil {
 		return errors.Wrap(err, "Report processing error")
 	}
-	reader := bufio.NewReader(bytes.NewBuffer(buf.Bytes()))
-	buffer := make([]byte, maxSize)
 
 	for {
 		n, err := reader.Read(buffer)

@@ -105,22 +105,22 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.Compl
 		if err != nil {
 			return err
 		}
-		log.Info("waiting to receive more data")
+		logrus.Debug("waiting to receive more data")
 
 		req, err := stream.Recv()
 		if err == io.EOF {
-			log.Info("no more data")
+			logrus.Debug("no more data")
 			break
 		}
 		if err != nil {
-			logrus.Infof("cannot receive chunk data: %v", err)
+			logrus.Debugf("cannot receive chunk data: %v", err)
 			return err
 		}
 		chunk := req.GetContent()
-		log.Infof("received a chunk with size: %d", len(chunk))
+		logrus.Debugf("received a chunk with size: %d", len(chunk))
 		_, err = reportData.Write(chunk)
 		if err != nil {
-			log.Infof("cannot write chunk data: %v", err)
+			logrus.Debugf("cannot write chunk data: %v", err)
 			return err
 		}
 	}
