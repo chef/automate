@@ -271,8 +271,8 @@ EOF
   trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
 
 [[load_balancer.v1.sys.frontend_tls]]
-  cert = """data.vault_generic_secret.wildcard_chef.data["crt"]"""
-  key = """data.vault_generic_secret.wildcard_chef.data["key"]"""
+  cert = """${data.vault_generic_secret.wildcard_chef.data["crt"]}"""
+  key = """${data.vault_generic_secret.wildcard_chef.data["key"]}"""
 
 [license_control.v1.svc]
   license = """${data.aws_s3_bucket_object.internal_license.body}"""
