@@ -36,7 +36,7 @@ Specify the action to restrict user access to the specific action.
 
 
 
-| Task | Method     | IAM Action | API endpoint  | URL      |
+| Task | Method     | IAM Action | API endpoint  | URL     |
 | ------| ---------- | --------- | ------------- | --------- |
 | List Infra Servers | GET | infra:infraServers:list | /api/v0/infra/servers | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers |
 | Get Infra Server | GET | infra:infraServers:get | /api/v0/infra/servers/{id} | https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{id} |
