@@ -1,9 +1,9 @@
 package ingesttest
 
 import (
-	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -144,21 +144,21 @@ func SendUniqueReport(iReport compliance.Report, onesie bool, threadNr int, repo
 	}
 	var maxSize = 1 << 20
 	start := time.Now()
-	buf := new(bytes.Buffer)
-	marshaller := &jsonpb.Marshaler{EmitDefaults: true}
-	err := marshaller.Marshal(buf, &iReport)
+
+	marshaller, err := json.Marshal(iReport)
 	if err != nil {
-		logrus.Errorf("Report unmarshal error, %v", err)
+		logrus.Errorf("Report Marshal error, %v", err)
 		return
 	}
+
+	reader := bytes.NewReader(marshaller)
+	buffer := make([]byte, maxSize)
 
 	stream, err := client.ProcessComplianceReport(ctx)
 	if err != nil {
 		logrus.Errorf("Report processing error, %v", err)
 		return
 	}
-	reader := bufio.NewReader(bytes.NewBuffer(buf.Bytes()))
-	buffer := make([]byte, maxSize)
 
 	for {
 		n, err := reader.Read(buffer)
