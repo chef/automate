@@ -23,7 +23,7 @@ func TestReadTrend(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
-	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
 
 	n := 5
