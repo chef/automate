@@ -168,6 +168,28 @@ func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.Update
 	return &stats.UpdateTelemetryReportedResponse{}, nil
 }
 
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	var count int64
+	var lastTelemetryReportedAt time.Time
+	// Get last telemetry reported date from postgres
+	telemetry, err := srv.pg.GetTelemetry(ctx)
+	if err != nil {
+		return nil, err
+	}
+	daysSinceLastPost := daysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	if daysSinceLastPost > 0 {
+		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), lastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &stats.GetNodesUsageCountResponse{
+		DaysSinceLastPost: int64(daysSinceLastPost),
+		NodeCnt:           count,
+	}, nil
+}
+
 func validateTrendData(in *stats.Query, filters map[string][]string) (err error) {
 	if in.Type == "" {
 		err = fmt.Errorf("Please specify the type of trend data you are requesting; nodes or controls")
@@ -224,24 +246,17 @@ func formatFilters(filters []*stats.ListFilter) map[string][]string {
 	return formattedFilters
 }
 
-//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
-func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
-	var count int64
-	var err error
-
-	// TODO: Get last telemetry reported date from postgres
-	var lastTelemetryReportedAt time.Time
-	// TODO: Count the days between last_telemetry_reported_at and current time
-	// For the testing purpose I have given it hard coded will remove it in next PR
-	var daysSinceLastPost int64 = 10
-	if daysSinceLastPost > 0 {
-		count, err = srv.es.GetUniqueNodesCount(daysSinceLastPost, lastTelemetryReportedAt)
-		if err != nil {
-			return nil, err
-		}
+// daysBetween get the calendar days between two timestamp
+func daysBetween(fromTime, toTime time.Time) int {
+	if fromTime.After(toTime) {
+		fromTime, toTime = toTime, fromTime
 	}
-	return &stats.GetNodesUsageCountResponse{
-		DaysSinceLastPost: daysSinceLastPost,
-		NodeCnt:           count,
-	}, nil
+
+	days := -fromTime.YearDay()
+	for year := fromTime.Year(); year < toTime.Year(); year++ {
+		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
+	}
+	days += toTime.YearDay()
+
+	return days
 }

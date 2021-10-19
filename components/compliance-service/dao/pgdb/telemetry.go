@@ -101,3 +101,14 @@ func (trans *DBTrans) DeleteTelemetry(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// Get last compliance telemetry reported timestamp
+func (db *DB) GetTelemetry(ctx context.Context) (Telemetry, error) {
+	var t Telemetry
+	err := db.QueryRow(`SELECT id,last_telemetry_reported_at, created_at from telemetry`).
+		Scan(&t.ID, &t.LastTelemetryReportedAt, &t.CreatedAt)
+	if err != nil {
+		return Telemetry{}, err
+	}
+	return t, nil
+}
