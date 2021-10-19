@@ -13,8 +13,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
 
 import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/services/user-preferences/user-preferences.actions';
-import { ComplianceStatsService } from './complicance-stats/complicance-stats.service';
-import { UnfilteredStats } from './complicance-stats/complicance-stats.model';
+import { ComplianceStatsService } from './compliance-stats/compliance-stats.service';
+import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 
 declare let analytics: any;
 
@@ -342,10 +342,12 @@ export class TelemetryService {
       console.log(error);
     }
     try {
-      const unfilteredStats: UnfilteredStats = await this.complianceStatsService
+      const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
         .getComplianceStats();
-      if (unfilteredStats) {
-        await this.sendUnfilteredStatsToTelemetry(unfilteredStats);
+      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
+        const ackStats: NodeUsageAckStats = await this
+        .sendUnfilteredStatsToTelemetry(nodeUsageStats);
+        await this.complianceStatsService.sendAcknowledgement(ackStats);
       }
     } catch (error) {
       console.log(error);
@@ -372,20 +374,20 @@ export class TelemetryService {
     return promise;
   }
 
-  sendUnfilteredStatsToTelemetry(unfilteredStats: UnfilteredStats) {
+  sendUnfilteredStatsToTelemetry(nodeUsageStats: NodeUsageStats): Promise<NodeUsageAckStats> {
     let resolver;
-    const promise = new Promise((resolve) => {
+    const promise = new Promise<NodeUsageAckStats>((resolve) => {
       resolver = resolve;
     });
-    const unfilteredStatsSubscription = this.emitToPipeline('track', {
+    const nodeUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'complianceCountsGlobal',
-      properties: unfilteredStats
+      properties: { node_cnt: nodeUsageStats.node_cnt }
     }, true).subscribe(() => {
-      if (unfilteredStatsSubscription) {
-        unfilteredStatsSubscription.unsubscribe();
+      if (nodeUsageStatsSubscription) {
+        nodeUsageStatsSubscription.unsubscribe();
       }
-      resolver('success');
+      resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
     },
     ({ status, error: { message } }: HttpErrorResponse) => {
       console.log(`Error emitting telemetry event: ${status} - ${message}`);
