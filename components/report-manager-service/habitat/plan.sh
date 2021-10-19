@@ -20,6 +20,8 @@ pkg_exposes=(
   port
 )
 pkg_binds=(
+  [automate-pg-gateway]="port"
+  [pg-sidecar-service]="port"
   [cereal-service]="port"
   [report-manager-minio-gateway]="port"
 )
@@ -31,6 +33,14 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
+
+do_install() {
+  do_default_install
+
+  build_line "Copying schema sql files"
+  mkdir "${pkg_prefix}/schema"
+  cp -r storage/schema/sql/* "${pkg_prefix}/schema"
+}
 
 do_strip() {
   return 0
