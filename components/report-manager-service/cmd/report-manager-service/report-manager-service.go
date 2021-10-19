@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 func main() {
@@ -70,6 +72,14 @@ func initConfig() error {
 		conf.CerealConfig.Target = "127.0.0.1:10101"
 	}
 
+	if conf.Storage.URI == "" {
+		var err error
+		conf.Storage.URI, err = platform_config.PGURIFromEnvironment(conf.Storage.Database)
+		if err != nil {
+			logrus.WithError(err).Error("Failed to get pg uri")
+			return err
+		}
+	}
 	return nil
 }
 
