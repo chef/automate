@@ -41,7 +41,7 @@ export class ComplianceStatsService {
       catchError(_err => observableOf('')));
   }
 
-  sendAckownledgement(nodeUsageAckStats: NodeUsageAckStats) {
+  sendAcknowledgement(nodeUsageAckStats: NodeUsageAckStats) {
     const url = `${COMPLIANCE_STATS_URL}` + '/nodes/count/updated';
     let resolver;
     const promise = new Promise((resolve) => {
