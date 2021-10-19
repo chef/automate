@@ -272,6 +272,33 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) ([]stri
 	return ids, nil
 }
 
+// InsertComplianceRunInfos ingests a number of run_info and at the end, refreshes the report index
+func (s *Suite) InsertComplianceRunInfos(reports []*relaxting.ESInSpecReport) ([]string, error) {
+	ids := make([]string, len(reports))
+
+	for i, report := range reports {
+		var err error
+		ids[i] = report.NodeID
+
+		for tries := 0; tries < 3; tries++ {
+			err = s.ingesticESClient.InsertComplianceRunInfo(context.Background(), report.NodeID, report.EndTime)
+			if err == nil {
+				break
+			}
+			logrus.Infof("InsertComplianceRunInfo failed try %d: %s", tries, err.Error())
+			s.RefreshRunInfoIndex()
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	s.RefreshRunInfoIndex()
+
+	return ids, nil
+}
+
 // InsertInspecSummaries ingests a number of summaries and at the end, refreshes the summary index
 func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) ([]string, error) {
 	ids := make([]string, len(summaries))
@@ -299,6 +326,10 @@ func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) ([
 	s.RefreshComplianceSummaryIndex()
 
 	return ids, nil
+}
+
+func (s *Suite) RefreshRunInfoIndex() {
+	s.RefreshIndices(mappings.IndexNameComplianceRunInfo)
 }
 
 func (s *Suite) RefreshComplianceReportIndex() {
