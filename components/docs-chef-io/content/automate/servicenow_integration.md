@@ -245,7 +245,7 @@ The typical production instance of ServiceNow can have between 8-12K nodes, and 
 | 2000          | 1h15m                          | 45m                               |
 | 10,000        | 5h40m                          | 3h3m                              |
 
-## Uninstallation
+## Uninstalling
 
 To uninstall the Chef Automate Integration App:
 
