@@ -24,6 +24,10 @@ var secretsCmd = &cobra.Command{
 }
 
 func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {
+	return executeSecretsCommand(args)
+}
+
+func executeSecretsCommand(args []string) error {
 	if isA2HARBFileExist() {
 		if len(args) == 0 {
 			writer.Print("please refer \n" + secretsHelpDocs)

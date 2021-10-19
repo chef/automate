@@ -14,6 +14,12 @@ func newProvisionInfraCmd() *cobra.Command {
 		RunE:  runProvisionInfraCmd,
 	}
 
+	provisionInfraCmd.PersistentFlags().StringVar(
+		&deployCmdFlags.channel,
+		"channel",
+		"",
+		"Release channel to deploy all services from")
+
 	return provisionInfraCmd
 }
 

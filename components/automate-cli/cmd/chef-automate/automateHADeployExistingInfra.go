@@ -22,9 +22,13 @@ func newExistingInfa(configPath string) *existingInfra {
 func (e *existingInfra) doDeployWork(args []string) error {
 	var err = bootstrapEnv(e)
 	if err != nil {
-		err = executeDeployment()
+		return err
 	}
-	return err
+	err = executeSecretsInitCommand(e.config.Architecture.ConfigInitials.SecretsKeyFile)
+	if err != nil {
+		return err
+	}
+	return executeDeployment()
 }
 
 func (e *existingInfra) doProvisionJob(args []string) error {
