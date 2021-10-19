@@ -342,7 +342,6 @@ export class TelemetryService {
       console.log(error);
     }
     try {
-      debugger;
       const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
         .getComplianceStats();
       if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
