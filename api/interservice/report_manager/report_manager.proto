@@ -16,6 +16,18 @@ message StoreReportRequest {
 
 message CustomReportRequest {
 	string requestor_id = 1;
+	string report_type = 2;
+	repeated ReportRequest reports = 3;
+}
+
+message ReportRequest {
+	string report_id = 1;
+	repeated Profile profiles = 2;
+}
+
+message Profile {
+	string profile_id = 1;
+	repeated string controls = 2;
 }
 
 message CustomReportResponse {
