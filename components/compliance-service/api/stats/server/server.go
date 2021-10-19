@@ -178,7 +178,7 @@ func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsa
 		return nil, err
 	}
 	daysSinceLastPost := daysBetween(telemetry.LastTelemetryReportedAt, time.Now())
-	if daysSinceLastPost > 0 || telemetry.LastTelemetryReportedAt.IsZero() {
+	if daysSinceLastPost > 0 {
 		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), lastTelemetryReportedAt)
 		if err != nil {
 			return nil, err
@@ -249,7 +249,7 @@ func formatFilters(filters []*stats.ListFilter) map[string][]string {
 // daysBetween get the calendar days between two timestamp
 func daysBetween(fromTime, toTime time.Time) int {
 	if fromTime.IsZero() {
-		return 0
+		return 15
 	}
 	if fromTime.After(toTime) {
 		fromTime, toTime = toTime, fromTime
