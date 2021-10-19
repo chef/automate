@@ -43,6 +43,27 @@ func (backend *ESClient) addDataToIndexWithID(ctx context.Context,
 	return err
 }
 
+// This method will support adding a document with a specified id
+func (backend *ESClient) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
+
+	_, err := backend.client.Update().
+		Index(mapping.Index).
+		Type(mapping.Type).
+		Id(id).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": id,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		Do(ctx)
+
+	return err
+}
+
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
 // in particular it creates the indexes and aliases for documents to be added
 func (backend *ESClient) InitializeStore(ctx context.Context) {
@@ -303,6 +324,12 @@ func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxtin
 		data.DocVersion = "0"
 	}
 	err := backend.addDataToIndexWithID(ctx, mapping, data.Sha256, data)
+	return err
+}
+
+func (backend *ESClient) InsertComplianceRunInfo(ctx context.Context, nodeId string, runDateTime time.Time) error {
+	mapping := mappings.ComplianceRunInfo
+	err := backend.upsertComplianceRunInfo(ctx, mapping, nodeId, runDateTime)
 	return err
 }
 
