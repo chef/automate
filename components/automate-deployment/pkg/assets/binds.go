@@ -98,7 +98,7 @@ notifications-service BINDING_MODE strict
 pg-sidecar-service REQUIRED automate-pg-gateway
 pg-sidecar-service BINDING_MODE strict
 report-manager-minio-gateway BINDING_MODE strict
-report-manager-service REQUIRED cereal-service report-manager-minio-gateway
+report-manager-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service report-manager-minio-gateway
 report-manager-service BINDING_MODE strict
 sample-data-service BINDING_MODE strict
 secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
