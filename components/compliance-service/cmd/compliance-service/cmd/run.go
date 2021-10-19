@@ -101,6 +101,7 @@ func init() {
 	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", 60, "Number of days to keep compliance reports")
 	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
 	runCmd.Flags().IntVar(&conf.Service.MessageBufferSize, "message-buffer-size", 100, "Number of ingest messages allowed to buffer")
+	runCmd.Flags().BoolVar(&conf.Service.IsSupportLCR, "upgrade-lcr", false, "upgrade to support large compliance reports")
 
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")
