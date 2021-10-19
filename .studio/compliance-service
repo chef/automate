@@ -36,6 +36,14 @@ function compliance_integration() {
   go_test -v "github.com/chef/automate/components/compliance-service/integration_test"
 }
 
+document "compliance_run_info_integration" <<DOC
+  Runs the integration tests for the compliance_run_info_integration
+DOC
+function compliance_run_info_integration() {
+  # Go based integration tests
+  go_test -run TestReportingServerRunInfo -v "github.com/chef/automate/components/compliance-service/integration_test"
+}
+
 document "go_update_compliance_service" <<DOC
   Go update will generate a new compliance-service binary (go_build) and force load it (reload_binary).
 
