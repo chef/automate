@@ -261,7 +261,7 @@ func TestSummary(t *testing.T) {
 
 	// ------------------------------- ReportProfilesFromInSpecProfiles test --------------------------------- //
 
-	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles)
+	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
 	profilesJson := fileContents("test_data/inspec_report_profiles_min_out.json")
 	expectedProfilesMin := parseProfilesMin(&profilesJson)
 
@@ -314,21 +314,31 @@ func TestSummary(t *testing.T) {
 	passert.Equal(t, expectedProfiles, actualProfiles, "profiles doc match")
 
 	// ------------------------------- ReportProfilesFromInSpecProfiles string limit test --------------------------------- //
-	for _, profile := range []*inspec.Profile{profile1, profile2}{
+	for _, profile := range []*inspec.Profile{profile1, profile2} {
 		for _, control := range profile.Controls {
 			for _, result := range control.Results {
-				result.CodeDesc = randomString(maxESKeywordBytes+10)
-				result.Message = randomString(maxESKeywordBytes+11)
-				result.SkipMessage = randomString(maxESKeywordBytes+12)
+				result.CodeDesc = randomString(maxESKeywordBytesv1 + 10)
+				result.Message = randomString(maxESKeywordBytesv1 + 11)
+				result.SkipMessage = randomString(maxESKeywordBytesv1 + 12)
 			}
 		}
 	}
-	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles)
-	for _, profile := range actualProfilesMin{
-		for _, control := range profile.Controls{
-			for _, result := range control.Results{
-				assert.Len(t, result.Message, maxESKeywordBytes)
-				assert.Len(t, result.SkipMessage, maxESKeywordBytes)
+	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, false)
+	for _, profile := range actualProfilesMin {
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				assert.Len(t, result.Message, maxESKeywordBytesv1)
+				assert.Len(t, result.SkipMessage, maxESKeywordBytesv1)
+			}
+		}
+	}
+
+	actualProfilesMin = ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles, true)
+	for _, profile := range actualProfilesMin {
+		for _, control := range profile.Controls {
+			for _, result := range control.Results {
+				assert.Len(t, result.Message, maxESKeywordBytesv2)
+				assert.Len(t, result.SkipMessage, maxESKeywordBytesv2)
 			}
 		}
 	}

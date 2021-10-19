@@ -25,7 +25,10 @@ const DocVersion = "1"
 // Elasticsearch rejects documents with values for keyword fields with more
 // than this number of bytes.
 // https://www.elastic.co/guide/en/elasticsearch/reference/6.4/ignore-above.html
-const maxESKeywordBytes = 32766
+const (
+	maxESKeywordBytesv1 = 32766
+	maxESKeywordBytesv2 = 1024
+)
 
 // ProfileControlSummary returns a NodeControlSummary struct with the counted controls based on their status and criticality,
 // This is working on all profiles embedded in a full json report.
@@ -110,7 +113,7 @@ func WaivedStr(data *inspec_api.WaiverData) (str string) {
 
 // ReportProfilesFromInSpecProfiles extracts the reports specific information
 // from the profile, leaving out the static profile data
-func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSums []relaxting.ESInSpecSummaryProfile) (profilesRep []relaxting.ESInSpecReportProfile) {
+func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSums []relaxting.ESInSpecSummaryProfile, isSupportLCR bool) (profilesRep []relaxting.ESInSpecReportProfile) {
 	// Creating a profilesSums hash to lookup the sums based on the profile (name|sha) string
 	profilesSumsHash := make(map[string]relaxting.ESInSpecSummaryProfile, len(profilesSums))
 	for _, profileSums := range profilesSums {
@@ -125,15 +128,19 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 		for i, control := range profile.Controls {
 			minResults := make([]*relaxting.ESInSpecReportControlsResult, len(control.Results))
 			for i, result := range control.Results {
+				var trimSize int
+				trimSize = maxESKeywordBytesv1
+				if isSupportLCR {
+					trimSize = maxESKeywordBytesv2
+				}
 				minResults[i] = &relaxting.ESInSpecReportControlsResult{
 					Status:      result.Status,
-					CodeDesc:    stringLimitBytes(result.CodeDesc, maxESKeywordBytes),
+					CodeDesc:    stringLimitBytes(result.CodeDesc, trimSize),
 					RunTime:     result.RunTime,
-					Message:     stringLimitBytes(result.Message, maxESKeywordBytes),
-					SkipMessage: stringLimitBytes(result.SkipMessage, maxESKeywordBytes),
+					Message:     stringLimitBytes(result.Message, trimSize),
+					SkipMessage: stringLimitBytes(result.SkipMessage, trimSize),
 				}
 			}
-
 			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
 			if control.Tags != nil {
 				for tKey, tValue := range control.Tags.Fields {
