@@ -6,7 +6,7 @@ module "system-tuning-automate" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_automate_ips)
+  instance_count                     = length(var.existing_automate_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
   private_ips                        = var.existing_automate_private_ips
   ssh_key_file                       = var.ssh_key_file
@@ -19,7 +19,7 @@ module "system-tuning-chef_server" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_chef_server_ips)
+  instance_count                     = length(var.existing_chef_server_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
   private_ips                        = var.existing_chef_server_private_ips
   ssh_key_file                       = var.ssh_key_file
@@ -32,7 +32,7 @@ module "system-tuning-elasticsearch" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length( var.existing_elasticsearch_ips )
+  instance_count                     = length(var.existing_elasticsearch_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
   private_ips                        = var.existing_elasticsearch_private_ips
   ssh_key_file                       = var.ssh_key_file
@@ -45,7 +45,7 @@ module "system-tuning-postgresql" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_postgresql_ips)
+  instance_count                     = length(var.existing_postgresql_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
   private_ips                        = var.existing_postgresql_private_ips
   ssh_key_file                       = var.ssh_key_file
@@ -57,7 +57,7 @@ module "system-tuning-postgresql" {
 module "airgap_bundle-elasticsearch" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-elasticsearch.archive_disk_info
-  instance_count    = length(var.existing_elasticsearch_ips)
+  instance_count    = length(var.existing_elasticsearch_private_ips)
   private_ips       = var.existing_elasticsearch_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
@@ -71,7 +71,7 @@ module "airgap_bundle-elasticsearch" {
 module "airgap_bundle-postgresql" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-postgresql.archive_disk_info
-  instance_count    = length(var.existing_postgresql_ips)
+  instance_count    = length(var.existing_postgresql_private_ips)
   private_ips       = var.existing_postgresql_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
@@ -85,7 +85,7 @@ module "airgap_bundle-postgresql" {
 module "airgap_bundle-automate" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-automate.archive_disk_info
-  instance_count    = length(var.existing_automate_ips)
+  instance_count    = length(var.existing_automate_private_ips)
   private_ips       = var.existing_automate_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
@@ -102,7 +102,7 @@ module "airgap_bundle-automate" {
 module "airgap_bundle-chef_server" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-chef_server.archive_disk_info
-  instance_count    = length(var.existing_chef_server_ips)
+  instance_count    = length(var.existing_chef_server_private_ips)
   private_ips       = var.existing_chef_server_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
@@ -126,7 +126,7 @@ module "habitat-elasticsearch" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = ""
-  instance_count                  = length(var.existing_elasticsearch_ips)
+  instance_count                  = length(var.existing_elasticsearch_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_elasticsearch_private_ips
@@ -151,7 +151,7 @@ module "habitat-postgresql" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = ""
-  instance_count                  = length(var.existing_postgresql_ips)
+  instance_count                  = length(var.existing_postgresql_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_postgresql_private_ips
@@ -176,7 +176,7 @@ module "habitat-automate" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = "--no-service"
-  instance_count                  = length(var.existing_automate_ips)
+  instance_count                  = length(var.existing_automate_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_automate_private_ips
@@ -198,7 +198,7 @@ module "habitat-chef_server" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = "--no-service"
-  instance_count                  = length(var.existing_chef_server_ips)
+  instance_count                  = length(var.existing_chef_server_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_chef_server_private_ips
