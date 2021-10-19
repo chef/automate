@@ -418,6 +418,32 @@ exceptions:
       reason: (rc) dep of core/git, used by Workflow and sqitch. Exception made by Stephen Delano, 4/23/20
     - name: core/procps-ng
       reason: Exception made by Chef Legal
+    - name: core/alsa-lib
+      reason:  Exception made by Chef Legal
+    - name: core/freetype
+      reason:  Exception made by Chef Legal
+    - name: core/groff
+      reason:  Exception made by Chef Legal
+    - name: core/gzip
+      reason:  Exception made by Chef Legal
+    - name: core/libiconv
+      reason:  Exception made by Chef Legal
+    - name: core/libidn2
+      reason:  Exception made by Chef Legal
+    - name: core/libpng
+      reason:  Exception made by Chef Legal
+    - name: core/libunistring
+      reason:  Exception made by Chef Legal
+    - name: core/lz4
+      reason:  Exception made by Chef Legal
+    - name: core/make
+      reason:  Exception made by Chef Legal
+    - name: core/openjdk11
+      reason:  Exception made by Chef Legal
+    - name: core/pkg-config
+      reason:  Exception made by Chef Legal
+    - name: core/systemd
+      reason:  Exception made by Chef Legal
 
   ruby:
     - name: highline
