@@ -25,13 +25,13 @@ type Compliance struct {
 }
 
 func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.ProjectsServiceClient,
-	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int, notifierClient notifier.Notifier, automateURL string) Compliance {
+	nodeMgrClient manager.NodeManagerServiceClient, messageBufferSize int, notifierClient notifier.Notifier, automateURL string, isSupportLCR bool) Compliance {
 	in := make(chan message.Compliance, messageBufferSize)
 	compliancePipeline(in,
 		processor.ComplianceProfile(client),
 		processor.ComplianceShared,
 		processor.ComplianceSummary,
-		processor.ComplianceReport(notifierClient, automateURL),
+		processor.ComplianceReport(notifierClient, automateURL, isSupportLCR),
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		publisher.StoreCompliance(client, 100))
