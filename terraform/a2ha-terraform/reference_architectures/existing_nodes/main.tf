@@ -6,9 +6,9 @@ module "system-tuning-automate" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_automate_ips)
+  instance_count                     = length(var.existing_automate_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.existing_automate_ips
+  private_ips                        = var.existing_automate_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.fe_sudo_password
@@ -19,9 +19,9 @@ module "system-tuning-chef_server" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_chef_server_ips)
+  instance_count                     = length(var.existing_chef_server_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.existing_chef_server_ips
+  private_ips                        = var.existing_chef_server_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.fe_sudo_password
@@ -32,9 +32,9 @@ module "system-tuning-elasticsearch" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length( var.existing_elasticsearch_ips )
+  instance_count                     = length(var.existing_elasticsearch_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.existing_elasticsearch_ips
+  private_ips                        = var.existing_elasticsearch_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.be_sudo_password
@@ -45,9 +45,9 @@ module "system-tuning-postgresql" {
   source                             = "./modules/system"
   automate_archive_disk_fs_path      = var.automate_archive_disk_fs_path
   elasticsearch_archive_disk_fs_path = var.elasticsearch_archive_disk_fs_path
-  instance_count                     = length(var.existing_postgresql_ips)
+  instance_count                     = length(var.existing_postgresql_private_ips)
   postgresql_archive_disk_fs_path    = var.postgresql_archive_disk_fs_path
-  public_ips                         = var.existing_postgresql_ips
+  private_ips                        = var.existing_postgresql_private_ips
   ssh_key_file                       = var.ssh_key_file
   ssh_user                           = var.ssh_user
   ssh_user_sudo_password             = local.be_sudo_password
@@ -57,8 +57,8 @@ module "system-tuning-postgresql" {
 module "airgap_bundle-elasticsearch" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-elasticsearch.archive_disk_info
-  instance_count    = length(var.existing_elasticsearch_ips)
-  public_ips        = var.existing_elasticsearch_ips
+  instance_count    = length(var.existing_elasticsearch_private_ips)
+  private_ips       = var.existing_elasticsearch_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -71,8 +71,8 @@ module "airgap_bundle-elasticsearch" {
 module "airgap_bundle-postgresql" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-postgresql.archive_disk_info
-  instance_count    = length(var.existing_postgresql_ips)
-  public_ips        = var.existing_postgresql_ips
+  instance_count    = length(var.existing_postgresql_private_ips)
+  private_ips       = var.existing_postgresql_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -85,8 +85,8 @@ module "airgap_bundle-postgresql" {
 module "airgap_bundle-automate" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-automate.archive_disk_info
-  instance_count    = length(var.existing_automate_ips)
-  public_ips        = var.existing_automate_ips
+  instance_count    = length(var.existing_automate_private_ips)
+  private_ips       = var.existing_automate_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -102,8 +102,8 @@ module "airgap_bundle-automate" {
 module "airgap_bundle-chef_server" {
   source            = "./modules/airgap_bundle"
   archive_disk_info = module.system-tuning-chef_server.archive_disk_info
-  instance_count    = length(var.existing_chef_server_ips)
-  public_ips        = var.existing_chef_server_ips
+  instance_count    = length(var.existing_chef_server_private_ips)
+  private_ips       = var.existing_chef_server_private_ips
   bundle_files = [{
     source      = var.backend_aib_local_file
     destination = var.backend_aib_dest_file
@@ -126,11 +126,10 @@ module "habitat-elasticsearch" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = ""
-  instance_count                  = length(var.existing_elasticsearch_ips)
+  instance_count                  = length(var.existing_elasticsearch_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_elasticsearch_private_ips
-  public_ips                      = var.existing_elasticsearch_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -152,11 +151,10 @@ module "habitat-postgresql" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = ""
-  instance_count                  = length(var.existing_postgresql_ips)
+  instance_count                  = length(var.existing_postgresql_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_postgresql_private_ips
-  public_ips                      = var.existing_postgresql_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -178,11 +176,10 @@ module "habitat-automate" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = "--no-service"
-  instance_count                  = length(var.existing_automate_ips)
+  instance_count                  = length(var.existing_automate_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_automate_private_ips
-  public_ips                      = var.existing_automate_ips
   peer_ips                        = var.existing_automate_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -201,11 +198,10 @@ module "habitat-chef_server" {
   hab_sup_ring_key                = var.hab_sup_ring_key
   hab_sup_run_args                = var.hab_sup_run_args
   install_hab_sh_args             = "--no-service"
-  instance_count                  = length(var.existing_chef_server_ips)
+  instance_count                  = length(var.existing_chef_server_private_ips)
   backend_aib_dest_file           = var.backend_aib_dest_file
   backend_aib_local_file          = var.backend_aib_local_file
   private_ips                     = var.existing_chef_server_private_ips
-  public_ips                      = var.existing_chef_server_ips
   peer_ips                        = var.existing_chef_server_private_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
@@ -231,7 +227,6 @@ module "elasticsearch" {
   kibana_pkg_ident             = var.kibana_pkg_ident
   metricbeat_pkg_ident         = var.metricbeat_pkg_ident
   private_ips                  = var.existing_elasticsearch_private_ips
-  public_ips                   = var.existing_elasticsearch_ips
   ssh_key_file                 = var.ssh_key_file
   ssh_user                     = var.ssh_user
   ssh_user_sudo_password       = local.be_sudo_password
@@ -263,7 +258,6 @@ module "postgresql" {
   proxy_pkg_ident                 = var.proxy_pkg_ident
   proxy_svc_load_args             = var.proxy_svc_load_args
   private_ips                     = var.existing_postgresql_private_ips
-  public_ips                      = var.existing_postgresql_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.be_sudo_password
@@ -294,7 +288,6 @@ module "bootstrap_automate" {
   postgresql_private_ips          = var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = slice(var.existing_automate_private_ips, 0, 1)
-  public_ips                      = slice(var.existing_automate_ips, 0, 1)
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.fe_sudo_password
@@ -330,11 +323,6 @@ module "automate" {
     1,
     length(var.existing_automate_private_ips),
   )
-  public_ips = slice(
-    var.existing_automate_ips,
-    1,
-    length(var.existing_automate_ips),
-  )
   ssh_key_file           = var.ssh_key_file
   ssh_user               = var.ssh_user
   ssh_user_sudo_password = local.fe_sudo_password
@@ -366,7 +354,6 @@ module "chef_server" {
   postgresql_private_ips          = var.existing_postgresql_private_ips
   postgresql_ssl_enable           = var.postgresql_ssl_enable
   private_ips                     = var.existing_chef_server_private_ips
-  public_ips                      = var.existing_chef_server_ips
   ssh_key_file                    = var.ssh_key_file
   ssh_user                        = var.ssh_user
   ssh_user_sudo_password          = local.fe_sudo_password
