@@ -5,4 +5,11 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
+pg-helper ensure-service-database "{{cfg.storage.database}}"
+pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+pg-helper fix-permissions "{{cfg.storage.database}}"
+
+# cleanup old migration files
+rm -rf "{{pkg.svc_static_path}}/schema"
+
 exec report-manager-service serve --config {{pkg.svc_config_path}}/config.toml
