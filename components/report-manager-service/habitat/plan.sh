@@ -20,6 +20,7 @@ pkg_exposes=(
   port
 )
 pkg_binds=(
+  [cereal-service]="port"
   [report-manager-minio-gateway]="port"
 )
 pkg_bin_dirs=(bin)
