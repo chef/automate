@@ -6,6 +6,12 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting"
 )
 
+type ESComplianceRunInfo struct {
+	NodeID   string    `json:"node_uuid"`
+	FirstRun time.Time `json:"first_run"`
+	LastRun  time.Time `json:"last_run"`
+}
+
 // Used to unmarshal summary documents stored in comp-s-* ElasticSearch indices
 type ESInSpecSummary struct {
 	NodeID        string    `json:"node_uuid"`
