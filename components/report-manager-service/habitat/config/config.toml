@@ -12,6 +12,13 @@ cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"
 root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
+[storage]
+database = "{{cfg.storage.database}}"
+user = "{{cfg.storage.user}}"
+schema_path = "{{pkg.path}}/schema"
+max_open_conns = {{cfg.storage.max_open_conns}}
+max_idle_conns = {{cfg.storage.max_idle_conns}}
+
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
