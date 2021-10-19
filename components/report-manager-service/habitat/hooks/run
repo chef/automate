@@ -5,4 +5,4 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
-exec report-manager-service serve --config {{pkg.svc_config_path}}/config.json
+exec report-manager-service serve --config {{pkg.svc_config_path}}/config.toml
