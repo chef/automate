@@ -7,6 +7,7 @@ type ReportManager struct {
 	Service         Service
 	Log             Log
 	CerealConfig    CerealConfig `mapstructure:"cereal"`
+	Storage         Storage      `mapstructure:"storage"`
 	certs.TLSConfig `mapstructure:"tls"`
 }
 
@@ -23,4 +24,13 @@ type Log struct {
 
 type CerealConfig struct {
 	Target string `mapstructure:"target"`
+}
+
+type Storage struct {
+	URI          string `mapstructure:"uri"`
+	DBUser       string `mapstructure:"user"`
+	Database     string `mapstructure:"database"`
+	SchemaPath   string `mapstructure:"schema_path"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }

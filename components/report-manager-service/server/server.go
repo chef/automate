@@ -95,8 +95,9 @@ func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.Cu
 	err := s.CerealManager.EnqueueWorkflow(s.ctx, worker.ReportWorkflowName,
 		fmt.Sprintf("%s-%s", "report-workflow", id.String()),
 		worker.ReportWorkflowParameters{
-			JobID:   id.String(),
-			Retries: 2,
+			JobID:       id.String(),
+			RequestorID: req.RequestorId,
+			Retries:     2,
 		})
 
 	if err != nil {

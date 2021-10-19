@@ -8,6 +8,7 @@ import (
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/config"
 	"github.com/chef/automate/components/report-manager-service/server"
+	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/worker"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/health"
@@ -32,13 +33,21 @@ func Serve(conf config.ReportManager, connFactory *secureconn.Factory) error {
 	}
 	logrus.Infof("connection established to object store, endPoint:%s", objStoreClient.EndpointURL())
 
+	//get cereal manager
 	cerealManager, err := getCerealManager(conf, connFactory)
 	if err != nil {
 		logrus.WithError(err).Fatal("error in establishing a connection to cereal manager")
 		return err
 	}
 
-	return serveGrpc(ctx, conf, objStoreClient, connFactory, cerealManager)
+	//establish db connection and perform migrations
+	db, err := storage.ConnectAndMigrate(&conf.Storage)
+	if err != nil {
+		logrus.WithError(err).Fatal("error in establishing a connection and running migrations to db")
+		return err
+	}
+
+	return serveGrpc(ctx, conf, objStoreClient, connFactory, cerealManager, db)
 }
 
 func getCerealManager(conf config.ReportManager, connFactory *secureconn.Factory) (*cereal.Manager, error) {
@@ -85,7 +94,7 @@ func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*
 }
 
 func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *minio.Client,
-	connFactory *secureconn.Factory, cerealManager *cereal.Manager) error {
+	connFactory *secureconn.Factory, cerealManager *cereal.Manager, db *storage.DB) error {
 
 	grpcBinding := fmt.Sprintf("%s:%d", conf.Service.Host, conf.Service.Port)
 	lis, err := net.Listen("tcp", grpcBinding)
@@ -101,7 +110,7 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 		server.New(objStoreClient, cerealManager))
 
 	//Initiate the cereal manager with 2 workers
-	err = worker.InitCerealManager(cerealManager, 2)
+	err = worker.InitCerealManager(cerealManager, 2, db)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}
