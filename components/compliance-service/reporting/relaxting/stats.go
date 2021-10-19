@@ -3,8 +3,10 @@ package relaxting
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
@@ -283,4 +285,28 @@ func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
 	return depth.getControlListStatsByProfileIdResults(&backend, searchResult, profileID)
+}
+
+//GetUniqueNodesCount: Get the unique nodes count based on the lastTelemetryReportedAt
+func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return 0, err
+	}
+
+	var rangeQueryThreshold *elastic.RangeQuery
+	if daysSinceLastPost > 15 {
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedAt).To(time.Now())
+	} else {
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").Gte("now-" + "15d")
+	}
+	boolQuery := elastic.NewBoolQuery().
+		Must(rangeQueryThreshold)
+
+	count, err := client.Count("comp-1-run-info").Query(boolQuery).Do(context.Background())
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

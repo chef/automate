@@ -158,7 +158,7 @@ service StatsService {
 	UpdateTelemetryReported
 
 	Acknowledge API  to updates the last complaince telemetry reported date in postgres
-
+	
 	Authorization Action:
 	```
 	iam:introspect:getAll
@@ -168,6 +168,29 @@ service StatsService {
 		option (google.api.http) = {
 			put: "/api/v0/compliance/reporting/stats/nodes/count/updated"
 			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
+
+	/*
+	GetNodesUsageCount
+	
+	Returns the count of unique nodes with lastRun in a given time.
+	The time duration can be between the last time Telemetry data sent and the current date.
+	If the duration < 15 days --> 15 days
+	duration > 15 days --> duration
+
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc GetNodesUsageCount(GetNodesUsageCountRequest) returns (GetNodesUsageCountResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/compliance/reporting/stats/nodes/count"
 		};
 		option (chef.automate.api.iam.policy) = {
 			resource: "iam:introspect"
@@ -436,5 +459,13 @@ message UpdateTelemetryReportedRequest {
 	string last_telemetry_reported_at = 1;
 }
 
-message UpdateTelemetryReportedResponse {
+message UpdateTelemetryReportedResponse {}
+
+message GetNodesUsageCountRequest {}
+
+message	GetNodesUsageCountResponse {
+	// number of days since telematics was last posted
+	int64 days_since_last_post =1;
+	// unique nodes count in a duration
+	int64 node_cnt =2;
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -221,4 +222,26 @@ func formatFilters(filters []*stats.ListFilter) map[string][]string {
 		formattedFilters[filter.Type] = filter.Values
 	}
 	return formattedFilters
+}
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	var count int64
+	var err error
+
+	// TODO: Get last telemetry reported date from postgres
+	var lastTelemetryReportedAt time.Time
+	// TODO: Count the days between last_telemetry_reported_at and current time
+	// For the testing purpose I have given it hard coded will remove it in next PR
+	var daysSinceLastPost int64 = 10
+	if daysSinceLastPost > 0 {
+		count, err = srv.es.GetUniqueNodesCount(daysSinceLastPost, lastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &stats.GetNodesUsageCountResponse{
+		DaysSinceLastPost: daysSinceLastPost,
+		NodeCnt:           count,
+	}, nil
 }
