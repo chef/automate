@@ -33,8 +33,11 @@ data "aws_s3_bucket_object" "pager_duty_token" {
 }
 
 # Configure the PagerDuty provider
+# Pinning the version to 1.11 since 2.0 requires a newer version of TF(.13+) versus the .11 
+# we are currently using
 provider "pagerduty" {
-  token = "${data.aws_s3_bucket_object.pager_duty_token.body}"
+  token   = "${data.aws_s3_bucket_object.pager_duty_token.body}"
+  version = "1.11.0"
 }
 
 data "pagerduty_team" "release_engineering" {

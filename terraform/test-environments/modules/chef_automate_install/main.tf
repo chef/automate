@@ -3,19 +3,18 @@ provider "aws" {
   profile = "chef-cd"
 }
 
+provider "vault" {
+  address   = "https://vault.es.chef.co"
+  namespace = "releng"
+}
+
+data "vault_generic_secret" "wildcard_chef" {
+  path = "secret/a2/testing/wildcard_cert"
+}
+
 data "aws_s3_bucket_object" "aws_private_key" {
   bucket = "chef-cd-citadel"
   key    = "cd-infrastructure-aws"
-}
-
-data "aws_s3_bucket_object" "wilcard_chef_co_crt" {
-  bucket = "chef-cd-citadel"
-  key    = "wildcard.chef.co.crt"
-}
-
-data "aws_s3_bucket_object" "wilcard_chef_co_key" {
-  bucket = "chef-cd-citadel"
-  key    = "wildcard.chef.co.key"
 }
 
 data "aws_s3_bucket_object" "internal_license" {
@@ -272,8 +271,8 @@ EOF
   trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
 
 [[load_balancer.v1.sys.frontend_tls]]
-  cert = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_crt.body)))}"""
-  key = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_key.body)))}"""
+  cert = """${data.vault_generic_secret.wildcard_chef.data["crt"]}"""
+  key = """${data.vault_generic_secret.wildcard_chef.data["key"]}"""
 
 [license_control.v1.svc]
   license = """${data.aws_s3_bucket_object.internal_license.body}"""
