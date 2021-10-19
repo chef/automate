@@ -66,6 +66,10 @@ func initConfig() error {
 		conf.Service.Port = 10152
 	}
 
+	if conf.CerealConfig.Target == "" {
+		conf.CerealConfig.Target = "127.0.0.1:10101"
+	}
+
 	return nil
 }
 

@@ -6,6 +6,7 @@ import "github.com/chef/automate/lib/tls/certs"
 type ReportManager struct {
 	Service         Service
 	Log             Log
+	CerealConfig    CerealConfig `mapstructure:"cereal"`
 	certs.TLSConfig `mapstructure:"tls"`
 }
 
@@ -18,4 +19,8 @@ type Service struct {
 type Log struct {
 	Level  string
 	Format string
+}
+
+type CerealConfig struct {
+	Target string `mapstructure:"target"`
 }

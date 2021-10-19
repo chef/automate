@@ -8,12 +8,17 @@ import (
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/config"
 	"github.com/chef/automate/components/report-manager-service/server"
+	"github.com/chef/automate/components/report-manager-service/worker"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+
+	"github.com/chef/automate/lib/cereal/grpc"
 )
 
 func Serve(conf config.ReportManager, connFactory *secureconn.Factory) error {
@@ -27,7 +32,24 @@ func Serve(conf config.ReportManager, connFactory *secureconn.Factory) error {
 	}
 	logrus.Infof("connection established to object store, endPoint:%s", objStoreClient.EndpointURL())
 
-	return serveGrpc(ctx, conf, objStoreClient, connFactory)
+	cerealManager, err := getCerealManager(conf, connFactory)
+	if err != nil {
+		logrus.WithError(err).Fatal("error in establishing a connection to cereal manager")
+		return err
+	}
+
+	return serveGrpc(ctx, conf, objStoreClient, connFactory, cerealManager)
+}
+
+func getCerealManager(conf config.ReportManager, connFactory *secureconn.Factory) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", conf.CerealConfig.Target)
+	logrus.Info("Cereal Connection:", conf.CerealConfig.Target)
+	if err != nil {
+		return nil, err
+	}
+
+	backend := grpc.NewGrpcBackendFromConn("report-manager-service", conn)
+	return cereal.NewManager(backend)
 }
 
 func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*minio.Client, error) {
@@ -62,7 +84,8 @@ func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*
 	return objStoreClient, nil
 }
 
-func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *minio.Client, connFactory *secureconn.Factory) error {
+func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *minio.Client,
+	connFactory *secureconn.Factory, cerealManager *cereal.Manager) error {
 
 	grpcBinding := fmt.Sprintf("%s:%d", conf.Service.Host, conf.Service.Port)
 	lis, err := net.Listen("tcp", grpcBinding)
@@ -74,8 +97,18 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 
 	//register health server for health status
 	health.RegisterHealthServer(s, health.NewService())
-	report_manager.RegisterReportManagerServiceServer(s, server.New(objStoreClient))
+	report_manager.RegisterReportManagerServiceServer(s,
+		server.New(objStoreClient, cerealManager))
 
+	//Initiate the cereal manager with 2 workers
+	err = worker.InitCerealManager(cerealManager, 2)
+	if err != nil {
+		logrus.Fatalf("failed to initiate cereal manager: %v", err)
+	}
+	cerealManager.Start(ctx)
+	logrus.Info("cereal manager started")
+
+	reflection.Register(s)
 	logrus.Info("Starting GRPC server on " + grpcBinding)
 
 	return s.Serve(lis)

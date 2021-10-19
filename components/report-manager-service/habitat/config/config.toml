@@ -1,0 +1,20 @@
+[service]
+host = "127.0.0.1"
+port = "{{cfg.service.port}}"
+message = "{{cfg.service.message}}"
+
+[log]
+format = "{{cfg.log.format}}"
+level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[cereal]
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+{{~#if @last}}
+target = "127.0.0.1:{{cereal-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
