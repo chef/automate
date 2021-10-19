@@ -44,7 +44,7 @@ import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 // Services
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
-import { ComplianceStatsService } from './services/telemetry/complicance-stats/complicance-stats.service';
+import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
 import { ConfigService } from './services/config/config.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';

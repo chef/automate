@@ -23,6 +23,7 @@ export const environment = {
   deployment_url: '/api/v0/deployment',
   gateway_url: '/api/v0',
   user_preference_url: '/api/v0/user-settings',
+  compliance_stats_url: '/api/v0/compliance/reporting/stats',
   elasticsearch_url: '/api/v0/elasticsearch',
   notifier_url: '/api/v0/notifications',
   data_feed_url: '/api/v0/datafeed',
