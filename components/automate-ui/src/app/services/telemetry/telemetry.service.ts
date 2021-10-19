@@ -345,7 +345,8 @@ export class TelemetryService {
       const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
         .getComplianceStats();
       if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
-        const ackStats: NodeUsageAckStats = await this.sendUnfilteredStatsToTelemetry(nodeUsageStats);
+        const ackStats: NodeUsageAckStats = await this
+        .sendUnfilteredStatsToTelemetry(nodeUsageStats);
         await this.complianceStatsService.sendAckownledgement(ackStats);
       }
     } catch (error) {
