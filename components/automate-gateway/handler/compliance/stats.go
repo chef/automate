@@ -73,3 +73,19 @@ func (a *Stats) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failu
 	}
 	return out, nil
 }
+
+//UpdateTelemetryReported Updates the last compliance telemetry reported date after the telemetry data is sent
+func (a *Stats) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
+	inDomain := &statsService.UpdateTelemetryReportedRequest{
+		LastTelemetryReportedAt: in.LastTelemetryReportedAt,
+	}
+	out := &stats.UpdateTelemetryReportedResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.UpdateTelemetryReported(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
