@@ -39,7 +39,7 @@ func reportManagerPublisher(in <-chan message.Compliance, reportmanagerClient ma
 			}
 			stream, err := reportmanagerClient.StoreReport(msg.Ctx)
 			if err != nil {
-				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, err.Error()))
+				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, "Unable to get report stream: %s", err))
 				continue
 			}
 			body, err := json.Marshal(msg.Report)
@@ -57,21 +57,21 @@ func reportManagerPublisher(in <-chan message.Compliance, reportmanagerClient ma
 					break
 				}
 				if err != nil {
-					grpcErr = status.Errorf(codes.Internal, err.Error())
+					grpcErr = status.Errorf(codes.Internal, "Read report buffer error: %s", err)
 					break
 				}
 				request := &report_manager.StoreReportRequest{Content: buffer[:n]}
 				logrus.Debugf("sending %d bytes", n)
 				err = stream.Send(request)
 				if err != nil {
-					grpcErr = status.Errorf(codes.Internal, err.Error())
+					grpcErr = status.Errorf(codes.Internal, "Unable to send report stream: %s", err)
 					break
 				}
 			}
 			_, err = stream.CloseAndRecv()
 			if err != nil || grpcErr != nil {
 				if grpcErr != nil {
-					msg.FinishProcessingCompliance(status.Errorf(codes.Internal, grpcErr.Error()))
+					msg.FinishProcessingCompliance(grpcErr)
 					continue
 				}
 				msg.FinishProcessingCompliance(status.Errorf(codes.Internal, err.Error()))
