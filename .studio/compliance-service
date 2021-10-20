@@ -44,6 +44,14 @@ function compliance_run_info_integration() {
   go_test -run TestReportingServerRunInfo -v "github.com/chef/automate/components/compliance-service/integration_test"
 }
 
+document "compliance_run_info_load_16_days" <<DOC
+  Runs the integration tests for the compliance_run_info_load_16_days
+DOC
+function compliance_run_info_load_16_days() {
+  # Go based integration tests
+  go_test -run TestReportingServerRunInfoLoadSixteenDaysOfData -v "github.com/chef/automate/components/compliance-service/integration_test"
+}
+
 document "go_update_compliance_service" <<DOC
   Go update will generate a new compliance-service binary (go_build) and force load it (reload_binary).
 

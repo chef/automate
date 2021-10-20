@@ -125,3 +125,131 @@ func TestReportingServerRunInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestReportingServerRunInfoLoadSixteenDaysOfData(t *testing.T) {
+	//clear out the docs
+	suite.DeleteAllDocuments()
+
+	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
+	server := reportingServer.New(backend)
+
+	lis := bufconn.Listen(1024 * 1024)
+	s := grpc.NewServer()
+	reporting.RegisterReportingServiceServer(s, server)
+
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+
+	dialer := func(string, time.Duration) (net.Conn, error) { return lis.Dial() }
+
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
+	defer conn.Close()
+	require.NoError(t, err)
+
+	now := time.Now().UTC().Truncate(60 * time.Second)
+	reports := []*relaxting.ESInSpecReport{}
+	summaries := []*relaxting.ESInSpecSummary{}
+
+	seventeenDaysAgo := now.Add(time.Duration(-24*17) * time.Hour)
+	//put in 2 reports and summaries every day for the past 16 days starting with yesterday
+	for i := 1; i <= 16; i++ {
+		dayOfReport := seventeenDaysAgo.Add(time.Duration(24*i) * time.Hour)
+		reports = append(reports,
+			&relaxting.ESInSpecReport{
+				NodeID:  newUUID(),
+				EndTime: dayOfReport,
+			})
+		reports = append(reports,
+			&relaxting.ESInSpecReport{
+				NodeID:  newUUID(),
+				EndTime: dayOfReport,
+			})
+
+		summaries = append(summaries,
+			&relaxting.ESInSpecSummary{
+				NodeID:  newUUID(),
+				EndTime: dayOfReport,
+			})
+		summaries = append(summaries,
+			&relaxting.ESInSpecSummary{
+				NodeID:  newUUID(),
+				EndTime: dayOfReport,
+			})
+	}
+
+	reportIds, err := suite.InsertInspecReports(reports)
+	require.NoError(t, err)
+
+	_, err = suite.InsertInspecSummaries(summaries)
+	require.NoError(t, err)
+
+	_, err = suite.InsertComplianceRunInfos(reports)
+	require.NoError(t, err)
+
+	rerunReports := []*relaxting.ESInSpecReport{}
+	rerunSummaries := []*relaxting.ESInSpecSummary{}
+
+	//rerun one of the two run nodes for each day on days 3, 4 and 5 and rerun on the same days, just a minute later
+	//we do two nodes a day above so
+	//day 3 runs occupy index 4 and 5
+	//day 4 runs occupy index 6 and 7
+	//day 5 runs occupy index 8 and 9
+	for i := 4; i < 10; i += 2 {
+		dayOfReport := reports[i].EndTime.Add(time.Duration(1) * time.Minute)
+		rerunReports = append(rerunReports,
+			&relaxting.ESInSpecReport{
+				NodeID:  reports[i].NodeID,
+				EndTime: dayOfReport,
+			})
+
+		rerunSummaries = append(rerunSummaries,
+			&relaxting.ESInSpecSummary{
+				NodeID:  reports[i].NodeID,
+				EndTime: dayOfReport,
+			})
+	}
+	reportIds, err = suite.InsertInspecReports(rerunReports)
+	require.NoError(t, err)
+
+	summaryIds, err := suite.InsertInspecSummaries(rerunSummaries)
+	require.NoError(t, err)
+
+	runInfoIds, err := suite.InsertComplianceRunInfos(rerunReports)
+	require.NoError(t, err)
+
+	require.Len(t, reportIds, len(rerunReports))
+	require.Len(t, summaryIds, len(rerunSummaries))
+	require.Len(t, runInfoIds, len(rerunReports))
+
+	rerunSecondReportFromSixteenDaysAgoToday := []*relaxting.ESInSpecReport{}
+	rerunSummariesFromSixteenDaysAgoToday := []*relaxting.ESInSpecSummary{}
+
+	//rerun the second report from 16 days ago.. rerun it today
+	rerunSecondReportFromSixteenDaysAgoToday = append(rerunSecondReportFromSixteenDaysAgoToday,
+		&relaxting.ESInSpecReport{
+			NodeID:  reports[1].NodeID,
+			EndTime: now,
+		})
+
+	rerunSummariesFromSixteenDaysAgoToday = append(rerunSummariesFromSixteenDaysAgoToday,
+		&relaxting.ESInSpecSummary{
+			NodeID:  reports[1].NodeID,
+			EndTime: now,
+		})
+
+	reportIds, err = suite.InsertInspecReports(rerunSecondReportFromSixteenDaysAgoToday)
+	require.NoError(t, err)
+
+	summaryIds, err = suite.InsertInspecSummaries(rerunSummariesFromSixteenDaysAgoToday)
+	require.NoError(t, err)
+
+	runInfoIds, err = suite.InsertComplianceRunInfos(rerunSecondReportFromSixteenDaysAgoToday)
+	require.NoError(t, err)
+
+	require.Len(t, reportIds, len(rerunSecondReportFromSixteenDaysAgoToday))
+	require.Len(t, summaryIds, len(rerunSummariesFromSixteenDaysAgoToday))
+	require.Len(t, runInfoIds, len(rerunSecondReportFromSixteenDaysAgoToday))
+}
