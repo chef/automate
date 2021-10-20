@@ -51,7 +51,7 @@ func init() {
     "/api/v0/compliance/reporting/stats/nodes/count": {
       "get": {
         "summary": "GetNodesUsageCount",
-        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the current date.\nIf the duration \u003c 15 days --\u003e 15 days\nduration \u003e 15 days --\u003e duration\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the day before the current date.\nIf the duration \u003c 15 days --\u003e 15 days\nduration \u003e 15 days --\u003e duration\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "StatsService_GetNodesUsageCount",
         "responses": {
           "200": {

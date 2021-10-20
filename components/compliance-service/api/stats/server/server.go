@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	utils "github.com/chef/automate/components/compliance-service/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -177,7 +178,12 @@ func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsa
 	if err != nil {
 		return nil, err
 	}
-	daysSinceLastPost := daysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	var daysSinceLastPost int
+	if telemetry.LastTelemetryReportedAt.IsZero() {
+		daysSinceLastPost = 15
+	} else {
+		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	}
 	if daysSinceLastPost > 0 {
 		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), lastTelemetryReportedAt)
 		if err != nil {
@@ -244,22 +250,4 @@ func formatFilters(filters []*stats.ListFilter) map[string][]string {
 		formattedFilters[filter.Type] = filter.Values
 	}
 	return formattedFilters
-}
-
-// daysBetween get the calendar days between two timestamp
-func daysBetween(fromTime, toTime time.Time) int {
-	if fromTime.IsZero() {
-		return 15
-	}
-	if fromTime.After(toTime) {
-		fromTime, toTime = toTime, fromTime
-	}
-
-	days := -fromTime.YearDay()
-	for year := fromTime.Year(); year < toTime.Year(); year++ {
-		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
-	}
-	days += toTime.YearDay()
-
-	return days
 }

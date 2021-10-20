@@ -2711,7 +2711,7 @@ type StatsServiceClient interface {
 	//GetNodesUsageCount
 	//
 	//Returns the count of unique nodes with lastRun in a given time.
-	//The time duration can be between the last time Telemetry data sent and the current date.
+	//The time duration can be between the last time Telemetry data sent and the day before the current date.
 	//If the duration < 15 days --> 15 days
 	//duration > 15 days --> duration
 	//
@@ -2900,7 +2900,7 @@ type StatsServiceServer interface {
 	//GetNodesUsageCount
 	//
 	//Returns the count of unique nodes with lastRun in a given time.
-	//The time duration can be between the last time Telemetry data sent and the current date.
+	//The time duration can be between the last time Telemetry data sent and the day before the current date.
 	//If the duration < 15 days --> 15 days
 	//duration > 15 days --> duration
 	//
