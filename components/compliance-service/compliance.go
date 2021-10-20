@@ -28,6 +28,7 @@ import (
 	aEvent "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	jobsserver "github.com/chef/automate/components/compliance-service/api/jobs/server"
 	profilesserver "github.com/chef/automate/components/compliance-service/api/profiles/server"
 	reportingserver "github.com/chef/automate/components/compliance-service/api/reporting/server"
@@ -174,6 +175,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	ingesticESClient := ingestic.NewESClient(esClient)
 	ingesticESClient.InitializeStore(context.Background())
 	runner.ESClient = ingesticESClient
+	reportmanagerClient := createReportManager(connFactory, conf.ReportConfig.Endpoint)
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
@@ -199,7 +201,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServiceServer(s,
-		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
+		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient, reportmanagerClient,
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, conf.Service.MessageBufferSize, conf.Service.IsSupportLCR))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
@@ -375,6 +377,24 @@ func getManagerConnection(connectionFactory *secureconn.Factory,
 	if mgrClient == nil {
 		logrus.Fatalf("getManagerConnection got nil for NewNodeManagerServiceClient")
 	}
+
+	return mgrClient
+}
+
+func createReportManager(connFactory *secureconn.Factory, address string) reportmanager.ReportManagerServiceClient {
+	if address == "" || address == ":0" {
+		logrus.Fatal("report-manager cannot be empty or Dial will get stuck")
+	}
+
+	logrus.Debugf("Connecting to report-manager %q", address)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	conn, err := connFactory.DialContext(timeoutCtx, "report-manager-service",
+		address, grpc.WithBlock())
+	if err != nil {
+		logrus.Fatalf("report-manager, error grpc dialing to manager %s", err.Error())
+	}
+	mgrClient := reportmanager.NewReportManagerServiceClient(conn)
 
 	return mgrClient
 }
