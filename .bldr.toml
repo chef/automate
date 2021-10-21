@@ -251,6 +251,7 @@ paths = [
   "lib/grpc/*",
   "lib/io/*",
   "lib/license/*",
+  "lib/oidc/*",
   "lib/platform/command/*",
   "lib/platform/sys/*",
   "lib/proc/*",
