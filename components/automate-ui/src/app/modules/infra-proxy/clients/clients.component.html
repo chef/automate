@@ -21,6 +21,12 @@
     <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchClients($event)" placeHolder="clients by name...">
       </app-infra-search-bar>
+      <app-paginator *ngIf="clients.length"
+        [length]= "total"
+        [pageSize]= "per_page"
+        [pageIndex]= "current_page"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
       <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>

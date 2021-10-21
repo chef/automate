@@ -19,6 +19,12 @@
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
     <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments by name..."></app-infra-search-bar>
+      <app-paginator *ngIf="environments.length"
+        [length]= "total"
+        [pageSize]= "per_page"
+        [pageIndex]= "current_page"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
       <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>

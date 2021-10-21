@@ -44,7 +44,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public current_page = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public dataBagItemToDelete: DataBagItems;
   public deleteModalVisible = false;
@@ -234,5 +234,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   openDatabagItemModal(): void {
     this.openDataBagItemModal.emit();
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.current_page = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.searching = true;
+    this.getDataBagItemsData();
   }
 }

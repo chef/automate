@@ -25,7 +25,7 @@ export class PaginatorComponent implements OnInit, OnChanges {
   @Output() changePage = new EventEmitter<any>(true);
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  pageSizeOptions: number[] = [10, 50, 100];
+  pageSizeOptions: number[] = [100, 500, 1000];
   pageEvent: PageEvent;
   public isPageAvailable = false;
 

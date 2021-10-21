@@ -30,7 +30,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   public current_page = 1;
   public environments: Environment[] = [];
-  public per_page = 9;
+  public per_page = 100;
   public searchValue = '';
   public total: number;
 
@@ -140,6 +140,13 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
     this.deleting = true;
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.current_page = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.searching = true;
+    this.getEnvironmentData();
   }
 }
 

@@ -52,7 +52,7 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public currentPage = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public nodeToDelete: InfraNode;
   public deleteModalVisible = false;
@@ -329,5 +329,12 @@ export class InfraNodesComponent implements OnInit, OnDestroy {
         value: value.name
       });
     }
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.searching = true;
+    this.currentPage = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.getNodesData();
   }
 }
