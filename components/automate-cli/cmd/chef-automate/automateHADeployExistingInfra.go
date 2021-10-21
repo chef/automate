@@ -24,7 +24,7 @@ func (e *existingInfra) doDeployWork(args []string) error {
 	if err != nil {
 		return err
 	}
-	err = executeSecretsInitCommand(e.config.Architecture.ConfigInitials.SecretsKeyFile)
+	err = executeSecretsInitCommand(e.config.Architecture.ConfigInitials.SecretsStoreFile)
 	if err != nil {
 		return err
 	}
