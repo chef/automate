@@ -1,5 +1,5 @@
 
-<div class="acc-header" [ngClass]="{'open-acc':showBody}" (click)="toggle()">
+<div class="acc-header" [ngClass]="{'open-acc':showBody}" (click)="toggle()" [attr.data-cy]="dataCy">
   <div class="headerTitle">
       {{title}}
   </div>

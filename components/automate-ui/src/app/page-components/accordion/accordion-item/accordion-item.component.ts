@@ -27,6 +27,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class AccordionItemComponent implements OnInit {
   @Input() title: string;
+  @Input() dataCy: string;
   showBody = false;
 
   constructor() { }

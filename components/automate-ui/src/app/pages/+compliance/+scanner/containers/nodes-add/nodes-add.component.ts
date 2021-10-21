@@ -36,6 +36,7 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   public scrollLoadingValue: boolean;
   public instanceNodeCredentials$: Observable<Credential[]>;
   public availablelist: AvailableType[] = [];
+  public dataCy = 'cred-accordion';
   public credentialType = [
      {name: 'SSH', asset: 'ssh'},
      {name: 'WinRM', asset: 'winrm'}
@@ -121,7 +122,7 @@ export class NodesAddComponent implements OnInit, OnDestroy {
       filter(status => !pending(status)))
       .subscribe(response => {
         if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
-            this.scrollLoadingValue = true;
+            this.scrollLoadingValue = false;
         }
       });
 
@@ -182,6 +183,7 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   }
 
   scroll() {
+    this.scrollLoadingValue = true;
     if (this.secrets.length === this.total) {
       this.scrollLoadingValue = false;
     }
@@ -292,12 +294,6 @@ export class NodesAddComponent implements OnInit, OnDestroy {
     this.pageNumber = 1;
     this.form.controls['wizardStep2']['controls']['backend'].setValue(this.secretType);
     this.getCredList(false);
-  }
-
-  // TODO move to ngrx/effects
-  fetchSecrets(body: any): Observable<any[]> {
-    return this.httpClient.post<any>(`${env.secrets_url}/search`, body).pipe(
-      map(({secrets}) => secrets));
   }
 
   // TODO move to ngrx/effects

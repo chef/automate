@@ -41,7 +41,7 @@
           </fieldset>
           <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
             <app-accordion>
-              <app-accordion-item title="Add credentials to connect to your nodes">
+              <app-accordion-item title="Add credentials to connect to your nodes" [dataCy]="dataCy">
                 <chef-select #ty (change)="onTypeSelect(ty.value)" >
                   <chef-option value={{credential.asset}} *ngFor="let credential of credentialType">{{credential.name}}</chef-option>                    
                   <!-- <chef-option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</chef-option> -->

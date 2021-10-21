@@ -9,12 +9,14 @@
       [infiniteScrollDistance]="scrollDistance"
       (scrolled)="onScrollDown()"
       [scrollWindow]="false"
-      class="scroll">
+      class="scroll"
+      id="scroll-right-side">
         <li 
           *ngFor="let data of listData;let i=index;"
           (click)="moveLeftOrRight !== 'right'  ? selectItem(data, 'left', data.type) : null" 
           [ngStyle]="{'cursor': moveLeftOrRight !== 'right' ? 'pointer' : 'no-drop'}"
-          [ngClass]="{'active': highlightElement(data)}">
+          [ngClass]="{'active': highlightElement(data)}"
+          [attr.data-cy]="'rightSide-' + i">
           {{ data.name}}
         </li>
         <chef-separator *ngIf="scrollLoadingRightSide">
@@ -26,7 +28,10 @@
       </ul>
     </div>
     <div class="button-group">
-      <chef-button [attr.disabled]="moveLeftOrRight === 'right'" secondary (click)="moveRight()">
+      <chef-button
+        [attr.disabled]="moveLeftOrRight === 'right'" 
+        secondary (click)="moveRight()"
+        data-cy="right-side-button">
         <div class="arrow-right"></div>
       </chef-button>
       <chef-button [attr.disabled]="moveLeftOrRight === 'left'" secondary (click)="moveLeft()">
@@ -38,12 +43,13 @@
       <div class="select-item-list-block">
         <ul class="select-item-list">
           <li 
-            *ngFor="let data of selectedListData"
+            *ngFor="let data of selectedListData;let i=index;"
             [attr.disabled]="moveLeftOrRight === 'right'"
             [hidden]="!(data[typeFieldName] === typeValue)"
             (click)="moveLeftOrRight !== 'left' ? selectItem(data, 'right', data[typeFieldName]) : null" 
             [ngStyle]="{'cursor': moveLeftOrRight !== 'left' ? 'pointer' : 'no-drop'}"
             [ngClass]="{'active': highlightElement(data)}"
+            [attr.data-cy]="'leftSide' + i"
             >
             {{ data.name }}
           </li>
@@ -57,3 +63,4 @@
     </label>
   </div>
 </main>
+

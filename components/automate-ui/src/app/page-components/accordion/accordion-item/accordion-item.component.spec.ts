@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AccordionItemComponent } from './accordion-item.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AccordionItemComponent', () => {
   let component: AccordionItemComponent;
@@ -8,15 +9,14 @@ describe('AccordionItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AccordionItemComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
+      declarations: [ AccordionItemComponent ],
+      providers: [],
+      imports: [BrowserAnimationsModule],
+      schemas: []
+    });
     fixture = TestBed.createComponent(AccordionItemComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {

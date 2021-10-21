@@ -6,17 +6,15 @@ describe('AccordionComponent', () => {
   let component: AccordionComponent;
   let fixture: ComponentFixture<AccordionComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ AccordionComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
+  beforeEach( () => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AccordionComponent
+      ]
+    });
     fixture = TestBed.createComponent(AccordionComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {

@@ -11,7 +11,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
   // eg: data = [{id:xyz, type:winrm}]
   @Input() data: any;
   // It can be anything pass type in parent component
-  // eg: type = "winrm"
+  // eg: typeValue = "winrm",  typeFieldName= "type"
   @Input() typeValue: string;
   @Input() typeFieldName: string;
   // searchFlag is optional
@@ -34,6 +34,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
   public moveLeftOrRight: string;
   public copyDataListFlags: boolean;
   newItemEvent: any;
+  openEvent: any;
 
   constructor() { }
 
@@ -60,7 +61,6 @@ export class SelectboxComponent implements OnInit, OnChanges {
       this.copyDataListFlags = true;
     }
 
-
     if (!this.combination) {
       if (this.typeValue !== this.selectedListTypeToMove) {
         this.selectedListDataToMove = [];
@@ -69,17 +69,11 @@ export class SelectboxComponent implements OnInit, OnChanges {
 
   }
 
-
   emitData(data: string) {
     this.searchData.emit(data);
   }
 
-  appendItems() {
-
-  }
-
   onScrollDown() {
-    this.scrollLoadingRightSide = true;
     this.onScrollListData.emit();
   }
 
@@ -101,13 +95,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
     }
   }
 
-
-
-  highlightElementLeft(listData: string): boolean {
-    return this.selectedListDataToMove.includes(listData);
-  }
-
-  highlightElement(listData: string): boolean {
+  highlightElement(listData: any): boolean {
     return this.selectedListDataToMove.includes(listData);
 }
 
