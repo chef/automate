@@ -45,6 +45,12 @@
     <div class="search-create-container">
       <app-infra-search-bar (searchButtonClick)="searchNodes($event)" placeHolder="nodes by name...">
       </app-infra-search-bar>
+      <app-paginator *ngIf="nodes.length"
+        [length]= "total"
+        [pageSize]= "per_page"
+        [pageIndex]= "currentPage"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || editRunlistLoading || deleting" size="50" fixed></chef-loading-spinner>
     <div *ngIf="!authFailure">

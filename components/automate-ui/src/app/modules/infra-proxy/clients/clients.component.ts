@@ -31,7 +31,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public searching = false;
   public searchValue = '';
   public current_page = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public clientToDelete: Client;
   public deleteModalVisible = false;
@@ -140,5 +140,12 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
     this.deleting = true;
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.current_page = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.searching = true;
+    this.getClientsData();
   }
 }
