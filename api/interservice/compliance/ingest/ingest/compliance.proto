@@ -10,14 +10,14 @@ import "interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
 service ComplianceIngesterService {
-	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
+	rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+  	rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+	rpc ProcessComplianceReport(stream ReportData) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			post: "/api/v0/events/compliance/report"
 			body: "*"
 		};
 	};
-	rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
-  rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
 }
 
 message ProjectUpdateStatusReq { }
@@ -26,4 +26,8 @@ message ProjectUpdateStatusResp {
     string state = 1;
     google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;
+}
+
+message ReportData {
+	bytes content = 1;
 }
