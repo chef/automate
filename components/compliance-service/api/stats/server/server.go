@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
+	utils "github.com/chef/automate/components/compliance-service/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -165,6 +167,33 @@ func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.Update
 		return nil, err
 	}
 	return &stats.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	var count int64
+	var lastTelemetryReportedAt time.Time
+	// Get last telemetry reported date from postgres
+	telemetry, err := srv.pg.GetTelemetry(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var daysSinceLastPost int
+	if telemetry.LastTelemetryReportedAt.IsZero() {
+		daysSinceLastPost = 15
+	} else {
+		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	}
+	if daysSinceLastPost > 0 {
+		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), lastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &stats.GetNodesUsageCountResponse{
+		DaysSinceLastPost: int64(daysSinceLastPost),
+		NodeCnt:           count,
+	}, nil
 }
 
 func validateTrendData(in *stats.Query, filters map[string][]string) (err error) {
