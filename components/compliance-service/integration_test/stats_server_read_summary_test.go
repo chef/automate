@@ -357,7 +357,7 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	n := 5
 	reportIds := make([]string, n)
 	for i := 0; i < n; i++ {
