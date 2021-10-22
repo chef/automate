@@ -450,7 +450,7 @@
     },
     "/api/v0/applications/telemetry/nodes/count": {
       "get": {
-        "operationId": "ApplicationsService_GetsServicesUsageCount",
+        "operationId": "ApplicationsService_GetServicesUsageCount",
         "responses": {
           "200": {
             "description": "A successful response.",

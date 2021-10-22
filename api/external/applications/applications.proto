@@ -443,7 +443,7 @@ service ApplicationsService {
   */
 
 
-  rpc GetsServicesUsageCount(GetServicesUsageCountRequest) returns (GetServicesUsageCountResponse) {
+  rpc GetServicesUsageCount(GetServicesUsageCountRequest) returns (GetServicesUsageCountResponse) {
     option (google.api.http) = {
       get: "/api/v0/applications/telemetry/nodes/count"
     };

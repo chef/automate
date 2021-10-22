@@ -267,5 +267,5 @@ func (s *Applications) UpdateTelemetryReported(ctx context.Context, req *applica
 // GetServicesUsageCount fetches the count of service
 func (a *Applications) GetServicesUsageCount(ctx context.Context,
 	e *applications.GetServicesUsageCountRequest) (*applications.GetServicesUsageCountResponse, error) {
-	return a.client.GetsServicesUsageCount(ctx, e)
+	return a.client.GetServicesUsageCount(ctx, e)
 }
