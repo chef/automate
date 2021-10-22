@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/ingester"
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
+	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
@@ -611,4 +612,46 @@ func (s *ApplicationsServer) UpdateTelemetryReported(ctx context.Context, req *a
 	}
 
 	return &applications.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetServicesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
+	e *applications.GetServicesUsageCountRequest) (*applications.GetServicesUsageCountResponse, error) {
+	// var count int64
+	// var lastTelemetryReportedAt time.Time
+	// // Get last telemetry reported date from postgres
+	// telemetry, err := app.storageClient.GetTelemetry(ctx)
+
+	// uniqueCount, err := app.storageClient.GetUniqueServicesFromPostgres(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return &applications.GetServicesUsageCountResponse{
+	// 	TotalServices: uniqueCount,
+	// }, nil
+
+	var count int64
+	var lastTelemetryReportedAt time.Time
+	// Get last telemetry reported date from postgres
+	telemetry, err := app.storageClient.GetTelemetry(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var daysSinceLastPost int
+	if telemetry.LastTelemetryReportedAt.IsZero() {
+		daysSinceLastPost = 15
+	} else {
+		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+	}
+	if daysSinceLastPost > 0 {
+		// count, err := app.storageClient.GetUniqueServicesFromPostgres(ctx)
+		count, err = app.storageClient.GetUniqueServicesFromPostgres(int64(daysSinceLastPost), lastTelemetryReportedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &applications.GetServicesUsageCountResponse{
+		TotalServices: count,
+	}, nil
 }

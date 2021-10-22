@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/external/habitat"
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 )
 
 type Client interface {
@@ -39,6 +40,8 @@ type Client interface {
 	GetDeploymentsCount() (int32, error)
 
 	UpdateTelemetryReported(context.Context, string) error
+	GetTelemetry(context.Context) (pgdb.Telemetry, error)
+	GetUniqueServicesFromPostgres(context.Context) (int64, error)
 
 	// Used by our Integration Tests
 	EmptyStorage() error

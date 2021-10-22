@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 )
@@ -63,4 +64,29 @@ func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedA
 		return err
 	}
 	return nil
+}
+
+// Get last services telemetry reported timestamp
+func (db *Postgres) GetTelemetry(ctx context.Context) (Telemetry, error) {
+	var t Telemetry
+	rows, err := db.Query(`SELECT id,last_telemetry_reported_at, created_at from telemetry`)
+	if err != nil {
+		return Telemetry{}, err
+	}
+	for rows.Next() {
+		err = rows.Scan(&t.ID, &t.LastTelemetryReportedAt, &t.CreatedAt)
+		if err != nil {
+			return Telemetry{}, err
+		}
+	}
+	return t, nil
+}
+
+// Get last 15 days services telemetry reported timestamp
+func (db *Postgres) GetUniqueServicesFromPostgres(ctx context.Context) (int64, error) {
+	rows, err := db.Query(`SELECT count (DISTINCT supervisior_id) from service_full where health_updated_at between now()::date - 15 AND now()::date`)
+	if err != nil {
+		return *storage.GetServicesCount{}, err
+	}
+	return rows.count, nil
 }
