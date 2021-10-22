@@ -201,6 +201,24 @@ func local_request_StatsService_UpdateTelemetryReported_0(ctx context.Context, m
 
 }
 
+func request_StatsService_GetNodesUsageCount_0(ctx context.Context, marshaler runtime.Marshaler, client StatsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetNodesUsageCountRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetNodesUsageCount(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_StatsService_GetNodesUsageCount_0(ctx context.Context, marshaler runtime.Marshaler, server StatsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetNodesUsageCountRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetNodesUsageCount(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterStatsServiceHandlerServer registers the http handlers for service StatsService to "mux".
 // UnaryRPC     :call StatsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -303,6 +321,26 @@ func RegisterStatsServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_StatsService_UpdateTelemetryReported_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_StatsService_GetNodesUsageCount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_StatsService_GetNodesUsageCount_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_StatsService_GetNodesUsageCount_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -447,6 +485,26 @@ func RegisterStatsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
+	mux.Handle("GET", pattern_StatsService_GetNodesUsageCount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_StatsService_GetNodesUsageCount_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_StatsService_GetNodesUsageCount_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -460,6 +518,8 @@ var (
 	pattern_StatsService_ReadFailures_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"api", "v0", "compliance", "reporting", "stats", "failures"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_StatsService_UpdateTelemetryReported_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7}, []string{"api", "v0", "compliance", "reporting", "stats", "nodes", "count", "updated"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_StatsService_GetNodesUsageCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"api", "v0", "compliance", "reporting", "stats", "nodes", "count"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -472,4 +532,6 @@ var (
 	forward_StatsService_ReadFailures_0 = runtime.ForwardResponseMessage
 
 	forward_StatsService_UpdateTelemetryReported_0 = runtime.ForwardResponseMessage
+
+	forward_StatsService_GetNodesUsageCount_0 = runtime.ForwardResponseMessage
 )

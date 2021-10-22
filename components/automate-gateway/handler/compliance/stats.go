@@ -89,3 +89,17 @@ func (a *Stats) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTel
 	}
 	return out, nil
 }
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (a *Stats) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	inDomain := &statsService.GetNodesUsageCountRequest{}
+	out := &stats.GetNodesUsageCountResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.GetNodesUsageCount(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
