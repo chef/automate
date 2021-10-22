@@ -27,8 +27,7 @@ function compile_client_mocks() {
       mockgen_debug -source authz/project.pb.go -destination authz/project.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
       mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
-      mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest
-      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt and event_feed because of
+      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt, event_feed and ingest because of
       # an issue with source-mode's ability to parse interfaces from the
       # grpc package. Details here:
       #
@@ -41,6 +40,7 @@ function compile_client_mocks() {
         github.com/chef/automate/api/interservice/cfgmgmt/service \
         github.com/chef/automate/api/interservice/cfgmgmt/service \
         CfgMgmtServiceClient,CfgMgmtService_NodeExportClient,CfgMgmtService_ReportExportClient,CfgMgmtServiceServer,CfgMgmtService_NodeExportServer,CfgMgmtService_ReportExportServer
+      mockgen_debug -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest github.com/chef/automate/api/interservice/compliance/ingest/ingest ComplianceIngesterServiceClient,ComplianceIngesterService_ProcessComplianceReportClient,ComplianceIngesterServiceServer,ComplianceIngesterService_ProcessComplianceReportServer
       mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
       mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
       mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
