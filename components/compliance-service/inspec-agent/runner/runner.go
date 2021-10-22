@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	neturl "net/url"
@@ -33,6 +34,8 @@ import (
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/cereal"
 )
+
+const maxSize = 1 << 20
 
 var ListenPort int = 2133
 
@@ -554,8 +557,37 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	}
 	stripProfilesMetadata(&report, profilesMissingMeta, RunTimeLimit)
 
-	_, err = t.ingestClient.ProcessComplianceReport(ctx, &report)
+	// send reports in chunks to compliance
+	marshaller, err := json.Marshal(report)
 	if err != nil {
+		return errors.Wrap(err, "Report processing error")
+	}
+
+	reader := bytes.NewReader(marshaller)
+	buffer := make([]byte, maxSize)
+	stream, err := t.ingestClient.ProcessComplianceReport(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Report processing error")
+	}
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logrus.Error("cannot read chunk to buffer: ", err)
+			return errors.Wrap(err, "Report processing error")
+		}
+		request := &ingest.ReportData{Content: buffer[:n]}
+		err = stream.Send(request)
+		if err != nil {
+			return errors.Wrap(err, "Report processing error")
+		}
+	}
+
+	_, err = stream.CloseAndRecv()
+	if err != nil && err != io.EOF {
 		return errors.Wrap(err, "Report processing error")
 	}
 	return nil
