@@ -1,12 +1,16 @@
 package server
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/blang/semver"
 	"github.com/gofrs/uuid"
 	gp "github.com/golang/protobuf/ptypes/empty"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -59,19 +63,19 @@ func (srv *ComplianceIngestServer) ProjectUpdateStatus(ctx context.Context,
 	return nil, status.Error(codes.Unimplemented, "Endpoint no longer used")
 }
 
-func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in *compliance.Report) (*gp.Empty, error) {
+func SendComplianceReport(ctx context.Context, in *compliance.Report, s *ComplianceIngestServer) error {
 	logrus.Debugf("ProcessComplianceReport with id: %s", in.ReportUuid)
 	if s == nil {
-		return nil, fmt.Errorf("ProcessComplianceReport, ComplianceIngestServer == nil")
+		return fmt.Errorf("ProcessComplianceReport, ComplianceIngestServer == nil")
 	}
 
 	if len(in.NodeUuid) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid report: missing node_uuid")
+		return status.Error(codes.InvalidArgument, "invalid report: missing node_uuid")
 	}
 
 	_, err := uuid.FromString(in.NodeUuid)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid report: invalid node_uuid: %s", err.Error())
+		return status.Errorf(codes.InvalidArgument, "invalid report: invalid node_uuid: %s", err.Error())
 	}
 
 	if len(in.Version) == 0 {
@@ -87,6 +91,58 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		}
 	}
 	logrus.Debugf("Calling compliancePipeline.Run for report id %s", in.ReportUuid)
-	err = s.compliancePipeline.Run(in)
-	return &gp.Empty{}, err
+	return s.compliancePipeline.Run(in)
+}
+
+// ProcessComplianceReport receives messages in chunks and creates report
+func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.ComplianceIngesterService_ProcessComplianceReportServer) error {
+	var err error
+	reportData := bytes.Buffer{}
+
+	// loop until all data is read in chunks or any error occur.
+	for {
+		err = contextError(stream.Context())
+		if err != nil {
+			return err
+		}
+		logrus.Debug("waiting to receive more data")
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			logrus.Debug("no more data")
+			break
+		}
+		if err != nil {
+			logrus.Debugf("cannot receive chunk data: %v", err)
+			return err
+		}
+		chunk := req.GetContent()
+		logrus.Debugf("received a chunk with size: %d", len(chunk))
+		_, err = reportData.Write(chunk)
+		if err != nil {
+			logrus.Debugf("cannot write chunk data: %v", err)
+			return err
+		}
+	}
+	in := &compliance.Report{}
+	err = json.Unmarshal(reportData.Bytes(), &in)
+	if err != nil {
+		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
+	}
+	err = SendComplianceReport(context.Background(), in, s)
+	if err != nil {
+		return err
+	}
+	return stream.SendAndClose(&gp.Empty{})
+}
+
+func contextError(ctx context.Context) error {
+	switch ctx.Err() {
+	case context.Canceled:
+		return errors.Wrap(ctx.Err(), "request is canceled")
+	case context.DeadlineExceeded:
+		return errors.Wrap(ctx.Err(), "deadline is exceeded")
+	default:
+		return nil
+	}
 }

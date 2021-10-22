@@ -139,7 +139,7 @@ func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error 
 	ctx := context.Background()
 
 	for tries := 0; tries < 3; tries++ {
-		_, err = s.ComplianceIngestServer.ProcessComplianceReport(ctx, &iReport)
+		err = server.SendComplianceReport(ctx, &iReport, s.ComplianceIngestServer)
 		if err == nil {
 			break
 		}
