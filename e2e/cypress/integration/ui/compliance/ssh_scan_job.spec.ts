@@ -16,7 +16,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const credName = 'a test ' + nowTime;
   const nodePrefix = '0-' + nowTime;
   const jobName = 'job ' + nowTime;
-  const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
+  //const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
 
   itFlaky('can create a credential with a username and key', () => {
     // we save the route that will be called when we navigate to the page
@@ -28,12 +28,12 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.url().should('include', '/settings/node-credentials/add');
 
     // fill in name for credential, username, and key
-    cy.get('form input[formcontrolname="name"]').first().type(credName);
-    cy.get('form input[formcontrolname="username"]').first()
-      .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER'));
+    // cy.get('form input[formcontrolname="name"]').first().type(credName);
+    // cy.get('form input[formcontrolname="username"]').first()
+    //   .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER'));
 
-    // we save some time by setting this long string as the value rather than typing it out
-    cy.get('form textarea[formcontrolname="key"]').clear().invoke('val', decoded).trigger('input');
+    // // we save some time by setting this long string as the value rather than typing it out
+    // cy.get('form textarea[formcontrolname="key"]').clear().invoke('val', decoded).trigger('input');
 
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later

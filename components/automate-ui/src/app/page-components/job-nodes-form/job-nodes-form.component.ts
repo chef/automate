@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -7,6 +7,9 @@ import { getOr } from 'lodash/fp';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { ManagerSearchFields, ManagersSearch} from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
+import { Manager } from 'app/entities/managers/manager.model';
+//import { boolean } from 'fp-ts';
+//import { totalcountNode } from '../../entities/managers/manager.selectors';
 //import { ManagerRequests } from 'app/entities/managers/manager.requests';
 
 @Component({
@@ -14,26 +17,55 @@ import * as selectors from '../../entities/managers/manager.selectors';
   templateUrl: "./job-nodes-form.component.html",
   styleUrls: ["./job-nodes-form.component.scss"],
 })
-export class JobNodesFormComponent implements OnInit {
+export class JobNodesFormComponent implements OnInit, OnChanges {
   @Input() form: FormGroup;
+  @Input() scrollCalled: any;
+  @Input() pageNo : any;
+  @Output() firstCall = new EventEmitter<boolean>();
+
+  managers$: Observable<Manager[]>;
   public automateCheck = false;
   public awsCheck = false;
   public azureCheck = false;
   public gcpCheck = false;
   public nodeSource = [];
+  public throttle = 300;
+  public scrollDistance = 2;
+  public scrollingLoader = false;
+  public total: number;
+ // private isDestroyed = new Subject<boolean>();
+  public NodeManagerArray: Manager[] = [];
+  public pagenumber = 1;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder //private managerRequests: ManagerRequests
   ) {}
 
+  ngOnChanges(): void {
+    console.log(this.scrollCalled, 'changes');
+  }
+
   ngOnInit() {
-    this.store.dispatch(
-      new ManagersSearch({
-        page: 1,
-        per_page: 10,
-      })
-    );
+
+    //   this.store.dispatch(
+    //   new ManagersSearch({
+    //     page: 1,
+    //     per_page: 10,
+    //   })
+    // );
+    // this.store.select(totalcountNode).pipe(
+    //   takeUntil(this.isDestroyed)
+    // ).subscribe((total) => {
+    //   this.total = total;
+    //   console.log('Total is ',total)
+    // });
+
+    //  console.log('The total arrays is:',this.form.get('managers')['controls']);
+    //  this.pagenumber++;
+console.log(this.scrollCalled, 'oninit');
+
+
   }
 
   addRegionValue(regionsGroup: FormGroup, index: number) {
@@ -144,10 +176,14 @@ export class JobNodesFormComponent implements OnInit {
   }
 
   search(searchName: string[]) {
+     this.firstCall.emit(true);
     console.log("Search value is", searchName);
     var payload = {};
     if (searchName === null && this.nodeSource.length === 0) {
-      this.store.dispatch(new ManagersSearch({}));
+      this.store.dispatch(new ManagersSearch({
+         page: 1,
+        per_page: 10,
+      }));
     } else {
       if (searchName === null) {
         payload = {
@@ -155,8 +191,10 @@ export class JobNodesFormComponent implements OnInit {
             {
               key: "manager_type",
               values: this.nodeSource,
-            },
-          ]
+            }
+          ],
+          page: 1,
+          per_page: 10,
         };
       } else if (searchName && this.nodeSource.length > 0) {
         payload = {
@@ -179,6 +217,8 @@ export class JobNodesFormComponent implements OnInit {
               values: searchName,
             },
           ],
+          page: 1,
+          per_page: 10,
         };
       }
 
@@ -188,6 +228,8 @@ export class JobNodesFormComponent implements OnInit {
   }
 
   onclickCheckbox(e: any, val: string) {
+    this.pageNo = 1;
+    this.firstCall.emit(true);
     switch (val) {
       case "automate": {
         this.automateCheck = e.target.checked;
@@ -235,11 +277,13 @@ export class JobNodesFormComponent implements OnInit {
     this.search(null);
   }
 
-  onSearchInput(event) {
+  onSearchInput(value : string) {
+    console.log('Onsearch called')
     const nameArray = [];
-    const value = event.target.value;
-    console.log(value);
+    console.log('value is',value);
     nameArray.push(value);
-    //this.search(nameArray);
+    this.search(nameArray);
   }
+
+
 }

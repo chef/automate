@@ -210,8 +210,10 @@ export class ManagerEffects {
     ofType(ManagerActionTypes.SEARCH_NODES),
     mergeMap((action: ManagerSearchNodes) =>
               this.requests.searchNodes(action.payload).pipe(
-              map((resp: ManagerSearchNodesResponse) =>
-                   new ManagerSearchNodesSuccess(Object.assign(resp, action.payload))),
+              map((resp: ManagerSearchNodesResponse) => {
+                   
+                   return new ManagerSearchNodesSuccess(Object.assign(resp, action.payload))
+                  }),
               catchError((error: HttpErrorResponse) =>
                      of(new ManagerSearchNodesFailure(error)))))));
 

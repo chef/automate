@@ -49,3 +49,24 @@ export const cloudManagers = createSelector(
   allManagers,
   (state) => filter((manager) => manager.type !== 'automate', state)
 );
+
+export const totalcountNode = createSelector(
+  managerState,
+  (state) => state.total
+);
+
+export const counterVal = createSelector(
+  managerState,
+  (state) => state.counter
+);
+
+
+export const nodestatus = createSelector(
+  managerState,
+  (state) => state.nodestatus
+);
+
+export const searchstatus = createSelector(
+  managerState,
+  (state) => state.searchstatus
+);

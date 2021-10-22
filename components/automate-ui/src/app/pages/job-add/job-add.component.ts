@@ -1,9 +1,9 @@
-import { map, distinctUntilChanged, debounceTime, takeUntil } from 'rxjs/operators';
-import { Component, OnDestroy } from '@angular/core';
+import { map, distinctUntilChanged, debounceTime, takeUntil} from 'rxjs/operators';
+import { Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { clamp, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
 import * as moment from 'moment/moment';
@@ -14,12 +14,13 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
-import { allManagers } from '../../entities/managers/manager.selectors';
+import { allManagers, counterVal,  nodestatus,  totalcountNode } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
   ManagerSearchFields,
   ManagerSearchNodes,
   ManagerAllNodes,
+  ManagersSearch,
 } from "../../entities/managers/manager.actions";
 import { ProfilesSearch } from '../../entities/profiles/profile.actions';
 import { JobCreate } from '../../entities/jobs/job.actions';
@@ -30,6 +31,9 @@ import {
   nodeSelectionRequiredValidator,
   profileSelectionRequiredValidator
 } from './job-add.validators';
+ import { EntityStatus } from 'app/entities/entities';
+// import { cons } from 'fp-ts/lib/ReadonlyArray';
+// import { JobNodesFormComponent } from 'app/page-components/job-nodes-form/job-nodes-form.component';
 
 export enum Step {
   First          = 0,
@@ -43,7 +47,7 @@ export enum Step {
   templateUrl: './job-add.component.html',
   styleUrls: ['./job-add.component.scss']
 })
-export class JobAddComponent implements OnDestroy {
+export class JobAddComponent implements OnDestroy , OnInit, DoCheck {
   form: FormGroup;
 
   Step = Step;
@@ -52,9 +56,20 @@ export class JobAddComponent implements OnDestroy {
   status$: Observable<Status>;
   managers$: Observable<Manager[]>;
   profiles$: Observable<Profile[]>;
+ // @ViewChild(JobNodesFormComponent) createChild: JobNodesFormComponent;
+
 
   private isDestroyed = new Subject<boolean>();
-
+  public pagenumber = 1;
+  public total: number;
+  public scrollCalled = false;
+  public firstTime = true;
+  public managersList : any;
+  public managersArray : any;
+  public counter = 0;
+  public tempcounter = 0;
+  public appendDataOnscrollLater : boolean;
+public managerId = []
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -77,15 +92,79 @@ export class JobAddComponent implements OnDestroy {
         }
       });
 
+      this.store.select(totalcountNode).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+      console.log('Total is ',total);
+    });
+
     this.setupForm();
 
-   // this.store.dispatch(new ManagersSearch({}));
+
     this.store.dispatch(new ProfilesSearch({ owner: this.chefSession.username }));
+  }
+
+  ngOnInit() {
+     this.store.dispatch(
+       new ManagersSearch({
+        page: this.pagenumber,
+        per_page: 10,
+      })
+   );
+    this.store.pipe(
+      select(nodestatus),
+      takeUntil(this.isDestroyed))
+      .subscribe(res => {
+         if (res === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
+       // this.managersList.forEach(manager => {
+          // for (const managerId in res) {
+          //   if (managerId === manager.id) {
+          //       if(!(this.managerId.includes(manager.id))) {
+          //         this.managerId.push(managerId)
+          //         this.counter =this.managerId.length;
+          //       }
+          //   }
+          // }
+          this.store.pipe(
+            select(counterVal),
+            takeUntil(this.isDestroyed)
+          ).subscribe(res => {
+            console.log(res, 'res counter')
+            this.counter = res
+          }
+
+          )
+
+         }
+
+
+      });
   }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  ngDoCheck() {
+    //  if(this.managersArray.length < this.total && this.counter  === this.managersArray.length && this.appendDataOnscrollLater) {
+    //  console.log("scroll called");
+    //  this.scrollCalled = true;
+    //  console.log('Length of array',this.managersArray.length)
+    //  this.store.dispatch(
+    //   new ManagersSearch({
+    //     page: ++this.pagenumber,
+    //     per_page: 10,
+    //   })
+    // );
+    // this.appendDataOnscrollLater=false;
+    //  }
+  }
+
+  public firstCalled(flag : boolean) {
+     this.firstTime = flag;
+     console.log('Value of first time from child',flag)
   }
 
   public setupForm() {
@@ -141,10 +220,24 @@ export class JobAddComponent implements OnDestroy {
     this.managers$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(managers => {
-        const managersArray = nodesGroup.controls['managers'] as FormArray;
-        managersArray.clear();
-        managers.forEach((manager, i) => {
-          const managerId = manager.id;
+        this.managersArray = nodesGroup.controls['managers'] as FormArray;
+        if(this.firstTime) {
+          console.log("first time called")
+           this.managersArray.clear();
+           this.pagenumber=1;
+            this.scrollCalled = false;
+          this.managersList = managers;
+          this.firstTime = false;
+        } else {
+
+               this.managersList = [...this.managersList, ...managers];
+               this.scrollCalled = false;
+          }
+
+
+        console.log('Managers:',managers);
+        this.managersList.forEach((manager, i) => {
+        const managerId = manager.id;
           const namesGroup = this.fb.group({
             key: 'name',
             include: true,
@@ -176,15 +269,17 @@ export class JobAddComponent implements OnDestroy {
             distinctUntilChanged((a, b) => isEqual(a, b)),
             takeUntil(this.isDestroyed))
             .subscribe(payload => {
+              console.log('ManagerSearchNodes called')
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 
-          managersArray.setControl(i, managerGroup);
+          this.managersArray.setControl(i, managerGroup);
 
-          this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
+       this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
 
           switch (manager.type) {
             case ('automate'): {
+              console.log('Inside ManagerSearchFields')
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'name'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -192,6 +287,7 @@ export class JobAddComponent implements OnDestroy {
             case ('aws-ec2'):
             case ('azure-vm'):
             case ('azure-api'): {
+            console.log('Inside ManagerSearchFields azure')
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -351,4 +447,27 @@ export class JobAddComponent implements OnDestroy {
     }
     return false;
   }
+
+  onScrollDown() {
+  console.log(this.counter);
+     this.scrollCalled = true;
+    // if(this.managersArray.length < this.total && this.counter  === this.managersArray.length ) {
+     console.log("scroll called");
+     console.log(this.managersArray.length < this.total,'true/false')
+     if(this.managersArray.length < this.total) {
+     console.log('Length of array',this.managersArray.length)
+     this.store.dispatch(
+      new ManagersSearch({
+        page: ++this.pagenumber,
+        per_page: 10,
+      })
+    );
+    console.log('pagenumber',this.pagenumber);
+     }
+      else{
+       this.scrollCalled = false;
+     }
+    }
+
+
 }

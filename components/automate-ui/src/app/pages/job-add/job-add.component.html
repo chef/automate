@@ -1,7 +1,8 @@
 <div class="content-container">
   <div class="container">
 
-    <main class="job-add">
+    <main class="job-add" style='height:100%; overflow: scroll' infinite-scroll (scrolled)="onScrollDown()" [infiniteScrollDistance]="2"
+      [scrollWindow]="false">
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/compliance/scan-jobs/jobs']">Scan jobs</chef-breadcrumb>
         Create new job
@@ -47,6 +48,9 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
+            [scrollCalled]="scrollCalled"
+            (firstCall) = "firstCalled($event)"
+            [pageNo] = "pagenumber"
             [form]="form.controls['nodesGroup'] | castFormGroup">
           </chef-job-nodes-form>
           <chef-job-profiles-form

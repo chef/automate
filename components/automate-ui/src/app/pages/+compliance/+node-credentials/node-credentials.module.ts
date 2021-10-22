@@ -30,13 +30,9 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
   declarations: [
     NodeCredentialListComponent,
     NodeCredentialDetailsScreenComponent,
-    CreateNodeCredentialModalComponent
+    CreateNodeCredentialModalComponent,
   ],
-  providers: [
-    SaveNodeCredential
-  ],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA
-  ]
+  providers: [SaveNodeCredential],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class NodeCredentialsModule {}
