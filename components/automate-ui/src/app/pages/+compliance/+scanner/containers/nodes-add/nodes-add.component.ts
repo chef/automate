@@ -28,6 +28,7 @@ export class NodesAddComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>
   ) {}
+
   private isDestroyed = new Subject<boolean>();
   public secretType: string;
   public secrets: Credential[] = [];

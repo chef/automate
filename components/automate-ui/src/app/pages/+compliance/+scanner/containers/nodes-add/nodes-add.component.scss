@@ -116,3 +116,28 @@
 .add-node-text {
   line-height: 3em;
 }
+
+
+.chef-dropdown {
+  min-width: calc(91% / 2);
+}
+
+chef-select ::ng-deep .selected-value {
+  border-radius: 5px;
+}
+
+chef-select ::ng-deep .options {
+  width: 90%;
+  float: right;
+}
+chef-select ::ng-deep .options ::ng-deep chef-dropdown {
+  border: 2px solid var(--chef-primary-bright);
+  border-radius: 5px;
+}
+
+chef-option {
+  padding: 6px 6px 6px 18px;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+}
