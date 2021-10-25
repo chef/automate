@@ -78,6 +78,7 @@ export class DataFeedTableComponent  {
 
   onToggleSort(field: string) {
     this.selectedSortField = field;
+    console.log(fieldDirection);
     this.sortval = this.sortval === 'ASC' ? 'DESC' : 'ASC';
     if (this.sortval === 'ASC') {
        this.destinations = this.destinations.sort((a, b) =>  (a[field] > b[field] ? 1 : -1));

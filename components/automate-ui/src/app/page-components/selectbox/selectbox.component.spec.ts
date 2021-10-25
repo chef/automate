@@ -64,6 +64,7 @@ describe('SelectboxComponent', () => {
         });
       }
       component.data = datalist;
+      component.selectedList = [];
       component.ngOnInit();
       component.ngOnChanges();
     });
