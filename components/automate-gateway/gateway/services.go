@@ -982,13 +982,23 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 	if err != nil {
 		return nil, errors.Wrap(err, "error extracting token")
 	}
-	token, _, err := new(jwt.Parser).ParseUnverified(reqIdToken, jwt.MapClaims{})
+
+	var jwtPayload map[string]interface{}
+
+	// Current JWT standard is a base64 string separated by 3 periods
+	jwtParts := strings.Split(reqIdToken, ".")
+
+	// Use JWT package base64 decoder
+	data, err := jwt.DecodeSegment(jwtParts[1])
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing token")
+		return nil, errors.Wrap(err, "error decoding token")
 	}
-	claims, _ := token.Claims.(jwt.MapClaims)
-	federated_claims := claims["federated_claims"]
-	user_id := federated_claims.(map[string]interface{})["user_id"]
+
+	if err := json.Unmarshal(data, &jwtPayload); err != nil {
+		return nil, errors.Wrap(err, "error unmarshal token")
+	}
+	// jwtPayload
+	user_id := jwtPayload["federated_claims"].(map[string]interface{})["user_id"]
 
 	ctx := metadata.NewOutgoingContext(r.Context(), md)
 	ctxWithUserId := context.WithValue(ctx, userIdKey{}, user_id)
