@@ -42,6 +42,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10121, protocol: "grpc" } ];
 				google.protobuf.StringValue external_fqdn = 7;
 				google.protobuf.Int32Value message_buffer_size = 8;
+				google.protobuf.BoolValue upgrade_lcr = 9;
 			}
 
 			message Profiles {
