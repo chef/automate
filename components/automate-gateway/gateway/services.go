@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	util "github.com/chef/automate/lib/oidc"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -972,14 +973,25 @@ func init() {
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
 	subjects := []string{}
-	type idTokenKey struct{}
+	type userIdKey struct{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
 	// it ourselves.
 	md := metadataFromRequest(r)
-	reqIdToken, _ := util.ExtractBearerToken(r)
+	reqIdToken, err := util.ExtractBearerToken(r)
+	if err != nil {
+		return nil, errors.Wrap(err, "error extracting token")
+	}
+	token, _, err := new(jwt.Parser).ParseUnverified(reqIdToken, jwt.MapClaims{})
+	if err != nil {
+		return nil, errors.Wrap(err, "error parsing token")
+	}
+	claims, _ := token.Claims.(jwt.MapClaims)
+	fedrated_claims := claims["federated_claims"]
+	user_id := fedrated_claims.(map[string]interface{})["user_id"]
+
 	ctx := metadata.NewOutgoingContext(r.Context(), md)
-	ctxWithIdToken := context.WithValue(ctx, idTokenKey{}, reqIdToken)
+	ctxWithUserId := context.WithValue(ctx, userIdKey{}, user_id)
 	// Handle certificate based authn:
 	//
 	// If the request has a verified TLS certificate and the request did NOT
@@ -1021,7 +1033,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	newCtx, authorized, err := s.authorizer.IsAuthorized(ctxWithIdToken, subjects, resource, action, projects)
+	newCtx, authorized, err := s.authorizer.IsAuthorized(ctxWithUserId, subjects, resource, action, projects)
 	if err != nil {
 		// If authorization can't be determined because of some error, we return that error.
 		// Upstream services, however, will consider it equivalent to an explicit permission
