@@ -9,6 +9,7 @@ level = "info"
 host = "localhost"
 port = 10121
 external_fqdn = "localhost"
+upgrade_lcr = false
 
 [storage]
 database = "chef_compliance_service"
