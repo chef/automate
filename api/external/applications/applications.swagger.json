@@ -448,7 +448,7 @@
         ]
       }
     },
-    "/api/v0/applications/telemetry/nodes/count": {
+    "/api/v0/applications/telemetry/services/count": {
       "get": {
         "operationId": "ApplicationsService_GetServicesUsageCount",
         "responses": {
