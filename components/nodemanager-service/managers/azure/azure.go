@@ -551,10 +551,7 @@ func isNameMaching(s string, arr []string, exclude bool) bool {
 		if len(arr) > 0 {
 			initBool = false
 			for _, val := range arr {
-				initBool = initBool || strings.Contains(
-					strings.ToLower(s),
-					strings.ToLower(val),
-				)
+				initBool = initBool || isMatch(s, val)
 			}
 		}
 	}
@@ -746,16 +743,61 @@ func handleTagFilters(filters []*common.Filter) (map[string][]string, map[string
 	return includeTags, excludeTags
 }
 
+func isMatch(s string, p string) bool {
+
+	runeInput := []rune(strings.ToLower(s))
+	runePattern := []rune(strings.ToLower(p))
+
+	lenInput := len(runeInput)
+	lenPattern := len(runePattern)
+
+	isMatchingMatrix := make([][]bool, lenInput+1)
+
+	for i := range isMatchingMatrix {
+		isMatchingMatrix[i] = make([]bool, lenPattern+1)
+	}
+
+	isMatchingMatrix[0][0] = true
+	for i := 1; i < lenInput; i++ {
+		isMatchingMatrix[i][0] = false
+	}
+
+	if lenPattern > 0 {
+		if runePattern[0] == '*' {
+			isMatchingMatrix[0][1] = true
+		}
+	}
+
+	for j := 2; j <= lenPattern; j++ {
+		if runePattern[j-1] == '*' {
+			isMatchingMatrix[0][j] = isMatchingMatrix[0][j-1]
+		}
+
+	}
+
+	for i := 1; i <= lenInput; i++ {
+		for j := 1; j <= lenPattern; j++ {
+
+			if runePattern[j-1] == '*' {
+				isMatchingMatrix[i][j] = isMatchingMatrix[i-1][j] || isMatchingMatrix[i][j-1]
+			}
+
+			if runePattern[j-1] == '?' || runeInput[i-1] == runePattern[j-1] {
+				isMatchingMatrix[i][j] = isMatchingMatrix[i-1][j-1]
+			}
+		}
+	}
+
+	return isMatchingMatrix[lenInput][lenPattern]
+}
+
 func filterIncludeTags(includeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
 	if len(includeTags) > 0 {
 		var filteredsubsList = []*manager.ManagerNode{}
 		for _, val := range subsList {
 			if sArray, ok := includeTags["name"]; ok {
 				for _, v := range sArray {
-					if strings.Contains(
-						strings.ToLower(val.Name),
-						strings.ToLower(v),
-					) {
+					if isMatch(val.Name, v) {
 						filteredsubsList = append(filteredsubsList, val)
 					}
 				}
@@ -875,15 +917,7 @@ func contains(s []string, e string) bool {
 func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map[string][]*manager.ManagerNode, error) {
 	var err error
 	vmList := make(map[string][]*manager.ManagerNode, 0)
-	subs := make([]*manager.ManagerNode, 0)
-	for _, filter := range filters {
-		if filter.Key == "subscription_id" {
-			subs = make([]*manager.ManagerNode, 0)
-			for _, subID := range filter.Values {
-				subs = append(subs, &manager.ManagerNode{Id: subID})
-			}
-		}
-	}
+	subs := filterBySubID(filters)
 	if len(subs) == 0 {
 		subs, err = creds.GetSubscriptions(ctx, filters)
 		if err != nil {
@@ -916,6 +950,20 @@ func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map
 func (creds *Creds) QueryApis(ctx context.Context, filters []*common.Filter) (map[string][]*manager.ManagerNode, error) {
 	var err error
 	vmList := make(map[string][]*manager.ManagerNode, 0)
+	subs := filterBySubID(filters)
+	if len(subs) == 0 {
+		subs, err = creds.GetSubscriptionsForApi(ctx, filters)
+		if err != nil {
+			return vmList, errors.Wrap(err, "QueryAPIs unable to list subscriptions")
+		}
+	}
+	for _, v := range subs {
+		vmList[v.Id] = []*manager.ManagerNode{v}
+	}
+	return vmList, nil
+}
+
+func filterBySubID(filters []*common.Filter) []*manager.ManagerNode {
 	subs := make([]*manager.ManagerNode, 0)
 	for _, filter := range filters {
 		if filter.Key == "subscription_id" {
@@ -925,16 +973,7 @@ func (creds *Creds) QueryApis(ctx context.Context, filters []*common.Filter) (ma
 			}
 		}
 	}
-	if len(subs) == 0 {
-		subs, err = creds.GetSubscriptionsForApi(ctx, filters)
-		if err != nil {
-			return vmList, errors.Wrap(err, "QueryVMs unable to list subscriptions")
-		}
-	}
-	for _, v := range subs {
-		vmList[v.Id] = []*manager.ManagerNode{v}
-	}
-	return vmList, nil
+	return subs
 }
 
 // QueryVMState returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
@@ -969,7 +1008,7 @@ func (creds *Creds) QueryVMState(ctx context.Context) ([]pgdb.InstanceState, err
 }
 
 // QueryField returns account tags, locations, subscriptions
-func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, field string) ([]string, error) {
+func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, field string, mgrType string) ([]string, error) {
 	var err error
 	resultArray := make([]string, 0)
 	subs := make([]*manager.ManagerNode, 0)
@@ -994,13 +1033,19 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 			return nil, errors.Wrap(err, "QueryField unable to list locations")
 		}
 	case "names", "tags:name":
-		vmsResult, err := creds.QueryVMs(ctx, []*common.Filter{})
-		if err != nil {
-			return nil, errors.Wrap(err, "QueryField unable to query vms")
-		}
-		for _, vms := range vmsResult {
-			for _, vm := range vms {
-				resultArray = append(resultArray, vm.Name)
+		if mgrType == "azure-api" {
+			for _, sub := range subs {
+				resultArray = append(resultArray, sub.Name)
+			}
+		} else {
+			vmsResult, err := creds.QueryVMs(ctx, []*common.Filter{})
+			if err != nil {
+				return nil, errors.Wrap(err, "QueryField unable to query vms")
+			}
+			for _, vms := range vmsResult {
+				for _, vm := range vms {
+					resultArray = append(resultArray, vm.Name)
+				}
 			}
 		}
 	case "tags":
@@ -1018,21 +1063,46 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 		}
 	default:
 		if strings.HasPrefix(field, "tags:") {
-			tags, err := creds.ListTags(ctx, subs)
+			resultArray, err = queryDefaultFieldTags(ctx, mgrType, subs, field, resultArray, creds)
 			if err != nil {
-				return nil, errors.Wrap(err, "QueryField unable to list tags")
-			}
-			key := strings.TrimPrefix(field, "tags:")
-			for k, v := range tags {
-				if k == key {
-					resultArray = append(resultArray, v...)
-				}
+				return nil, err
 			}
 		} else {
 			return resultArray, errorutils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
 		}
 	}
 
+	return resultArray, nil
+}
+
+func queryDefaultFieldTags(ctx context.Context, mgrType string, subs []*manager.ManagerNode, field string, resultArray []string, creds *Creds) ([]string, error) {
+	key := strings.TrimPrefix(field, "tags:")
+	if mgrType == "azure-api" {
+		if field == "tags:Name" {
+			for _, sub := range subs {
+				resultArray = append(resultArray, sub.Name)
+			}
+		}
+		key := strings.TrimPrefix(field, "tags:")
+		for _, v := range subs {
+			for _, val := range v.Tags {
+				if val.Key == key {
+					resultArray = append(resultArray, val.Value)
+				}
+			}
+		}
+		resultArray = UniqueString(resultArray)
+	} else {
+		tags, err := creds.ListTags(ctx, subs)
+		if err != nil {
+			return nil, errors.Wrap(err, "QueryField unable to list tags")
+		}
+		for k, v := range tags {
+			if k == key {
+				resultArray = append(resultArray, v...)
+			}
+		}
+	}
 	return resultArray, nil
 }
 
@@ -1046,66 +1116,6 @@ func UniqueString(a []string) []string {
 		}
 	}
 	return b
-}
-
-func (creds *Creds) QueryFieldApi(ctx context.Context, filters []*common.Filter, field string) ([]string, error) {
-	var err error
-	resultArray := make([]string, 0)
-	subs := make([]*manager.ManagerNode, 0)
-	for _, filter := range filters {
-		if filter.Key == "subscription_id" {
-			subs = make([]*manager.ManagerNode, 0)
-			for _, subID := range filter.Values {
-				subs = append(subs, &manager.ManagerNode{Id: subID})
-			}
-		}
-	}
-	if len(subs) == 0 {
-		subs, err = creds.ListSubscriptions(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "QueryField unable to list subscriptions")
-		}
-	}
-	switch field {
-	case "regions":
-		resultArray, err = creds.ListLocations(ctx, subs)
-		if err != nil {
-			return nil, errors.Wrap(err, "QueryField unable to list locations")
-		}
-	case "names", "tags:name", "tags:Name":
-		for _, sub := range subs {
-			resultArray = append(resultArray, sub.Name)
-		}
-	case "tags":
-		tags, err := creds.ListTags(ctx, subs)
-		if err != nil {
-			return nil, errors.Wrap(err, "QueryField unable to list tags")
-		}
-		for k := range tags {
-			resultArray = append(resultArray, k)
-		}
-
-		resultArray = append(resultArray, "name")
-	case "subscriptions":
-		for _, sub := range subs {
-			resultArray = append(resultArray, fmt.Sprintf("%s:%s", sub.Name, sub.Id))
-		}
-	default:
-		if strings.HasPrefix(field, "tags:") {
-			key := strings.TrimPrefix(field, "tags:")
-			for _, v := range subs {
-				for _, val := range v.Tags {
-					if val.Key == key {
-						resultArray = append(resultArray, val.Value)
-					}
-				}
-			}
-		} else {
-			return resultArray, errorutils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
-		}
-	}
-	resultArray = UniqueString(resultArray)
-	return resultArray, nil
 }
 
 func uniqueStringSliceCaseInsens(stringSlice []string) []string {

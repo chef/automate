@@ -211,7 +211,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	assert.Equal(t, 0, len(filteredResources))
 
 	filters = []*common.Filter{
-		{Key: "name", Values: []string{"test-1"}},
+		{Key: "name", Values: []string{"test-1*"}},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
@@ -237,14 +237,14 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
-		{Key: "name", Values: []string{"test-4"}},
+		{Key: "name", Values: []string{"test-4*"}},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
-		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test*"}},
 		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
@@ -260,7 +260,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
 		{Key: "region", Values: []string{"eastus2"}},
-		{Key: "name", Values: []string{"test"}},
+		{Key: "name", Values: []string{"test*"}},
 		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
@@ -281,7 +281,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 		}},
 	}
 	filters = []*common.Filter{
-		{Key: "name", Values: []string{"ljkp"}, Exclude: false},
+		{Key: "name", Values: []string{"ljkp*"}, Exclude: false},
 		{Key: "name", Values: []string{"ljkp-win"}, Exclude: true},
 		{Key: "region", Values: []string{"eastus"}, Exclude: false},
 	}
