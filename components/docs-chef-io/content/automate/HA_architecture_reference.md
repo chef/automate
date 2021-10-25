@@ -34,7 +34,7 @@ Later, series of configurations and installation happens like:
 - installing Chef Infra Server in all chef-server instances
 - installing and configuring **PostgreSQL** into the **postres** instances
 - configuring and installing **Elasticsearch** into **elasticsearch** instances, and
-- installing a habitat and creation of a supervisor network.
+- installing a Chef Habitat and creation of a supervisor network.
 
 ### Bare Infrastructure Deployment / On-premise Deployment (existing_node)
 
@@ -42,6 +42,6 @@ Some customers already have basic network infrastructure with VMs, networks, loa
 
 #### What happens if you choose bare infrastructure or on-premises reference architecture?
 
-If you choose bare infrastructure or on premises reference architecture, **Terraform** creates all components from scratch like VPC, ec2, Load Balancer.
+If you choose bare infrastructure or on premises reference architecture, **Terraform** creates all components from scratch like VPC, EC2, Load Balancer.
 
 If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture. You can also utilize **Terraform** script for this scenario; however, then this script only handles installing and configuring components and does not create instances on the cloud providers.
