@@ -40,7 +40,7 @@
                     <chef-select #ty (change)="onTypeSelect(ty.value)" data-cy="selectCredtype">
                       <chef-option
                       panelClass="chef-dropdown"
-                      value={{credential.asset}}
+                      value="{{credential.asset}}"
                       *ngFor="let credential of credentialType"
                       [attr.data-cy]="credential.asset">
                       {{credential.name}}
