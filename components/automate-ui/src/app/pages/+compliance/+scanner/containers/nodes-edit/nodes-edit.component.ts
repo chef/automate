@@ -13,10 +13,7 @@ import { allCredentials, credStatus, credtotal } from 'app/entities/credentials/
 import { allCredentials as allCredentialsGetById } from 'app/entities/node-credentials/node-credential.selectors';
 import { EntityStatus, pending } from 'app/entities/entities';
 import { Credential } from 'app/entities/credentials/credential.model';
-import { GetNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
-import { getStatus } from 'app/entities/node-credentials/node-credential.selectors';
-// import { GetNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
-// import { getStatus } from 'app/entities/node-credentials/node-credential.selectors';
+import { GetNodeCredential, ResetStore } from 'app/entities/node-credentials/node-credential.actions';
 
 @Component({
   templateUrl: './nodes-edit.component.html',
@@ -112,19 +109,13 @@ export class NodesEditComponent implements OnInit, OnDestroy {
               break;
           }
         });
-        this.store.select(getStatus).pipe(
-          takeUntil(this.isDestroyed))
-          .subscribe(response => {
-            if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
-              this.store.pipe(
-                takeUntil(this.isDestroyed),
-                select(allCredentialsGetById)
-              ).subscribe((secretList) => {
-                this.selectedSecrets$ = secretList;
-            });
-            }
-          });
-
+        this.store.pipe(
+          takeUntil(this.isDestroyed),
+          select(allCredentialsGetById)
+        ).subscribe((secretList) => {
+          this.selectedSecrets$ = secretList;
+        });
+        this.store.dispatch(new ResetStore());
         for (let i = 0; i < node['target_config']['secrets'].length; i++) {
           this.store.dispatch(new GetNodeCredential({
             id: node['target_config']['secrets'][i]

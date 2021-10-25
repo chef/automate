@@ -84,6 +84,15 @@ export function nodeCredentialEntityReducer(
       );
     }
 
+    case NodeCredentialActionTypes.RESET: {
+      console.log('ResetStore reducer');
+      return set(
+        GET_STATUS,
+        EntityStatus.notLoaded,
+        nodeCredentialEntityAdapter.removeAll(state)
+      );
+    }
+
     case NodeCredentialActionTypes.GET_ALL_SUCCESS: {
       return set(
         GET_ALL_STATUS,
