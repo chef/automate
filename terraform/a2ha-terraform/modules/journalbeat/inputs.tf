@@ -35,7 +35,10 @@ variable "journalbeat_tags" {
 
 variable "private_ips" {
   default     = []
-  description = "the Elasticsearch Private IPs"
+}
+
+variable "elasticsearch_private_ips" {
+  default     = []
 }
 
 variable "public_ips" {
