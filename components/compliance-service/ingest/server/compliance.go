@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/chef/automate/api/interservice/report_manager"
+
 	"github.com/blang/semver"
 	"github.com/gofrs/uuid"
 	gp "github.com/golang/protobuf/ptypes/empty"
@@ -36,12 +38,12 @@ type ComplianceIngestServer struct {
 
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
-func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
+func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient,
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsServiceClient,
 	messageBufferSize int, isSupportLCR bool) *ComplianceIngestServer {
 
 	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
-		authzProjectsClient, mgrClient, messageBufferSize, notifierClient, automateURL, isSupportLCR)
+		authzProjectsClient, mgrClient, reportMgrClient, messageBufferSize, notifierClient, automateURL, isSupportLCR)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,
