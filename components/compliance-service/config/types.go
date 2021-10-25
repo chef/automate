@@ -35,6 +35,7 @@ type Compliance struct {
 	EventConfig
 	Notifications
 	CerealConfig
+	ReportConfig
 }
 
 type Notifications struct {
@@ -131,5 +132,9 @@ type EventConfig struct {
 }
 
 type CerealConfig struct {
+	Endpoint string
+}
+
+type ReportConfig struct {
 	Endpoint string
 }
