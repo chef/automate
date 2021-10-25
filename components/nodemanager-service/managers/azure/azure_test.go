@@ -211,7 +211,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	assert.Equal(t, 0, len(filteredResources))
 
 	filters = []*common.Filter{
-		{Key: "name", Values: []string{"test-1*"}},
+		{Key: "name", Values: []string{"test-1"}},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
@@ -237,14 +237,14 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
-		{Key: "name", Values: []string{"test-4*"}},
+		{Key: "name", Values: []string{"test-4"}},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
 
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
-		{Key: "name", Values: []string{"test*"}},
+		{Key: "name", Values: []string{"test"}},
 		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
@@ -260,7 +260,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	filters = []*common.Filter{
 		{Key: "region", Values: []string{"eastus"}},
 		{Key: "region", Values: []string{"eastus2"}},
-		{Key: "name", Values: []string{"test*"}},
+		{Key: "name", Values: []string{"test"}},
 		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
@@ -281,7 +281,7 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 		}},
 	}
 	filters = []*common.Filter{
-		{Key: "name", Values: []string{"ljkp*"}, Exclude: false},
+		{Key: "name", Values: []string{"ljkp"}, Exclude: false},
 		{Key: "name", Values: []string{"ljkp-win"}, Exclude: true},
 		{Key: "region", Values: []string{"eastus"}, Exclude: false},
 	}
@@ -354,75 +354,4 @@ func TestHandleReFilterNameAndRegion(t *testing.T) {
 	}
 	filteredResources = reFilterNameAndRegion(filters, vmList)
 	assert.Equal(t, 1, len(filteredResources))
-}
-
-func TestHandleTagFilters(t *testing.T) {
-	filters := []*common.Filter{
-		{Key: "name", Values: []string{"test-1A"}, Exclude: false},
-		{Key: "name", Values: []string{"test-2B"}, Exclude: false},
-		{Key: "name", Values: []string{"test-3C"}, Exclude: false},
-		{Key: "name", Values: []string{"test-1A"}, Exclude: true},
-		{Key: "name", Values: []string{"test-4D"}, Exclude: true},
-	}
-	includeTags, excludetags := handleTagFilters(filters)
-	assert.Equal(t, 3, len(includeTags["name"]))
-	assert.Equal(t, 2, len(excludetags["name"]))
-}
-
-func TestHandlefilterIncludeAndExcludeTags(t *testing.T) {
-
-	subList := []*manager.ManagerNode{
-		{Name: "test-1A", Region: "eastus", Id: "1234"},
-		{Name: "test-2B", Region: "eastus1", Id: "3234"},
-		{Name: "test-3C", Region: "eastus2", Id: "1434"},
-		{Name: "test-4D", Region: "eastus", Id: "12234"},
-	}
-
-	t.Log("Test no include tags")
-	filteredResources := filterIncludeTags(map[string][]string{}, subList)
-	assert.Equal(t, 4, len(filteredResources))
-
-	t.Log("Test no exclude tags")
-	filteredResources = filterExcludeTags(map[string][]string{}, subList)
-	assert.Equal(t, 4, len(filteredResources))
-
-	t.Log("Test single include tags")
-	tags := map[string][]string{
-		"name": {"test-1A"},
-	}
-	filteredResources = filterIncludeTags(tags, subList)
-	assert.Equal(t, 1, len(filteredResources))
-
-	t.Log("Test single exclude tags")
-	filteredResources = filterExcludeTags(tags, subList)
-	assert.Equal(t, 3, len(filteredResources))
-
-	tags = map[string][]string{
-		"name": {"test-1A", "test-2B"},
-	}
-	t.Log("Test multiple include tags")
-	filteredResources = filterIncludeTags(tags, subList)
-	assert.Equal(t, 2, len(filteredResources))
-
-	t.Log("Test multiple exclude tags")
-	filteredResources = filterExcludeTags(tags, subList)
-	assert.Equal(t, 2, len(filteredResources))
-
-	t.Log("Combination of include and exclude tags")
-	tags = map[string][]string{
-		"name": {"test-1A", "test-2B"},
-	}
-	filteredResources = filterIncludeTags(tags, subList)
-	tags = map[string][]string{
-		"name": {"test-1A"},
-	}
-	filteredResources = filterExcludeTags(tags, filteredResources)
-	assert.Equal(t, 1, len(filteredResources))
-
-	tags = map[string][]string{
-		"name": {"test-1A", "test-2B", "test-3C", "test-4D"},
-	}
-	filteredResources = filterExcludeTags(tags, subList)
-	assert.Equal(t, 0, len(filteredResources))
-
 }

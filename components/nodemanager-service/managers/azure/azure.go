@@ -551,7 +551,10 @@ func isNameMaching(s string, arr []string, exclude bool) bool {
 		if len(arr) > 0 {
 			initBool = false
 			for _, val := range arr {
-				initBool = initBool || isMatch(s, val)
+				initBool = initBool || strings.Contains(
+					strings.ToLower(s),
+					strings.ToLower(val),
+				)
 			}
 		}
 	}
