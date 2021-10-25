@@ -30,7 +30,6 @@ export class ComplianceStatsService {
   }
 
   fetchNodeUsageStats() {
-    //const url = '/api/v0/compliance/reporting/stats/nodes/count';
     const url = `${COMPLIANCE_STATS_URL}` + '/nodes/count';
     return this.httpClient.get(url).pipe(
       map((res) => {
@@ -42,8 +41,7 @@ export class ComplianceStatsService {
       catchError(_err => observableOf('')));
   }
 
-  sendAckownledgement(nodeUsageAckStats: NodeUsageAckStats) {
-    //const url = '/api/v0/compliance/reporting/stats/nodes/count/updated';
+  sendAcknowledgement(nodeUsageAckStats: NodeUsageAckStats) {
     const url = `${COMPLIANCE_STATS_URL}` + '/nodes/count/updated';
     let resolver;
     const promise = new Promise((resolve) => {

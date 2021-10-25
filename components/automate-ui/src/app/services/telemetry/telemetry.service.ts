@@ -345,8 +345,9 @@ export class TelemetryService {
       const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
         .getComplianceStats();
       if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
-        const ackStats: NodeUsageAckStats = await this.sendUnfilteredStatsToTelemetry(nodeUsageStats);
-        await this.complianceStatsService.sendAckownledgement(ackStats);
+        const ackStats: NodeUsageAckStats = await this
+        .sendUnfilteredStatsToTelemetry(nodeUsageStats);
+        await this.complianceStatsService.sendAcknowledgement(ackStats);
       }
     } catch (error) {
       console.log(error);
@@ -378,13 +379,13 @@ export class TelemetryService {
     const promise = new Promise<NodeUsageAckStats>((resolve) => {
       resolver = resolve;
     });
-    const unfilteredStatsSubscription = this.emitToPipeline('track', {
+    const nodeUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'complianceCountsGlobal',
       properties: { node_cnt: nodeUsageStats.node_cnt }
     }, true).subscribe(() => {
-      if (unfilteredStatsSubscription) {
-        unfilteredStatsSubscription.unsubscribe();
+      if (nodeUsageStatsSubscription) {
+        nodeUsageStatsSubscription.unsubscribe();
       }
       resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
     },

@@ -86,9 +86,9 @@ const haExistingNodesConfigTemplate = `
 [architecture.existing_infra]
 secrets_key_file = "/hab/a2_deploy_workspace/secrets.key"
 secrets_store_file = "secrets.json"
-architecture = "aws"
+architecture = "existing_nodes"
 workspace_path = "/hab/a2_deploy_workspace"
-ssh_user = "existing_infra"
+ssh_user = "centos"
 # private ssh key file path to access instances
 ssh_key_file = "~/.ssh/A2HA.pem"
 sudo_password = ""
