@@ -12,6 +12,7 @@ import "interservice/cfgmgmt/response/actions.proto";
 import "interservice/cfgmgmt/response/inventory_nodes.proto";
 import "external/cfgmgmt/response/errors.proto";
 import "external/cfgmgmt/response/rollouts.proto";
+import "interservice/cfgmgmt/response/telemetry.proto";
 
 import "interservice/cfgmgmt/request/root.proto";
 import "interservice/cfgmgmt/request/stats.proto";
@@ -22,6 +23,7 @@ import "interservice/cfgmgmt/request/inventory_nodes.proto";
 import "interservice/cfgmgmt/request/node_export.proto";
 import "external/cfgmgmt/request/errors.proto";
 import "external/cfgmgmt/request/rollouts.proto";
+import "interservice/cfgmgmt/request/telemetry.proto";
 
 service CfgMgmtService {
 	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
@@ -50,4 +52,5 @@ service CfgMgmtService {
   rpc ListNodeSegmentsWithRolloutProgress(chef.automate.api.cfgmgmt.request.ListNodeSegmentsWithRolloutProgress) returns (chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress);
   rpc CreateRolloutTest(chef.automate.api.cfgmgmt.request.CreateRolloutTest) returns (chef.automate.api.cfgmgmt.response.CreateRolloutTest);
   rpc HandlePolicyUpdateAction(chef.automate.domain.cfgmgmt.request.PolicyUpdateAction) returns (chef.automate.domain.cfgmgmt.response.PolicyUpdateAction);
+  rpc UpdateTelemetryReported(chef.automate.domain.cfgmgmt.request.UpdateTelemetryReportedRequest) returns (chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse);
 }
