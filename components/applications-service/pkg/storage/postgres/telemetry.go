@@ -84,7 +84,7 @@ func (db *Postgres) GetTelemetry(ctx context.Context) (Telemetry, error) {
 // Get last 15 days services telemetry reported timestamp
 func (db *Postgres) GetUniqueServicesFromPostgres(ctx context.Context) (int64, error) {
 	var count int64
-	rows, err := db.Query(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between now()::date - 15 AND now()::date`)
+	rows, err := db.Query(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between now()::date - 16 AND now()::date - 1`)
 	if err != nil {
 		return 0, err
 	}
