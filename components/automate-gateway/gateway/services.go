@@ -987,8 +987,8 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		return nil, errors.Wrap(err, "error parsing token")
 	}
 	claims, _ := token.Claims.(jwt.MapClaims)
-	fedrated_claims := claims["federated_claims"]
-	user_id := fedrated_claims.(map[string]interface{})["user_id"]
+	federated_claims := claims["federated_claims"]
+	user_id := federated_claims.(map[string]interface{})["user_id"]
 
 	ctx := metadata.NewOutgoingContext(r.Context(), md)
 	ctxWithUserId := context.WithValue(ctx, userIdKey{}, user_id)
