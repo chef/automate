@@ -7,7 +7,6 @@ var ConfigManagementRunInfo = Mapping{
 	Timeseries: false,
 	Mapping: `
 {
-  "template": "` + IndexNameNodeRunInfo + `",
   "settings": {
     "index": {
       "refresh_interval": "1s"
