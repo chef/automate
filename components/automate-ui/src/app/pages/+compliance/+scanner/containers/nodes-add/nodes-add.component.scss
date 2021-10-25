@@ -118,8 +118,9 @@
 }
 
 
-.chef-dropdown {
-  min-width: calc(91% / 2);
+chef-select {
+  // width: calc(91% / 2);
+  width: 17.2vw;
 }
 
 chef-select ::ng-deep .selected-value {

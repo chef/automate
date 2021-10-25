@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { environment as env } from '../../../../../../environments/environment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { AvailableType } from 'app/modules/infra-proxy/infra-roles/infra-roles.component';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { select, Store } from '@ngrx/store';
 import { NodeCredentialsSearchPayload, SearchCredentials } from 'app/entities/credentials/credential.actions';
@@ -36,7 +35,6 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   public total: number;
   public scrollLoadingValue: boolean;
   public instanceNodeCredentials$: Observable<Credential[]>;
-  public availablelist: AvailableType[] = [];
   public dataCy = 'cred-accordion';
   public credentialType = [
      {name: 'SSH', asset: 'ssh'},
@@ -96,11 +94,13 @@ export class NodesAddComponent implements OnInit, OnDestroy {
           break;
       }
     });
+    this.searchData = '';
     this.secrets = [];
     this.pageNumber = 1;
     this.secretType = 'ssh';
-    let secretCred;
-    secretCred = this.store.pipe(
+    let secretCred$;
+    this.scrollLoadingValue = false;
+    secretCred$ = this.store.pipe(
       takeUntil(this.isDestroyed),
       select(allCredentials)
     );
@@ -108,16 +108,14 @@ export class NodesAddComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe((total) => {
       this.total = total;
-
     });
-    secretCred.subscribe((secret) => {
+    secretCred$.subscribe((secret) => {
       if (this.isScroll) {
         this.secrets = [...this.secrets, ...secret];
       } else {
         this.secrets = secret;
       }
     });
-
     this.store.pipe(
       select(credStatus),
       filter(status => !pending(status)))
@@ -174,12 +172,12 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   }
 
   selected(data: any) {
-    const secrets: string[] = [];
+    const secretIds: string[] = [];
     data.forEach((listOfSecrets) => {
-      secrets.push(listOfSecrets.id);
+      secretIds.push(listOfSecrets.id);
     });
-    if (secrets.length === data.length) {
-      this.form.controls['wizardStep2']['controls']['secrets'].setValue(secrets);
+    if (secretIds.length === data.length) {
+      this.form.controls['wizardStep2']['controls']['secrets'].setValue(secretIds);
     }
   }
 

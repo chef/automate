@@ -1,26 +1,61 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Observable, combineLatest  } from 'rxjs';
-import { startWith, switchMap, map } from 'rxjs/operators';
+import {  Observable, Subject  } from 'rxjs';
+import { startWith, switchMap, map, takeUntil, filter } from 'rxjs/operators';
 import { environment as env } from 'environments/environment';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { NodeCredentialsSearchPayload, SearchCredentials } from 'app/entities/credentials/credential.actions';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { select, Store } from '@ngrx/store';
+import { allCredentials, credStatus, credtotal } from 'app/entities/credentials/credential.selectors';
+import { allCredentials as allCredentialsGetById } from 'app/entities/node-credentials/node-credential.selectors';
+import { EntityStatus, pending } from 'app/entities/entities';
+import { Credential } from 'app/entities/credentials/credential.model';
+import { GetNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
+import { getStatus } from 'app/entities/node-credentials/node-credential.selectors';
+// import { GetNodeCredential } from 'app/entities/node-credentials/node-credential.actions';
+// import { getStatus } from 'app/entities/node-credentials/node-credential.selectors';
 
 @Component({
   templateUrl: './nodes-edit.component.html',
   styleUrls: ['./nodes-edit.component.scss']
 })
-export class NodesEditComponent implements OnInit {
+export class NodesEditComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private httpClient: HttpClient,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>
   ) {}
 
   node: any;
+  private isDestroyed = new Subject<boolean>();
+  public secretType: string;
+  public secrets: Credential[] = [];
+  public selectedSecrets$ = [];
+  public sortBy: string;
+  public total: number;
+  public scrollLoadingValue: boolean;
+  public instanceNodeCredentials$: Observable<Credential[]>;
+  public dataCy = 'cred-accordion';
+  public credentialType = [
+     {name: 'SSH', asset: 'ssh'},
+     {name: 'WinRM', asset: 'winrm'}
+    ];
+
+  public typeFieldName = 'type';
+  public uniqueFiledName = 'id';
+  activeStep = 1;
+  isLoading = false;
+  accordionTitle = 'credentials to connect to your nodes';
+  isScroll: any;
+  searchData: string;
+  pageNumber = 0;
+  secretFilter: NodeCredentialsSearchPayload;
 
   form: FormGroup;
   backendControl: FormGroup;
@@ -30,6 +65,8 @@ export class NodesEditComponent implements OnInit {
   secrets$: Observable<any[]>;
 
   ngOnInit() {
+    this.scrollLoadingValue = false;
+    this.searchData = '';
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.route.paramMap.pipe(
       switchMap(params => this.fetchNode(params.get('id'))))
@@ -75,15 +112,118 @@ export class NodesEditComponent implements OnInit {
               break;
           }
         });
+        this.store.select(getStatus).pipe(
+          takeUntil(this.isDestroyed))
+          .subscribe(response => {
+            if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
+              this.store.pipe(
+                takeUntil(this.isDestroyed),
+                select(allCredentialsGetById)
+              ).subscribe((secretList) => {
+                this.selectedSecrets$ = secretList;
+            });
+            }
+          });
 
-        this.secrets$ = combineLatest([
-          this.fetchSecrets(),
-          this.backendValue$
-        ]).pipe(
-          map(([secrets, backend]: [any[], string]) =>
-            secrets.filter(s => s.type === backend || s.type === 'sudo'))
-        );
+        for (let i = 0; i < node['target_config']['secrets'].length; i++) {
+          this.store.dispatch(new GetNodeCredential({
+            id: node['target_config']['secrets'][i]
+          }));
+        }
       });
+
+    this.searchData = '';
+    this.secrets = [];
+    this.pageNumber = 1;
+    this.secretType = 'ssh';
+    // let secretCred;
+    this.scrollLoadingValue = false;
+    // secretCred =
+    this.store.select(credtotal).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+      console.log(this.total);
+    });
+    this.store.pipe(
+      takeUntil(this.isDestroyed),
+      select(allCredentials)
+    ).subscribe((secretList) => {
+      if (this.isScroll) {
+        this.secrets = [...this.secrets, ...secretList];
+      } else {
+        this.secrets = secretList;
+      }
+    });
+    this.store.pipe(
+      select(credStatus),
+      filter(status => !pending(status)))
+      .subscribe(response => {
+        if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
+            this.scrollLoadingValue = false;
+        }
+      });
+
+    this.getCredList(false);
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  getCredList(isScroll: boolean): void {
+    this.secretFilter = {
+      filters:  [
+        {
+            key: 'name',
+            values: [this.searchData]
+        },
+        {
+            key: 'type',
+            values: [this.secretType ]
+        }
+    ],
+      page: this.pageNumber,
+      per_page: 100
+    };
+
+    this.store.dispatch(new SearchCredentials(this.secretFilter));
+    this.isScroll = isScroll;
+  }
+
+  search(data: any) {
+    this.searchData = data;
+    this.pageNumber = 1;
+    this.getCredList(false);
+  }
+
+  selected(data: any) {
+    const secrets: string[] = [];
+    data.forEach((listOfSecrets) => {
+      secrets.push(listOfSecrets.id);
+    });
+    if (secrets.length === data.length) {
+      this.form.controls['target_config']['controls']['secrets'].setValue(secrets);
+    }
+  }
+
+  scroll() {
+    this.scrollLoadingValue = true;
+    if (this.secrets.length === this.total) {
+      this.scrollLoadingValue = false;
+    }
+    if (this.secrets.length < this.total) {
+      this.pageNumber++;
+      this.getCredList(true);
+    }
+  }
+
+  onTypeSelect(type: string) {
+    this.secretType = type;
+    this.pageNumber = 1;
+    this.form.controls['target_config']['controls']['backend'].setValue(this.secretType);
+    this.getCredList(false);
   }
 
   submit(node): void {

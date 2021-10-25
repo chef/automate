@@ -17,6 +17,7 @@ export interface NodeCredentialEntityState extends EntityState<NodeCredential> {
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const GET_STATUS = 'getStatus';
 const SAVE_STATUS = 'saveStatus';
 const SAVE_ERROR = 'saveError';
 const UPDATE_STATUS = 'updateStatus';
@@ -57,6 +58,30 @@ export function nodeCredentialEntityReducer(
       return set('status', EntityStatus.loadingFailure, state);
     case NodeCredentialActionTypes.GET_ALL: {
       return set(GET_ALL_STATUS, EntityStatus.loading, state);
+    }
+
+    case NodeCredentialActionTypes.GET: {
+      return set(
+        GET_STATUS,
+        EntityStatus.notLoaded,
+        state
+      );
+    }
+
+    case NodeCredentialActionTypes.GET_SUCCESS: {
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingSuccess,
+        nodeCredentialEntityAdapter.addOne(action.payload, state)
+      );
+    }
+
+    case NodeCredentialActionTypes.GET_FAILURE: {
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingFailure,
+        state
+      );
     }
 
     case NodeCredentialActionTypes.GET_ALL_SUCCESS: {

@@ -20,6 +20,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
   // if are pagination pass value from parent component in scrollloading
   @Input() scrollLoadingRightSide: boolean;
   @Input() uniqueFiledName: string;
+  @Input() selectedList: any[];
 
   @Output() searchData = new EventEmitter<string>();
   @Output() selectData = new EventEmitter<any[]>();
@@ -45,9 +46,12 @@ export class SelectboxComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log(this.selectedList);
     if (!this.copyDataListFlags && this.data === this.listData || this.data !== null ) {
       this.listData = [...this.data];
-      this.selectData.emit(this.selectedListData);
+      if (this.selectedList !== []) {
+        this.selectedListData = [...this.selectedList];
+      }
       this.selectedListData.forEach((selectedListValue) => {
         if (selectedListValue[this.typeFieldName] === this.typeValue) {
           this.listData.forEach(
@@ -111,6 +115,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
     });
     this.selectedListDataToMove = [];
     this.moveLeftOrRight = '';
+    this.selectData.emit(this.selectedListData);
   }
 
   moveLeft() {
@@ -120,6 +125,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
     });
     this.selectedListDataToMove = [];
     this.moveLeftOrRight = '';
+    this.selectData.emit(this.selectedListData);
   }
 
 }

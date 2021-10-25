@@ -22,7 +22,7 @@ export const credStatus = createSelector(
   (state) => state.status
 );
 
-export const credtotal = createSelector(
+export const  credtotal = createSelector(
   credentialState,
   (state) => state.total
 );

@@ -52,20 +52,12 @@
                 <chef-select #ty (change)="onTypeSelect(ty.value)" data-cy="selectCredtype">
                   <chef-option
                   panelClass="chef-dropdown"
-                  value={{credential.asset}}
+                  value="{{credential.asset}}"
                   *ngFor="let credential of credentialType"
                   [attr.data-cy]="credential.asset">
                   {{credential.name}}
                 </chef-option>                    
                 </chef-select>
-                <!-- <mat-select #li panelClass="chef-dropdown" [value]="secretType"
-                  (selectionChange)="onTypeSelect(li.value)">
-                  <mat-option
-                  *ngFor="let credential of credentialType"
-                  value={{credential.asset}}>
-                    {{credential.name}}
-                  </mat-option>
-                </mat-select> -->
                 <app-selectbox
                 [data]="secrets"
                 [searchFlag]=true
@@ -77,6 +69,7 @@
                 [uniqueFiledName]="uniqueFiledName"
                 [typeValue]="secretType"
                 [typeFieldName]="typeFieldName"
+                [selectedList]="[]"
                 >
                 </app-selectbox>
                 <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>

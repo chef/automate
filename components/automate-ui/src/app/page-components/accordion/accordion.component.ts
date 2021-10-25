@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 @Component({
   selector: 'app-accordion',
@@ -16,7 +16,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     ])
   ]
 })
-export class AccordionComponent implements OnInit {
+export class AccordionComponent {
   public showIncludedPolicies = false;
   public activeIncludedPolicies: string;
   public policyFileDetailsLoading = true;
@@ -25,9 +25,6 @@ export class AccordionComponent implements OnInit {
 
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
   handlePolicyFileSelected() {
     this.state === 'default' ? this.state = 'open' : this.state = 'default';
