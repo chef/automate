@@ -9,7 +9,7 @@
   flex-basis: 50%;
   margin-right: 0.5em;
   width: calc(100%/2);
-  
+
   fieldset {
     margin: 0;
     padding: 1em 0;
@@ -109,7 +109,7 @@
   margin-bottom: 1em;
 }
 
-.wizard{
+.wizard {
   display: contents;
 }
 
@@ -131,6 +131,7 @@ chef-select ::ng-deep .options {
   width: 90%;
   float: right;
 }
+
 chef-select ::ng-deep .options ::ng-deep chef-dropdown {
   border: 2px solid var(--chef-primary-bright);
   border-radius: 5px;
