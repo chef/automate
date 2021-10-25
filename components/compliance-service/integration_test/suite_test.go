@@ -13,6 +13,7 @@ import (
 	event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/ingest/server"
@@ -34,13 +35,14 @@ var complianceSummaryIndex = fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Ind
 // Suite helps you manipulate various stages of your tests, it provides
 // common functionality.
 type Suite struct {
-	elasticClient          *elastic.Client
-	ingesticESClient       *ingestic.ESClient
-	ComplianceIngestServer *server.ComplianceIngestServer
-	ProjectsClientMock     *authz.MockProjectsServiceClient
-	NodeManagerMock        *NodeManagerMock
-	NotifierMock           *NotifierMock
-	EventServiceClientMock *event.MockEventServiceClient
+	elasticClient           *elastic.Client
+	ingesticESClient        *ingestic.ESClient
+	ComplianceIngestServer  *server.ComplianceIngestServer
+	ProjectsClientMock      *authz.MockProjectsServiceClient
+	NodeManagerMock         *NodeManagerMock
+	NotifierMock            *NotifierMock
+	EventServiceClientMock  *event.MockEventServiceClient
+	ReportServiceClientMock *report_manager.MockReportManagerServiceClient
 }
 
 // Initialize the test suite
@@ -74,7 +76,7 @@ func NewGlobalSuite() *Suite {
 		&event.PublishResponse{}, nil)
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
-		s.NodeManagerMock, "", s.NotifierMock,
+		s.NodeManagerMock, nil, "", s.NotifierMock,
 		s.ProjectsClientMock, 100, false)
 
 	return s
@@ -100,10 +102,11 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.ProjectsClientMock = authz.NewMockProjectsServiceClient(gomock.NewController(t))
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
+	s.ReportServiceClientMock = report_manager.NewMockReportManagerServiceClient(gomock.NewController(t))
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
-		s.NodeManagerMock, "", s.NotifierMock,
+		s.NodeManagerMock, s.ReportServiceClientMock, "", s.NotifierMock,
 		s.ProjectsClientMock, 100, false)
 
 	return s
@@ -150,7 +153,6 @@ func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error 
 			os.Exit(3)
 		}
 	}
-
 	return err
 }
 
