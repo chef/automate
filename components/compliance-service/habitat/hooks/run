@@ -50,6 +50,7 @@ fi
 CONFIG="$CONFIG --profiles-path {{pkg.svc_data_path}}/profiles"
 CONFIG="$CONFIG --log-level {{cfg.logger.level}}"
 CONFIG="$CONFIG --port {{cfg.service.port}}"
+CONFIG="$CONFIG --upgrade-lcr={{cfg.service.upgrade_lcr}}"
 
 # Interval in minutes to poll for node status.
 CONFIG="$CONFIG --manager-awsec2-poll {{cfg.nodemanager.awsec2_polling_interval}}"
