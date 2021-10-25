@@ -33,6 +33,7 @@ function compile_client_mocks() {
       #
       # https://github.com/golang/mock/issues/156#issuecomment-586213812
       #
+      mockgen_debug -destination report_manager/report_manager.pb.client_mock.go -package report_manager -self_package github.com/chef/automate/api/interservice/report_manager github.com/chef/automate/api/interservice/report_manager ReportManagerServiceClient,ReportManagerService_StoreReportClient,ReportManagerServiceServer,ReportManagerService_StoreReportServer
       mockgen_debug -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed github.com/chef/automate/api/interservice/event_feed EventFeedServiceClient,EventFeedService_EventExportClient,EventFeedServiceServer,EventFeedService_EventExportServer
       mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go \
         -package service \
