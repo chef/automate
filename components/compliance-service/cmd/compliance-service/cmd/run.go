@@ -60,6 +60,9 @@ var conf = config.Compliance{
 	DataRetention: config.DataRetention{
 		ComplianceReportDays: 60,
 	},
+	ReportConfig: config.ReportConfig{
+		Endpoint: "127.0.0.1:10152",
+	},
 }
 
 // runCmd represents the run command
@@ -157,4 +160,7 @@ func init() {
 
 	// Cereal Service Flags
 	runCmd.Flags().StringVar(&conf.CerealConfig.Endpoint, "cereal-endpoint", conf.CerealConfig.Endpoint, "Cereal Service Endpoint")
+
+	// Report Manager Flags
+	runCmd.Flags().StringVar(&conf.ReportConfig.Endpoint, "report-manager-endpoint", conf.ReportConfig.Endpoint, "Report Manager Service Endpoint")
 }
