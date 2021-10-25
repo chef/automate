@@ -28,7 +28,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   public clientsListLoading = true;
   public authFailure = false;
   public clientName: string;
-  public searching = false;
+  public loading = false;
   public searchValue = '';
   public current_page = 1;
   public per_page = 100;
@@ -59,7 +59,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.clients = ClientsState?.items;
         this.total = ClientsState?.total;
         this.clientsListLoading = false;
-        this.searching = false;
+        this.loading = false;
         this.deleting = false;
       } else if (getClientsSt === EntityStatus.loadingFailure) {
         this.clientsListLoading = false;
@@ -71,7 +71,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.clients.length === 0 &&
           this.current_page !== 1) {
           this.current_page = this.current_page - 1;
@@ -82,10 +82,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   searchClients(currentText: string) {
     this.current_page = 1;
-    this.searching = true;
+    this.loading = true;
     this.searchValue = currentText;
     if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
-      this.searching = false;
+      this.loading = false;
       this.clients.length = 0;
       this.total = 0;
     } else {
@@ -95,7 +95,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   onPageChange(event: number): void {
     this.current_page = event;
-    this.searching = true;
+    this.loading = true;
     this.getClientsData();
   }
 
@@ -130,7 +130,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   public deleteClient(): void {
-    this.searching = true;
+    this.loading = true;
     this.closeDeleteModal();
     this.store.dispatch(new DeleteClient({
       server_id: this.serverId, org_id: this.orgId, name: this.clientToDelete.name
@@ -145,7 +145,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
     this.current_page = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
-    this.searching = true;
+    this.loading = true;
     this.getClientsData();
   }
 }

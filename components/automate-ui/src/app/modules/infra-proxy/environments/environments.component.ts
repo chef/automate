@@ -25,7 +25,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   public authFailure = false;
   public deleteModalVisible = false;
   public environmentsListLoading = true;
-  public searching = false;
+  public loading = false;
   public deleting = true;
 
   public current_page = 1;
@@ -60,7 +60,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
           this.environments = EnvironmentsState?.items;
           this.total = EnvironmentsState?.total;
           this.environmentsListLoading = false;
-          this.searching = false;
+          this.loading = false;
           this.deleting = false;
         } else if (getEnvironmentsSt === EntityStatus.loadingFailure) {
           this.environmentsListLoading = false;
@@ -72,7 +72,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.environments && this.environments.length === 0 &&
           this.current_page !== 1) {
           this.current_page = this.current_page - 1;
@@ -87,10 +87,10 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   searchEnvironment(currentText: string) {
     this.current_page = 1;
-    this.searching = true;
+    this.loading = true;
     this.searchValue = currentText;
     if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
-      this.searching = false;
+      this.loading = false;
       this.environments.length = 0;
       this.total = 0;
     } else {
@@ -100,7 +100,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
 
   onPageChange(event: number): void {
     this.current_page = event;
-    this.searching = true;
+    this.loading = true;
     this.getEnvironmentData();
   }
 
@@ -145,7 +145,7 @@ export class EnvironmentsComponent implements OnInit, OnDestroy {
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
     this.current_page = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
-    this.searching = true;
+    this.loading = true;
     this.getEnvironmentData();
   }
 }

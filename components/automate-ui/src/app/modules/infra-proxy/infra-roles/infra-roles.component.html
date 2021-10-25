@@ -1,5 +1,5 @@
 <section class="infra-roles">
-  <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
+  <chef-loading-spinner class="spinner" *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
   <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
     objectNoun="role"
@@ -21,76 +21,77 @@
     (resetKeyRedirection)="resetKeyTabRedirection($event)">
   </app-empty-state>
   <ng-container *ngIf="!rolesListLoading && !authFailure">
-    <div class="search-create-container">
-      <app-infra-search-bar
-        (searchButtonClick)="searchRoles($event)"
-        placeHolder="roles by name...">
-      </app-infra-search-bar>
-      <app-paginator *ngIf="roles.length"
-        [length]= "total"
-        [pageSize]= "per_page"
-        [pageIndex]= "currentPage"
-        (changePage)= "onUpdatePage($event)"
-      ></app-paginator>
-      <chef-button
-        id="role-create"
-        primary
-        (click)="openCreateModal()"
-        data-cy="create-role-button">
-        Create Role
-      </chef-button>
-    </div>
-    <chef-loading-spinner
-      class="full-screen-spinner"
-      *ngIf="searching || deleting"
-      size="50"
-      fixed>
-    </chef-loading-spinner>
-    <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !roles.length">
-      <img alt="No preview" src="/assets/img/no_preview.gif" />
-      <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
-      <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
-    </div>
-    <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
-      <chef-table>
-        <chef-thead>
-          <chef-tr class="no_border_tr">
-            <chef-th class="no_border_th">Name</chef-th>
-            <chef-th class="no_border_th">Description</chef-th>
-            <chef-th class="no_border_th">Environments</chef-th>
-            <chef-th class="no_border_th"></chef-th>
-            <chef-th class="no_border_th three-dot-column"></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <chef-tr *ngFor="let role of roles">
-            <chef-td>
-              <a [routerLink]="['/infrastructure','chef-servers', serverId,
-              'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
-            </chef-td>
-            <chef-td>
-              {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
-            </chef-td>
-            <chef-td>{{ role.environments.join(", ") }}</chef-td>
-            <chef-td></chef-td>
-            <chef-td class="three-dot-column">
-              <mat-select panelClass="chef-control-menu">
-                <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
-              </mat-select>
-            </chef-td>
-          </chef-tr>
-        </chef-tbody>
-      </chef-table>
-    </div>
+    <div class="wrapper">
+      <div class="search-create-container">
+        <app-infra-search-bar
+          (searchButtonClick)="searchRoles($event)"
+          placeHolder="roles by name...">
+        </app-infra-search-bar>
+        <app-paginator *ngIf="roles.length"
+          [length]= "total"
+          [pageSize]= "per_page"
+          [pageIndex]= "currentPage"
+          (changePage)= "onUpdatePage($event)"
+        ></app-paginator>
+        <chef-button
+          id="role-create"
+          primary
+          (click)="openCreateModal()"
+          data-cy="create-role-button">
+          Create Role
+        </chef-button>
+      </div>
+      <chef-loading-spinner
+        class="full-screen-spinner"
+        *ngIf="loading || deleting"
+        size="50"
+        fixed>
+      </chef-loading-spinner>
+      <div data-cy="empty-list" class="empty-section" *ngIf="!loading && !roles.length">
+        <img alt="No preview" src="/assets/img/no_preview.gif" />
+        <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
+        <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
+      </div>
+      <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr class="no_border_tr">
+              <chef-th class="no_border_th">Name</chef-th>
+              <chef-th class="no_border_th">Description</chef-th>
+              <chef-th class="no_border_th">Environments</chef-th>
+              <chef-th class="no_border_th"></chef-th>
+              <chef-th class="no_border_th three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let role of roles">
+              <chef-td>
+                <a [routerLink]="['/infrastructure','chef-servers', serverId,
+                'organizations', orgId, 'roles', role.name]">{{ role.name }}</a>
+              </chef-td>
+              <chef-td>
+                {{ (role.description.length &gt; 30)? (role.description | slice:0:30)+'...' : (role.description === '' ?  '...' : role.description) }}
+              </chef-td>
+              <chef-td>{{ role.environments.join(", ") }}</chef-td>
+              <chef-td></chef-td>
+              <chef-td class="three-dot-column">
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option data-cy="delete-role" (onSelectionChange)="startRoleDelete(role)">Delete</mat-option>
+                </mat-select>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
 
-    <app-page-picker
-      *ngIf="!searching"
-      class="roles-list-paging"
-      [total]="total"
-      [perPage]="per_page"
-      [page]="currentPage"
-      (pageChanged)="onPageChange($event)">
-    </app-page-picker>
-
+      <app-page-picker
+        *ngIf="!loading"
+        class="roles-list-paging"
+        [total]="total"
+        [perPage]="per_page"
+        [page]="currentPage"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
+    </div>
   </ng-container>
 </section>
