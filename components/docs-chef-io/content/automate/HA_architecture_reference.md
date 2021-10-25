@@ -31,9 +31,9 @@ In AWS deployment, the entire Chef Automate HA infrastructure is built into the 
 Later, series of configurations and installation happens like:
 
 - installing automate into the automate instances
-- installing chef server in all chef-server instances
-- installing and configuring **PostgreSql** into the **postres** instances
-- configuring and installing **elasticsearch** into **elasticsearch** instances, and
+- installing Chef Infra Server in all chef-server instances
+- installing and configuring **PostgreSQL** into the **postres** instances
+- configuring and installing **Elasticsearch** into **elasticsearch** instances, and
 - installing a habitat and creation of a supervisor network.
 
 ### Bare Infrastructure Deployment / On-premise Deployment (existing_node)

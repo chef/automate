@@ -59,11 +59,11 @@ Chef Automate and Chef Server act as frontend nodes and serve as a web UI with l
 These clusters comprise **four** different servers with HA mode, which are as follows:
 
 1. Chef-automate
-2. Chef-server
+2. Chef Infra Server
 3. Elasticsearch - an open-source search and analytics engine based on Apache Lucene and built with Java. It is a NoSQL database that stores data in an unstructured way.
 4. PostgreSQL - an open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance.
 
-**JournalBeat** and **MetricBeat** are common for all database instances. **JournalBeat** installed as an agent on the servers  collects all the services logs and forwards them to Elasticsearch. **MetricBeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
+**Journalbeat** and **Metricbeat** are common for all database instances. **Journalbeat** installed as an agent on the servers collects all the services logs and forwards them to Elasticsearch. **Metricbeat** installed on the servers periodically collects metrics from the operating system and services running on the server and sends them to the **Kibana**.
 
 **Kibana** is an open-source, web-based data visualization and analytical tool that allows you to explore, visualize, and build a dashboard over the log data massed in Elasticsearch clusters. It is a part of the Elastic Stack and integrates with Elasticsearch. The **Kibana** **Dashboard** is a collection of charts, graphs, metrics, searches, and maps in a single pane and provides at-a-glance insights into data from multiple perspectives enabling you to drill down into the details.
 
@@ -71,7 +71,7 @@ These clusters comprise **four** different servers with HA mode, which are as fo
 
 The Chef Automate Clusters is a professional services solution offering installation, high availability, system uptime/ scale-out performance, maintenance, and disaster recovery capabilities.
 
-It includes the Chef Server API to simplify the Chef Infrastructure and is built for customers with more than 10,000 chef-client nodes. You can configure it in the private data center or preferred cloud.
+It includes the Chef Infra Server API to simplify the Chef Infrastructure and is built for customers with more than 10,000 chef-client nodes. You can configure it in the private data center or preferred cloud.
 
 ### Performance and Scalability
 
@@ -111,11 +111,11 @@ Chef Automate Cluster allows you to minimize downtime by utilizing redundant sys
 
 - Automate Frontend
 
-Both Chef Automate and Chef Server have a load balancer with a UI. For example, let's say we have three Chef Automate and Chef Server instances. If any of the Chef Automate or Chef-Server instances fails to operate, then the traffic is distributed between the rest of the two servers. Thus, you will never experience any downtime, or the amount of downtime would be minimal.
+Both Chef Automate and Chef Infra Server have a load balancer with a UI. For example, let's say we have three Chef Automate and Chef Server instances. If any of the Chef Automate or Chef Infra Server instances fails to operate, then the traffic is distributed between the rest of the two servers. Thus, you will never experience any downtime, or the amount of downtime would be minimal.
 
 - Automate Backend
 
-The **Elasticsearch** and **Postgresql** database instances act as an automated backend component. Chef habitat's hab supervisor concept is used to make a cluster for the database instance. Automate backend cluster rests in the habitat ring. For **Postgresql**, **pgleaderchk** service runs in all the **Postgresql** instances and ensures to choose a leader in case the leader database fails. For **Elasticsearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
+The **Elasticsearch** and **PostgreSQL** database instances act as an automated backend component. Chef habitat's hab supervisor concept is used to make a cluster for the database instance. Automate backend cluster rests in the habitat ring. For **Postgresql**, **pgleaderchk** service runs in all the **PostgreSQL** instances and ensures to choose a leader in case the leader database fails. For **Elasticsearch**, there is a **msae** concept of leader-follower, and for any database failure, a leader election occurs, and a new leader is chosen.
 
 ### Disaster Recovery (DR)
 
