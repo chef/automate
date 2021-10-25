@@ -23,6 +23,7 @@ pkg_binds=(
   [authz-service]="port"
   [nodemanager-service]="port"
   [cereal-service]="port"
+  [report-manager-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"
