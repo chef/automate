@@ -85,7 +85,6 @@ export function nodeCredentialEntityReducer(
     }
 
     case NodeCredentialActionTypes.RESET: {
-      console.log('ResetStore reducer');
       return set(
         GET_STATUS,
         EntityStatus.notLoaded,

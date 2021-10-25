@@ -134,7 +134,6 @@ export class NodesEditComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe((total) => {
       this.total = total;
-      console.log(this.total);
     });
     this.store.pipe(
       takeUntil(this.isDestroyed),

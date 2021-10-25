@@ -46,7 +46,6 @@ export class SelectboxComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log(this.selectedList);
     if (!this.copyDataListFlags && this.data === this.listData || this.data !== null ) {
       this.listData = [...this.data];
       if (this.selectedList !== []) {

@@ -156,9 +156,7 @@ export class DeleteNodeCredentialFailure implements Action {
 
 export class ResetStore implements Action {
   readonly type = NodeCredentialActionTypes.RESET;
-  constructor() {
-    console.log('ResetStore action');
-  }
+  constructor() { }
 }
 
 
