@@ -332,7 +332,7 @@ func (db *DB) GetNodeManagers(sortField string, insortOrder manager.Query_OrderT
 
 var mgrFilterField = map[string]string{
 	"manager_type": "type",
-	"name": "name",
+	"name":         "name",
 }
 
 func validateNodeManagerFilters(filters []*common.Filter) error {
