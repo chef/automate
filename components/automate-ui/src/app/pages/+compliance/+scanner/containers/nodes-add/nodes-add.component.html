@@ -46,7 +46,7 @@
               <input id="custom-prefix" type="text" chefInput formControlName="customPrefix" placeholder="eg: my-node-prefix-, my-node-name-" />
             </chef-form-field>
           </fieldset>
-          <fieldset id="wizard-step-2" formGroupName="wizardStep2" class="wizard">
+          <fieldset id="wizard-step-2" formGroupName="wizardStep2">
             <app-accordion>
               <app-accordion-item title="Add credentials to connect to your nodes" [dataCy]="dataCy">
                 <chef-select #ty (change)="onTypeSelect(ty.value)" data-cy="selectCredtype">
