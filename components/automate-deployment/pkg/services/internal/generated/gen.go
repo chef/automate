@@ -191,6 +191,26 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/report-manager-minio-gateway",
+      "metadata": {
+        "name": "chef/report-manager-minio-gateway",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/report-manager-service",
+      "metadata": {
+        "name": "chef/report-manager-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/compliance-service",
       "metadata": {
         "name": "chef/compliance-service",
@@ -491,26 +511,6 @@ var ProductMetadataJSON = `
     {
       "name": "chef/automate-cluster-ctl",
       "metadata": null
-    },
-    {
-      "name": "chef/report-manager-minio-gateway",
-      "metadata": {
-        "name": "chef/report-manager-minio-gateway",
-        "data_service": true,
-        "binlinks": null,
-        "uses_platform_scaffolding": false,
-        "bootstrap": null
-      }
-    },
-    {
-      "name": "chef/report-manager-service",
-      "metadata": {
-        "name": "chef/report-manager-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
     },
     {
       "name": "core/rsync",

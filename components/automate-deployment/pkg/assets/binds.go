@@ -67,7 +67,7 @@ automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
 cereal-service REQUIRED automate-pg-gateway pg-sidecar-service
 cereal-service BINDING_MODE strict
-compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service secrets-service
+compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service report-manager-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-service
