@@ -97,7 +97,7 @@ smoke-test:
 	@echo "make smoke-test has been deprecated. Instead, run ./scripts/smoke-test --help"
 
 ## Generate random Habitat Supervisor ring key and HTTP gateway bearer token
-sup-keys: $(HABITAT_TFVARS)
+sup-keys: $(HABITAT_TFVARS) habitat-sup-cert
 
 ## Generate habitat certificate for cluster internal secure communication 
 habitat-sup-cert:
@@ -108,5 +108,5 @@ bump-aib:
 	bash scripts/bumpaib.sh $(TERRAFORM_PATH)/terraform.tfvars
 
 ## Setup habitat keys and airgap bundles
-setup: sup-keys bundle habitat-sup-cert
+setup: sup-keys bundle
 

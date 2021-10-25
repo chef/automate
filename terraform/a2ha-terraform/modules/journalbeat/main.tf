@@ -5,7 +5,7 @@ locals {
       ", ",
       formatlist(
         "\"https://%s:%s\"",
-        var.private_ips,
+        var.elasticsearch_private_ips,
         var.elasticsearch_listen_port,
       ),
     ),

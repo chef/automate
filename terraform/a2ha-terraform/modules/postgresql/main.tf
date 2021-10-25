@@ -39,7 +39,8 @@ module "journalbeat" {
   journalbeat_pkg_ident     = var.journalbeat_pkg_ident
   journalbeat_svc_binds     = "--bind elasticsearch:automate-backend-elasticsearch.default"
   journalbeat_tags          = ["postgresql"]
-  private_ips               = var.elasticsearch_private_ips
+  elasticsearch_private_ips = var.elasticsearch_private_ips
+  private_ips               = var.private_ips
   source                    = "../journalbeat"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user
@@ -56,7 +57,8 @@ module "metricbeat" {
   metricbeat_pkg_ident      = var.metricbeat_pkg_ident
   metricbeat_svc_binds      = "--bind database:automate-backend-postgresql.default --bind elasticsearch:automate-backend-elasticsearch.default"
   metricbeat_tags           = ["postgresql"]
-  private_ips               = var.elasticsearch_private_ips
+  elasticsearch_private_ips = var.elasticsearch_private_ips
+  private_ips               = var.private_ips
   source                    = "../metricbeat"
   ssh_key_file              = var.ssh_key_file
   ssh_user                  = var.ssh_user

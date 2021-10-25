@@ -8,6 +8,10 @@ variable "elasticsearch_listen_port" {
   default = 9200
 }
 
+variable "elasticsearch_private_ips" {
+  default     = []
+}
+
 variable "habitat_info" {
 }
 
@@ -35,7 +39,6 @@ variable "journalbeat_tags" {
 
 variable "private_ips" {
   default     = []
-  description = "the Elasticsearch Private IPs"
 }
 
 variable "public_ips" {
