@@ -24,9 +24,9 @@ docker_run() {
     if [ -z "$image" ]; then
         image="chefes/a2-integration:latest"
     fi
-    local HOST_PWD = `pwd`
+    local HOST_PWD=`pwd`
     echo "........$HOST_PWD"
-    local HOST_PWD2 = pwd
+    local HOST_PWD2=pwd
     echo "........$HOST_PWD2"
     local docker_run_args=(
             "--detach"
