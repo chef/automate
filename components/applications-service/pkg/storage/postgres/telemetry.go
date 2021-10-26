@@ -48,7 +48,7 @@ func (pg *Postgres) UpdateTelemetryReported(ctx context.Context, lastTelemetryRe
 	return nil
 }
 
-// StoreTelemetry Store last compliance telemetry reported timestamp
+// StoreTelemetry Store last application service telemetry reported timestamp
 func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedAt time.Time) error {
 	telArr := make([]interface{}, 0)
 
