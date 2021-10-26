@@ -451,6 +451,38 @@ func init() {
         ]
       }
     },
+    "/api/v0/applications/telemetry/services/count/updated": {
+      "put": {
+        "operationId": "ApplicationsService_UpdateTelemetryReported",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateTelemetryReportedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/api/v0/applications/version": {
       "get": {
         "summary": "Show Version",
@@ -1036,6 +1068,18 @@ func init() {
       "type": "object"
     },
     "chef.automate.api.applications.UpdateDisconnectedServicesConfigRes": {
+      "type": "object"
+    },
+    "chef.automate.api.applications.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last application service telemetry reported date"
+        }
+      }
+    },
+    "chef.automate.api.applications.UpdateTelemetryReportedResponse": {
       "type": "object"
     },
     "chef.automate.api.common.query.Pagination": {

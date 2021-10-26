@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"io"
 
 	"github.com/chef/automate/api/external/applications"
@@ -242,4 +243,23 @@ func (a *Applications) DeleteServicesByID(
 func (a *Applications) GetVersion(ctx context.Context,
 	e *version.VersionInfoRequest) (*version.VersionInfo, error) {
 	return a.client.GetVersion(ctx, e)
+}
+
+//UpdateTelemetryReported Updates the application services telemetry reported date in postgres
+func (s *Applications) UpdateTelemetryReported(ctx context.Context, req *applications.UpdateTelemetryReportedRequest) (*applications.UpdateTelemetryReportedResponse, error) {
+
+	if req.LastTelemetryReportedAt == "" {
+		return &applications.UpdateTelemetryReportedResponse{}, errors.New("LastTelemetryReported timestamp is required")
+	}
+
+	aapServiceRequest := &applications.UpdateTelemetryReportedRequest{
+		LastTelemetryReportedAt: req.LastTelemetryReportedAt,
+	}
+
+	_, err := s.client.UpdateTelemetryReported(ctx, aapServiceRequest)
+	if err != nil {
+		return &applications.UpdateTelemetryReportedResponse{}, err
+	}
+
+	return &applications.UpdateTelemetryReportedResponse{}, nil
 }
