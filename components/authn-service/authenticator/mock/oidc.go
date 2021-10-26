@@ -6,10 +6,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/chef/automate/api/interservice/id_token"
 
 	"go.uber.org/zap"
 	jose "gopkg.in/square/go-jose.v2"
@@ -70,6 +71,10 @@ func (r *oidcRequestor) Subject() string {
 	default:
 		return "user:" + r.connID + ":" + r.userID
 	}
+}
+
+func (r *oidcRequestor) Requestor() string {
+	return r.userID
 }
 
 func (r *oidcRequestor) Teams() []string {

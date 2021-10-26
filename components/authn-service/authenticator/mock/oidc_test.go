@@ -75,6 +75,7 @@ func TestAuthenticate(t *testing.T) {
 			} else {
 				require.NotNil(t, requestor)
 				assert.Equal(t, "user:mockmock:mockuser", requestor.Subject())
+				assert.Equal(t, "mockuser", requestor.Requestor())
 				if d.expectedTeams != nil {
 					assert.ElementsMatch(t, d.expectedTeams, requestor.Teams())
 				}
