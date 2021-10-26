@@ -4,9 +4,10 @@ package mock
 
 import (
 	"errors"
-	"github.com/chef/automate/api/interservice/id_token"
 	"net/http"
 	"net/url"
+
+	"github.com/chef/automate/api/interservice/id_token"
 
 	"go.uber.org/zap"
 
@@ -33,6 +34,10 @@ type htaRequestor struct {
 
 func (r *htaRequestor) Subject() string {
 	return "token:" + r.id
+}
+
+func (r *htaRequestor) Requestor() string {
+	return r.id
 }
 
 func (*htaRequestor) Teams() []string {

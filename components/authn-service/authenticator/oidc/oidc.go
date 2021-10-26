@@ -31,6 +31,10 @@ func (r *requestor) Subject() string {
 	return fmt.Sprintf("user:%s:%s", r.connID, r.userID)
 }
 
+func (r *requestor) Requestor() string {
+	return r.userID
+}
+
 func (r *requestor) Teams() []string {
 	teams := make([]string, len(r.teams))
 	for i, team := range r.teams {

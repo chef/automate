@@ -67,7 +67,7 @@ func (s *Server) Authenticate(ctx context.Context, _ *api.AuthenticateRequest) (
 		user.AppendTeams(teams)
 	}
 
-	return &api.AuthenticateResponse{Subject: requestor.Subject(), Teams: requestor.Teams()}, nil
+	return &api.AuthenticateResponse{Subject: requestor.Subject(), Teams: requestor.Teams(), Requestor: requestor.Requestor()}, nil
 }
 
 func reqFromMD(md metadata.MD) (*http.Request, error) {

@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	util "github.com/chef/automate/lib/oidc"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -973,47 +971,12 @@ func init() {
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
 	subjects := []string{}
-	type userIdKey struct{}
-	type tokenIdKey struct{}
-	var ctxWithRequestorId context.Context
+	type requestorKey struct{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
 	// it ourselves.
 	md := metadataFromRequest(r)
 	ctx := metadata.NewOutgoingContext(r.Context(), md)
-	reqIdToken, err := util.ExtractBearerToken(r)
-	if err != nil {
-		authnClient, err := s.clientsFactory.AuthenticationClient()
-		if err != nil {
-			return nil, errors.Wrap(err, "authn-service unavailable")
-		}
-		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
-		if err != nil {
-			return nil, errors.Wrap(err, "authn-service error")
-		}
-		subject := authnResp.GetSubject()
-		token_id_string := strings.Split(subject, ":")
-		tokenId := make([]interface{}, len(token_id_string[1]))
-		for i, v := range token_id_string {
-			tokenId[i] = v
-		}
-		ctxWithRequestorId = context.WithValue(ctx, tokenIdKey{}, tokenId)
-	} else {
-		var jwtPayload map[string]interface{}
-		// Current JWT standard is a base64 string separated by 3 periods
-		jwtParts := strings.Split(reqIdToken, ".")
-		// Use JWT package base64 decoder
-		data, err := jwt.DecodeSegment(jwtParts[1])
-		if err != nil {
-			return nil, errors.Wrap(err, "error decoding token")
-		}
-		if err := json.Unmarshal(data, &jwtPayload); err != nil {
-			return nil, errors.Wrap(err, "error unmarshal token")
-		}
-		// jwtPayload
-		user_id := jwtPayload["federated_claims"].(map[string]interface{})["user_id"]
-		ctxWithRequestorId = context.WithValue(ctx, userIdKey{}, user_id)
-	}
 
 	// Handle certificate based authn:
 	//
@@ -1035,7 +998,6 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 			}
 		}
 	}
-
 	if len(subjects) < 1 {
 		authnClient, err := s.clientsFactory.AuthenticationClient()
 		if err != nil {
@@ -1043,6 +1005,9 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
+
+		ctx = context.WithValue(ctx, requestorKey{}, authnResp.Requestor)
+
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service error")
 		}
@@ -1056,7 +1021,10 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	newCtx, authorized, err := s.authorizer.IsAuthorized(ctxWithRequestorId, subjects, resource, action, projects)
+	newCtx, authorized, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
+
+	fmt.Println(newCtx, "requestorXxx")
+
 	if err != nil {
 		// If authorization can't be determined because of some error, we return that error.
 		// Upstream services, however, will consider it equivalent to an explicit permission

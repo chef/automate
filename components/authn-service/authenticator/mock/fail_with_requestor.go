@@ -19,6 +19,7 @@ import (
 type StaticFailWithRequestorConfig struct {
 	Requestor string `json:"requestor"`
 	ErrorMsg  string `json:"error"`
+	UserID    string `json:"user_id"`
 }
 
 // StaticFailWithRequestorAuthenticator holds the state of the fail_with_requestor authenticator
@@ -29,10 +30,15 @@ type StaticFailWithRequestorAuthenticator struct {
 
 type requestor struct {
 	subject string
+	userID  string
 }
 
 func (r *requestor) Subject() string {
 	return r.subject
+}
+
+func (r *requestor) Requestor() string {
+	return r.userID
 }
 
 func (*requestor) Teams() []string {
