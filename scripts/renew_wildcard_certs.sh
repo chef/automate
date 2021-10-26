@@ -2,16 +2,10 @@
 set -Eeo pipefail
 CERT_DIR="$(pwd)/etc/letsencrypt/live/cd.chef.co/"
 
-credentials=$(vault read account/dynamic/aws/chef-cd/creds/default --format=json | jq '.data')
-session=$(echo $credentials | jq '.security_token')
-access_key=$(echo $credentials | jq '.access_key')
-secret_key=$(echo $credentials | jq '.secret_key')
-
 docker run -p 80:80 -p 443:443 \
            -it --rm --name certbot \
-           -e AWS_SESSION_TOKEN=${session} \
-           -e AWS_ACCESS_KEY_ID=${access_key} \
-           -e AWS_SECRET_ACCESS_KEY=${secret_key} \
+           -e AWS_CONFIG_FILE=/.aws/config \
+           -v "/var/lib/buildkite-agent/.aws:/.aws" \
            -v "$(pwd)/etc/letsencrypt:/etc/letsencrypt" \
            -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
            certbot/dns-route53 certonly \
@@ -23,7 +17,7 @@ docker run -p 80:80 -p 443:443 \
 if [[ -f "${CERT_DIR}/fullchain.pem" && -f "${CERT_DIR}/privkey.pem" ]]; then
     echo "Updating certificates in vault..."
     cd ${CERT_DIR}
-    vault write secret/mike foo=@fullchain.pem bar=privkey.pem
+    vault write secret/a2/testing/wildcard_cert crt=@fullchain.pem key=privkey.pem
 else
     echo "Certificates not found. Skipping vault update step"
 fi
