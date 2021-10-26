@@ -7,4 +7,5 @@ steps:
       accounts:
         - aws/chef-cd
       executor:
-        docker:
+        linux:
+          privileged: true
