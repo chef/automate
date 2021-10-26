@@ -1023,8 +1023,6 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 	newCtx, authorized, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
 
-	fmt.Println(newCtx, "requestorXxx")
-
 	if err != nil {
 		// If authorization can't be determined because of some error, we return that error.
 		// Upstream services, however, will consider it equivalent to an explicit permission
