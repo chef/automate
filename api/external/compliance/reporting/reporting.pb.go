@@ -4898,7 +4898,7 @@ type ReportingServiceClient interface {
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
-	//Max return payload size is 4MB, use paginiation to fetch remaining data.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
@@ -5031,7 +5031,7 @@ type ReportingServiceClient interface {
 	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
-	//Max return payload size is 4MB, use paginiation to fetch remaining data.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
@@ -5235,7 +5235,7 @@ type ReportingServiceServer interface {
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
-	//Max return payload size is 4MB, use paginiation to fetch remaining data.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
@@ -5368,7 +5368,7 @@ type ReportingServiceServer interface {
 	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
-	//Max return payload size is 4MB, use paginiation to fetch remaining data.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
