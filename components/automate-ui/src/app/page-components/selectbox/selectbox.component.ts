@@ -26,6 +26,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
   @Output() selectData = new EventEmitter<any[]>();
   @Output() onScrollListData = new EventEmitter();
   public scrollDistance = 2;
+  public selectedListFlag = true;
 
 
   public listData: any[] = [];
@@ -48,10 +49,10 @@ export class SelectboxComponent implements OnInit, OnChanges {
   ngOnChanges() {
     if (!this.copyDataListFlags && this.data === this.listData || this.data !== null ) {
       this.listData = [...this.data];
-      if (this.selectedList.length !== 0) {
+      if (this.selectedListFlag) {
         this.selectedListData = [...this.selectedList];
+        this.selectedListFlag = false;
       }
-      console.log(this.selectedList.length !== 0);
       this.selectedListData.forEach((selectedListValue) => {
         if (selectedListValue[this.typeFieldName] === this.typeValue) {
           this.listData.forEach(

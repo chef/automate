@@ -10,7 +10,7 @@
         <chef-heading>Edit node</chef-heading>
         <chef-subheading>Edit your node details</chef-subheading>
         <div slot="header-buttons">
-          <chef-button primary type="submit" [disabled]="!form.valid" (click)="submit(form.value)" *ngIf="node">Save Node</chef-button>
+          <chef-button primary type="submit" [disabled]="!form.valid" (click)="submit(form.value)" *ngIf="node" data-cy="submit">Save Node</chef-button>
           <chef-button tertiary routerLink="/compliance/scan-jobs/nodes">Cancel</chef-button>
         </div>
       </chef-page-header>
@@ -19,7 +19,7 @@
           <div>
             <chef-form-field class="field">
               <label for="name">Name <span class="required">*</span></label>
-              <input id="name" type="text" chefInput formControlName="name" placeholder="Node name" />
+              <input id="name" type="text" chefInput formControlName="name" placeholder="Node name" data-cy="name"/>
               <chef-error *ngIf="form.get('name').touched && form.get('name').invalid">
                 Node name is required.
               </chef-error>
@@ -28,7 +28,7 @@
           <div formGroupName="target_config">
             <chef-form-field class="field host">
               <label for="host">Host <span class="required">*</span></label>
-              <input id="host" type="text" chefInput formControlName="host" placeholder="Hostname" />
+              <input id="host" type="text" chefInput formControlName="host" placeholder="Hostname" data-cy="host"/>
               <chef-error *ngIf="form.get('target_config.host').touched && form.get('target_config.host').invalid">
                 Hostname is required.
               </chef-error>

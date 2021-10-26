@@ -1,13 +1,8 @@
-describe('chef datafeed', () => {
+describe('Scan job', () => {
 
-  const token = 'behwveh3238238=';
-  const DestinationID = 'chef-server-dev-test';
   const reusableDate = Date.now();
   let adminIdToken = '';
   const name = 'cytest' + reusableDate;
-  const url = 'https://localhost/api/x_chef_automate/asset';
-  const ServiceNow = 'Service Now';
-  const Webhook = 'Webhook';
 
   before(() => {
       cy.adminLogin('/').then(() => {
@@ -18,7 +13,6 @@ describe('chef datafeed', () => {
       });
       cy.visit('/compliance/scan-jobs/nodes/add');
       cy.get('app-welcome-modal').invoke('hide');
-      // cy.restoreStorage();
     });
 
   beforeEach(() => {
@@ -137,20 +131,53 @@ describe('chef datafeed', () => {
 
     it(
       'port should be 5985 if i select WinRM and ssl and self signed should present', () => {
-        cy.get('[id=scroll-right-side]').scrollTo('top');
         cy.get('[data-cy=selectCredtype]').click();
-        // cy.get('[data-cy=ssh]').click();
+        cy.get('[data-cy=winrm]').click();
         cy.get('[data-cy=winrm]').should('be.visible').click();
-        // cy.get('[data-cy=port]').should('have.value', '5985');
-        // cy.get('[data-cy=port]').should('not.have.value', '22');
-        // cy.get('[data-cy=self_signed]').should('be.visible');
-        // cy.get('[data-cy=ssl]').should('be.visible');
-        // cy.get('[data-cy=sudo]').should('not.be.visible');
+        cy.get('[data-cy=port]').should('have.value', '5985');
+        cy.get('[data-cy=port]').should('not.have.value', '22');
+        cy.get('[data-cy=self_signed]').should('be.visible');
+        cy.get('[data-cy=ssl]').should('be.visible');
+        cy.get('[data-cy=sudo]').should('not.be.visible');
+        cy.get('[data-cy=selectCredtype]').click();
+        cy.get('[data-cy=ssh]').click();
     });
 
 
     it('click on Add nodes', () => {
       cy.get('[data-cy=add-nodes]').click();
+    });
+
+    it('click on Edit button to update scan job nodes', () => {
+      cy.get('[data-cy=edit-0]').click();
+    });
+
+    it('open accordion in edit page', () => {
+      cy.get('[data-cy=cred-accordion]').click();
+    });
+
+    it('select ssh from dropdown in edit page', () => {
+      cy.get('[data-cy=selectCredtype]').click();
+      cy.get('[data-cy=ssh]').click();
+    });
+
+    it('select data from select box in edit page', () => {
+      cy.get('[data-cy=rightSide-0]').click();
+      cy.get('[data-cy=right-side-button]').click();
+    });
+
+
+    it('check duplicate data is present in right side select box in edit page', () => {
+      cy.get('[data-cy=rightSide-0]').should('not.have.value', 'secret-ssh0');
+    });
+
+    it('select/unselect data in edit page', () => {
+      cy.get('[data-cy=rightSide-0]').should('not.have.value', 'secret-ssh0');
+    });
+
+
+    it('update data', () => {
+      cy.get('[data-cy=submit]').click();
     });
 
   });
