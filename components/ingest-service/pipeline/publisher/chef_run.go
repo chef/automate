@@ -40,7 +40,8 @@ func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- messag
 			runc := insertChefRun(msg, client)
 			nodec := insertNode(msg, client)
 			attrc := insertNodeAttribute(msg, client)
-			errc := merge(runc, nodec, attrc)
+			runInfo := insertNodeInfo(msg, client)
+			errc := merge(runc, nodec, attrc, runInfo)
 
 			for err := range errc {
 				if err != nil {
@@ -139,6 +140,25 @@ func insertNodeAttribute(msg message.ChefRun, client backend.Client) <-chan erro
 		err := client.InsertNodeAttribute(msg.Ctx, msg.NodeAttribute)
 		if err != nil {
 			log.Errorf("Error inserting Node object: %s", err)
+			out <- err
+		} else {
+			out <- nil
+		}
+		close(out)
+	}()
+	return out
+}
+
+func insertNodeInfo(msg message.ChefRun, client backend.Client) <-chan error {
+	out := make(chan error)
+	go func() {
+		log.WithFields(log.Fields{
+			"entity_uuid": msg.NodeRunDateInfo.NodeID,
+		}).Info("IngestingNode Run Date Info")
+		// Ingest NodeState
+		err := client.InsertNodeRunDateInfo(msg.Ctx, msg.NodeRunDateInfo)
+		if err != nil {
+			log.Errorf("Error inserting Node run date object: %s", err)
 			out <- err
 		} else {
 			out <- nil

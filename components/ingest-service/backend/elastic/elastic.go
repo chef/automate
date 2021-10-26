@@ -27,6 +27,13 @@ type Backend struct {
 	client      *elastic.Client
 }
 
+func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.NodeRunDateInfo) error {
+	mapping := mappings.NodeState
+	err := es.upsertDataWithID(ctx, mapping, nodeInfo.NodeID, nodeInfo)
+	return err
+	panic("implement me")
+}
+
 func New(esURL string) (*Backend, error) {
 	client, err := elastic.NewClient(
 		// In the future we will need to create a custom http.Client to pass headers.
