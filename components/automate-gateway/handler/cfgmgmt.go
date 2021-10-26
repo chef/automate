@@ -4,6 +4,7 @@ import (
 	"context"
 
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	// Cfgmgmt Request/Response definitions
@@ -633,4 +634,27 @@ func (s *CfgMgmtServer) GetOrganizations(ctx context.Context, e *cfgReq.Organiza
 //GetSourceFqdns returns the names of every organization for the configuration management service
 func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context, e *cfgReq.SourceFqdns) (*gpStruct.ListValue, error) {
 	return s.cfgMgmtClient.GetSourceFqdns(ctx, &cmsReq.SourceFQDNS{})
+}
+
+//UpdateTelemetryReported Updates the last client run telemetry reported date in postgres
+func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *cfgReq.UpdateTelemetryReportedRequest) (*cfgRes.UpdateTelemetryReportedResponse, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	if req.LastTelemetryReportedAt == "" {
+		return &cfgRes.UpdateTelemetryReportedResponse{}, errors.New("LastTelemetryReported timestamp is required")
+	}
+
+	cfgMgmtRequest := &cmsReq.UpdateTelemetryReportedRequest{
+		LastTelemetryReportedAt: req.LastTelemetryReportedAt,
+	}
+
+	_, err := s.cfgMgmtClient.UpdateTelemetryReported(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.UpdateTelemetryReportedResponse{}, err
+	}
+
+	return &cfgRes.UpdateTelemetryReportedResponse{}, nil
 }
