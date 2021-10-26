@@ -13,6 +13,12 @@ import (
 const (
 	// The format of the date string on the end of the index name
 	TimeseriesDateFmt = "2006.01.02"
+
+	DocType = "_doc"
+	//run info for telematics
+	NodeCurrentRunInfoVersion = "1"
+	nodeAndVersionRunInfo     = "node-" + NodeCurrentRunInfoVersion
+	IndexNameNodeRunInfo      = nodeAndVersionRunInfo + "-run-info"
 )
 
 // AllMappings is the list of all mappings that we currently have
@@ -23,6 +29,7 @@ var AllMappings = []Mapping{
 	NodeState,
 	ConvergeHistory,
 	NodeAttribute,
+	ConfigManagementRunInfo,
 }
 
 // Mapping type is the representation of an ES mapping, it contains
