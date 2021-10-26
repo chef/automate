@@ -18,6 +18,9 @@ schedules:
   - name: cleanup_abandoned_a2_instances
     description: Cleanup abandoned a2instances
     cronline: "0 1 * * *" # every day at 1am
+  - name: renew_wildcard_certs
+    description: "Updates the wildcard certs used in tests"
+    cronline: "0 2 1 */2 *"
 
 # These are our Buildkite pipelines where deploys take place
 pipelines:
@@ -31,6 +34,9 @@ pipelines:
   - nightly:
       description: Nightly tests against master
       definition: .expeditor/nightly.pipeline.yml
+  - renew-certs:
+      description: Bi Monthly renew certificates
+      definition: .expeditor/renew-certs.pipeline.yml
   - post-promote:
       description: Generate and upload release artifacts
       definition: .expeditor/post-promote.pipeline.yml
@@ -165,3 +171,6 @@ subscriptions:
   - workload: schedule_triggered:{{agent_id}}:cleanup_abandoned_a2_instances:*
     actions:
       - bash:.expeditor/cleanup-abandoned-a2-instances.sh
+  - workload: schedule_triggered:chef/automate:main:renew_wildcard_certs:*
+    actions:
+      - trigger_pipeline:renew-certs
