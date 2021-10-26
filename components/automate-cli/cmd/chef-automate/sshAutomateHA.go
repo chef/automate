@@ -232,7 +232,7 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(contents, automateHAInfraDetails)
+		err = json.Unmarshal(contents, automateHAInfraDetails)
 		if err != nil {
 			return nil, err
 		}
