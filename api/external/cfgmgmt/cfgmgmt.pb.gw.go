@@ -916,6 +916,40 @@ func local_request_ConfigMgmt_ListNodeSegmentsWithRolloutProgress_0(ctx context.
 
 }
 
+func request_ConfigMgmt_UpdateTelemetryReported_0(ctx context.Context, marshaler runtime.Marshaler, client ConfigMgmtClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.UpdateTelemetryReportedRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.UpdateTelemetryReported(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ConfigMgmt_UpdateTelemetryReported_0(ctx context.Context, marshaler runtime.Marshaler, server ConfigMgmtServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.UpdateTelemetryReportedRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.UpdateTelemetryReported(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterConfigMgmtHandlerServer registers the http handlers for service ConfigMgmt to "mux".
 // UnaryRPC     :call ConfigMgmtServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -1358,6 +1392,26 @@ func RegisterConfigMgmtHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 		}
 
 		forward_ConfigMgmt_ListNodeSegmentsWithRolloutProgress_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("PUT", pattern_ConfigMgmt_UpdateTelemetryReported_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ConfigMgmt_UpdateTelemetryReported_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ConfigMgmt_UpdateTelemetryReported_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1842,6 +1896,26 @@ func RegisterConfigMgmtHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
+	mux.Handle("PUT", pattern_ConfigMgmt_UpdateTelemetryReported_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ConfigMgmt_UpdateTelemetryReported_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ConfigMgmt_UpdateTelemetryReported_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -1889,6 +1963,8 @@ var (
 	pattern_ConfigMgmt_GetRolloutForChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "find"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ConfigMgmt_ListNodeSegmentsWithRolloutProgress_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "beta", "cfgmgmt", "rollouts", "progress_by_node_segment"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_ConfigMgmt_UpdateTelemetryReported_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6}, []string{"api", "v0", "cfgmgmt", "telemetry", "nodes", "count", "updated"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -1935,4 +2011,6 @@ var (
 	forward_ConfigMgmt_GetRolloutForChefRun_0 = runtime.ForwardResponseMessage
 
 	forward_ConfigMgmt_ListNodeSegmentsWithRolloutProgress_0 = runtime.ForwardResponseMessage
+
+	forward_ConfigMgmt_UpdateTelemetryReported_0 = runtime.ForwardResponseMessage
 )
