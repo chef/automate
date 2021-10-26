@@ -126,7 +126,7 @@ docker_run_args=(
         "--env" "DOCKER_HOST=unix:///docker.sock"
         "--workdir" "$workdir"
 )
-
+echo ".......------------> $HOST_PWD"
 if [ $CI = "true" ]
 then
     buildkite_agent=$(command -v buildkite-agent)
