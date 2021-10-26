@@ -252,4 +252,17 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/ListNodeSegmentsWithRolloutProgress", "infra:nodes", "infra:nodes:list", "GET", "/api/beta/cfgmgmt/rollouts/progress_by_node_segment", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/UpdateTelemetryReported", "iam:introspect", "iam:introspect:getAll", "PUT", "/api/v0/cfgmgmt/telemetry/nodes/count/updated", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.UpdateTelemetryReportedRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "last_telemetry_reported_at":
+					return m.LastTelemetryReportedAt
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

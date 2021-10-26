@@ -957,6 +957,39 @@ func init() {
         ]
       }
     },
+    "/api/v0/cfgmgmt/telemetry/nodes/count/updated": {
+      "put": {
+        "summary": "UpdateTelemetryReported\nAcknowledge API  to updates the last client run telemetry reported date in postgres\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ConfigMgmt_UpdateTelemetryReported",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.UpdateTelemetryReportedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.request.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/version": {
       "get": {
         "operationId": "ConfigMgmt_GetVersion",
@@ -1052,6 +1085,15 @@ func init() {
         "SCM_WEB_TYPE_GITHUB"
       ],
       "default": "SCM_WEB_TYPE_UNSPECIFIED"
+    },
+    "chef.automate.api.cfgmgmt.request.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last client run telemetry reported date"
+        }
+      }
     },
     "chef.automate.api.cfgmgmt.response.CheckInCounts": {
       "type": "object",
@@ -1924,6 +1966,9 @@ func init() {
           "title": "The field type counted"
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.UpdateTelemetryReportedResponse": {
+      "type": "object"
     },
     "chef.automate.api.cfgmgmt.response.ValueCount": {
       "type": "object",

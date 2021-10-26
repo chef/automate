@@ -10,12 +10,14 @@ import "external/cfgmgmt/request/rollouts.proto";
 import "external/cfgmgmt/request/stats.proto";
 import "external/cfgmgmt/request/errors.proto";
 import "external/cfgmgmt/request/root.proto";
+import "external/cfgmgmt/request/telemetry.proto";
 
 import "external/cfgmgmt/response/actions.proto";
 import "external/cfgmgmt/response/nodes.proto";
 import "external/cfgmgmt/response/rollouts.proto";
 import "external/cfgmgmt/response/stats.proto";
 import "external/cfgmgmt/response/errors.proto";
+import "external/cfgmgmt/response/telemetry.proto";
 
 import "external/common/query/parameters.proto";
 import "external/common/version/version.proto";
@@ -496,5 +498,24 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
+
+  /*
+	UpdateTelemetryReported
+	Acknowledge API  to updates the last client run telemetry reported date in postgres
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc UpdateTelemetryReported(cfgmgmt.request.UpdateTelemetryReportedRequest) returns (cfgmgmt.response.UpdateTelemetryReportedResponse) {
+		option (google.api.http) = {
+			put: "/api/v0/cfgmgmt/telemetry/nodes/count/updated"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
 
 }
