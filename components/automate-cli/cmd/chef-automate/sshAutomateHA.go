@@ -9,15 +9,10 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh"
 )
 
 const automateHATerraformOutputFile = "/hab/a2_deploy_workspace/terraform/terraform.tfstate"
 const automateHATerraformDestroyOutputFile = "/hab/a2_deploy_workspace/terraform/destroy/aws/terraform.tfstate"
-
-type Client struct {
-	client *ssh.Client
-}
 
 var sshFlags = struct {
 	hostname string
@@ -226,7 +221,10 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(contents, automateHAInfraDetails)
+		err = json.Unmarshal(contents, automateHAInfraDetails)
+		if err != nil {
+			return nil, err
+		}
 		return automateHAInfraDetails, nil
 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
 		automateHAInfraDetails := &AutomteHAInfraDetails{}
@@ -235,6 +233,9 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 			return nil, err
 		}
 		json.Unmarshal(contents, automateHAInfraDetails)
+		if err != nil {
+			return nil, err
+		}
 		return automateHAInfraDetails, nil
 	} else {
 		writer.Error("Automate Ha infra confile file not exits.")
