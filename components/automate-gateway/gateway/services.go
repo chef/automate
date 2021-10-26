@@ -971,7 +971,6 @@ func init() {
 
 func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
 	subjects := []string{}
-	type requestorKey struct{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
 	// it ourselves.
@@ -1006,7 +1005,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
 
-		ctx = context.WithValue(ctx, requestorKey{}, authnResp.Requestor)
+		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service error")

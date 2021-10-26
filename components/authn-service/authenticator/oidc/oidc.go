@@ -56,6 +56,10 @@ func (l *localRequestor) Subject() string {
 	return fmt.Sprintf("user:local:%s", l.email)
 }
 
+func (l *localRequestor) Requestor() string {
+	return l.userID
+}
+
 func (l *localRequestor) AppendTeams(teams []string) {
 	l.teams = append(l.teams, teams...)
 }
