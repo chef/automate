@@ -7,9 +7,10 @@ API endpoint - "/api/v0/compliance/reporting/stats/nodes/count"
 ## Adding nodes to populate compliance reporting
 from hab studio:
 
-1. Command to generate 50k nodes and 100k nodes as follows:-
+1. Command to generate 50k, 100k and 200k nodes as follows:-
     chef_load_compliance_scans -D2 -N50000 -M1 -T100000
     chef_load_compliance_scans -D2 -N100000 -M1 -T200000
+    chef_load_compliance_scans -D2 -N200000 -M1 -T400000
 
 2. Open postgres DB and truncate table in hab studio
 
@@ -27,6 +28,6 @@ from hab studio:
    | 66472      | 44ms              |
    | 79703      | 76ms              |
    | 119699     | 127ms             |
-   | 134673     | 27ms              |
+   | 225292     | 99ms              |
 
 
