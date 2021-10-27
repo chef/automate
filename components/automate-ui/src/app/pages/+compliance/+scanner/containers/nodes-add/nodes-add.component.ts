@@ -172,7 +172,6 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   }
 
   selected(data: any) {
-    console.log(data, 'a');
     const secretIds: string[] = [];
     data.forEach((listOfSecrets) => {
       secretIds.push(listOfSecrets.id);
