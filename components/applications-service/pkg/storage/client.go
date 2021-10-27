@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -36,6 +37,8 @@ type Client interface {
 	GetServiceGroupsCount() (int32, error)
 	GetSupervisorsCount() (int32, error)
 	GetDeploymentsCount() (int32, error)
+
+	UpdateTelemetryReported(context.Context, string) error
 
 	// Used by our Integration Tests
 	EmptyStorage() error
