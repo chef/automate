@@ -599,3 +599,16 @@ func toProtoTimestamp(t *time.Time) *timestamp.Timestamp {
 	}
 	return ts
 }
+
+func (s *ApplicationsServer) UpdateTelemetryReported(ctx context.Context, req *applications.UpdateTelemetryReportedRequest) (*applications.UpdateTelemetryReportedResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	err := s.storageClient.UpdateTelemetryReported(ctx, req.LastTelemetryReportedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &applications.UpdateTelemetryReportedResponse{}, nil
+}

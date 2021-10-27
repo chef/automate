@@ -418,6 +418,17 @@ service ApplicationsService {
 			tags: "retention";
 		};
   }
+
+  rpc UpdateTelemetryReported(UpdateTelemetryReportedRequest) returns (UpdateTelemetryReportedResponse) {
+		option (google.api.http) = {
+			put: "/api/v0/applications/telemetry/services/count/updated"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
 }
 
 
@@ -764,4 +775,12 @@ message HealthCheckResult {
   string stdout = 1;
   string stderr = 2;
   int32 exit_status = 3;
+}
+
+message UpdateTelemetryReportedRequest {
+	// last application service telemetry reported date
+	string last_telemetry_reported_at = 1;
+}
+
+message UpdateTelemetryReportedResponse {
 }
