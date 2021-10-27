@@ -14,7 +14,7 @@ type Telemetry struct {
 	CreatedAt               time.Time `db:"created_at" json:"created_at"`
 }
 
-//UpdateLastTelemetryReported Upsert the last client run telemetry reported date in postgres
+//UpdateLastTelemetryReported Upsert the last application service telemetry reported date in postgres
 func (pg *Postgres) UpdateTelemetryReported(ctx context.Context, lastTelemetryReportedTime string) error {
 
 	err := Transact(pg, func(tx *DBTrans) error {
