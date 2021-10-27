@@ -42,6 +42,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public per_page = 1;
   public total: number;
+  public searchArrayLength: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -132,6 +133,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       this.groupList = list;
     }
     this.searching = false;
+    this.searchArrayLength = this.groupList.length;
   }
 
   onChangePage($event: { page: number; pageOfItems: Array<any> }) {
