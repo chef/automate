@@ -122,5 +122,3 @@ The **Elasticsearch** and **PostgreSQL** database instances act as an automated 
 Disaster Recovery (DR) is a comprehensive plan for recovering critical operations and systems after catastrophic events. Chef Automate HA focuses on serious but more typical failures, such as a failing component or server. A DR plan may cope with the loss of an entire region.
 
 Chef Automate HA promotes the DR cluster through regular backup and restores measures syncing the data from the production cluster to the DR cluster. Typically, these two clusters are located in different data centers or cloud provider regions enabling a production environment in a short period with minimal data loss.
-
-# Topology (Details on components- introduction and details around that) - pending - needed inputs from Eng. team
