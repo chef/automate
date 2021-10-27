@@ -135,12 +135,11 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   }
 
   onChangePage($event: { page: number; pageOfItems: Array<any> }) {
-    this.pageOfItems = $event.pageOfItems; 
+    this.pageOfItems = $event.pageOfItems;
     this.currentPage = $event.page;
   }
 
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
-    this.searching = true;
     this.currentPage = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
   }

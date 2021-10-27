@@ -54,8 +54,10 @@
 
   .mat-option {
     border-bottom: 1px solid $chef-grey;
+
     &:last-child {
       border-bottom: none;
     }
+
   }
 }

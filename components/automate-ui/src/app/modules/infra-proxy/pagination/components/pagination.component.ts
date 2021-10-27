@@ -36,12 +36,16 @@ export class PaginationComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // reset page if items array has changed
-    // if (changes.items && changes.items.currentValue !== changes.items.previousValue) {
-    //   this.setPage(this.initialPage);
-    // }
+    if (changes.items && changes.items.currentValue !== changes.items.previousValue) {
+      this.setPage(this.initialPage);
+    }
+
+    // reset page if page Index has changed
     if (changes.pageIndex && changes.pageIndex.currentValue !== changes.pageIndex.previousValue) {
       this.setPage(changes.pageIndex.currentValue);
     }
+
+    // reset page if page size has changed
     if (changes.pageSize && changes.pageSize.currentValue !== changes.pageSize.previousValue) {
       this.pageSize = changes.pageSize.currentValue;
       this.setPage(this.initialPage);
@@ -49,17 +53,19 @@ export class PaginationComponent implements OnInit, OnChanges {
   }
 
   setPage(page: number) {
-    // get new pager object for specified page
-    this.pager = paginate(this.items.length, page, this.pageSize, this.maxPages);
+    if (this.items) {
+      // get new pager object for specified page
+      this.pager = paginate(this.items.length, page, this.pageSize, this.maxPages);
 
-    // get new page of items from items array
-    let pageEvent = {
-      page,
-      pageSize : this.pageSize,
-      pageOfItems : this.items.slice(this.pager.startIndex, this.pager.endIndex + 1)
-    };
+      // get new page of items from items array
+      const pageEvent = {
+        page,
+        pageSize : this.pageSize,
+        pageOfItems : this.items.slice(this.pager.startIndex, this.pager.endIndex + 1)
+      };
 
-    // call change page function in parent component
-    this.changePage.emit(pageEvent);
+      // call change page function in parent component
+      this.changePage.emit(pageEvent);
+    }
   }
 }

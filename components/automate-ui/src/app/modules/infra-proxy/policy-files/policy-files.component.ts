@@ -42,7 +42,8 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public per_page = 100;
   public total: number;
-  
+  public searchArraylength: number;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -92,7 +93,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
 
   onChangePage($event: { page: number; pageOfItems: Array<any> }) {
     // update current page of items
-    this.pageOfItems = $event.pageOfItems; 
+    this.pageOfItems = $event.pageOfItems;
     this.currentPage = $event.page;
   }
 
@@ -115,6 +116,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
       });
     }
     this.searching = false;
+    this.searchArraylength = this.searchArr.length;
   }
 
   public startpolicyFilesDelete(policyFile: PolicyFile): void {
@@ -136,7 +138,6 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   }
 
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
-    this.searching = true;
     this.currentPage = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
   }
