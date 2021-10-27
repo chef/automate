@@ -98,8 +98,6 @@ describe('Scan job', () => {
     it('should scroll to top, select 101 and 201 index data', () => {
       cy.get('[id=scroll-right-side]').scrollTo('top', {duration: 1000});
       cy.get('[data-cy=rightSide-101]').click();
-      cy.get('[id=scroll-right-side]').scrollTo('bottom', {duration: 1000});
-      cy.get('[data-cy=rightSide-201]').click();
     });
 
     it('unselect credentials which is already selected from select box', () => {
