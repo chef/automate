@@ -24,7 +24,7 @@ docker_run() {
     if [ -z "$image" ]; then
         image="chefes/a2-integration:latest"
     fi
-    echo "........$HOST_PWD"
+    echo "...........--------->>>>>>>$HOST_PWD"
     local docker_run_args=(
             "--detach"
             "--env" "HOST_PWD"
@@ -41,7 +41,7 @@ docker_run() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "$A2_WORK_DIR"
+            "--volume" "$HOST_PWD:$A2_WORK_DIR"
             "--workdir" "$A2_WORK_DIR"
     )
 
