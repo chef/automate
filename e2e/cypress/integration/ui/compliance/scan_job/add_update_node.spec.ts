@@ -32,7 +32,7 @@ describe('Scan job', () => {
       body: {}
       }).then((secrectSearchResp) => {
         if (!(secrectSearchResp.body.total >= 300)) {
-          for (let i = 0; i < 600; i++) {
+          for (let i = 0; i < 220; i++) {
             cy.request({
               auth: { bearer: adminIdToken },
               method: 'POST',
