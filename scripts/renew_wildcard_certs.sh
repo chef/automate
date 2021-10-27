@@ -4,8 +4,9 @@ CERT_DIR="$(pwd)/etc/letsencrypt/live/cd.chef.co/"
 
 docker run -p 80:80 -p 443:443 \
            -it --rm --name certbot \
-           -e AWS_CONFIG_FILE=/.aws/config \
-           -v "/var/lib/buildkite-agent/.aws:/.aws" \
+           -e AWS_CONFIG_FILE=/root/.aws/config \
+           -e AWS_PROFILE=chef-cd \
+           -v "/var/lib/buildkite-agent/.aws:/root/.aws" \
            -v "$(pwd)/etc/letsencrypt:/etc/letsencrypt" \
            -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
            certbot/dns-route53 certonly \
