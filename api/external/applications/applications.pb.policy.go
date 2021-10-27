@@ -103,4 +103,17 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/RunDeleteDisconnectedServicesJob", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/api/v0/retention/service_groups/delete_disconnected_services/run", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateTelemetryReported", "iam:introspect", "iam:introspect:getAll", "PUT", "/api/v0/applications/telemetry/services/count/updated", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*UpdateTelemetryReportedRequest); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "last_telemetry_reported_at":
+					return m.LastTelemetryReportedAt
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }
