@@ -82,9 +82,9 @@ else
     docker pull chefes/centos-systemd:latest
     docker pull chefes/a2-integration:latest
 fi
-
+pwd
 workdir="/go/src/github.com/chef/automate"
-
+echo ".......------PWD------> $PWD"
 docker_run_args=(
         "--detach"
         "--env" "CI"
@@ -126,6 +126,7 @@ docker_run_args=(
         "--env" "DOCKER_HOST=unix:///docker.sock"
         "--workdir" "$workdir"
 )
+echo ".......------------> $PWD"
 echo ".......------------> $HOST_PWD"
 if [ $CI = "true" ]
 then
