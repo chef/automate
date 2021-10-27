@@ -19,10 +19,12 @@ import paginate from '../pagination.util';
 export class PaginationComponent implements OnInit, OnChanges {
   @Input() items: Array<any>;
   @Input() initialPage = 1;
-  @Input() pageSize = 9;
+  @Input() pageSize: number;
   @Input() maxPages = 9;
+  @Input() pageIndex: number;
   @Output() changePage = new EventEmitter<any>(true);
 
+  public pageOfItems: Array<any>;
   pager: any = {};
 
   ngOnInit() {
@@ -34,7 +36,14 @@ export class PaginationComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // reset page if items array has changed
-    if (changes.items.currentValue !== changes.items.previousValue) {
+    // if (changes.items && changes.items.currentValue !== changes.items.previousValue) {
+    //   this.setPage(this.initialPage);
+    // }
+    if (changes.pageIndex && changes.pageIndex.currentValue !== changes.pageIndex.previousValue) {
+      this.setPage(changes.pageIndex.currentValue);
+    }
+    if (changes.pageSize && changes.pageSize.currentValue !== changes.pageSize.previousValue) {
+      this.pageSize = changes.pageSize.currentValue;
       this.setPage(this.initialPage);
     }
   }
@@ -44,9 +53,13 @@ export class PaginationComponent implements OnInit, OnChanges {
     this.pager = paginate(this.items.length, page, this.pageSize, this.maxPages);
 
     // get new page of items from items array
-    const pageOfItems = this.items.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    let pageEvent = {
+      page,
+      pageSize : this.pageSize,
+      pageOfItems : this.items.slice(this.pager.startIndex, this.pager.endIndex + 1)
+    };
 
     // call change page function in parent component
-    this.changePage.emit(pageOfItems);
+    this.changePage.emit(pageEvent);
   }
 }
