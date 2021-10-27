@@ -139,6 +139,5 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.searching = true;
     this.currentPage = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
-    // this.getPolicyFiles();
   }
 }
