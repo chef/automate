@@ -80,10 +80,12 @@ func (db *Postgres) GetTelemetry(ctx context.Context) (storage.Telemetry, error)
 func (db *Postgres) GetUniqueServicesFromPostgres(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
 	var count int64
 	var err error
+
+	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02 15:04:05")
 	if daysSinceLastPost > 15 {
-		count, err = db.DbMap.SelectInt(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between $1 AND now()::date - 1`, lastTelemetryReportedAt)
+		count, err = db.DbMap.SelectInt(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between $1 AND now()::date`, lastTelemetryReportedDate)
 	} else {
-		count, err = db.DbMap.SelectInt(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between now()::date - 16 AND now()::date - 1`)
+		count, err = db.DbMap.SelectInt(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at between now()::date - 16 AND now()::date`)
 	}
 	return count, err
 }
