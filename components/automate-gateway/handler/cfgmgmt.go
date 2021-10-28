@@ -661,7 +661,7 @@ func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *cfgReq
 	return &cfgRes.UpdateTelemetryReportedResponse{}, nil
 }
 
-//GetNodesUsageCount
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
 	log.WithFields(log.Fields{
 		"request": req.String(),
