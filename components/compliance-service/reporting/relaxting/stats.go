@@ -298,8 +298,10 @@ func (backend ES2Backend) GetUniqueNodesCount(daysSinceLastPost int64, lastTelem
 	var rangeQueryThreshold *elastic.RangeQuery
 	t := time.Now().AddDate(0, 0, -1)
 	yesterdayEODTimeStamp := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, t.Nanosecond(), t.Location())
+	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
+
 	if daysSinceLastPost > 15 {
-		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedAt).To(yesterdayEODTimeStamp)
+		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(lastTelemetryReportedDate).To(yesterdayEODTimeStamp)
 	} else {
 		startTimeStamp := yesterdayEODTimeStamp.AddDate(0, 0, -16)
 		rangeQueryThreshold = elastic.NewRangeQuery("last_run").From(startTimeStamp).To(yesterdayEODTimeStamp)
