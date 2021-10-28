@@ -27,9 +27,30 @@ type Backend struct {
 	client      *elastic.Client
 }
 
-func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.NodeRunDateInfo) error {
-	mapping := mappings.NodeState
-	err := es.upsertDataWithID(ctx, mapping, nodeInfo.NodeID, nodeInfo)
+// This method will support adding a document with a specified id
+func (es *Backend) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+	runDateTimeAsString := runDateTime.Format(time.RFC3339)
+
+	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
+
+	_, err := es.client.Update().
+		Index(mapping.Index).
+		Type(mapping.Type).
+		Id(id).
+		Script(script).
+		Upsert(map[string]interface{}{
+			"node_uuid": id,
+			"first_run": runDateTime,
+			"last_run":  runDateTime,
+		}).
+		Do(ctx)
+
+	return err
+}
+
+func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.Run) error {
+	mapping := mappings.NodeRunInfo
+	err := es.upsertComplianceRunInfo(ctx, mapping, nodeInfo.EntityUuid, nodeInfo.EndTime)
 	return err
 	panic("implement me")
 }

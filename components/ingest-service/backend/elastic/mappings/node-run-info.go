@@ -16,8 +16,8 @@ var runInfoProps = `
       }
 `
 
-// ConfigManagementRunInfo mapping used to create the `config-mgmt-run-info index
-var ConfigManagementRunInfo = Mapping{
+// NodeRunInfo mapping used to create the `config-mgmt-run-info index
+var NodeRunInfo = Mapping{
 	Index:      IndexNameNodeRunInfo,
 	Type:       DocType,
 	Timeseries: false,

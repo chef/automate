@@ -25,7 +25,7 @@ type Client interface {
 	// @param (context, UTC time, data)
 	InsertNodeAttribute(context.Context, NodeAttribute) error
 	// @param (context, UTC time)
-	InsertNodeRunDateInfo(context.Context, NodeRunDateInfo) error
+	InsertNodeRunDateInfo(context.Context, Run) error
 	// @param (context, threshold)
 	MarkNodesMissing(context.Context, string) ([]string, error)
 	// @param (context, threshold)

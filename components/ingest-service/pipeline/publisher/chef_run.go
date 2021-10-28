@@ -148,22 +148,3 @@ func insertNodeAttribute(msg message.ChefRun, client backend.Client) <-chan erro
 	}()
 	return out
 }
-
-func insertNodeInfo(msg message.ChefRun, client backend.Client) <-chan error {
-	out := make(chan error)
-	go func() {
-		log.WithFields(log.Fields{
-			"entity_uuid": msg.NodeRunDateInfo.NodeID,
-		}).Info("IngestingNode Run Date Info")
-		// Ingest NodeState
-		err := client.InsertNodeRunDateInfo(msg.Ctx, msg.NodeRunDateInfo)
-		if err != nil {
-			log.Errorf("Error inserting Node run date object: %s", err)
-			out <- err
-		} else {
-			out <- nil
-		}
-		close(out)
-	}()
-	return out
-}
