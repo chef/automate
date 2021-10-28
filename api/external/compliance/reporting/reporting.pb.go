@@ -4898,7 +4898,7 @@ type ReportingServiceClient interface {
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
@@ -4926,7 +4926,7 @@ type ReportingServiceClient interface {
 	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	//Not limited to 10k results.
+	//Max return payload size is 4MB.
 	//
 	//Authorization Action:
 	//```
@@ -5031,7 +5031,7 @@ type ReportingServiceClient interface {
 	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
@@ -5235,7 +5235,7 @@ type ReportingServiceServer interface {
 	//
 	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	//Supports pagination, filtering, and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, latest_report.end_time, latest_report.status, node_name
 	//
@@ -5263,7 +5263,7 @@ type ReportingServiceServer interface {
 	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
-	//Not limited to 10k results.
+	//Max return payload size is 4MB.
 	//
 	//Authorization Action:
 	//```
@@ -5368,7 +5368,7 @@ type ReportingServiceServer interface {
 	//List Nodes
 	//
 	//List all nodes, with optional filtering, pagination, and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//| Sort parameter | Sort value |
 	//| --- | --- |
