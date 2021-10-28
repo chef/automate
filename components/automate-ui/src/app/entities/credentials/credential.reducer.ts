@@ -17,8 +17,10 @@ export const InitialState: CredentialState = credentialAdapter.getInitialState({
   total: 0
 });
 
-export function credentialReducer(state: CredentialState = InitialState,
-                                        action: CredentialActions): CredentialState {
+export function credentialReducer(
+  state: CredentialState = InitialState,
+  action: CredentialActions): CredentialState {
+
   switch (action.type) {
 
     case CredentialActionTypes.SEARCH:
@@ -27,7 +29,7 @@ export function credentialReducer(state: CredentialState = InitialState,
     case CredentialActionTypes.SEARCH_SUCCESS:
       const total = set('total', action.payload.total, state);
       return set('status', EntityStatus.loadingSuccess,
-                 credentialAdapter.setAll(action.payload.secrets, total));
+        credentialAdapter.setAll(action.payload.secrets, total));
 
     case CredentialActionTypes.SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);

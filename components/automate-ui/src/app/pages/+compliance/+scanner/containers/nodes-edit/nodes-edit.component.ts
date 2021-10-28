@@ -147,6 +147,7 @@ export class NodesEditComponent implements OnInit, OnDestroy {
     });
     this.store.pipe(
       select(credStatus),
+      takeUntil(this.isDestroyed),
       filter(status => !pending(status)))
       .subscribe(response => {
         if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {

@@ -99,6 +99,14 @@ export class SelectboxComponent implements OnInit, OnChanges {
     }
   }
 
+
+  onClickData (data, side, type) {
+    const avoidDuplication = side === 'left' ? 'right' : 'left';
+    if (this.moveLeftOrRight !== avoidDuplication) {
+      this.selectItem(data, side, type);
+    }
+  }
+
   highlightElement(listData: any): boolean {
     return this.selectedListDataToMove.includes(listData);
 }
