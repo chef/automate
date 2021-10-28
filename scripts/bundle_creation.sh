@@ -96,12 +96,12 @@ airgap_bundle_create() {
 
     if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
     then
+          # getting packges info from airgap bundle       
+          ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
           tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
-          # getting packges info from airgap bundle
-          ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${BACKENDAIB} > ${PACKAGES_INFO}
           outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
           backend_name=$(basename "${outfile_backend}")
           echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
@@ -127,15 +127,15 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  $(echo "pgleaderchk_pkg_ident =$(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "postgresql_pkg_ident =$(grep "automate-backend-postgresql" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "proxy_pkg_ident = $(grep "automate-backend-haproxy" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "journalbeat_pkg_ident = $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "metricbeat_pkg_ident = $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "kibana_pkg_ident = $(grep "automate-backend-kibana" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "elasticsearch_pkg_ident = $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "elasticsidecar_pkg_ident = $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})" | sed 's/,*$//g')
-  $(echo "curator_pkg_ident = $(grep "automate-backend-curator" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "pgleaderchk_pkg_ident = \" $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})\""
+  $(echo "postgresql_pkg_ident = \" $(grep "automate-backend-postgresql" ${PACKAGES_INFO})\"" 
+  $(echo "proxy_pkg_ident = \" $(grep "automate-backend-haproxy" ${PACKAGES_INFO})\""
+  $(echo "journalbeat_pkg_ident = \" $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})\""
+  $(echo "metricbeat_pkg_ident = \" $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})\""
+  $(echo "kibana_pkg_ident = \" $(grep "automate-backend-kibana" ${PACKAGES_INFO})\""
+  $(echo "elasticsearch_pkg_ident = \" $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})\""
+  $(echo "elasticsidecar_pkg_ident = \" $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})\""
+  $(echo "curator_pkg_ident = \" $(grep "automate-backend-curator" ${PACKAGES_INFO})\""
 EOL
 }
 
