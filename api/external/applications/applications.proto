@@ -419,6 +419,16 @@ service ApplicationsService {
 		};
   }
 
+
+  /*
+  UpdateTelemetryReported
+  update the last reported talemetry date for the application service.
+  Authorization Action:
+  ```
+  iam:introspect:getAll
+  ```
+  */
+
   rpc UpdateTelemetryReported(UpdateTelemetryReportedRequest) returns (UpdateTelemetryReportedResponse) {
 		option (google.api.http) = {
 			put: "/api/v0/applications/telemetry/services/count/updated"
@@ -429,6 +439,7 @@ service ApplicationsService {
 			action: "iam:introspect:getAll"
 		};
 	};
+
   /*
   GetservicesUsageCount
 
@@ -441,7 +452,6 @@ service ApplicationsService {
   iam:introspect:getAll
   ```
   */
-
 
   rpc GetServicesUsageCount(GetServicesUsageCountRequest) returns (GetServicesUsageCountResponse) {
     option (google.api.http) = {

@@ -19,7 +19,6 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/ingester"
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
@@ -617,22 +616,9 @@ func (s *ApplicationsServer) UpdateTelemetryReported(ctx context.Context, req *a
 //GetServicesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
 	e *applications.GetServicesUsageCountRequest) (*applications.GetServicesUsageCountResponse, error) {
-	// var count int64
-	// var lastTelemetryReportedAt time.Time
-	// // Get last telemetry reported date from postgres
-	// telemetry, err := app.storageClient.GetTelemetry(ctx)
-
-	// uniqueCount, err := app.storageClient.GetUniqueServicesFromPostgres(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &applications.GetServicesUsageCountResponse{
-	// 	TotalServices: uniqueCount,
-	// }, nil
 
 	var count int64
-	var lastTelemetryReportedAt time.Time
+	// var lastTelemetryReportedAt time.Time
 	// Get last telemetry reported date from postgres
 	telemetry, err := app.storageClient.GetTelemetry(ctx)
 	if err != nil {
@@ -642,11 +628,11 @@ func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
 	if telemetry.LastTelemetryReportedAt.IsZero() {
 		daysSinceLastPost = 15
 	} else {
-		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
+		daysSinceLastPost = DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
+
 	if daysSinceLastPost > 0 {
-		// count, err := app.storageClient.GetUniqueServicesFromPostgres(ctx)
-		count, err = app.storageClient.GetUniqueServicesFromPostgres(int64(daysSinceLastPost), lastTelemetryReportedAt)
+		count, err = app.storageClient.GetUniqueServicesFromPostgres(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -654,4 +640,19 @@ func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
 	return &applications.GetServicesUsageCountResponse{
 		TotalServices: count,
 	}, nil
+}
+
+// DaysBetween get the calendar days between two timestamp
+func DaysBetween(fromTime, toTime time.Time) int {
+	if fromTime.After(toTime) {
+		fromTime, toTime = toTime, fromTime
+	}
+
+	days := -fromTime.YearDay()
+	for year := fromTime.Year(); year < toTime.Year(); year++ {
+		days += time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay()
+	}
+	days += toTime.YearDay()
+
+	return days
 }
