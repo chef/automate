@@ -1,6 +1,6 @@
 pkg_name="automate-backend-ctl"
 pkg_origin="chef"
-pkg_version="1.0.28"
+pkg_version="0.1.0"
 pkg_maintainer="The Chef Server Maintainers <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_description="Provides automate-backend-ctl for Automate HA Backend Services"

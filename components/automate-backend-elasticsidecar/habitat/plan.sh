@@ -5,7 +5,7 @@ pkg_origin="chef"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
-pkg_version="1.0.28"
+pkg_version="0.1.0"
 pkg_upstream_url="http://github.com/chef/a2-ha-backend/components/automate-backend-elasticsidecar"
 pkg_deps=(
   core/bash

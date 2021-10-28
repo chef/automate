@@ -1,7 +1,7 @@
 pkg_name=automate-backend-deployment
 pkg_description="A wrapper package for setting up a deployment workstation for the A2 HA Backend."
 pkg_origin=chef
-pkg_version="1.0.28"
+pkg_version="0.1.0"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_deps=(
