@@ -26,7 +26,8 @@ func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *reques
 
 //GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
-	var count int64 // Get last telemetry reported date from postgres
+	var count int64
+	// Get last telemetry reported date from postgres
 	telemetry, err := s.pg.GetTelemetry(ctx)
 	if err != nil {
 		return nil, err

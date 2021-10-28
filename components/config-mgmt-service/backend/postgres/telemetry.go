@@ -66,7 +66,7 @@ func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedA
 	return nil
 }
 
-// Get last client run telemetry reported timestamp
+// GetTelemetry Get last client run telemetry reported timestamp
 func (pg *Postgres) GetTelemetry(ctx context.Context) (Telemetry, error) {
 	var t Telemetry
 	rows, err := pg.db.Query(`SELECT id,last_telemetry_reported_at, created_at from telemetry`)
