@@ -189,3 +189,7 @@ func (m Backend) GetNodeRunsDailyStatusTimeSeries(nodeID string, startTime,
 func (es Backend) GetLatestRunRolloutBreakdownCounts() (*backend.NodeSegmentRolloutProgress, error) {
 	return nil, nil
 }
+
+func (es Backend) GetUniqueNodesCount(int64, time.Time) (int64, error) {
+	return 0, nil
+}

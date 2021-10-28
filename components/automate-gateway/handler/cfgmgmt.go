@@ -9,7 +9,9 @@ import (
 
 	// Cfgmgmt Request/Response definitions
 	cfgService "github.com/chef/automate/api/external/cfgmgmt"
+	"github.com/chef/automate/api/external/cfgmgmt/request"
 	cfgReq "github.com/chef/automate/api/external/cfgmgmt/request"
+	"github.com/chef/automate/api/external/cfgmgmt/response"
 	cfgRes "github.com/chef/automate/api/external/cfgmgmt/response"
 
 	// Shared Response/Request definitions
@@ -657,4 +659,24 @@ func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *cfgReq
 	}
 
 	return &cfgRes.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetNodesUsageCount
+func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.GetNodesUsageCountRequest{}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodesUsageCount(ctx, cfgMgmtRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfgRes.GetNodesUsageCountResponse{
+		DaysSinceLastPost: cfgmgmtResponse.GetDaysSinceLastPost(),
+		NodeCnt:           cfgmgmtResponse.GetNodeCnt(),
+	}, nil
 }

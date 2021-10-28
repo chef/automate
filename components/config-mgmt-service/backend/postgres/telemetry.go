@@ -49,7 +49,7 @@ func (pg *Postgres) UpdateTelemetryReported(ctx context.Context, req *request.Up
 	return nil
 }
 
-// StoreTelemetry Store last compliance telemetry reported timestamp
+// StoreTelemetry Store last client run telemetry reported timestamp
 func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedAt time.Time) error {
 	telArr := make([]interface{}, 0)
 
@@ -64,4 +64,20 @@ func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedA
 		return err
 	}
 	return nil
+}
+
+// Get last client run telemetry reported timestamp
+func (pg *Postgres) GetTelemetry(ctx context.Context) (Telemetry, error) {
+	var t Telemetry
+	rows, err := pg.db.Query(`SELECT id,last_telemetry_reported_at, created_at from telemetry`)
+	if err != nil {
+		return Telemetry{}, err
+	}
+	for rows.Next() {
+		err = rows.Scan(&t.ID, &t.LastTelemetryReportedAt, &t.CreatedAt)
+		if err != nil {
+			return Telemetry{}, err
+		}
+	}
+	return t, nil
 }
