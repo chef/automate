@@ -62,7 +62,6 @@ export class NodesAddComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.scrollLoadingValue = false;
     this.searchData = '';
-    // this.availablelist = [{name: 'a', type: 2}];
     this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.form = this.createForm();
 
