@@ -17,7 +17,6 @@ import { AccordionComponent } from '../../../page-components/accordion/accordion
 import { AccordionItemComponent } from '../../../page-components/accordion/accordion-item/accordion-item.component';
 import { SelectboxComponent } from '../../../page-components/selectbox/selectbox.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-// import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   imports: [
@@ -28,7 +27,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     RouterModule,
     ScannerRoutingModule,
     InfiniteScrollModule
-    // MatSelectModule
   ],
   providers: [
     ChefStatusIconPipe,
