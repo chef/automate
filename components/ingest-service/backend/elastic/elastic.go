@@ -52,7 +52,6 @@ func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.R
 	mapping := mappings.NodeRunInfo
 	err := es.upsertComplianceRunInfo(ctx, mapping, nodeInfo.EntityUuid, nodeInfo.EndTime)
 	return err
-	panic("implement me")
 }
 
 func New(esURL string) (*Backend, error) {
