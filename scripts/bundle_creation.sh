@@ -23,12 +23,12 @@ export BUNDLE_TYPE=
 export BACKENDAIB_TFVARS=
 export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
-export MANIFEST_PATH="manifest.json"
 TEMP_DIR=/tmp
 export TEMP_BUNDLE_FILE=$TEMP_DIR/bundle.aib.$$.$RANDOM
 export TEMP_TAR_FILE=$TEMP_DIR/my.aib.$$.$RANDOM
 export MANIFEST_TFVARS="terraform/a2ha_manifest.auto.tfvars"
 export BACKENDAIB=
+export PACKAGES_INFO="/tmp/packages.info"
 # Helper Functions
 echo_env() {
     echo "=============================================="
@@ -100,6 +100,8 @@ airgap_bundle_create() {
           # this removes the magic header from the .aib
           # making it usable with the tar command
           rm -f ${TEMP_TAR_FILE}    
+          # getting packges info from airgap bundle
+          ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${BACKENDAIB} > ${PACKAGES_INFO}
           outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
           backend_name=$(basename "${outfile_backend}")
           echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
@@ -112,11 +114,9 @@ airgap_bundle_create() {
     exit 1
   fi
   
-  if [ -f "${MANIFEST_PATH}" ]; then
+    #Create Manifest auto_tfvars
     create_manifest_auto_tfvars
-  else
-    hardcode_manifest_auto_tfvars
-  fi
+
 }
 
 exec_linux() {
@@ -127,33 +127,18 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  $(echo "pgleaderchk_pkg_ident =$(grep "automate-backend-pgleaderchk" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "postgresql_pkg_ident =$(grep "automate-backend-postgresql" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "proxy_pkg_ident = $(grep "automate-backend-haproxy" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "journalbeat_pkg_ident = $(grep "automate-backend-journalbeat" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "metricbeat_pkg_ident = $(grep "automate-backend-metricbeat" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "kibana_pkg_ident = $(grep "automate-backend-kibana" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "elasticsearch_pkg_ident = $(grep "automate-backend-elasticsearch" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "elasticsidecar_pkg_ident = $(grep "automate-backend-elasticsidecar" ${MANIFEST_PATH})" | sed 's/,*$//g')
-  $(echo "curator_pkg_ident = $(grep "automate-backend-curator" ${MANIFEST_PATH})" | sed 's/,*$//g')
+  $(echo "pgleaderchk_pkg_ident =$(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "postgresql_pkg_ident =$(grep "automate-backend-postgresql" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "proxy_pkg_ident = $(grep "automate-backend-haproxy" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "journalbeat_pkg_ident = $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "metricbeat_pkg_ident = $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "kibana_pkg_ident = $(grep "automate-backend-kibana" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "elasticsearch_pkg_ident = $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "elasticsidecar_pkg_ident = $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})" | sed 's/,*$//g')
+  $(echo "curator_pkg_ident = $(grep "automate-backend-curator" ${PACKAGES_INFO})" | sed 's/,*$//g')
 EOL
 }
 
-hardcode_manifest_auto_tfvars(){
-    # We are hardcoding this value as of now for a2ha_manifest.auto.tfvars, because when we will be moving this in automate repo there will be automate manifest file so 
-   # from that file we will be creating the a2ha_manifest.auto.tfvars like we are doing in elif section 
-    echo "
-    pgleaderchk_pkg_ident    = \"chef/automate-backend-pgleaderchk/1.0.22/20201118194223\"
-    postgresql_pkg_ident     = \"chef/automate-backend-postgresql/1.0.22/20201118194223\"
-    proxy_pkg_ident          = \"chef/automate-backend-haproxy/1.0.22/20201118194223\"
-    journalbeat_pkg_ident    = \"chef/automate-backend-journalbeat/1.0.22/20201118194223\"
-    metricbeat_pkg_ident     = \"chef/automate-backend-metricbeat/1.0.22/20201118194223\"
-    kibana_pkg_ident         = \"chef/automate-backend-kibana/1.0.22/20201118194223\"
-    elasticsearch_pkg_ident  = \"chef/automate-backend-elasticsearch/1.0.22/20201118194201\"
-    elasticsidecar_pkg_ident = \"chef/automate-backend-elasticsidecar/1.0.22/20201118194223\"
-    curator_pkg_ident        = \"chef/automate-backend-curator/1.0.22/20201118193951\"
-   " > ${MANIFEST_TFVARS}
-}
 
 exec_docker() {
   # in Docker mode we hard code various arguments
