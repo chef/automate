@@ -13,6 +13,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
 
 import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/services/user-preferences/user-preferences.actions';
+import { ClientRunsStatsService } from './client-runs-stats/client-runs-stats.service';
 import { ComplianceStatsService } from './compliance-stats/compliance-stats.service';
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
 
@@ -62,7 +63,8 @@ export class TelemetryService {
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>,
-    private complianceStatsService: ComplianceStatsService) {
+    private complianceStatsService: ComplianceStatsService,
+    private clientRunsStatsService: ClientRunsStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
     router.events.subscribe((event) => {
@@ -342,13 +344,7 @@ export class TelemetryService {
       console.log(error);
     }
     try {
-      const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
-        .getComplianceStats();
-      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
-        const ackStats: NodeUsageAckStats = await this
-        .sendUnfilteredStatsToTelemetry(nodeUsageStats);
-        await this.complianceStatsService.sendAcknowledgement(ackStats);
-      }
+      await this.handleTelemetryNodeStats();
     } catch (error) {
       console.log(error);
     }
@@ -374,14 +370,48 @@ export class TelemetryService {
     return promise;
   }
 
-  sendUnfilteredStatsToTelemetry(nodeUsageStats: NodeUsageStats): Promise<NodeUsageAckStats> {
+  async handleTelemetryNodeStats() {
+    let resolver;
+    const promise = new Promise((resolve) => {
+      resolver = resolve;
+    });
+    // compliance stats
+    try {
+      const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
+        .getComplianceStats();
+      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
+        const ackStats: NodeUsageAckStats = await this
+        .sendNodeStatsToTelemetry(nodeUsageStats, 'complianceCountsGlobal');
+        await this.complianceStatsService.sendAcknowledgement(ackStats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    // client runs stats
+    try {
+      const nodeUsageStats: NodeUsageStats = await this.clientRunsStatsService
+        .getClientRunsStats();
+      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
+        const ackStats: NodeUsageAckStats = await this
+        .sendNodeStatsToTelemetry(nodeUsageStats, 'clientRunPureCountGlobal');
+        await this.clientRunsStatsService.sendAcknowledgement(ackStats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    resolver('success');
+    return promise;
+  }
+
+  sendNodeStatsToTelemetry(nodeUsageStats: NodeUsageStats, eventName: string)
+  : Promise<NodeUsageAckStats> {
     let resolver;
     const promise = new Promise<NodeUsageAckStats>((resolve) => {
       resolver = resolve;
     });
     const nodeUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
-      event: 'complianceCountsGlobal',
+      event: eventName,
       properties: { node_cnt: nodeUsageStats.node_cnt }
     }, true).subscribe(() => {
       if (nodeUsageStatsSubscription) {
