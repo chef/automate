@@ -1,5 +1,3 @@
-import { nodejson, uuidv4 } from '../../../support/helpers';
-
 describe('Node manager service ', () => {
 
 let id: any;
@@ -67,17 +65,17 @@ let id: any;
     //   expect(response.body.summary.valid).to.equal(true);
     // });
 
-    cy.uploadFileRequest(
-      'testproxy-0.1.0.tar.gz',
-      'testproxy-0.1.0.tar.gz',
-      'demoFileUploadRequest'
-    );
+    // cy.uploadFileRequest(
+    //   'testproxy-0.1.0.tar.gz',
+    //   'testproxy-0.1.0.tar.gz',
+    //   'demoFileUploadRequest'
+    // );
 
-    // cy.wait(30000)
+    // // cy.wait(30000)
 
-    cy.wait('@demoFileUploadRequest', {timeout: 120000}).then((response) => {
-      expect(response.status).to.eq(200);
-    });
+    // cy.wait('@demoFileUploadRequest', {timeout: 120000}).then((response) => {
+    //   expect(response.status).to.eq(200);
+    // });
   });
 
   it('get manager id', () => {
@@ -92,7 +90,6 @@ let id: any;
   });
 
   it('run scan', () => {
-    cy.wait(10000);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
@@ -125,33 +122,41 @@ let id: any;
     // let month = (dt.getMonth() + 1).toString().padStart(2, "0");
     // let day   = dt.getDate().toString().padStart(2, "0");
     // let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
-    // cy.wait(10000);
-    // cy.request({
-    //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    //   method: 'POST',
-    //   url: 'api/v0/compliance/reporting/stats/summary',
-    //   body: {
-    //     filters: [{
-    //       type: 'job_id',
-    //       values: [id]},
-    //     {
-    //       type: 'start_time',
-    //       values: [`${year}-${month}-${dayPrev}T00:00:00Z`]}, {type: 'end_time', values: [`${year}-${month}-${day}T23:59:59Z`]}]}
-    // }).then((response) => {
-    //   cy.task('log', response.body);
-    //   id = response.body.id;
-    // });
+
+    const endDate = Cypress.moment().utc().startOf('day').add(12, 'hours');
+    const startDate = Cypress.moment(endDate).subtract(10, 'days');
+
+    cy.task('log', endDate);
+    cy.task('log', startDate);
+
+    cy.wait(10000);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: `api/v0/compliance/reporting/reports/id/${nodeId}`,
+      url: 'api/v0/compliance/reporting/stats/summary',
       body: {
-        filters: []
-      }
+        filters: [{
+          type: 'job_id',
+          values: [id]},
+        {
+          type: 'start_time',
+          values: [startDate]}, {type: 'end_time', values: [endDate]}]}
     }).then((response) => {
       cy.task('log', response.body);
       id = response.body.id;
     });
+    // cy.request({
+    //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    //   method: 'POST',
+    //   url: `api/v0/compliance/reporting/reports/id/${nodeId}`,
+    //   body: {
+    //     filters: []
+    //   }
+    // }).then((response) => {
+    //   cy.task('log', response.body);
+    //   id = response.body.id;
+    //   expect(response.body.status).to.eq('passed');
+    // });
   });
 });
 
