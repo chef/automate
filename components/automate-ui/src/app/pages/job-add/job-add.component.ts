@@ -1,5 +1,5 @@
 import { map, distinctUntilChanged, debounceTime, takeUntil} from 'rxjs/operators';
-import { Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
@@ -14,7 +14,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
-import { allManagers, counterVal,  nodestatus,  totalcountNode } from '../../entities/managers/manager.selectors';
+import { allManagers, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
   ManagerSearchFields,
@@ -31,9 +31,6 @@ import {
   nodeSelectionRequiredValidator,
   profileSelectionRequiredValidator
 } from './job-add.validators';
- import { EntityStatus } from 'app/entities/entities';
-// import { cons } from 'fp-ts/lib/ReadonlyArray';
-// import { JobNodesFormComponent } from 'app/page-components/job-nodes-form/job-nodes-form.component';
 
 export enum Step {
   First          = 0,
@@ -47,7 +44,7 @@ export enum Step {
   templateUrl: './job-add.component.html',
   styleUrls: ['./job-add.component.scss']
 })
-export class JobAddComponent implements OnDestroy , OnInit, DoCheck {
+export class JobAddComponent implements OnDestroy , OnInit {
   form: FormGroup;
 
   Step = Step;
@@ -56,20 +53,26 @@ export class JobAddComponent implements OnDestroy , OnInit, DoCheck {
   status$: Observable<Status>;
   managers$: Observable<Manager[]>;
   profiles$: Observable<Profile[]>;
- // @ViewChild(JobNodesFormComponent) createChild: JobNodesFormComponent;
+
 
 
   private isDestroyed = new Subject<boolean>();
   public pagenumber = 1;
   public total: number;
   public scrollCalled = false;
+  public loadMore = false;
   public firstTime = true;
+  public firstTimeOninit = true;
   public managersList : any;
   public managersArray : any;
-  public counter = 0;
+  public counter = 31;
   public tempcounter = 0;
   public appendDataOnscrollLater : boolean;
-public managerId = []
+  public managerId = [];
+  public searchName : [];
+  public nodeArray : [] ;
+  public nodeManagerArray : any;
+  public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -106,60 +109,43 @@ public managerId = []
   }
 
   ngOnInit() {
+    console.log('Inside ngoninit')
      this.store.dispatch(
        new ManagersSearch({
         page: this.pagenumber,
         per_page: 10,
       })
    );
-    this.store.pipe(
-      select(nodestatus),
-      takeUntil(this.isDestroyed))
-      .subscribe(res => {
-         if (res === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
-       // this.managersList.forEach(manager => {
-          // for (const managerId in res) {
-          //   if (managerId === manager.id) {
-          //       if(!(this.managerId.includes(manager.id))) {
-          //         this.managerId.push(managerId)
-          //         this.counter =this.managerId.length;
-          //       }
-          //   }
-          // }
-          this.store.pipe(
-            select(counterVal),
+   console.log('Total value in ngonint',this.total);
+   console.log('Manager array len',this.firstTimeOninit &&  this.managersArray.length < this.total);
+
+     this.store.pipe(
+            select(nodesByManager),
             takeUntil(this.isDestroyed)
           ).subscribe(res => {
-            console.log(res, 'res counter')
-            this.counter = res
-          }
-
-          )
-
-         }
-
-
-      });
+           // console.log(res, 'node by manger val');
+            var counter = 0;
+            this.nodeManagerArray.forEach((manager) => {
+              if(manager.id in res)
+              {
+                if(!res[manager.id].loadingAllTotal) {
+                    counter++;
+                }
+              }
+            });
+            console.log('Counter val in pipe',counter);
+            console.log('managerarray length', this.nodeManagerArray.length);
+            console.log('Total elements',this.total);
+            if(this.nodeManagerArray.length == 10 && counter == 10 ){
+                    console.log('load more in if');
+                    this.loadMore =true;
+      }
+          });
   }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  ngDoCheck() {
-    //  if(this.managersArray.length < this.total && this.counter  === this.managersArray.length && this.appendDataOnscrollLater) {
-    //  console.log("scroll called");
-    //  this.scrollCalled = true;
-    //  console.log('Length of array',this.managersArray.length)
-    //  this.store.dispatch(
-    //   new ManagersSearch({
-    //     page: ++this.pagenumber,
-    //     per_page: 10,
-    //   })
-    // );
-    // this.appendDataOnscrollLater=false;
-    //  }
   }
 
   public firstCalled(flag : boolean) {
@@ -220,18 +206,19 @@ public managerId = []
     this.managers$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(managers => {
+
+        this.nodeManagerArray = managers;
+        console.log('Node manger array listed',this.nodeManagerArray);
         this.managersArray = nodesGroup.controls['managers'] as FormArray;
         if(this.firstTime) {
           console.log("first time called")
            this.managersArray.clear();
            this.pagenumber=1;
-            this.scrollCalled = false;
           this.managersList = managers;
           this.firstTime = false;
         } else {
 
                this.managersList = [...this.managersList, ...managers];
-               this.scrollCalled = false;
           }
 
 
@@ -448,26 +435,131 @@ public managerId = []
     return false;
   }
 
-  onScrollDown() {
-  console.log(this.counter);
-     this.scrollCalled = true;
-    // if(this.managersArray.length < this.total && this.counter  === this.managersArray.length ) {
-     console.log("scroll called");
-     console.log(this.managersArray.length < this.total,'true/false')
-     if(this.managersArray.length < this.total) {
-     console.log('Length of array',this.managersArray.length)
-     this.store.dispatch(
-      new ManagersSearch({
+    onLoadFunc(data) {
+      this.loadMore = false;
+      var payload = {};
+      console.log('Load func called');
+
+     console.log('Length of array',this.managersArray.length);
+    this.searchName = data.search;
+    this.nodeArray = data.nodearray;
+
+    console.log('search name',this.searchName,this.nodeArray);
+
+
+     if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
         page: ++this.pagenumber,
         per_page: 10,
-      })
-    );
-    console.log('pagenumber',this.pagenumber);
-     }
-      else{
-       this.scrollCalled = false;
-     }
+      }));
+    } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeArray,
+            }
+          ],
+          page: ++this.pagenumber,
+          per_page: 10,
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeArray,
+            },
+            {
+              key: "name",
+              values: this.searchName,
+            },
+          ],
+          page: ++this.pagenumber,
+          per_page: 10,
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "name",
+              values: this.searchName,
+            },
+          ],
+          page: ++this.pagenumber,
+          per_page: 10,
+        };
+      }
+
+      console.log("payload is", payload);
+      this.store.dispatch(new ManagersSearch(payload));
     }
+
+
+  }
+
+  clickCallChild(data) {
+   console.log('Click from child called',data);
+   console.log('search',data.search);
+   console.log('array',data.nodearray);
+   this.searchName = data.search;
+   this.nodeArray = data.nodearray;
+   var payload = {};
+
+   this.loadMore = false;
+
+    if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
+         page: 1,
+        per_page: 10,
+      }));
+    } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeArray,
+            }
+          ],
+          page: 1,
+          per_page: 10,
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "manager_type",
+              values: this.nodeArray,
+            },
+            {
+              key: "name",
+              values: this.searchName,
+            },
+          ],
+          page: 1,
+          per_page: 10,
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: "name",
+              values: this.searchName,
+            },
+          ],
+          page: 1,
+          per_page: 10,
+        };
+      }
+
+      console.log("payload is", payload);
+      this.store.dispatch(new ManagersSearch(payload));
+    }
+
+
+}
 
 
 }

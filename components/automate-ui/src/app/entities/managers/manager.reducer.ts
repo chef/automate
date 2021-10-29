@@ -4,8 +4,6 @@ import { set } from 'lodash/fp';
 import { Manager } from './manager.model';
 import { ManagerActionTypes, ManagerActions } from './manager.actions';
 import { EntityStatus } from '../entities';
-
-
 export interface ManagerEntityState extends EntityState<Manager> {
   status: EntityStatus;
   total: number;
@@ -21,7 +19,9 @@ export interface ManagerEntityState extends EntityState<Manager> {
       nodes: string[],
       total: number,
       allTotal: number,
-      loading: boolean
+      loading: boolean,
+      loadingAllTotal: boolean
+
     }
   };
   counter : number;
@@ -47,13 +47,14 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
   switch (action.type) {
 
     case ManagerActionTypes.SEARCH:
-       const searchstatus = set('searchstatus', EntityStatus.loading, state)
+       const searchstatus = set('searchstatus', EntityStatus.loading, state);
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
-      managerEntityAdapter.removeAll(state);
-      let c = state.counter;
-      const counter = set('counter', --c , state)
+
+        console.log('search success called ')
+        managerEntityAdapter.removeAll(state);
+        const counter = set('counter', 0 , state);
       const totalCount = set('total', action.payload.total, counter)
        const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount)
       return set('status', EntityStatus.loadingSuccess,
@@ -62,17 +63,18 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
 
     case ManagerActionTypes.SEARCH_FAILURE:
       let c = state.counter;
-      const counter = set('counter', --c , state)
+      const counter = set('counter', --c , state);
       return set('status', EntityStatus.loadingFailure, counter);
 
     case ManagerActionTypes.SEARCH_FIELDS_SUCCESS: {
       let c = state.counter;
-      const counter = set('counter', --c , state)
+      const counter = set('counter', --c , state);
       const {managerId, field, fields} = action.payload;
       return set(`fieldsByManager.${managerId}.fields.${field}`, fields, counter);
     }
 
     case ManagerActionTypes.GET_NODES: {
+      console.log('get nodes called');
       const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loading`, true, state);
     }
@@ -97,16 +99,22 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.SEARCH_NODES_SUCCESS: {
+      console.log('seach nodes called...');
       const {managerId, nodes} = action.payload;
       return set(`nodesByManager.${managerId}.nodes`, nodes,
         set(`nodesByManager.${managerId}.loading`, false, state));
     }
 
+    case ManagerActionTypes.ALL_NODES: {
+       const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotal`, true, state);
+    }
+
+
     case ManagerActionTypes.ALL_NODES_SUCCESS: {
       const {managerId, total} = action.payload;
-      const nodestatus = set('nodestatus', EntityStatus.loadingSuccess, state)
-      const nodecounter = set('counter', state.counter+1, nodestatus)
-      return set(`nodesByManager.${managerId}.allTotal`, total, nodecounter);
+      const nodestatus = set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
+      return set(`nodesByManager.${managerId}.allTotal`, total, nodestatus);
     }
 
     case ManagerActionTypes.GET:

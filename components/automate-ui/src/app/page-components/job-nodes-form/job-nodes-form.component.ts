@@ -1,27 +1,29 @@
 import { map } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { getOr } from 'lodash/fp';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { ManagerSearchFields, ManagersSearch} from '../../entities/managers/manager.actions';
+import { ManagerSearchFields } from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
 import { Manager } from 'app/entities/managers/manager.model';
-//import { boolean } from 'fp-ts';
-//import { totalcountNode } from '../../entities/managers/manager.selectors';
-//import { ManagerRequests } from 'app/entities/managers/manager.requests';
+
 
 @Component({
   selector: "chef-job-nodes-form",
   templateUrl: "./job-nodes-form.component.html",
   styleUrls: ["./job-nodes-form.component.scss"],
 })
-export class JobNodesFormComponent implements OnInit, OnChanges {
+export class JobNodesFormComponent implements OnInit {
   @Input() form: FormGroup;
   @Input() scrollCalled: any;
+  @Input() loadMore: any;
+  @Input() nodeManagerLength: any;
   @Input() pageNo : any;
   @Output() firstCall = new EventEmitter<boolean>();
+  @Output() load = new EventEmitter<{search:string[], nodearray:string[]}>();
+  @Output() clickCalled = new EventEmitter<{search:string[], nodearray:string[]}>();
 
   managers$: Observable<Manager[]>;
   public automateCheck = false;
@@ -33,6 +35,7 @@ export class JobNodesFormComponent implements OnInit, OnChanges {
   public scrollDistance = 2;
   public scrollingLoader = false;
   public total: number;
+  public searchName: any;
  // private isDestroyed = new Subject<boolean>();
   public NodeManagerArray: Manager[] = [];
   public pagenumber = 1;
@@ -42,28 +45,8 @@ export class JobNodesFormComponent implements OnInit, OnChanges {
     private fb: FormBuilder //private managerRequests: ManagerRequests
   ) {}
 
-  ngOnChanges(): void {
-    console.log(this.scrollCalled, 'changes');
-  }
 
   ngOnInit() {
-
-    //   this.store.dispatch(
-    //   new ManagersSearch({
-    //     page: 1,
-    //     per_page: 10,
-    //   })
-    // );
-    // this.store.select(totalcountNode).pipe(
-    //   takeUntil(this.isDestroyed)
-    // ).subscribe((total) => {
-    //   this.total = total;
-    //   console.log('Total is ',total)
-    // });
-
-    //  console.log('The total arrays is:',this.form.get('managers')['controls']);
-    //  this.pagenumber++;
-console.log(this.scrollCalled, 'oninit');
 
 
   }
@@ -176,60 +159,16 @@ console.log(this.scrollCalled, 'oninit');
   }
 
   search(searchName: string[]) {
+    this.pageNo =1 ;
      this.firstCall.emit(true);
     console.log("Search value is", searchName);
-    var payload = {};
-    if (searchName === null && this.nodeSource.length === 0) {
-      this.store.dispatch(new ManagersSearch({
-         page: 1,
-        per_page: 10,
-      }));
-    } else {
-      if (searchName === null) {
-        payload = {
-          filter_map: [
-            {
-              key: "manager_type",
-              values: this.nodeSource,
-            }
-          ],
-          page: 1,
-          per_page: 10,
-        };
-      } else if (searchName && this.nodeSource.length > 0) {
-        payload = {
-          filter_map: [
-            {
-              key: "manager_type",
-              values: this.nodeSource,
-            },
-            {
-              key: "name",
-              values: searchName,
-            },
-          ],
-        };
-      } else if (searchName && this.nodeSource.length === 0) {
-        payload = {
-          filter_map: [
-            {
-              key: "name",
-              values: searchName,
-            },
-          ],
-          page: 1,
-          per_page: 10,
-        };
-      }
-
-      console.log("payload is", payload);
-      this.store.dispatch(new ManagersSearch(payload));
-    }
+    this.searchName = searchName;
+    this.clickCalled.emit({search:searchName, nodearray:this.nodeSource});
   }
 
   onclickCheckbox(e: any, val: string) {
-    this.pageNo = 1;
-    this.firstCall.emit(true);
+     this.pageNo = 1;
+     this.firstCall.emit(true);
     switch (val) {
       case "automate": {
         this.automateCheck = e.target.checked;
@@ -283,6 +222,21 @@ console.log(this.scrollCalled, 'oninit');
     console.log('value is',value);
     nameArray.push(value);
     this.search(nameArray);
+  }
+
+  loadMoreFunc() {
+    var nodesource = [];
+     this.load.emit({search:null,nodearray:nodesource});
+  }
+
+  showSpinner() {
+    if(this.nodeManagerLength==10 && !this.loadMore) {
+      return true;
+    } else {
+        return false;
+    }
+
+
   }
 
 
