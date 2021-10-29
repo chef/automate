@@ -41,6 +41,7 @@ export class ApplicationStatsService {
       catchError(_err => observableOf('')));
   }
 
+  // tslint:disable-next-line:no-shadowed-variable
   sendAcknowledgement(ApplicationUsageAckStats: ApplicationUsageAckStats) {
     const url = `${APPLICATIONS_STATS_URL}` + '/telemetry/services/count/updated';
     let resolver;

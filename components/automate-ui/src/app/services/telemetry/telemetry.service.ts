@@ -64,7 +64,7 @@ export class TelemetryService {
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>,
-    private applicationStatsService: ApplicationStatsService, 
+    private applicationStatsService: ApplicationStatsService,
     private complianceStatsService: ComplianceStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
@@ -345,24 +345,7 @@ export class TelemetryService {
       console.log(error);
     }
     try {
-      const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
-        .getComplianceStats();
-      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
-        const ackStats: NodeUsageAckStats = await this
-        .sendUnfilteredStatsToTelemetry(nodeUsageStats);
-        await this.complianceStatsService.sendAcknowledgement(ackStats);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    try {
-      const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
-        .getApplicationStats();
-      if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
-        const ApplicationAckStats: ApplicationUsageAckStats = await this
-        .sendUnfilteredApplicationStatsToTelemetry(applicationUsageStats);
-        await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
-      }
+      await this.handleTelemetryNodeStats();
     } catch (error) {
       console.log(error);
     }
@@ -388,7 +371,40 @@ export class TelemetryService {
     return promise;
   }
 
-  sendUnfilteredStatsToTelemetry(nodeUsageStats: NodeUsageStats): Promise<NodeUsageAckStats> {
+  async handleTelemetryNodeStats() {
+    let resolver;
+    const promise = new Promise((resolve) => {
+      resolver = resolve;
+    });
+
+    // compliance stats
+    try {
+      const nodeUsageStats: NodeUsageStats = await this.complianceStatsService
+        .getComplianceStats();
+      if (nodeUsageStats && Number(nodeUsageStats['days_since_last_post']) > 0) {
+        const ackStats: NodeUsageAckStats = await this
+        .sendNodeStatsToTelemetry(nodeUsageStats);
+        await this.complianceStatsService.sendAcknowledgement(ackStats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    // application stats
+    try {
+      const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
+        .getApplicationStats();
+        const ApplicationAckStats: ApplicationUsageAckStats = await this
+        .sendApplicationStatsToTelemetry(applicationUsageStats);
+        await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
+    } catch (error) {
+      console.log(error);
+    }
+    resolver('success');
+    return promise;
+  }
+
+  sendNodeStatsToTelemetry(nodeUsageStats: NodeUsageStats)
+  : Promise<NodeUsageAckStats> {
     let resolver;
     const promise = new Promise<NodeUsageAckStats>((resolve) => {
       resolver = resolve;
@@ -410,7 +426,8 @@ export class TelemetryService {
     return promise;
   }
 
-  sendUnfilteredApplicationStatsToTelemetry(applicationUsageStats: ApplicationUsageStats): Promise<NodeUsageAckStats> {
+  sendApplicationStatsToTelemetry(applicationUsageStats: ApplicationUsageStats)
+  : Promise<NodeUsageAckStats> {
     let resolver;
     const promise = new Promise<ApplicationUsageAckStats>((resolve) => {
       resolver = resolve;
@@ -418,7 +435,7 @@ export class TelemetryService {
     const applicationUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
       event: 'servicesCounts',
-      properties: { node_cnt: applicationUsageStats.total_services }
+      properties: { total_services: applicationUsageStats.total_services }
     }, true).subscribe(() => {
       if (applicationUsageStatsSubscription) {
         applicationUsageStatsSubscription.unsubscribe();
