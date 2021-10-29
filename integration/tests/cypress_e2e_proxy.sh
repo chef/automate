@@ -29,9 +29,9 @@ do_deploy() {
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 
-    yum –y install openssh-server openssh-clients
+    yum –y install openssh-server
     systemctl start sshd
-    chpasswd <<< '123456'
+    chpasswd <<< 'root:123456'
 }
 
 do_test_deploy() {
