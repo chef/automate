@@ -92,7 +92,7 @@ var file_interservice_cfgmgmt_service_cfgmgmt_proto_rawDesc = []byte{
 	0x2f, 0x72, 0x6f, 0x6c, 0x6c, 0x6f, 0x75, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
 	0x2c, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x66,
 	0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2f, 0x74, 0x65,
-	0x6c, 0x65, 0x6d, 0x65, 0x74, 0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xa6, 0x1a,
+	0x6c, 0x65, 0x6d, 0x65, 0x74, 0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xc3, 0x1b,
 	0x0a, 0x0e, 0x43, 0x66, 0x67, 0x4d, 0x67, 0x6d, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
 	0x12, 0x73, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x31,
 	0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64,
@@ -303,11 +303,21 @@ var file_interservice_cfgmgmt_service_cfgmgmt_proto_rawDesc = []byte{
 	0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2e, 0x72, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x54, 0x65, 0x6c,
 	0x65, 0x6d, 0x65, 0x74, 0x72, 0x79, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x65, 0x64, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61,
-	0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x2f, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2f, 0x73, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x9a, 0x01, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x4e, 0x6f,
+	0x64, 0x65, 0x73, 0x55, 0x73, 0x61, 0x67, 0x65, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x3f, 0x2e,
+	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64, 0x6f,
+	0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2e, 0x72, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x73, 0x55, 0x73, 0x61,
+	0x67, 0x65, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x41,
+	0x2e, 0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x64,
+	0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2e, 0x72, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x73, 0x55,
+	0x73, 0x61, 0x67, 0x65, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x2f, 0x63, 0x66, 0x67, 0x6d, 0x67, 0x6d, 0x74, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var file_interservice_cfgmgmt_service_cfgmgmt_proto_goTypes = []interface{}{
@@ -338,28 +348,30 @@ var file_interservice_cfgmgmt_service_cfgmgmt_proto_goTypes = []interface{}{
 	(*request1.CreateRolloutTest)(nil),                   // 24: chef.automate.api.cfgmgmt.request.CreateRolloutTest
 	(*request.PolicyUpdateAction)(nil),                   // 25: chef.automate.domain.cfgmgmt.request.PolicyUpdateAction
 	(*request.UpdateTelemetryReportedRequest)(nil),       // 26: chef.automate.domain.cfgmgmt.request.UpdateTelemetryReportedRequest
-	(*response.VersionInfo)(nil),                         // 27: chef.automate.domain.cfgmgmt.response.VersionInfo
-	(*response.Health)(nil),                              // 28: chef.automate.domain.cfgmgmt.response.Health
-	(*response.NodesCounts)(nil),                         // 29: chef.automate.domain.cfgmgmt.response.NodesCounts
-	(*response.RunsCounts)(nil),                          // 30: chef.automate.domain.cfgmgmt.response.RunsCounts
-	(*response.Run)(nil),                                 // 31: chef.automate.domain.cfgmgmt.response.Run
-	(*_struct.ListValue)(nil),                            // 32: google.protobuf.ListValue
-	(*response.NodeAttribute)(nil),                       // 33: chef.automate.domain.cfgmgmt.response.NodeAttribute
-	(*response.PolicyCookbooks)(nil),                     // 34: chef.automate.domain.cfgmgmt.response.PolicyCookbooks
-	(*response.InventoryNodes)(nil),                      // 35: chef.automate.domain.cfgmgmt.response.InventoryNodes
-	(*response.ExportData)(nil),                          // 36: chef.automate.domain.cfgmgmt.response.ExportData
-	(*response.ReportExportData)(nil),                    // 37: chef.automate.domain.cfgmgmt.response.ReportExportData
-	(*response.CheckInCountsTimeSeries)(nil),             // 38: chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries
-	(*response1.Errors)(nil),                             // 39: chef.automate.api.cfgmgmt.response.Errors
-	(*response.MissingNodeDurationCounts)(nil),           // 40: chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts
-	(*response.NodeMetadataCounts)(nil),                  // 41: chef.automate.domain.cfgmgmt.response.NodeMetadataCounts
-	(*response.NodeRunsDailyStatusTimeSeries)(nil),       // 42: chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries
-	(*response1.Rollout)(nil),                            // 43: chef.automate.api.cfgmgmt.response.Rollout
-	(*response1.Rollouts)(nil),                           // 44: chef.automate.api.cfgmgmt.response.Rollouts
-	(*response1.NodeSegmentsWithRolloutProgress)(nil),    // 45: chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress
-	(*response1.CreateRolloutTest)(nil),                  // 46: chef.automate.api.cfgmgmt.response.CreateRolloutTest
-	(*response.PolicyUpdateAction)(nil),                  // 47: chef.automate.domain.cfgmgmt.response.PolicyUpdateAction
-	(*response.UpdateTelemetryReportedResponse)(nil),     // 48: chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse
+	(*request.GetNodesUsageCountRequest)(nil),            // 27: chef.automate.domain.cfgmgmt.request.GetNodesUsageCountRequest
+	(*response.VersionInfo)(nil),                         // 28: chef.automate.domain.cfgmgmt.response.VersionInfo
+	(*response.Health)(nil),                              // 29: chef.automate.domain.cfgmgmt.response.Health
+	(*response.NodesCounts)(nil),                         // 30: chef.automate.domain.cfgmgmt.response.NodesCounts
+	(*response.RunsCounts)(nil),                          // 31: chef.automate.domain.cfgmgmt.response.RunsCounts
+	(*response.Run)(nil),                                 // 32: chef.automate.domain.cfgmgmt.response.Run
+	(*_struct.ListValue)(nil),                            // 33: google.protobuf.ListValue
+	(*response.NodeAttribute)(nil),                       // 34: chef.automate.domain.cfgmgmt.response.NodeAttribute
+	(*response.PolicyCookbooks)(nil),                     // 35: chef.automate.domain.cfgmgmt.response.PolicyCookbooks
+	(*response.InventoryNodes)(nil),                      // 36: chef.automate.domain.cfgmgmt.response.InventoryNodes
+	(*response.ExportData)(nil),                          // 37: chef.automate.domain.cfgmgmt.response.ExportData
+	(*response.ReportExportData)(nil),                    // 38: chef.automate.domain.cfgmgmt.response.ReportExportData
+	(*response.CheckInCountsTimeSeries)(nil),             // 39: chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries
+	(*response1.Errors)(nil),                             // 40: chef.automate.api.cfgmgmt.response.Errors
+	(*response.MissingNodeDurationCounts)(nil),           // 41: chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts
+	(*response.NodeMetadataCounts)(nil),                  // 42: chef.automate.domain.cfgmgmt.response.NodeMetadataCounts
+	(*response.NodeRunsDailyStatusTimeSeries)(nil),       // 43: chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries
+	(*response1.Rollout)(nil),                            // 44: chef.automate.api.cfgmgmt.response.Rollout
+	(*response1.Rollouts)(nil),                           // 45: chef.automate.api.cfgmgmt.response.Rollouts
+	(*response1.NodeSegmentsWithRolloutProgress)(nil),    // 46: chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress
+	(*response1.CreateRolloutTest)(nil),                  // 47: chef.automate.api.cfgmgmt.response.CreateRolloutTest
+	(*response.PolicyUpdateAction)(nil),                  // 48: chef.automate.domain.cfgmgmt.response.PolicyUpdateAction
+	(*response.UpdateTelemetryReportedResponse)(nil),     // 49: chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse
+	(*response.GetNodesUsageCountResponse)(nil),          // 50: chef.automate.domain.cfgmgmt.response.GetNodesUsageCountResponse
 }
 var file_interservice_cfgmgmt_service_cfgmgmt_proto_depIdxs = []int32{
 	0,  // 0: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetVersion:input_type -> chef.automate.domain.cfgmgmt.request.VersionInfo
@@ -389,35 +401,37 @@ var file_interservice_cfgmgmt_service_cfgmgmt_proto_depIdxs = []int32{
 	24, // 24: chef.automate.domain.cfgmgmt.service.CfgMgmtService.CreateRolloutTest:input_type -> chef.automate.api.cfgmgmt.request.CreateRolloutTest
 	25, // 25: chef.automate.domain.cfgmgmt.service.CfgMgmtService.HandlePolicyUpdateAction:input_type -> chef.automate.domain.cfgmgmt.request.PolicyUpdateAction
 	26, // 26: chef.automate.domain.cfgmgmt.service.CfgMgmtService.UpdateTelemetryReported:input_type -> chef.automate.domain.cfgmgmt.request.UpdateTelemetryReportedRequest
-	27, // 27: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetVersion:output_type -> chef.automate.domain.cfgmgmt.response.VersionInfo
-	28, // 28: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetHealth:output_type -> chef.automate.domain.cfgmgmt.response.Health
-	29, // 29: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodesCounts:output_type -> chef.automate.domain.cfgmgmt.response.NodesCounts
-	30, // 30: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRunsCounts:output_type -> chef.automate.domain.cfgmgmt.response.RunsCounts
-	31, // 31: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeRun:output_type -> chef.automate.domain.cfgmgmt.response.Run
-	32, // 32: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodes:output_type -> google.protobuf.ListValue
-	32, // 33: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRuns:output_type -> google.protobuf.ListValue
-	32, // 34: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetSuggestions:output_type -> google.protobuf.ListValue
-	32, // 35: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetOrganizations:output_type -> google.protobuf.ListValue
-	32, // 36: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetSourceFqdns:output_type -> google.protobuf.ListValue
-	33, // 37: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetAttributes:output_type -> chef.automate.domain.cfgmgmt.response.NodeAttribute
-	34, // 38: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetPolicyCookbooks:output_type -> chef.automate.domain.cfgmgmt.response.PolicyCookbooks
-	35, // 39: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetInventoryNodes:output_type -> chef.automate.domain.cfgmgmt.response.InventoryNodes
-	36, // 40: chef.automate.domain.cfgmgmt.service.CfgMgmtService.NodeExport:output_type -> chef.automate.domain.cfgmgmt.response.ExportData
-	37, // 41: chef.automate.domain.cfgmgmt.service.CfgMgmtService.ReportExport:output_type -> chef.automate.domain.cfgmgmt.response.ReportExportData
-	38, // 42: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetCheckInCountsTimeSeries:output_type -> chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries
-	39, // 43: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetErrors:output_type -> chef.automate.api.cfgmgmt.response.Errors
-	40, // 44: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetMissingNodeDurationCounts:output_type -> chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts
-	41, // 45: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeMetadataCounts:output_type -> chef.automate.domain.cfgmgmt.response.NodeMetadataCounts
-	42, // 46: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeRunsDailyStatusTimeSeries:output_type -> chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries
-	43, // 47: chef.automate.domain.cfgmgmt.service.CfgMgmtService.CreateRollout:output_type -> chef.automate.api.cfgmgmt.response.Rollout
-	44, // 48: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRollouts:output_type -> chef.automate.api.cfgmgmt.response.Rollouts
-	43, // 49: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRolloutById:output_type -> chef.automate.api.cfgmgmt.response.Rollout
-	45, // 50: chef.automate.domain.cfgmgmt.service.CfgMgmtService.ListNodeSegmentsWithRolloutProgress:output_type -> chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress
-	46, // 51: chef.automate.domain.cfgmgmt.service.CfgMgmtService.CreateRolloutTest:output_type -> chef.automate.api.cfgmgmt.response.CreateRolloutTest
-	47, // 52: chef.automate.domain.cfgmgmt.service.CfgMgmtService.HandlePolicyUpdateAction:output_type -> chef.automate.domain.cfgmgmt.response.PolicyUpdateAction
-	48, // 53: chef.automate.domain.cfgmgmt.service.CfgMgmtService.UpdateTelemetryReported:output_type -> chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse
-	27, // [27:54] is the sub-list for method output_type
-	0,  // [0:27] is the sub-list for method input_type
+	27, // 27: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodesUsageCount:input_type -> chef.automate.domain.cfgmgmt.request.GetNodesUsageCountRequest
+	28, // 28: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetVersion:output_type -> chef.automate.domain.cfgmgmt.response.VersionInfo
+	29, // 29: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetHealth:output_type -> chef.automate.domain.cfgmgmt.response.Health
+	30, // 30: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodesCounts:output_type -> chef.automate.domain.cfgmgmt.response.NodesCounts
+	31, // 31: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRunsCounts:output_type -> chef.automate.domain.cfgmgmt.response.RunsCounts
+	32, // 32: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeRun:output_type -> chef.automate.domain.cfgmgmt.response.Run
+	33, // 33: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodes:output_type -> google.protobuf.ListValue
+	33, // 34: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRuns:output_type -> google.protobuf.ListValue
+	33, // 35: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetSuggestions:output_type -> google.protobuf.ListValue
+	33, // 36: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetOrganizations:output_type -> google.protobuf.ListValue
+	33, // 37: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetSourceFqdns:output_type -> google.protobuf.ListValue
+	34, // 38: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetAttributes:output_type -> chef.automate.domain.cfgmgmt.response.NodeAttribute
+	35, // 39: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetPolicyCookbooks:output_type -> chef.automate.domain.cfgmgmt.response.PolicyCookbooks
+	36, // 40: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetInventoryNodes:output_type -> chef.automate.domain.cfgmgmt.response.InventoryNodes
+	37, // 41: chef.automate.domain.cfgmgmt.service.CfgMgmtService.NodeExport:output_type -> chef.automate.domain.cfgmgmt.response.ExportData
+	38, // 42: chef.automate.domain.cfgmgmt.service.CfgMgmtService.ReportExport:output_type -> chef.automate.domain.cfgmgmt.response.ReportExportData
+	39, // 43: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetCheckInCountsTimeSeries:output_type -> chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries
+	40, // 44: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetErrors:output_type -> chef.automate.api.cfgmgmt.response.Errors
+	41, // 45: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetMissingNodeDurationCounts:output_type -> chef.automate.domain.cfgmgmt.response.MissingNodeDurationCounts
+	42, // 46: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeMetadataCounts:output_type -> chef.automate.domain.cfgmgmt.response.NodeMetadataCounts
+	43, // 47: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodeRunsDailyStatusTimeSeries:output_type -> chef.automate.domain.cfgmgmt.response.NodeRunsDailyStatusTimeSeries
+	44, // 48: chef.automate.domain.cfgmgmt.service.CfgMgmtService.CreateRollout:output_type -> chef.automate.api.cfgmgmt.response.Rollout
+	45, // 49: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRollouts:output_type -> chef.automate.api.cfgmgmt.response.Rollouts
+	44, // 50: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetRolloutById:output_type -> chef.automate.api.cfgmgmt.response.Rollout
+	46, // 51: chef.automate.domain.cfgmgmt.service.CfgMgmtService.ListNodeSegmentsWithRolloutProgress:output_type -> chef.automate.api.cfgmgmt.response.NodeSegmentsWithRolloutProgress
+	47, // 52: chef.automate.domain.cfgmgmt.service.CfgMgmtService.CreateRolloutTest:output_type -> chef.automate.api.cfgmgmt.response.CreateRolloutTest
+	48, // 53: chef.automate.domain.cfgmgmt.service.CfgMgmtService.HandlePolicyUpdateAction:output_type -> chef.automate.domain.cfgmgmt.response.PolicyUpdateAction
+	49, // 54: chef.automate.domain.cfgmgmt.service.CfgMgmtService.UpdateTelemetryReported:output_type -> chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse
+	50, // 55: chef.automate.domain.cfgmgmt.service.CfgMgmtService.GetNodesUsageCount:output_type -> chef.automate.domain.cfgmgmt.response.GetNodesUsageCountResponse
+	28, // [28:56] is the sub-list for method output_type
+	0,  // [0:28] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -486,6 +500,7 @@ type CfgMgmtServiceClient interface {
 	CreateRolloutTest(ctx context.Context, in *request1.CreateRolloutTest, opts ...grpc.CallOption) (*response1.CreateRolloutTest, error)
 	HandlePolicyUpdateAction(ctx context.Context, in *request.PolicyUpdateAction, opts ...grpc.CallOption) (*response.PolicyUpdateAction, error)
 	UpdateTelemetryReported(ctx context.Context, in *request.UpdateTelemetryReportedRequest, opts ...grpc.CallOption) (*response.UpdateTelemetryReportedResponse, error)
+	GetNodesUsageCount(ctx context.Context, in *request.GetNodesUsageCountRequest, opts ...grpc.CallOption) (*response.GetNodesUsageCountResponse, error)
 }
 
 type cfgMgmtServiceClient struct {
@@ -785,6 +800,15 @@ func (c *cfgMgmtServiceClient) UpdateTelemetryReported(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *cfgMgmtServiceClient) GetNodesUsageCount(ctx context.Context, in *request.GetNodesUsageCountRequest, opts ...grpc.CallOption) (*response.GetNodesUsageCountResponse, error) {
+	out := new(response.GetNodesUsageCountResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.cfgmgmt.service.CfgMgmtService/GetNodesUsageCount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CfgMgmtServiceServer is the server API for CfgMgmtService service.
 type CfgMgmtServiceServer interface {
 	GetVersion(context.Context, *request.VersionInfo) (*response.VersionInfo, error)
@@ -814,6 +838,7 @@ type CfgMgmtServiceServer interface {
 	CreateRolloutTest(context.Context, *request1.CreateRolloutTest) (*response1.CreateRolloutTest, error)
 	HandlePolicyUpdateAction(context.Context, *request.PolicyUpdateAction) (*response.PolicyUpdateAction, error)
 	UpdateTelemetryReported(context.Context, *request.UpdateTelemetryReportedRequest) (*response.UpdateTelemetryReportedResponse, error)
+	GetNodesUsageCount(context.Context, *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error)
 }
 
 // UnimplementedCfgMgmtServiceServer can be embedded to have forward compatible implementations.
@@ -900,6 +925,9 @@ func (*UnimplementedCfgMgmtServiceServer) HandlePolicyUpdateAction(context.Conte
 }
 func (*UnimplementedCfgMgmtServiceServer) UpdateTelemetryReported(context.Context, *request.UpdateTelemetryReportedRequest) (*response.UpdateTelemetryReportedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTelemetryReported not implemented")
+}
+func (*UnimplementedCfgMgmtServiceServer) GetNodesUsageCount(context.Context, *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodesUsageCount not implemented")
 }
 
 func RegisterCfgMgmtServiceServer(s *grpc.Server, srv CfgMgmtServiceServer) {
@@ -1398,6 +1426,24 @@ func _CfgMgmtService_UpdateTelemetryReported_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CfgMgmtService_GetNodesUsageCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.GetNodesUsageCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CfgMgmtServiceServer).GetNodesUsageCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.cfgmgmt.service.CfgMgmtService/GetNodesUsageCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CfgMgmtServiceServer).GetNodesUsageCount(ctx, req.(*request.GetNodesUsageCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _CfgMgmtService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.cfgmgmt.service.CfgMgmtService",
 	HandlerType: (*CfgMgmtServiceServer)(nil),
@@ -1501,6 +1547,10 @@ var _CfgMgmtService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateTelemetryReported",
 			Handler:    _CfgMgmtService_UpdateTelemetryReported_Handler,
+		},
+		{
+			MethodName: "GetNodesUsageCount",
+			Handler:    _CfgMgmtService_GetNodesUsageCount_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
