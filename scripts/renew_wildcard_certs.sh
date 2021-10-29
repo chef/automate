@@ -15,6 +15,8 @@ docker run -p 80:80 -p 443:443 \
            --register-unsafely-without-email \
            --agree-tos
 
+sudo chown -R $(id -u $USER):$(id -g $USER) "$(pwd)/etc/"
+
 if [[ -f "${CERT_DIR}/fullchain.pem" && -f "${CERT_DIR}/privkey.pem" ]]; then
     echo "Updating certificates in vault..."
     cd ${CERT_DIR}
