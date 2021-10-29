@@ -53,4 +53,5 @@ service CfgMgmtService {
   rpc CreateRolloutTest(chef.automate.api.cfgmgmt.request.CreateRolloutTest) returns (chef.automate.api.cfgmgmt.response.CreateRolloutTest);
   rpc HandlePolicyUpdateAction(chef.automate.domain.cfgmgmt.request.PolicyUpdateAction) returns (chef.automate.domain.cfgmgmt.response.PolicyUpdateAction);
   rpc UpdateTelemetryReported(chef.automate.domain.cfgmgmt.request.UpdateTelemetryReportedRequest) returns (chef.automate.domain.cfgmgmt.response.UpdateTelemetryReportedResponse);
+  rpc GetNodesUsageCount(chef.automate.domain.cfgmgmt.request.GetNodesUsageCountRequest) returns (chef.automate.domain.cfgmgmt.response.GetNodesUsageCountResponse) {};
 }

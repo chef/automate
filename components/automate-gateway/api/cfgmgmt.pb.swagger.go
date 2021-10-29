@@ -957,6 +957,30 @@ func init() {
         ]
       }
     },
+    "/api/v0/cfgmgmt/telemetry/nodes/count": {
+      "get": {
+        "summary": "GetNodesUsageCount",
+        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the day before the current date.\nIf the duration \u003c 15 days --\u003e 15 days\nduration \u003e 15 days --\u003e duration\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ConfigMgmt_GetNodesUsageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.GetNodesUsageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/api/v0/cfgmgmt/telemetry/nodes/count/updated": {
       "put": {
         "summary": "UpdateTelemetryReported\nAcknowledge API  to updates the last client run telemetry reported date in postgres\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
@@ -1283,6 +1307,21 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           },
           "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.GetNodesUsageCountResponse": {
+      "type": "object",
+      "properties": {
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
+        },
+        "node_cnt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unique nodes count in a duration"
         }
       }
     },

@@ -518,4 +518,25 @@ service ConfigMgmt {
 		};
 	};
 
+  /*
+	GetNodesUsageCount
+	
+	Returns the count of unique nodes with lastRun in a given time.
+	The time duration can be between the last time Telemetry data sent and the day before the current date.
+	If the duration < 15 days --> 15 days
+	duration > 15 days --> duration
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc GetNodesUsageCount(cfgmgmt.request.GetNodesUsageCountRequest) returns (cfgmgmt.response.GetNodesUsageCountResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/cfgmgmt/telemetry/nodes/count"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
 }
