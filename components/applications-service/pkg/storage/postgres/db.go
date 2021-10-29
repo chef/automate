@@ -22,6 +22,10 @@ type Postgres struct {
 	*config.Postgres
 }
 
+type DBTrans struct {
+	*gorp.Transaction
+}
+
 // New creates a new Postgres client, connects to the database server and runs
 // the migrations
 func ConnectAndMigrate(dbConf *config.Postgres) (*Postgres, error) {
@@ -81,6 +85,7 @@ func (db *Postgres) connect() error {
 		return errors.Wrapf(err, "Failed to ping database with uri: %s", db.URI)
 	}
 
+	db.DbMap.AddTableWithName(Telemetry{}, "telemetry").SetKeys(false, "id")
 	return nil
 }
 
@@ -94,4 +99,30 @@ func (db *Postgres) initDB() error {
 	}
 
 	return nil
+}
+
+// Transact wraps your calls in a transaction. If the call should fail with an error it will
+// perform a rollback. Otherwise the transaction will be committed.
+func Transact(pg *Postgres, txFunc func(*DBTrans) error) error {
+	trans, err := pg.DbMap.Begin()
+	if err != nil {
+		return errors.Wrap(err, "Unable to start transaction.")
+	}
+	tx := DBTrans{
+		Transaction: trans,
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback() // nolint: errcheck
+		} else {
+			err = tx.Commit()
+			if err != nil {
+				tx.Rollback() // nolint: errcheck
+				err = errors.Wrap(err, "Transaction failed and will be rolled back.")
+			}
+		}
+	}()
+
+	err = txFunc(&tx)
+	return err
 }

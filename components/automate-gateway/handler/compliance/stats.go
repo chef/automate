@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"errors"
 
 	"github.com/chef/automate/api/external/compliance/reporting/stats"
 	statsService "github.com/chef/automate/api/interservice/compliance/stats"
@@ -78,6 +79,9 @@ func (a *Stats) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failu
 func (a *Stats) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
 	inDomain := &statsService.UpdateTelemetryReportedRequest{
 		LastTelemetryReportedAt: in.LastTelemetryReportedAt,
+	}
+	if in.LastTelemetryReportedAt == "" {
+		return nil, errors.New("LastTelemetryReported timestamp is required")
 	}
 	out := &stats.UpdateTelemetryReportedResponse{}
 	f := func() (proto.Message, error) {

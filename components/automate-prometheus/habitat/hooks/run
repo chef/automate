@@ -2,6 +2,9 @@
 
 exec 2>&1
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 exec {{pkgPathFor "core/prometheus"}}/bin/prometheus \
   --config.file={{pkg.svc_config_path}}/prometheus.yml \
   --web.listen-address=":{{cfg.port}}" \

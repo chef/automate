@@ -4,6 +4,9 @@ exec 2>&1
 
 set -e
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 export HOME="{{pkg.svc_data_path}}"
 
 export RUST_LOG="{{cfg.log.level}},{{strJoin cfg.log.scoped_levels ","}}"

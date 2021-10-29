@@ -10,12 +10,14 @@ import "external/cfgmgmt/request/rollouts.proto";
 import "external/cfgmgmt/request/stats.proto";
 import "external/cfgmgmt/request/errors.proto";
 import "external/cfgmgmt/request/root.proto";
+import "external/cfgmgmt/request/telemetry.proto";
 
 import "external/cfgmgmt/response/actions.proto";
 import "external/cfgmgmt/response/nodes.proto";
 import "external/cfgmgmt/response/rollouts.proto";
 import "external/cfgmgmt/response/stats.proto";
 import "external/cfgmgmt/response/errors.proto";
+import "external/cfgmgmt/response/telemetry.proto";
 
 import "external/common/query/parameters.proto";
 import "external/common/version/version.proto";
@@ -35,7 +37,7 @@ service ConfigMgmt {
   Adding a filter makes a list of all nodes that meet the filter criteria.
   Filters for the same field are ORd together, while filters across different fields are ANDed together.
   Supports pagination, filtering (with wildcard support), and sorting.
-	Limited to 10k results.
+	Max return payload size is 4MB, use pagination to fetch remaining data.
 
   Example:
   ```
@@ -497,4 +499,44 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   }
 
+  /*
+	UpdateTelemetryReported
+	Acknowledge API  to updates the last client run telemetry reported date in postgres
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc UpdateTelemetryReported(cfgmgmt.request.UpdateTelemetryReportedRequest) returns (cfgmgmt.response.UpdateTelemetryReportedResponse) {
+		option (google.api.http) = {
+			put: "/api/v0/cfgmgmt/telemetry/nodes/count/updated"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
+
+  /*
+	GetNodesUsageCount
+	
+	Returns the count of unique nodes with lastRun in a given time.
+	The time duration can be between the last time Telemetry data sent and the day before the current date.
+	If the duration < 15 days --> 15 days
+	duration > 15 days --> duration
+	Authorization Action:
+	```
+	iam:introspect:getAll
+	```
+	*/
+	rpc GetNodesUsageCount(cfgmgmt.request.GetNodesUsageCountRequest) returns (cfgmgmt.response.GetNodesUsageCountResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/cfgmgmt/telemetry/nodes/count"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "iam:introspect"
+			action: "iam:introspect:getAll"
+		};
+	};
 }

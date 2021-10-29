@@ -132,6 +132,6 @@ export class JobNodesFormComponent {
   }
 
   supportsFilterByTag(managerType: string): boolean {
-    return ['automate', 'aws-ec2', 'azure-vm'].includes(managerType);
+    return ['automate', 'aws-ec2', 'azure-vm', 'azure-api'].includes(managerType);
   }
 }
