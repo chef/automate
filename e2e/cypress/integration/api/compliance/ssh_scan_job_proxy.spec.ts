@@ -24,7 +24,7 @@ let id: any;
     });
   });
 
-  let nodeId;
+  let nodeId: any;
 
   it('add node', () => {
     cy.request({
@@ -33,7 +33,7 @@ let id: any;
       url: 'api/v0/nodes/bulk-create',
       body: {
         nodes: [{
-          name: 'test-0.0.0.0',
+          name: 'test-localhost',
           manager: 'automate',
           target_config: {
           backend: 'ssh',
@@ -106,7 +106,7 @@ let id: any;
             manager_id: id,
             filters: [{
               key: 'name',
-              values: ['test-0.0.0.0'],
+              values: ['test-localhost'],
               exclude: false
             }]
           }],
@@ -119,24 +119,35 @@ let id: any;
 
   it('wait for scan', () => {
 
-    var dt = new Date();
+    // var dt = new Date();
 
-    let year  = dt.getFullYear();
-    let month = (dt.getMonth() + 1).toString().padStart(2, "0");
-    let day   = dt.getDate().toString().padStart(2, "0");
-    let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
-    cy.wait(10000);
+    // let year  = dt.getFullYear();
+    // let month = (dt.getMonth() + 1).toString().padStart(2, "0");
+    // let day   = dt.getDate().toString().padStart(2, "0");
+    // let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
+    // cy.wait(10000);
+    // cy.request({
+    //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    //   method: 'POST',
+    //   url: 'api/v0/compliance/reporting/stats/summary',
+    //   body: {
+    //     filters: [{
+    //       type: 'job_id',
+    //       values: [id]},
+    //     {
+    //       type: 'start_time',
+    //       values: [`${year}-${month}-${dayPrev}T00:00:00Z`]}, {type: 'end_time', values: [`${year}-${month}-${day}T23:59:59Z`]}]}
+    // }).then((response) => {
+    //   cy.task('log', response.body);
+    //   id = response.body.id;
+    // });
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: 'api/v0/compliance/reporting/stats/summary',
+      url: `api/v0/compliance/reporting/reports/id/${nodeId}`,
       body: {
-        filters: [{
-          type: 'job_id',
-          values: [id]},
-        {
-          type: 'start_time',
-          values: [`${year}-${month}-${dayPrev}T00:00:00Z`]}, {type: 'end_time', values: [`${year}-${month}-${day}T23:59:59Z`]}]}
+        filters: []
+      }
     }).then((response) => {
       cy.task('log', response.body);
       id = response.body.id;
