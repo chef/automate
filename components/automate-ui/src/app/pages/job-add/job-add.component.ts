@@ -14,7 +14,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
-import { allManagers, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
+import { allManagers, fieldsByManager, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
   ManagerSearchFields,
@@ -65,8 +65,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public firstTimeOninit = true;
   public managersList : any;
   public managersArray : any;
-  public counter = 31;
-  public tempcounter = 0;
+  public fieldCounter = 0;
   public appendDataOnscrollLater : boolean;
   public managerId = [];
   public searchName : [];
@@ -120,6 +119,23 @@ export class JobAddComponent implements OnDestroy , OnInit {
    console.log('Manager array len',this.firstTimeOninit &&  this.managersArray.length < this.total);
 
      this.store.pipe(
+            select(fieldsByManager),
+            takeUntil(this.isDestroyed)
+          ).subscribe(res => {
+           this.fieldCounter =0 ;
+            this.nodeManagerArray.forEach((manager) => {
+              if(manager.id in res)
+              {
+                if(!res[manager.id].loadingAllTotalFields) {
+                    this.fieldCounter++;
+                }
+              }
+            });
+            console.log('Counter val in field pipe',this.fieldCounter);
+            console.log('managerarray length in field', this.nodeManagerArray.length);
+          });
+
+     this.store.pipe(
             select(nodesByManager),
             takeUntil(this.isDestroyed)
           ).subscribe(res => {
@@ -136,7 +152,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
             console.log('Counter val in pipe',counter);
             console.log('managerarray length', this.nodeManagerArray.length);
             console.log('Total elements',this.total);
-            if(this.nodeManagerArray.length == 10 && counter == 10 ){
+            if(this.nodeManagerArray.length == 10 && counter + this.fieldCounter == 20 ){
                     console.log('load more in if');
                     this.loadMore =true;
       }

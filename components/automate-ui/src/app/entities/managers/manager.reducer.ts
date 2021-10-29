@@ -11,7 +11,8 @@ export interface ManagerEntityState extends EntityState<Manager> {
     [id: string]: {
       fields: {
         [name: string]: string[]
-      }
+      },
+    loadingAllTotalFields: boolean
     }
   };
   nodesByManager: {
@@ -66,11 +67,16 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       const counter = set('counter', --c , state);
       return set('status', EntityStatus.loadingFailure, counter);
 
+       case ManagerActionTypes.SEARCH_FIELDS: {
+       const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotalFields`, true, state);
+    }
+
     case ManagerActionTypes.SEARCH_FIELDS_SUCCESS: {
-      let c = state.counter;
-      const counter = set('counter', --c , state);
+
       const {managerId, field, fields} = action.payload;
-      return set(`fieldsByManager.${managerId}.fields.${field}`, fields, counter);
+      const fieldstatus = set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
+      return set(`fieldsByManager.${managerId}.fields.${field}`, fields, fieldstatus);
     }
 
     case ManagerActionTypes.GET_NODES: {
