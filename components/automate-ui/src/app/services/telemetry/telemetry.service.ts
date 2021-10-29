@@ -15,6 +15,8 @@ import { Store } from '@ngrx/store';
 import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/services/user-preferences/user-preferences.actions';
 import { ComplianceStatsService } from './compliance-stats/compliance-stats.service';
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
+import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
+import { ApplicationStatsService } from './application-stats/application-stats.service';
 
 declare let analytics: any;
 
@@ -62,6 +64,7 @@ export class TelemetryService {
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>,
+    private applicationStatsService: ApplicationStatsService, 
     private complianceStatsService: ComplianceStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
@@ -352,6 +355,17 @@ export class TelemetryService {
     } catch (error) {
       console.log(error);
     }
+    try {
+      const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
+        .getApplicationStats();
+      if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
+        const ApplicationAckStats: ApplicationUsageAckStats = await this
+        .sendUnfilteredApplicationStatsToTelemetry(applicationUsageStats);
+        await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
     if (this.chefSessionService.telemetry_enabled) {
       this.isSkipNotification = true;
       this.engageTelemetry(trackingOperations);
@@ -386,6 +400,28 @@ export class TelemetryService {
     }, true).subscribe(() => {
       if (nodeUsageStatsSubscription) {
         nodeUsageStatsSubscription.unsubscribe();
+      }
+      resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
+    },
+    ({ status, error: { message } }: HttpErrorResponse) => {
+      console.log(`Error emitting telemetry event: ${status} - ${message}`);
+      resolver('error');
+    });
+    return promise;
+  }
+
+  sendUnfilteredApplicationStatsToTelemetry(applicationUsageStats: ApplicationUsageStats): Promise<NodeUsageAckStats> {
+    let resolver;
+    const promise = new Promise<ApplicationUsageAckStats>((resolve) => {
+      resolver = resolve;
+    });
+    const applicationUsageStatsSubscription = this.emitToPipeline('track', {
+      userId: this.anonymousId,
+      event: 'servicesCounts',
+      properties: { node_cnt: applicationUsageStats.total_services }
+    }, true).subscribe(() => {
+      if (applicationUsageStatsSubscription) {
+        applicationUsageStatsSubscription.unsubscribe();
       }
       resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
     },
