@@ -155,7 +155,7 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
   cy.server()
     .route({
       method: 'POST',
-      url: 'https://a2-dev.test/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin',
+      url: 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin',
     })
     .as(aliasName)
     .window()
@@ -169,7 +169,7 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
           // var formData = new FormData();
           // formData.append('testproxy-0.1.0.tar.gz', fileToUpload);
 
-          xhr.open('POST', 'https://a2-dev.test/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin');
+          xhr.open('POST', 'api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin');
 
           xhr.setRequestHeader('api-token', Cypress.env('ADMIN_TOKEN'));
           xhr.timeout = 300000;
