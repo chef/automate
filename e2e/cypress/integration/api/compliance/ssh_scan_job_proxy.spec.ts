@@ -123,7 +123,7 @@ let id: any;
     // let day   = dt.getDate().toString().padStart(2, "0");
     // let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
 
-    const endDate = Cypress.moment().utc().endOf('day').add(24, 'hours');
+    const endDate = Cypress.moment().utc().endOf('day');
     const startDate = Cypress.moment(endDate).subtract(10, 'days').startOf('day');
 
     cy.task('log', endDate);
@@ -143,6 +143,7 @@ let id: any;
           values: [startDate]}, {type: 'end_time', values: [endDate]}]}
     }).then((response) => {
       cy.task('log', response.body);
+      cy.task('log', id);
       id = response.body.id;
     });
     // cy.request({
