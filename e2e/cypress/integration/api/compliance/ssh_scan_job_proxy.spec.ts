@@ -138,6 +138,7 @@ let id: any;
           type: 'start_time',
           values: [`${year}-${month}-${dayPrev}T00:00:00Z`]}, {type: 'end_time', values: [`${year}-${month}-${day}T23:59:59Z`]}]}
     }).then((response) => {
+      cy.log('response.body:::::::', response.body);
       id = response.body.id;
     });
   });
