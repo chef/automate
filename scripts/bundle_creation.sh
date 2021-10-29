@@ -80,39 +80,39 @@ clean_up() {
 trap clean_up SIGHUP SIGINT SIGTERM ERR
 
 airgap_bundle_create() {
-  original_aib_path="${TEMP_BUNDLE_FILE}"
-  args=('airgap' 'bundle' 'create')
-  args+=("${original_aib_path}")
-  # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
-  if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
-    if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
-    then
-          cat "${original_aib_path}" > ${TARBALL_PATH}
-          outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
-          bname=$(basename "${outfile}")
-          echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
-          echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
-    fi
+  # original_aib_path="${TEMP_BUNDLE_FILE}"
+  # args=('airgap' 'bundle' 'create')
+  # args+=("${original_aib_path}")
+  # # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
+  # if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
+  #   if [ "$BUNDLE_TYPE" == "upgradefrontends" ] || [ "$BUNDLE_TYPE" == "all" ]
+  #   then
+  #         cat "${original_aib_path}" > ${TARBALL_PATH}
+  #         outfile=${ORIGINAL_TARBALL:-${TARBALL_PATH}}
+  #         bname=$(basename "${outfile}")
+  #         echo "frontend_aib_dest_file = \"/var/tmp/${bname}\""  > ${FRONTENDAIB_TFVARS}
+  #         echo "frontend_aib_local_file = \"${bname}\"" >> ${FRONTENDAIB_TFVARS}
+  #   fi
 
-    if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
-    then
-          # getting packges info from airgap bundle       
-          ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
-          tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
-          # this removes the magic header from the .aib
-          # making it usable with the tar command
-          rm -f ${TEMP_TAR_FILE}    
-          outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
-          backend_name=$(basename "${outfile_backend}")
-          echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
-          echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
-    fi
-    rm -f "${original_aib_path}"
-  else
-    echo "✘ ERROR"
-    cat /tmp/thelog.log
-    exit 1
-  fi
+  #   if [ "$BUNDLE_TYPE" == "upgradebackends" ] || [ "$BUNDLE_TYPE" == "all" ]
+  #   then
+  #         # getting packges info from airgap bundle       
+  #         ${CHEF_AUTOMATE_BIN_PATH}  airgap bundle info ${original_aib_path} > ${PACKAGES_INFO}
+  #         tail -c +8 "${original_aib_path}" > "${TEMP_TAR_FILE}" && cat "${TEMP_TAR_FILE}" > ${BACKENDAIB}
+  #         # this removes the magic header from the .aib
+  #         # making it usable with the tar command
+  #         rm -f ${TEMP_TAR_FILE}    
+  #         outfile_backend=${ORIGINAL_TARBALL:-${BACKENDAIB}}
+  #         backend_name=$(basename "${outfile_backend}")
+  #         echo "backend_aib_dest_file = \"/var/tmp/${backend_name}\"" > ${BACKENDAIB_TFVARS} 
+  #         echo "backend_aib_local_file = \"${backend_name}\"" >> ${BACKENDAIB_TFVARS}
+  #   fi
+  #   rm -f "${original_aib_path}"
+  # else
+  #   echo "✘ ERROR"
+  #   cat /tmp/thelog.log
+  #   exit 1
+  # fi
   
     #Create Manifest auto_tfvars
     create_manifest_auto_tfvars
@@ -127,15 +127,15 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  $(echo "pgleaderchk_pkg_ident = \" $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})\"")
-  $(echo "postgresql_pkg_ident = \" $(grep "automate-backend-postgresql" ${PACKAGES_INFO})\"" )
-  $(echo "proxy_pkg_ident = \" $(grep "automate-backend-haproxy" ${PACKAGES_INFO})\"")
-  $(echo "journalbeat_pkg_ident = \" $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})\"")
-  $(echo "metricbeat_pkg_ident = \" $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})\"")
-  $(echo "kibana_pkg_ident = \" $(grep "automate-backend-kibana" ${PACKAGES_INFO})\"")
-  $(echo "elasticsearch_pkg_ident = \" $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})\"")
-  $(echo "elasticsidecar_pkg_ident = \" $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})\"")
-  $(echo "curator_pkg_ident = \" $(grep "automate-backend-curator" ${PACKAGES_INFO})\"")
+  pgleaderchk_pkg_ident = " $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})"
+  postgresql_pkg_ident = " $(grep "automate-backend-postgresql" ${PACKAGES_INFO})" 
+  proxy_pkg_ident = " $(grep "automate-backend-haproxy" ${PACKAGES_INFO})"
+  journalbeat_pkg_ident = " $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})"
+  metricbeat_pkg_ident = " $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})"
+  kibana_pkg_ident = " $(grep "automate-backend-kibana" ${PACKAGES_INFO})"
+  elasticsearch_pkg_ident = " $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})"
+  elasticsidecar_pkg_ident = " $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})"
+  curator_pkg_ident = " $(grep "automate-backend-curator" ${PACKAGES_INFO})"
 EOL
 }
 
@@ -148,7 +148,7 @@ exec_docker() {
   else
     args+=('-m' '/workspace/manifest.json')
   fi
-  touch ${TARBALL_PATH}
+  touch "${TARBALL_PATH}"
   docker run --rm -it \
     --env="ORIGINAL_TARBALL=${TARBALL_PATH}" \
     --volume "${REPO_PATH}":/workspace:ro \
