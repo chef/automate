@@ -8,5 +8,12 @@ const cypressTypeScriptPreprocessor = require('./cy-ts-preprocessor')
 
 module.exports = on => {
   // `on` is used to hook into various events Cypress emits
-  on('file:preprocessor', cypressTypeScriptPreprocessor)
+  on('file:preprocessor', cypressTypeScriptPreprocessor),
+  on('task', {
+    log(message) {
+      console.log(message)
+
+      return null
+    },
+  })
 }
