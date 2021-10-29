@@ -40,7 +40,7 @@ let id: any;
           secrets: [],
           port: 22,
           sudo: false,
-          hosts: ['0.0.0.0']
+          hosts: ['localhost']
           },
           tags: []
         }]
@@ -81,17 +81,11 @@ let id: any;
   });
 
   it('get manager id', () => {
-    cy.wait(10000);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
       url: 'api/v0/nodemanagers/search',
-      body: {
-        id: 'test',
-        name: 'test',
-        type: 'ssh',
-        data: {filter_map: [{key: 'manager_type', values: ['automate']}], sort: 'date_added'}
-      }
+      body: {filter_map: [{key: 'manager_type', values: ['automate']}], sort: 'date_added'}
     }).then((response) => {
       id = response.body.managers[0].id;
     });
@@ -124,6 +118,13 @@ let id: any;
   });
 
   it('wait for scan', () => {
+
+    var dt = new Date();
+
+    let year  = dt.getFullYear();
+    let month = (dt.getMonth() + 1).toString().padStart(2, "0");
+    let day   = dt.getDate().toString().padStart(2, "0");
+    let dayPrev   = (dt.getDate() - 1).toString().padStart(2, "0");
     cy.wait(10000);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -135,7 +136,7 @@ let id: any;
           values: [id]},
         {
           type: 'start_time',
-          values: [`${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()-1}T00:00:00Z`]}, {type: 'end_time', values: [`${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}T23:59:59Z`]}]}
+          values: [`${year}-${month}-${dayPrev}T00:00:00Z`]}, {type: 'end_time', values: [`${year}-${month}-${day}T23:59:59Z`]}]}
     }).then((response) => {
       id = response.body.id;
     });
@@ -171,7 +172,7 @@ Cypress.Commands.add('uploadFileRequest', (fileToUpload: any, uniqueName: any, a
           xhr.open('POST', 'https://a2-dev.test/api/v0/compliance/profiles?contentType=application/x-gzip&owner=admin');
 
           xhr.setRequestHeader('api-token', Cypress.env('ADMIN_TOKEN'));
-          xhr.timeout = 300000
+          xhr.timeout = 300000;
 
           xhr.send(data);
         });
