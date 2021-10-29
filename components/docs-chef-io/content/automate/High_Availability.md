@@ -1,5 +1,5 @@
 +++
-title = "High Availability"
+title = "Chef Automate - High Availability"
 
 draft = true
 

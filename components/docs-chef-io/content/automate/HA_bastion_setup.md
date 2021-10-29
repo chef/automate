@@ -1,5 +1,5 @@
 +++
-title = "HA - Bastion Setup"
+title = "Chef Automate HA - Bastion Setup"
 
 draft = true
 
@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA - Bastion Setup"
     parent = "automate/High_Availability"
-    identifier = "automate/reference/HA_bastion_setup.md HA Bastion Setup"
+    identifier = "automate/reference/ha_bastion_setup.md HA Bastion Setup"
     weight = 40
 +++
 

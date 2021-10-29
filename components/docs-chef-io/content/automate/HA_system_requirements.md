@@ -1,5 +1,5 @@
 +++
-title = "HA - System and Software Requirements"
+title = "Chef Automate HA - System and Software Requirements"
 
 draft = true
 
@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA - System and Software Requirements"
     parent = "automate/High_Availability"
-    identifier = "automate/reference/HA_system_requirements.md HA System and Software Requirements"
+    identifier = "automate/reference/ha_system_requirements.md HA System and Software Requirements"
     weight = 40
 +++
 
