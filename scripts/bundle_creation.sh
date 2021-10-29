@@ -127,18 +127,17 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  $(echo "pgleaderchk_pkg_ident = \" $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})\""
-  $(echo "postgresql_pkg_ident = \" $(grep "automate-backend-postgresql" ${PACKAGES_INFO})\"" 
-  $(echo "proxy_pkg_ident = \" $(grep "automate-backend-haproxy" ${PACKAGES_INFO})\""
-  $(echo "journalbeat_pkg_ident = \" $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})\""
-  $(echo "metricbeat_pkg_ident = \" $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})\""
-  $(echo "kibana_pkg_ident = \" $(grep "automate-backend-kibana" ${PACKAGES_INFO})\""
-  $(echo "elasticsearch_pkg_ident = \" $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})\""
-  $(echo "elasticsidecar_pkg_ident = \" $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})\""
-  $(echo "curator_pkg_ident = \" $(grep "automate-backend-curator" ${PACKAGES_INFO})\""
+  $(echo "pgleaderchk_pkg_ident = \" $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})\"")
+  $(echo "postgresql_pkg_ident = \" $(grep "automate-backend-postgresql" ${PACKAGES_INFO})\"" )
+  $(echo "proxy_pkg_ident = \" $(grep "automate-backend-haproxy" ${PACKAGES_INFO})\"")
+  $(echo "journalbeat_pkg_ident = \" $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})\"")
+  $(echo "metricbeat_pkg_ident = \" $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})\"")
+  $(echo "kibana_pkg_ident = \" $(grep "automate-backend-kibana" ${PACKAGES_INFO})\"")
+  $(echo "elasticsearch_pkg_ident = \" $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})\"")
+  $(echo "elasticsidecar_pkg_ident = \" $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})\"")
+  $(echo "curator_pkg_ident = \" $(grep "automate-backend-curator" ${PACKAGES_INFO})\"")
 EOL
 }
-
 
 exec_docker() {
   # in Docker mode we hard code various arguments
