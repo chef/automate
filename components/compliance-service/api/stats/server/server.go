@@ -172,7 +172,6 @@ func (srv *Server) UpdateTelemetryReported(ctx context.Context, in *stats.Update
 //GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
 func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
 	var count int64
-	var lastTelemetryReportedAt time.Time
 	// Get last telemetry reported date from postgres
 	telemetry, err := srv.pg.GetTelemetry(ctx)
 	if err != nil {
@@ -185,7 +184,7 @@ func (srv *Server) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsa
 		daysSinceLastPost = utils.DaysBetween(telemetry.LastTelemetryReportedAt, time.Now())
 	}
 	if daysSinceLastPost > 0 {
-		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), lastTelemetryReportedAt)
+		count, err = srv.es.GetUniqueNodesCount(int64(daysSinceLastPost), telemetry.LastTelemetryReportedAt)
 		if err != nil {
 			return nil, err
 		}

@@ -265,4 +265,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodesUsageCount", "iam:introspect", "iam:introspect:getAll", "GET", "/api/v0/cfgmgmt/telemetry/nodes/count", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
