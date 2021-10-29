@@ -2,6 +2,9 @@
 
 exec 2>&1
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 # From memcache 1.5.19:
 #
 # - ssl_chain_cert:      certificate chain file in PEM format

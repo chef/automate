@@ -537,7 +537,7 @@ type ConfigMgmtClient interface {
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
 	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
 	//Supports pagination, filtering (with wildcard support), and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Example:
 	//```
@@ -1136,7 +1136,7 @@ type ConfigMgmtServer interface {
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
 	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
 	//Supports pagination, filtering (with wildcard support), and sorting.
-	//Limited to 10k results.
+	//Max return payload size is 4MB, use pagination to fetch remaining data.
 	//
 	//Example:
 	//```

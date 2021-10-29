@@ -717,7 +717,7 @@ steps:
   - label: "ontop backup"
     command:
       - integration/run_test integration/tests/backup_ontop.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:

@@ -154,7 +154,7 @@ func TestAuthenticateWhenTokenExtractionFailsReturnsError(t *testing.T) {
 	}
 }
 
-func TestAuthenticateWhenEverythingSucceedsReturnsSubject(t *testing.T) {
+func TestAuthenticateWhenEverythingSucceedsReturnsSubjectAndRequestor(t *testing.T) {
 	issuer := "https://mockissuer"
 	clientID := "client-id"
 	verifier := newPassingVerifier(&mockToken{
@@ -190,6 +190,7 @@ func TestAuthenticateWhenEverythingSucceedsReturnsSubject(t *testing.T) {
 		t.Fatalf("authenticator expected requestor 'alice', got nil")
 	}
 	assert.Equal(t, "user:mock-connector:mock-user-id", requestor.Subject())
+	assert.Equal(t, "mock-user-id", requestor.Requestor())
 }
 
 func TestCustomClientReturnsClientWithCustomTransport(t *testing.T) {
@@ -228,6 +229,22 @@ func TestSubject(t *testing.T) {
 	for desc, test := range tests {
 		t.Run(desc, func(t *testing.T) {
 			assert.Equal(t, test.subject, test.r.Subject())
+		})
+	}
+}
+
+func TestRequestor(t *testing.T) {
+	tests := map[string]struct {
+		r      authenticator.Requestor
+		userID string
+	}{
+		"ldap user":  {&requestor{connID: "ldap", userID: "alice"}, "alice"},
+		"saml user":  {&requestor{connID: "saml", userID: "alice"}, "alice"},
+		"local user": {&localRequestor{"alice@example.com", requestor{connID: "local", userID: "alice"}}, "alice"},
+	}
+	for desc, test := range tests {
+		t.Run(desc, func(t *testing.T) {
+			assert.Equal(t, test.userID, test.r.Requestor())
 		})
 	}
 }

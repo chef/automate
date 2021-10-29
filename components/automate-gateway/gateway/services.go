@@ -997,7 +997,6 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 			}
 		}
 	}
-
 	if len(subjects) < 1 {
 		authnClient, err := s.clientsFactory.AuthenticationClient()
 		if err != nil {
@@ -1005,6 +1004,9 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
+
+		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
+
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service error")
 		}
@@ -1019,6 +1021,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 	projects := auth_context.ProjectsFromMetadata(md)
 
 	newCtx, authorized, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
+
 	if err != nil {
 		// If authorization can't be determined because of some error, we return that error.
 		// Upstream services, however, will consider it equivalent to an explicit permission

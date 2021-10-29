@@ -52,6 +52,16 @@ directories:
   - ./components/session-service
   - ./components/teams-service
   - ./components/trial-license-service
+  - ./components/automate-backend-curator
+  - ./components/automate-backend-elasticsearch
+  - ./components/automate-backend-elasticsidecar
+  - ./components/automate-backend-haproxy
+  - ./components/automate-backend-journalbeat
+  - ./components/automate-backend-kibana
+  - ./components/automate-backend-metricbeat
+  - ./components/automate-backend-postgresql
+  - ./components/automate-backend-deployment
+  - ./components/automate-backend-pgleaderchk
 
 habitat:
   channel_for_origin:
@@ -284,6 +294,9 @@ fallbacks:
     - name: github.com/shirou/w32
       license_id: w32-Authors
       license_content: https://raw.githubusercontent.com/shirou/w32/master/LICENSE
+    - name: golang.org/x/crypto
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/crypto/master/LICENSE
 
   habitat:
     - name: chef/mlsa
@@ -418,6 +431,33 @@ exceptions:
       reason: (rc) dep of core/git, used by Workflow and sqitch. Exception made by Stephen Delano, 4/23/20
     - name: core/procps-ng
       reason: Exception made by Chef Legal
+    - name: core/alsa-lib
+      reason:  Exception made by Chef Legal
+    - name: core/freetype
+      reason:  Exception made by Chef Legal
+    - name: core/groff
+      reason:  Exception made by Chef Legal
+    - name: core/gzip
+      reason:  Exception made by Chef Legal
+    - name: core/libiconv
+      reason:  Exception made by Chef Legal
+    - name: core/libidn2
+      reason:  Exception made by Chef Legal
+    - name: core/libpng
+      reason:  Exception made by Chef Legal
+    - name: core/libunistring
+      reason:  Exception made by Chef Legal
+    - name: core/lz4
+      reason:  Exception made by Chef Legal
+    - name: core/make
+      reason:  Exception made by Chef Legal
+    - name: core/openjdk11
+      reason:  Exception made by Chef Legal
+    - name: core/pkg-config
+      reason:  Exception made by Chef Legal
+    - name: core/systemd
+      reason:  Exception made by Chef Legal
+
 
   ruby:
     - name: highline

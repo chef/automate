@@ -2,6 +2,9 @@
 
 exec 2>&1
 
+# Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
+export GODEBUG=x509ignoreCN=0
+
 # We shipped a version of A2 where es-gateway would write logs into the /hab/pkgs
 # path. Attempt to clean up those log files if they exist:
 rm -f /hab/pkgs/core/nginx/1.15.6/20181212185120/chef /hab/pkgs/core/nginx/1.15.6/20190115154053/chef

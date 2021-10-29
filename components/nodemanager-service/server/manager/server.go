@@ -406,7 +406,7 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 	case "aws-ec2", "aws-api":
 		return srv.searchAwsFields(ctx, in)
 	case "azure-vm", "azure-api":
-		return srv.searchAzureFields(ctx, in)
+		return srv.searchAzureFields(ctx, in, mgr.Type)
 	case "gcp-api":
 		return srv.searchGenericNodesFields(ctx, in, in.NodeManagerId)
 	case "automate":
@@ -416,7 +416,7 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 	}
 }
 
-func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
+func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery, mgrType string) (*manager.Fields, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
@@ -424,7 +424,7 @@ func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery
 	if in.Query == nil {
 		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
-	results, err := myazure.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
+	results, err := myazure.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field, mgrType)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -490,7 +490,7 @@ func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.Nod
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
-	subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
+	subs, err := myazure.GetSubscriptionsForApi(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -828,7 +828,7 @@ func (srv *Server) SearchManagerNodes(ctx context.Context, in *manager.NodeQuery
 		if err != nil {
 			return nil, errors.Wrapf(err, "Failed to get credentials for azure node manager: %s", in.GetNodeManagerId())
 		}
-		subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
+		subs, err := myazure.GetSubscriptionsForApi(ctx, in.GetQuery().GetFilterMap())
 		if err != nil {
 			return nil, fmt.Errorf("Failed to query all nodes for job manager %s: %s", in.GetNodeManagerId(), err)
 		}

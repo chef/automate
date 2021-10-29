@@ -8,8 +8,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-12-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-11-01/network"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2016-06-01/subscriptions"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2017-05-10/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2021-01-01/subscriptions"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
@@ -98,7 +98,11 @@ func (creds *Creds) ListSubscriptions(ctx context.Context) ([]*manager.ManagerNo
 			return subs, errors.Wrap(err, "ListSubscriptions unable to list subscriptions")
 		}
 		for _, val := range res.Values() {
-			subs = append(subs, &manager.ManagerNode{Id: *val.SubscriptionID, Name: *val.DisplayName})
+			tags := []*common.Kv{}
+			for key, value := range val.Tags {
+				tags = append(tags, &common.Kv{Key: key, Value: *value})
+			}
+			subs = append(subs, &manager.ManagerNode{Id: *val.SubscriptionID, Name: *val.DisplayName, Tags: tags})
 		}
 	}
 	return subs, nil
@@ -126,7 +130,7 @@ func (creds *Creds) ListLocations(ctx context.Context, subs []*manager.ManagerNo
 	client := subscriptions.NewClient()
 	client.Authorizer = getAuthorizer(creds.Token)
 	for _, sub := range subs {
-		res, err := client.ListLocations(ctx, sub.Id)
+		res, err := client.ListLocations(ctx, sub.Id, nil)
 		if err != nil {
 			return locations, errors.Wrap(err, "ListLocations unable to list locations")
 		}
@@ -251,7 +255,7 @@ func (creds *Creds) handleVMFilters(ctx context.Context, sub *manager.ManagerNod
 			resourcesList[key] = append(resourcesList[key], resources)
 		}
 	}
-	resourceListVals := make(map[string][]resources.GenericResource)
+	resourceListVals := make(map[string][]resources.GenericResourceExpanded)
 	if len(excludedTagFilterStrings) > 0 {
 		for _, excludedTagFilterString := range excludedTagFilterStrings {
 			logrus.Debugf("exclusion filter string used to call list on azure resources: %s", excludedTagFilterString)
@@ -276,7 +280,7 @@ func (creds *Creds) handleVMFilters(ctx context.Context, sub *manager.ManagerNod
 	return handleResources(resourceListVals, filters)
 }
 
-func handleExcludedResources(resourcesList []resources.GenericResource, excludedResourcesList []resources.GenericResource) []resources.GenericResource {
+func handleExcludedResources(resourcesList []resources.GenericResourceExpanded, excludedResourcesList []resources.GenericResourceExpanded) []resources.GenericResourceExpanded {
 	filteredList := resourcesList
 	for _, excludedResource := range excludedResourcesList {
 		filteredList = removeMatchingResource(filteredList, excludedResource)
@@ -284,8 +288,8 @@ func handleExcludedResources(resourcesList []resources.GenericResource, excluded
 	return filteredList
 }
 
-func removeMatchingResource(list []resources.GenericResource, matcher resources.GenericResource) []resources.GenericResource {
-	newResourcesList := make([]resources.GenericResource, 0)
+func removeMatchingResource(list []resources.GenericResourceExpanded, matcher resources.GenericResourceExpanded) []resources.GenericResourceExpanded {
+	newResourcesList := make([]resources.GenericResourceExpanded, 0)
 	for _, resource := range list {
 		if resource.ID != matcher.ID {
 			newResourcesList = append(newResourcesList, resource)
@@ -294,7 +298,7 @@ func removeMatchingResource(list []resources.GenericResource, matcher resources.
 	return newResourcesList
 }
 
-func handleResources(vals map[string][]resources.GenericResource, filters []*common.Filter) ([]string, error) {
+func handleResources(vals map[string][]resources.GenericResourceExpanded, filters []*common.Filter) ([]string, error) {
 	resourceGroupNames := make(map[string][]string, 0)
 	// we go through each entry in the map and get a map entry of resource group names
 	var aKey string
@@ -723,6 +727,134 @@ func removeExcludedSubsFromList(list []*manager.ManagerNode, exclude []string) [
 	return returnList
 }
 
+func handleTagFilters(filters []*common.Filter) (map[string][]string, map[string][]string) {
+	includeTags := map[string][]string{}
+	excludeTags := map[string][]string{}
+	for _, filter := range filters {
+		if filter.Key != "subscription_id" {
+			if !filter.Exclude {
+				for _, val := range filter.Values {
+					includeTags[filter.Key] = append(includeTags[filter.Key], val)
+				}
+			} else {
+				for _, val := range filter.Values {
+					excludeTags[filter.Key] = append(excludeTags[filter.Key], val)
+				}
+			}
+		}
+	}
+	return includeTags, excludeTags
+}
+
+func isMatch(s string, p string) bool {
+
+	runeInput := []rune(strings.ToLower(s))
+	runePattern := []rune(strings.ToLower(p))
+
+	lenInput := len(runeInput)
+	lenPattern := len(runePattern)
+
+	isMatchingMatrix := make([][]bool, lenInput+1)
+
+	for i := range isMatchingMatrix {
+		isMatchingMatrix[i] = make([]bool, lenPattern+1)
+	}
+
+	isMatchingMatrix[0][0] = true
+	for i := 1; i < lenInput; i++ {
+		isMatchingMatrix[i][0] = false
+	}
+
+	if lenPattern > 0 {
+		if runePattern[0] == '*' {
+			isMatchingMatrix[0][1] = true
+		}
+	}
+
+	for j := 2; j <= lenPattern; j++ {
+		if runePattern[j-1] == '*' {
+			isMatchingMatrix[0][j] = isMatchingMatrix[0][j-1]
+		}
+
+	}
+
+	for i := 1; i <= lenInput; i++ {
+		for j := 1; j <= lenPattern; j++ {
+
+			if runePattern[j-1] == '*' {
+				isMatchingMatrix[i][j] = isMatchingMatrix[i-1][j] || isMatchingMatrix[i][j-1]
+			}
+
+			if runePattern[j-1] == '?' || runeInput[i-1] == runePattern[j-1] {
+				isMatchingMatrix[i][j] = isMatchingMatrix[i-1][j-1]
+			}
+		}
+	}
+
+	return isMatchingMatrix[lenInput][lenPattern]
+}
+
+func filterIncludeTags(includeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
+	if len(includeTags) > 0 {
+		var filteredsubsList = []*manager.ManagerNode{}
+		for _, val := range subsList {
+			if sArray, ok := includeTags["name"]; ok {
+				for _, v := range sArray {
+					if isMatch(val.Name, v) {
+						filteredsubsList = append(filteredsubsList, val)
+					}
+				}
+			}
+			for _, v := range val.Tags {
+				if _, ok := includeTags[v.Key]; ok {
+					if contains(includeTags[v.Key], v.Value) {
+						filteredsubsList = append(filteredsubsList, val)
+					}
+				}
+			}
+		}
+		return filteredsubsList
+	}
+	return subsList
+}
+
+func filterExcludeTags(excludeTags map[string][]string, subsList []*manager.ManagerNode) []*manager.ManagerNode {
+	if len(excludeTags) > 0 {
+		var rmSubsList = []string{}
+		var filteredsubsList = []*manager.ManagerNode{}
+		for _, val := range subsList {
+			sArray, ok := excludeTags["name"]
+			if ok {
+				for _, v := range sArray {
+					if val.Name == v {
+						rmSubsList = append(rmSubsList, val.Id)
+					}
+				}
+			}
+			if len(val.Tags) > 0 {
+				for _, v := range val.Tags {
+					if _, ok := excludeTags[v.Key]; ok {
+						if contains(excludeTags[v.Key], v.Value) {
+							rmSubsList = append(rmSubsList, val.Id)
+						}
+					}
+				}
+			}
+		}
+		if len(rmSubsList) > 0 {
+			for _, val := range subsList {
+				if !contains(rmSubsList, val.Id) {
+					filteredsubsList = append(filteredsubsList, val)
+				}
+			}
+		} else {
+			filteredsubsList = subsList
+		}
+		return filteredsubsList
+	}
+	return subsList
+}
+
 func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filter) ([]*manager.ManagerNode, error) {
 	subs, excludedSubs := handleSubscriptionFilters(filters)
 	if len(subs) > 0 {
@@ -738,19 +870,57 @@ func (creds *Creds) GetSubscriptions(ctx context.Context, filters []*common.Filt
 	return removeExcludedSubsFromList(subsList, excludedSubs), nil
 }
 
+func (creds *Creds) GetSubscriptionsForApi(ctx context.Context, filters []*common.Filter) ([]*manager.ManagerNode, error) {
+	subs, excludedSubs := handleSubscriptionFilters(filters)
+	includeTags, excludeTags := handleTagFilters(filters)
+
+	if len(subs) > 0 {
+		return subs, nil
+	}
+	subsList, err := creds.ListSubscriptions(ctx)
+	if err != nil {
+		return subsList, errors.Wrap(err, "getSubscriptions unable to list subscriptions")
+	}
+	filteredsubsList := filterIncludeTags(includeTags, subsList)
+	filteredsubsList = UniqueManager(filteredsubsList)
+	if len(includeTags) > 0 {
+		filteredsubsList = filterExcludeTags(excludeTags, filteredsubsList)
+	} else {
+		filteredsubsList = filterExcludeTags(excludeTags, subsList)
+	}
+
+	if len(excludedSubs) == 0 {
+		return filteredsubsList, nil
+	}
+	return removeExcludedSubsFromList(filteredsubsList, excludedSubs), nil
+}
+
+func UniqueManager(a []*manager.ManagerNode) []*manager.ManagerNode {
+	seen := map[string]bool{}
+	var b []*manager.ManagerNode
+	for _, v := range a {
+		if _, ok := seen[v.Id]; !ok {
+			seen[v.Id] = true
+			b = append(b, v)
+		}
+	}
+	return b
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 // QueryVMs returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
 func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map[string][]*manager.ManagerNode, error) {
 	var err error
 	vmList := make(map[string][]*manager.ManagerNode, 0)
-	subs := make([]*manager.ManagerNode, 0)
-	for _, filter := range filters {
-		if filter.Key == "subscription_id" {
-			subs = make([]*manager.ManagerNode, 0)
-			for _, subID := range filter.Values {
-				subs = append(subs, &manager.ManagerNode{Id: subID})
-			}
-		}
-	}
+	subs := filterBySubID(filters)
 	if len(subs) == 0 {
 		subs, err = creds.GetSubscriptions(ctx, filters)
 		if err != nil {
@@ -777,6 +947,36 @@ func (creds *Creds) QueryVMs(ctx context.Context, filters []*common.Filter) (map
 		logrus.Errorf("We had errors retrieving nodes from azure: %+v", poolOfTasks.GetErrors())
 	}
 	return vmList, nil
+}
+
+// QueryApis returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
+func (creds *Creds) QueryApis(ctx context.Context, filters []*common.Filter) (map[string][]*manager.ManagerNode, error) {
+	var err error
+	vmList := make(map[string][]*manager.ManagerNode, 0)
+	subs := filterBySubID(filters)
+	if len(subs) == 0 {
+		subs, err = creds.GetSubscriptionsForApi(ctx, filters)
+		if err != nil {
+			return vmList, errors.Wrap(err, "QueryAPIs unable to list subscriptions")
+		}
+	}
+	for _, v := range subs {
+		vmList[v.Id] = []*manager.ManagerNode{v}
+	}
+	return vmList, nil
+}
+
+func filterBySubID(filters []*common.Filter) []*manager.ManagerNode {
+	subs := make([]*manager.ManagerNode, 0)
+	for _, filter := range filters {
+		if filter.Key == "subscription_id" {
+			subs = make([]*manager.ManagerNode, 0)
+			for _, subID := range filter.Values {
+				subs = append(subs, &manager.ManagerNode{Id: subID})
+			}
+		}
+	}
+	return subs
 }
 
 // QueryVMState returns an array of ManagerNodes, one for each vm in the account, over all subscriptions
@@ -811,7 +1011,7 @@ func (creds *Creds) QueryVMState(ctx context.Context) ([]pgdb.InstanceState, err
 }
 
 // QueryField returns account tags, locations, subscriptions
-func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, field string) ([]string, error) {
+func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, field string, mgrType string) ([]string, error) {
 	var err error
 	resultArray := make([]string, 0)
 	subs := make([]*manager.ManagerNode, 0)
@@ -836,13 +1036,19 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 			return nil, errors.Wrap(err, "QueryField unable to list locations")
 		}
 	case "names", "tags:name":
-		vmsResult, err := creds.QueryVMs(ctx, []*common.Filter{})
-		if err != nil {
-			return nil, errors.Wrap(err, "QueryField unable to query vms")
-		}
-		for _, vms := range vmsResult {
-			for _, vm := range vms {
-				resultArray = append(resultArray, vm.Name)
+		if mgrType == "azure-api" {
+			for _, sub := range subs {
+				resultArray = append(resultArray, sub.Name)
+			}
+		} else {
+			vmsResult, err := creds.QueryVMs(ctx, []*common.Filter{})
+			if err != nil {
+				return nil, errors.Wrap(err, "QueryField unable to query vms")
+			}
+			for _, vms := range vmsResult {
+				for _, vm := range vms {
+					resultArray = append(resultArray, vm.Name)
+				}
 			}
 		}
 	case "tags":
@@ -860,15 +1066,9 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 		}
 	default:
 		if strings.HasPrefix(field, "tags:") {
-			tags, err := creds.ListTags(ctx, subs)
+			resultArray, err = queryDefaultFieldTags(ctx, mgrType, subs, field, resultArray, creds)
 			if err != nil {
-				return nil, errors.Wrap(err, "QueryField unable to list tags")
-			}
-			key := strings.TrimPrefix(field, "tags:")
-			for k, v := range tags {
-				if k == key {
-					resultArray = append(resultArray, v...)
-				}
+				return nil, err
 			}
 		} else {
 			return resultArray, errorutils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
@@ -876,6 +1076,49 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 	}
 
 	return resultArray, nil
+}
+
+func queryDefaultFieldTags(ctx context.Context, mgrType string, subs []*manager.ManagerNode, field string, resultArray []string, creds *Creds) ([]string, error) {
+	key := strings.TrimPrefix(field, "tags:")
+	if mgrType == "azure-api" {
+		if field == "tags:Name" {
+			for _, sub := range subs {
+				resultArray = append(resultArray, sub.Name)
+			}
+		}
+		key := strings.TrimPrefix(field, "tags:")
+		for _, v := range subs {
+			for _, val := range v.Tags {
+				if val.Key == key {
+					resultArray = append(resultArray, val.Value)
+				}
+			}
+		}
+		resultArray = UniqueString(resultArray)
+	} else {
+		tags, err := creds.ListTags(ctx, subs)
+		if err != nil {
+			return nil, errors.Wrap(err, "QueryField unable to list tags")
+		}
+		for k, v := range tags {
+			if k == key {
+				resultArray = append(resultArray, v...)
+			}
+		}
+	}
+	return resultArray, nil
+}
+
+func UniqueString(a []string) []string {
+	seen := map[string]bool{}
+	var b []string
+	for _, v := range a {
+		if _, ok := seen[v]; !ok {
+			seen[v] = true
+			b = append(b, v)
+		}
+	}
+	return b
 }
 
 func uniqueStringSliceCaseInsens(stringSlice []string) []string {
