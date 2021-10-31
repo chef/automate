@@ -419,6 +419,16 @@ service ApplicationsService {
 		};
   }
 
+
+  /*
+  UpdateTelemetryReported
+  update the last reported talemetry date for the application service.
+  Authorization Action:
+  ```
+  iam:introspect:getAll
+  ```
+  */
+
   rpc UpdateTelemetryReported(UpdateTelemetryReportedRequest) returns (UpdateTelemetryReportedResponse) {
 		option (google.api.http) = {
 			put: "/api/v0/applications/telemetry/services/count/updated"
@@ -429,6 +439,30 @@ service ApplicationsService {
 			action: "iam:introspect:getAll"
 		};
 	};
+
+  /*
+  GetservicesUsageCount
+
+  Returns the count of unique services with lastRun in a given time.
+  The time duration can be between the last time Telemetry data sent and the day before the current date.
+  If the duration < 15 days --> 15 days
+  duration > 15 days --> duration
+  Authorization Action:
+  ```
+  iam:introspect:getAll
+  ```
+  */
+
+  rpc GetServicesUsageCount(GetServicesUsageCountRequest) returns (GetServicesUsageCountResponse) {
+    option (google.api.http) = {
+      get: "/api/v0/applications/telemetry/services/count"
+    };
+    option (chef.automate.api.iam.policy) = {
+      resource: "iam:introspect"
+      action: "iam:introspect:getAll"
+    };
+  }
+
 }
 
 
@@ -598,7 +632,6 @@ message PeriodicJobInfo {
 	google.protobuf.Duration last_elapsed = 4;
 	google.protobuf.Timestamp next_due_at = 5;
 }
-
 
 message GetDisconnectedServicesConfigReq{}
 message UpdateDisconnectedServicesConfigRes {}
@@ -777,10 +810,17 @@ message HealthCheckResult {
   int32 exit_status = 3;
 }
 
+// Telemetry
 message UpdateTelemetryReportedRequest {
 	// last application service telemetry reported date
 	string last_telemetry_reported_at = 1;
 }
 
-message UpdateTelemetryReportedResponse {
+message UpdateTelemetryReportedResponse {}
+
+message GetServicesUsageCountRequest {}
+
+message	GetServicesUsageCountResponse {
+  // unique services count in a duration
+  int64 total_services = 1;
 }

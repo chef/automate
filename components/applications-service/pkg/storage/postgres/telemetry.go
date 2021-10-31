@@ -4,15 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 )
-
-type Telemetry struct {
-	ID                      string    `db:"id" json:"id"`
-	LastTelemetryReportedAt time.Time `db:"last_telemetry_reported_at" json:"last_telemetry_reported_at"`
-	CreatedAt               time.Time `db:"created_at" json:"created_at"`
-}
 
 //UpdateLastTelemetryReported Upsert the last application service telemetry reported date in postgres
 func (pg *Postgres) UpdateTelemetryReported(ctx context.Context, lastTelemetryReportedTime string) error {
@@ -52,7 +47,7 @@ func (pg *Postgres) UpdateTelemetryReported(ctx context.Context, lastTelemetryRe
 func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedAt time.Time) error {
 	telArr := make([]interface{}, 0)
 
-	tel := Telemetry{
+	tel := storage.Telemetry{
 		ID:                      uuid.Must(uuid.NewV4()).String(),
 		LastTelemetryReportedAt: lastTelemetryReportedAt,
 		CreatedAt:               time.Now(),
@@ -63,4 +58,35 @@ func (trans *DBTrans) StoreTelemetry(ctx context.Context, lastTelemetryReportedA
 		return err
 	}
 	return nil
+}
+
+// Get last services telemetry reported timestamp
+func (db *Postgres) GetTelemetry(ctx context.Context) (storage.Telemetry, error) {
+	var t storage.Telemetry
+	rows, err := db.Query(`SELECT id,last_telemetry_reported_at, created_at from telemetry`)
+	if err != nil {
+		return storage.Telemetry{}, err
+	}
+	for rows.Next() {
+		err = rows.Scan(&t.ID, &t.LastTelemetryReportedAt, &t.CreatedAt)
+		if err != nil {
+			return storage.Telemetry{}, err
+		}
+	}
+	return t, nil
+}
+
+// Get last 15 days services telemetry reported timestamp
+func (db *Postgres) GetUniqueServicesFromPostgres(daysSinceLastPost int64, lastTelemetryReportedAt time.Time) (int64, error) {
+	var count int64
+	var err error
+
+	lastTelemetryReportedDate := lastTelemetryReportedAt.Format("2006-01-02")
+	if daysSinceLastPost > 15 {
+		count, err = db.DbMap.SelectInt(
+			`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at > $1 AND health_updated_at < now()::date`, lastTelemetryReportedDate)
+	} else {
+		count, err = db.DbMap.SelectInt(`SELECT count (DISTINCT supervisor_id) from service_full where health_updated_at > now()::date - 16 AND health_updated_at < now()::date`)
+	}
+	return count, err
 }
