@@ -35,7 +35,7 @@ let id: any;
           manager: 'automate',
           target_config: {
           backend: 'ssh',
-          secrets: [],
+          secrets: [id],
           port: 22,
           sudo: false,
           hosts: ['localhost']
