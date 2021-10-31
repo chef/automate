@@ -116,4 +116,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesUsageCount", "iam:introspect", "iam:introspect:getAll", "GET", "/api/v0/applications/telemetry/services/count", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }

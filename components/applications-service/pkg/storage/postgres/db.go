@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
@@ -85,7 +86,7 @@ func (db *Postgres) connect() error {
 		return errors.Wrapf(err, "Failed to ping database with uri: %s", db.URI)
 	}
 
-	db.DbMap.AddTableWithName(Telemetry{}, "telemetry").SetKeys(false, "id")
+	db.DbMap.AddTableWithName(storage.Telemetry{}, "telemetry").SetKeys(false, "id")
 	return nil
 }
 
