@@ -12,7 +12,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/BurntSushi/toml v0.3.1
-	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Masterminds/squirrel v1.1.0
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/alexedwards/scs v1.4.1
