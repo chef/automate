@@ -78,13 +78,13 @@ func getObjectStoreConnection(ctx context.Context, conf config.ReportManager) (*
 	}
 
 	//check if the default bucket is available or not
-	isExist, err := objStoreClient.BucketExists(ctx, "default")
+	isExist, err := objStoreClient.BucketExists(ctx, conf.ObjStore.BucketName)
 	if err != nil {
 		return nil, fmt.Errorf("error in checking the default bucket existence in object store:%w", err)
 	}
 	//create a default bucket if not available
 	if !isExist {
-		err := objStoreClient.MakeBucket(ctx, "default", minio.MakeBucketOptions{})
+		err := objStoreClient.MakeBucket(ctx, conf.ObjStore.BucketName, minio.MakeBucketOptions{})
 		if err != nil {
 			return nil, fmt.Errorf("error in creating a default bucket in object store to store the report data: %w", err)
 		}
@@ -107,10 +107,10 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 	//register health server for health status
 	health.RegisterHealthServer(s, health.NewService())
 	report_manager.RegisterReportManagerServiceServer(s,
-		server.New(objStoreClient, cerealManager))
+		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName))
 
 	//Initiate the cereal manager with 2 workers
-	err = worker.InitCerealManager(cerealManager, 2, db)
+	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}

@@ -19,6 +19,9 @@ schema_path = "{{pkg.path}}/schema"
 max_open_conns = {{cfg.storage.max_open_conns}}
 max_idle_conns = {{cfg.storage.max_idle_conns}}
 
+[objstore]
+bucket = "{{cfg.objstore.bucket}}"
+
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}

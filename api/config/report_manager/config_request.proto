@@ -22,12 +22,16 @@ message ConfigRequest {
 			Service service = 2;
 			chef.automate.infra.config.TLSCredentials tls = 3;
 			chef.automate.infra.config.Log log = 4;
+			Objstore objstore = 5;
 
 
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true];
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10152, protocol: "grpc" } ];
-        		google.protobuf.StringValue message = 3;
+			}
+
+			message Objstore {
+				google.protobuf.StringValue bucket = 1;
 			}
 		}
 
