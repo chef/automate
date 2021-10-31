@@ -9,6 +9,8 @@ import (
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/report_manager"
+	"github.com/chef/automate/components/report-manager-service/objstore"
+	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/components/report-manager-service/worker"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/google/uuid"
@@ -17,35 +19,23 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type ObjectStore interface {
-	PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
-		opts minio.PutObjectOptions) (info minio.UploadInfo, err error)
-}
-
-type ReportManagerObjStore struct {
-	objStoreClient *minio.Client
-}
-
-func (rmc ReportManagerObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
-	opts minio.PutObjectOptions) (info minio.UploadInfo, err error) {
-	return rmc.objStoreClient.PutObject(ctx, bucketName, objectName, reader, objectSize, opts)
-}
-
 // Server implementation for reporting
 type Server struct {
-	ObjStoreClient ObjectStore
+	ObjStoreClient objstore.ObjectStore
 	CerealManager  *cereal.Manager
 	ctx            context.Context
+	ObjBucket      string
 }
 
 // New creates a new server
-func New(objStoreClient *minio.Client, cerealManager *cereal.Manager) *Server {
+func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string) *Server {
 	return &Server{
-		ObjStoreClient: ReportManagerObjStore{
-			objStoreClient: objStoreClient,
+		ObjStoreClient: objstore.ReportManagerObjStore{
+			ObjStoreClient: objStoreClient,
 		},
 		CerealManager: cerealManager,
 		ctx:           context.Background(),
+		ObjBucket:     objBucket,
 	}
 }
 
@@ -74,10 +64,10 @@ func (s *Server) StoreReport(stream report_manager.ReportManagerService_StoreRep
 		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
 	}
 
-	objName := fmt.Sprintf("%s.json", complianceReport.GetReportUuid())
+	objName := utils.GetObjName(complianceReport.GetReportUuid())
 
 	//TODO:: Add an expiry based on user configuration
-	info, err := s.ObjStoreClient.PutObject(s.ctx, "default", objName, &reportData, -1, minio.PutObjectOptions{})
+	info, err := s.ObjStoreClient.PutObject(s.ctx, s.ObjBucket, objName, &reportData, -1, minio.PutObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("error in storing the report %s in object store: %w", complianceReport.GetReportUuid(), err)
 	}
@@ -95,9 +85,10 @@ func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.Cu
 	err := s.CerealManager.EnqueueWorkflow(s.ctx, worker.ReportWorkflowName,
 		fmt.Sprintf("%s-%s", "report-workflow", id.String()),
 		worker.ReportWorkflowParameters{
-			JobID:       id.String(),
-			RequestorID: req.RequestorId,
-			Retries:     2,
+			JobID:            id.String(),
+			RequestorID:      req.RequestorId,
+			Retries:          2,
+			RequestToProcess: req,
 		})
 
 	if err != nil {
