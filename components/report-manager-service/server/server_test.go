@@ -30,7 +30,7 @@ type mockObjStore struct {
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
 	opts minio.PutObjectOptions) (info minio.UploadInfo, err error) {
 
-	assert.Equal(m.T, "default", bucketName)
+	assert.Equal(m.T, "testBucket", bucketName)
 	assert.Equal(m.T, "34567890-36d6-439e-ac70-a41504242605.json", objectName)
 
 	if m.ForFailure {
@@ -51,6 +51,10 @@ func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName stri
 	}, nil
 }
 
+func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*[]byte, error) {
+	return nil, nil
+}
+
 func dialer(t *testing.T, isForFailure bool) func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 
@@ -61,6 +65,7 @@ func dialer(t *testing.T, isForFailure bool) func(context.Context, string) (net.
 			T:          t,
 			ForFailure: isForFailure,
 		},
+		ObjBucket: "testBucket",
 	})
 
 	go func() {
