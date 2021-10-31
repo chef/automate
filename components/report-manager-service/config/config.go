@@ -9,6 +9,11 @@ type ReportManager struct {
 	CerealConfig    CerealConfig `mapstructure:"cereal"`
 	Storage         Storage      `mapstructure:"storage"`
 	certs.TLSConfig `mapstructure:"tls"`
+	ObjStore        ObjStore `mapstructure:"objstore"`
+}
+
+type ObjStore struct {
+	BucketName string `mapstructure:"bucket"`
 }
 
 type Service struct {
