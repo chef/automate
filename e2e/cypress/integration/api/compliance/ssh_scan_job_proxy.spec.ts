@@ -145,6 +145,7 @@ let id: any;
       cy.task('log', response.body);
       cy.task('log', id);
       id = response.body.id;
+      expect(response.body.report_summary.status).to.eq('passed');
     });
     // cy.request({
     //   headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
