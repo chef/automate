@@ -80,6 +80,10 @@ func initConfig() error {
 			return err
 		}
 	}
+
+	if conf.ObjStore.BucketName == "" {
+		conf.ObjStore.BucketName = "default"
+	}
 	return nil
 }
 

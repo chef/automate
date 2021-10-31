@@ -18,3 +18,6 @@ database = "chef_report_manager_service"
 user = "report_manager"
 max_open_conns = 10
 max_idle_conns = 5
+
+[objstore]
+bucket = "default"
