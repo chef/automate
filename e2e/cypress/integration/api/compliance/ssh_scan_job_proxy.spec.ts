@@ -65,17 +65,17 @@ let id: any;
     //   expect(response.body.summary.valid).to.equal(true);
     // });
 
-    // cy.uploadFileRequest(
-    //   'testproxy-0.1.0.tar.gz',
-    //   'testproxy-0.1.0.tar.gz',
-    //   'demoFileUploadRequest'
-    // );
+    cy.uploadFileRequest(
+      'testproxy-0.1.0.tar.gz',
+      'testproxy-0.1.0.tar.gz',
+      'demoFileUploadRequest'
+    );
 
-    // // cy.wait(30000)
+    // cy.wait(30000)
 
-    // cy.wait('@demoFileUploadRequest', {timeout: 120000}).then((response) => {
-    //   expect(response.status).to.eq(200);
-    // });
+    cy.wait('@demoFileUploadRequest', {timeout: 120000}).then((response) => {
+      expect(response.status).to.eq(200);
+    });
   });
 
   it('get manager id', () => {
@@ -129,7 +129,7 @@ let id: any;
     cy.task('log', endDate);
     cy.task('log', startDate);
 
-    cy.wait(10000);
+    cy.wait(90000);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
