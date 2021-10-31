@@ -42,6 +42,15 @@ do_deploy() {
 
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 
+    timestamp=$(date +"%m-%d-%y-%H-%M")
+
+    log_info "generating admin token"
+    if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
+        log_error "Non-zero exit code, output:"
+        log_error "$token"
+        return 1
+    fi
+
     export CYPRESS_ADMIN_TOKEN=$token
     export CYPRESS_RUN_FLAKY=$FLAKY
 

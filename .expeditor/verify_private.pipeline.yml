@@ -893,7 +893,7 @@ steps:
 
   - label: "proxy"
     command:
-      - integration/run_test integration/tests/proxy.sh
+      - FLAKY=no integration/run_test integration/tests/proxy.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
