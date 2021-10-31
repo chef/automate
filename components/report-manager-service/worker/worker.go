@@ -2,10 +2,18 @@ package worker
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/report_manager"
+	"github.com/chef/automate/components/report-manager-service/objstore"
 	"github.com/chef/automate/components/report-manager-service/storage"
+	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -21,7 +29,8 @@ const (
 	SuccessStatus string = "success"
 )
 
-func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *storage.DB) error {
+func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *storage.DB, objStoreClient *minio.Client,
+	objBucket string) error {
 	err := cerealManager.RegisterWorkflowExecutor(ReportWorkflowName, &ReportWorkflow{
 		DB: db,
 	})
@@ -29,8 +38,12 @@ func InitCerealManager(cerealManager *cereal.Manager, workerCount int, db *stora
 		return err
 	}
 
-	return cerealManager.RegisterTaskExecutor(ReportTaskName, &GenerateReportTask{},
-		cereal.TaskExecutorOpts{Workers: workerCount})
+	return cerealManager.RegisterTaskExecutor(ReportTaskName, &GenerateReportTask{
+		ObjStoreClient: objstore.ReportManagerObjStore{
+			ObjStoreClient: objStoreClient,
+		},
+		ObjBucketName: objBucket,
+	}, cereal.TaskExecutorOpts{Workers: workerCount})
 }
 
 type ReportWorkflow struct {
@@ -38,9 +51,10 @@ type ReportWorkflow struct {
 }
 
 type ReportWorkflowParameters struct {
-	JobID       string
-	RequestorID string
-	Retries     int
+	JobID            string
+	RequestorID      string
+	Retries          int
+	RequestToProcess *report_manager.CustomReportRequest
 }
 
 type ReportWorkflowPayload struct {
@@ -73,7 +87,8 @@ func (s *ReportWorkflow) OnStart(w cereal.WorkflowInstance,
 	workflowPayload.Status = RunningStatus
 
 	err = w.EnqueueTask(ReportTaskName, GenerateReportParameters{
-		JobID: workflowParams.JobID,
+		JobID:            workflowParams.JobID,
+		RequestToProcess: workflowParams.RequestToProcess,
 	})
 	if err != nil {
 		err = errors.Wrap(err, "failed to enqueue the report-task")
@@ -110,8 +125,17 @@ func (s *ReportWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		if payload.RetriesLeft > 0 {
 			logrus.Debugf("retring report-task %s", payload.JobID)
 
+			workflowParams := ReportWorkflowParameters{}
+			err := w.GetParameters(&workflowParams)
+			if err != nil {
+				err = errors.Wrap(err, "failed to unmarshal report-workflow parameters")
+				logrus.WithError(err).Error()
+				return w.Fail(err)
+			}
+
 			err = w.EnqueueTask(ReportTaskName, GenerateReportParameters{
-				JobID: payload.JobID,
+				JobID:            payload.JobID,
+				RequestToProcess: workflowParams.RequestToProcess,
 			})
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue the report-task")
@@ -152,31 +176,65 @@ func (s *ReportWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEve
 }
 
 type GenerateReportTask struct {
+	ObjStoreClient objstore.ObjectStore
+	ObjBucketName  string
 }
 
 type GenerateReportParameters struct {
-	JobID     string
-	StartTime *time.Time
-	EndTime   *time.Time
+	JobID            string
+	StartTime        *time.Time
+	EndTime          *time.Time
+	RequestToProcess *report_manager.CustomReportRequest
 }
 
 func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var job GenerateReportParameters
 	if err := task.GetParameters(&job); err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal GenerateReportParameters")
+		err = errors.Wrap(err, "could not unmarshal GenerateReportParameters")
+		logrus.WithError(err).Error()
+		return nil, err
 	}
 
 	logrus.Infof("In TaskRun working on job %s", job.JobID)
+	logrus.Infof("%v\n", job)
 
 	startTime := time.Now().UTC().Round(time.Second)
 	job.StartTime = &startTime
 
-	//TODO:: perform actual job
-	var err error
-	time.Sleep(5 * time.Second)
+	for _, report := range job.RequestToProcess.Reports {
+		controlsMap := make(map[string]map[string]*inspec.Control)
+		profilesMap := make(map[string]*inspec.Profile)
+		objectName := utils.GetObjName(report.GetReportId())
+		bytes, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
+		if err != nil {
+			err = errors.Wrap(err, "could not get the file from object store")
+			logrus.WithError(err).Error()
+			return nil, err
+		}
+		cmpReport := compliance.Report{}
+		err = json.Unmarshal(*bytes, &cmpReport)
+		if err != nil {
+			err = errors.Wrap(err, "error in unmarshalling the report content")
+			logrus.WithError(err).Error()
+			return nil, err
+		}
+
+		//populate controlsMap and ProfileMap
+		for _, profile := range cmpReport.Profiles {
+			profilesMap[profile.Sha256] = profile
+			controlMap := make(map[string]*inspec.Control)
+			for _, control := range profile.Controls {
+				controlMap[control.Id] = control
+			}
+			controlsMap[profile.Sha256] = controlMap
+		}
+
+		//prepare json or csv reports
+		fmt.Println(cmpReport.ReportUuid)
+	}
 
 	endTime := time.Now().UTC().Round(time.Second)
 	job.EndTime = &endTime
 
-	return &job, err
+	return &job, nil
 }
