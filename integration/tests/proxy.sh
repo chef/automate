@@ -4,28 +4,6 @@
 test_name="proxy"
 test_proxy="true"
 
-source integration/services/common.sh
-_ssh_node_container_name="$(service_container_name "ssh_node")"
-
-do_setup() {
-    do_setup_default
-    local previous_umask
-    previous_umask=$(umask)
-    umask 022
-
-    echo "Installing docker"
-    hab pkg install --binlink core/docker
-    echo "Installed docker"
-
-    hab pkg install core/jq-static
-
-    umask "$previous_umask"
-}
-
-jq() {
-    hab pkg exec core/jq-static jq "$@"
-}
-
 do_deploy() {
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
