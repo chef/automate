@@ -6,16 +6,16 @@ test_name=":cypress: e2e tests"
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
 
-do_create_config() {
-    do_create_config_default
-    #shellcheck disable=SC2154
-    cat <<EOF >> "$test_config_path"
-[global.v1.proxy]
-host = "localhost"
-port = 80
-no_proxy = ["0.0.0.0", "127.0.0.1"]
-EOF
-}
+# do_create_config() {
+#     do_create_config_default
+#     #shellcheck disable=SC2154
+#     cat <<EOF >> "$test_config_path"
+# [global.v1.proxy]
+# host = "localhost"
+# port = 80
+# no_proxy = ["0.0.0.0", "127.0.0.1"]
+# EOF
+# }
 
 # Note: these tests use the UI, so a valid license needs to be set up.
 # Alternatively, the UI tests could also _apply the license_ and thus
