@@ -36,7 +36,7 @@ The Incident App generates a data stream of compliance events that you can lever
 
 * The [Integration App]({{< relref "servicenow_integration" >}}) is already installed and configured.
 
-## Installation
+## Install
 
 Get the app from the [ServiceNow](https://store.servicenow.com) store and then install it to your account from the **Service Management** dashboard.
 

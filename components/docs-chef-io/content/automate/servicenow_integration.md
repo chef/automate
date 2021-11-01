@@ -42,7 +42,7 @@ Install following ServiceNow plugins from the Service Management dashboard:
 - Configuration Management (CMDB) 1.1.
 - Configuration Management for Scoped Apps (com.snc.cmdb.scoped) 1.0.0.
 
-## Installatopm
+## Install
 
 Get the app from the [ServiceNow](https://store.servicenow.com) store and then install it to your account from the **Service Management** dashboard.
 
@@ -196,7 +196,7 @@ The Integration App has nine configurable **Application Properties**. Changing t
 `x_chef_automate.enable.system.app`
 : Used to enable software installed mappings. Valid Values: `Yes`, `No`. Default: `No`.
 
-## Uninstallation
+## Uninstall
 
 To uninstall the Integration App:
 
