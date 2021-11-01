@@ -35,10 +35,10 @@ do_deploy() {
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 
-    proxyurl="http://${test_proxy_container_name}:3128"
-    echo "export http_proxy=${proxyurl}" >> ~/.bashrc
-    echo "export https_proxy=${proxyurl}" >> ~/.bashrc
-    source ~/.bashrc
+    # proxyurl="http://${test_proxy_container_name}:3128"
+    # echo "export http_proxy=${proxyurl}" >> ~/.bashrc
+    # echo "export https_proxy=${proxyurl}" >> ~/.bashrc
+    # source ~/.bashrc
 
     yum install openssh -y
     yum install openssh-server -y
