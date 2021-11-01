@@ -13,7 +13,7 @@ docker run -p 80:80 -p 443:443 \
            --dns-route53 \
            -d "*.cd.chef.co" \
            --register-unsafely-without-email \
-           --agree-tos
+           --agree-tos --test-cert
 
 sudo chown -R $(id -u $USER):$(id -g $USER) "$(pwd)/etc/"
 
