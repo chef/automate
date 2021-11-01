@@ -28,7 +28,7 @@ type Backend struct {
 }
 
 // This method will support adding a document with a specified id
-func (es *Backend) upsertComplianceRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
+func (es *Backend) upsertNodeRunInfo(ctx context.Context, mapping mappings.Mapping, id string, runDateTime time.Time) error {
 	runDateTimeAsString := runDateTime.Format(time.RFC3339)
 
 	script := elastic.NewScript(fmt.Sprintf("ctx._source.last_run = '%s'", runDateTimeAsString))
@@ -50,7 +50,7 @@ func (es *Backend) upsertComplianceRunInfo(ctx context.Context, mapping mappings
 
 func (es *Backend) InsertNodeRunDateInfo(ctx context.Context, nodeInfo backend.Run) error {
 	mapping := mappings.NodeRunInfo
-	err := es.upsertComplianceRunInfo(ctx, mapping, nodeInfo.EntityUuid, nodeInfo.EndTime)
+	err := es.upsertNodeRunInfo(ctx, mapping, nodeInfo.EntityUuid, nodeInfo.EndTime)
 	return err
 }
 
@@ -144,7 +144,6 @@ func (es *Backend) addDataToTimeseriesIndex(ctx context.Context,
 	data interface{}) error {
 
 	index := mapping.IndexTimeseriesFmt(date)
-
 	// Wrapping the ES query to measure
 	f := func() error {
 		// Add a document on a particular index and let elasticsearch generate flake id

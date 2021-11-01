@@ -127,9 +127,17 @@ func (s *Suite) GlobalTeardown() {
 		return
 	}
 
-	_, err := s.client.DeleteIndex(indices...).Do(context.Background())
+	indicesToDelete := make([]string, 0)
+	for _, index := range indices {
+		//don't ever delete node run info.. we'll do that after each test when needed
+		if index != mappings.IndexNameNodeRunInfo {
+			indicesToDelete = append(indicesToDelete, index)
+		}
+	}
+	time.Sleep(2 * time.Second)
+	_, err := s.client.DeleteIndex(indicesToDelete...).Do(context.Background())
 	if err != nil {
-		fmt.Printf("Could not 'delete' ES indices: '%s'\nError: %s", indices, err)
+		fmt.Printf("Could not 'delete' ES indicesToDelete: '%s'\nError: %s", indicesToDelete, err)
 		os.Exit(3)
 	}
 }
@@ -325,6 +333,17 @@ func (s *Suite) IngestNodeAttributes(nodeAttributes []iBackend.NodeAttribute) {
 
 	// Refresh Indices
 	s.RefreshIndices(mappings.NodeAttribute.Index)
+}
+
+// IngestRuns ingests a number of runs and at the end, refreshes converge-history index
+func (s *Suite) IngestNodeRunDateInfo(runs []iBackend.Run) {
+	// Insert runs
+	for _, run := range runs {
+		s.ingest.InsertNodeRunDateInfo(context.Background(), run)
+	}
+
+	// Refresh Indices
+	s.RefreshIndices(mappings.ConvergeHistory.Index + "-*")
 }
 
 func contextWithProjects(projects []string) context.Context {
