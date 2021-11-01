@@ -39,6 +39,8 @@ type Client interface {
 	GetDeploymentsCount() (int32, error)
 
 	UpdateTelemetryReported(context.Context, string) error
+	GetTelemetry(context.Context) (Telemetry, error)
+	GetUniqueServicesFromPostgres(int64, time.Time) (int64, error)
 
 	// Used by our Integration Tests
 	EmptyStorage() error
@@ -152,4 +154,10 @@ type HealthCounts struct {
 	Critical     int32
 	Unknown      int32
 	Disconnected int32
+}
+
+type Telemetry struct {
+	ID                      string    `db:"id" json:"id"`
+	LastTelemetryReportedAt time.Time `db:"last_telemetry_reported_at" json:"last_telemetry_reported_at"`
+	CreatedAt               time.Time `db:"created_at" json:"created_at"`
 }
