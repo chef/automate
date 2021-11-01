@@ -30,7 +30,7 @@ The Integration App works by exposing the REST API endpoints for communication b
 ### System Requirements
 
 - A running [Chef Automate](https://www.chef.io/automate/) instance.
-- Chef Automate is provisioned with a valid SSL/TLS certificate from a trusted certificate authority (CA).
+- Chef Automate has a valid SSL/TLS certificate from a trusted certificate authority (CA).
 - A running [ServiceNow](https://www.servicenow.com/) instance.
 - The ServiceNow instance is reachable on port 443.
 
