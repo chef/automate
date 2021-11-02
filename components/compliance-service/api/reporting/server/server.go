@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
+	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
@@ -28,12 +29,19 @@ const streamBufferSize = 262144
 
 // Server implementation for reporting
 type Server struct {
-	es *relaxting.ES2Backend
+	es        *relaxting.ES2Backend
+	reportMgr reportmanager.ReportManagerServiceClient
 }
 
 // New creates a new server
-func New(es *relaxting.ES2Backend) *Server {
-	return &Server{es: es}
+func New(es *relaxting.ES2Backend, rm reportmanager.ReportManagerServiceClient) *Server {
+	server := Server{
+		es: es,
+	}
+	if rm != nil {
+		server.reportMgr = rm
+	}
+	return &server
 }
 
 // ListReports returns a list of reports based on query
@@ -101,6 +109,7 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 	}
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
+		logrus.Info(errorutils.FormatErrorMsg(err, in.Id))
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	report, err := srv.es.GetReport(in.Id, formattedFilters)
@@ -141,7 +150,7 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 		}
 	}
 	if in.Type == "" {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("Parameter 'type' not specified"))
+		return nil, status.Error(codes.InvalidArgument, "Parameter 'type' not specified")
 	}
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
@@ -277,6 +286,74 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	return nil
 }
 
+// ExportReportManager populate the report manager request and sent for processing
+func (srv *Server) ExportReportManager(ctx context.Context, in *reporting.Query) (*reporting.CustomReportResponse, error) {
+	if srv.reportMgr == nil {
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for supporting large compliance reports")
+	}
+
+	responseID := &reporting.CustomReportResponse{}
+	formattedFilters := formatFilters(in.Filters)
+	logrus.Debugf("Export called with filters %+v", formattedFilters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return responseID, err
+	}
+
+	err = validateReportQueryParams(formattedFilters)
+	if err != nil {
+		return responseID, err
+	}
+
+	// Retrieving the latest report ID for each node based on the provided filters
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false)
+	if err != nil {
+		return responseID, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters)
+	if err != nil {
+		return responseID, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	if reportIDs == nil || len(reportIDs.Ids) == 0 {
+		return nil, status.Error(codes.NotFound, "No reports found")
+	}
+
+	total := len(reportIDs.Ids)
+
+	//get requestor information from context
+	requestorID, err := auth_context.RequestorFromIncomingContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, fmt.Sprintf("error in getting the requestor info from context %s", err.Error()))
+	}
+	if requestorID == "" {
+		return nil, status.Error(codes.NotFound, "missing requestor information in the context")
+	}
+
+	// get all report manager requests one by one.
+	reportMgrRequests := &reportmanager.CustomReportRequest{
+		RequestorId: requestorID,
+		ReportType:  in.Type,
+	}
+
+	for idx := total - 1; idx >= 0; idx-- {
+		cur, err := srv.es.GetReportManagerRequest(reportIDs.Ids[idx], formattedFilters)
+		if err != nil {
+			return responseID, fmt.Errorf("failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err)
+		}
+		reportMgrRequests.Reports = append(reportMgrRequests.Reports, cur)
+	}
+	// send request to report manager
+	reportMgrResponse, err := srv.reportMgr.PrepareCustomReport(ctx, reportMgrRequests)
+	if err != nil {
+		return responseID, status.Error(codes.Internal, fmt.Sprintf("Failed to retrieve report manager acknowledgement: %s", err))
+	}
+	responseID.AcknowledgementId = reportMgrResponse.AcknowledgementId
+
+	return responseID, nil
+}
+
 func validateReportQueryParams(formattedFilters map[string][]string) error {
 	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
 		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
@@ -354,7 +431,7 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 	return func(data *reporting.Report) error {
 		raw, err := json.Marshal(data)
 		if err != nil {
-			return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+			return fmt.Errorf("failed to marshal JSON export data: %+v", err)
 		}
 
 		if initialRun {
@@ -370,7 +447,7 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		})
 		_, err = io.CopyBuffer(writer, reader, buf)
 		if err != nil {
-			return fmt.Errorf("Failed to export JSON: %+v", err)
+			return fmt.Errorf("failed to export JSON: %+v", err)
 		}
 
 		return nil
@@ -402,7 +479,7 @@ func csvExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		})
 		_, err = io.CopyBuffer(writer, reader, buf)
 		if err != nil {
-			return fmt.Errorf("Failed to export CSV: %+v", err)
+			return fmt.Errorf("failed to export CSV: %+v", err)
 		}
 
 		return nil

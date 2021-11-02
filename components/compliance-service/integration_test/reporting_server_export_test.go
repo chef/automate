@@ -10,12 +10,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/chef/automate/api/interservice/compliance/reporting"
+	"github.com/chef/automate/api/interservice/report_manager"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -23,7 +25,14 @@ import (
 )
 
 func TestReportingServerExport(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportServiceClientMock := report_manager.NewMockReportManagerServiceClient(gomock.NewController(t))
+
+	reportServiceClientMock.EXPECT().PrepareCustomReport(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&report_manager.CustomReportResponse{
+			AcknowledgementId: "testAck",
+		}, nil)
+
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, reportServiceClientMock)
 
 	/*
 	   Create a struct suitable for setting up a streaming server connection in a test environment.
@@ -184,4 +193,12 @@ func TestReportingServerExport(t *testing.T) {
 			assert.ElementsMatch(t, test.expectedIds, actualIds)
 		})
 	}
+
+	//Test ExportReportManager
+	ctx := auth_context.NewOutgoingContext(contextWithProjects([]string{"project1", "project2"}))
+	ctx = auth_context.NewOutgoingRequestorInfoContext(contextWithRequestorID(ctx))
+	resp, err := client.ExportReportManager(ctx, &reporting.Query{})
+	require.NoError(t, err)
+
+	assert.Equal(t, "testAck", resp.AcknowledgementId)
 }

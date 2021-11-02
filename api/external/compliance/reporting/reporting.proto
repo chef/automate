@@ -249,6 +249,28 @@ service ReportingService {
 	rpc ExportNode(Query) returns (stream chef.automate.api.common.ExportData) {};
 
 	/*
+	Export reports
+
+	Export multiple reports.
+	Supports filtering by profile or control. API returns an acknowledgement ID.
+
+	Authorization Action:
+	```
+	compliance:reports:list
+	```
+	*/
+	rpc ExportReportManager(Query) returns (CustomReportResponse) {
+		option (google.api.http) = {
+			post: "/api/v0/compliance/reporting/reportmanager/export"
+			body: "*"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "compliance:reporting:reports"
+			action: "compliance:reports:list"
+		};
+	};
+
+	/*
 	Show Node by ID
 
 	Show a specific node by ID.
@@ -917,4 +939,8 @@ message ControlElement {
 message ControlElements {
 	// List of control elements
 	repeated ControlElement control_elements = 1;
+}
+
+message CustomReportResponse {
+	string acknowledgement_id = 1;
 }

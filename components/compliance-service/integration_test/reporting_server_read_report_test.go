@@ -14,7 +14,7 @@ import (
 )
 
 func TestReadReport(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},

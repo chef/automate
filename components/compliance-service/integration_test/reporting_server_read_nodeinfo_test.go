@@ -13,18 +13,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestReadNodeInfo(t *testing.T){
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+func TestReadNodeInfo(t *testing.T) {
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	reports := []*relaxting.ESInSpecReport{
 		{
 			Projects: []string{},
-			NodeID: "1",
-			EndTime: time.Now(),
+			NodeID:   "1",
+			EndTime:  time.Now(),
 		},
 		{
 			Projects: []string{"project1", "project2"},
-			NodeID: "2",
-			EndTime: time.Now(),
+			NodeID:   "2",
+			EndTime:  time.Now(),
 		},
 	}
 	reportIds, err := suite.InsertInspecReports(reports)
@@ -36,45 +36,45 @@ func TestReadNodeInfo(t *testing.T){
 
 	unassignedReportID := reportIds[0]
 	assignedReportID := reportIds[1]
-	successCases := []struct{
-		description string
+	successCases := []struct {
+		description     string
 		allowedProjects []string
-		reportID string
-		expectdID string
+		reportID        string
+		expectdID       string
 	}{
 		{
-			description: "reporting_server_read_nodeinfo_test.go => Projects: user has access to all projects accessing an assigned report",
+			description:     "reporting_server_read_nodeinfo_test.go => Projects: user has access to all projects accessing an assigned report",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
-			reportID: assignedReportID,
-			expectdID: "2",
+			reportID:        assignedReportID,
+			expectdID:       "2",
 		},
 		{
 			description:     "reporting_server_read_nodeinfo_test.go => Projects: user has access to all projects accessing an unassigned report",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			reportID:        unassignedReportID,
-			expectdID: "1",
+			expectdID:       "1",
 		},
 		{
 			description:     "reporting_server_read_nodeinfo_test.go => Projects: user has access to all projects a report belongs to accessing an assigned report",
 			allowedProjects: []string{"project1", "project2"},
 			reportID:        assignedReportID,
-			expectdID: "2",
+			expectdID:       "2",
 		},
 		{
 			description:     "reporting_server_read_nodeinfo_test.go => Projects: user has access to some projects a report belongs to accessing an assigned report",
 			allowedProjects: []string{"project1", "project3"},
 			reportID:        assignedReportID,
-			expectdID: "2",
+			expectdID:       "2",
 		},
 		{
 			description:     "reporting_server_read_nodeinfo_test.go => Projects: user has access to unassigned reports accessing an unassigned report",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
 			reportID:        assignedReportID,
-			expectdID: "2",
+			expectdID:       "2",
 		},
 	}
 
-	for _, test := range successCases{
+	for _, test := range successCases {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
@@ -85,7 +85,6 @@ func TestReadNodeInfo(t *testing.T){
 			assert.Equal(t, test.expectdID, response.NodeId)
 		})
 	}
-
 
 	failureCases := []struct {
 		description     string
