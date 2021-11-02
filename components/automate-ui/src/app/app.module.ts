@@ -42,6 +42,7 @@ import { TeamModule } from 'app/modules/team/team.module';
 import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 
 // Services
+import { ApplicationStatsService } from './services/telemetry/application-stats/application-stats.service';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
@@ -320,6 +321,7 @@ import {
     },
     AdminKeyRequests,
     ApiTokenRequests,
+    ApplicationStatsService,
     AttributesService,
     AutomateSettingsRequests,
     CdsRequests,
