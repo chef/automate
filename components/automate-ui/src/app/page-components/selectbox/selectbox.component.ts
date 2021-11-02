@@ -47,11 +47,16 @@ export class SelectboxComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    // above logic is necessary to Deep copy data array
     if (!this.copyDataListFlags && this.data === this.listData || this.data !== null ) {
       this.listData = [...this.data];
+
+      // Deep copy of selected data
       if (this.selectedList.length !== 0) {
         this.selectedListData = [...this.selectedList];
       }
+
+      // eliminate selected data
       this.selectedListData.forEach((selectedListValue) => {
         if (selectedListValue[this.typeFieldName] === this.typeValue) {
           this.listData.forEach(
@@ -109,7 +114,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
 
   highlightElement(listData: any): boolean {
     return this.selectedListDataToMove.includes(listData);
-}
+  }
 
   moveRight() {
     if (this.selectedListData.length !== 0) {
