@@ -76,6 +76,10 @@ describe('Scan job', () => {
       cy.get('[data-cy=add-nodes]').contains('Add 3 Node(s)');
     });
 
+    it('close accordion', () => {
+      cy.get('[data-cy=cred-accordion]').click();
+    });
+
     it('open accordion', () => {
       cy.get('[data-cy=cred-accordion]').click();
     });
@@ -148,6 +152,10 @@ describe('Scan job', () => {
 
     it('click on Edit button to update scan job nodes', () => {
       cy.get('[data-cy=edit-0]').click();
+    });
+
+    it('close accordion in edit page', () => {
+      cy.get('[data-cy=cred-accordion]').click();
     });
 
     it('open accordion in edit page', () => {
