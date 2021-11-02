@@ -47,13 +47,33 @@ From hab studio:
 
 NOTE: to add the 10k, 20k, 50k entries we need to do manually changes in .studio/applications-service file.
 
-2. Hit the node count API and get the node count details.  
+2. Hit the application serivces count API and get the count details.  
+
+
+3. The following details are captured through node count API
+
+   | Service Count | API response time |
+   | ------------- | ----------------- |
+   | 27347         | 74ms              |
+   | 55278         | 136ms             |
+
+
+## chef client-run node count usage API URL
+API endpoint - "api/v0/cfgmgmt/telemetry/nodes/count"
+
+## Adding client-run node data
+From hab studio:
+
+1. Command to add the client-run data:-  
+    chef_load_nodes 10000
+    chef_load_nodes 20000
+    chef_load_nodes 50000
+
+2. Hit the client-run nodes count API and get the node count details.  
 
 
 3. The following details are captured through node count API
 
    | Node Count | API response time |
    | ---------- | ----------------- |
-   | 27347      | 74ms              |
-   | 55278      | 136ms             |
-
+   | 33393      | 36ms              |
