@@ -14,7 +14,7 @@ import (
 )
 
 func TestReadNode(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 
 	unassignedNodeId := newUUID()
 	assignedNodeId := newUUID()
