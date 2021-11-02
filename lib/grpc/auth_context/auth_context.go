@@ -34,10 +34,11 @@ var (
 
 // Properties is a container for metadata available from the context.
 type Properties struct {
-	Subjects []string
-	Projects []string
-	Resource string
-	Action   string
+	Subjects    []string
+	Projects    []string
+	Resource    string
+	Action      string
+	RequestorID string
 }
 
 // NewContext returns a new `context.Context` that holds a reference
@@ -50,6 +51,10 @@ func NewContext(ctx context.Context, subs []string, projects []string,
 	ctx = context.WithValue(ctx, resourceKey, res)
 	ctx = context.WithValue(ctx, actionKey, act)
 	return ctx
+}
+
+func NewRequestorContext(ctx context.Context, requestorID string) context.Context {
+	return context.WithValue(ctx, "requestorid", requestorID)
 }
 
 // NewOutgoingContext translates previously injected auth_context info into
@@ -73,6 +78,11 @@ func NewOutgoingProjectsContext(ctx context.Context) context.Context {
 		"projects": auth.Projects,
 	}
 	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func NewOutgoingRequestorInfoContext(ctx context.Context) context.Context {
+	auth := FromContext(ctx)
+	return metadata.AppendToOutgoingContext(ctx, "requestorid", auth.RequestorID)
 }
 
 // ProjectsFromMetadata extracts the requested projects from (incoming) metadata
@@ -113,7 +123,7 @@ func ContextWithoutProjects(ctx context.Context) context.Context {
 // or `nil` or "" if a piece of the information could not be found.
 func FromContext(ctx context.Context) *Properties {
 	var subs, projs []string
-	var res, act string
+	var res, act, requestorID string
 	if s, ok := ctx.Value(subjectsKey).([]string); ok {
 		subs = s
 	}
@@ -126,11 +136,16 @@ func FromContext(ctx context.Context) *Properties {
 	if a, ok := ctx.Value(actionKey).(string); ok {
 		act = a
 	}
+	if a, ok := ctx.Value("requestorid").(string); ok {
+		requestorID = a
+	}
+
 	return &Properties{
-		Subjects: subs,
-		Resource: res,
-		Action:   act,
-		Projects: projs,
+		Subjects:    subs,
+		Resource:    res,
+		Action:      act,
+		Projects:    projs,
+		RequestorID: requestorID,
 	}
 }
 
@@ -154,6 +169,14 @@ func ProjectsFromIncomingContext(ctx context.Context) ([]string, error) {
 	return authProps.Projects, nil
 }
 
+func RequestorFromIncomingContext(ctx context.Context) (string, error) {
+	authProps := FromContext(FromIncomingMetadata(ctx))
+	if authProps == nil {
+		return "", ErrParseAuthContext
+	}
+	return authProps.RequestorID, nil
+}
+
 // AllProjectsRequested takes in the project filter list
 // and returns true if the list is a single entry of *.
 func AllProjectsRequested(projectsFilter []string) bool {
@@ -163,7 +186,7 @@ func AllProjectsRequested(projectsFilter []string) bool {
 // FromIncomingMetadata translates auth info provided by GRPC metadata into
 // auth_context's representation, to be retrieved via auth_context.FromContext.
 func FromIncomingMetadata(ctx context.Context) context.Context {
-	var res, act string
+	var res, act, requestorID string
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return ctx
@@ -176,5 +199,10 @@ func FromIncomingMetadata(ctx context.Context) context.Context {
 	if a, ok := md["action"]; ok && len(a) > 0 {
 		act = a[0]
 	}
+	if r, ok := md["requestorid"]; ok && len(r) > 0 {
+		requestorID = r[0]
+	}
+	ctx = NewRequestorContext(ctx, requestorID)
+
 	return NewContext(ctx, subs, projs, res, act)
 }
