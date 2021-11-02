@@ -13,9 +13,11 @@ export interface NodeCredentialEntityState extends EntityState<NodeCredential> {
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
   status: EntityStatus;
+  total: number;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const GET_STATUS = 'getStatus';
 const SAVE_STATUS = 'saveStatus';
 const SAVE_ERROR = 'saveError';
 const UPDATE_STATUS = 'updateStatus';
@@ -35,7 +37,8 @@ nodeCredentialEntityAdapter.getInitialState(<NodeCredentialEntityState>{
   getAllStatus: EntityStatus.notLoaded,
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
-  status: EntityStatus.notLoaded
+  status: EntityStatus.notLoaded,
+  total: 0
 });
 
 export function nodeCredentialEntityReducer(
@@ -47,13 +50,46 @@ export function nodeCredentialEntityReducer(
       return set('status', EntityStatus.loading, state);
 
     case NodeCredentialActionTypes.SEARCH_SUCCESS:
+      const totalCountState = set('total', action.payload.total, state);
       return set('status', EntityStatus.loadingSuccess,
-        nodeCredentialEntityAdapter.setAll(action.payload.secrets, state));
+        nodeCredentialEntityAdapter.setAll(action.payload.secrets, totalCountState));
 
     case NodeCredentialActionTypes.SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
     case NodeCredentialActionTypes.GET_ALL: {
       return set(GET_ALL_STATUS, EntityStatus.loading, state);
+    }
+
+    case NodeCredentialActionTypes.GET: {
+      return set(
+        GET_STATUS,
+        EntityStatus.notLoaded,
+        state
+      );
+    }
+
+    case NodeCredentialActionTypes.GET_SUCCESS: {
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingSuccess,
+        nodeCredentialEntityAdapter.addOne(action.payload, state)
+      );
+    }
+
+    case NodeCredentialActionTypes.GET_FAILURE: {
+      return set(
+        GET_STATUS,
+        EntityStatus.loadingFailure,
+        state
+      );
+    }
+
+    case NodeCredentialActionTypes.RESET: {
+      return set(
+        GET_STATUS,
+        EntityStatus.notLoaded,
+        nodeCredentialEntityAdapter.removeAll(state)
+      );
     }
 
     case NodeCredentialActionTypes.GET_ALL_SUCCESS: {

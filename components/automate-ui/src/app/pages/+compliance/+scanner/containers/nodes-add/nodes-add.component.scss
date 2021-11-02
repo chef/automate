@@ -8,6 +8,7 @@
 .nodes-form {
   flex-basis: 50%;
   margin-right: 0.5em;
+  width: calc(100%/2);
 
   fieldset {
     margin: 0;
@@ -106,4 +107,38 @@
 
 .add-tag-btn {
   margin-bottom: 1em;
+}
+
+#wizard-step-2 {
+  display: contents;
+}
+
+.add-node-text {
+  line-height: 3em;
+}
+
+
+chef-select {
+  width: 17.2vw;
+}
+
+chef-select ::ng-deep .selected-value {
+  border-radius: 5px;
+}
+
+chef-select ::ng-deep .options {
+  width: 90%;
+  float: right;
+}
+
+chef-select ::ng-deep .options ::ng-deep chef-dropdown {
+  border: 2px solid var(--chef-primary-bright);
+  border-radius: 5px;
+}
+
+chef-option {
+  padding: 6px 6px 6px 18px;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
 }

@@ -1,0 +1,14 @@
+
+<div class="acc-header" [ngClass]="{'open-acc':showBody}" (click)="toggle()" [attr.data-cy]="dataCy">
+  <div class="headerTitle">
+      {{title}}
+  </div>
+  <div [@rotatedState]="!showBody? 'default': 'rotated'" class="arrow">
+    <chef-icon class="arrows">keyboard_arrow_down</chef-icon>
+  </div>
+</div>
+<div [@smoothCollapse]="!showBody? 'initial': 'final'">
+  <div class="acc-body">
+      <ng-content></ng-content>
+  </div>
+</div>

@@ -16,7 +16,8 @@ import {
 } from 'app/entities/node-credentials/node-credential.selectors';
 import { NodeCredential, NodeCredentialTypes } from 'app/entities/node-credentials/node-credential.model';
 import {
-  allCredentials
+  allCredentials,
+  totalNodeCredential
 } from 'app/entities/node-credentials/node-credential.selectors';
 
 import { NodeCredentialOrder, SortParams } from './node-credential-list.reducer';
@@ -39,6 +40,12 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
   public sortBy: string;
   public params: SortParams;
 
+  public throttle = 300;
+  public scrollDistance = 2;
+  public credentialArray: NodeCredential[] = [];
+  public total: number;
+  public scrollingLoader = false;
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
@@ -48,6 +55,19 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
+    this.instanceNodeCredentials$ = this.store.pipe(
+      takeUntil(this.isDestroyed),
+      select(allCredentials)
+    );
+    this.instanceNodeCredentials$.subscribe((results) => {
+      if (this.scrollingLoader) {
+        this.credentialArray = [...this.credentialArray, ...results];
+        this.scrollingLoader = false;
+      } else {
+        this.credentialArray = results;
+        this.nodesListLoading = false;
+      }
+    });
     this.instanceNodeCredentials$ = this.store.pipe(select(allCredentials));
     this.store.select(nodeCredentialListState).pipe(
       takeUntil(this.isDestroyed)
@@ -61,7 +81,24 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
         this.params = { ...this.params, order: toUpper(this.orderBy), sort: this.sortBy };
       }
     });
+    this.store.select(totalNodeCredential).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+    });
     this.getNodeList();
+  }
+
+  appendItems() {
+    this.params.page++;
+    this.getNodeList();
+  }
+
+  onScrollDown() {
+    if (this.credentialArray.length < this.total) {
+      this.scrollingLoader = true;
+      this.appendItems();
+    }
   }
 
   openCreateModal(): void {
@@ -73,6 +110,7 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
   }
 
   handleSortToggle({ detail: sortParams }): void {
+    this.nodesListLoading = true;
     this.store.dispatch(new SortNodeCredentialList(sortParams));
     this.getNodeList();
   }
@@ -99,7 +137,6 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
 
   getNodeList(): void {
     this.store.dispatch(new NodeCredentialsSearch(this.params));
-    this.nodesListLoading = false;
   }
 
   deleteNodeCredential(): void {
