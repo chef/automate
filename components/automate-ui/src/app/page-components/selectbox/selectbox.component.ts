@@ -55,6 +55,7 @@ export class SelectboxComponent implements OnInit, OnChanges {
       if (this.selectedList.length !== 0) {
         this.selectedListData = [...this.selectedList];
       }
+      this.moveLeftOrRight = '';
 
       // eliminate selected data
       this.selectedListData.forEach((selectedListValue) => {
@@ -108,6 +109,10 @@ export class SelectboxComponent implements OnInit, OnChanges {
   onClickData (data, side, type) {
     const avoidDuplication = side === 'left' ? 'right' : 'left';
     if (this.moveLeftOrRight !== avoidDuplication) {
+      this.selectItem(data, side, type);
+    }
+    if (this.moveLeftOrRight === avoidDuplication) {
+      this.selectedListDataToMove = [];
       this.selectItem(data, side, type);
     }
   }

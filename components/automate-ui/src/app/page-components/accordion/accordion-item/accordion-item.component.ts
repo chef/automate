@@ -28,7 +28,7 @@ import { Component, Input } from '@angular/core';
 export class AccordionItemComponent {
   @Input() title: string;
   @Input() dataCy: string;
-  showBody = false;
+  showBody = true;
 
   constructor() { }
 
