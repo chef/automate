@@ -17,6 +17,7 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
+	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
@@ -334,57 +335,11 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 // GetReport returns the information about a single report
 func (backend *ES2Backend) GetReport(reportId string, filters map[string][]string) (*reportingapi.Report, error) {
 	var report *reportingapi.Report
-
-	depth, err := backend.NewDepth(filters, false)
+	var method = "GetReport"
+	searchResult, queryInfo, err := backend.getSearchResult(reportId, filters, method)
 	if err != nil {
-		return report, errors.Wrap(err, "GetReport unable to get depth level for report")
+		return report, err
 	}
-
-	queryInfo := depth.getQueryInfo()
-
-	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
-	// query builder. we need to do this because this variation of filter query provides this func with deeper
-	// information about the report being retrieved.
-	queryInfo.filtQuery = getFiltersQueryForDeepReport(reportId, filters)
-
-	logrus.Debugf("GetReport will retrieve report %s based on filters %+v", reportId, filters)
-
-	fsc := elastic.NewFetchSourceContext(true)
-
-	if queryInfo.level != ReportLevel {
-		fsc.Exclude("profiles")
-	}
-	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportId, filters)
-
-	searchSource := elastic.NewSearchSource().
-		FetchSourceContext(fsc).
-		Query(queryInfo.filtQuery).
-		Size(1)
-
-	source, err := searchSource.Source()
-	if err != nil {
-		return report, errors.Wrap(err, "GetReport unable to get Source")
-	}
-	LogQueryPartMin(queryInfo.esIndex, source, "GetReport query searchSource")
-
-	searchResult, err := queryInfo.client.Search().
-		SearchSource(searchSource).
-		Index(queryInfo.esIndex).
-		FilterPath(
-			"took",
-			"hits.total",
-			"hits.hits._id",
-			"hits.hits._source",
-			"hits.hits.inner_hits").
-		Do(context.Background())
-
-	if err != nil {
-		return report, errors.Wrap(err, "GetReport unable to complete search")
-	}
-
-	logrus.Debugf("GetReport got %d reports in %d milliseconds\n", searchResult.TotalHits(),
-		searchResult.TookInMillis)
-
 	// we should only receive one value
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
@@ -1638,7 +1593,7 @@ func getFiltersQueryForDeepReport(reportId string,
 	return boolQuery
 }
 
-// getFilterQuerWithPagination creates a boolquery with filters and pagination support.
+// getFilterQueryWithPagination creates a boolquery with filters and pagination support.
 func (backend ES2Backend) getFilterQueryWithPagination(reportId string,
 	filters map[string][]string) (*elastic.BoolQuery, error) {
 	utils.DeDupFilters(filters)
@@ -1816,4 +1771,149 @@ func paginatedParams(filters map[string][]string) (int, int, error) {
 		size, err = strconv.Atoi(filters["size"][0])
 	}
 	return from, size, err
+}
+
+// GetReportManagerRequest takes report id and filters to populate the report manager request
+func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[string][]string) (*reportmanager.ReportRequest, error) {
+	mgrRequest := &reportmanager.ReportRequest{}
+	var method = "GetReportManagerRequest"
+	searchResult, queryInfo, err := backend.getSearchResult(reportId, filters, method)
+	if err != nil {
+		return mgrRequest, err
+	}
+	// we should only receive one searchResult value
+	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
+		for _, hit := range searchResult.Hits.Hits {
+			esInSpecReport := ESInSpecReport{}
+			if hit.Source != nil {
+				err := json.Unmarshal(*hit.Source, &esInSpecReport)
+				if err != nil {
+					logrus.Errorf("error unmarshalling the search response: %+v", err)
+					return mgrRequest, err
+				}
+
+				var esInspecProfiles []ESInSpecReportProfile //`json:"profiles"`
+
+				if queryInfo.level == ReportLevel {
+					esInspecProfiles = esInSpecReport.Profiles
+				} else if queryInfo.level == ProfileLevel || queryInfo.level == ControlLevel {
+					esInspecProfiles, _, err = getDeepInspecProfiles(hit, queryInfo)
+					if err != nil {
+						//todo - handle this
+						logrus.Errorf("GetReportManagerRequest time error: %s", err.Error())
+					}
+				}
+				// read all profiles
+				profiles := make([]*reportingapi.Profile, 0)
+				for _, esInSpecReportProfileMin := range esInspecProfiles {
+					logrus.Debugf("Determine profile: %s", esInSpecReportProfileMin.Name)
+					esInSpecProfile, err := backend.GetProfile(esInSpecReportProfileMin.SHA256)
+					if err != nil {
+						logrus.Errorf("GetReportManagerRequest - Could not get profile '%s' error: %s", esInSpecReportProfileMin.SHA256, err.Error())
+						logrus.Debug("GetReportManagerRequest - Making the most from the profile information in esInSpecReportProfileMin")
+						esInSpecProfile.Sha256 = esInSpecReportProfileMin.SHA256
+					}
+
+					reportProfile := inspec.Profile{}
+					reportProfile.Sha256 = esInSpecProfile.Sha256
+
+					reportProfile.Controls = make([]inspec.Control, len(esInSpecReportProfileMin.Controls))
+
+					// Creating a map of report control ids to avoid a n^2 complexity later on when we look for the
+					// matching profile control id
+					profileControlsMap := make(map[string]*reportingapi.Control, len(esInSpecProfile.Controls))
+					for _, control := range esInSpecProfile.Controls {
+						profileControlsMap[control.Id] = control
+					}
+
+					convertedControls := make([]*reportingapi.Control, 0)
+					// Enrich min report controls with profile metadata
+					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
+						if controlFromMap, ok := profileControlsMap[reportControlMin.ID]; ok {
+							reportControlMin.Tags = controlFromMap.Tags
+							// store controls to returned request
+							convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
+							if convertedControl != nil {
+								convertedControls = append(convertedControls, convertedControl)
+							}
+
+						} else {
+							logrus.Warnf("GetReportManagerRequest: %s was not found in the profile control map",
+								reportControlMin.ID)
+						}
+					}
+					if len(convertedControls) > 0 {
+						convertedProfile := reportingapi.Profile{
+							Sha256:   reportProfile.Sha256,
+							Controls: convertedControls,
+						}
+						profiles = append(profiles, &convertedProfile)
+					}
+				}
+				mgrRequest.ReportId = hit.Id
+				for _, profile := range profiles {
+					tempProfile := &reportmanager.Profile{}
+					tempProfile.ProfileId = profile.Sha256
+					for _, control := range profile.Controls {
+						tempProfile.Controls = append(tempProfile.Controls, control.Id)
+					}
+					mgrRequest.Profiles = append(mgrRequest.Profiles, tempProfile)
+				}
+			}
+		}
+		return mgrRequest, nil
+	}
+	return mgrRequest, errorutils.ProcessNotFound(nil, mgrRequest.ReportId)
+}
+
+func (backend *ES2Backend) getSearchResult(reportId string, filters map[string][]string, method string) (*elastic.SearchResult, *QueryInfo, error) {
+	depth, err := backend.NewDepth(filters, false)
+	if err != nil {
+		return nil, nil, errors.Errorf("%s unable to get depth level for report, %s", method, err.Error())
+	}
+	queryInfo := depth.getQueryInfo()
+
+	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
+	// query builder. we need to do this because this variation of filter query provides this func with deeper
+	// information about the report being retrieved.
+	queryInfo.filtQuery = getFiltersQueryForDeepReport(reportId, filters)
+	logrus.Debugf("%s will retrieve report %s based on filters %+v", method, reportId, filters)
+
+	fsc := elastic.NewFetchSourceContext(true)
+
+	if queryInfo.level != ReportLevel {
+		fsc.Exclude("profiles")
+	}
+	logrus.Debugf("%s for reportid=%s, filters=%+v", method, reportId, filters)
+
+	searchSource := elastic.NewSearchSource().
+		FetchSourceContext(fsc).
+		Query(queryInfo.filtQuery).
+		Size(1)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, nil, errors.Errorf("%s unable to get Source, %s", method, err.Error())
+	}
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", method))
+
+	searchResult, err := queryInfo.client.Search().
+		SearchSource(searchSource).
+		Index(queryInfo.esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._source",
+			"hits.hits.inner_hits").
+		Do(context.Background())
+
+	if err != nil {
+		return nil, nil, errors.Errorf("%s unable to complete search, %s", method, err.Error())
+	}
+
+	logrus.Debugf("%s got %d reports in %d milliseconds\n", method, searchResult.TotalHits(),
+		searchResult.TookInMillis)
+
+	return searchResult, queryInfo, nil
 }

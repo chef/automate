@@ -77,7 +77,7 @@ func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (
 			log.Debugf("error authenticating request: %s", err)
 			return nil, err
 		}
-		authCtx = context.WithValue(authCtx, "requestorID", authResponse.Requestor)
+		authCtx = context.WithValue(authCtx, "requestorid", authResponse.Requestor)
 		subs = append(authResponse.Teams, authResponse.Subject)
 	}
 
