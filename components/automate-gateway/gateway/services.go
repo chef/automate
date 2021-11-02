@@ -1005,7 +1005,7 @@ func (s *Server) authRequest(r *http.Request, resource, action string) (context.
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
 
-		ctx = context.WithValue(ctx, "requestorID", authnResp.Requestor)
+		ctx = context.WithValue(ctx, "requestorid", authnResp.Requestor)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "authn-service error")
