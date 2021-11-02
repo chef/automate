@@ -188,45 +188,45 @@ service InfraProxy {
   rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:get";
   };
   rpc GetDataBagItems (infra_proxy.request.DataBagItems) returns (infra_proxy.response.DataBagItems) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
   };
   rpc GetDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:get";
   };
   rpc CreateDataBag (infra_proxy.request.CreateDataBag) returns (infra_proxy.response.CreateDataBag) {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:create";
   };
   rpc CreateDataBagItem (infra_proxy.request.CreateDataBagItem) returns (infra_proxy.response.CreateDataBagItem) {
     option (google.api.http).post = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:create";
   };
   rpc DeleteDataBag (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBags:delete";
   };
   rpc DeleteDataBagItem (infra_proxy.request.DataBagItem) returns (infra_proxy.response.DataBagItem) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:delete";
   };
   rpc UpdateDataBagItem (infra_proxy.request.UpdateDataBagItem) returns (infra_proxy.response.UpdateDataBagItem) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item_id}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsDataBagsItem:update";
   };
 
   rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
