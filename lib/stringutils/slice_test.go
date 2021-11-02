@@ -86,3 +86,13 @@ func TestSliceReject(t *testing.T) {
 		})
 	}
 }
+
+func TestGetFullPlatformName(t *testing.T) {
+	fullName := stringutils.GetFullPlatformName("platform", "1.2.3")
+	assert.Equal(t, "platform 1.2.3", fullName)
+}
+
+func TestGetFullProfileName(t *testing.T) {
+	fullName := stringutils.GetFullProfileName("profile", "1.2.3")
+	assert.Equal(t, "profile, v1.2.3", fullName)
+}
