@@ -545,3 +545,7 @@ func contextWithProjects(projects []string) context.Context {
 	ctx := context.Background()
 	return auth_context.NewContext(ctx, []string{}, projects, "", "")
 }
+
+func contextWithRequestorID(ctx context.Context) context.Context {
+	return auth_context.NewRequestorContext(ctx, "testRequestorID")
+}
