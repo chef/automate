@@ -47,13 +47,9 @@
         <div class="search-create-container">
           <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items by name...">
           </app-infra-search-bar>
-          <app-paginator *ngIf="dataBagItems"
-            [length]= "total"
-            [pageSize]= "per_page"
-            [pageIndex]= "current_page"
-            (changePage)= "onUpdatePage($event)"
-          ></app-paginator>
-          <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}', 'post', [serverId, orgId, dataBagName]]">
+            <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
+          </app-authorized>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
           <chef-loading-spinner *ngIf="loading || deleting" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
@@ -84,18 +80,22 @@
                           <chef-icon>remove_circle</chef-icon>
                           <span>Collapse All</span>
                         </chef-button>
-                        <chef-button tertiary class="action right-button-box" (click)="startDataBagItemDelete(item)">
-                          <chef-icon class="material-icons">delete</chef-icon>
-                          <span>Delete</span>
-                        </chef-button>
-                        <chef-button
-                          tertiary
-                          class="action right-button-box"
-                          (click)="startUpdateDataBagItem(item, selectedItemDetails)"
-                          [disabled]="editDisable">
-                          <chef-icon class="material-icons">mode_edit</chef-icon>
-                          <span>Edit</span>
-                        </chef-button>
+                        <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}', 'delete', [serverId, orgId, dataBagName, item.name]]">
+                          <chef-button tertiary class="action right-button-box" (click)="startDataBagItemDelete(item)">
+                            <chef-icon class="material-icons">delete</chef-icon>
+                            <span>Delete</span>
+                          </chef-button>
+                        </app-authorized>
+                        <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}', 'put', [serverId, orgId, dataBagName, item.name]]">
+                          <chef-button
+                            tertiary
+                            class="action right-button-box"
+                            (click)="startUpdateDataBagItem(item, selectedItemDetails)"
+                            [disabled]="editDisable">
+                            <chef-icon class="material-icons">mode_edit</chef-icon>
+                            <span>Edit</span>
+                          </chef-button>
+                        </app-authorized>
                       </div>
 
                       <app-json-tree-table class="json-tree-container" #tree [json]="selectedItemDetails"></app-json-tree-table>
