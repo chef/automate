@@ -24,7 +24,7 @@ func TestReadTrend(t *testing.T) {
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
 	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl})
+	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: opensearchUrl}, nil)
 
 	n := 5
 
