@@ -121,41 +121,38 @@ export class NodesEditComponent implements OnInit, OnDestroy {
             id: node['target_config']['secrets'][i]
           }));
         }
+        this.searchData = '';
+        this.secrets = [];
+        this.pageNumber = 1;
+        this.secretType = node['target_config']['backend'];
+        this.scrollLoadingValue = false;
+        this.store.select(credtotal).pipe(
+          takeUntil(this.isDestroyed)
+        ).subscribe((total) => {
+          this.total = total;
+        });
+        this.store.pipe(
+          takeUntil(this.isDestroyed),
+          select(allCredentials)
+        ).subscribe((secretList) => {
+          if (this.isScroll) {
+            this.secrets = [...this.secrets, ...secretList];
+          } else {
+            this.secrets = secretList;
+          }
+        });
+        this.store.pipe(
+          select(credStatus),
+          takeUntil(this.isDestroyed),
+          filter(status => !pending(status)))
+          .subscribe(response => {
+            if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
+                this.scrollLoadingValue = false;
+            }
+          });
+        this.getCredList(false);
       });
 
-    this.searchData = '';
-    this.secrets = [];
-    this.pageNumber = 1;
-    this.secretType = 'ssh';
-    // let secretCred;
-    this.scrollLoadingValue = false;
-    // secretCred =
-    this.store.select(credtotal).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe((total) => {
-      this.total = total;
-    });
-    this.store.pipe(
-      takeUntil(this.isDestroyed),
-      select(allCredentials)
-    ).subscribe((secretList) => {
-      if (this.isScroll) {
-        this.secrets = [...this.secrets, ...secretList];
-      } else {
-        this.secrets = secretList;
-      }
-    });
-    this.store.pipe(
-      select(credStatus),
-      takeUntil(this.isDestroyed),
-      filter(status => !pending(status)))
-      .subscribe(response => {
-        if (response === EntityStatus.loadingSuccess || EntityStatus.loadingFailure) {
-            this.scrollLoadingValue = false;
-        }
-      });
-
-    this.getCredList(false);
   }
 
   ngOnDestroy() {

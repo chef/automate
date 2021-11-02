@@ -37,7 +37,7 @@
               <div class="field">
                 <app-accordion>
                   <app-accordion-item title="Add credentials to connect to your nodes" [dataCy]="dataCy">
-                    <chef-select #ty (change)="onTypeSelect(ty.value)" data-cy="selectCredtype">
+                    <chef-select #ty [value]="secretType" (change)="onTypeSelect(ty.value)" data-cy="selectCredtype">
                       <chef-option
                         panelClass="chef-dropdown"
                         value="{{credential.asset}}"
