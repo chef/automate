@@ -264,6 +264,40 @@ func init() {
         ]
       }
     },
+    "/api/v0/compliance/reporting/reportmanager/export": {
+      "post": {
+        "summary": "Export reports",
+        "description": "Export multiple reports.\nSupports filtering by profile or control. API returns an acknowledgement ID.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "ReportingService_ExportReportManager",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.CustomReportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/reports": {
       "post": {
         "summary": "List Reports",
@@ -637,6 +671,14 @@ func init() {
         }
       },
       "description": "A minimal representation of the statuses of the controls in the report."
+    },
+    "chef.automate.api.compliance.reporting.v1.CustomReportResponse": {
+      "type": "object",
+      "properties": {
+        "acknowledgement_id": {
+          "type": "string"
+        }
+      }
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
