@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -9,10 +10,10 @@ import (
 	gp "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 
 	version "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/api/external/compliance/reporting"
-	"github.com/chef/automate/api/interservice/compliance/jobs"
 	jobsService "github.com/chef/automate/api/interservice/compliance/jobs"
 	reportingService "github.com/chef/automate/api/interservice/compliance/reporting"
 	versionService "github.com/chef/automate/api/interservice/compliance/version"
@@ -146,6 +147,27 @@ func (a *Reporting) ListProfiles(ctx context.Context, in *reporting.Query) (*rep
 	return out, nil
 }
 
+// should cover reporting/reportmanager/export
+func (a *Reporting) ExportReportManager(ctx context.Context, in *reporting.Query) (*reporting.CustomReportResponse, error) {
+	//get the requestor and append it to metadata
+	requestor := ctx.Value("requestorid")
+	if requestor == nil || requestor.(string) == "" {
+		return nil, fmt.Errorf("missing requestor info in the context")
+	}
+	ctx = metadata.AppendToOutgoingContext(ctx, "requestorid", requestor.(string))
+
+	inDomain := &reportingService.Query{}
+	out := &reporting.CustomReportResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.ExportReportManager(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (a *Reporting) Export(*reporting.Query, reporting.ReportingService_ExportServer) error {
 	// Please see components/automate-gateway/services.go ReportExportHandler for implementation
 	return nil
@@ -211,7 +233,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 	//	260:// ListInitiatedScans returns a list of ids for all scans with an end_time after or equal to the time
 	//262:func (srv *Server) ListInitiatedScans(ctx context.Context, in *jobs.TimeQuery) (*jobs.Ids, error) {
 	//	263:	jobIDList, err := srv.db.ListInitiatedScans(ctx, in.StartTime)
-	jobsList, err := a.scanner.ListInitiatedScans(ctx, &jobs.TimeQuery{StartTime: in.GetStartTime()})
+	jobsList, err := a.scanner.ListInitiatedScans(ctx, &jobsService.TimeQuery{StartTime: in.GetStartTime()})
 	if err != nil {
 		return nil, errors.Wrap(err, "could not list owca scans")
 	}
