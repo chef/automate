@@ -18,7 +18,7 @@
      <div class="withLable">
         <label>Local service</label>
         <div class="automateDiv">
-          <chef-checkbox [checked]=automateCheck (change)="onclickCheckbox($event,'automate')">
+          <chef-checkbox  data-cy="automate_click" [checked]=automateCheck (change)="onclickCheckbox($event,'automate')">
             <img src="/assets/img/logos/AutomateLogo-default.svg" alt="Automate" class="logo automate" />
           </chef-checkbox>
         </div>
@@ -28,13 +28,13 @@
       <div>
         <div class="withLable">
           <label>Cloud Services</label>
-          <chef-checkbox class=awsDiv id="awsCheckbox" [checked]=awsCheck (change)="onclickCheckbox($event,'aws')">
+          <chef-checkbox data-cy="aws_click" class=awsDiv id="awsCheckbox" [checked]=awsCheck (change)="onclickCheckbox($event,'aws')">
             <img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws"/>
           </chef-checkbox>
-          <chef-checkbox class=awsDiv [checked]=azureCheck (change)="onclickCheckbox($event,'azure')">
+          <chef-checkbox data-cy="azure_click" class=awsDiv [checked]=azureCheck (change)="onclickCheckbox($event,'azure')">
             <img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure"/>
           </chef-checkbox>
-          <chef-checkbox class=awsDiv [checked]=gcpCheck (change)="onclickCheckbox($event,'gcp')">
+          <chef-checkbox data-cy="gcp_click" class=awsDiv [checked]=gcpCheck (change)="onclickCheckbox($event,'gcp')">
             <img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp"/>
           </chef-checkbox>
           </div>
@@ -45,6 +45,7 @@
   <div class="managers" formArrayName="managers">
     <chef-card
       *ngFor="let managerControl of form.get('managers')['controls']; let mIndex = index;"
+      [attr.data-cy]="managerControl.value.type + '-' + mIndex"
       formGroupName="{{mIndex}}"
       id="{{managerControl.value.id}}"
       class="manager">
