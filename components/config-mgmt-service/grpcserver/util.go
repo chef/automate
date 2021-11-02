@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
@@ -10,6 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	gp "github.com/golang/protobuf/ptypes/struct"
 	google_protobuf1 "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 // messageArrayToListValue Casts a 'Proto Message Array' into a 'Proto ListValue'
@@ -66,4 +68,19 @@ func DaysBetween(fromTime, toTime time.Time) int {
 	days += toTime.YearDay()
 
 	return days
+}
+
+func LogQueryPartMin(indices string, partToPrint interface{}, name string) {
+	part, err := json.Marshal(partToPrint)
+	if err != nil {
+		logrus.Errorf("%s", err)
+	}
+	stringPart := string(part)
+	if stringPart == "null" {
+		stringPart = ""
+	} else {
+		stringPart = "\n" + stringPart
+	}
+	logrus.Debugf("\n------------------ %s-(start)--[%s]---------------%s \n------------------ %s-(end)-----------------------------------\n",
+		name, indices, stringPart, name)
 }

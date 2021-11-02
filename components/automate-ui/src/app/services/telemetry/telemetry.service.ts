@@ -16,6 +16,8 @@ import { UpdateUserPreferencesSuccess, UpdateUserPreferencesFailure } from 'app/
 import { ClientRunsStatsService } from './client-runs-stats/client-runs-stats.service';
 import { ComplianceStatsService } from './compliance-stats/compliance-stats.service';
 import { NodeUsageStats, NodeUsageAckStats } from './compliance-stats/compliance-stats.model';
+import { ApplicationUsageStats, ApplicationUsageAckStats } from './application-stats/application-stats.model';
+import { ApplicationStatsService } from './application-stats/application-stats.service';
 
 declare let analytics: any;
 
@@ -64,6 +66,7 @@ export class TelemetryService {
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>,
     private complianceStatsService: ComplianceStatsService,
+    private applicationStatsService: ApplicationStatsService,
     private clientRunsStatsService: ClientRunsStatsService) {
     // Subscribe to Router's NavigationEnd event to automatically track page
     // browsing of the user.
@@ -399,6 +402,16 @@ export class TelemetryService {
     } catch (error) {
       console.log(error);
     }
+    // application stats
+    try {
+      const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
+        .getApplicationStats();
+        const ApplicationAckStats: ApplicationUsageAckStats = await this
+        .sendApplicationStatsToTelemetry(applicationUsageStats);
+        await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
+    } catch (error) {
+      console.log(error);
+    }
     resolver('success');
     return promise;
   }
@@ -416,6 +429,29 @@ export class TelemetryService {
     }, true).subscribe(() => {
       if (nodeUsageStatsSubscription) {
         nodeUsageStatsSubscription.unsubscribe();
+      }
+      resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
+    },
+    ({ status, error: { message } }: HttpErrorResponse) => {
+      console.log(`Error emitting telemetry event: ${status} - ${message}`);
+      resolver('error');
+    });
+    return promise;
+  }
+
+  sendApplicationStatsToTelemetry(applicationUsageStats: ApplicationUsageStats)
+  : Promise<NodeUsageAckStats> {
+    let resolver;
+    const promise = new Promise<ApplicationUsageAckStats>((resolve) => {
+      resolver = resolve;
+    });
+    const applicationUsageStatsSubscription = this.emitToPipeline('track', {
+      userId: this.anonymousId,
+      event: 'servicesCounts',
+      properties: { total_services: applicationUsageStats.total_services }
+    }, true).subscribe(() => {
+      if (applicationUsageStatsSubscription) {
+        applicationUsageStatsSubscription.unsubscribe();
       }
       resolver({lastTelemetryReportedAt: this.getCurrentDateTime()});
     },

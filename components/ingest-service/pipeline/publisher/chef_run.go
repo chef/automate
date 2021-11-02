@@ -40,7 +40,8 @@ func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- messag
 			runc := insertChefRun(msg, client)
 			nodec := insertNode(msg, client)
 			attrc := insertNodeAttribute(msg, client)
-			errc := merge(runc, nodec, attrc)
+			runInfo := insertNodeInfo(msg, client)
+			errc := merge(runc, nodec, attrc, runInfo)
 
 			for err := range errc {
 				if err != nil {
