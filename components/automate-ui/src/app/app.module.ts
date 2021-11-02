@@ -45,6 +45,7 @@ import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 import { ApplicationStatsService } from './services/telemetry/application-stats/application-stats.service';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
+import { ClientRunsStatsService } from './services/telemetry/client-runs-stats/client-runs-stats.service';
 import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
 import { ConfigService } from './services/config/config.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
@@ -328,6 +329,7 @@ import {
     AutomateSettingsRequests,
     CdsRequests,
     ChefSessionService,
+    ClientRunsStatsService,
     ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
