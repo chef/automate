@@ -25,7 +25,6 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
-	aEvent "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	reportmanager "github.com/chef/automate/api/interservice/report_manager"
@@ -175,7 +174,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	ingesticESClient := ingestic.NewESClient(esClient)
 	ingesticESClient.InitializeStore(context.Background())
 	runner.ESClient = ingesticESClient
-	reportmanagerClient := createReportManager(connFactory, conf.ReportConfig.Endpoint)
+	var reportmanagerClient reportmanager.ReportManagerServiceClient
+	reportmanagerClient = nil
+	if conf.Service.IsSupportLCR {
+		reportmanagerClient = createReportManager(connFactory, conf.ReportConfig.Endpoint)
+	}
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
@@ -206,7 +209,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
-	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
+	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr, reportmanagerClient))
 
 	ps := profilesserver.New(db, &esr, ingesticESClient, &conf.Profiles, eventClient, statusSrv)
 	profiles.RegisterProfilesServiceServer(s, ps)
@@ -275,7 +278,7 @@ func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address s
 }
 
 func getEventConnection(connectionFactory *secureconn.Factory,
-	eventEndpoint string) aEvent.EventServiceClient {
+	eventEndpoint string) event.EventServiceClient {
 	if eventEndpoint == "" || eventEndpoint == ":0" {
 		if os.Getenv("RUN_MODE") == "test" {
 			logrus.Infof("using mock Event service Client")
@@ -296,7 +299,7 @@ func getEventConnection(connectionFactory *secureconn.Factory,
 		logrus.Fatalf("compliance setup, error grpc dialing to event-service aborting...")
 	}
 	// get event client
-	eventClient := aEvent.NewEventServiceClient(conn)
+	eventClient := event.NewEventServiceClient(conn)
 	if eventClient == nil {
 		logrus.Fatalf("compliance setup, could not obtain automate events service client: %s", err)
 	}
