@@ -13,7 +13,7 @@ import (
 )
 
 func TestNodeControl(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	ctx := context.Background()
 	endTime := time.Now()
 	IDs := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
@@ -585,7 +585,7 @@ func TestNodeControl(t *testing.T) {
 }
 
 func TestNodeControlWithError(t *testing.T) {
-	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl}, nil)
 	ctx := context.Background()
 	endTime := time.Now()
 	IDs := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
