@@ -1,4 +1,4 @@
-import { map, distinctUntilChanged, debounceTime, takeUntil} from 'rxjs/operators';
+import { map, distinctUntilChanged, debounceTime, takeUntil } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,8 +20,8 @@ import {
   ManagerSearchFields,
   ManagerSearchNodes,
   ManagerAllNodes,
-  ManagersSearch,
-} from "../../entities/managers/manager.actions";
+  ManagersSearch
+} from '../../entities/managers/manager.actions';
 import { ProfilesSearch } from '../../entities/profiles/profile.actions';
 import { JobCreate } from '../../entities/jobs/job.actions';
 
@@ -63,14 +63,14 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public loadMore = false;
   public firstTime = true;
   public firstTimeOninit = true;
-  public managersList : any;
-  public managersArray : any;
+  public managersList: any;
+  public managersArray: any;
   public fieldCounter = 0;
-  public appendDataOnscrollLater : boolean;
+  public appendDataOnscrollLater: boolean;
   public managerId = [];
-  public searchName : [];
-  public nodeArray : [] ;
-  public nodeManagerArray : any;
+  public searchName: [];
+  public nodeArray: [] ;
+  public nodeManagerArray: any;
   public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -98,7 +98,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
       takeUntil(this.isDestroyed)
     ).subscribe((total) => {
       this.total = total;
-      console.log('Total is ',total);
+      console.log('Total is ', total);
     });
 
     this.setupForm();
@@ -108,65 +108,53 @@ export class JobAddComponent implements OnDestroy , OnInit {
   }
 
   ngOnInit() {
-    console.log('Inside ngoninit')
-     this.store.dispatch(
-       new ManagersSearch({
+    this.store.dispatch(
+      new ManagersSearch({
         page: this.pagenumber,
-        per_page: 10,
-      })
+        per_page: 10
+    })
    );
-   console.log('Total value in ngonint',this.total);
-   console.log('Manager array len',this.firstTimeOninit &&  this.managersArray.length < this.total);
-
-     this.store.pipe(
+      this.store.pipe(
             select(fieldsByManager),
             takeUntil(this.isDestroyed)
           ).subscribe(res => {
-           this.fieldCounter =0 ;
+           this.fieldCounter = 0 ;
             this.nodeManagerArray.forEach((manager) => {
-              if(manager.id in res)
-              {
-                if(!res[manager.id].loadingAllTotalFields) {
+              if (manager.id in res) {
+                if (!res[manager.id].loadingAllTotalFields) {
                     this.fieldCounter++;
                 }
               }
-            });
-            console.log('Counter val in field pipe',this.fieldCounter);
-            console.log('managerarray length in field', this.nodeManagerArray.length);
-          });
+       });
+
+        });
 
      this.store.pipe(
             select(nodesByManager),
             takeUntil(this.isDestroyed)
           ).subscribe(res => {
-           // console.log(res, 'node by manger val');
-            var counter = 0;
+            let counter = 0;
             this.nodeManagerArray.forEach((manager) => {
-              if(manager.id in res)
-              {
-                if(!res[manager.id].loadingAllTotal) {
+              if (manager.id in res) {
+                if (!res[manager.id].loadingAllTotal) {
                     counter++;
                 }
               }
             });
-            console.log('Counter val in pipe',counter);
-            console.log('managerarray length', this.nodeManagerArray.length);
-            console.log('Total elements',this.total);
-            if(this.nodeManagerArray.length == 10 && counter + this.fieldCounter == 20 ){
+            if (this.nodeManagerArray.length === 10 && counter + this.fieldCounter === 20 ) {
                     console.log('load more in if');
-                    this.loadMore =true;
-      }
+                    this.loadMore = true;
+            }
           });
-  }
+}
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
-  public firstCalled(flag : boolean) {
+  public firstCalled(flag: boolean) {
      this.firstTime = flag;
-     console.log('Value of first time from child',flag)
   }
 
   public setupForm() {
@@ -222,23 +210,17 @@ export class JobAddComponent implements OnDestroy , OnInit {
     this.managers$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(managers => {
-
         this.nodeManagerArray = managers;
-        console.log('Node manger array listed',this.nodeManagerArray);
         this.managersArray = nodesGroup.controls['managers'] as FormArray;
-        if(this.firstTime) {
-          console.log("first time called")
+        if (this.firstTime) {
+          console.log('first time called');
            this.managersArray.clear();
-           this.pagenumber=1;
+           this.pagenumber = 1;
           this.managersList = managers;
           this.firstTime = false;
         } else {
-
-               this.managersList = [...this.managersList, ...managers];
+            this.managersList = [...this.managersList, ...managers];
           }
-
-
-        console.log('Managers:',managers);
         this.managersList.forEach((manager, i) => {
         const managerId = manager.id;
           const namesGroup = this.fb.group({
@@ -272,7 +254,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
             distinctUntilChanged((a, b) => isEqual(a, b)),
             takeUntil(this.isDestroyed))
             .subscribe(payload => {
-              console.log('ManagerSearchNodes called')
+              console.log('ManagerSearchNodes called');
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 
@@ -282,7 +264,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
 
           switch (manager.type) {
             case ('automate'): {
-              console.log('Inside ManagerSearchFields')
+              console.log('Inside ManagerSearchFields');
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'name'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -290,7 +272,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
             case ('aws-ec2'):
             case ('azure-vm'):
             case ('azure-api'): {
-            console.log('Inside ManagerSearchFields azure')
+            console.log('Inside ManagerSearchFields azure');
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -453,129 +435,114 @@ export class JobAddComponent implements OnDestroy , OnInit {
 
     onLoadFunc(data) {
       this.loadMore = false;
-      var payload = {};
-      console.log('Load func called');
+      let payload = {};
+      this.searchName = data.search;
+      this.nodeArray = data.nodearray;
 
-     console.log('Length of array',this.managersArray.length);
-    this.searchName = data.search;
-    this.nodeArray = data.nodearray;
-
-    console.log('search name',this.searchName,this.nodeArray);
-
-
-     if (this.searchName === null && this.nodeArray.length === 0) {
-      this.store.dispatch(new ManagersSearch({
-        page: ++this.pagenumber,
-        per_page: 10,
-      }));
-    } else {
+      if (this.searchName === null && this.nodeArray.length === 0) {
+        this.store.dispatch(new ManagersSearch({
+          page: ++this.pagenumber,
+          per_page: 10
+        }));
+      } else {
       if (this.searchName === null) {
         payload = {
           filter_map: [
             {
-              key: "manager_type",
-              values: this.nodeArray,
+              key: 'manager_type',
+              values: this.nodeArray
             }
           ],
           page: ++this.pagenumber,
-          per_page: 10,
+          per_page: 10
         };
       } else if (this.searchName && this.nodeArray.length > 0) {
         payload = {
           filter_map: [
             {
-              key: "manager_type",
-              values: this.nodeArray,
+              key: 'manager_type',
+              values: this.nodeArray
             },
             {
-              key: "name",
-              values: this.searchName,
-            },
+              key: 'name',
+              values: this.searchName
+            }
           ],
           page: ++this.pagenumber,
-          per_page: 10,
+          per_page: 10
         };
       } else if (this.searchName && this.nodeArray.length === 0) {
         payload = {
           filter_map: [
             {
-              key: "name",
-              values: this.searchName,
-            },
+              key: 'name',
+              values: this.searchName
+            }
           ],
           page: ++this.pagenumber,
-          per_page: 10,
+          per_page: 10
         };
       }
+      this.store.dispatch(new ManagersSearch(payload));
+      }
 
-      console.log("payload is", payload);
+
+    }
+
+  clickCallChild(data) {
+   this.searchName = data.search;
+   this.nodeArray = data.nodearray;
+   let payload = {};
+   this.loadMore = false;
+  if (this.searchName === null && this.nodeArray.length === 0) {
+    this.store.dispatch(new ManagersSearch({
+         page: 1,
+        per_page: 10
+    }));
+  } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            },
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      }
       this.store.dispatch(new ManagersSearch(payload));
     }
 
 
   }
-
-  clickCallChild(data) {
-   console.log('Click from child called',data);
-   console.log('search',data.search);
-   console.log('array',data.nodearray);
-   this.searchName = data.search;
-   this.nodeArray = data.nodearray;
-   var payload = {};
-
-   this.loadMore = false;
-
-    if (this.searchName === null && this.nodeArray.length === 0) {
-      this.store.dispatch(new ManagersSearch({
-         page: 1,
-        per_page: 10,
-      }));
-    } else {
-      if (this.searchName === null) {
-        payload = {
-          filter_map: [
-            {
-              key: "manager_type",
-              values: this.nodeArray,
-            }
-          ],
-          page: 1,
-          per_page: 10,
-        };
-      } else if (this.searchName && this.nodeArray.length > 0) {
-        payload = {
-          filter_map: [
-            {
-              key: "manager_type",
-              values: this.nodeArray,
-            },
-            {
-              key: "name",
-              values: this.searchName,
-            },
-          ],
-          page: 1,
-          per_page: 10,
-        };
-      } else if (this.searchName && this.nodeArray.length === 0) {
-        payload = {
-          filter_map: [
-            {
-              key: "name",
-              values: this.searchName,
-            },
-          ],
-          page: 1,
-          per_page: 10,
-        };
-      }
-
-      console.log("payload is", payload);
-      this.store.dispatch(new ManagersSearch(payload));
-    }
-
-
-}
 
 
 }

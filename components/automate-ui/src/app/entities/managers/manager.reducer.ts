@@ -25,9 +25,9 @@ export interface ManagerEntityState extends EntityState<Manager> {
 
     }
   };
-  counter : number;
-  nodestatus : EntityStatus,
-  searchstatus : EntityStatus
+  counter: number;
+  nodestatus: EntityStatus;
+  searchstatus: EntityStatus;
 }
 
 export const managerEntityAdapter: EntityAdapter<Manager> = createEntityAdapter<Manager>();
@@ -52,14 +52,14 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
-
-        console.log('search success called ')
-        managerEntityAdapter.removeAll(state);
-        const counter = set('counter', 0 , state);
-      const totalCount = set('total', action.payload.total, counter)
-       const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount)
+      managerEntityAdapter.removeAll(state);
+      // tslint:disable-next-line: no-shadowed-variable
+      const counter = set('counter', 0 , state);
+      const totalCount = set('total', action.payload.total, counter);
+      // tslint:disable-next-line: no-shadowed-variable
+      const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount);
       return set('status', EntityStatus.loadingSuccess,
-                 managerEntityAdapter.setAll(action.payload.managers, searchstatus));
+                managerEntityAdapter.setAll(action.payload.managers, searchstatus));
     }
 
     case ManagerActionTypes.SEARCH_FAILURE:
@@ -80,7 +80,6 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.GET_NODES: {
-      console.log('get nodes called');
       const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loading`, true, state);
     }
@@ -112,7 +111,7 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.ALL_NODES: {
-       const {managerId} = action.payload;
+      const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loadingAllTotal`, true, state);
     }
 

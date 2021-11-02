@@ -132,56 +132,58 @@ chef-form-field {
 }
 
 
-  .logo {
-    width: 100px;
-  }
-
-  .aws {
-    height: 47px;
-    padding-top: 5px;
-    width: 39px;
-  }
-  .gcp {
-    height: 45px;
-    padding-top: 5px;
-    width: 85px;
-  }
-  .automate {
-    height: 45px;
-    padding-top: 5px;
-  }
-
-  .azure {
-     height: 45px;
-    padding-top: 5px;
-    width: 85px;
-  }
-
-.nodeOptions{
-    display: flex;
-    justify-content: space-between;
-    margin-top: 60px;
-    margin-bottom: 30px;
+.logo {
+  width: 100px;
 }
 
-.searchWidth{
-      padding-bottom: 25px;
-    padding-top: 25px;
+.aws {
+  height: 47px;
+  padding-top: 5px;
+  width: 39px;
+}
+
+.gcp {
+  height: 45px;
+  padding-top: 5px;
+  width: 85px;
+}
+
+.automate {
+  height: 45px;
+  padding-top: 5px;
+}
+
+.azure {
+  height: 45px;
+  padding-top: 5px;
+  width: 85px;
+}
+
+.nodeOptions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  margin-bottom: 30px;
+}
+
+.searchWidth {
+  padding-bottom: 25px;
+  padding-top: 25px;
 }
 
 
-.searchDiv{
+.searchDiv {
   vertical-align: bottom;
 }
 
 .searchDiv::after {
+  display: block;
   content: '';
   position: absolute;
   width: 5px;
   height: 100px;
   top: 10px;
   left: 50%;
-  display: block;
 }
 
 .elementSpinner {
@@ -191,30 +193,30 @@ chef-form-field {
 }
 
 .automateDiv {
-    margin-right: 2em;
-    background: white;
-    padding: 1px 18px 0px 18px;
-    margin-bottom: 1em;
+  margin-right: 2em;
+  background: white;
+  padding: 1px 18px 0px 18px;
+  margin-bottom: 1em;
 }
 
 .awsDiv {
   margin-right: 2em;
-    background: white;
-    padding: 1px 18px 0px 18px;
-    margin-bottom: 1em;
+  background: white;
+  padding: 1px 18px 0px 18px;
+  margin-bottom: 1em;
 }
 
 .searchButton {
-    align-self: flex-start;
-    margin: 0;
-    padding: 8px;
+  margin: 0;
+  padding: 8px;
+  align-self: flex-start;
 }
 
 .seperator {
-        padding: 1px;
-        height: 52px;
-        background: black;
-        margin-right: 2em;
+  padding: 1px;
+  height: 52px;
+  background: black;
+  margin-right: 2em;
 }
 
 .withLable {
@@ -223,6 +225,11 @@ chef-form-field {
 
 .searchIcon {
   font-size: 25px;
+}
+
+.searchBox {
+  display: flex;
+  width: 46%;
 }
 
 

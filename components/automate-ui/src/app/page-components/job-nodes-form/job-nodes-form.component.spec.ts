@@ -1,11 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-//import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
-//import { ROUTER_NAVIGATION } from '@ngrx/router-store';
-
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -52,7 +49,7 @@ describe('JobNodesFormComponent', () => {
   });
 
   it('it should click the checkbox for aws', () => {
-    component.onclickCheckbox({target:{checked:true}},'aws');
+    component.onclickCheckbox({target: {checked: true}}, 'aws');
     expect(component.nodeSource[0]).toEqual('aws-ec2');
     expect(component.nodeSource[1]).toEqual('aws-api');
 
@@ -60,17 +57,17 @@ describe('JobNodesFormComponent', () => {
   });
 
   it('it should click the checkbox for automate', () => {
-    component.onclickCheckbox({target:{checked:true}},'automate');
+    component.onclickCheckbox({target: {checked: true}}, 'automate');
     expect(component.nodeSource[0]).toEqual('automate');
   });
 
   it('it should click the checkbox for gcp', () => {
-    component.onclickCheckbox({target:{checked:true}},'gcp');
+    component.onclickCheckbox({target: {checked: true}}, 'gcp');
     expect(component.nodeSource[0]).toEqual('gcp-api');
   });
 
    it('it should click the checkbox for azure', () => {
-    component.onclickCheckbox({target:{checked:true}},'azure');
+    component.onclickCheckbox({target: {checked: true}}, 'azure');
     expect(component.nodeSource[0]).toEqual('azure-api');
     expect(component.nodeSource[0]).toEqual('azure-vm');
   });
@@ -85,9 +82,9 @@ describe('JobNodesFormComponent', () => {
   });
 
  it('search function is called', () => {
-     var payload = {
+    const payload = {
         page: 1,
-        per_page: 10,
+        per_page: 10
      };
     component.search(null);
     component.nodeSource = [];
@@ -98,9 +95,9 @@ describe('JobNodesFormComponent', () => {
 
 
   it('search function is called', () => {
-     var payload = {
+     const payload = {
         page: 1,
-        per_page: 10,
+        per_page: 10
      };
     component.search(null);
     component.nodeSource = [];
@@ -110,9 +107,9 @@ describe('JobNodesFormComponent', () => {
   });
 
   it('search function is called', () => {
-     var payload = {
+     const payload = {
         page: 1,
-        per_page: 10,
+        per_page: 10
      };
     component.search(null);
     component.nodeSource = [];

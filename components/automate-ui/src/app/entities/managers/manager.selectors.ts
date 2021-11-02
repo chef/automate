@@ -60,7 +60,6 @@ export const counterVal = createSelector(
   (state) => state.counter
 );
 
-
 export const nodestatus = createSelector(
   managerState,
   (state) => state.nodestatus

@@ -45,7 +45,6 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
-            [scrollCalled]="scrollCalled"
             [loadMore]= "loadMore"
             [nodeManagerLength]="nodeManagerArray.length"
             (firstCall) = "firstCalled($event)"
