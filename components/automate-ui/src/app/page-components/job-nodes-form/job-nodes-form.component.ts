@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -8,6 +8,7 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 import { ManagerSearchFields } from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
 import { Manager } from 'app/entities/managers/manager.model';
+
 
 
 @Component({
@@ -23,7 +24,9 @@ export class JobNodesFormComponent implements OnInit {
   @Input() pageNo: any;
   @Output() firstCall = new EventEmitter<boolean>();
   @Output() load = new EventEmitter<{search: string[], nodearray: string[]}>();
-  @Output() clickCalled = new EventEmitter<{search: string[], nodearray: string[]}>();
+  @Output() clickCalled = new EventEmitter<{search: string[], nodearray: string[], checked: any}>();
+  @ViewChild('searchInput') searchval: ElementRef;
+  @Input() checked;
 
   managers$: Observable<Manager[]>;
   public automateCheck = false;
@@ -46,8 +49,10 @@ export class JobNodesFormComponent implements OnInit {
 
 
   ngOnInit() {
-
-
+    this.awsCheck = this.checked?.aws;
+    this.azureCheck = this.checked?.azure;
+    this.gcpCheck = this.checked?.gcp;
+    this.automateCheck = this.checked?.automate;
   }
 
   addRegionValue(regionsGroup: FormGroup, index: number) {
@@ -161,11 +166,17 @@ export class JobNodesFormComponent implements OnInit {
     this.pageNo = 1 ;
     this.firstCall.emit(true);
     this.searchName = searchName;
-    this.clickCalled.emit({search: searchName, nodearray: this.nodeSource});
+    this.clickCalled.emit({search: searchName, nodearray: this.nodeSource, checked: {
+      aws: this.awsCheck,
+      azure: this.azureCheck,
+      gcp: this.gcpCheck,
+      automate: this.automateCheck
+    }});
   }
 
   onclickCheckbox(e: any, val: string) {
     this.pageNo = 1;
+    this.searchval.nativeElement.value = '';
     this.firstCall.emit(true);
     switch (val) {
       case 'automate': {
@@ -214,14 +225,12 @@ export class JobNodesFormComponent implements OnInit {
 
   onSearchInput(value: string) {
     const nameArray = [];
-    console.log('value is', value);
     nameArray.push(value);
     this.search(nameArray);
   }
 
   loadMoreFunc() {
-    const nodesource = [];
-    this.load.emit({search: null, nodearray: nodesource});
+    this.load.emit({search: null, nodearray: this.nodeSource});
   }
 
   showSpinner() {

@@ -71,6 +71,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public searchName: [];
   public nodeArray: [] ;
   public nodeManagerArray: any;
+  public checked: any;
   public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -98,7 +99,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
       takeUntil(this.isDestroyed)
     ).subscribe((total) => {
       this.total = total;
-      console.log('Total is ', total);
     });
 
     this.setupForm();
@@ -261,7 +261,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
 
           switch (manager.type) {
             case ('automate'): {
-              console.log('Inside ManagerSearchFields');
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'name'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -269,7 +268,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
             case ('aws-ec2'):
             case ('azure-vm'):
             case ('azure-api'): {
-            console.log('Inside ManagerSearchFields azure');
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
               break;
@@ -435,6 +433,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
     let payload = {};
     this.searchName = data.search;
     this.nodeArray = data.nodearray;
+    this.checked = data.checked;
 
     if (this.searchName === null && this.nodeArray.length === 0) {
       this.store.dispatch(new ManagersSearch({
@@ -487,6 +486,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   clickCallChild(data) {
     this.searchName = data.search;
     this.nodeArray = data.nodearray;
+    this.checked = data.checked;
     let payload = {};
     this.loadMore = false;
     if (this.searchName === null && this.nodeArray.length === 0) {
