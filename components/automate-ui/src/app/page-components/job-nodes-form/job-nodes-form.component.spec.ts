@@ -66,13 +66,13 @@ describe('JobNodesFormComponent', () => {
     expect(component.nodeSource[0]).toEqual('gcp-api');
   });
 
-   it('it should click the checkbox for azure', () => {
+  it('it should click the checkbox for azure', () => {
     component.onclickCheckbox({target: {checked: true}}, 'azure');
     expect(component.nodeSource[0]).toEqual('azure-api');
     expect(component.nodeSource[0]).toEqual('azure-vm');
   });
 
-   it('on serach input called', () => {
+  it('on serach input called', () => {
     const arr = [];
     arr.push('aws');
    component.onSearchInput('aws');
@@ -81,7 +81,7 @@ describe('JobNodesFormComponent', () => {
 
   });
 
- it('search function is called', () => {
+  it('search function is called', () => {
     const payload = {
         page: 1,
         per_page: 10

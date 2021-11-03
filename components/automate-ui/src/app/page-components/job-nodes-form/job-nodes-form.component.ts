@@ -230,7 +230,7 @@ export class JobNodesFormComponent implements OnInit {
     } else {
       return false;
     }
-}
+  }
 
 
 }

@@ -94,7 +94,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
         }
       });
 
-      this.store.select(totalcountNode).pipe(
+    this.store.select(totalcountNode).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe((total) => {
       this.total = total;
@@ -112,40 +112,38 @@ export class JobAddComponent implements OnDestroy , OnInit {
       new ManagersSearch({
         page: this.pagenumber,
         per_page: 10
-    })
-   );
-      this.store.pipe(
-            select(fieldsByManager),
-            takeUntil(this.isDestroyed)
-          ).subscribe(res => {
-           this.fieldCounter = 0 ;
-            this.nodeManagerArray.forEach((manager) => {
-              if (manager.id in res) {
-                if (!res[manager.id].loadingAllTotalFields) {
-                    this.fieldCounter++;
-                }
-              }
-       });
+      })
+    );
+    this.store.pipe(
+      select(fieldsByManager),
+      takeUntil(this.isDestroyed)
+    ).subscribe(res => {
+      this.fieldCounter = 0 ;
+      this.nodeManagerArray.forEach((manager) => {
+        if (manager.id in res) {
+          if (!res[manager.id].loadingAllTotalFields) {
+            this.fieldCounter++;
+          }
+        }
+      });
+    });
 
-        });
-
-     this.store.pipe(
-            select(nodesByManager),
-            takeUntil(this.isDestroyed)
-          ).subscribe(res => {
-            let counter = 0;
-            this.nodeManagerArray.forEach((manager) => {
-              if (manager.id in res) {
-                if (!res[manager.id].loadingAllTotal) {
-                    counter++;
-                }
-              }
-            });
-            if (this.nodeManagerArray.length === 10 && counter + this.fieldCounter === 20 ) {
-                    console.log('load more in if');
-                    this.loadMore = true;
-            }
-          });
+    this.store.pipe(
+      select(nodesByManager),
+      takeUntil(this.isDestroyed)
+    ).subscribe(res => {
+      let counter = 0;
+      this.nodeManagerArray.forEach((manager) => {
+        if (manager.id in res) {
+          if (!res[manager.id].loadingAllTotal) {
+            counter++;
+          }
+        }
+      });
+      if (this.nodeManagerArray.length === 10 && counter + this.fieldCounter === 20 ) {
+        this.loadMore = true;
+      }
+    });
 }
 
   ngOnDestroy() {
@@ -213,16 +211,15 @@ export class JobAddComponent implements OnDestroy , OnInit {
         this.nodeManagerArray = managers;
         this.managersArray = nodesGroup.controls['managers'] as FormArray;
         if (this.firstTime) {
-          console.log('first time called');
-           this.managersArray.clear();
-           this.pagenumber = 1;
+          this.managersArray.clear();
+          this.pagenumber = 1;
           this.managersList = managers;
           this.firstTime = false;
         } else {
-            this.managersList = [...this.managersList, ...managers];
-          }
+          this.managersList = [...this.managersList, ...managers];
+        }
         this.managersList.forEach((manager, i) => {
-        const managerId = manager.id;
+          const managerId = manager.id;
           const namesGroup = this.fb.group({
             key: 'name',
             include: true,
@@ -260,7 +257,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
 
           this.managersArray.setControl(i, managerGroup);
 
-       this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
+          this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
 
           switch (manager.type) {
             case ('automate'): {
@@ -433,73 +430,18 @@ export class JobAddComponent implements OnDestroy , OnInit {
     return false;
   }
 
-    onLoadFunc(data) {
-      this.loadMore = false;
-      let payload = {};
-      this.searchName = data.search;
-      this.nodeArray = data.nodearray;
+  onLoadFunc(data) {
+    this.loadMore = false;
+    let payload = {};
+    this.searchName = data.search;
+    this.nodeArray = data.nodearray;
 
-      if (this.searchName === null && this.nodeArray.length === 0) {
-        this.store.dispatch(new ManagersSearch({
-          page: ++this.pagenumber,
-          per_page: 10
-        }));
-      } else {
-      if (this.searchName === null) {
-        payload = {
-          filter_map: [
-            {
-              key: 'manager_type',
-              values: this.nodeArray
-            }
-          ],
-          page: ++this.pagenumber,
-          per_page: 10
-        };
-      } else if (this.searchName && this.nodeArray.length > 0) {
-        payload = {
-          filter_map: [
-            {
-              key: 'manager_type',
-              values: this.nodeArray
-            },
-            {
-              key: 'name',
-              values: this.searchName
-            }
-          ],
-          page: ++this.pagenumber,
-          per_page: 10
-        };
-      } else if (this.searchName && this.nodeArray.length === 0) {
-        payload = {
-          filter_map: [
-            {
-              key: 'name',
-              values: this.searchName
-            }
-          ],
-          page: ++this.pagenumber,
-          per_page: 10
-        };
-      }
-      this.store.dispatch(new ManagersSearch(payload));
-      }
-
-
-    }
-
-  clickCallChild(data) {
-   this.searchName = data.search;
-   this.nodeArray = data.nodearray;
-   let payload = {};
-   this.loadMore = false;
-  if (this.searchName === null && this.nodeArray.length === 0) {
-    this.store.dispatch(new ManagersSearch({
-         page: 1,
+    if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
+        page: ++this.pagenumber,
         per_page: 10
-    }));
-  } else {
+      }));
+    } else {
       if (this.searchName === null) {
         payload = {
           filter_map: [
@@ -508,7 +450,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
               values: this.nodeArray
             }
           ],
-          page: 1,
+          page: ++this.pagenumber,
           per_page: 10
         };
       } else if (this.searchName && this.nodeArray.length > 0) {
@@ -523,7 +465,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
               values: this.searchName
             }
           ],
-          page: 1,
+          page: ++this.pagenumber,
           per_page: 10
         };
       } else if (this.searchName && this.nodeArray.length === 0) {
@@ -534,15 +476,64 @@ export class JobAddComponent implements OnDestroy , OnInit {
               values: this.searchName
             }
           ],
-          page: 1,
+          page: ++this.pagenumber,
           per_page: 10
         };
       }
       this.store.dispatch(new ManagersSearch(payload));
     }
-
-
   }
 
-
+  clickCallChild(data) {
+    this.searchName = data.search;
+    this.nodeArray = data.nodearray;
+    let payload = {};
+    this.loadMore = false;
+    if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
+        page: 1,
+        per_page: 10
+      }));
+    } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            },
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      }
+      this.store.dispatch(new ManagersSearch(payload));
+    }
+  }
 }
