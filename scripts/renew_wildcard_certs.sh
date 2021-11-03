@@ -20,7 +20,7 @@ sudo chown -R "$(id -u "$USER")":"$(id -g "$USER")" "$(pwd)/etc/"
 if [[ -f "${CERT_DIR}/fullchain.pem" && -f "${CERT_DIR}/privkey.pem" ]]; then
     echo "Updating certificates in vault..."
     cd "${CERT_DIR}"
-    vault write secret/a2/testing/wildcard_cert crt=@fullchain.pem key=privkey.pem
+    vault write secret/a2/testing/wildcard_cert crt=@fullchain.pem key=@privkey.pem
 else
     echo "Certificates not found. Skipping vault update step"
 fi
