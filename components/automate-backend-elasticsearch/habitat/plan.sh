@@ -9,14 +9,11 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
-  chef/mlsa
-  core/bash
-  core/procps-ng
-  core/openssl
+  chef/mlsa/1.0.1/20200421170200
+  core/bash/5.0.16/20200305233030
+  core/procps-ng/3.3.15/20200305231457
   "${UPSTREAM_PKG_IDENT}"
 )
-
-
 pkg_lib_dirs=(lib)
 
 pkg_exports=(
