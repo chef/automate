@@ -297,7 +297,6 @@ import {
     UserModule,
     TeamModule,
     ReactiveFormsModule,
-    InfiniteScrollModule,
     RoleModule,
     InfiniteScrollModule,
     StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
