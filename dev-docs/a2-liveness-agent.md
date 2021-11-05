@@ -1,6 +1,6 @@
 ## Automate Liveness Agent
 
-Automate liveness agent sends keepalive messages to Chef Automate, 
+Automate Liveness Agent sends keepalive messages to Chef Automate, 
 which prevents nodes that are up but not frequently running Chef Client 
 from appearing as "missing" in Automate UI.  
 The default interval of sending the keepalive messages is 1800 seconds.
