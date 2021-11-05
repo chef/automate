@@ -10,7 +10,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { JobNodesFormComponent } from './job-nodes-form.component';
 import { MockComponent } from 'ng2-mock-component';
-import { ManagersSearch } from 'app/entities/managers/manager.actions';
+
 
 
 
@@ -29,8 +29,7 @@ describe('JobNodesFormComponent', () => {
       ],
       declarations: [
         JobNodesFormComponent,
-         MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] })
-
+        MockComponent({ selector: 'chef-checkbox', inputs: ['checked'] })
       ],
       providers: [
         { provide: ChefSessionService, useClass: MockChefSessionService },
@@ -49,6 +48,8 @@ describe('JobNodesFormComponent', () => {
   });
 
   it('it should click the checkbox for aws', () => {
+    component.searchval = jasmine.createSpyObj('searchval', ['nativeElement']);
+    component.searchval.nativeElement = {value: ''};
     component.onclickCheckbox({target: {checked: true}}, 'aws');
     expect(component.nodeSource[0]).toEqual('aws-ec2');
     expect(component.nodeSource[1]).toEqual('aws-api');
@@ -57,69 +58,32 @@ describe('JobNodesFormComponent', () => {
   });
 
   it('it should click the checkbox for automate', () => {
+    component.searchval = jasmine.createSpyObj('searchval', ['nativeElement']);
+    component.searchval.nativeElement = {value: ''};
     component.onclickCheckbox({target: {checked: true}}, 'automate');
     expect(component.nodeSource[0]).toEqual('automate');
   });
 
   it('it should click the checkbox for gcp', () => {
+    component.searchval = jasmine.createSpyObj('searchval', ['nativeElement']);
+    component.searchval.nativeElement = {value: ''};
     component.onclickCheckbox({target: {checked: true}}, 'gcp');
     expect(component.nodeSource[0]).toEqual('gcp-api');
   });
 
   it('it should click the checkbox for azure', () => {
+    component.searchval = jasmine.createSpyObj('searchval', ['nativeElement']);
+    component.searchval.nativeElement = {value: ''};
     component.onclickCheckbox({target: {checked: true}}, 'azure');
     expect(component.nodeSource[0]).toEqual('azure-api');
-    expect(component.nodeSource[0]).toEqual('azure-vm');
+    expect(component.nodeSource[1]).toEqual('azure-vm');
   });
 
   it('on serach input called', () => {
     const arr = [];
     arr.push('aws');
-   component.onSearchInput('aws');
-   // tslint:disable-next-line: no-unused-expression
-   expect(component.search(arr)).toBeTruthy;
-
+    component.onSearchInput('aws');
+    // tslint:disable-next-line: no-unused-expression
+    expect(component.search(arr)).toBeTruthy;
   });
-
-  it('search function is called', () => {
-    const payload = {
-        page: 1,
-        per_page: 10
-     };
-    component.search(null);
-    component.nodeSource = [];
-    expect(component.nodeSource.length).toEqual(0);
-    expect(component['store'].dispatch).toHaveBeenCalledWith(new ManagersSearch(payload));
-
-  });
-
-
-  it('search function is called', () => {
-     const payload = {
-        page: 1,
-        per_page: 10
-     };
-    component.search(null);
-    component.nodeSource = [];
-    expect(component.nodeSource.length).toEqual(0);
-    expect(component['store'].dispatch).toHaveBeenCalledWith(new ManagersSearch(payload));
-
-  });
-
-  it('search function is called', () => {
-     const payload = {
-        page: 1,
-        per_page: 10
-     };
-    component.search(null);
-    component.nodeSource = [];
-    expect(component.nodeSource.length).toEqual(0);
-    expect(component['store'].dispatch).toHaveBeenCalledWith(new ManagersSearch(payload));
-
-  });
-
-
-
-
-
 });

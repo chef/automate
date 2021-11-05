@@ -48,7 +48,7 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
   switch (action.type) {
 
     case ManagerActionTypes.SEARCH:
-       const searchstatus = set('searchstatus', EntityStatus.loading, state);
+      const searchstatus = set('searchstatus', EntityStatus.loading, state);
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
@@ -67,13 +67,12 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       const counter = set('counter', --c , state);
       return set('status', EntityStatus.loadingFailure, counter);
 
-       case ManagerActionTypes.SEARCH_FIELDS: {
-       const {managerId} = action.payload;
+    case ManagerActionTypes.SEARCH_FIELDS: {
+      const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loadingAllTotalFields`, true, state);
     }
 
     case ManagerActionTypes.SEARCH_FIELDS_SUCCESS: {
-
       const {managerId, field, fields} = action.payload;
       const fieldstatus = set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
       return set(`fieldsByManager.${managerId}.fields.${field}`, fields, fieldstatus);
@@ -104,7 +103,6 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.SEARCH_NODES_SUCCESS: {
-      console.log('seach nodes called...');
       const {managerId, nodes} = action.payload;
       return set(`nodesByManager.${managerId}.nodes`, nodes,
         set(`nodesByManager.${managerId}.loading`, false, state));
@@ -115,23 +113,24 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set(`nodesByManager.${managerId}.loadingAllTotal`, true, state);
     }
 
-
     case ManagerActionTypes.ALL_NODES_SUCCESS: {
       const {managerId, total} = action.payload;
       const nodestatus = set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
       return set(`nodesByManager.${managerId}.allTotal`, total, nodestatus);
     }
 
-    case ManagerActionTypes.GET:
+    case ManagerActionTypes.GET: {
       return set('status', EntityStatus.loading, state);
+    }
 
-    case ManagerActionTypes.GET_SUCCESS:
+    case ManagerActionTypes.GET_SUCCESS: {
       return set('status', EntityStatus.loadingSuccess,
                  managerEntityAdapter.addOne(action['payload'].manager, state));
+    }
 
     case ManagerActionTypes.GET_FAILURE:
-
       return set('status', EntityStatus.loadingFailure, state);
+
 
     case ManagerActionTypes.CREATE:
       return set('status', EntityStatus.loading, state);

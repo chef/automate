@@ -251,7 +251,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
             distinctUntilChanged((a, b) => isEqual(a, b)),
             takeUntil(this.isDestroyed))
             .subscribe(payload => {
-              console.log('ManagerSearchNodes called');
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 

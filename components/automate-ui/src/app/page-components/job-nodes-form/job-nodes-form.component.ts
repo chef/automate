@@ -8,9 +8,6 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 import { ManagerSearchFields } from '../../entities/managers/manager.actions';
 import * as selectors from '../../entities/managers/manager.selectors';
 import { Manager } from 'app/entities/managers/manager.model';
-
-
-
 @Component({
   selector: 'chef-job-nodes-form',
   templateUrl: './job-nodes-form.component.html',
@@ -18,7 +15,6 @@ import { Manager } from 'app/entities/managers/manager.model';
 })
 export class JobNodesFormComponent implements OnInit {
   @Input() form: FormGroup;
-  @Input() scrollCalled: any;
   @Input() loadMore: any;
   @Input() nodeManagerLength: any;
   @Input() pageNo: any;
@@ -28,7 +24,7 @@ export class JobNodesFormComponent implements OnInit {
   @ViewChild('searchInput') searchval: ElementRef;
   @Input() checked;
 
-  managers$: Observable<Manager[]>;
+  public managers$: Observable<Manager[]>;
   public automateCheck = false;
   public awsCheck = false;
   public azureCheck = false;
@@ -44,7 +40,7 @@ export class JobNodesFormComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder // private managerRequests: ManagerRequests
+    private fb: FormBuilder
   ) {}
 
 
@@ -99,21 +95,25 @@ export class JobNodesFormComponent implements OnInit {
   fieldValuesFor(managerId: string, field: string): Observable<string[]> {
     return this.store
       .select(selectors.fieldsByManager)
-      .pipe(map(getOr([], `${managerId}.fields.${field}`))) as Observable<
-      string[]
-    >;
+      .pipe(
+        map(getOr([], `${managerId}.fields.${field}`))
+        ) as Observable<string[]>;
   }
 
   previewNodesFor(managerId: string): Observable<string[]> {
     return this.store
       .select(selectors.nodesByManager)
-      .pipe(map(getOr([], `${managerId}.nodes`))) as Observable<string[]>;
+      .pipe(
+        map(getOr([], `${managerId}.nodes`))
+        ) as Observable<string[]>;
   }
 
   isLoadingPreviewNodesFor(managerId: string): Observable<boolean> {
     return this.store
       .select(selectors.nodesByManager)
-      .pipe(map(getOr(false, `${managerId}.loading`))) as Observable<boolean>;
+      .pipe(
+        map(getOr(false, `${managerId}.loading`))
+        ) as Observable<boolean>;
   }
 
   previewNodesCountFor(managerId: string): Observable<number> {
@@ -123,24 +123,26 @@ export class JobNodesFormComponent implements OnInit {
   availableNodesCountFor(managerId: string): Observable<number> {
     return this.store
       .select(selectors.nodesByManager)
-      .pipe(map(getOr(0, `${managerId}.allTotal`))) as Observable<number>;
+      .pipe(
+        map(getOr(0, `${managerId}.allTotal`))
+        ) as Observable<number>;
   }
 
   logoFor(managerType: string) {
     const dir = 'assets/img';
     switch (managerType) {
-      case 'automate': {
+      case ('automate'): {
         return `${dir}/logos/AutomateLogo-default.svg`;
       }
-      case 'aws-ec2':
-      case 'aws-api': {
+      case ('aws-ec2'):
+      case ('aws-api'): {
         return `${dir}/logo-aws.svg`;
       }
-      case 'azure-vm':
-      case 'azure-api': {
+      case ('azure-vm'):
+      case ('azure-api'): {
         return `${dir}/logo-azure.svg`;
       }
-      case 'gcp-api': {
+      case ('gcp-api'): {
         return `${dir}/logo-gcp.svg`;
       }
     }
@@ -234,11 +236,7 @@ export class JobNodesFormComponent implements OnInit {
   }
 
   showSpinner() {
-    if (this.nodeManagerLength === 10 && !this.loadMore) {
-      return true;
-    } else {
-      return false;
-    }
+   return (this.nodeManagerLength === 10 && !this.loadMore);
   }
 
 
