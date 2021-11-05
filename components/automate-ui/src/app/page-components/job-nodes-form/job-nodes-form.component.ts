@@ -159,7 +159,7 @@ export class JobNodesFormComponent implements OnInit {
   }
 
   supportsFilterByTag(managerType: string): boolean {
-    return ['automate', 'aws-ec2', 'azure-vm','azure-api'].includes(managerType);
+    return ['automate', 'aws-ec2', 'azure-vm', 'azure-api'].includes(managerType);
   }
 
   search(searchName: string[]) {

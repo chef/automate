@@ -36,11 +36,13 @@ describe('Scan job', () => {
                 method: 'POST',
                 url: '/api/v0/nodemanagers',
                 body: {
-                    'name':'AWStest',
-                    'type':'aws-ec2',
-                    'credential_data':[
-                        {'key':'AWS_ACCESS_KEY_ID','value':Cypress.env('AWS_ACCESS_KEY_ID')},
-                        {'key':'AWS_SECRET_ACCESS_KEY','value':Cypress.env('AWS_SECRET_ACCESS_KEY')}
+                    'name': 'AWStest',
+                    'type': 'aws-ec2',
+                    'credential_data': [
+                        {'key': 'AWS_ACCESS_KEY_ID' , 'value': Cypress.env('AWS_ACCESS_KEY_ID')},
+                        {'key': 'AWS_SECRET_ACCESS_KEY' ,
+                        'value': Cypress.env('AWS_SECRET_ACCESS_KEY'
+                        )}
                     ]
                 }
             }).then((secrectResp) => {
@@ -61,18 +63,21 @@ describe('Scan job', () => {
                 body: {
                     'name': 'AzureFinal',
                     'type': 'azure-api',
-                    "credential_data": [
+                    'credential_data' : [
                         {
-                            'key': 'AZURE_CLIENT_ID','value': 'Cypress.env(SECRET_AZURE_CLIENT_ID)'
+                            'key': 'AZURE_CLIENT_ID' ,
+                            'value': 'Cypress.env(SECRET_AZURE_CLIENT_ID)'
                         },
                         {
-                            'key': 'AZURE_CLIENT_SECRET','value': 'Cypress.env(SECRET_AZURE_CLIENT_SECRET)'
+                            'key': 'AZURE_CLIENT_SECRET',
+                            'value': 'Cypress.env(SECRET_AZURE_CLIENT_SECRET)'
                         },
                         {
-                            'key': 'AZURE_TENANT_ID','value': 'Cypress.env(SECRET_AZURE_TENANT_ID)'
+                            'key': 'AZURE_TENANT_ID',
+                            'value': 'Cypress.env(SECRET_AZURE_TENANT_ID)'
                         }
                     ],
-                    "instance_credentials": []
+                    'instance_credentials': []
                 }
             }).then((secrectResp) => {
               expect(secrectResp.status).to.equal(200);

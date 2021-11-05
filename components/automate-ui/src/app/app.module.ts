@@ -213,6 +213,7 @@ import {
   DataFeedTableComponent
 } from './page-components/data-feed-table/data-feed-table.component';
 
+
 @NgModule({
   declarations: [
     // Page Components
@@ -298,7 +299,6 @@ import {
     TeamModule,
     ReactiveFormsModule,
     RoleModule,
-    InfiniteScrollModule,
     StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
     StoreRouterConnectingModule.forRoot({
       serializer: RouterSerializer
