@@ -47,6 +47,9 @@ do_deploy() {
     docker_run "${_frontend2_container_name}"
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
+        "ls" "$(a2_root_dir)"
+
+    docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
     docker exec -t "$_frontend2_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
