@@ -72,6 +72,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public nodeArray: [] ;
   public nodeManagerArray: any;
   public checked: any;
+  public counter: number;
   public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -126,21 +127,24 @@ export class JobAddComponent implements OnDestroy , OnInit {
           }
         }
       });
+      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
+        this.loadMore = true;
+      }
     });
 
     this.store.pipe(
       select(nodesByManager),
       takeUntil(this.isDestroyed)
     ).subscribe(res => {
-      let counter = 0;
+      this.counter = 0;
       this.nodeManagerArray.forEach((manager) => {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
-            counter++;
+            this.counter++;
           }
         }
       });
-      if (this.nodeManagerArray.length === 10 && counter + this.fieldCounter === 20 ) {
+      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
         this.loadMore = true;
       }
     });
