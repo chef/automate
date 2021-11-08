@@ -90,7 +90,7 @@ TERMS
   config.vm.provider "virtualbox" do |v|
     v.name       = 'chef-automate'
     v.memory     = 8192
-    v.cpus       = 2
+    v.cpus       = 4
     v.customize ['modifyvm', :id, '--audio', 'none']
   end
 
@@ -140,8 +140,8 @@ Retrieving a trial license through Chef Automate requires the Vagrant instance t
 You can install Chef Automate on any x86_64 Linux instance running CentOS 7.5,
 RHEL 7.5, or Ubuntu 16.04 with the following minimum system resources:
 
-* 8 GB RAM
+* 4 CPU
+* 16 GB RAM
 * 5 GB free disk space
-* 2 CPUs
 
 Follow the [Installation Guide]({{< relref "install.md" >}}) to install Chef Automate on your own resources.
