@@ -28,6 +28,7 @@
   "private": true,
   "dependencies": {
     "d3": "^5.9.7",
+    "highlight.js": "^9.15.8",
     "lodash": "^4.17.21",
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
