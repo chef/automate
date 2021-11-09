@@ -40,7 +40,7 @@ export enum ManagerActionTypes {
 }
 
 export interface ManagersSearchPayload {
-  filters?: any[];
+  filter_map?: any[];
   page?: number;
   per_page?: number;
   sort?: string;

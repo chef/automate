@@ -1,7 +1,5 @@
 <div class="content-container">
   <div class="container">
-
-    <main class="job-add">
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/compliance/scan-jobs/jobs']">Scan jobs</chef-breadcrumb>
         Create new job
@@ -47,6 +45,13 @@
         <ng-container [ngSwitch]="step$ | async">
           <chef-job-nodes-form
             *ngSwitchCase="Step['add-nodes']"
+            [loadMore]= "loadMore"
+            [nodeManagerLength]="nodeManagerArray.length"
+            (firstCall) = "firstCalled($event)"
+            (clickCalled) = "clickCallChild($event)"
+            (load) = "onLoadFunc($event)"
+            [pageNo] = "pagenumber"
+            [checked] = "checked"
             [form]="form.controls['nodesGroup'] | castFormGroup">
           </chef-job-nodes-form>
           <chef-job-profiles-form
@@ -59,7 +64,6 @@
           </chef-job-schedule-form>
         </ng-container>
       </form>
-    </main>
 
   </div>
 </div>

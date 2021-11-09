@@ -76,7 +76,7 @@ steps:
     expeditor:
       executor:
         docker:
-          
+
   - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
     commands:
       - gem install bundler:1.16.6
