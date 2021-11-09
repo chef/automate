@@ -35,6 +35,56 @@ enabled = false
 EOF
 }
 
+docker_run_1() {
+    local name="$1"
+    local image="$2"
+
+    if [ -z "$image" ]; then
+        image="chefes/a2-integration:latest"
+    fi
+
+    local docker_run_args=(
+            "--detach"
+            "--env" "HAB_ORIGIN=$HAB_ORIGIN"
+            "--env" "HAB_STUDIO_SUP=false"
+            "--env" "HAB_NONINTERACTIVE=true"
+            "--env" "CONTAINER_HOSTNAME=$name"
+            "--hostname" "$name"
+            "--interactive"
+            "--name" "$name"
+            "--privileged"
+            "--rm"
+            "--tmpfs=/tmp:rw,noexec,nosuid"
+            "--tmpfs=/var/tmp:rw,noexec,nosuid"
+            "--tmpfs=/dev/shm:rw,noexec,nosuid"
+            "--tty"
+            "--volume" "/go/src/github.com/chef/automate:/go/src/github.com/chef/automate"
+            "--workdir" "/go/src/github.com/chef/automate"
+    )
+
+    if [ -n "$SERVICES_CONFIG_PATH" ]; then
+    docker_run_args+=(
+            "--volume" "$SERVICES_CONFIG_PATH:/services"
+    )
+    fi
+
+    if [ "$CI" == "true" ]; then
+        buildkite_agent=$(command -v buildkite-agent)
+        docker_run_args+=(
+            "--env" "BUILDKITE_JOB_ID"
+            "--env" "BUILDKITE_BUILD_ID"
+            "--env" "BUILDKITE_AGENT_ACCESS_TOKEN"
+            "--env" "BUILDKITE"
+            "--volume" "$buildkite_agent:/usr/bin/buildkite-agent"
+            "--label" "buildkitejob=$BUILDKITE_JOB_ID"
+        )
+    fi
+
+    echo "${docker_run_args[*]}"
+
+    docker run "${docker_run_args[@]}" "$image"
+}
+
 do_deploy() {
     local frontend1_ip frontend2_ip
 
@@ -44,8 +94,8 @@ do_deploy() {
     hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
     pwd
     ls
-    docker_run "${_frontend1_container_name}"
-    docker_run "${_frontend2_container_name}"
+    docker_run_1 "${_frontend1_container_name}"
+    docker_run_1 "${_frontend2_container_name}"
     echo "========PWD======\n"
     docker exec -t "$_frontend1_container_name" \
         "pwd"
