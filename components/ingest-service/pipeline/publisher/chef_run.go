@@ -18,7 +18,7 @@ func BuildChefRun(client backend.Client, numberOfPublishers int) message.ChefRun
 		out := make(chan message.ChefRun, 100)
 
 		for i := 0; i < numberOfPublishers; i++ {
-			ChefRun(in, client, out, i)
+			go ChefRun(in, client, out, i)
 		}
 
 		return out
@@ -27,39 +27,37 @@ func BuildChefRun(client backend.Client, numberOfPublishers int) message.ChefRun
 
 // ChefRun The Chef run publisher pipe. This stores the chef run information in the datastore.
 func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- message.ChefRun, number int) {
-	go func() {
-		for msg := range in {
-			var megaErr error
+	for msg := range in {
+		var megaErr error
 
-			log.WithFields(log.Fields{
-				"publisher_id": number,
-				"message_id":   msg.ID,
-				"buffer_size":  len(out),
-			}).Debug("Publishing ChefRun")
+		log.WithFields(log.Fields{
+			"publisher_id": number,
+			"message_id":   msg.ID,
+			"buffer_size":  len(out),
+		}).Debug("Publishing ChefRun")
 
-			runc := insertChefRun(msg, client)
-			nodec := insertNode(msg, client)
-			attrc := insertNodeAttribute(msg, client)
-			runInfo := insertNodeInfo(msg, client)
-			errc := merge(runc, nodec, attrc, runInfo)
+		runc := insertChefRun(msg, client)
+		nodec := insertNode(msg, client)
+		attrc := insertNodeAttribute(msg, client)
+		runInfo := insertNodeInfo(msg, client)
+		errc := merge(runc, nodec, attrc, runInfo)
 
-			for err := range errc {
-				if err != nil {
-					if megaErr != nil {
-						megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
-					} else {
-						megaErr = err
-					}
+		for err := range errc {
+			if err != nil {
+				if megaErr != nil {
+					megaErr = fmt.Errorf(err.Error() + " " + megaErr.Error())
+				} else {
+					megaErr = err
 				}
 			}
-			if megaErr != nil {
-				msg.FinishProcessing(status.Errorf(codes.Internal, megaErr.Error()))
-			} else {
-				out <- msg
-			}
 		}
-		close(out)
-	}()
+		if megaErr != nil {
+			msg.FinishProcessing(status.Errorf(codes.Internal, megaErr.Error()))
+		} else {
+			out <- msg
+		}
+	}
+	close(out)
 }
 
 func merge(cs ...<-chan error) <-chan error {
