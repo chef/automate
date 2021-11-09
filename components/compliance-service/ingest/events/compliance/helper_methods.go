@@ -225,7 +225,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			Title:         profile.Title,
 			Profile:       profileSums.Profile,
 			Version:       profile.Version,
-			Full:          fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
+			Full:          stringutils.GetFullProfileName(profile.Title, profile.Version),
 			SHA256:        profile.Sha256,
 			Controls:      minControls,
 			ControlsSums:  profileSums.ControlsSums,

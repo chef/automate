@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -13,6 +12,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	reportingTypes "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
@@ -66,7 +66,7 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 					SHA256:       profile.Sha256,
 					Title:        profile.Title,
 					Version:      profile.Version,
-					Full:         fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
+					Full:         stringutils.GetFullProfileName(profile.Title, profile.Version),
 					Status:       profileStatus,
 					ControlsSums: sum,
 				})
@@ -141,7 +141,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 			}
 			msg.InspecSummary.Platform.Name = msg.Report.Platform.Name
 			msg.InspecSummary.Platform.Release = msg.Report.Platform.Release
-			msg.InspecSummary.Platform.Full = fmt.Sprintf("%s %s", msg.Report.Platform.Name, msg.Report.Platform.Release)
+			msg.InspecSummary.Platform.Full = stringutils.GetFullPlatformName(msg.Report.Platform.Name, msg.Report.Platform.Release)
 			msg.InspecSummary.InSpecVersion = msg.Report.Version
 			msg.InspecSummary.Statistics.Duration = msg.Report.Statistics.Duration
 

@@ -80,7 +80,6 @@ func (s *Server) StoreReport(stream report_manager.ReportManagerService_StoreRep
 func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.CustomReportRequest) (
 	*report_manager.CustomReportResponse, error) {
 
-	//TODO:: Main intention here is to validate enqueuing the work flow. The actual business logic will be added in next PRs
 	id := uuid.New()
 	err := s.CerealManager.EnqueueWorkflow(s.ctx, worker.ReportWorkflowName,
 		fmt.Sprintf("%s-%s", "report-workflow", id.String()),

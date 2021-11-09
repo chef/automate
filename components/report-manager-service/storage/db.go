@@ -82,8 +82,8 @@ func (db *DB) InsertTask(id, requestorID, status string, createdTime, updatedTim
 	return err
 }
 
-func (db *DB) UpdateTask(id, status, msg string, updatedTime time.Time) error {
-	_, err := db.Exec(updateTask, status, msg, updatedTime, id)
+func (db *DB) UpdateTask(id, status, msg string, updatedTime time.Time, objSize int64) error {
+	_, err := db.Exec(updateTask, status, msg, objSize, updatedTime, id)
 	if err != nil {
 		err = fmt.Errorf("error in executing the update task: %w", err)
 	}
@@ -95,5 +95,5 @@ INSERT INTO custom_report_requests(id, requestor, status,created_at,updated_at)
 VALUES ($1, $2, $3, $4, $5);
 `
 const updateTask = `
-UPDATE custom_report_requests SET status = $1, message = $2, updated_at = $3 WHERE id = $4;
+UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;
 `

@@ -58,10 +58,10 @@ func TestUpdateTaskSuccess(t *testing.T) {
 
 	updatedTime := time.Now()
 
-	query := `UPDATE custom_report_requests SET status = $1, message = $2, updated_at = $3 WHERE id = $4;`
-	mock.ExpectExec(query).WithArgs("status", "message", updatedTime, "id").WillReturnResult(sqlmock.NewResult(1, 1))
+	query := `UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;`
+	mock.ExpectExec(query).WithArgs("status", "message", 1024, updatedTime, "id").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = db.UpdateTask("id", "status", "message", updatedTime)
+	err = db.UpdateTask("id", "status", "message", updatedTime, 1024)
 	assert.NoError(t, err)
 }
 
@@ -76,9 +76,9 @@ func TestUpdateTaskFailure(t *testing.T) {
 
 	updatedTime := time.Now()
 
-	query := `UPDATE custom_report_requests SET status = $1, message = $2, updated_at = $3 WHERE id = $4;`
-	mock.ExpectExec(query).WithArgs("status", "message", updatedTime, "id").WillReturnError(fmt.Errorf("update error"))
+	query := `UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;`
+	mock.ExpectExec(query).WithArgs("status", "message", 0, updatedTime, "id").WillReturnError(fmt.Errorf("update error"))
 
-	err = db.UpdateTask("id", "status", "message", updatedTime)
+	err = db.UpdateTask("id", "status", "message", updatedTime, 0)
 	assert.Equal(t, "error in executing the update task: update error", err.Error())
 }

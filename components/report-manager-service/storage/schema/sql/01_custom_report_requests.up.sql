@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS custom_report_requests (
   requestor     text NOT NULL,
   status        text NOT NULL,
   message       text,
+  custom_report_size bigint,
   created_at    timestamp DEFAULT '0001-01-01T00:00:00Z00:00',
   updated_at    timestamp DEFAULT '0001-01-01T00:00:00Z00:00',
   primary key(id)
