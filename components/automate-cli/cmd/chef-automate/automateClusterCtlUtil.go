@@ -106,16 +106,24 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 }
 
 func checkIfProcessExited(process *os.Process) bool {
-	err := process.Signal(syscall.Signal(0))
-	if err == nil {
-		return false
-	}
-	if err != nil && err.Error() == "os: process already finished" {
+	proc, err := os.FindProcess(int(process.Pid))
+	if err != nil {
+		fmt.Println("Exited 1")
 		return true
 	}
-	errno, ok := err.(syscall.Errno)
+	err = proc.Signal(syscall.Signal(0))
+	if err != nil && err.Error() == "os: process already finished" {
+		fmt.Println("Exited 2")
+		return true
+	}
+	err1 := errors.New("")
+	errno, ok := err1.(syscall.Errno)
+	if err == nil && ok {
+		return false
+	}
 	if !ok {
-		fmt.Println("Exited")
+		fmt.Println("Exited 3")
+		fmt.Println(errno)
 		return true
 	}
 	switch errno {
