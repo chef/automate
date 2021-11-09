@@ -1,18 +1,21 @@
 package worker
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/objstore"
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/stringutils"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -146,8 +149,8 @@ func (s *ReportWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			payload.RetriesLeft--
 			return w.Continue(&payload)
 		}
-		//if there are no retries left, update the failed status to db
-		dbErr := s.DB.UpdateTask(payload.JobID, FailedStatus, err.Error(), time.Now())
+		//if there are no retries left, update the failed status to db and set the object size as 0
+		dbErr := s.DB.UpdateTask(payload.JobID, FailedStatus, err.Error(), time.Now(), 0)
 		if dbErr != nil {
 			dbErr = errors.Wrap(dbErr, "failed to update the record in postgres")
 			logrus.WithError(dbErr).Error()
@@ -158,8 +161,18 @@ func (s *ReportWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		logrus.WithError(err).Error()
 		return w.Fail(err)
 	}
+
+	//get the results returned by task run
+	var jobResult GenerateReportParameters
+	err := ev.Result.Get(&jobResult)
+	if err != nil {
+		err = errors.Wrap(err, "failed to get the task run result in OnTaskComplete")
+		logrus.WithError(err).Error()
+		return w.Fail(err)
+	}
+
 	//update the finished status to db
-	err := s.DB.UpdateTask(payload.JobID, SuccessStatus, "", time.Now())
+	err = s.DB.UpdateTask(payload.JobID, SuccessStatus, "", time.Now(), jobResult.ReportSize)
 	if err != nil {
 		err = errors.Wrap(err, "failed to update the record in postgres")
 		logrus.WithError(err).Error()
@@ -185,6 +198,7 @@ type GenerateReportParameters struct {
 	StartTime        *time.Time
 	EndTime          *time.Time
 	RequestToProcess *report_manager.CustomReportRequest
+	ReportSize       int64
 }
 
 func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -196,23 +210,66 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 	}
 
 	logrus.Infof("In TaskRun working on job %s", job.JobID)
-	logrus.Infof("%v\n", job)
 
 	startTime := time.Now().UTC().Round(time.Second)
 	job.StartTime = &startTime
 
-	for _, report := range job.RequestToProcess.Reports {
+	finalData, err := t.prepareCustomReportData(ctx, job.RequestToProcess)
+	if err != nil {
+		return nil, err
+	}
+
+	//check the existence of bucket
+	isBucketExist, err := t.ObjStoreClient.BucketExists(ctx, job.RequestToProcess.RequestorId)
+	if err != nil {
+		err = errors.Wrap(err, "error in checking the existence of bucket in objectstore")
+		logrus.WithError(err).Error()
+		return nil, err
+	}
+	if !isBucketExist {
+		err := t.ObjStoreClient.MakeBucket(ctx, job.RequestToProcess.RequestorId, minio.MakeBucketOptions{})
+		if err != nil {
+			err = errors.Wrap(err, "error in creating a bucket in objectstore")
+			logrus.WithError(err).Error()
+			return nil, err
+		}
+	}
+
+	var reportSize int64
+	if job.RequestToProcess.ReportType == "json" {
+		reportSize, err = t.jsonExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
+		if err != nil {
+			return nil, err
+		}
+	} else if job.RequestToProcess.ReportType == "csv" {
+		/*reportSize, err = t.csvExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
+		if err != nil {
+			return nil, err
+		}*/
+	}
+
+	endTime := time.Now().UTC().Round(time.Second)
+	job.EndTime = &endTime
+	job.ReportSize = reportSize
+
+	return &job, nil
+}
+
+func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToProcess *report_manager.CustomReportRequest) ([]*reporting.Report, error) {
+	finalData := []*reporting.Report{}
+	for _, report := range reqToProcess.Reports {
 		controlsMap := make(map[string]map[string]*inspec.Control)
 		profilesMap := make(map[string]*inspec.Profile)
 		objectName := utils.GetObjName(report.GetReportId())
-		bytes, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
+		objReader, err := t.ObjStoreClient.GetObject(ctx, t.ObjBucketName, objectName, minio.GetObjectOptions{})
 		if err != nil {
 			err = errors.Wrap(err, "could not get the file from object store")
 			logrus.WithError(err).Error()
 			return nil, err
 		}
 		cmpReport := compliance.Report{}
-		err = json.Unmarshal(*bytes, &cmpReport)
+		d := json.NewDecoder(objReader)
+		err = d.Decode(&cmpReport)
 		if err != nil {
 			err = errors.Wrap(err, "error in unmarshalling the report content")
 			logrus.WithError(err).Error()
@@ -229,12 +286,156 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 			controlsMap[profile.Sha256] = controlMap
 		}
 
-		//prepare json or csv reports
-		fmt.Println(cmpReport.ReportUuid)
+		reportData := &reporting.Report{
+			Id:            cmpReport.ReportUuid,
+			NodeId:        cmpReport.NodeUuid,
+			NodeName:      cmpReport.NodeName,
+			Status:        cmpReport.Status,
+			Environment:   cmpReport.Environment,
+			Version:       cmpReport.Version,
+			JobId:         cmpReport.JobUuid,
+			Ipaddress:     cmpReport.Ipaddress,
+			Fqdn:          cmpReport.Fqdn,
+			Roles:         cmpReport.Roles,
+			ChefTags:      cmpReport.ChefTags,
+			StatusMessage: cmpReport.StatusMessage,
+		}
+		if cmpReport.Platform != nil && (cmpReport.Platform.Name != "" || cmpReport.Platform.Release != "") {
+			reportData.Platform = &reporting.Platform{
+				Name:    cmpReport.Platform.Name,
+				Release: cmpReport.Platform.Release,
+				Full:    stringutils.GetFullPlatformName(cmpReport.Platform.Name, cmpReport.Platform.Release),
+			}
+		}
+		if cmpReport.Statistics != nil {
+			reportData.Statistics = &reporting.Statistics{
+				Duration: cmpReport.Statistics.Duration,
+			}
+		}
+		if cmpReport.EndTime != "" {
+			endTime, err := time.Parse(time.RFC3339, cmpReport.EndTime)
+			if err != nil {
+				err = errors.Wrap(err, "error in converting the end time content")
+				logrus.WithError(err).Error()
+				return nil, err
+			}
+			endTimeProto, err := ptypes.TimestampProto(endTime)
+			if err != nil {
+				err = errors.Wrap(err, "error in converting the end time content to proto format")
+				logrus.WithError(err).Error()
+				return nil, err
+			}
+			reportData.EndTime = endTimeProto
+		}
+		for _, profile := range report.Profiles {
+			compProfile, ok := profilesMap[profile.ProfileId]
+			if !ok {
+				continue
+			}
+			//TODO:: Fix Profile status
+			profileData := &reporting.Profile{
+				Name:           compProfile.Name,
+				Title:          compProfile.Title,
+				Copyright:      compProfile.Copyright,
+				CopyrightEmail: compProfile.CopyrightEmail,
+				Summary:        compProfile.Summary,
+				Version:        compProfile.Version,
+				Full:           stringutils.GetFullProfileName(compProfile.Title, compProfile.Version),
+				Sha256:         compProfile.Sha256,
+				Status:         compProfile.Status,
+				SkipMessage:    compProfile.SkipMessage,
+				StatusMessage:  compProfile.StatusMessage,
+			}
+			for _, depend := range compProfile.Depends {
+				profileData.Depends = append(profileData.Depends, &reporting.Dependency{
+					Name:        depend.Name,
+					Url:         depend.Url,
+					Path:        depend.Path,
+					Git:         depend.Git,
+					Branch:      depend.Branch,
+					Tag:         depend.Tag,
+					Commit:      depend.Commit,
+					Version:     depend.Version,
+					Supermarket: depend.Supermarket,
+					Compliance:  depend.Compliance,
+					Status:      depend.Status,
+					SkipMessage: depend.SkipMessage,
+				})
+			}
+			controlMap := controlsMap[profile.ProfileId]
+			for _, control := range profile.Controls {
+				compControl, ok := controlMap[control]
+				if !ok {
+					continue
+				}
+				//TODO: Add Tags and waived_str at control level
+				controlData := &reporting.Control{
+					Id:     compControl.Id,
+					Code:   compControl.Code,
+					Desc:   compControl.Desc,
+					Impact: compControl.Impact,
+					Title:  compControl.Title,
+				}
+				if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
+					compControl.SourceLocation.Line != 0) {
+					controlData.SourceLocation = &reporting.SourceLocation{
+						Ref:  compControl.SourceLocation.Ref,
+						Line: compControl.SourceLocation.Line,
+					}
+				}
+				if compControl.WaiverData != nil && (compControl.WaiverData.ExpirationDate != "" ||
+					compControl.WaiverData.Justification != "" || compControl.WaiverData.Run ||
+					compControl.WaiverData.SkippedDueToWaiver || compControl.WaiverData.Message != "") {
+					controlData.WaiverData = &reporting.OrigWaiverData{
+						ExpirationDate:     compControl.WaiverData.ExpirationDate,
+						Justification:      compControl.WaiverData.Justification,
+						Run:                compControl.WaiverData.Run,
+						SkippedDueToWaiver: compControl.WaiverData.SkippedDueToWaiver,
+						Message:            compControl.WaiverData.Message,
+					}
+				}
+				if compControl.RemovedResultsCounts != nil && (compControl.RemovedResultsCounts.Failed != 0 ||
+					compControl.RemovedResultsCounts.Skipped != 0 || compControl.RemovedResultsCounts.Passed != 0) {
+					controlData.RemovedResultsCounts = &reporting.RemovedResultsCounts{
+						Failed:  compControl.RemovedResultsCounts.Failed,
+						Skipped: compControl.RemovedResultsCounts.Skipped,
+						Passed:  compControl.RemovedResultsCounts.Passed,
+					}
+				}
+				for _, result := range compControl.Results {
+					controlData.Results = append(controlData.Results, &reporting.Result{
+						Status:      result.Status,
+						CodeDesc:    result.CodeDesc,
+						RunTime:     result.RunTime,
+						Message:     result.Message,
+						SkipMessage: result.SkipMessage,
+					})
+				}
+				profileData.Controls = append(profileData.Controls, controlData)
+			}
+			reportData.Profiles = append(reportData.Profiles, profileData)
+		}
+		finalData = append(finalData, reportData)
+	}
+	return finalData, nil
+}
+
+func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*reporting.Report, jobID,
+	requestorID string) (int64, error) {
+	buf := new(bytes.Buffer)
+	err := json.NewEncoder(buf).Encode(finalData)
+	if err != nil {
+		err = errors.Wrap(err, "error in encoding the final data")
+		logrus.WithError(err).Error()
+		return 0, err
 	}
 
-	endTime := time.Now().UTC().Round(time.Second)
-	job.EndTime = &endTime
-
-	return &job, nil
+	objectName := utils.GetObjName(jobID)
+	info, err := t.ObjStoreClient.PutObject(ctx, requestorID, objectName, buf, -1, minio.PutObjectOptions{})
+	if err != nil {
+		err = errors.Wrap(err, "error in storing the data object to objectstore")
+		logrus.WithError(err).Error()
+		return 0, err
+	}
+	return info.Size, nil
 }
