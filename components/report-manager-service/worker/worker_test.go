@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -189,6 +190,7 @@ func (w *CerealWorkflow) TotalCompletedTasks() int {
 
 type TaskResult struct {
 	isError bool
+	failGet bool
 }
 
 func (r *TaskResult) GetParameters(obj interface{}) error {
@@ -196,7 +198,13 @@ func (r *TaskResult) GetParameters(obj interface{}) error {
 }
 
 func (r *TaskResult) Get(obj interface{}) error {
-	return nil
+	if r.failGet {
+		return fmt.Errorf("Error in fetching job results")
+	}
+	jsonString := `{"JobID":"1234-5678","ReportSize":8200}`
+	jsonBytes := []byte(jsonString)
+	err := json.Unmarshal(jsonBytes, obj)
+	return err
 }
 
 func (r *TaskResult) Err() error {
@@ -208,18 +216,19 @@ func (r *TaskResult) Err() error {
 
 func TestOnTaskComplete(t *testing.T) {
 	tests := []struct {
-		name                string
-		isDBFailure         bool
-		isGetPayloadFailure bool
-		isEnqueueFailure    bool
-		isFailedExpected    bool
-		isContinueExpected  bool
-		isCompleteExpected  bool
-		isRetriesLeft       bool
-		isTaskError         bool
-		isRetryTest         bool
-		isParameterFailure  bool
-		expectedError       string
+		name                 string
+		isDBFailure          bool
+		isGetPayloadFailure  bool
+		isEnqueueFailure     bool
+		isFailedExpected     bool
+		isContinueExpected   bool
+		isCompleteExpected   bool
+		isRetriesLeft        bool
+		isTaskError          bool
+		isRetryTest          bool
+		isParameterFailure   bool
+		expectedError        string
+		isFetchTaskResultErr bool
 	}{
 		{
 			name:                "testOnTaskComplete_Success",
@@ -267,6 +276,18 @@ func TestOnTaskComplete(t *testing.T) {
 			expectedError:       "failed to update the record in postgres: error in executing the update task: update error",
 		},
 		{
+			name:                 "testOnTaskComplete_GetTaskResult_fail",
+			isDBFailure:          false,
+			isGetPayloadFailure:  false,
+			isEnqueueFailure:     false,
+			isFailedExpected:     true,
+			isContinueExpected:   false,
+			isCompleteExpected:   false,
+			isRetriesLeft:        true,
+			isFetchTaskResultErr: true,
+			expectedError:        "failed to get the task run result in OnTaskComplete: Error in fetching job results",
+		},
+		{
 			name:                "testOnTaskComplete_RetriesLeft_Success",
 			isDBFailure:         false,
 			isGetPayloadFailure: false,
@@ -277,7 +298,21 @@ func TestOnTaskComplete(t *testing.T) {
 			isRetriesLeft:       true,
 			isTaskError:         true,
 			isRetryTest:         true,
-			expectedError:       "failed to run report-task: error in task execution",
+			expectedError:       "",
+		},
+		{
+			name:                "testOnTaskComplete_RetriesLeft_GetParameter_Fail",
+			isDBFailure:         false,
+			isGetPayloadFailure: false,
+			isEnqueueFailure:    false,
+			isFailedExpected:    true,
+			isContinueExpected:  false,
+			isCompleteExpected:  false,
+			isRetriesLeft:       true,
+			isTaskError:         true,
+			isRetryTest:         true,
+			isParameterFailure:  true,
+			expectedError:       "failed to unmarshal report-workflow parameters: Error in fetching parameters",
 		},
 		{
 			name:                "testOnTaskComplete_RetriesLeft_GetParameter_Fail",
@@ -352,24 +387,25 @@ func TestOnTaskComplete(t *testing.T) {
 				workflowInstance.failGetParameters = true
 			}
 
-			query := `UPDATE custom_report_requests SET status = $1, message = $2, updated_at = $3 WHERE id = $4;`
+			query := `UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;`
 			if tc.isDBFailure {
 				if !workflowInstance.isRetriesLeft {
-					mock.ExpectExec(query).WithArgs("failed", "error in task execution", sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
+					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
 				} else {
-					mock.ExpectExec(query).WithArgs("success", "", sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
+					mock.ExpectExec(query).WithArgs("success", "", 8200, sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
 				}
 			} else {
 				if !workflowInstance.isRetriesLeft {
-					mock.ExpectExec(query).WithArgs("failed", "error in task execution", sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
+					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
 				} else {
-					mock.ExpectExec(query).WithArgs("success", "", sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
+					mock.ExpectExec(query).WithArgs("success", "", 8200, sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
 				}
 			}
 
 			result := workFlow.OnTaskComplete(workflowInstance, cereal.TaskCompleteEvent{
 				Result: &TaskResult{
 					isError: tc.isTaskError,
+					failGet: tc.isFetchTaskResultErr,
 				},
 			})
 			assert.Equal(t, tc.isFailedExpected, result.IsFailed())
@@ -402,24 +438,42 @@ func (t *CerealTask) GetMetadata() cereal.TaskMetadata {
 }
 
 type mockObjStore struct {
-	T                    *testing.T
-	ForFailure           bool
-	ForUnmarshallFailure bool
+	T                      *testing.T
+	ForGetObjectFailure    bool
+	ForPutObjectFailure    bool
+	ForUnmarshallFailure   bool
+	IsBucketExisted        bool
+	ForBucketExistenceFail bool
+	ForMakeBucketFail      bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
 	opts minio.PutObjectOptions) (minio.UploadInfo, error) {
-	return minio.UploadInfo{}, nil
+	assert.Equal(m.T, "reqID123", bucketName)
+	assert.Equal(m.T, "1234-5678.json", objectName)
+	assert.Equal(m.T, int64(-1), objectSize)
+	if m.ForPutObjectFailure {
+		return minio.UploadInfo{}, fmt.Errorf("error in storing object to object store")
+	}
+
+	bytes, err := io.ReadAll(reader)
+	assert.NoError(m.T, err)
+	//expects new line at the end of the content
+	assert.Equal(m.T, `[{"id":"r1","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r1p1","title":"r1p1","full":"r1p1, v","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","full":"r1p2, v","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}]},{"id":"r2","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r2p1","title":"r2p1","full":"r2p1, v","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","full":"r2p2, v","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}]}]
+`, string(bytes))
+
+	return minio.UploadInfo{
+		Size: 8200,
+	}, nil
 }
 
-func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*[]byte, error) {
+func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (io.Reader, error) {
 	assert.Equal(m.T, "testBucket", bucketName)
 
-	if m.ForFailure {
+	if m.ForGetObjectFailure {
 		return nil, fmt.Errorf("Error in fetching the object from object store")
 	} else if m.ForUnmarshallFailure {
-		bytes := []byte("")
-		return &bytes, nil
+		return strings.NewReader(""), nil
 	}
 
 	var json string
@@ -428,21 +482,50 @@ func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName stri
 	} else if objectName == "r2.json" {
 		json = `{"profiles":[{"name":"r2p1","title":"r2p1","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}],"report_uuid":"r2","node_uuid":"nodeID","node_name":"TestNode"}`
 	}
-	jsonBytes := []byte(json)
-	return &jsonBytes, nil
+	//jsonBytes := []byte(json)
+	//return &jsonBytes, nil
+	return strings.NewReader(json), nil
+}
+
+func (m mockObjStore) BucketExists(ctx context.Context, bucketName string) (bool, error) {
+	assert.Equal(m.T, "reqID123", bucketName)
+	if m.ForBucketExistenceFail {
+		return false, fmt.Errorf("error in checking the existence of a bucket")
+	}
+	if m.IsBucketExisted {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) error {
+	assert.Equal(m.T, "reqID123", bucketName)
+	if m.ForMakeBucketFail {
+		return fmt.Errorf("error in creating a bucket in object store")
+	}
+	return nil
 }
 
 func TestRun(t *testing.T) {
 	tests := []struct {
-		name                   string
-		isGetParametersFailure bool
-		isDataStoreError       bool
-		isUnmarshalError       bool
-		expectedError          string
+		name                       string
+		isGetParametersFailure     bool
+		isDataStoreGetError        bool
+		isDataStorePutError        bool
+		isUnmarshalError           bool
+		expectedError              string
+		isBucketExisted            bool
+		isBucketExistenceCheckFail bool
+		isCreateBucketFail         bool
 	}{
 		{
 			name:          "testRun_Success",
 			expectedError: "",
+		},
+		{
+			name:            "testRun_Success_WithExistingBucket",
+			expectedError:   "",
+			isBucketExisted: true,
 		},
 		{
 			name:                   "testRun_GetParameter_Fail",
@@ -450,14 +533,29 @@ func TestRun(t *testing.T) {
 			expectedError:          "could not unmarshal GenerateReportParameters: error in fetching parameters",
 		},
 		{
-			name:             "testRun_GetObject_Fail",
-			isDataStoreError: true,
-			expectedError:    "could not get the file from object store: Error in fetching the object from object store",
+			name:                "testRun_GetObject_Fail",
+			isDataStoreGetError: true,
+			expectedError:       "could not get the file from object store: Error in fetching the object from object store",
 		},
 		{
 			name:             "testRun_GetObject_Unmarshall_Fail",
 			isUnmarshalError: true,
-			expectedError:    "error in unmarshalling the report content: unexpected end of JSON input",
+			expectedError:    "error in unmarshalling the report content: EOF",
+		},
+		{
+			name:                       "testRun_BucketExistence_Fail",
+			isBucketExistenceCheckFail: true,
+			expectedError:              "error in checking the existence of bucket in objectstore: error in checking the existence of a bucket",
+		},
+		{
+			name:               "testRun_CreateBucket_Fail",
+			isCreateBucketFail: true,
+			expectedError:      "error in creating a bucket in objectstore: error in creating a bucket in object store",
+		},
+		{
+			name:                "testRun_PutObject_Fail",
+			isDataStorePutError: true,
+			expectedError:       "error in storing the data object to objectstore: error in storing object to object store",
 		},
 	}
 
@@ -465,18 +563,26 @@ func TestRun(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			task := worker.GenerateReportTask{
 				ObjStoreClient: mockObjStore{
-					T:                    t,
-					ForFailure:           tc.isDataStoreError,
-					ForUnmarshallFailure: tc.isUnmarshalError,
+					T:                      t,
+					ForGetObjectFailure:    tc.isDataStoreGetError,
+					ForPutObjectFailure:    tc.isDataStorePutError,
+					ForUnmarshallFailure:   tc.isUnmarshalError,
+					IsBucketExisted:        tc.isBucketExisted,
+					ForBucketExistenceFail: tc.isBucketExistenceCheckFail,
+					ForMakeBucketFail:      tc.isCreateBucketFail,
 				},
 				ObjBucketName: "testBucket",
 			}
-			_, err := task.Run(context.Background(), &CerealTask{
+			result, err := task.Run(context.Background(), &CerealTask{
 				isParameterFailure: tc.isGetParametersFailure,
 			})
 			if tc.expectedError != "" {
 				assert.Error(t, err)
 				assert.Equal(t, tc.expectedError, err.Error())
+			}
+			if result != nil {
+				formattedResult := result.(*worker.GenerateReportParameters)
+				assert.Equal(t, int64(8200), formattedResult.ReportSize)
 			}
 		})
 	}
