@@ -330,7 +330,7 @@ steps:
     command:
       - cd components/automate-ui
       - make install lint unit
-    timeout_in_minutes: 30
+    timeout_in_minutes: 20
     retry:
       automatic:
         limit: 1
