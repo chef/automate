@@ -46,16 +46,15 @@ do_deploy() {
     ls
     docker_run "${_frontend1_container_name}"
     docker_run "${_frontend2_container_name}"
-    #shellcheck disable=SC2154
+    echo "========PWD======\n"
     docker exec -t "$_frontend1_container_name" \
         "pwd"
 
+    echo "========LS======\n"
     docker exec -t "$_frontend1_container_name" \
        "ls"
 
-    docker exec -t "$_frontend1_container_name" \
-       "ls scripts"
-
+    echo "========RUN======\n"
     docker exec -t "$_frontend1_container_name" \
         "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
     docker exec -t "$_frontend2_container_name" \
