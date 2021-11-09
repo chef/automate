@@ -144,7 +144,8 @@ func tailFile(logFilePath string, state *os.ProcessState) {
 
 func showSpinnerForLongWait(logFilePath string, state *os.ProcessState) {
 	for {
-		time.Sleep(2 * time.Minute)
+		fmt.Println(state.Exited())
+		time.Sleep(1 * time.Minute)
 		if getFileSize(logFilePath) == logFileSize {
 			writer.StartSpinner()
 		} else {
