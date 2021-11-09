@@ -27,6 +27,8 @@ func reportManagerPublisher(in <-chan message.Compliance, reportmanagerClient ma
 	go func() {
 		defer close(out)
 		for msg := range in {
+			//append the calculated status to add into custom report exporting.
+			msg.Report.Status = msg.Shared.Status
 			var grpcErr error
 			err := msg.Ctx.Err()
 			if err != nil {
