@@ -212,6 +212,7 @@ import { DataFeedConfigDetailsComponent } from './pages/data-feed-config-details
 import {
   DataFeedTableComponent
 } from './page-components/data-feed-table/data-feed-table.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 
 @NgModule({
@@ -299,6 +300,7 @@ import {
     TeamModule,
     ReactiveFormsModule,
     RoleModule,
+    InfiniteScrollModule,
     StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
     StoreRouterConnectingModule.forRoot({
       serializer: RouterSerializer
