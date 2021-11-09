@@ -202,6 +202,14 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(derr, status.ConfigError, invalidConfig)
 	}
 	if deployer != nil {
+		conf := new(dc.AutomateConfig)
+		if err := mergeFlagOverrides(conf); err != nil {
+			return status.Wrap(
+				err,
+				status.ConfigError,
+				"Merging command flag overrides into Chef Automate config failed",
+			)
+		}
 		return deployer.doDeployWork(args)
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")

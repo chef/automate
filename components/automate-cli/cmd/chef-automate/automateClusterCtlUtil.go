@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
@@ -17,6 +19,8 @@ import (
 	"github.com/chef/automate/lib/version"
 	"github.com/hpcloud/tail"
 )
+
+var logFileSize int64 = 0
 
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
@@ -52,7 +56,7 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDocs string) error {
 	var logFilePath = filepath.Join(AUTOMATE_HA_RUN_LOG_DIR, "/a2ha-run.log")
 	if len(command) < 1 {
-		return errors.New("Invalid or empty command")
+		return errors.New("invalid or empty command")
 	}
 	if _, err := os.Stat(AUTOMATE_HA_RUN_LOG_DIR); !errors.Is(err, nil) {
 		err = os.Mkdir(AUTOMATE_HA_RUN_LOG_DIR, os.ModeDir)
@@ -87,19 +91,65 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
-	tailFile(logFilePath)
+	state, err := c.Process.Wait()
+	if err != nil {
+		fmt.Println("&^#&^&#^$&#^$&#^$&#^$&^#&$&# ERRROR *($(*(#*$(#*$#*$(#*")
+		fmt.Println(err)
+	} else {
+		fmt.Println("NO ERROR *&(A%$*)$*#($#*($#*(")
+	}
+	if !state.Exited() {
+		go showSpinnerForLongWait(logFilePath, state)
+	}
+	tailFile(logFilePath, state)
+	c.Wait()
 	return err
 }
 
-func tailFile(logFilePath string) {
+func killTailProcess(t *tail.Tail, secondsToStop int) {
+	time.Sleep(time.Duration(secondsToStop) * time.Millisecond)
+	writer.Println("Process Exited!")
+	t.Stop()
+}
+func tailFile(logFilePath string, state *os.ProcessState) {
+	var exitFlag bool = false
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
 	if err != nil {
 		writer.Printf(err.Error())
 		return
 	}
-	for line := range t.Lines {
+	if state.Exited() {
+		writer.Print("Tail exit command triggered")
+		go killTailProcess(t, 1000)
+		exitFlag = true
+	}
+	/* for {
+		//fmt.Println(state.Exited())
+		go killTailProcess(t, 120)
+		line, open := <-t.Lines
+		if !open {
+			break
+		}
 		writer.Println(line.Text)
+	} */
+	for line := range t.Lines {
+		if state.Exited() && !exitFlag {
+			go killTailProcess(t, 1000)
+			exitFlag = true
+		}
+		writer.Println(logMessageFilter(line.Text))
+	}
+}
+
+func showSpinnerForLongWait(logFilePath string, state *os.ProcessState) {
+	for {
+		time.Sleep(2 * time.Minute)
+		if getFileSize(logFilePath) == logFileSize {
+			writer.StartSpinner()
+		} else {
+			writer.StopSpinner()
+		}
 	}
 }
 
@@ -152,6 +202,14 @@ func checkIfFileExist(path string) bool {
 	return false
 }
 
+func getFileSize(path string) int64 {
+	if checkIfFileExist(path) {
+		info, _ := os.Stat(path)
+		return info.Size()
+	}
+	return 0
+}
+
 func executeSecretsInitCommand(secretsKeyFilePath string) error {
 	if !checkIfFileExist(secretsKeyFilePath) {
 		writer.Printf("doing secrets init  \n")
@@ -184,4 +242,25 @@ func executeShellCommand(command string, args []string) error {
 	}
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
+}
+
+func logMessageFilter(logLine string) string {
+	writer.Println("filtering log messages")
+	logMessageKeys, logMessageMap := getLogMessageGrammer()
+	for _, k := range logMessageKeys {
+		if strings.Contains(logLine, k) {
+			logLine = strings.ReplaceAll(logLine, k, logMessageMap[k])
+		}
+	}
+	return logLine
+}
+func getLogMessageGrammer() ([]string, map[string]string) {
+	m := make(map[string]string)
+	m["automate-cluster-ctl"] = "chef-automate"
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys, m
 }
