@@ -48,7 +48,7 @@ document "compliance_run_info_load_16_days" <<DOC
   Runs the integration tests for the compliance_run_info_load_16_days
 DOC
 function compliance_run_info_load_16_days() {
-  # Go based integration tests
+  # Go based integration tests for 16 days
   go_test -run TestReportingServerRunInfoLoadSixteenDaysOfData -v "github.com/chef/automate/components/compliance-service/integration_test"
 }
 
