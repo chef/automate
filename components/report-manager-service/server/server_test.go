@@ -51,8 +51,16 @@ func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName stri
 	}, nil
 }
 
-func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (*[]byte, error) {
+func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (io.Reader, error) {
 	return nil, nil
+}
+
+func (m mockObjStore) BucketExists(ctx context.Context, bucketName string) (bool, error) {
+	return true, nil
+}
+
+func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) error {
+	return nil
 }
 
 func dialer(t *testing.T, isForFailure bool) func(context.Context, string) (net.Conn, error) {
