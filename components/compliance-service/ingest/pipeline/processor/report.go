@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 func ComplianceReport(notifierClient notifier.Notifier, automateURL string, isSupportLCR bool) message.CompliancePipe {
@@ -78,7 +79,7 @@ func complianceReport(in <-chan message.Compliance, notifierClient notifier.Noti
 			msg.InspecReport.Platform.Name = msg.Report.GetPlatform().GetName()
 			msg.InspecReport.Platform.Release = msg.Report.GetPlatform().GetRelease()
 			msg.InspecReport.Statistics.Duration = msg.Report.GetStatistics().GetDuration()
-			msg.InspecReport.Platform.Full = fmt.Sprintf("%s %s",
+			msg.InspecReport.Platform.Full = stringutils.GetFullPlatformName(
 				msg.InspecReport.Platform.Name, msg.InspecReport.Platform.Release)
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Report")
 			message.Propagate(out, &msg)
