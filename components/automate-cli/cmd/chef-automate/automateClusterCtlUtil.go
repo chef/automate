@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	dc "github.com/chef/automate/api/config/deployment"
@@ -91,27 +92,47 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
-	state, err := c.Process.Wait()
-	if err != nil {
-		fmt.Println("&^#&^&#^$&#^$&#^$&#^$&^#&$&# ERRROR *($(*(#*$(#*$#*$(#*")
-		fmt.Println(err)
+	isExited := checkIfProcessExited(c.Process)
+	if isExited {
+		writer.Println("Exited")
 	} else {
-		fmt.Println("NO ERROR *&(A%$*)$*#($#*($#*(")
+		writer.Println("Not Exited")
 	}
-	if !state.Exited() {
-		go showSpinnerForLongWait(logFilePath, state)
+	if !isExited {
+		go showSpinnerForLongWait(logFilePath, c.Process)
 	}
-	tailFile(logFilePath, state)
-	c.Wait()
+	tailFile(logFilePath, c.Process)
 	return err
 }
 
+func checkIfProcessExited(process *os.Process) bool {
+	err := process.Signal(syscall.Signal(0))
+	if err != nil && err.Error() == "os: process already finished" {
+		return true
+	}
+	errno, ok := err.(syscall.Errno)
+	if !ok {
+		fmt.Println("Exited")
+		return true
+	}
+	switch errno {
+	case syscall.ESRCH:
+		fmt.Println("Exit ESRCH")
+		return true
+	case syscall.EPERM:
+		fmt.Println("NOT Exit EPERM")
+		return false
+	}
+	return true
+}
+
 func killTailProcess(t *tail.Tail, secondsToStop int) {
+	writer.Print("Tail exit command triggered")
 	time.Sleep(time.Duration(secondsToStop) * time.Millisecond)
 	writer.Println("Process Exited!")
 	t.Stop()
 }
-func tailFile(logFilePath string, state *os.ProcessState) {
+func tailFile(logFilePath string, process *os.Process) {
 	var exitFlag bool = false
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
@@ -119,10 +140,11 @@ func tailFile(logFilePath string, state *os.ProcessState) {
 		writer.Printf(err.Error())
 		return
 	}
-	if state.Exited() {
-		writer.Print("Tail exit command triggered")
+	if checkIfProcessExited(process) {
 		go killTailProcess(t, 1000)
 		exitFlag = true
+	} else {
+		writer.Println("Not killed yet")
 	}
 	/* for {
 		//fmt.Println(state.Exited())
@@ -134,7 +156,7 @@ func tailFile(logFilePath string, state *os.ProcessState) {
 		writer.Println(line.Text)
 	} */
 	for line := range t.Lines {
-		if state.Exited() && !exitFlag {
+		if checkIfProcessExited(process) && !exitFlag {
 			go killTailProcess(t, 1000)
 			exitFlag = true
 		}
@@ -142,9 +164,9 @@ func tailFile(logFilePath string, state *os.ProcessState) {
 	}
 }
 
-func showSpinnerForLongWait(logFilePath string, state *os.ProcessState) {
+func showSpinnerForLongWait(logFilePath string, process *os.Process) {
 	for {
-		fmt.Println(state.Exited())
+		fmt.Println("is exited", checkIfProcessExited(process))
 		time.Sleep(1 * time.Minute)
 		if getFileSize(logFilePath) == logFileSize {
 			writer.StartSpinner()
