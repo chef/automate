@@ -51,6 +51,12 @@ do_deploy() {
         "pwd"
 
     docker exec -t "$_frontend1_container_name" \
+       "ls"
+
+    docker exec -t "$_frontend1_container_name" \
+       "ls scripts"
+
+    docker exec -t "$_frontend1_container_name" \
         "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
     docker exec -t "$_frontend2_container_name" \
         "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
