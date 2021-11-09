@@ -128,7 +128,7 @@ func TestReportingServerRunInfo(t *testing.T) {
 
 func TestReportingServerRunInfoLoadSixteenDaysOfData(t *testing.T) {
 	//clear out the docs
-	suite.DeleteAllDocuments()
+	defer suite.DeleteAllDocuments()
 
 	backend := &relaxting.ES2Backend{ESUrl: elasticsearchUrl}
 	server := reportingServer.New(backend)
