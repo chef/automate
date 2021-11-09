@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	reportmanager "github.com/chef/automate/components/report-manager-service"
 	"github.com/chef/automate/components/report-manager-service/config"
@@ -98,9 +97,6 @@ func serve(*cobra.Command, []string) error {
 	if err := initConfig(); err != nil {
 		return errors.Wrap(err, "failed to load config")
 	}
-
-	//Wait till report-manager-minio-gateway is up and running
-	time.Sleep(30 * time.Second)
 
 	conf.FixupRelativeTLSPaths(cfgFile)
 	serviceCerts, err := conf.ReadCerts()
