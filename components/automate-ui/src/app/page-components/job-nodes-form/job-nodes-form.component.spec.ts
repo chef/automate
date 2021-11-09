@@ -78,5 +78,4 @@ describe('JobNodesFormComponent', () => {
     expect(component.nodeSource[0]).toEqual('azure-api');
     expect(component.nodeSource[1]).toEqual('azure-vm');
   });
-  
 });
