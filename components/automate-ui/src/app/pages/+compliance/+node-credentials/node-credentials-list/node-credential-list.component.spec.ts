@@ -58,6 +58,7 @@ describe('NodeCredentialListComponent', () => {
       ],
       imports: [
         ChefPipesModule,
+        InfiniteScrollModule,
         StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ]
     }).compileComponents();

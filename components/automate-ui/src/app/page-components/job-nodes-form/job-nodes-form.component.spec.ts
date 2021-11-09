@@ -78,12 +78,5 @@ describe('JobNodesFormComponent', () => {
     expect(component.nodeSource[0]).toEqual('azure-api');
     expect(component.nodeSource[1]).toEqual('azure-vm');
   });
-
-  it('on serach input called', () => {
-    const arr = [];
-    arr.push('aws');
-    component.onSearchInput('aws');
-    // tslint:disable-next-line: no-unused-expression
-    expect(component.search(arr)).toBeTruthy;
-  });
+  
 });

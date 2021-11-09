@@ -76,7 +76,7 @@ steps:
     expeditor:
       executor:
         docker:
-          
+
   - label: ":ruby: :buildkite: a2-ha-backend/automate-cluster-ctl"
     commands:
       - gem install bundler:1.16.6
@@ -330,7 +330,7 @@ steps:
     command:
       - cd components/automate-ui
       - make install lint unit
-    timeout_in_minutes: 20
+    timeout_in_minutes: 30
     retry:
       automatic:
         limit: 1
