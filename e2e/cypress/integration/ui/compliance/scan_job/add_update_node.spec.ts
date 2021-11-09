@@ -31,7 +31,7 @@ describe('Scan job', () => {
       url: '/api/v0/secrets/search',
       body: {}
       }).then((secrectSearchResp) => {
-        if (!(secrectSearchResp.body.total >= 300)) {
+        if (!(secrectSearchResp.body.total >= 220)) {
           for (let i = 0; i < 220; i++) {
             cy.request({
               auth: { bearer: adminIdToken },
@@ -181,11 +181,24 @@ describe('Scan job', () => {
       cy.get('[data-cy=rightSide-0]').should('not.have.value', 'secret-ssh0');
     });
 
-
     it('update data', () => {
       cy.get('[data-cy=submit]').click();
     });
 
+    it('click on Add new credentials on add page', () => {
+      cy.visit('/compliance/scan-jobs/nodes/add');
+      cy.get('[data-cy=node-credentials]').click();
+      cy.get('app-welcome-modal').invoke('hide');
+      cy.get('[slot=title').contains('Create Credential');
+    });
+
+    it('click on Add new credentials on add page', () => {
+      cy.visit('/compliance/scan-jobs/nodes');
+      cy.get('app-welcome-modal').invoke('hide');
+      cy.get('[data-cy=edit-0]').click();
+      cy.get('[data-cy=node-credentials]').click();
+      cy.get('[slot=title').contains('Create Credential');
+    });
   });
 
 });
