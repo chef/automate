@@ -15,6 +15,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 const (
@@ -230,7 +231,7 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) (*ESInSpecSummary, 
 			Status:       profileStatus,
 			ControlsSums: dstControlSums,
 			Name:         profileName,
-			Full:         fmt.Sprintf("%s, v%s", profileTitle, profileVersion),
+			Full:         stringutils.GetFullProfileName(profileTitle, profileVersion),
 			Title:        profileTitle,
 			SHA256:       profileId,
 			Version:      profileVersion,
@@ -298,7 +299,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 			ControlsSums: profilesSumsMap[srcProfileMin.SHA256],
 			Name:         srcProfileMin.Name,
 			Title:        profileTitle,
-			Full:         fmt.Sprintf("%s, v%s", profileTitle, srcProfileMin.Version),
+			Full:         stringutils.GetFullProfileName(profileTitle, srcProfileMin.Version),
 			SHA256:       srcProfileMin.SHA256,
 			Version:      srcProfileMin.Version,
 		}

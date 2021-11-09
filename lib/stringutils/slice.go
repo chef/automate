@@ -1,6 +1,9 @@
 package stringutils
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var ErrNotFound = errors.New("Not found")
 
@@ -47,4 +50,12 @@ func SliceReject(haystack []string, needle string) []string {
 	}
 
 	return res
+}
+
+func GetFullPlatformName(name, release string) string {
+	return fmt.Sprintf("%s %s", name, release)
+}
+
+func GetFullProfileName(name, release string) string {
+	return fmt.Sprintf("%s, v%s", name, release)
 }
