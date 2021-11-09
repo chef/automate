@@ -47,7 +47,7 @@ defmodule Notifications.Mixfile do
       # GRPC endpoint: service to service, currently
       #                used by ingest service to trigger
       #                notifications
-      {:protobuf, github: "tony612/protobuf-elixir", override: true},
+      {:protobuf, github: "tony612/protobuf-elixir", branch: "main", override: true},
       {:google_protos, github: "tony612/google-protos", override: true},
       {:grpc, github: "elixir-grpc/grpc"},
       # database w/ pooling for pgsql access
