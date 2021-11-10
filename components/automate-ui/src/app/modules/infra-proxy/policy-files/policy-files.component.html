@@ -33,6 +33,7 @@
     </div>
     <chef-loading-spinner class="full-screen-spinner" *ngIf="deleting || searching" size="50" fixed></chef-loading-spinner>
     <div id="policy-file-table-container" *ngIf="policyFiles.length" data-cy="policy-file-table-container">
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles', 'get', [serverId, orgId]]">
       <chef-table>
         <chef-thead *ngIf="!searchFlag || searchArr.length">
           <chef-tr class="no_border_tr">
@@ -59,18 +60,21 @@
                   Revisions
                   <chef-icon aria-hidden="true" class="primary">add</chef-icon>
                 </mat-option>
-                <mat-option
-                  data-cy="delete"
-                  class="secondary"
-                  (onSelectionChange)="startpolicyFilesDelete(policyFile)">
-                  Delete
-                  <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
-                </mat-option>
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policyfiles/{name}', 'delete', [serverId, orgId, policyFile.name]]">
+                  <mat-option
+                    data-cy="delete"
+                    class="secondary"
+                    (onSelectionChange)="startpolicyFilesDelete(policyFile)">
+                    Delete
+                    <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
+                  </mat-option>
+                </app-authorized>
               </mat-select>
             </chef-td>
           </chef-tr>
         </chef-tbody>
       </chef-table>
+      </app-authorized>
     </div>
     <app-pagination *ngIf="!searchFlag"
       [items]="policyFiles"
