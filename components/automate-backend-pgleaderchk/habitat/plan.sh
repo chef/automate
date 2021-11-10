@@ -2,7 +2,7 @@
 pkg_name=automate-backend-pgleaderchk
 binary_name=pgleaderchk
 pkg_origin=chef
-pkg_version="0.1.0"
+pkg_version="1.1.0"
 pkg_repo=automate
 pkg_description="Automate Backend PostreSQL leader check"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
