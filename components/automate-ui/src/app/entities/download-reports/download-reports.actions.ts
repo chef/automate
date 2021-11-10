@@ -11,3 +11,4 @@ export class AckDownloadReports implements Action {
 
 export type DownloadReportsActions =
   | AckDownloadReports;
+

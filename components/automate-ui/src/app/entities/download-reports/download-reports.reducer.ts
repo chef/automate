@@ -3,7 +3,6 @@ import { set } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
 import { DownloadReportsActionTypes, DownloadReportsActions } from './download-reports.actions';
 
-
 export interface DownloadReportsEntityState {
   list: {
     notificationStack: string[]
@@ -33,3 +32,4 @@ export function downloadReportsEntityReducer(
       return state;
   }
 }
+
