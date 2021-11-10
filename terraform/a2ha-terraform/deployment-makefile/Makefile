@@ -7,6 +7,7 @@ TMPOUT = '/tmp/make.out'
 REPO_ROOT = $(shell pwd)
 DATESTAMP := $(shell date +"%Y%m%d%H%M%S")
 BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle-$(DATESTAMP).aib
+BUNDLEAIBDEV = $(TERRAFORM_PATH)/transfer_files/bundle-dev-$(DATESTAMP).aib
 BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend-$(DATESTAMP).aib
 BACKENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_be.auto.tfvars
 FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
