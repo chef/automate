@@ -90,7 +90,7 @@ describe('DataBags get', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databags get returns 200 when infraServersOrgsDataBags get actions is allowed', () => {
+    it('databags get returns 200 when get actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsGetActionToken },
             method: 'GET',
@@ -100,7 +100,7 @@ describe('DataBags get', () => {
             });
     });
 
-    it('databags get returns 403 when infraServersOrgsDataBags get actions is denied', () => {
+    it('databags get returns 403 when get actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsGetActionToken },
             method: 'GET',
@@ -205,7 +205,7 @@ describe('Create DataBags', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databags post returns 200 when infraServersOrgsDataBags create actions is allowed', () => {
+    it('databags post returns 200 when create actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsCreateActionToken },
             method: 'POST',
@@ -220,7 +220,7 @@ describe('Create DataBags', () => {
             });
     });
 
-    it('databags post returns 404 when infraServersOrgsDataBags create actions is denied', () => {
+    it('databags post returns 404 when create actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsCreateActionToken },
             method: 'POST',
@@ -330,7 +330,7 @@ describe('DataBagsItem get', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databagsitem get returns 200 when infraServersOrgsDataBagsItem get actions is allowed', () => {
+    it('databagsitem get returns 200 when get actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsItemGetActionToken },
             method: 'GET',
@@ -340,7 +340,7 @@ describe('DataBagsItem get', () => {
             });
     });
 
-    it('databagsitem get returns 403 when infraServersOrgsDataBagsItem get actions is denied', () => {
+    it('databagsitem get returns 403 when get actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsItemGetActionToken },
             method: 'GET',
@@ -444,7 +444,7 @@ describe('Create DataBags item', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databags post returns 200 when infraServersOrgsDataBagsItem create actions is allowed', () => {
+    it('databags post returns 200 when create actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsItemCreateActionToken },
             method: 'POST',
@@ -452,7 +452,7 @@ describe('Create DataBags item', () => {
                 org_id: 'test-org',
                 server_id: 'local-dev',
                 name: 'colors',
-                data: {id: "test1"}
+                data: {id: 'test1'}
             },
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/colors'
             }).then((resp) => {
@@ -460,7 +460,7 @@ describe('Create DataBags item', () => {
             });
     });
 
-    it('databags post returns 403 when infraServersOrgsDataBagsItem create actions is denied', () => {
+    it('databags post returns 403 when create actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsItemCreateActionToken },
             method: 'POST',
@@ -468,7 +468,7 @@ describe('Create DataBags item', () => {
                 org_id: 'test-org',
                 server_id: 'local-dev',
                 name: 'colors',
-                data: {id: "test1"}
+                data: {id: 'test1'}
             },
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/colors',
             failOnStatusCode: false
@@ -571,7 +571,7 @@ describe('Update DataBags item', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databagsitem put returns 200 when infraServersOrgsDataBagsItem update actions is allowed', () => {
+    it('databagsitem put returns 200 when update actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsItemUpdateActionToken },
             method: 'PUT',
@@ -579,7 +579,7 @@ describe('Update DataBags item', () => {
                 org_id: 'test-org',
                 server_id: 'local-dev',
                 name: 'colors',
-                data: {id: "test1"}
+                data: {id: 'test1'}
             },
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/colors/test1'
             }).then((resp) => {
@@ -587,7 +587,7 @@ describe('Update DataBags item', () => {
             });
     });
 
-    it('databagsitem put returns 403 when infraServersOrgsDataBagsItem update actions is denied', () => {
+    it('databagsitem put returns 403 when update actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsItemUpdateActionToken },
             method: 'PUT',
@@ -595,7 +595,7 @@ describe('Update DataBags item', () => {
                 org_id: 'test-org',
                 server_id: 'local-dev',
                 name: 'colors',
-                data: {id: "test1"}
+                data: {id: 'test1'}
             },
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/data_bags/colors/test1',
             failOnStatusCode: false
@@ -697,7 +697,7 @@ describe('Delete DataBagsItem', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databagsitem delete returns 200 when infraServersOrgsDataBagsItem delete actions is allowed', () => {
+    it('databagsitem delete returns 200 when delete actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsItemDeleteActionToken },
             method: 'DELETE',
@@ -707,7 +707,7 @@ describe('Delete DataBagsItem', () => {
             });
     });
 
-    it('databagsitem delete returns 403 when infraServersOrgsDataBags delete actions is denied', () => {
+    it('databagsitem delete returns 403 when delete actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsItemDeleteActionToken },
             method: 'DELETE',
@@ -813,7 +813,7 @@ describe('Delete DataBags', () => {
         cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
     });
 
-    it('databags put returns 200 when infraServersOrgsDataBags delete actions is allowed', () => {
+    it('databags put returns 200 when delete actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersDataBagsDeleteActionToken },
             method: 'DELETE',
@@ -823,7 +823,7 @@ describe('Delete DataBags', () => {
             });
     });
 
-    it('databags put returns 403 when infraServersOrgsDataBags delete actions is denied', () => {
+    it('databags put returns 403 when delete actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersDataBagsDeleteActionToken },
             method: 'DELETE',
