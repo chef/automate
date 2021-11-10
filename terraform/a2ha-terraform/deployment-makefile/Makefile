@@ -59,6 +59,12 @@ $(BUNDLEAIB):
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
 
+$(BUNDLEAIBDEV):
+	@echo "# Updating FE and BE component package versions from dev channel " && \
+		$(AIRGAP_SH) -t all -c dev -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)  && \
+	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
+	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
+
 $(FRONTENDAIB):
 	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
 		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS) && \
@@ -75,6 +81,9 @@ $(HABITAT_TFVARS):
 
 ## Create both frontend and backend .aib
 bundle: $(BUNDLEAIB)
+
+## Create both frontend and backend .aib from dev channel
+bundle-dev: $(BUNDLEAIBDEV)
 
 ## Create a frontend .aib
 fe-bundle: $(FRONTENDAIB)

@@ -25,6 +25,7 @@ class AutomateClusterSetup < AutomateCluster::Command
   option ["-n", "--skip-changes"], :flag, "Only show what changes are needed, don't apply them"
   option ["-s", "--skip-deploy"], :flag, "Skip the deploy step, this this if you only want to update terraform plans or airgap bundles."
   option ["-t", "--timeout"], 'MINUTES', "Set timeout value for commands to finish running", default: 10
+  option ["-c", "--dev"], :flag, "Downloads the dev channel manifest"
 
   def valid_bundle?
     tf_aib_valid?
@@ -39,7 +40,7 @@ class AutomateClusterSetup < AutomateCluster::Command
   end
 
   def need_bundle?
-    !valid_bundle? || upgrade_airgap_bundles?
+    !valid_bundle? || upgrade_airgap_bundles? || dev?
   end
   
   def need_FE_upgrade?
@@ -68,7 +69,7 @@ class AutomateClusterSetup < AutomateCluster::Command
       status = run_make_cmd('bundle', command_opts)
 
       if status.error? || !valid_bundle?
-        logger.error "Error encountered generating FE airgap bundles"
+        logger.error "Error encountered generating airgap bundles"
         logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
         logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
         spin.error "Failed to generate airgap bundles"
@@ -79,6 +80,24 @@ class AutomateClusterSetup < AutomateCluster::Command
     end if need_bundle?
  
   end
+
+  def generate_dev_bundle
+    wait_while 'Generating airgap bundles for dev channel ', true do |spin|
+      status = run_make_cmd('bundle-dev', command_opts)
+
+      if status.error? || !valid_bundle?
+        logger.error "Error encountered generating  airgap bundles"
+        logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
+        logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
+        spin.error "Failed to generate airgap bundles"
+        exit 1
+      end
+
+      valid_bundle?
+    end if need_bundle?
+ 
+  end
+
 
   def upgrade_FE_bundle
     wait_while 'upgrading FE airgap bundle', true do |spin|
@@ -105,7 +124,7 @@ class AutomateClusterSetup < AutomateCluster::Command
         logger.error "Error encountered generating BE airgap bundles"
         logger.error "STDOUT: #{status.stdout}" unless status.stdout.empty?
         logger.error "STDERR: #{status.stderr}" unless status.stderr.empty?
-        spin.error "Failed to upgrade FE airgap bundles"
+        spin.error "Failed to upgrade BE airgap bundles"
         exit 1
       end
 
@@ -176,7 +195,9 @@ class AutomateClusterSetup < AutomateCluster::Command
       exit 1
     end
 
-    if upgrade_frontends? 
+    if dev?
+        generate_dev_bundle
+    elsif upgrade_frontends? 
         upgrade_FE_bundle
     elsif upgrade_backends?
         upgrade_BE_bundle

@@ -23,12 +23,14 @@ export BUNDLE_TYPE=
 export BACKENDAIB_TFVARS=
 export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
+export CHANNEL=current
 TEMP_DIR=/tmp
 export TEMP_BUNDLE_FILE=$TEMP_DIR/bundle.aib.$$.$RANDOM
 export TEMP_TAR_FILE=$TEMP_DIR/my.aib.$$.$RANDOM
 export MANIFEST_TFVARS="terraform/a2ha_manifest.auto.tfvars"
 export BACKENDAIB=
 export PACKAGES_INFO="/tmp/packages.info"
+
 # Helper Functions
 echo_env() {
     echo "=============================================="
@@ -82,6 +84,7 @@ trap clean_up SIGHUP SIGINT SIGTERM ERR
 airgap_bundle_create() {
   original_aib_path="${TEMP_BUNDLE_FILE}"
   args=('airgap' 'bundle' 'create')
+  args+=('-c' "${CHANNEL}")
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
@@ -173,7 +176,7 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h:v:q:" opt; do
+while getopts ":b:d:t:w:o:h:v:q:c:" opt; do
   case "${opt}" in
     d)
       export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
@@ -195,6 +198,9 @@ while getopts ":b:d:t:w:o:h:v:q:" opt; do
       ;;
     q)
       export BACKENDAIB_TFVARS=${OPTARG}
+      ;;
+    c)
+      export CHANNEL=${OPTARG}
       ;;
     h)
       usage
