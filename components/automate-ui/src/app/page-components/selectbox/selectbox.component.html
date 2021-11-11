@@ -1,0 +1,61 @@
+<main>
+  <div class="selectbox-main-section">
+    <div class="list-item">
+      <chef-input #search placeholder='Search...' autocomplete="on" class="Search" (change)=emitData(search.value) *ngIf="searchFlag">
+        <chef-icon class="search-Icon">search</chef-icon>
+      </chef-input>
+      <ul
+        infinite-scroll
+        [infiniteScrollDistance]="scrollDistance"
+        (scrolled)="onScrollDown()"
+        [scrollWindow]="false"
+        class="scroll"
+        id="scroll-right-side">
+        <li 
+          *ngFor="let data of listData;let i=index;"
+          (click)="onClickData(data, 'left', data[typeFieldName])" 
+          [ngClass]="{'active': highlightElement(data)}"
+          [ngStyle]="{'cursor': 'pointer'}"
+          [attr.data-cy]="'rightSide-' + i">
+          {{ data.name}}
+        </li>
+        <chef-separator *ngIf="scrollLoadingRightSide">
+          <chef-pill>
+            <chef-loading-spinner class="elementSpinner" size='14'></chef-loading-spinner>
+            Loading...
+          </chef-pill>
+        </chef-separator>
+      </ul>
+    </div>
+    <div class="button-group">
+      <chef-button
+        [attr.disabled]="moveLeftOrRight === 'right'" 
+        secondary (click)="moveRight()"
+        data-cy="right-side-button">
+        <div class="arrow-right"></div>
+      </chef-button>
+      <chef-button [attr.disabled]="moveLeftOrRight === 'left'" secondary (click)="moveLeft()">
+        <div class="arrow-left"></div>
+      </chef-button>
+    </div>
+    <div class="select-item">
+      <label>Your Credentials</label>
+      <div class="select-item-list-block">
+        <ul class="select-item-list">
+          <li 
+            *ngFor="let data of selectedListData;let i=index;"
+            [attr.disabled]="moveLeftOrRight === 'right'"
+            [hidden]="!(data[typeFieldName] === typeValue)"
+            (click)="onClickData(data, 'right', data[typeFieldName])" 
+            [ngStyle]="{'cursor': 'pointer'}"
+            [ngClass]="{'active': highlightElement(data)}"
+            [attr.data-cy]="'leftSide' + i"
+            >
+            {{ data.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+

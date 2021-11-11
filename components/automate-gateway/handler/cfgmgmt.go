@@ -4,11 +4,14 @@ import (
 	"context"
 
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	// Cfgmgmt Request/Response definitions
 	cfgService "github.com/chef/automate/api/external/cfgmgmt"
+	"github.com/chef/automate/api/external/cfgmgmt/request"
 	cfgReq "github.com/chef/automate/api/external/cfgmgmt/request"
+	"github.com/chef/automate/api/external/cfgmgmt/response"
 	cfgRes "github.com/chef/automate/api/external/cfgmgmt/response"
 
 	// Shared Response/Request definitions
@@ -633,4 +636,47 @@ func (s *CfgMgmtServer) GetOrganizations(ctx context.Context, e *cfgReq.Organiza
 //GetSourceFqdns returns the names of every organization for the configuration management service
 func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context, e *cfgReq.SourceFqdns) (*gpStruct.ListValue, error) {
 	return s.cfgMgmtClient.GetSourceFqdns(ctx, &cmsReq.SourceFQDNS{})
+}
+
+//UpdateTelemetryReported Updates the last client run telemetry reported date in postgres
+func (s *CfgMgmtServer) UpdateTelemetryReported(ctx context.Context, req *cfgReq.UpdateTelemetryReportedRequest) (*cfgRes.UpdateTelemetryReportedResponse, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	if req.LastTelemetryReportedAt == "" {
+		return &cfgRes.UpdateTelemetryReportedResponse{}, errors.New("LastTelemetryReported timestamp is required")
+	}
+
+	cfgMgmtRequest := &cmsReq.UpdateTelemetryReportedRequest{
+		LastTelemetryReportedAt: req.LastTelemetryReportedAt,
+	}
+
+	_, err := s.cfgMgmtClient.UpdateTelemetryReported(ctx, cfgMgmtRequest)
+	if err != nil {
+		return &cfgRes.UpdateTelemetryReportedResponse{}, err
+	}
+
+	return &cfgRes.UpdateTelemetryReportedResponse{}, nil
+}
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (s *CfgMgmtServer) GetNodesUsageCount(ctx context.Context, req *request.GetNodesUsageCountRequest) (*response.GetNodesUsageCountResponse, error) {
+	log.WithFields(log.Fields{
+		"request": req.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	cfgMgmtRequest := &cmsReq.GetNodesUsageCountRequest{}
+
+	cfgmgmtResponse, err := s.cfgMgmtClient.GetNodesUsageCount(ctx, cfgMgmtRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfgRes.GetNodesUsageCountResponse{
+		DaysSinceLastPost: cfgmgmtResponse.GetDaysSinceLastPost(),
+		NodeCnt:           cfgmgmtResponse.GetNodeCnt(),
+	}, nil
 }

@@ -1,9 +1,9 @@
 import { map, distinctUntilChanged, debounceTime, takeUntil } from 'rxjs/operators';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { clamp, isEqual } from 'lodash/fp';
 import { RRule } from 'rrule';
 import * as moment from 'moment/moment';
@@ -14,13 +14,13 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Manager } from '../../entities/managers/manager.model';
 import { Profile } from '../../entities/profiles/profile.model';
-import { allManagers } from '../../entities/managers/manager.selectors';
+import { allManagers, fieldsByManager, nodesByManager, totalcountNode } from '../../entities/managers/manager.selectors';
 import { allProfiles } from '../../entities/profiles/profile.selectors';
 import {
-  ManagersSearch,
   ManagerSearchFields,
   ManagerSearchNodes,
-  ManagerAllNodes
+  ManagerAllNodes,
+  ManagersSearch
 } from '../../entities/managers/manager.actions';
 import { ProfilesSearch } from '../../entities/profiles/profile.actions';
 import { JobCreate } from '../../entities/jobs/job.actions';
@@ -44,7 +44,7 @@ export enum Step {
   templateUrl: './job-add.component.html',
   styleUrls: ['./job-add.component.scss']
 })
-export class JobAddComponent implements OnDestroy {
+export class JobAddComponent implements OnDestroy , OnInit {
   form: FormGroup;
 
   Step = Step;
@@ -54,8 +54,26 @@ export class JobAddComponent implements OnDestroy {
   managers$: Observable<Manager[]>;
   profiles$: Observable<Profile[]>;
 
-  private isDestroyed = new Subject<boolean>();
 
+
+  private isDestroyed = new Subject<boolean>();
+  public pagenumber = 1;
+  public total: number;
+  public scrollCalled = false;
+  public loadMore = false;
+  public firstTime = true;
+  public firstTimeOninit = true;
+  public managersList: any;
+  public managersArray: any;
+  public fieldCounter = 0;
+  public appendDataOnscrollLater: boolean;
+  public managerId = [];
+  public searchName: [];
+  public nodeArray: [] ;
+  public nodeManagerArray: any;
+  public checked: any;
+  public counter: number;
+  public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -78,15 +96,67 @@ export class JobAddComponent implements OnDestroy {
         }
       });
 
+    this.store.select(totalcountNode).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe((total) => {
+      this.total = total;
+    });
+
     this.setupForm();
 
-    this.store.dispatch(new ManagersSearch({}));
+
     this.store.dispatch(new ProfilesSearch({ owner: this.chefSession.username }));
   }
+
+  ngOnInit() {
+    this.store.dispatch(
+      new ManagersSearch({
+        page: this.pagenumber,
+        per_page: 10
+      })
+    );
+    this.store.pipe(
+      select(fieldsByManager),
+      takeUntil(this.isDestroyed)
+    ).subscribe(res => {
+      this.fieldCounter = 0 ;
+      this.nodeManagerArray.forEach((manager) => {
+        if (manager.id in res) {
+          if (!res[manager.id].loadingAllTotalFields) {
+            this.fieldCounter++;
+          }
+        }
+      });
+      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
+        this.loadMore = true;
+      }
+    });
+
+    this.store.pipe(
+      select(nodesByManager),
+      takeUntil(this.isDestroyed)
+    ).subscribe(res => {
+      this.counter = 0;
+      this.nodeManagerArray.forEach((manager) => {
+        if (manager.id in res) {
+          if (!res[manager.id].loadingAllTotal) {
+            this.counter++;
+          }
+        }
+      });
+      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
+        this.loadMore = true;
+      }
+    });
+}
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public firstCalled(flag: boolean) {
+     this.firstTime = flag;
   }
 
   public setupForm() {
@@ -142,9 +212,17 @@ export class JobAddComponent implements OnDestroy {
     this.managers$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(managers => {
-        const managersArray = nodesGroup.controls['managers'] as FormArray;
-
-        managers.forEach((manager, i) => {
+        this.nodeManagerArray = managers;
+        this.managersArray = nodesGroup.controls['managers'] as FormArray;
+        if (this.firstTime) {
+          this.managersArray.clear();
+          this.pagenumber = 1;
+          this.managersList = managers;
+          this.firstTime = false;
+        } else {
+          this.managersList = [...this.managersList, ...managers];
+        }
+        this.managersList.forEach((manager, i) => {
           const managerId = manager.id;
           const namesGroup = this.fb.group({
             key: 'name',
@@ -180,7 +258,7 @@ export class JobAddComponent implements OnDestroy {
               this.store.dispatch(new ManagerSearchNodes(payload));
             });
 
-          managersArray.setControl(i, managerGroup);
+          this.managersArray.setControl(i, managerGroup);
 
           this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
 
@@ -351,5 +429,114 @@ export class JobAddComponent implements OnDestroy {
         return this.form.get('scheduleGroup').valid;
     }
     return false;
+  }
+
+  onLoadFunc(data) {
+    this.loadMore = false;
+    let payload = {};
+    this.searchName = data.search;
+    this.nodeArray = data.nodearray;
+    this.checked = data.checked;
+
+    if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
+        page: ++this.pagenumber,
+        per_page: 10
+      }));
+    } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            }
+          ],
+          page: ++this.pagenumber,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            },
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: ++this.pagenumber,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: ++this.pagenumber,
+          per_page: 10
+        };
+      }
+      this.store.dispatch(new ManagersSearch(payload));
+    }
+  }
+
+  clickCallChild(data) {
+    this.searchName = data.search;
+    this.nodeArray = data.nodearray;
+    this.checked = data.checked;
+    let payload = {};
+    this.loadMore = false;
+    if (this.searchName === null && this.nodeArray.length === 0) {
+      this.store.dispatch(new ManagersSearch({
+        page: 1,
+        per_page: 10
+      }));
+    } else {
+      if (this.searchName === null) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length > 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'manager_type',
+              values: this.nodeArray
+            },
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      } else if (this.searchName && this.nodeArray.length === 0) {
+        payload = {
+          filter_map: [
+            {
+              key: 'name',
+              values: this.searchName
+            }
+          ],
+          page: 1,
+          per_page: 10
+        };
+      }
+      this.store.dispatch(new ManagersSearch(payload));
+    }
   }
 }

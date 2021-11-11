@@ -23,6 +23,13 @@ type UpsertNode struct {
 	Created time.Time `json:"created,omitempty"`
 }
 
+// NodeRunDateInfo The node data to store latest run datetime in elasticsearch
+type NodeRunDateInfo struct {
+	NodeID   string    `json:"node_uuid"`
+	FirstRun time.Time `json:"first_run"`
+	LastRun  time.Time `json:"last_run"`
+}
+
 // Node is the representation of a Node
 type Node struct {
 	NodeInfo

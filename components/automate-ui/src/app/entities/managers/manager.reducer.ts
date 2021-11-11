@@ -4,7 +4,6 @@ import { set } from 'lodash/fp';
 import { Manager } from './manager.model';
 import { ManagerActionTypes, ManagerActions } from './manager.actions';
 import { EntityStatus } from '../entities';
-
 export interface ManagerEntityState extends EntityState<Manager> {
   status: EntityStatus;
   total: number;
@@ -12,7 +11,8 @@ export interface ManagerEntityState extends EntityState<Manager> {
     [id: string]: {
       fields: {
         [name: string]: string[]
-      }
+      },
+    loadingAllTotalFields: boolean
     }
   };
   nodesByManager: {
@@ -20,18 +20,26 @@ export interface ManagerEntityState extends EntityState<Manager> {
       nodes: string[],
       total: number,
       allTotal: number,
-      loading: boolean
+      loading: boolean,
+      loadingAllTotal: boolean
+
     }
   };
+  counter: number;
+  nodestatus: EntityStatus;
+  searchstatus: EntityStatus;
 }
 
 export const managerEntityAdapter: EntityAdapter<Manager> = createEntityAdapter<Manager>();
 
 export const ManagerEntityInitialState: ManagerEntityState = managerEntityAdapter.getInitialState({
   status: EntityStatus.notLoaded,
+  nodestatus: EntityStatus.notLoaded,
+  searchstatus: EntityStatus.notLoaded,
   total: 0,
   fieldsByManager: {},
-  nodesByManager: {}
+  nodesByManager: {},
+  counter : 0
 });
 
 export function managerEntityReducer(state: ManagerEntityState = ManagerEntityInitialState,
@@ -40,18 +48,34 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
   switch (action.type) {
 
     case ManagerActionTypes.SEARCH:
-      return set('status', EntityStatus.loading, state);
+      const searchstatus = set('searchstatus', EntityStatus.loading, state);
+      return set('status', EntityStatus.loading, searchstatus);
 
-    case ManagerActionTypes.SEARCH_SUCCESS:
+    case ManagerActionTypes.SEARCH_SUCCESS: {
+      managerEntityAdapter.removeAll(state);
+      // tslint:disable-next-line: no-shadowed-variable
+      const counter = set('counter', 0 , state);
+      const totalCount = set('total', action.payload.total, counter);
+      // tslint:disable-next-line: no-shadowed-variable
+      const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount);
       return set('status', EntityStatus.loadingSuccess,
-                 managerEntityAdapter.setAll(action.payload.managers, state));
+                managerEntityAdapter.setAll(action.payload.managers, searchstatus));
+    }
 
     case ManagerActionTypes.SEARCH_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      let c = state.counter;
+      const counter = set('counter', --c , state);
+      return set('status', EntityStatus.loadingFailure, counter);
+
+    case ManagerActionTypes.SEARCH_FIELDS: {
+      const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotalFields`, true, state);
+    }
 
     case ManagerActionTypes.SEARCH_FIELDS_SUCCESS: {
       const {managerId, field, fields} = action.payload;
-      return set(`fieldsByManager.${managerId}.fields.${field}`, fields, state);
+      const fieldstatus = set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
+      return set(`fieldsByManager.${managerId}.fields.${field}`, fields, fieldstatus);
     }
 
     case ManagerActionTypes.GET_NODES: {
@@ -84,20 +108,29 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
         set(`nodesByManager.${managerId}.loading`, false, state));
     }
 
-    case ManagerActionTypes.ALL_NODES_SUCCESS: {
-      const {managerId, total} = action.payload;
-      return set(`nodesByManager.${managerId}.allTotal`, total, state);
+    case ManagerActionTypes.ALL_NODES: {
+      const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotal`, true, state);
     }
 
-    case ManagerActionTypes.GET:
-      return set('status', EntityStatus.loading, state);
+    case ManagerActionTypes.ALL_NODES_SUCCESS: {
+      const {managerId, total} = action.payload;
+      const nodestatus = set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
+      return set(`nodesByManager.${managerId}.allTotal`, total, nodestatus);
+    }
 
-    case ManagerActionTypes.GET_SUCCESS:
+    case ManagerActionTypes.GET: {
+      return set('status', EntityStatus.loading, state);
+    }
+
+    case ManagerActionTypes.GET_SUCCESS: {
       return set('status', EntityStatus.loadingSuccess,
                  managerEntityAdapter.addOne(action['payload'].manager, state));
+    }
 
     case ManagerActionTypes.GET_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
+
 
     case ManagerActionTypes.CREATE:
       return set('status', EntityStatus.loading, state);

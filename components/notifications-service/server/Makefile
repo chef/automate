@@ -12,7 +12,7 @@ unit: install ci_test
 install:
 	mix local.hex --force
 	mix local.rebar --force
-	mix escript.install github tony612/protobuf-elixir --force
+	mix escript.install github tony612/protobuf-elixir branch main --force
 
 deps:
 	mix deps.get

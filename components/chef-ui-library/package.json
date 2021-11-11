@@ -36,7 +36,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "set-value": "^4.1.0",
-    "tar": "^4.4.15"
+    "tar": "^4.4.19"
   },
   "devDependencies": {
     "@stencil/core": "^1.2.3",
@@ -48,6 +48,7 @@
     "@types/puppeteer": "^1.12.4",
     "jest": "^24.8.0",
     "jest-cli": "^24.8.0",
+    "node-notifier": "^10.0.0",
     "node-sass": "^6.0.1",
     "puppeteer": "1.17.0",
     "sass-lint": "^1.13.1",
