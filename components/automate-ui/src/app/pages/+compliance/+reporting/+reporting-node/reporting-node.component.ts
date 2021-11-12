@@ -202,7 +202,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   private setActiveReport(report: any) {
     const reportQuery = this.reportQueryService.getReportQueryForReport(report);
-    this.statsService.getSingleReport(report.id, reportQuery)
+    this.statsService.getNodeHeader(report.id, reportQuery)
       .pipe(first())
       .subscribe(data => {
         this.reportLoading = false;
