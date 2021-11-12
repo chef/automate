@@ -1,4 +1,4 @@
-# automate-backend-ctl
+# automate-ha-ctl
 
 This is a utility pkg to provide the `automate-cluster-ctl` command. This provides command line utilities.
 

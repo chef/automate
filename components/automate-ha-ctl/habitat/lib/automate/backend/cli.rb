@@ -50,7 +50,7 @@ module Automate
         puts Automate::Backend::ServiceConfig.new('localhost', '9631', options[:svc]).hab_config_applied
       end
 
-      desc 'version', 'Version of automate-backend-ctl'
+      desc 'version', 'Version of automate-ha-ctl'
       def version
         puts "VERSION: #{AutomateBackend::Ctl::VERSION}"
       end

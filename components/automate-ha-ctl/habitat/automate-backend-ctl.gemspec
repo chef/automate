@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'automate/backend/ctl/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "automate-backend-ctl"
+  spec.name          = "automate-ha-ctl"
   spec.version       = AutomateBackend::Ctl::VERSION
   spec.authors       = ["Jeremy J. Miller"]
   spec.email         = ["jm@chef.io"]
@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
 
   spec.files         = %w{LICENSE README.md} + Dir.glob("{bin,doc,helpers,liblugins,spec}/**/*")
   spec.bindir        = "gem_bin"
-  spec.executables   = "automate-backend-ctl"
+  spec.executables   = "automate-ha-ctl"
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 

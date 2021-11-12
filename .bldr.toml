@@ -1163,10 +1163,10 @@ paths = [
   "components/automate-backend-postgresql/*"
 ]
 
-[automate-backend-ctl]
-plan_path = "components/automate-backend-ctl"
+[automate-ha-ctl]
+plan_path = "components/automate-ha-ctl"
 paths = [
-  "components/automate-backend-ctl/*"
+  "components/automate-ha-ctl/*"
 ]
 
 [automate-backend-deployment]

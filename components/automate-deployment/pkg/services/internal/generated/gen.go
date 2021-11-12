@@ -469,7 +469,7 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-ctl",
+      "name": "chef/automate-ha-ctl",
       "metadata": null
     },
     {

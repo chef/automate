@@ -1,9 +1,9 @@
-pkg_name="automate-backend-ctl"
+pkg_name="automate-ha-ctl"
 pkg_origin="chef"
 pkg_version="0.1.0"
 pkg_maintainer="The Chef Server Maintainers <support@chef.io>"
 pkg_license=("Chef-MLSA")
-pkg_description="Provides automate-backend-ctl for Automate HA Backend Services"
+pkg_description="Provides automate-ha-ctl for Automate HA Backend Services"
 
 do_before() {
   update_pkg_version
@@ -67,18 +67,18 @@ do_install() {
 
   # Install wrapper 'binaries'
   wrapper_bin_path="${pkg_prefix}/bin"
-  install "$PLAN_CONTEXT/bin/automate-backend-ctl" "$wrapper_bin_path/automate-backend-ctl"
+  install "$PLAN_CONTEXT/bin/automate-ha-ctl" "$wrapper_bin_path/automate-ha-ctl"
 
   # Fix up some paths
-  build_line "Replacing REPLACE_ME with ${pkg_prefix} in ${pkg_prefix}/bin/automate-backend-ctl"
-  sed -i -e "s,REPLACE_ME,${pkg_prefix},g" "${pkg_prefix}/bin/automate-backend-ctl"
-  #fix_interpreter "${pkg_prefix}/bin/automate-backend-ctl" core/bash bin/bash
-  fix_interpreter "${pkg_prefix}/bin/automate-backend-ctl" core/coreutils bin/env
+  build_line "Replacing REPLACE_ME with ${pkg_prefix} in ${pkg_prefix}/bin/automate-ha-ctl"
+  sed -i -e "s,REPLACE_ME,${pkg_prefix},g" "${pkg_prefix}/bin/automate-ha-ctl"
+  #fix_interpreter "${pkg_prefix}/bin/automate-ha-ctl" core/bash bin/bash
+  fix_interpreter "${pkg_prefix}/bin/automate-ha-ctl" core/coreutils bin/env
   build_line "Replacing REPLACE_ME with ${pkg_prefix} in ${pkg_prefix}/bin/knife"
   sed -i -e "s,REPLACE_ME,${pkg_prefix},g" "${pkg_prefix}/bin/knife"
   fix_interpreter "${pkg_prefix}/bin/knife" core/bash bin/bash
 
-  wrap_ruby_bin "$pkg_prefix/bin/automate-backend-ctl"
+  wrap_ruby_bin "$pkg_prefix/bin/automate-ha-ctl"
   wrap_ruby_bin "$pkg_prefix/bin/knife"
 }
 

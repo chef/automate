@@ -1,4 +1,4 @@
-# automate-backend-ctl
+# automate-ha-ctl
 
 This is a utility pkg to provide the `backend-automate-ctl` command.
 
@@ -12,4 +12,4 @@ Non-service package.
 
 ## Usage
 
-`automate-backend-ctl help`
+`automate-ha-ctl help`

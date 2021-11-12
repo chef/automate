@@ -102,7 +102,7 @@ module AutomateCluster
           leader = utils.pg_hab_elected_leader
           utils.backend_logger.info "Querying Habitat for existing automate-backend-#{service} Gossip Layer Config on #{leader}.."
           script = bash_script <<~SCRIPT
-            /bin/hab pkg exec chef/automate-backend-ctl automate-backend-ctl applied --svc=automate-backend-#{service} \
+            /bin/hab pkg exec chef/automate-ha-ctl automate-ha-ctl applied --svc=automate-backend-#{service} \
             | grep -v "DEBUG\\|INFO\\|WARN\\|ERROR\\|FATAL" 2>&1
           SCRIPT
           local_script_file = Tempfile.new('script')

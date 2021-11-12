@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    automate-backend-ctl (0.1.0)
+    automate-ha-ctl (0.1.0)
       httparty
       json
       knife-ec-backup
@@ -236,7 +236,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  automate-backend-ctl!
+  automate-ha-ctl!
   bundler
   pry
   rake
