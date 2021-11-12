@@ -22,8 +22,6 @@ automate-ha-kibana BINDING_MODE strict
 automate-ha-metricbeat REQUIRED elasticsearch
 automate-ha-metricbeat OPTIONAL database
 automate-ha-metricbeat BINDING_MODE strict
-automate-ha-pgleaderchk OPTIONAL database
-automate-ha-pgleaderchk BINDING_MODE strict
 automate-ha-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
@@ -51,6 +49,8 @@ automate-es-gateway REQUIRED automate-elasticsearch
 automate-es-gateway BINDING_MODE relaxed
 automate-gateway OPTIONAL applications-service authn-service authz-service automate-cds compliance-service config-mgmt-service data-feed-service deployment-service event-feed-service infra-proxy-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service user-settings-service
 automate-gateway BINDING_MODE relaxed
+automate-ha-pgleaderchk OPTIONAL database
+automate-ha-pgleaderchk BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-minio BINDING_MODE strict

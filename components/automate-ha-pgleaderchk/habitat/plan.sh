@@ -7,7 +7,7 @@ pkg_repo=automate
 pkg_description="Automate Backend PostreSQL leader check"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
-pkg_upstream_url="http://github.com/chef/automate/components/automate-backend-pgleaderchk"
+pkg_upstream_url="http://github.com/chef/automate/components/automate-ha-pgleaderchk"
 pkg_deps=(
   core/bash
   core/curl

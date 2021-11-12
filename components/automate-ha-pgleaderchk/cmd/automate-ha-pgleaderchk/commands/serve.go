@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/chef/automate/components/automate-backend-pgleaderchk/pkg/pgleaderchk"
+	"github.com/chef/automate/components/automate-ha-pgleaderchk/pkg/pgleaderchk"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

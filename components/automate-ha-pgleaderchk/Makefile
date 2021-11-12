@@ -1,5 +1,5 @@
 BINARY=pgleaderchk
-PACKAGE_PATH ?= github.com/chef/a2-ha-backend/components/automate-backend-pgleaderchk
+PACKAGE_PATH ?= github.com/chef/a2-ha-backend/components/automate-ha-pgleaderchk
 PGLEADERCHK_PKG=${PACKAGE_PATH}/cmd/pgleaderchk
 BINS = ${PGLEADERCHK_PKG}
 GOOS = $(shell go env GOOS)

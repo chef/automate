@@ -88,5 +88,5 @@ automate-ha-curator components/automate-backend-curator
 automate-ha-postgresql components/automate-backend-postgresql
 automate-ha-ctl components/automate-backend-ctl
 automate-ha-deployment components/automate-backend-deployment
-automate-ha-pgleaderchk components/automate-backend-pgleaderchk
+automate-ha-pgleaderchk components/automate-ha-pgleaderchk
 automate-ha-cluster-ctl components/automate-cluster-ctl
