@@ -24,7 +24,7 @@ backup_mount "{{ .Architecture.ConfigInitials.BackupMount }}"
 automate do
   # admin_password "{{ .Automate.Config.AdminPassword }}"
   ### Leave commented out if using AWS infrastructure
-  # fqdn "{{ .Automate.Config.Fqdn }}"
+  fqdn "{{ .Automate.Config.Fqdn }}"
   instance_count {{ .Automate.Config.InstanceCount }}
   ### Uncomment and set this value if the teams service
   ### port (default: 10128) conflicts with another service.

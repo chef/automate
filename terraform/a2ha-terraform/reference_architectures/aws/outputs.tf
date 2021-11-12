@@ -26,6 +26,6 @@ output "postgresql_private_ips" {
   value = formatlist("%s", module.aws.postgresql_private_ips)
 }
 
-output "press" {
-  value = "Cltr + c to exit if processes not exited"
+output "user" {
+  value = "action item Press ctrl + c to exit if processes not exited"
 }

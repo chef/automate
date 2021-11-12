@@ -137,7 +137,7 @@ class AutomateClusterStatus < AutomateCluster::Command
   end
 
   def render_fancy_table(headers, data, opts = {})
-    opts.merge!({ multiline: true, padding: [0,1,0,1], alignments: [:left, :left]})
+    opts.merge!({ multiline: true, padding: [0,1,0,1], alignments: [:left, :left], width: 100})
 
     table = TTY::Table.new(headers, data)
     puts table.render(:ascii, opts)

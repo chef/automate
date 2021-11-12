@@ -14,8 +14,8 @@ func init() {
 
 var workspaceCmd = &cobra.Command{
 	Use:   "workspace",
-	Short: "set workspace env for automate HA.",
-	Long:  "set up automate ha cluster workspace.",
+	Short: "Set workspace env for Automate HA.",
+	Long:  "Set up Automate HA cluster workspace.",
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},

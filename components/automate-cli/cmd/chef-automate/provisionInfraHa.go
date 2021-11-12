@@ -8,8 +8,8 @@ import (
 func newProvisionInfraCmd() *cobra.Command {
 	var provisionInfraCmd = &cobra.Command{
 		Use:   "provision-infra",
-		Short: "Provison automate HA infra.",
-		Long:  "Provison automate HA infra for automate HA deployment.",
+		Short: "Provision Automate HA infra.",
+		Long:  "Provision infra for Automate HA deployment.",
 		Args:  cobra.RangeArgs(0, 1),
 		RunE:  runProvisionInfraCmd,
 	}
