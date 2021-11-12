@@ -23,6 +23,7 @@ import * as dataBagEntity from './entities/data-bags/data-bags.reducer';
 import * as dataBagItemsEntity from './entities/data-bags/data-bag-details.reducer';
 import * as dataBagItemDetailsEntity from './entities/data-bags/data-bag-item-details.reducer';
 import * as desktopEntity from './entities/desktop/desktop.reducer';
+import * as downloadReportsEntity from './entities/download-reports/download-reports.reducer';
 import * as environmentEntity from './entities/environments/environment.reducer';
 import * as environmentDetailsEntity from './entities/environments/environment-details.reducer';
 import * as infraNodeEntity from './entities/infra-nodes/infra-nodes.reducer';
@@ -106,6 +107,7 @@ export interface NgrxStateAtom {
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityState;
   desktops: desktopEntity.DesktopEntityState;
   destinations: destinationEntity.DestinationEntityState;
+  downloadReports: downloadReportsEntity.DownloadReportsEntityState;
   globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityState;
   environments: environmentEntity.EnvironmentEntityState;
   environmentDetails: environmentDetailsEntity.EnvironmentDetailsEntityState;
@@ -243,6 +245,7 @@ export const defaultInitialState = {
   dataBagItems: dataBagItemsEntity.DataBagItemsEntityInitialState,
   dataBagItemDetails: dataBagItemDetailsEntity.DataBagItemDetailsEntityInitialState,
   destinations: destinationEntity.DestinationEntityInitialState,
+  downloadReports: downloadReportsEntity.DownloadReportsEntityInitialState,
   globalDataFeedConfig: destinationConfigEntity.GlobalConfigEntityInitialState,
   environments: environmentEntity.EnvironmentEntityInitialState,
   environmentDetails: environmentDetailsEntity.EnvironmentEntityInitialState,
@@ -317,6 +320,7 @@ export const ngrxReducers = {
   dataBagItems: dataBagItemsEntity.dataBagItemsEntityReducer,
   dataBagItemDetails: dataBagItemDetailsEntity.dataBagItemDetailsEntityReducer,
   destinations: destinationEntity.destinationEntityReducer,
+  downloadReports: downloadReportsEntity.downloadReportsEntityReducer,
   globalDataFeedConfig: destinationConfigEntity.globalConfigEntityReducer,
   environments: environmentEntity.environmentEntityReducer,
   environmentDetails: environmentDetailsEntity.environmentDetailsEntityReducer,
