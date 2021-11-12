@@ -18,6 +18,10 @@ import (
 	"github.com/hpcloud/tail"
 )
 
+const logFileSize int64 = 0
+
+var spinning bool = false
+
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -98,6 +102,7 @@ func tailFile(logFilePath string) {
 		writer.Printf(err.Error())
 		return
 	}
+	go showSpinnerForTailChangesWaiting(logFilePath)
 	for line := range t.Lines {
 		writer.Println(line.Text)
 	}
@@ -184,4 +189,27 @@ func executeShellCommand(command string, args []string) error {
 	}
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
+}
+
+func showSpinnerForTailChangesWaiting(logFile string) {
+	for {
+		if checkIfFileExist(logFile) {
+			time.Sleep(2 * time.Minute)
+			if getFileSize(logFile) == logFileSize && !spinning {
+				writer.StartSpinner()
+			} else if spinning && getFileSize(logFile) != logFileSize {
+				writer.StopSpinner()
+			} else {
+				writer.Print("")
+			}
+		}
+	}
+}
+
+func getFileSize(path string) int64 {
+	if checkIfFileExist(path) {
+		info, _ := os.Stat(path)
+		return info.Size()
+	}
+	return 0
 }
