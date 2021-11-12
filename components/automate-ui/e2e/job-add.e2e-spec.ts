@@ -7,7 +7,11 @@ describe('Job Add', () => {
     browser.waitForAngularEnabled(false);
 
     fakeServer()
-      .post('/api/v0/nodemanagers/search', '{}')
+      .post('/api/v0/nodemanagers/search', {
+        page: 1,
+        per_page: 10
+      })
+      .any()
       .reply(200, JSON.stringify({
         managers: [
           {
@@ -252,6 +256,7 @@ describe('Job Add', () => {
       .post('/api/v0/compliance/profiles/search', JSON.stringify({
         owner: 'testchefuser'
       }))
+      .any()
       .reply(200, JSON.stringify({
         profiles: [
           {
