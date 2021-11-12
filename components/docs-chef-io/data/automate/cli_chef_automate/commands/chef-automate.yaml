@@ -43,7 +43,7 @@ see_also:
 - restart-services - restart deployment services
 - secrets - set secrets to automate HA
 - service-versions - Retrieve the versions of the individual Chef Automate services
-- ssh - Set Ssh env for automate HA.
+- ssh - ssh into automate HA servers
 - start - Start Chef Automate
 - status - Retrieve Chef Automate status
 - stop - Stop deployment
