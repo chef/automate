@@ -107,7 +107,7 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 	//register health server for health status
 	health.RegisterHealthServer(s, health.NewService())
 	report_manager.RegisterReportManagerServiceServer(s,
-		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName))
+		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName, db))
 
 	//Initiate the cereal manager with 2 workers
 	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName)
