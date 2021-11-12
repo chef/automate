@@ -4,10 +4,12 @@ package chef.automate.domain.report_manager.service;
 option go_package = "github.com/chef/automate/api/interservice/report_manager";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service ReportManagerService {
 	rpc StoreReport(stream StoreReportRequest) returns (google.protobuf.Empty) {};
 	rpc PrepareCustomReport(CustomReportRequest) returns (CustomReportResponse) {};
+	rpc GetAllRequestsStatus(AllStatusRequest) returns (AllStatusResponse) {}; 
 }
 
 message StoreReportRequest {
@@ -32,4 +34,21 @@ message Profile {
 
 message CustomReportResponse {
 	string acknowledgement_id = 1;
+}
+
+message AllStatusRequest {
+	string requestor_id = 1;
+}
+
+message AllStatusResponse {
+	repeated StatusResponse data = 1;
+}
+
+message StatusResponse {
+	string acknowledgement_id = 1;
+	string status = 2;
+	int64 report_size = 3;
+	string err_message = 4;
+	google.protobuf.Timestamp created_at = 5;
+	google.protobuf.Timestamp ended_at = 6;
 }

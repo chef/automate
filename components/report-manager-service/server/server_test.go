@@ -11,13 +11,18 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	pb "github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/server"
+	"github.com/chef/automate/components/report-manager-service/storage"
+	"github.com/go-gorp/gorp"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go/v7"
 	"github.com/stretchr/testify/assert"
 )
@@ -63,7 +68,7 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 	return nil
 }
 
-func dialer(t *testing.T, isForFailure bool) func(context.Context, string) (net.Conn, error) {
+func dialer(t *testing.T, isForFailure bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 
 	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024 * 2))
@@ -74,6 +79,7 @@ func dialer(t *testing.T, isForFailure bool) func(context.Context, string) (net.
 			ForFailure: isForFailure,
 		},
 		ObjBucket: "testBucket",
+		DataStore: db,
 	})
 
 	go func() {
@@ -105,7 +111,7 @@ func getTestData(t *testing.T) *compliance.Report {
 
 func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false)))
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -142,7 +148,7 @@ func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 
 func TestReportManagerServer_StoreReport_Fail(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true)))
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -214,4 +220,60 @@ func TestReportManagerServer_StoreReport_Fail(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestReportManagerServer_GetAllRequestsStatus(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	ctx := context.Background()
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, db)))
+	assert.NoError(t, err)
+
+	defer conn.Close()
+
+	columns := []string{"id", "status", "message", "custom_report_size", "created_at", "updated_at"}
+	endedAt := time.Now()
+	createdAt := endedAt.Add(-10 * time.Minute)
+	endedAtProto, err := ptypes.TimestampProto(endedAt)
+	assert.NoError(t, err)
+	createdAtProto, err := ptypes.TimestampProto(createdAt)
+	assert.NoError(t, err)
+
+	query := `SELECT id, status, message, custom_report_size, created_at, updated_at FROM custom_report_requests WHERE requestor = $1 AND created_at >= $2 ORDER BY created_at DESC;`
+	mock.ExpectQuery(query).WithArgs("test_requestor_id", sqlmock.AnyArg()).
+		WillReturnRows(sqlmock.NewRows(columns).AddRow("1", "success", "", 1024*1024, createdAt, endedAt).
+			AddRow("2", "failed", "error in running task", 0, createdAt, endedAt).AddRow("3", "running", "", 0, createdAt, createdAt))
+
+	client := pb.NewReportManagerServiceClient(conn)
+
+	t.Run("Success", func(t *testing.T) {
+		resp, err := client.GetAllRequestsStatus(ctx, &pb.AllStatusRequest{
+			RequestorId: "test_requestor_id",
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(resp.Data))
+
+		assert.Equal(t, "1", resp.Data[0].AcknowledgementId)
+		assert.Equal(t, "success", resp.Data[0].Status)
+		assert.Equal(t, int64(1048576), resp.Data[0].ReportSize)
+		assert.Equal(t, createdAtProto, resp.Data[0].CreatedAt)
+		assert.Equal(t, endedAtProto, resp.Data[0].EndedAt)
+		assert.Equal(t, "failed", resp.Data[1].Status)
+		assert.Equal(t, "error in running task", resp.Data[1].ErrMessage)
+		assert.Equal(t, "running", resp.Data[2].Status)
+	})
+
+	t.Run("Fail", func(t *testing.T) {
+		_, err := client.GetAllRequestsStatus(ctx, &pb.AllStatusRequest{
+			RequestorId: "",
+		})
+		assert.Error(t, err)
+		assert.EqualError(t, err, "rpc error: code = Unknown desc = empty requestore information")
+	})
 }
