@@ -489,7 +489,7 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/automate-cluster-ctl",
+      "name": "chef/automate-ha-cluster-ctl",
       "metadata": null
     },
     {

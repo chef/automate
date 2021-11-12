@@ -1181,7 +1181,7 @@ paths = [
   "components/automate-backend-pgleaderchk/*"
 ]
 
-[automate-cluster-ctl]
+[automate-ha-cluster-ctl]
 plan_path = "components/automate-cluster-ctl"
 paths = [
   "components/automate-cluster-ctl/*"
