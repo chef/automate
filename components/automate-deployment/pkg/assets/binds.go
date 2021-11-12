@@ -8,23 +8,23 @@ authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-ser
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
-automate-backend-curator REQUIRED elasticsearch
-automate-backend-curator BINDING_MODE strict
-automate-backend-elasticsearch BINDING_MODE strict
-automate-backend-elasticsidecar REQUIRED elasticsearch
-automate-backend-elasticsidecar BINDING_MODE strict
-automate-backend-haproxy OPTIONAL database pgleaderchk
-automate-backend-haproxy BINDING_MODE strict
-automate-backend-journalbeat REQUIRED elasticsearch
-automate-backend-journalbeat BINDING_MODE strict
-automate-backend-kibana REQUIRED elasticsearch
-automate-backend-kibana BINDING_MODE strict
-automate-backend-metricbeat REQUIRED elasticsearch
-automate-backend-metricbeat OPTIONAL database
-automate-backend-metricbeat BINDING_MODE strict
-automate-backend-pgleaderchk OPTIONAL database
-automate-backend-pgleaderchk BINDING_MODE strict
-automate-backend-postgresql BINDING_MODE strict
+automate-ha-curator REQUIRED elasticsearch
+automate-ha-curator BINDING_MODE strict
+automate-ha-elasticsearch BINDING_MODE strict
+automate-ha-elasticsidecar REQUIRED elasticsearch
+automate-ha-elasticsidecar BINDING_MODE strict
+automate-ha-haproxy OPTIONAL database pgleaderchk
+automate-ha-haproxy BINDING_MODE strict
+automate-ha-journalbeat REQUIRED elasticsearch
+automate-ha-journalbeat BINDING_MODE strict
+automate-ha-kibana REQUIRED elasticsearch
+automate-ha-kibana BINDING_MODE strict
+automate-ha-metricbeat REQUIRED elasticsearch
+automate-ha-metricbeat OPTIONAL database
+automate-ha-metricbeat BINDING_MODE strict
+automate-ha-pgleaderchk OPTIONAL database
+automate-ha-pgleaderchk BINDING_MODE strict
+automate-ha-postgresql BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-minio automate-pg-gateway pg-sidecar-service session-service
 automate-builder-api BINDING_MODE strict
 automate-builder-api-proxy REQUIRED automate-builder-api
