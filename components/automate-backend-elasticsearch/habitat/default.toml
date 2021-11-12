@@ -31,8 +31,8 @@
     max_local_storage_nodes = 1
 
   [es_yaml.path]
-    data = "/hab/svc/automate-backend-elasticsearch/data"
-    logs = "/hab/svc/automate-backend-elasticsearch/logs"
+    data = "/hab/svc/automate-ha-elasticsearch/data"
+    logs = "/hab/svc/automate-ha-elasticsearch/logs"
 
   [es_yaml.opendistro_security]
     enable_snapshot_restore_privilege = true

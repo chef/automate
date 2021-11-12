@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-pkg_name=automate-backend-pgleaderchk
+pkg_name=automate-ha-pgleaderchk
 binary_name=pgleaderchk
 pkg_origin=chef
 pkg_version="0.1.0"

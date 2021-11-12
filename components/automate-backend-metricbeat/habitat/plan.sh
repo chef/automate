@@ -1,6 +1,6 @@
 # shellcheck disable=SC2148
 UPSTREAM_PKG_IDENT="chef/metricbeat/6.8.6"
-pkg_name="automate-backend-metricbeat"
+pkg_name="automate-ha-metricbeat"
 pkg_description="Wrapper package for chef/metricbeat"
 pkg_origin="chef"
 pkg_version="6.8.6"

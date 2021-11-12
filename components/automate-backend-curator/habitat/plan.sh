@@ -1,6 +1,6 @@
 # shellcheck disable=SC2148
 UPSTREAM_PKG_IDENT="core/curator"
-pkg_name="automate-backend-curator"
+pkg_name="automate-ha-curator"
 pkg_description="Wrapper package for core/curator"
 pkg_origin="chef"
 vendor_origin="chef"

@@ -1115,49 +1115,49 @@ paths = [
   "lib/version/*"
 ]
 
-[automate-backend-elasticsearch]
+[automate-ha-elasticsearch]
 plan_path = "components/automate-backend-elasticsearch"
 paths = [
   "components/automate-backend-elasticsearch/*"
 ]
 
-[automate-backend-metricbeat]
+[automate-ha-metricbeat]
 plan_path = "components/automate-backend-metricbeat"
 paths = [
   "components/automate-backend-metricbeat/*"
 ]
 
-[automate-backend-journalbeat]
+[automate-ha-journalbeat]
 plan_path = "components/automate-backend-journalbeat"
 paths = [
   "components/automate-backend-journalbeat/*"
 ]
 
-[automate-backend-haproxy]
+[automate-ha-haproxy]
 plan_path = "components/automate-backend-haproxy"
 paths = [
   "components/automate-backend-haproxy/*"
 ]
 
-[automate-backend-kibana]
+[automate-ha-kibana]
 plan_path = "components/automate-backend-kibana"
 paths = [
   "components/automate-backend-kibana/*"
 ]
 
-[automate-backend-elasticsidecar]
+[automate-ha-elasticsidecar]
 plan_path = "components/automate-backend-elasticsidecar"
 paths = [
   "components/automate-backend-elasticsidecar/*"
 ]
 
-[automate-backend-curator]
+[automate-ha-curator]
 plan_path = "components/automate-backend-curator"
 paths = [
   "components/automate-backend-curator/*"
 ]
 
-[automate-backend-postgresql]
+[automate-ha-postgresql]
 plan_path = "components/automate-backend-postgresql"
 paths = [
   "components/automate-backend-postgresql/*"
@@ -1169,13 +1169,13 @@ paths = [
   "components/automate-backend-ctl/*"
 ]
 
-[automate-backend-deployment]
+[automate-ha-deployment]
 plan_path = "components/automate-backend-deployment"
 paths = [
   "components/automate-backend-deployment/*"
 ]
 
-[automate-backend-pgleaderchk]
+[automate-ha-pgleaderchk]
 plan_path = "components/automate-backend-pgleaderchk"
 paths = [
   "components/automate-backend-pgleaderchk/*"
