@@ -216,7 +216,8 @@ export class StatsService {
   }
 
   downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
-    const url = `${CC_API_URL}/reporting/export`;
+    // const url = `${CC_API_URL}/reporting/export`; // use it if LCR is disabled
+    const url = `${CC_API_URL}/reporting/reportmanager/export`;
 
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
