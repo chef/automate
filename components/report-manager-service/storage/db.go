@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"github.com/go-gorp/gorp"
+	"github.com/golang/protobuf/ptypes"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/config"
 	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
@@ -18,6 +20,16 @@ import (
 
 type DB struct {
 	*gorp.DbMap
+}
+
+// customReportRequestStatus used to read custom report request status from DB
+type customReportRequestStatus struct {
+	ID         string    `db:"id"`
+	Status     string    `db:"status"`
+	Message    string    `db:"message"`
+	ReportSize int64     `db:"custom_report_size"`
+	StartTime  time.Time `db:"created_at"`
+	EndTime    time.Time `db:"updated_at"`
 }
 
 // ConnectAndMigrate creates a new Postgres connection, connects to the database server and runs
@@ -90,10 +102,42 @@ func (db *DB) UpdateTask(id, status, msg string, updatedTime time.Time, objSize 
 	return err
 }
 
+func (db *DB) GetAllStatus(id string, endTime time.Time) (*report_manager.AllStatusResponse, error) {
+	var dbResp []*customReportRequestStatus
+	resp := report_manager.AllStatusResponse{}
+	_, err := db.Select(&dbResp, getStatus, id, endTime)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in fetching the report request status from db")
+	}
+	for _, reportStatus := range dbResp {
+		createdAt, err := ptypes.TimestampProto(reportStatus.StartTime)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error in converting the created at with value %s to timestamppb.Timestamp", reportStatus.StartTime)
+		}
+		endedAt, err := ptypes.TimestampProto(reportStatus.EndTime)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error in converting the ended at with value %s to timestamppb.Timestamp", reportStatus.EndTime)
+		}
+		resp.Data = append(resp.Data, &report_manager.StatusResponse{
+			AcknowledgementId: reportStatus.ID,
+			Status:            reportStatus.Status,
+			ReportSize:        reportStatus.ReportSize,
+			ErrMessage:        reportStatus.Message,
+			CreatedAt:         createdAt,
+			EndedAt:           endedAt,
+		})
+	}
+	return &resp, nil
+}
+
 const insertTask = `
 INSERT INTO custom_report_requests(id, requestor, status,created_at,updated_at)
 VALUES ($1, $2, $3, $4, $5);
 `
 const updateTask = `
 UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;
+`
+
+const getStatus = `
+SELECT id, status, message, custom_report_size, created_at, updated_at FROM custom_report_requests WHERE requestor = $1 AND created_at >= $2 ORDER BY created_at DESC;
 `
