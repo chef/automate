@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'automate/backend/cli'
+require 'automate/ha/cli'
 
 Automate::Backend::CLI.start(ARGV)
