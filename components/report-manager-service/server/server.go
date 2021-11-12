@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/objstore"
+	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/components/report-manager-service/worker"
 	"github.com/chef/automate/lib/cereal"
@@ -25,10 +27,11 @@ type Server struct {
 	CerealManager  *cereal.Manager
 	ctx            context.Context
 	ObjBucket      string
+	DataStore      *storage.DB
 }
 
 // New creates a new server
-func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string) *Server {
+func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string, db *storage.DB) *Server {
 	return &Server{
 		ObjStoreClient: objstore.ReportManagerObjStore{
 			ObjStoreClient: objStoreClient,
@@ -36,6 +39,7 @@ func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket 
 		CerealManager: cerealManager,
 		ctx:           context.Background(),
 		ObjBucket:     objBucket,
+		DataStore:     db,
 	}
 }
 
@@ -98,4 +102,11 @@ func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.Cu
 	return &report_manager.CustomReportResponse{
 		AcknowledgementId: id.String(),
 	}, nil
+}
+
+func (s *Server) GetAllRequestsStatus(ctx context.Context, req *report_manager.AllStatusRequest) (*report_manager.AllStatusResponse, error) {
+	if req.RequestorId == "" {
+		return &report_manager.AllStatusResponse{}, fmt.Errorf("empty requestore information")
+	}
+	return s.DataStore.GetAllStatus(req.RequestorId, time.Now().Add(-24*time.Hour))
 }
