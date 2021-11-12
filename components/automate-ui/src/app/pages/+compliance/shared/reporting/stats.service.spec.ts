@@ -682,7 +682,8 @@ describe('StatsService', () => {
 
   describe('downloadReport()', () => {
     it('fetches a report export as text', done => {
-      const url = `${COMPLIANCE_URL}/reporting/export`;
+      // const url = `${COMPLIANCE_URL}/reporting/export`; // needed for LCR later
+      const url = `${COMPLIANCE_URL}/reporting/reportmanager/export`;
       const type = 'csv';
       const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
       const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
