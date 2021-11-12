@@ -189,8 +189,9 @@
             </chef-tr>
           </chef-thead>
           <chef-tbody>
-            <ng-container *ngFor="let profile of filteredProfiles(activeReport.profiles, activeStatusFilter)">
-              <ng-container *ngFor="let control of filteredControls(profile.controls, activeStatusFilter)">
+            <!-- below code needed for control list -->
+            <!-- <ng-container *ngFor="let profile of filteredProfiles(activeReport.profiles, activeStatusFilter)"> 
+              <ng-container *ngFor="let control of filteredControls(profile.controls, activeStatusFilter)"> 
                 <chef-tr>
                   <chef-td >
                     <chef-icon *ngIf="control.status !== 'waived'" class="status-icon" [ngClass]="control.status">
@@ -229,9 +230,9 @@
                           <dt>Reason:</dt>
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
-                      </div>
+                      </div>-->
                       <!-- show results of control even if waived -->
-                      <div class="result-item" *ngFor="let result of control.results">
+                      <!-- <div class="result-item" *ngFor="let result of control.results">
                         <div class="result-item-header">
                           <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
                           <p>{{ result.code_desc }}</p>
@@ -239,8 +240,8 @@
                         <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
                           <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
                         </div>
-                      </div>
-                      <!-- display message when there are no results -->
+                      </div>-->
+                      <!-- display message when there are no results 
                       <div class="result-item" *ngIf="control.results.length === 0">
                         <div class="result-item-header">
                           <p>No tests were executed</p>
@@ -256,7 +257,7 @@
                   </ng-container>
                 </div>
               </ng-container>
-            </ng-container>
+            </ng-container>-->
           </chef-tbody>
         </chef-table>
 
