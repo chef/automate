@@ -89,4 +89,4 @@ automate-backend-postgresql components/automate-backend-postgresql
 automate-ha-ctl components/automate-backend-ctl
 automate-backend-deployment components/automate-backend-deployment
 automate-backend-pgleaderchk components/automate-backend-pgleaderchk
-automate-cluster-ctl components/automate-cluster-ctl
+automate-ha-cluster-ctl components/automate-cluster-ctl
