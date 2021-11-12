@@ -83,7 +83,7 @@ wait_for_backend_ctl() {
   max=20
   n=0
   until [ $n -ge $max ]; do
-    if hab pkg exec chef/automate-ha-ctl automate-ha-ctl connect --conf-out ${tmp_path}/automate_conf.toml --toml=${tmp_path}/connector.toml --erb=${tmp_path}/config.toml.erb 2>>${tmp_path}/automate-ctl.log; then
+    if hab pkg exec chef/automate-ha-ctl automate-backend-ctl connect --conf-out ${tmp_path}/automate_conf.toml --toml=${tmp_path}/connector.toml --erb=${tmp_path}/config.toml.erb 2>>${tmp_path}/automate-ctl.log; then
       break
     fi
     n=$((n+1))
@@ -168,7 +168,7 @@ wait_for_healthy() {
 }
 
 wait_for_install chef-automate
-wait_for_install automate-ha-ctl
+wait_for_install automate-backend-ctl
 wait_for_frontend_aib
 wait_for_backend_aib
 wait_for_backend_ctl
