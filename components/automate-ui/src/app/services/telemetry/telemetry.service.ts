@@ -104,7 +104,7 @@ export class TelemetryService {
 
   setUserTelemetryPreference(isOptedIn: boolean): void {
     if (isOptedIn === true) {
-       this.engageTelemetry(this.trackingOperations);
+      this.engageTelemetry(this.trackingOperations);
     }
     this.chefSessionService.storeTelemetryPreference(isOptedIn);
   }
@@ -189,9 +189,9 @@ export class TelemetryService {
             analytics[trackingData.operation](trackingData.identifier, trackingData.properties);
           });
           this.trackInitialData();
-           if (!this.isSkipNotification) {
+          if (!this.isSkipNotification) {
             this.store.dispatch(new UpdateUserPreferencesSuccess('Updated user preferences.'));
-           }
+          }
 
         },
         ({ status, error: { message } }: HttpErrorResponse) => {
@@ -284,13 +284,13 @@ export class TelemetryService {
 
     this.httpClient.post(this.telemetryUrl + '/events', json, { headers, params: { unfiltered: 'true' } })
       .subscribe(
-         _response => {
+        _response => {
            // WooHoo! we successfully submitted our telemetry event to the pipeline!
-         },
-         ({ status, error: { message } }: HttpErrorResponse) => {
-           console.log(`Error emitting telemetry event: ${status} - ${message}`);
-         }
-       );
+        },
+        ({ status, error: { message } }: HttpErrorResponse) => {
+          console.log(`Error emitting telemetry event: ${status} - ${message}`);
+        }
+      );
   }
 
   private retrieveSegmentWriteKey() {
@@ -406,9 +406,11 @@ export class TelemetryService {
     try {
       const applicationUsageStats: ApplicationUsageStats = await this.applicationStatsService
         .getApplicationStats();
-        const ApplicationAckStats: ApplicationUsageAckStats = await this
-        .sendApplicationStatsToTelemetry(applicationUsageStats);
-        await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
+        if (applicationUsageStats && Number(applicationUsageStats['days_since_last_post']) > 0) {
+          const ApplicationAckStats: ApplicationUsageAckStats = await this
+          .sendApplicationStatsToTelemetry(applicationUsageStats);
+          await this.applicationStatsService.sendAcknowledgement(ApplicationAckStats);
+        }
     } catch (error) {
       console.log(error);
     }
@@ -447,7 +449,7 @@ export class TelemetryService {
     });
     const applicationUsageStatsSubscription = this.emitToPipeline('track', {
       userId: this.anonymousId,
-      event: 'servicesCounts',
+      event: 'servicesCountsGlobal',
       properties: { total_services: applicationUsageStats.total_services }
     }, true).subscribe(() => {
       if (applicationUsageStatsSubscription) {
