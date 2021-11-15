@@ -33,7 +33,7 @@ export class ApplicationStatsService {
     const url = `${APPLICATIONS_STATS_URL}` + '/telemetry/services/count';
     return this.httpClient.get(url).pipe(
       map((res) => {
-          if (res && res['total_services']) {
+          if (res && res['total_services'] && res['days_since_last_post']) {
             return res;
           }
           return res;
