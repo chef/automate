@@ -15,8 +15,6 @@ pkg_deps=(
   core/openssl
   "${UPSTREAM_PKG_IDENT}"
 )
-
-
 pkg_lib_dirs=(lib)
 
 pkg_exports=(
