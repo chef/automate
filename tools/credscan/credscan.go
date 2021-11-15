@@ -107,7 +107,7 @@ var a2Config = config{
 		{regex: `components/automate-backend-elasticsearch/habitat/config/certificates/*`},
 		{regex: `components/automate-backend-elasticsidecar/habitat/config/certificates/*`},
 		{regex: `components/automate-backend-kibana/habitat/config/certificates/*`},
-		{regex: `components/automate-backend-postgresql/habitat/config/certificates/*`},
+		{regex: `components/automate-backend-postgresql/habitat/config/*`},
 		{regex: `test/lib/certificate_store.rb`},
 		{regex: `test/lib/credentials.rb`},
 		// Test data from workflow
