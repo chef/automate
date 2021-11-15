@@ -25,10 +25,10 @@ if primary_ready >/dev/null; then
       if [[ "${last_replay}" == "" ]] || [ "${last_replay}" -gt {{cfg.replication.max_replay_lag_before_restart_s}} ]; then
         # Leader has been up 2 minutes, this replica is lagging greater than threshold and replication has either
         # never been applied or is greater than the max_replay_lag_before_restart_s
-        if [ -s /hab/svc/automate-backend-postgresql/var/postgresql.pid ]; then
+        if [ -s /hab/svc/automate-ha-postgresql/var/postgresql.pid ]; then
           echo "CRITICAL: No Replication changes have been applied within a reasonble threshold ({{cfg.replication.max_replay_lag_before_restart_s}}s). Restarting this replica immediately as a preemptive measure!"
           # SIGINT will result in Fast Shutdown mode
-          kill -INT $(cat /hab/svc/automate-backend-postgresql/var/postgresql.pid)
+          kill -INT $(cat /hab/svc/automate-ha-postgresql/var/postgresql.pid)
         fi
       fi
     fi

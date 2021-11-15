@@ -1,6 +1,6 @@
 # shellcheck disable=SC2148
 UPSTREAM_PKG_IDENT="core/haproxy"
-pkg_name="automate-backend-haproxy"
+pkg_name="automate-ha-haproxy"
 pkg_description="Wrapper package for core/haproxy"
 vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"

@@ -61,7 +61,7 @@ directories:
   - ./components/automate-backend-metricbeat
   - ./components/automate-backend-postgresql
   - ./components/automate-backend-deployment
-  - ./components/automate-backend-pgleaderchk
+  - ./components/automate-ha-pgleaderchk
 
 habitat:
   channel_for_origin:

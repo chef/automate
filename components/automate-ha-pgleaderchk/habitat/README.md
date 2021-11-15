@@ -1,4 +1,4 @@
-# automate-backend-pgleaderchk
+# automate-HA-pgleaderchk
 
 This pkg runs a HTTP server that reponds with a 200 if the local PostgreSQL service is a Leader.
 

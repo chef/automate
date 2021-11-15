@@ -31,11 +31,11 @@ max_replay_lag_before_restart_s = 180
 
 [wal_archive]
 enable = false
-path = "/hab/svc/automate-backend-postgresql/data/archive"
+path = "/hab/svc/automate-ha-postgresql/data/archive"
 
 [pg_dump]
 enable = true
-path = "/hab/svc/automate-backend-postgresql/data/pg_dump"
+path = "/hab/svc/automate-ha-postgresql/data/pg_dump"
 
 [ssl]
 enable = true

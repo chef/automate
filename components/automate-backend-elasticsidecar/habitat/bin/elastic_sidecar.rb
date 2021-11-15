@@ -59,7 +59,7 @@ module AutomateCluster
     end
 
     def load_config
-      config_file = '/hab/svc/automate-backend-elasticsidecar/config/elastic_sidecar.toml'
+      config_file = '/hab/svc/automate-ha-elasticsidecar/config/elastic_sidecar.toml'
       logger.warn "Attempting to load config from #{config_file}"
       conf = TomlRB.load_file(config_file)
       conf['ssl_mode'] = if conf['ssl_verify'] == false
@@ -139,9 +139,9 @@ module AutomateCluster
         FileUtils.mkdir_p(config['securityconfig_path'])
       end
       FileUtils.cp %w[
-        /hab/svc/automate-backend-elasticsidecar/config/securityconfig/action_groups.yml
-        /hab/svc/automate-backend-elasticsidecar/config/securityconfig/config.yml
-        /hab/svc/automate-backend-elasticsidecar/config/securityconfig/roles.yml
+        /hab/svc/automate-ha-elasticsidecar/config/securityconfig/action_groups.yml
+        /hab/svc/automate-ha-elasticsidecar/config/securityconfig/config.yml
+        /hab/svc/automate-ha-elasticsidecar/config/securityconfig/roles.yml
       ], config['securityconfig_path']
     end
 

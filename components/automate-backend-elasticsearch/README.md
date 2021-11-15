@@ -1,4 +1,4 @@
-# Automate-Backend-Elasticsearch
+# Automate-HA-Backend-Elasticsearch
 
 This is a wrapper package of core/elasticsearch for Chef Automate that provides a backend HA Elasticsearch.
 
