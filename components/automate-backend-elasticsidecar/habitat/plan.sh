@@ -40,6 +40,7 @@ do_install() {
   gem install toml-rb --no-document --install-dir "${pkg_prefix}/lib/gems"
   gem install mixlib-shellout --no-document --install-dir "${pkg_prefix}/lib/gems"
   gem install pry --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install chefstyle --no-document --install-dir "${pkg_prefix}/lib/gems"
   mkdir "${pkg_prefix}/bin"
   install "$PLAN_CONTEXT/bin/elastic_sidecar.rb" "${pkg_prefix}/bin/elastic_sidecar.rb"
   mkdir "${pkg_prefix}/data"
