@@ -8,10 +8,10 @@ pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
-pkg_version=11.0.10+9
-pkg_source=https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.10_9.tar.gz
-pkg_shasum=ae78aa45f84642545c01e8ef786dfd700d2226f8b12881c844d6a1f71789cb99
-pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.10_9.tar.gz
+pkg_version=11.0.12+7
+pkg_source=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.12%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.12_7.tar.gz
+pkg_shasum=8770f600fc3b89bf331213c7aa21f8eedd9ca5d96036d1cd48cb2748a3dbefd2
+pkg_filename=OpenJDK11U-jdk_x64_linux_hotspot_11.0.12_7.tar.gz
 pkg_dirname="jdk-${pkg_version}"
 pkg_license=("GPL-2.0-with-classpath-exception")
 pkg_description=('AdoptOpenJDK binaries are created from the unmodified source code at OpenJDK.')
