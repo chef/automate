@@ -38,13 +38,13 @@ module Automate
         end
       end
 
-      option :svc, required: true, type: :string, desc: 'service name ie. automate-backend-postgresql'
+      option :svc, required: true, type: :string, desc: 'service name ie. automate-ha-postgresql'
       desc 'show', 'Show running config for locally running service'
       def show
         puts Automate::Backend::ServiceConfig.new('localhost', '9631', options[:svc]).toml_config
       end
 
-      option :svc, required: true, type: :string, desc: 'service name ie. automate-backend-postgresql'
+      option :svc, required: true, type: :string, desc: 'service name ie. automate-ha-postgresql'
       desc 'applied', 'Show gossip config that was hab config applied for locally running service'
       def applied
         puts Automate::Backend::ServiceConfig.new('localhost', '9631', options[:svc]).hab_config_applied

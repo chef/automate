@@ -37,7 +37,7 @@ module "journalbeat" {
   habitat_info              = var.habitat_info
   instance_count            = var.postgresql_instance_count
   journalbeat_pkg_ident     = var.journalbeat_pkg_ident
-  journalbeat_svc_binds     = "--bind elasticsearch:automate-backend-elasticsearch.default"
+  journalbeat_svc_binds     = "--bind elasticsearch:automate-ha-elasticsearch.default"
   journalbeat_tags          = ["postgresql"]
   elasticsearch_private_ips = var.elasticsearch_private_ips
   private_ips               = var.private_ips
@@ -55,7 +55,7 @@ module "metricbeat" {
   habitat_info              = var.habitat_info
   instance_count            = var.postgresql_instance_count
   metricbeat_pkg_ident      = var.metricbeat_pkg_ident
-  metricbeat_svc_binds      = "--bind database:automate-backend-postgresql.default --bind elasticsearch:automate-backend-elasticsearch.default"
+  metricbeat_svc_binds      = "--bind database:automate-ha-postgresql.default --bind elasticsearch:automate-ha-elasticsearch.default"
   metricbeat_tags           = ["postgresql"]
   elasticsearch_private_ips = var.elasticsearch_private_ips
   private_ips               = var.private_ips

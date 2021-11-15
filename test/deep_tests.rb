@@ -45,10 +45,10 @@ class DeepTests < Assert::Context
     assert_equal [], codes.reject(&:zero?)
   end
 
-  test 'PostgreSQL survives fast rolling cluster automate-backend-postgresql restart' do
+  test 'PostgreSQL survives fast rolling cluster automate-ha-postgresql restart' do
     host_ips = harness.pg_public_ips.shuffle.shuffle
     harness.ping_until_alive(host_ips)
-    harness.rolling_svc_restart(host_ips, 'chef/automate-backend-postgresql', fast: true)
+    harness.rolling_svc_restart(host_ips, 'chef/automate-ha-postgresql', fast: true)
     harness.ping_until_alive(host_ips)
     leader = harness.pg_hab_elected_leader
     assert_true !leader.nil?

@@ -130,15 +130,15 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  pgleaderchk_pkg_ident = " $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})"
-  postgresql_pkg_ident = " $(grep "automate-backend-postgresql" ${PACKAGES_INFO})" 
-  proxy_pkg_ident = " $(grep "automate-backend-haproxy" ${PACKAGES_INFO})"
-  journalbeat_pkg_ident = " $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})"
-  metricbeat_pkg_ident = " $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})"
-  kibana_pkg_ident = " $(grep "automate-backend-kibana" ${PACKAGES_INFO})"
-  elasticsearch_pkg_ident = " $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})"
-  elasticsidecar_pkg_ident = " $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})"
-  curator_pkg_ident = " $(grep "automate-backend-curator" ${PACKAGES_INFO})"
+  pgleaderchk_pkg_ident = " $(grep "automate-ha-pgleaderchk" ${PACKAGES_INFO})"
+  postgresql_pkg_ident = " $(grep "automate-ha-postgresql" ${PACKAGES_INFO})" 
+  proxy_pkg_ident = " $(grep "automate-ha-haproxy" ${PACKAGES_INFO})"
+  journalbeat_pkg_ident = " $(grep "automate-ha-journalbeat" ${PACKAGES_INFO})"
+  metricbeat_pkg_ident = " $(grep "automate-ha-metricbeat" ${PACKAGES_INFO})"
+  kibana_pkg_ident = " $(grep "automate-ha-kibana" ${PACKAGES_INFO})"
+  elasticsearch_pkg_ident = " $(grep "automate-ha-elasticsearch" ${PACKAGES_INFO})"
+  elasticsidecar_pkg_ident = " $(grep "automate-ha-elasticsidecar" ${PACKAGES_INFO})"
+  curator_pkg_ident = " $(grep "automate-ha-curator" ${PACKAGES_INFO})"
 EOL
 }
 

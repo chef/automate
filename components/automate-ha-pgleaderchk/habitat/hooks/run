@@ -5,4 +5,4 @@ exec 2>&1
 # Required to allow common name feild in certificate. Feature soon to deprecated by 1.17
 export GODEBUG=x509ignoreCN=0
 
-exec pgleaderchk -c {{pkg.svc_config_path}}/config.toml serve
+exec automate-ha-pgleaderchk -c {{pkg.svc_config_path}}/config.toml serve

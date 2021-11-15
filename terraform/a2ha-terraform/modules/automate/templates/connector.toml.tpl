@@ -15,13 +15,13 @@
   ips = ${elasticsearch_ips}
   sup_port = 9631
   svc_group = "default"
-  svc_name = "automate-backend-elasticsearch"
+  svc_name = "automate-ha-elasticsearch"
   svc_port = ${elasticsearch_listen_port}
 
   [services.postgresql]
   ips = ${postgresql_ips}
   sup_port = 9631
   svc_group = "default"
-  svc_name = "automate-backend-postgresql"
+  svc_name = "automate-ha-postgresql"
   svc_port = ${proxy_listen_port}
   ssl = ${postgresql_ssl_enable}

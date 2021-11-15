@@ -181,7 +181,7 @@ module BackendUtils
     def pg_hab_elected_leader
       each_alive(postgresql_public_ips) do |conn|
         cmd = "#{curl_bin} -sk -H \"Authorization: Bearer #{hab_sup_http_gateway_auth_token}\" https://localhost:9631/census | #{jq_bin} \
-          '.census_groups.\"automate-backend-postgresql.default\".population[] | select \
+          '.census_groups.\"automate-ha-postgresql.default\".population[] | select \
           (.leader == true) | \"\\(.sys.gossip_ip)\"'"
         @backend_logger.debug "Running: #{cmd}"
         output = conn.run_command(cmd).stdout.chomp
@@ -292,7 +292,7 @@ module BackendUtils
 
     def pg_bin_path
       pg_bin_path = "\$(#{accept_license_no_persist} hab pkg path core/postgresql11)/bin"
-      pg_pw = "PGPASSWORD=$(echo ENV['SUDO_PASSWORD'] | #{sudo_cmd} -S cat /hab/svc/automate-backend-postgresql/config/pwfile)"
+      pg_pw = "PGPASSWORD=$(echo ENV['SUDO_PASSWORD'] | #{sudo_cmd} -S cat /hab/svc/automate-ha-postgresql/config/pwfile)"
       @pg_bin_path ||= "#{pg_pw} #{pg_bin_path}"
     end
 

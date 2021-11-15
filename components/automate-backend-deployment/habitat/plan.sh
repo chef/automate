@@ -1,4 +1,4 @@
-pkg_name=automate-backend-deployment
+pkg_name=automate-ha-deployment
 pkg_description="A wrapper package for setting up a deployment workstation for the A2 HA Backend."
 pkg_origin=chef
 pkg_version="0.1.0"
@@ -20,7 +20,7 @@ pkg_deps=(
   core/curl
   core/rsync
   core/terraform
-  chef/automate-cluster-ctl
+  chef/automate-ha-cluster-ctl
 )
 
 pkg_build_deps=(

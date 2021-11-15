@@ -348,8 +348,8 @@ module AutomateCluster
           admin_sql = "alter role admin with password '#{admin_pass}'"
           replication_sql = "alter role replication with password '#{replication_pass}'"
           script = bash_script <<~SCRIPT
-            PGPASSFILE=/hab/svc/automate-backend-postgresql/config/.pgpass hab pkg exec \
-            chef/automate-backend-postgresql psql -U admin -p 5432 -h 127.0.0.1 -d postgres \
+            PGPASSFILE=/hab/svc/automate-ha-postgresql/config/.pgpass hab pkg exec \
+            chef/automate-ha-postgresql psql -U admin -p 5432 -h 127.0.0.1 -d postgres \
             -c "#{replication_sql}" -c "#{admin_sql}"
           SCRIPT
           local_script_file = Tempfile.new('script')

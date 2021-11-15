@@ -1,4 +1,4 @@
-# automate-backend-kibana-module
+# automate-ha-kibana-module
 
 Terraform Module
 

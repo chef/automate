@@ -5,22 +5,22 @@
 
     [kibana_yaml.server.ssl]
       enabled = true
-      certificate =  "/hab/svc/automate-backend-kibana/config/certificates/kibana.pem"
-      key = "/hab/svc/automate-backend-kibana/config/certificates/kibana.key"
+      certificate =  "/hab/svc/automate-ha-kibana/config/certificates/kibana.pem"
+      key = "/hab/svc/automate-ha-kibana/config/certificates/kibana.key"
       supportedProtocols = ['TLSv1.2']
       cipherSuites = ['ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-RSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-CHACHA20-POLY1305', 'ECDHE-RSA-CHACHA20-POLY1305', 'ECDHE-ECDSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES128-GCM-SHA256']
 
   [kibana_yaml.elasticsearch]
     url = "https://localhost:9200"
     [kibana_yaml.elasticsearch.ssl]
-      certificateAuthorities = "/hab/svc/automate-backend-kibana/config/certificates/CA.pem"
+      certificateAuthorities = "/hab/svc/automate-ha-kibana/config/certificates/CA.pem"
       verificationMode = "certificate"
 
   [kibana_yaml.path]
-    data = "/hab/svc/automate-backend-kibana/data/"
+    data = "/hab/svc/automate-ha-kibana/data/"
 
   [kibana_yaml.pid]
-    file = "/hab/svc/automate-backend-kibana/var/kibana.pid"
+    file = "/hab/svc/automate-ha-kibana/var/kibana.pid"
 
 # default self signed keys for testing, override in production
 # Certificate used for kibana interface
