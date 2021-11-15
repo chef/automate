@@ -59,7 +59,7 @@
                       [typeFieldName]="typeFieldName"
                       [selectedList]="selectedSecrets$">
                     </app-selectbox>
-                    <a [routerLink]="['/settings', 'node-credentials', 'add']" class="add-node-text">Add new credentials</a>
+                    <a [routerLink]="['/settings', 'node-credentials', 'add']" data-cy="node-credentials" class="add-node-text">Add new credentials</a>
                     <chef-form-field class="field">
                       <label for="port">Enter optional port access</label>
                       <input id="port" type="number" chefInput formControlName="port" name="port" placeholder="Port" />

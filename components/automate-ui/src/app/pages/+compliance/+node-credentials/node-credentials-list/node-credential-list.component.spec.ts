@@ -11,6 +11,8 @@ import { FormBuilder } from '@angular/forms';
 import { NodeCredential, NodeCredentialTypes } from 'app/entities/node-credentials/node-credential.model';
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { RouterTestingModule } from '@angular/router/testing';
+
 
 describe('NodeCredentialListComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -59,6 +61,7 @@ describe('NodeCredentialListComponent', () => {
       imports: [
         ChefPipesModule,
         InfiniteScrollModule,
+        RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ]
     }).compileComponents();

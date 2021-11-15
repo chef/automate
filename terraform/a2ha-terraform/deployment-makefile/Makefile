@@ -7,6 +7,7 @@ TMPOUT = '/tmp/make.out'
 REPO_ROOT = $(shell pwd)
 DATESTAMP := $(shell date +"%Y%m%d%H%M%S")
 BUNDLEAIB = $(TERRAFORM_PATH)/transfer_files/bundle-$(DATESTAMP).aib
+BUNDLEAIBDEV = $(TERRAFORM_PATH)/transfer_files/bundle-dev-$(DATESTAMP).aib
 BACKENDAIB = $(TERRAFORM_PATH)/transfer_files/backend-$(DATESTAMP).aib
 BACKENDAIB_TFVARS = $(shell pwd)/terraform/a2ha_aib_be.auto.tfvars
 FRONTENDAIB = $(TERRAFORM_PATH)/transfer_files/frontend-$(DATESTAMP).aib
@@ -59,6 +60,12 @@ $(BUNDLEAIB):
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
 	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
 
+$(BUNDLEAIBDEV):
+	@echo "# Updating FE and BE component package versions from dev channel " && \
+		$(AIRGAP_SH) -t all -c dev -o $(FRONTENDAIB) -b $(BACKENDAIB) -v $(FRONTENDAIB_TFVARS) -q $(BACKENDAIB_TFVARS)  && \
+	  $$(hab pkg path core/coreutils)/bin/md5sum $(FRONTENDAIB) > $(FRONTENDAIB).md5 && \
+	  $$(hab pkg path core/coreutils)/bin/md5sum $(BACKENDAIB) > $(BACKENDAIB).md5
+
 $(FRONTENDAIB):
 	@echo "# Updating FE component package versions: $(FRONTENDAIB_TFVARS)" && \
 		$(AIRGAP_SH) -t upgradefrontends -o $(FRONTENDAIB) -v $(FRONTENDAIB_TFVARS) && \
@@ -75,6 +82,9 @@ $(HABITAT_TFVARS):
 
 ## Create both frontend and backend .aib
 bundle: $(BUNDLEAIB)
+
+## Create both frontend and backend .aib from dev channel
+bundle-dev: $(BUNDLEAIBDEV)
 
 ## Create a frontend .aib
 fe-bundle: $(FRONTENDAIB)

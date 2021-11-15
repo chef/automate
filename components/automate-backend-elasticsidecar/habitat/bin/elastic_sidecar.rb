@@ -6,9 +6,8 @@ require 'http'
 require 'json'
 require 'logger'
 require 'toml-rb'
-require 'yaml'
 require 'mixlib/shellout'
-require "chefstyle"
+require 'chefstyle'
 
 module AutomateCluster
   class ElasticSidecar
