@@ -638,7 +638,8 @@ func (app *ApplicationsServer) GetServicesUsageCount(ctx context.Context,
 		}
 	}
 	return &applications.GetServicesUsageCountResponse{
-		TotalServices: count,
+		TotalServices:     count,
+		DaysSinceLastPost: int64(daysSinceLastPost),
 	}, nil
 }
 

@@ -739,6 +739,11 @@ func init() {
           "type": "string",
           "format": "int64",
           "title": "unique services count in a duration"
+        },
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
         }
       }
     },
