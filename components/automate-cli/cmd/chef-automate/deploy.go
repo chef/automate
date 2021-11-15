@@ -41,6 +41,7 @@ If you want to provision cluster then you have to first run provision command.
 After that you can run this command`
 
 var invalidConfig = "Invalid toml config file, please check your toml file."
+var invalidChannelName = "Invalid channel permited channels are dev and stable"
 
 var deployCmdFlags = struct {
 	channel                         string
@@ -202,7 +203,24 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(derr, status.ConfigError, invalidConfig)
 	}
 	if deployer != nil {
-		return deployer.doDeployWork(args)
+		conf := new(dc.AutomateConfig)
+		if err := mergeFlagOverrides(conf); err != nil {
+			return status.Wrap(
+				err,
+				status.ConfigError,
+				"Merging command flag overrides into Chef Automate config failed",
+			)
+		}
+		if len(deployCmdFlags.channel) > 0 && (deployCmdFlags.channel == "dev" || deployCmdFlags.channel == "current") {
+			writer.Printf("deploying with channel : %s \n" + deployCmdFlags.channel)
+			args = append(args, "--"+deployCmdFlags.channel)
+			return deployer.doDeployWork(args)
+		} else if len(deployCmdFlags.channel) == 0 {
+			writer.Printf("deploying with default channel")
+			return deployer.doDeployWork(args)
+		} else {
+			return status.Wrap(derr, status.ConfigError, invalidChannelName)
+		}
 	}
 	writer.Printf("Automate deployment non HA mode proceeding...")
 	if !deployCmdFlags.acceptMLSA {

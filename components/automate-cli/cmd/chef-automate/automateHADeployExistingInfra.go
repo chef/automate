@@ -28,7 +28,7 @@ func (e *existingInfra) doDeployWork(args []string) error {
 	if err != nil {
 		return err
 	}
-	return executeDeployment()
+	return executeDeployment(args)
 }
 
 func (e *existingInfra) doProvisionJob(args []string) error {
