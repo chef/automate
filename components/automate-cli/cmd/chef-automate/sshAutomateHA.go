@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -217,7 +217,7 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 	if checkIfFileExist(automateHATerraformOutputFile) {
 		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformOutputFile)
+		contents, err := os.ReadFile(automateHATerraformOutputFile)
 		if err != nil {
 			return nil, err
 		}
@@ -228,7 +228,7 @@ func getAutomateHAInfraDetails() (*AutomteHAInfraDetails, error) {
 		return automateHAInfraDetails, nil
 	} else if checkIfFileExist(automateHATerraformDestroyOutputFile) {
 		automateHAInfraDetails := &AutomteHAInfraDetails{}
-		contents, err := ioutil.ReadFile(automateHATerraformDestroyOutputFile)
+		contents, err := os.ReadFile(automateHATerraformDestroyOutputFile)
 		if err != nil {
 			return nil, err
 		}
