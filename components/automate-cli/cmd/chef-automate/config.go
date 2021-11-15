@@ -133,7 +133,7 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 			writer.Printf("error in patching automate config to automate HA")
 			return err
 		}
-		return executeDeployment()
+		return executeDeployment(args)
 	}
 
 	if err = client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
