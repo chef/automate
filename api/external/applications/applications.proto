@@ -823,4 +823,6 @@ message GetServicesUsageCountRequest {}
 message	GetServicesUsageCountResponse {
   // unique services count in a duration
   int64 total_services = 1;
+  // number of days since telematics was last posted
+  int64 days_since_last_post =2;
 }
