@@ -179,5 +179,7 @@ func TestDialWithNoEndpointsAndNullBackendSock(t *testing.T) {
 	require.NoError(t, err)
 	_, err = f.UsersMgmtClient()
 	require.NoError(t, err)
+	_, err = f.ReportManagerClient()
+	require.NoError(t, err)
 	require.NoError(t, f.Close())
 }

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package chef.automate.api.report_manager;
+option go_package = "github.com/chef/automate/api/external/report_manager";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "external/annotations/iam/annotations.proto";
+
+service ReportManagerService {
+	/*
+	List Download Report Requests
+
+	Returns the details of the download report requests placed by the user.
+
+	Authorization Action:
+	```
+	reportmanager:requests:list
+	```
+	*/
+    rpc ListDownloadReportRequests(google.protobuf.Empty) returns (ListDownloadReportRequestsResponse) {
+		option (google.api.http) = {
+			get: "/api/v0/reportmanager/requests"
+		};
+		option (chef.automate.api.iam.policy) = {
+			resource: "reportmanager:requests"
+			action: "reportmanager:requests:list"
+		};
+	};
+}
+
+message ListDownloadReportRequestsResponse {
+	repeated DownloadRequestResponse data = 1;
+}
+
+message DownloadRequestResponse {
+	string acknowledgement_id = 1;
+	string status = 2;
+	int64 report_size = 3;
+	string err_message = 4;
+	google.protobuf.Timestamp created_at = 5;
+	google.protobuf.Timestamp ended_at = 6;
+}
