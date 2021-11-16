@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "external/annotations/iam/annotations.proto";
+import "external/common/response.proto";
 
 service ReportManagerService {
 	/*
@@ -28,6 +29,8 @@ service ReportManagerService {
 			action: "reportmanager:requests:list"
 		};
 	};
+
+	rpc ExportFromReportManager(ExportFromReportManagerRequest) returns (stream chef.automate.api.common.ExportData) {};
 }
 
 message ListDownloadReportRequestsResponse {
@@ -41,4 +44,8 @@ message DownloadRequestResponse {
 	string err_message = 4;
 	google.protobuf.Timestamp created_at = 5;
 	google.protobuf.Timestamp ended_at = 6;
+}
+
+message ExportFromReportManagerRequest {
+	string id = 1;
 }
