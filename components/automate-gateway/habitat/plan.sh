@@ -39,6 +39,7 @@ pkg_binds_optional=(
   [secrets-service]="port"
   [automate-cds]="port"
   [user-settings-service]="port"
+  [report-manager-service]="port"
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)
