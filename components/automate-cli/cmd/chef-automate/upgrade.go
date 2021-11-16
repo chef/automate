@@ -84,19 +84,6 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 		}
 
-		if upgradeRunCmdFlags.upgradefrontends {
-			args = append(args, "--upgrade-frontends")
-		}
-		if upgradeRunCmdFlags.upgradebackends {
-			args = append(args, "--upgrade-backends")
-		}
-		if upgradeRunCmdFlags.upgradeairgapbundles {
-			args = append(args, "--upgrade-airgap-bundles")
-		}
-		if upgradeRunCmdFlags.skipDeploy {
-			args = append(args, "--skip-deploy")
-		}
-
 		return executeAutomateClusterCtlCommand("deploy", args, upgradeHaHelpDoc)
 	}
 
