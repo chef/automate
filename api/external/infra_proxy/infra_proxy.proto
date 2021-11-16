@@ -334,7 +334,7 @@ service InfraProxy {
   rpc GetPolicygroup (infra_proxy.request.Policygroup) returns (infra_proxy.response.Policygroup) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:policygroups";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsPolicyGroups:get";
   };
 
   rpc GetOrgUsersList (infra_proxy.request.OrgUsers) returns (infra_proxy.response.OrgUsers) {
