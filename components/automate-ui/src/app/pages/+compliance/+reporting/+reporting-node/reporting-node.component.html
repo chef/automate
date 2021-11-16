@@ -178,7 +178,8 @@
           </div>
         </div>
 
-        <chef-table class="controls-table" *ngIf="activeReport.controls.total > 0">
+        <chef-table class="controls-table"
+         *ngIf="activeReport.controls.total > 0 && controlList != undefined">
           <chef-thead>
             <chef-tr>
               <chef-th>Control</chef-th>
@@ -189,10 +190,9 @@
             </chef-tr>
           </chef-thead>
           <chef-tbody>
-            <!-- below code needed for control list -->
-            <!-- <ng-container *ngFor="let profile of filteredProfiles(activeReport.profiles, activeStatusFilter)"> 
-              <ng-container *ngFor="let control of filteredControls(profile.controls, activeStatusFilter)"> 
-                <chef-tr>
+            <ng-container *ngFor="let profile of activeReport.profiles"> 
+              <ng-container *ngFor="let control of controlList.control_elements"> 
+               <chef-tr>
                   <chef-td >
                     <chef-icon *ngIf="control.status !== 'waived'" class="status-icon" [ngClass]="control.status">
                       {{ statusIcon(control.status) }}
@@ -204,9 +204,9 @@
                     {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
                   </chef-td>
                   <chef-td >{{profile.name}}</chef-td>
-                  <chef-td >{{control.results.length | number}}</chef-td>
+                  <chef-td >{{control.results}}</chef-td>
                   <chef-td >
-                    <chef-button secondary (click)="toggleControl(control)">
+                    <chef-button disabled secondary (click)="toggleControl(control)">
                       <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                       <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
                     </chef-button>
@@ -230,9 +230,9 @@
                           <dt>Reason:</dt>
                           <dd>{{ control.waiver_data.justification }}</dd>
                         </dl>
-                      </div>-->
+                      </div>
                       <!-- show results of control even if waived -->
-                      <!-- <div class="result-item" *ngFor="let result of control.results">
+                       <div class="result-item" *ngFor="let result of control.results">
                         <div class="result-item-header">
                           <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
                           <p>{{ result.code_desc }}</p>
@@ -240,8 +240,8 @@
                         <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
                           <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
                         </div>
-                      </div>-->
-                      <!-- display message when there are no results 
+                      </div>
+                      <!-- display message when there are no results -->
                       <div class="result-item" *ngIf="control.results.length === 0">
                         <div class="result-item-header">
                           <p>No tests were executed</p>
@@ -257,9 +257,17 @@
                   </ng-container>
                 </div>
               </ng-container>
-            </ng-container>-->
+            </ng-container>
           </chef-tbody>
         </chef-table>
+
+        <app-page-picker
+          class="reporting-controls-paging"
+          [perPage]="perPage"
+          [total]="activeReport.controls.total"
+          [page]="pageIndex"
+          (pageChanged)="onControlListPageChanged($event)">
+        </app-page-picker>
 
         <chef-scroll-top></chef-scroll-top>
       </ng-container>

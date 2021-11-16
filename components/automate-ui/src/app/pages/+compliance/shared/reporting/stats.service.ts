@@ -242,6 +242,24 @@ export class StatsService {
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 
+  getSingleReport(reportID: string, reportQuery: ReportQuery): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const body = { filters: formatted };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
+        data.profiles.forEach(p => {
+          p.controls.forEach(c => {
+            // precalculate overall control status from results
+            c.results = c.results || [];
+            c.status = this.getControlStatus(c);
+          });
+        });
+        return omitBy(data, isNil);
+      }));
+  }
+
   getNodeHeader(reportID: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodeheader/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);
@@ -249,6 +267,27 @@ export class StatsService {
 
     return this.httpClient.post<any>(url, body).pipe(
       map((data) => {
+        return omitBy(data, isNil);
+      }));
+  }
+
+  getControlsList(reportID: string, reportQuery: ReportQuery, pageIndex): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const pagevalue = (pageIndex - 1);
+    const pageParam = [
+      ...formatted,
+      {'type': 'from', 'values': [`${pagevalue}`]},
+      {'type': 'size', 'values': ['100']}
+    ];
+    const body = { filters: pageParam };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
+        // data.control_elements.forEach(c => {
+        //     // precalculate overall control status from results
+        //     c.results = c.results || [];
+        // });
         return omitBy(data, isNil);
       }));
   }

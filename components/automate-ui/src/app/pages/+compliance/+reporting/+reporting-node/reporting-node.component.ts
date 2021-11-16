@@ -36,6 +36,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   downloadInProgress = false;
   downloadFailed = false;
   openControls = {};
+  controlList: any = {};
+  pageIndex = 1;
+  perPage = 100;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -209,6 +212,19 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.layoutFacade.ShowPageLoading(false);
         this.activeReport = Object.assign(report, data);
       });
+
+    this.getControlData(report);
+  }
+
+  getControlData(report: any) {
+    const reportQuery = this.reportQueryService.getReportQueryForReport(report);
+    this.statsService.getControlsList(report.id, reportQuery, this.pageIndex)
+    .pipe(first())
+    .subscribe(data => {
+      this.reportLoading = false;
+      this.layoutFacade.ShowPageLoading(false);
+      this.controlList = Object.assign(data);
+    });
   }
 
   toggleDownloadDropdown() {
@@ -248,5 +264,10 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.downloadNodeReport(fileFormat, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
+  }
+
+  onControlListPageChanged(event) {
+    this.pageIndex = event;
+    this.getControlData(this.activeReport);
   }
 }
