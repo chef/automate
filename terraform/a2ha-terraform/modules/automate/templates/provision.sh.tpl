@@ -79,19 +79,19 @@ wait_for_backend_aib() {
 }
 
 wait_for_backend_ctl() {
-  # TODO: instead of looping here, we should increase the already existing retry loops in the automate-backend-ctl gem
+  # TODO: instead of looping here, we should increase the already existing retry loops in the automate-ha-ctl gem
   max=20
   n=0
   until [ $n -ge $max ]; do
-    if hab pkg exec chef/automate-backend-ctl automate-backend-ctl connect --conf-out ${tmp_path}/automate_conf.toml --toml=${tmp_path}/connector.toml --erb=${tmp_path}/config.toml.erb 2>>${tmp_path}/automate-ctl.log; then
+    if hab pkg exec chef/automate-ha-ctl automate-backend-ctl connect --conf-out ${tmp_path}/automate_conf.toml --toml=${tmp_path}/connector.toml --erb=${tmp_path}/config.toml.erb 2>>${tmp_path}/automate-ctl.log; then
       break
     fi
     n=$((n+1))
-    echo "Waiting for automate-backend-ctl to connect to backends.."
+    echo "Waiting for automate-ha-ctl to connect to backends.."
     sleep 30
   done
   if [[ $n -ge $max ]]; then
-    failure "Timed out waiting automate-backend-ctl to within $max iterations!"
+    failure "Timed out waiting automate-ha-ctl to within $max iterations!"
   fi
 }
 

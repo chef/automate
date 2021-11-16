@@ -1,4 +1,4 @@
-# automate-backend-postgresql-module
+# automate-HA-postgresql-module
 
 Terraform Module
 

@@ -30,7 +30,7 @@ module "journalbeat" {
   habitat_info              = var.habitat_info
   instance_count            = var.elasticsearch_instance_count
   journalbeat_pkg_ident     = var.journalbeat_pkg_ident
-  journalbeat_svc_binds     = "--bind elasticsearch:automate-backend-elasticsearch.default"
+  journalbeat_svc_binds     = "--bind elasticsearch:automate-ha-elasticsearch.default"
   journalbeat_tags          = ["elasticsearch"]
   elasticsearch_private_ips = var.private_ips
   private_ips               = var.private_ips
@@ -48,7 +48,7 @@ module "metricbeat" {
   habitat_info              = var.habitat_info
   instance_count            = var.elasticsearch_instance_count
   metricbeat_pkg_ident      = var.metricbeat_pkg_ident
-  metricbeat_svc_binds      = "--bind elasticsearch:automate-backend-elasticsearch.default"
+  metricbeat_svc_binds      = "--bind elasticsearch:automate-ha-elasticsearch.default"
   metricbeat_tags           = ["elasticsearch"]
   elasticsearch_private_ips = var.private_ips
   private_ips               = var.private_ips
@@ -66,7 +66,7 @@ module "kibana" {
   habitat_info              = var.habitat_info
   instance_count            = var.elasticsearch_instance_count
   kibana_pkg_ident          = var.kibana_pkg_ident
-  kibana_svc_binds          = "--bind elasticsearch:automate-backend-elasticsearch.default"
+  kibana_svc_binds          = "--bind elasticsearch:automate-ha-elasticsearch.default"
   private_ips               = var.private_ips
   source                    = "../kibana"
   ssh_key_file              = var.ssh_key_file
@@ -82,7 +82,7 @@ module "curator" {
   habitat_info              = var.habitat_info
   instance_count            = var.elasticsearch_instance_count
   curator_pkg_ident         = var.curator_pkg_ident
-  curator_svc_binds         = "--bind elasticsearch:automate-backend-elasticsearch.default"
+  curator_svc_binds         = "--bind elasticsearch:automate-ha-elasticsearch.default"
   private_ips               = var.private_ips
   source                    = "../curator"
   ssh_key_file              = var.ssh_key_file

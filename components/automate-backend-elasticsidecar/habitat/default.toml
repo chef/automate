@@ -2,4 +2,4 @@ ssl_verify = false
 elasticsearch_port = 9300
 wait_period = 60
 log_debug = false
-dashboard_directory = "/hab/svc/automate-backend-elasticsidecar/config/dashboards/"
+dashboard_directory = "/hab/svc/automate-ha-elasticsidecar/config/dashboards/"

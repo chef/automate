@@ -1,4 +1,4 @@
-# automate-backend-metricbeat-module
+# automate-ha-metricbeat-module
 
 Terraform Module
 

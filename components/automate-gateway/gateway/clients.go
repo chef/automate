@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"fmt"
+
 	"github.com/chef/automate/api/interservice/user_settings"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -31,6 +32,7 @@ import (
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/api/interservice/teams"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
@@ -60,6 +62,7 @@ var grpcServices = []string{
 	"teams-service",
 	"secrets-service",
 	"user-settings-service",
+	"report-manager-service",
 }
 
 // clientMetrics holds the clients (identified by service) for which we'll
@@ -123,6 +126,7 @@ type ClientsFactory interface {
 	InfraProxyClient() (infra_proxy.InfraProxyServiceClient, error)
 	CdsClient() (cds.AutomateCdsServiceClient, error)
 	UserSettingsClient() (user_settings.UserSettingsServiceClient, error)
+	ReportManagerClient() (report_manager.ReportManagerServiceClient, error)
 	Close() error
 }
 
@@ -457,6 +461,14 @@ func (c *clientsFactory) UserSettingsClient() (user_settings.UserSettingsService
 		return nil, err
 	}
 	return user_settings.NewUserSettingsServiceClient(conn), nil
+}
+
+func (c *clientsFactory) ReportManagerClient() (report_manager.ReportManagerServiceClient, error) {
+	conn, err := c.connectionByName("report-manager-service")
+	if err != nil {
+		return nil, err
+	}
+	return report_manager.NewReportManagerServiceClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {

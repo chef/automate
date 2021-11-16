@@ -20,6 +20,10 @@ type Postgres struct {
 	mapper *gorp.DbMap
 }
 
+type DBTrans struct {
+	*gorp.Transaction
+}
+
 const clearAllRows = `DELETE FROM rollouts;`
 
 func Open(config *config.Postgres) (*Postgres, error) {
@@ -66,6 +70,7 @@ func (p *Postgres) Connect() error {
 	p.mapper = &gorp.DbMap{Db: dbMap, Dialect: gorp.PostgresDialect{}}
 	p.mapper.AddTableWithName(Rollout{}, "rollouts").SetKeys(true, "Id")
 	p.mapper.AddTableWithName(NewRollout{}, "rollouts").SetKeys(true, "Id")
+	p.mapper.AddTableWithName(Telemetry{}, "telemetry").SetKeys(false, "id")
 
 	return nil
 }
@@ -94,5 +99,31 @@ func (p *Postgres) Close() error {
 
 func (p *Postgres) Clear() error {
 	_, err := p.db.Exec(clearAllRows)
+	return err
+}
+
+// Transact wraps your calls in a transaction. If the call should fail with an error it will
+// perform a rollback. Otherwise the transaction will be committed.
+func Transact(pg *Postgres, txFunc func(*DBTrans) error) error {
+	trans, err := pg.mapper.Begin()
+	if err != nil {
+		return errors.Wrap(err, "Unable to start transaction.")
+	}
+	tx := DBTrans{
+		Transaction: trans,
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback() // nolint: errcheck
+		} else {
+			err = tx.Commit()
+			if err != nil {
+				tx.Rollback() // nolint: errcheck
+				err = errors.Wrap(err, "Transaction failed and will be rolled back.")
+			}
+		}
+	}()
+
+	err = txFunc(&tx)
 	return err
 }

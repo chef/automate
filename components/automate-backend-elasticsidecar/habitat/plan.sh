@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-pkg_name="automate-backend-elasticsidecar"
+pkg_name="automate-ha-elasticsidecar"
 pkg_description="Password manager for elasticsearch-odfe"
 pkg_origin="chef"
 vendor_origin="chef"
@@ -18,8 +18,6 @@ pkg_build_deps=(
 )
 pkg_interpreters=(bin/ruby)
 
-
-# currently broken, these should be required binds, but they are never found
 pkg_binds=(
   [elasticsearch]="http-port transport-port root-ca admin-pem admin-key admin_username admin_password dashboard_username dashboard_password"
 )
@@ -35,10 +33,14 @@ do_build() {
 }
 
 do_install() {
-  pushd habitat/automate-backend-elasticsidecar/
-    bundle config set --local path "${pkg_prefix}/lib/gems"
-    bundle install
-  popd
+  gem update --system
+  gem install bcrypt --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install http --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install json --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install toml-rb --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install mixlib-shellout --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install pry --no-document --install-dir "${pkg_prefix}/lib/gems"
+  gem install chefstyle --no-document --install-dir "${pkg_prefix}/lib/gems"
   mkdir "${pkg_prefix}/bin"
   install "$PLAN_CONTEXT/bin/elastic_sidecar.rb" "${pkg_prefix}/bin/elastic_sidecar.rb"
   mkdir "${pkg_prefix}/data"

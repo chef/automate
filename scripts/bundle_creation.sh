@@ -23,12 +23,14 @@ export BUNDLE_TYPE=
 export BACKENDAIB_TFVARS=
 export FRONTENDAIB_TFVARS=
 export TARBALL_PATH=
+export CHANNEL=current
 TEMP_DIR=/tmp
 export TEMP_BUNDLE_FILE=$TEMP_DIR/bundle.aib.$$.$RANDOM
 export TEMP_TAR_FILE=$TEMP_DIR/my.aib.$$.$RANDOM
 export MANIFEST_TFVARS="terraform/a2ha_manifest.auto.tfvars"
 export BACKENDAIB=
 export PACKAGES_INFO="/tmp/packages.info"
+
 # Helper Functions
 echo_env() {
     echo "=============================================="
@@ -82,6 +84,7 @@ trap clean_up SIGHUP SIGINT SIGTERM ERR
 airgap_bundle_create() {
   original_aib_path="${TEMP_BUNDLE_FILE}"
   args=('airgap' 'bundle' 'create')
+  args+=('-c' "${CHANNEL}")
   args+=("${original_aib_path}")
   # printf '%s\n' "Running: ${CHEF_AUTOMATE_BIN_PATH} ${args[*]}"
   if "${CHEF_AUTOMATE_BIN_PATH}" "${args[@]}" > /tmp/thelog.log; then
@@ -127,15 +130,15 @@ exec_linux() {
 # We are creating a2ha_manifest.auto.tfvars as they will be used by terraform modules while deployment
 create_manifest_auto_tfvars(){
   cat >"${MANIFEST_TFVARS}" <<EOL
-  pgleaderchk_pkg_ident = " $(grep "automate-backend-pgleaderchk" ${PACKAGES_INFO})"
-  postgresql_pkg_ident = " $(grep "automate-backend-postgresql" ${PACKAGES_INFO})" 
-  proxy_pkg_ident = " $(grep "automate-backend-haproxy" ${PACKAGES_INFO})"
-  journalbeat_pkg_ident = " $(grep "automate-backend-journalbeat" ${PACKAGES_INFO})"
-  metricbeat_pkg_ident = " $(grep "automate-backend-metricbeat" ${PACKAGES_INFO})"
-  kibana_pkg_ident = " $(grep "automate-backend-kibana" ${PACKAGES_INFO})"
-  elasticsearch_pkg_ident = " $(grep "automate-backend-elasticsearch" ${PACKAGES_INFO})"
-  elasticsidecar_pkg_ident = " $(grep "automate-backend-elasticsidecar" ${PACKAGES_INFO})"
-  curator_pkg_ident = " $(grep "automate-backend-curator" ${PACKAGES_INFO})"
+  pgleaderchk_pkg_ident = " $(grep "automate-ha-pgleaderchk" ${PACKAGES_INFO})"
+  postgresql_pkg_ident = " $(grep "automate-ha-postgresql" ${PACKAGES_INFO})" 
+  proxy_pkg_ident = " $(grep "automate-ha-haproxy" ${PACKAGES_INFO})"
+  journalbeat_pkg_ident = " $(grep "automate-ha-journalbeat" ${PACKAGES_INFO})"
+  metricbeat_pkg_ident = " $(grep "automate-ha-metricbeat" ${PACKAGES_INFO})"
+  kibana_pkg_ident = " $(grep "automate-ha-kibana" ${PACKAGES_INFO})"
+  elasticsearch_pkg_ident = " $(grep "automate-ha-elasticsearch" ${PACKAGES_INFO})"
+  elasticsidecar_pkg_ident = " $(grep "automate-ha-elasticsidecar" ${PACKAGES_INFO})"
+  curator_pkg_ident = " $(grep "automate-ha-curator" ${PACKAGES_INFO})"
 EOL
 }
 
@@ -173,7 +176,7 @@ do_tasks() {
 if [ $# -eq 0 ]; then
   usage
 fi
-while getopts ":b:d:t:w:o:h:v:q:" opt; do
+while getopts ":b:d:t:w:o:h:v:q:c:" opt; do
   case "${opt}" in
     d)
       export CHEF_AUTOMATE_BIN_PATH=${OPTARG}
@@ -195,6 +198,9 @@ while getopts ":b:d:t:w:o:h:v:q:" opt; do
       ;;
     q)
       export BACKENDAIB_TFVARS=${OPTARG}
+      ;;
+    c)
+      export CHANNEL=${OPTARG}
       ;;
     h)
       usage

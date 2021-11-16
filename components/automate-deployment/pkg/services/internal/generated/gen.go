@@ -465,51 +465,51 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/automate-backend-deployment",
+      "name": "chef/automate-ha-deployment",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-elasticsearch",
+      "name": "chef/automate-ha-elasticsearch",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-elasticsidecar",
+      "name": "chef/automate-ha-elasticsidecar",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-kibana",
+      "name": "chef/automate-ha-kibana",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-metricbeat",
+      "name": "chef/automate-ha-metricbeat",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-journalbeat",
+      "name": "chef/automate-ha-journalbeat",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-ctl",
+      "name": "chef/automate-ha-ctl",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-curator",
+      "name": "chef/automate-ha-curator",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-haproxy",
+      "name": "chef/automate-ha-haproxy",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-pgleaderchk",
+      "name": "chef/automate-ha-pgleaderchk",
       "metadata": null
     },
     {
-      "name": "chef/automate-backend-postgresql",
+      "name": "chef/automate-ha-postgresql",
       "metadata": null
     },
     {
-      "name": "chef/automate-cluster-ctl",
+      "name": "chef/automate-ha-cluster-ctl",
       "metadata": null
     },
     {

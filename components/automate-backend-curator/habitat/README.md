@@ -1,4 +1,4 @@
-# Automate-Backend-Curator
+# Automate-HA-Curator
 
 This is a wrapper package of core/curator for Chef Automate Backend.
 

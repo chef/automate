@@ -18,7 +18,7 @@ class HabSvc < Inspec.resource(1)
   name 'hab_svc'
   desc 'Use the hab_svc InSpec audit resource to test if the named service (controlled by hab) is installed, running / transient or persistent'
   example "
-    describe hab_svc('chef/automate-backend-postgresql') do
+    describe hab_svc('chef/automate-ha-postgresql') do
       it { should be_installed }
       it { should be_transient }
       it { should be_up }

@@ -12,17 +12,17 @@ openssl req -new -key ssl.key -out ssl.csr -subj '/C=US/ST=Washington/L=Seattle/
  
 openssl x509 -req -in ssl.csr -CA MyRootCA.pem -CAkey MyRootCA.key -CAcreateserial -out ssl.pem -sha256
  
-cat <<EOF >> default.toml
+cat <<EOF >> habitat/default.toml
 # server public cert used for ssl listener
 ssl_cert = """$(cat ssl.pem)"""
 EOF
  
-cat <<EOF >> default.toml
+cat <<EOF >> habitat/default.toml
 # server private key
 ssl_key = """$(cat ssl.key)"""
 EOF
 
-cat <<EOF >> default.toml
+cat <<EOF >> habitat/default.toml
 # issuer public cert that signed the above server public cert
-issuer_cert = """$(cat MyRootCA.key)"""
+issuer_cert = """$(cat MyRootCA.pem)"""
 EOF

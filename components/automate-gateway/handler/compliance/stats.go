@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"errors"
 
 	"github.com/chef/automate/api/external/compliance/reporting/stats"
 	statsService "github.com/chef/automate/api/interservice/compliance/stats"
@@ -66,6 +67,39 @@ func (a *Stats) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failu
 	out := &stats.Failures{}
 	f := func() (proto.Message, error) {
 		return a.client.ReadFailures(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+//UpdateTelemetryReported Updates the last compliance telemetry reported date after the telemetry data is sent
+func (a *Stats) UpdateTelemetryReported(ctx context.Context, in *stats.UpdateTelemetryReportedRequest) (*stats.UpdateTelemetryReportedResponse, error) {
+	inDomain := &statsService.UpdateTelemetryReportedRequest{
+		LastTelemetryReportedAt: in.LastTelemetryReportedAt,
+	}
+	if in.LastTelemetryReportedAt == "" {
+		return nil, errors.New("LastTelemetryReported timestamp is required")
+	}
+	out := &stats.UpdateTelemetryReportedResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.UpdateTelemetryReported(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+//GetNodesUsageCount returns the count of unique nodes with lastRun in a given time.
+func (a *Stats) GetNodesUsageCount(ctx context.Context, in *stats.GetNodesUsageCountRequest) (*stats.GetNodesUsageCountResponse, error) {
+	inDomain := &statsService.GetNodesUsageCountRequest{}
+	out := &stats.GetNodesUsageCountResponse{}
+	f := func() (proto.Message, error) {
+		return a.client.GetNodesUsageCount(ctx, inDomain)
 	}
 	err := protobuf.CallDomainService(in, inDomain, f, out)
 	if err != nil {

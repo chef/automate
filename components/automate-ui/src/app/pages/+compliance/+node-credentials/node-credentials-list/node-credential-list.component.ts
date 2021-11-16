@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, AfterViewInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { get, toUpper, pick } from 'lodash/fp';
 import { Observable, Subject } from 'rxjs';
@@ -23,12 +23,13 @@ import {
 import { NodeCredentialOrder, SortParams } from './node-credential-list.reducer';
 import { nodeCredentialListState } from './node-credential-list.selectors';
 import { SortNodeCredentialList } from './node-credential-list.actions';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 @Component({
   selector: 'app-node-credential-list',
   templateUrl: './node-credential-list.component.html',
   styleUrls: ['./node-credential-list.component.scss']
 })
-export class NodeCredentialListComponent implements OnInit, OnDestroy {
+export class NodeCredentialListComponent implements OnInit, OnDestroy, AfterViewInit {
   private isDestroyed = new Subject<boolean>();
   public loading$: Observable<boolean>;
   public instanceNodeCredentials$: Observable<NodeCredential[]>;
@@ -48,7 +49,8 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private route: ActivatedRoute
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
   }
@@ -87,6 +89,16 @@ export class NodeCredentialListComponent implements OnInit, OnDestroy {
       this.total = total;
     });
     this.getNodeList();
+  }
+
+  ngAfterViewInit() {
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      if (params.get('action') === 'add') {
+        setTimeout(() => {
+          this.openCreateModal();
+        });
+      }
+    });
   }
 
   appendItems() {

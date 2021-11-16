@@ -48,6 +48,64 @@ func init() {
         ]
       }
     },
+    "/api/v0/compliance/reporting/stats/nodes/count": {
+      "get": {
+        "summary": "GetNodesUsageCount",
+        "description": "Returns the count of unique nodes with lastRun in a given time.\nThe time duration can be between the last time Telemetry data sent and the day before the current date.\nIf the duration \u003c 15 days --\u003e 15 days\nduration \u003e 15 days --\u003e duration\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "StatsService_GetNodesUsageCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.GetNodesUsageCountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
+    "/api/v0/compliance/reporting/stats/nodes/count/updated": {
+      "put": {
+        "summary": "UpdateTelemetryReported",
+        "description": "Acknowledge API  to updates the last complaince telemetry reported date in postgres\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:introspect:getAll\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "StatsService_UpdateTelemetryReported",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
     "/api/v0/compliance/reporting/stats/profiles": {
       "post": {
         "summary": "Read Profiles",
@@ -283,6 +341,21 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.FailureSummary"
           },
           "description": "Top failed environments across the infrastructure."
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.GetNodesUsageCountResponse": {
+      "type": "object",
+      "properties": {
+        "days_since_last_post": {
+          "type": "string",
+          "format": "int64",
+          "title": "number of days since telematics was last posted"
+        },
+        "node_cnt": {
+          "type": "string",
+          "format": "int64",
+          "title": "unique nodes count in a duration"
         }
       }
     },
@@ -711,6 +784,18 @@ func init() {
           "description": "Set of statistics for passed/failed/skipped nodes or controls in a trendgraph friendly data format."
         }
       }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedRequest": {
+      "type": "object",
+      "properties": {
+        "last_telemetry_reported_at": {
+          "type": "string",
+          "title": "last complaince telemetry reported date"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.UpdateTelemetryReportedResponse": {
+      "type": "object"
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",

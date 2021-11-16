@@ -42,8 +42,11 @@ import { TeamModule } from 'app/modules/team/team.module';
 import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 
 // Services
+import { ApplicationStatsService } from './services/telemetry/application-stats/application-stats.service';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
+import { ClientRunsStatsService } from './services/telemetry/client-runs-stats/client-runs-stats.service';
+import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
 import { ConfigService } from './services/config/config.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
@@ -321,10 +324,13 @@ import {
     },
     AdminKeyRequests,
     ApiTokenRequests,
+    ApplicationStatsService,
     AttributesService,
     AutomateSettingsRequests,
     CdsRequests,
     ChefSessionService,
+    ClientRunsStatsService,
+    ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
     CookbookDetailsRequests,

@@ -61,7 +61,7 @@ variable "chef_server_instance_count" {
 }
 
 variable "curator_pkg_ident" {
-  default = "chef/automate-backend-curator"
+  default = "chef/automate-ha-curator"
 }
 
 variable "curator_svc_load_args" {
@@ -86,7 +86,7 @@ variable "elasticsearch_listen_port" {
 }
 
 variable "elasticsearch_pkg_ident" {
-  default = "chef/automate-backend-elasticsearch"
+  default = "chef/automate-ha-elasticsearch"
 }
 
 variable "elasticsearch_svc_load_args" {
@@ -94,7 +94,7 @@ variable "elasticsearch_svc_load_args" {
 }
 
 variable "elasticsidecar_pkg_ident" {
-  default = "chef/automate-backend-elasticsidecar"
+  default = "chef/automate-ha-elasticsidecar"
 }
 
 variable "elasticsidecar_svc_load_args" {
@@ -134,7 +134,7 @@ variable "hab_sup_run_args" {
 }
 
 variable "journalbeat_pkg_ident" {
-  default = "chef/automate-backend-journalbeat"
+  default = "chef/automate-ha-journalbeat"
 }
 
 variable "kibana_https_user" {
@@ -142,11 +142,11 @@ variable "kibana_https_user" {
 }
 
 variable "kibana_pkg_ident" {
-  default = "chef/automate-backend-kibana"
+  default = "chef/automate-ha-kibana"
 }
 
 variable "metricbeat_pkg_ident" {
-  default = "chef/automate-backend-metricbeat"
+  default = "chef/automate-ha-metricbeat"
 }
 
 variable "nfs_mount_path" {
@@ -159,7 +159,7 @@ variable "pgleaderchk_listen_port" {
 }
 
 variable "pgleaderchk_pkg_ident" {
-  default = "chef/automate-backend-pgleaderchk"
+  default = "chef/automate-ha-pgleaderchk"
 }
 
 variable "pgleaderchk_svc_load_args" {
@@ -180,7 +180,7 @@ variable "postgresql_listen_port" {
 }
 
 variable "postgresql_pkg_ident" {
-  default = "chef/automate-backend-postgresql"
+  default = "chef/automate-ha-postgresql"
 }
 
 variable "postgresql_pg_dump_enabled" {
@@ -207,7 +207,7 @@ variable "proxy_listen_port" {
 }
 
 variable "proxy_pkg_ident" {
-  default = "chef/automate-backend-haproxy"
+  default = "chef/automate-ha-haproxy"
 }
 
 variable "proxy_svc_load_args" {

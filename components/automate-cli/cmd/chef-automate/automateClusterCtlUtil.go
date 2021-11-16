@@ -159,3 +159,29 @@ func executeSecretsInitCommand(secretsKeyFilePath string) error {
 	}
 	return nil
 }
+
+func executeShellCommand(command string, args []string) error {
+	writer.Printf("%s command execution started \n\n\n", command)
+	c := exec.Command(command, args...)
+	c.Stdin = os.Stdin
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	c.Stdout = io.MultiWriter(os.Stdout, &out)
+	c.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	err := c.Run()
+	if err != nil {
+		writer.Printf(stderr.String())
+		return status.Wrap(err, status.CommandExecutionError, "")
+	} else {
+		writer.Printf("No error in executing commands")
+	}
+	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
+	if len(outStr) > 0 {
+		writer.Printf("\nout:\n%s", outStr)
+	}
+	if len(errStr) > 0 {
+		writer.Printf("\nerr:\n%s\n", errStr)
+	}
+	writer.Printf("%s command execution done, exiting\n", command)
+	return err
+}

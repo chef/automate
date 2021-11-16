@@ -5,10 +5,10 @@
 title 'Chef Automate Backend Deploy Elasticsearch Smoke Tests'
 
 %w(
-  chef/automate-backend-elasticsearch
-  chef/automate-backend-kibana
-  chef/automate-backend-metricbeat
-  chef/automate-backend-journalbeat
+  chef/automate-ha-elasticsearch
+  chef/automate-ha-kibana
+  chef/automate-ha-metricbeat
+  chef/automate-ha-journalbeat
 ).each do |svc|
   describe hab_svc(svc) do
     it { should be_installed }
@@ -16,18 +16,18 @@ title 'Chef Automate Backend Deploy Elasticsearch Smoke Tests'
   end
 end
 
-describe bash("HAB_LICENSE=accept-no-persist /hab/svc/automate-backend-elasticsearch/hooks/health-check") do
+describe bash("HAB_LICENSE=accept-no-persist /hab/svc/automate-ha-elasticsearch/hooks/health-check") do
   its('exit_status') { should eq 0 }
 end
 
-describe x509_certificate('/hab/svc/automate-backend-elasticsearch/config/certificates/odfe-ssl.pem') do
+describe x509_certificate('/hab/svc/automate-ha-elasticsearch/config/certificates/odfe-ssl.pem') do
   its('validity_in_days') { should be > 30 }
 end
 
-describe x509_certificate('/hab/svc/automate-backend-elasticsearch/config/certificates/odfe-admin.pem') do
+describe x509_certificate('/hab/svc/automate-ha-elasticsearch/config/certificates/odfe-admin.pem') do
   its('validity_in_days') { should be > 30 }
 end
 
-describe x509_certificate('/hab/svc/automate-backend-kibana/config/certificates/kibana.pem') do
+describe x509_certificate('/hab/svc/automate-ha-kibana/config/certificates/kibana.pem') do
   its('validity_in_days') { should be > 30 }
 end
