@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -18,6 +17,5 @@ func executeDeployment(args []string) error {
 	}
 	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
 	args = append(args, "-y")
-	fmt.Println(args)
 	return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs)
 }
