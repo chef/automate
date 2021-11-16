@@ -13,9 +13,14 @@ interface SessionSettings {
   idle_timeout_minutes?: number;
 }
 
+interface LcrSettings {
+  upgrade_lcr?: boolean;
+}
+
 interface ConfigTypes {
   banner?: BannerConfigTypes;
   session_settings?: SessionSettings;
+  lcr?: LcrSettings;
 }
 
 const initialConfig = {
@@ -28,6 +33,9 @@ const initialConfig = {
     session_settings: {
       enable_idle_timeout: null,
       idle_timeout_minutes: null
+    },
+    lcr: {
+      upgrade_lcr: null
     }
 };
 
@@ -71,6 +79,10 @@ export class AppConfigService {
 
   get bannerTextColor(): string {
     return this.convertToHex(this.appConfig.banner.text_color);
+  }
+
+  get isLcrEnabled(): boolean {
+    return this.appConfig.lcr.upgrade_lcr;
   }
 
   private convertToHex(color: string): string {

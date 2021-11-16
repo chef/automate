@@ -1,0 +1,6 @@
+[compliance.v1.sys.service]
+upgrade_lcr = true
+
+[global.v1.lcr]
+upgrade_lcr = false
+
