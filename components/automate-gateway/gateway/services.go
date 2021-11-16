@@ -39,6 +39,7 @@ import (
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
+	pb_report_manager "github.com/chef/automate/api/external/report_manager"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
 	pb_user_settings "github.com/chef/automate/api/external/user_settings"
 	"github.com/chef/automate/api/interservice/authn"
@@ -325,6 +326,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_user_settings.RegisterUserSettingsServiceServer(grpcServer, handler.NewUserSettingsHandler(userSettingsClient))
 
+	reportManagerClient, err := clients.ReportManagerClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for report-manager service")
+	}
+	pb_report_manager.RegisterReportManagerServiceServer(grpcServer, handler.NewReportManagerHandler(reportManagerClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -373,6 +380,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"applications":             pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 		"infra-proxy":              pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 		"user-settings":            pb_user_settings.RegisterUserSettingsServiceHandlerFromEndpoint,
+		"report-manager":           pb_report_manager.RegisterReportManagerServiceHandlerFromEndpoint,
 	})
 }
 
