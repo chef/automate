@@ -29,7 +29,7 @@ const (
 )
 
 // This is a compile-time assertion that a sufficiently up-to-date version
-// of the legacy proto package is being used
+// of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
 var File_external_infra_proxy_infra_proxy_proto protoreflect.FileDescriptor
