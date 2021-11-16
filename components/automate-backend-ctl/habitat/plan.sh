@@ -93,7 +93,7 @@ if test -n "\$DEBUG"; then set -x; fi
 export GEM_HOME="$GEM_HOME"
 export GEM_PATH="$GEM_PATH"
 unset RUBYOPT GEMRC
-exec $(pkg_path_for ruby26)/bin/ruby -I $pkg_prefix/lib ${bin}.real \$@
+exec $(pkg_path_for ruby30)/bin/ruby -I $pkg_prefix/lib ${bin}.real \$@
 EOF
   chmod -v 755 "$bin"
 }
