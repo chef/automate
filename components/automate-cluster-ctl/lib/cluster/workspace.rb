@@ -66,7 +66,7 @@ module AutomateCluster
       @source = Workspace.new(from)
     end
 
-    def clone(**opts)
+    def clone(opts = {})
       options = {
         copy_configs: false,
         copy_aibs: false,
@@ -250,7 +250,7 @@ module AutomateCluster
       end
     end
 
-    def sync_configs(**opts)
+    def sync_configs(opts = {})
       raise "No source set" unless source
 
       FileUtils.mkdir_p(workspace_path)

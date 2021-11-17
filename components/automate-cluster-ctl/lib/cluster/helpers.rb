@@ -56,7 +56,7 @@ module AutomateCluster
       File.join(workspace_path, 'terraform')
     end
 
-    def shellout!(cmd, **opts)
+    def shellout!(cmd, opts = {})
       opts[:environment] ||= {}
       opts[:environment]['HAB_LICENSE'] ||= 'accept-no-persist'
 
@@ -88,7 +88,7 @@ module AutomateCluster
       Mixlib::ShellOut.new(cmd, **opts)
     end
 
-    def run_make_cmd(cmd, **opts)
+    def run_make_cmd(cmd, opts = {})
       opts ||= {}
       opts[:cwd] ||= workspace_path
 
@@ -121,7 +121,7 @@ module AutomateCluster
       so
     end
 
-    def terraform_run(cmd, **opts)
+    def terraform_run(cmd, opts = {})
       opts ||= {}
       opts[:cwd] = terraform_path
       opts[:environment] ||= {}
