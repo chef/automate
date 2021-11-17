@@ -305,7 +305,7 @@ fallbacks:
     - name: core/ruby
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
-    - name: core/ruby26
+    - name: core/ruby30
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
     - name: core/cacerts
