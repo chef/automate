@@ -13,14 +13,14 @@ interface SessionSettings {
   idle_timeout_minutes?: number;
 }
 
-interface LcrSettings {
-  upgrade_lcr?: boolean;
+interface LargeReportingSettings {
+  enable_large_reporting?: boolean;
 }
 
 interface ConfigTypes {
   banner?: BannerConfigTypes;
   session_settings?: SessionSettings;
-  lcr?: LcrSettings;
+  large_reporting?: LargeReportingSettings;
 }
 
 const initialConfig = {
@@ -34,8 +34,8 @@ const initialConfig = {
       enable_idle_timeout: null,
       idle_timeout_minutes: null
     },
-    lcr: {
-      upgrade_lcr: null
+    large_reporting: {
+      enable_large_reporting: null
     }
 };
 
@@ -81,8 +81,8 @@ export class AppConfigService {
     return this.convertToHex(this.appConfig.banner.text_color);
   }
 
-  get isLcrEnabled(): boolean {
-    return this.appConfig.lcr.upgrade_lcr;
+  get isLargeReportingEnabled(): boolean {
+    return this.appConfig.large_reporting.enable_large_reporting;
   }
 
   private convertToHex(color: string): string {

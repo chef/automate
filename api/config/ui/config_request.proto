@@ -31,7 +31,7 @@ message ConfigRequest {
 			message CustomSettings {
 				Banner banner = 1;
 				SessionSettings session_settings = 2;
-				Lcr lcr = 3;
+				LargeReporting large_reporting = 3;
 			}
 
 			message Service {
@@ -87,8 +87,8 @@ message ConfigRequest {
 			google.protobuf.Int32Value idle_timeout_minutes = 2;
 		}
 
-		message Lcr {
-			google.protobuf.BoolValue upgrade_lcr = 1;
+		message LargeReporting {
+			google.protobuf.BoolValue enable_large_reporting = 1;
 		}
 	}
 }
