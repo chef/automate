@@ -195,6 +195,6 @@ export class NodeCredentialDetailsScreenComponent implements OnInit, OnDestroy {
   }
 
   checkError(field: string , type: any) {
-   return  ((type.get(field).hasError('required') || type.get(field).hasError('pattern')) && type.get(field).dirty) && type.get(field).value !== '';
+    return ((type.get(field).hasError('required') || type.get(field).hasError('pattern')) && type.get(field).dirty) && type.get(field).value !== '';
   }
 }
