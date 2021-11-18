@@ -133,7 +133,9 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       this.groupList = list;
     }
     this.searching = false;
-    this.searchArrayLength = this.groupList.length;
+    if (this.groupList !== undefined) {
+      this.searchArrayLength = this.groupList.length;
+    }
   }
 
   onChangePage($event: { page: number; pageOfItems: Array<any> }) {
