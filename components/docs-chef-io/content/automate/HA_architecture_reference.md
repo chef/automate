@@ -1,15 +1,15 @@
 +++
-title = "Chef Automate HA - Reference Architecture"
+title = "HA Reference Architecture"
 
 draft = true
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA - Reference Architecture"
-    parent = "automate/High_Availability"
-    identifier = "automate/reference/ha_architecture_reference.md HA - Reference Architecture"
-    weight = 20
+    title = "High Availability Reference Architecture"
+    parent = "automate/install"
+    identifier = "automate/install/ha_architecture_reference.md HA - Reference Architecture"
+    weight = 230
 +++
 
 ## Reference Architecture
@@ -74,6 +74,6 @@ Some customers already have basic network infrastructure with VMs, networks, loa
 
 As a AWS setup **Terraform** creates all components from scratch like VPC, EC2, Load Balancer if you choose bare infrastructure or on-premises reference architecture.
 
-If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture. 
+If you don't let **Terraform** create them, or the customer has already made those by themselves, or customers have on-premises servers, or the customers just want to configure Chef Automate HA (**automate**, **chef-server**, **elasticsearch**, **postgresql**) in those servers, and then the customer should choose existing_node reference architecture.
 
 You can also utilize **Terraform** script for this scenario; however, then this script only handles installing and configuring components and does not create instances on the cloud providers.

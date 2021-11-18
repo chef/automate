@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate HA Deployment"
+title = "HA Deployment"
 
 draft = true
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "HA - Reference Architecture"
-    parent = "automate/High_Availability"
-    identifier = "automate/reference/ha_deploy.md Chef Automate HA Deployment"
-    weight = 20
+    parent = "automate/install"
+    identifier = "automate/install/ha_deploy.md Chef Automate HA Deployment"
+    weight = 220
 +++
 
 !-- Chef gonna give storage calculator for customer to provide req and derive their infrastructure.. this calc will be loaded into the doc page??
@@ -58,14 +58,14 @@ Follow these steps to install **Chef Automate** utility on the fresh server.
 
 - Chef Automate Utility
 - Servers provisioned and accessible through SSH from each other.
-- List of Virtual Machines (VM) with public and private  numbers. Public IP address is not mandatory. 
-- Create the HAB user --how? 
+- List of Virtual Machines (VM) with public and private  numbers. Public IP address is not mandatory.
+- Create the HAB user --how?
 - Create following directories for all *Postgress* nodes using commands as listed:
 
-  - sudo mkdir -p /mnt/automate_backups/postgresql/pg_dump/ 
-  - sudo mkdir -p /mnt/automate_backups/postgresql/archive/ 
-  - sudo chown -R hab:hab /mnt/automate_backups/ 
-  
+  - sudo mkdir -p /mnt/automate_backups/postgresql/pg_dump/
+  - sudo mkdir -p /mnt/automate_backups/postgresql/archive/
+  - sudo chown -R hab:hab /mnt/automate_backups/
+
 - All VMs must expose the port 22 for SSH. Yoy may need to open certain port across the VMs to establish the communication, which are:
 
    | Component                                | Port                    |
@@ -74,8 +74,8 @@ Follow these steps to install **Chef Automate** utility on the fresh server.
    | Habitat gossip (UDP)                     |     9638                |
    | Habitat http API                         |     9631                |
    | PostgreSQL                               |     5432                |
-   | Pgleaderchk                              |     6432                | 
-   | HaProxy                                  |     7432                | 
+   | Pgleaderchk                              |     6432                |
+   | HaProxy                                  |     7432                |
    | Elasticsearch (https)                    |     9200                |
    | Elasticsearch (transport)                |     9300                |
    | Kibana                                   |     5601                |
@@ -89,7 +89,7 @@ Follow the steps below to deploy Chef Automate HA on-premise server or on existi
 
 {{< figure src="/images/automate/chef_automate_configtoml" alt="Chef Automate HA Default Configuration File">}}
 
-1. In `config.toml` file, specify on-premise IPs, list of IP address for the cluster separated by comma. 
+1. In `config.toml` file, specify on-premise IPs, list of IP address for the cluster separated by comma.
 
 1. In `config.toml` file, specify public IPs for the virtual machines. In case, you dont have them, provide private IPs. The `config.toml` configuration file generates with default settings.
 
