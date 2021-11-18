@@ -1,15 +1,15 @@
 +++
-title = "Chef Automate - High Availability"
+title = "HA Overview"
 
 draft = true
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "High Availability"
-    parent = "automate/High_Availability"
-    identifier = "automate/reference/high_availability.md High Availability"
-    weight = 50
+    title = "High Availability Overview"
+    parent = "automate/install"
+    identifier = "automate/install/high_availability.md High Availability"
+    weight = 200
 +++
 
 ## Introduction
