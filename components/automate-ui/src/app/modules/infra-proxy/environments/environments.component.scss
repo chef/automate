@@ -43,22 +43,20 @@ chef-table-new {
   }
 }
 
-chef-loading-spinner {
+chef-loading-spinner.spinner {
   display: block;
   margin: 100px auto;
   width: 100px;
   z-index: 199;
 }
 
+.wrapper {
+  position: relative;
+}
+
 .full-screen-spinner {
-  display: flex;
-  margin: auto;
-  margin-top: 239px;
-  background-color: $chef-white;
-  opacity: 0.7;
-  width: initial;
-  height: 110vh;
-  padding-bottom: 40vh;
+  margin: -34px;
+  margin-top: -20px;
 }
 
 .empty-section {

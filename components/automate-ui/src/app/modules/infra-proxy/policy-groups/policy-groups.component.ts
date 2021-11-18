@@ -39,6 +39,10 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public pageOfItems: Array<any>;
   public searchFlag: boolean;
   public policyGroups: Array<any>;
+  public currentPage = 1;
+  public per_page = 100;
+  public total: number;
+  public searchArrayLength: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -59,6 +63,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
         this.policyFiles = policyFilesState;
         this.groupList = this.policyFiles;
         this.policyGroupsListLoading = false;
+        this.total = this.policyFiles.length;
         this.filterDataGroupWise();
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyGroupsListLoading = false;
@@ -128,9 +133,18 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
       this.groupList = list;
     }
     this.searching = false;
+    if (this.groupList !== undefined) {
+      this.searchArrayLength = this.groupList.length;
+    }
   }
 
-  onChangePage(pageOfItems: Array<any>) {
-    this.pageOfItems = pageOfItems;
+  onChangePage($event: { page: number; pageOfItems: Array<any> }) {
+    this.pageOfItems = $event.pageOfItems;
+    this.currentPage = $event.page;
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.currentPage = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
   }
 }

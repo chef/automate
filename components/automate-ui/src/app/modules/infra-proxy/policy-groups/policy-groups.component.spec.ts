@@ -114,7 +114,7 @@ describe('PolicyGroupsComponent', () => {
       ], function (description: string, input: string) {
         it(('when the name ' + description), () => {
           component.searchPolicyFiles(input);
-          expect(component.policyFiles.length).toBe(0);
+          expect(component.searchArrayLength).toBe(undefined);
         });
       });
 
@@ -152,7 +152,7 @@ describe('PolicyGroupsComponent', () => {
       ], function (description: string, input: string) {
         it(('when the name only' + description), () => {
           component.searchPolicyFiles(input);
-          expect(component.policyFiles.length).toBe(0);
+          expect(component.searchArrayLength).toBe(undefined);
         });
       });
     });

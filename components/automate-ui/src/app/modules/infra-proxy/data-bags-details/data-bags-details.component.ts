@@ -41,10 +41,10 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   public dataBagsItemDetailsLoading = false;
   public selectedItemDetails: object;
   public activeClassName: string;
-  public searching = false;
+  public loading = false;
   public searchValue = '';
   public current_page = 1;
-  public per_page = 9;
+  public per_page = 100;
   public total: number;
   public dataBagItemToDelete: DataBagItems;
   public deleteModalVisible = false;
@@ -89,7 +89,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
         this.total = dataBagItemsState.total;
         this.appendActiveToItems(this.dataBagItems);
         this.dataBagsDetailsLoading = false;
-        this.searching = false;
+        this.loading = false;
         this.deleting = false;
       });
 
@@ -97,7 +97,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.dataBagItems &&
           this.dataBagItems.length === 0 &&
           this.current_page !== 1) {
@@ -171,11 +171,11 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   searchDataBagItems(currentText: string) {
-    this.searching = true;
+    this.loading = true;
     this.current_page = 1;
     this.searchValue = currentText;
     if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
-      this.searching = false;
+      this.loading = false;
       this.dataBagItems.length = 0;
       this.total = 0;
     } else {
@@ -184,7 +184,7 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: number): void {
-    this.searching = true;
+    this.loading = true;
     this.current_page = event;
     this.getDataBagItemsData();
   }
@@ -234,5 +234,12 @@ export class DataBagsDetailsComponent implements OnInit, OnDestroy {
 
   openDatabagItemModal(): void {
     this.openDataBagItemModal.emit();
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.current_page = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
+    this.loading = true;
+    this.getDataBagItemsData();
   }
 }

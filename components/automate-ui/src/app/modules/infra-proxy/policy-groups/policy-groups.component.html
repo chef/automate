@@ -8,6 +8,18 @@
         (searchButtonClick)="searchPolicyFiles($event)"
         placeHolder="policy groups by name...">
       </app-infra-search-bar>
+      <app-paginator *ngIf="!searchFlag && policyGroups.length"
+        [length]= "total"
+        [pageSize]= "per_page"
+        [pageIndex]= "currentPage"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
+      <app-paginator *ngIf="searchFlag && policyGroups.length"
+        [length]= "searchArrayLength"
+        [pageSize]= "per_page"
+        [pageIndex]= "currentPage"
+        (changePage)= "onUpdatePage($event)"
+      ></app-paginator>
     </div>
     <div data-cy="empty-list" class="empty-section" *ngIf="!groupList.length">
       <img alt="No preview" src="/assets/img/no_preview.gif" />
@@ -36,6 +48,8 @@
   <app-pagination
     *ngIf="searchFlag"
     [items]="groupList"
+    [pageSize]="per_page"
+    [pageIndex]="currentPage"
     class="policy-group-list-paging"
     label="name"
     (changePage)="onChangePage($event)">
@@ -43,6 +57,8 @@
   <app-pagination
     *ngIf="!searchFlag"
     [items]="policyGroups"
+    [pageSize]="per_page"
+    [pageIndex]="currentPage"
     class="policy-group-list-paging"
     label="name"
     (changePage)="onChangePage($event)">

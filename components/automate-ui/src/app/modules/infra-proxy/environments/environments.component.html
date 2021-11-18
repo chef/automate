@@ -1,5 +1,5 @@
 <section class="environments">
-  <chef-loading-spinner *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
+  <chef-loading-spinner class="spinner" *ngIf="environmentsListLoading" size="50"></chef-loading-spinner>
   <app-delete-infra-object-modal
     [visible]="deleteModalVisible"
     objectNoun="environment"
@@ -17,53 +17,61 @@
     [currentPage]="current_page">
   </app-create-environment-modal>
   <ng-container *ngIf="!environmentsListLoading && !authFailure">
-    <div class="search-create-container">
-      <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments by name..."></app-infra-search-bar>
-      <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
-    </div>
-    <chef-loading-spinner class="full-screen-spinner" *ngIf="searching || deleting" size="50" fixed></chef-loading-spinner>
-    <div *ngIf="!authFailure">
-      <div class="empty-section" *ngIf="!searching && !environments.length && current_page === 1">
-        <img alt="No preview" src="/assets/img/no_preview.gif" />
-        <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
-        <p *ngIf="searchValue === ''">No environment available.</p>
+    <div class="wrapper">
+      <div class="search-create-container">
+        <app-infra-search-bar (searchButtonClick)="searchEnvironment($event)" placeHolder="environments by name..."></app-infra-search-bar>
+        <app-paginator *ngIf="environments.length"
+          [length]= "total"
+          [pageSize]= "per_page"
+          [pageIndex]= "current_page"
+          (changePage)= "onUpdatePage($event)"
+        ></app-paginator>
+        <chef-button id="env-create" primary (click)="openCreateModal()">Create Environment</chef-button>
       </div>
+      <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || deleting" size="50" fixed></chef-loading-spinner>
+      <div *ngIf="!authFailure">
+        <div class="empty-section" *ngIf="!loading && !environments.length && current_page === 1">
+          <img alt="No preview" src="/assets/img/no_preview.gif" />
+          <p *ngIf="searchValue !== ''">No results found for "{{searchValue}}".</p>
+          <p *ngIf="searchValue === ''">No environment available.</p>
+        </div>
+      </div>
+      <chef-table *ngIf="environments.length">
+        <chef-thead>
+          <chef-tr class="no_border_tr">
+            <chef-th class="no_border_th">Name</chef-th>
+            <chef-th class="no_border_th">Description</chef-th>
+            <chef-th class="no_border_th"></chef-th>
+            <chef-th class="no_border_th"></chef-th>
+            <chef-th class="no_border_th three-dot-column"></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr *ngFor="let environment of environments">
+            <chef-td>
+              <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'environments', environment.name]">{{ environment.name }}</a>
+            </chef-td>
+            <chef-td>
+              {{ (environment.description.length &gt; 30)? (environment.description | slice:0:30)+'...' : environment.description }}
+            </chef-td>
+            <chef-td></chef-td>
+            <chef-td></chef-td>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu" id="menu-{{environment.id}}">
+                <mat-option data-cy="delete" (onSelectionChange)="startEnvironmentDelete(environment)">Delete</mat-option>
+              </mat-select>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+      <app-page-picker
+        *ngIf="!loading"
+        class="environment-list-paging"
+        [total]="total"
+        [perPage]="per_page"
+        [page]="current_page"
+        (pageChanged)="onPageChange($event)">
+      </app-page-picker>
     </div>
-    <chef-table *ngIf="environments.length">
-      <chef-thead>
-        <chef-tr class="no_border_tr">
-          <chef-th class="no_border_th">Name</chef-th>
-          <chef-th class="no_border_th">Description</chef-th>
-          <chef-th class="no_border_th"></chef-th>
-          <chef-th class="no_border_th"></chef-th>
-          <chef-th class="no_border_th three-dot-column"></chef-th>
-        </chef-tr>
-      </chef-thead>
-      <chef-tbody>
-        <chef-tr *ngFor="let environment of environments">
-          <chef-td>
-            <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'environments', environment.name]">{{ environment.name }}</a>
-          </chef-td>
-          <chef-td>
-            {{ (environment.description.length &gt; 30)? (environment.description | slice:0:30)+'...' : environment.description }}
-          </chef-td>
-          <chef-td></chef-td>
-          <chef-td></chef-td>
-          <chef-td class="three-dot-column">
-            <mat-select panelClass="chef-control-menu" id="menu-{{environment.id}}">
-              <mat-option data-cy="delete" (onSelectionChange)="startEnvironmentDelete(environment)">Delete</mat-option>
-            </mat-select>
-          </chef-td>
-        </chef-tr>
-      </chef-tbody>
-    </chef-table>
-    <app-page-picker
-      *ngIf="!searching"
-      class="environment-list-paging"
-      [total]="total"
-      [perPage]="per_page"
-      [page]="current_page"
-      (pageChanged)="onPageChange($event)">
-    </app-page-picker>
   </ng-container>
 </section>
