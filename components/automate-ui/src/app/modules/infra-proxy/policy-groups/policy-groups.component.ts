@@ -40,7 +40,7 @@ export class PolicyGroupsComponent implements OnInit, OnDestroy {
   public searchFlag: boolean;
   public policyGroups: Array<any>;
   public currentPage = 1;
-  public per_page = 1;
+  public per_page = 100;
   public total: number;
   public searchArrayLength: number;
 
