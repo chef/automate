@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate HA - System and Software Requirements"
+title = "HA Requirements"
 
 draft = true
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "HA - System and Software Requirements"
-    parent = "automate/High_Availability"
-    identifier = "automate/reference/ha_system_requirements.md HA System and Software Requirements"
-    weight = 40
+    parent = "automate/install"
+    identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
+    weight = 210
 +++
 
 ## System & Software Requirements
@@ -45,7 +45,7 @@ For **Elasticsearch** and **PostgresSQL**, a minimum of three node clusters is r
 
 Amazon VPC, a virtual network dedicated to your AWS account that enables you to launch AWS resources into a virtual network. This virtual network resembles a traditional network that you had operate in your own data center, with the benefits of using the scalable infrastructure of AWS.
 
-Amazon VPC is the networking layer for Amazon EC2. 
+Amazon VPC is the networking layer for Amazon EC2.
 
 Amazon Elastic Compute Cloud (Amazon EC2) provides scalable computing capacity in the Amazon Web Services (AWS) Cloud. Using Amazon EC2 eliminates your need to invest in hardware up front, so you can develop and deploy applications faster. You can use Amazon EC2 to launch as many or as few virtual servers as you need, configure security and networking, and manage storage. Amazon EC2 enables you to scale up or down to handle changes in requirements or spikes in popularity, reducing your need to forecast traffic.
 
