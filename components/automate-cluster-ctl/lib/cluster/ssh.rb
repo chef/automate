@@ -54,7 +54,7 @@ module AutomateCluster
   class SSHConnection
     attr_reader :ip, :options
 
-    def initialize(ip, **opts)
+    def initialize(ip, opts = {})
       @ip = ip
       @options = opts.merge({
         host: ip, port: 22, user: AutomateCluster::Config.ssh_user,
@@ -89,7 +89,7 @@ module AutomateCluster
       "HAB_LICENSE=accept-no-persist hab pkg exec core/curl curl"
     end
 
-    def curl_es(endpoint, **opts)
+    def curl_es(endpoint, opts = {})
       options = { host: 'localhost', port: 9200 }.merge(opts)
 
       cmd = [ curl_bin, '-s', File.join("http://#{options[:host]}:#{options[:port]}", endpoint) ]
@@ -122,7 +122,7 @@ module AutomateCluster
       end
     end
 
-    def run(cmd, **opts)
+    def run(cmd, opts = {})
       opts = { valid_exit_codes: [0] }.merge(opts)
       cmd = Array(cmd).flatten.compact.join(' ')
       result = connection.run_command cmd
