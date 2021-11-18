@@ -396,7 +396,10 @@
           "description": "External supporting documents for the control."
         },
         "tags": {
-          "type": "string",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
           "description": "Metadata defined on the control in key-value format."
         },
         "waived_str": {
