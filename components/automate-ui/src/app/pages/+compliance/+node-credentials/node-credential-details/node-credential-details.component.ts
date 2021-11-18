@@ -171,22 +171,22 @@ export class NodeCredentialDetailsScreenComponent implements OnInit, OnDestroy {
       this.nodeCredential = this.saveCred.getNodeCredentialCreate(data);
     }
     if (!this.checkError(
-        'password',
-        data.type === 'ssh' ? this.sshForms
-        : data.type === 'winrm' ? this.winrmForms
-        : this.sudoForms
+          'password',
+          data.type === 'ssh' ? this.sshForms
+          : data.type === 'winrm' ? this.winrmForms
+          : this.sudoForms
         ) || (!this.checkError(
-        'username',
-        data.type === 'ssh' ? this.sshForms
-        : data.type === 'winrm' ? this.winrmForms
-        : ''
-        ))) {
-          this.store.dispatch(new UpdateNodeCredential(this.nodeCredential));
-          if (data.type !== 'sudo') {
-            this.resetForm.controls[data.type]['controls']['username'].setValue('');
-          }
-          this.resetForm.controls[data.type]['controls']['password'].setValue('');
-        }
+          'username',
+          data.type === 'ssh' ? this.sshForms
+          : data.type === 'winrm' ? this.winrmForms
+          : ''
+    ))) {
+      this.store.dispatch(new UpdateNodeCredential(this.nodeCredential));
+      if (data.type !== 'sudo') {
+        this.resetForm.controls[data.type]['controls']['username'].setValue('');
+      }
+      this.resetForm.controls[data.type]['controls']['password'].setValue('');
+    }
 }
 
   ngOnDestroy() {
