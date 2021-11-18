@@ -7,8 +7,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Data Collection"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/data_collection.md Data Collection"
+    parent = "automate/configure"
+    identifier = "automate/configure/data_collection.md Data Collection"
     weight = 20
 +++
 

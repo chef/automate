@@ -6,10 +6,10 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Migrate from Chef Automate 1"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/migrate.md Migrate from Chef Automate 1"
-    weight = 60
+    title = "Migrate"
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/migrate.md Migrate from Chef Automate 1"
+    weight = 45
 +++
 
 Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported.

@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Backup"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/backup.md Backup"
-    weight = 70
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/backup.md Backup"
+    weight = 10
 +++
 
 Backups are crucial for protecting your data from catastrophic loss and preparing a recovery procedure.
