@@ -8,7 +8,7 @@
         (searchButtonClick)="searchPolicyFiles($event)"
         placeHolder="policy groups by name...">
       </app-infra-search-bar>
-      <app-paginator *ngIf="searchFlag && policyGroups.length"
+      <app-paginator *ngIf="!searchFlag && policyGroups.length"
         [length]= "total"
         [pageSize]= "per_page"
         [pageIndex]= "currentPage"
