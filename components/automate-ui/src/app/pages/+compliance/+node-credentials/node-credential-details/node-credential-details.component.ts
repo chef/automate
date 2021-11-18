@@ -171,15 +171,15 @@ export class NodeCredentialDetailsScreenComponent implements OnInit, OnDestroy {
       this.nodeCredential = this.saveCred.getNodeCredentialCreate(data);
     }
     if (!this.checkError(
-          'password',
-          data.type === 'ssh' ? this.sshForms
-          : data.type === 'winrm' ? this.winrmForms
-          : this.sudoForms
-        ) || (!this.checkError(
-          'username',
-          data.type === 'ssh' ? this.sshForms
-          : data.type === 'winrm' ? this.winrmForms
-          : ''
+        'password',
+        data.type === 'ssh' ? this.sshForms
+        : data.type === 'winrm' ? this.winrmForms
+        : this.sudoForms
+      ) || (!this.checkError(
+        'username',
+        data.type === 'ssh' ? this.sshForms
+        : data.type === 'winrm' ? this.winrmForms
+        : ''
     ))) {
       this.store.dispatch(new UpdateNodeCredential(this.nodeCredential));
       if (data.type !== 'sudo') {
