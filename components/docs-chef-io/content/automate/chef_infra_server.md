@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "Chef Infra Server"
     parent = "automate/infrastructure"
     identifier = "automate/infrastructure/chef_infra_server.md Chef Infra Server"
-    weight = 20
+    weight = 30
 +++
 
 ## Overview

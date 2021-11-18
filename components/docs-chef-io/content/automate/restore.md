@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Restore"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/restore.md Restore"
-    weight = 80
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/restore.md Restore"
+    weight = 70
 +++
 
 Restore Chef Automate from a [filesystem backup]({{< ref "restore.md#restore-from-a-filesystem-backup" >}}), an [Amazon S3 bucket backup]({{< ref "restore.md#restore-from-an-aws-s3-backup" >}}), or a [Google Cloud Storage (GCS) bucket backup]({{< ref "restore.md#restore-from-a-google-cloud-storage-backup" >}}).
