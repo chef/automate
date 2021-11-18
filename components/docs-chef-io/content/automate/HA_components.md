@@ -1,14 +1,14 @@
 +++
-title = "Chef Automate HA Components"
+title = "HA Glossary"
 
 draft = true
 
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "HA Components"
-    parent = "automate/High_Availability"
-    identifier = "automate/reference/ha_components.md HA Components"
+    title = "HA Glossary"
+    parent = "automate/install"
+    identifier = "automate/install/ha_components.md HA Components"
     weight = 30
 +++
 
