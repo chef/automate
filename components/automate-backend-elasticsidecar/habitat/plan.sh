@@ -9,7 +9,7 @@ pkg_version="0.1.0"
 pkg_upstream_url="http://github.com/chef/a2-ha-backend/components/automate-backend-elasticsidecar"
 pkg_deps=(
   core/bash
-  core/ruby26
+  core/ruby30
   chef/elasticsearch-odfe
 )
 pkg_build_deps=(

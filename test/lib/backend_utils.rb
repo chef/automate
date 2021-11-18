@@ -35,7 +35,7 @@ module BackendUtils
       @top_level_dir ||= File.expand_path(File.dirname(__FILE__) + '/../../')
     end
 
-    def run_command(cmd, **opts)
+    def run_command(cmd, opts = {})
       # this avoids forcing any pre-exising bundler settings on commands that are executed
       opts ||= {}
       opts[:environment] = {  HAB_LICENSE: 'accept-no-persist',
