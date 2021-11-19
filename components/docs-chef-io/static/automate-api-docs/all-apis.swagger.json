@@ -19,7 +19,7 @@
     },
     "license": {
       "name": "Apache 2.0",
-      "url": "https://github.com/chef/automate/blob/master/LICENSE"
+      "url": "https://github.com/chef/automate/blob/main/LICENSE"
     },
     "version": "version not set",
     "x-logo": {
