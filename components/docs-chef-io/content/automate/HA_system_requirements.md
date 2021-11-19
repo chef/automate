@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA System and Software Requirements"
     parent = "automate/install"
-    identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
+    identifier = "automate/install/HA_system_requirements.md HA System and Software Requirements"
     weight = 210
 +++
 
@@ -62,5 +62,5 @@ You require a minimum of three node clusters for ElaticSearcg and Postgres-sql i
 
 !--  Do we need to cover about firewall settings? https://github.com/chef/a2ha-docs/wiki/FireWall-Setting
 
-CIDR block —Classless Inter-Domain Routing. An internet protocol address allocation and route aggregation methodology. For more information, see Classless Inter-Domain Routing in Wikipedia.
-Subnet — A range of IP addresses in your VPC.
+CIDR block -Classless Inter-Domain Routing. An internet protocol address allocation and route aggregation methodology. For more information, see Classless Inter-Domain Routing in Wikipedia.
+Subnet - A range of IP addresses in your VPC.
