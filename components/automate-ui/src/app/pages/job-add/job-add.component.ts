@@ -61,8 +61,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public total: number;
   public scrollCalled = false;
   public loadMore = false;
-  public firstTime = true;
-  public firstTimeOninit = true;
+  public notFirstTime = false;
   public managersList: any;
   public managersArray: any;
   public fieldCounter = 0;
@@ -141,6 +140,9 @@ export class JobAddComponent implements OnDestroy , OnInit {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
             this.counter++;
+          if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
+            this.fieldCounter = this.fieldCounter + 1;
+          }
           }
         }
       });
@@ -153,10 +155,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  public firstCalled(flag: boolean) {
-     this.firstTime = flag;
   }
 
   public setupForm() {
@@ -214,13 +212,14 @@ export class JobAddComponent implements OnDestroy , OnInit {
       .subscribe(managers => {
         this.nodeManagerArray = managers;
         this.managersArray = nodesGroup.controls['managers'] as FormArray;
-        if (this.firstTime) {
+        if (this.notFirstTime) {
+          this.managersList = [...this.managersList, ...managers];
+          this.notFirstTime = false;
+        } else {
           this.managersArray.clear();
           this.pagenumber = 1;
           this.managersList = managers;
-          this.firstTime = false;
-        } else {
-          this.managersList = [...this.managersList, ...managers];
+
         }
         this.managersList.forEach((manager, i) => {
           const managerId = manager.id;
@@ -432,6 +431,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   }
 
   onLoadFunc(data) {
+    this.notFirstTime = true;
     this.loadMore = false;
     let payload = {};
     this.searchName = data.search;

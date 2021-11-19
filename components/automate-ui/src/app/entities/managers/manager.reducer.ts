@@ -52,9 +52,9 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
-      managerEntityAdapter.removeAll(state);
+      let state1 = managerEntityAdapter.removeAll(state);
       // tslint:disable-next-line: no-shadowed-variable
-      const counter = set('counter', 0 , state);
+      const counter = set('counter', 0 , state1);
       const totalCount = set('total', action.payload.total, counter);
       // tslint:disable-next-line: no-shadowed-variable
       const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount);
