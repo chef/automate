@@ -83,6 +83,7 @@ type V1 struct {
 	Disclosure      *Disclosure              `protobuf:"bytes,8,opt,name=disclosure,proto3" json:"disclosure,omitempty" toml:"disclosure,omitempty" mapstructure:"disclosure,omitempty"`
 	Banner          *Banner                  `protobuf:"bytes,9,opt,name=banner,proto3" json:"banner,omitempty" toml:"banner,omitempty" mapstructure:"banner,omitempty"`
 	SessionSettings *SessionSettings         `protobuf:"bytes,10,opt,name=session_settings,json=sessionSettings,proto3" json:"session_settings,omitempty" toml:"session_settings,omitempty" mapstructure:"session_settings,omitempty"`
+	LargeReporting  *LargeReporting          `protobuf:"bytes,11,opt,name=large_reporting,json=largeReporting,proto3" json:"large_reporting,omitempty" toml:"large_reporting,omitempty" mapstructure:"large_reporting,omitempty"`
 }
 
 func (x *V1) Reset() {
@@ -183,6 +184,13 @@ func (x *V1) GetBanner() *Banner {
 func (x *V1) GetSessionSettings() *SessionSettings {
 	if x != nil {
 		return x.SessionSettings
+	}
+	return nil
+}
+
+func (x *V1) GetLargeReporting() *LargeReporting {
+	if x != nil {
+		return x.LargeReporting
 	}
 	return nil
 }
@@ -692,6 +700,53 @@ func (x *SessionSettings) GetIdleTimeoutMinutes() *wrapperspb.Int32Value {
 	return nil
 }
 
+type LargeReporting struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	EnableLargeReporting *wrappers.BoolValue `protobuf:"bytes,1,opt,name=enable_large_reporting,json=enableLargeReporting,proto3" json:"enable_large_reporting,omitempty" toml:"enable_large_reporting,omitempty" mapstructure:"enable_large_reporting,omitempty"`
+}
+
+func (x *LargeReporting) Reset() {
+	*x = LargeReporting{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_config_shared_global_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LargeReporting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LargeReporting) ProtoMessage() {}
+
+func (x *LargeReporting) ProtoReflect() protoreflect.Message {
+	mi := &file_config_shared_global_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LargeReporting.ProtoReflect.Descriptor instead.
+func (*LargeReporting) Descriptor() ([]byte, []int) {
+	return file_config_shared_global_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *LargeReporting) GetEnableLargeReporting() *wrappers.BoolValue {
+	if x != nil {
+		return x.EnableLargeReporting
+	}
+	return nil
+}
+
 type External_Elasticsearch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -707,7 +762,7 @@ type External_Elasticsearch struct {
 func (x *External_Elasticsearch) Reset() {
 	*x = External_Elasticsearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_shared_global_proto_msgTypes[10]
+		mi := &file_config_shared_global_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -720,7 +775,7 @@ func (x *External_Elasticsearch) String() string {
 func (*External_Elasticsearch) ProtoMessage() {}
 
 func (x *External_Elasticsearch) ProtoReflect() protoreflect.Message {
-	mi := &file_config_shared_global_proto_msgTypes[10]
+	mi := &file_config_shared_global_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3585,7 +3640,7 @@ var file_config_shared_global_proto_rawDesc = []byte{
 	0x67, 0x12, 0x2e, 0x0a, 0x02, 0x76, 0x31, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e,
 	0x63, 0x68, 0x65, 0x66, 0x2e, 0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2e, 0x69, 0x6e,
 	0x66, 0x72, 0x61, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x56, 0x31, 0x52, 0x02, 0x76,
-	0x31, 0x22, 0x8b, 0x05, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x30, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e,
+	0x31, 0x22, 0xe0, 0x05, 0x0a, 0x02, 0x56, 0x31, 0x12, 0x30, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56,
 	0x61, 0x6c, 0x75, 0x65, 0x52, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x12, 0x34, 0x0a, 0x04, 0x6d, 0x6c,
@@ -4837,7 +4892,7 @@ func file_config_shared_global_proto_init() {
 			}
 		}
 		file_config_shared_global_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*External_Elasticsearch); i {
+			switch v := v.(*LargeReporting); i {
 			case 0:
 				return &v.state
 			case 1:
