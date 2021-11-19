@@ -7,6 +7,7 @@ import * as moment from 'moment/moment';
 import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
 import { ReportQuery } from './report-query.service';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 const CC_API_URL = environment.compliance_url;
 
@@ -32,7 +33,8 @@ export class ReportCollection {
 export class StatsService {
   constructor(
     private httpClient: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private appConfigService: AppConfigService
   ) {}
 
   getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
@@ -216,8 +218,12 @@ export class StatsService {
   }
 
   downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
-    // const url = `${CC_API_URL}/reporting/export`; // use it if LCR is disabled
-    const url = `${CC_API_URL}/reporting/reportmanager/export`;
+    let url = '';
+    if (this.appConfigService.isLargeReportingEnabled) {
+      url = `${CC_API_URL}/reporting/reportmanager/export`; // download Ack API
+    } else {
+      url = `${CC_API_URL}/reporting/export`; // direct download
+    }
 
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
