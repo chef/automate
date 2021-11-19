@@ -1,15 +1,16 @@
 +++
-title = "HA Commands"
+title = "HA Troubleshooting"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
-    title = "High Availability"
+    title = "HA Troubleshooting"
     parent = "automate/install"
-    identifier = "automate/install/high_availability.md High Availability"
-    weight = 250
+    identifier = "automate/install/HA_troubleshoot.md Troubleshooting"
+    weight = 100
 +++
 
 o	df -h
