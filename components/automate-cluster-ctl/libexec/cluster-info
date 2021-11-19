@@ -39,7 +39,9 @@ class AutomateClusterInfo < AutomateCluster::Command
     puts table.render(:basic,
                       multiline: true,
                       padding: [0,0,0,0],
-                      alignments: [:right, :left])
+                      alignments: [:right, :left],
+                      column_widths: 200,
+                      resize: true)
   end
 end
 

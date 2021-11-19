@@ -35,7 +35,7 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	if err != nil {
 		return err
 	}
-	err = executeSecretsInitCommand(a.config.Architecture.ConfigInitials.SecretsStoreFile)
+	err = executeSecretsInitCommand(a.config.Architecture.ConfigInitials.SecretsKeyFile)
 	if err != nil {
 		return err
 	}

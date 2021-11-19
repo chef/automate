@@ -17,8 +17,8 @@ Usage:
 func newTestCmd() *cobra.Command {
 	var testCmd = &cobra.Command{
 		Use:   "test",
-		Short: "Run automate HA smoke tests",
-		Long:  "Run smoke test for automate HA services.",
+		Short: "Run Automate HA smoke tests",
+		Long:  "Run smoke test for Automate HA services.",
 		Args:  cobra.RangeArgs(0, 1),
 		RunE:  runTestCmd,
 	}
