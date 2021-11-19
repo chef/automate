@@ -19,6 +19,7 @@ message V1 {
   Disclosure disclosure = 8;
   Banner banner = 9;
   SessionSettings session_settings = 10;
+  LargeReporting large_reporting = 11;
 }
 
 message External {
@@ -255,4 +256,8 @@ message Banner {
 message SessionSettings {
   google.protobuf.BoolValue enable_idle_timeout = 1;
   google.protobuf.Int32Value idle_timeout_minutes = 2;
+}
+
+message LargeReporting {
+	google.protobuf.BoolValue enable_large_reporting = 1;
 }
