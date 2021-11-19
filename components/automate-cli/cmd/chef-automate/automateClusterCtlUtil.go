@@ -18,8 +18,6 @@ import (
 	"github.com/hpcloud/tail"
 )
 
-const logFileSize int64 = 0
-
 func executeAutomateClusterCtlCommand(command string, args []string, helpDocs string) error {
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
@@ -91,7 +89,10 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
 	executed := make(chan struct{})
 	go tailFile(logFilePath, executed)
-	c.Process.Wait()
+	_, err = c.Process.Wait()
+	if err != nil {
+		return err
+	}
 	time.Sleep(5 * time.Second)
 	close(executed)
 	return err
@@ -110,7 +111,7 @@ func tailFile(logFilePath string, executed chan struct{}) {
 		select {
 		case <-executed:
 			writer.Println("Exiting as execution process completed")
-			t.Stop()
+			_ = t.Stop()
 			return
 		case line := <-t.Lines:
 			if spinning {
@@ -207,12 +208,4 @@ func executeShellCommand(command string, args []string) error {
 	}
 	writer.Printf("%s command execution done, exiting\n", command)
 	return err
-}
-
-func getFileSize(path string) int64 {
-	if checkIfFileExist(path) {
-		info, _ := os.Stat(path)
-		return info.Size()
-	}
-	return 0
 }
