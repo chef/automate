@@ -29,27 +29,27 @@ see_also:
 - external-cert - Manage Chef Automate's external certificate
 - gather-logs - Gather system diagnostics and logs
 - iam - Chef Automate iam commands
-- info - InFo about automate HA
+- info - Info about Automate HA
 - infrastructure - Chef Automate infrastructure
 - init-config - Initialize default config
-- init-config-ha - Initialize default config for HA
+- init-config-ha - Initialize default config for Automate HA
 - internal-ca - Manage Chef Automate's internal certificate authority
 - license - Chef Automate license management
 - maintenance - Put Chef Automate into or out of maintenance mode
 - migrate-from-v1 - Migrate from Chef Automate v1
 - migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
 - preflight-check - Perform preflight check
-- provision-infra - Provison automate HA infra.
+- provision-infra - Provision Automate HA infra.
 - restart-services - restart deployment services
-- secrets - set secrets to automate HA
+- secrets - Set secrets to Automate HA
 - service-versions - Retrieve the versions of the individual Chef Automate services
-- ssh - ssh into automate HA servers
+- ssh - SSH into Automate HA servers
 - start - Start Chef Automate
 - status - Retrieve Chef Automate status
 - stop - Stop deployment
 - system-logs - Tail Chef Automate logs
-- test - Run automate HA smoke tests
+- test - Run Automate HA smoke tests
 - uninstall - Uninstall Chef Automate
 - upgrade - upgrade automate to the latest version
 - version - Show CLI version
-- workspace - set workspace env for automate HA.
+- workspace - Set workspace env for Automate HA.

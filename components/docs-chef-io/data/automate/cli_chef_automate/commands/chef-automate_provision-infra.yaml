@@ -1,7 +1,7 @@
 name: chef-automate provision-infra
-synopsis: Provison automate HA infra.
+synopsis: Provision Automate HA infra.
 usage: chef-automate provision-infra [flags]
-description: Provison automate HA infra for automate HA deployment.
+description: Provision infra for Automate HA deployment.
 options:
 - name: channel
   usage: Release channel to deploy all services from
