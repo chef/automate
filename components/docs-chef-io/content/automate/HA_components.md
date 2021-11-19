@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Glossary"
     parent = "automate/install"
-    identifier = "automate/install/ha_components.md HA Components"
+    identifier = "automate/install/HA_components.md HA Components"
     weight = 230
 +++
 

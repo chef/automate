@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Troubleshooting"
     parent = "automate/install"
     identifier = "automate/install/HA_troubleshoot.md Troubleshooting"
-    weight = 100
+    weight = 290
 +++
 
 o	df -h

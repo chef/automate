@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Bastion Setup"
     parent = "automate/install"
-    identifier = "automate/install/ha_bastion_setup.md HA Bastion Setup"
+    identifier = "automate/install/HA_bastion_setup.md HA Bastion Setup"
     weight = 240
 +++
 
@@ -123,13 +123,13 @@ Specify appropriate security groups or create a security group for the bastion h
 This will open up the port 22 which is usually used with SSH.
 Select a source, which is done to ensure that relevant people (who have access to add their IPs) have access to the Bastion host.
 The security groups of the current instances have to be changed to make sure that inbound SSH (if any) can be accessed through the Bastion Host's IP address only.
-The local ~/.ssh/config file has to be edited to reflect the bastion host name, username, and a ‘Yes' value for the ForwardAgent field. This is used to set up the SSH forwarding via the local machine to the bastion host so that the file used to access the EC2 instance is made available only when the user tries to connect to one of the servers.
+The local ~/.ssh/config file has to be edited to reflect the bastion host name, username, and a 'Yes' value for the ForwardAgent field. This is used to set up the SSH forwarding via the local machine to the bastion host so that the file used to access the EC2 instance is made available only when the user tries to connect to one of the servers.
 Username refers to the person who has the rights to login to the server. Hostname refers to the IP address of the bastion host.
-This makes sure that the user can SSH into the Bastion server by just typing ‘ssh bastion' from the command line interface.
+This makes sure that the user can SSH into the Bastion server by just typing 'ssh bastion' from the command line interface.
 Bastion Host needs to be accessed with the help of SSH. into an existing server instance, and this way, a much tighter security would be built into the servers, by making these servers accessible only through a Bastion host.
 Copy any available VPC ID from aws web portal
 Navigate to the Subnet option from the Virtual Private Cloud menu of the AWS console.
-Note down the unique Ipv4 CIDR field in the subnet section. We need to derive a value for ‘aws_cidr_block_addr'.
+Note down the unique Ipv4 CIDR field in the subnet section. We need to derive a value for 'aws_cidr_block_addr'.
 
 Follow the below approach to do so
 
@@ -141,7 +141,7 @@ Subnet field: iI your vpc IPv4 CIDR block is 172.31.0.0/16 then just add plus 2 
 
 IP Address: Write down 172.31.0.0 from 172.31.0.0/16 from IPv4 CIDR block and press calculate.
 
-From the results, note the available Network Address field as a value for ‘aws_cidr_block_addr= ‘ field.
+From the results, note the available Network Address field as a value for 'aws_cidr_block_addr= ' field.
 
 Specify CIDR
 
