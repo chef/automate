@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Reference Architecture"
+    title = "HA Deploy"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy.md Chef Automate HA Deployment"
+    identifier = "automate/install/HA_deploy.md Chef Automate HA Deployment"
     weight = 220
 +++
 

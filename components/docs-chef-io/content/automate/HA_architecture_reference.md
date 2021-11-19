@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Reference Architecture"
     parent = "automate/install"
-    identifier = "automate/install/ha_architecture_reference.md HA Reference Architecture"
+    identifier = "automate/install/HA_architecture_reference.md HA Reference Architecture"
     weight = 230
 +++
 
