@@ -1,15 +1,16 @@
 +++
 title = "HA Glossary"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
     title = "HA Glossary"
     parent = "automate/install"
     identifier = "automate/install/ha_components.md HA Components"
-    weight = 30
+    weight = 230
 +++
 
 ## A2HA Components -- need to clarify and browse for more description

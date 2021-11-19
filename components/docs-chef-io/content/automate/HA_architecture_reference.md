@@ -1,14 +1,15 @@
 +++
 title = "HA Reference Architecture"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
-    title = "High Availability Reference Architecture"
+    title = "HA Reference Architecture"
     parent = "automate/install"
-    identifier = "automate/install/ha_architecture_reference.md HA - Reference Architecture"
+    identifier = "automate/install/ha_architecture_reference.md HA Reference Architecture"
     weight = 230
 +++
 

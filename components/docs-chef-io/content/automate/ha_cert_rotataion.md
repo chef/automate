@@ -1,12 +1,13 @@
 +++
 title = "HA Certificate Rotation"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
-    title = "HA - Certificate Rotation"
+    title = "HA Certificate Rotation"
     parent = "automate/install"
     identifier = "automate/install/ha_cert_rotataion.md Chef Automate Certificate Rotation"
     weight = 260
