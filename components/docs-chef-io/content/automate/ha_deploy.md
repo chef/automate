@@ -117,11 +117,11 @@ in config.toml: - I coudnt succeed
 
 1. Type the command, `./chef-automate deploy` and press **Enter**. This command installs the latest deployment package and deploys (by provisioning with terraform) airgap bundles on the created infrastructure.
 
-1. Type the command, `./scripts/credentials set postgresql –auto` and press **Enter**. This command rotates the credentials for Postgresql.
+1. Type the command, `./scripts/credentials set postgresql -auto` and press **Enter**. This command rotates the credentials for Postgresql.
 
-1. Type the command, `./scripts/credentials set elasticsearch –auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
+1. Type the command, `./scripts/credentials set elasticsearch -auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
 
-1. Type the command, `chef-automate test –full` and press **Enter**. This command runs smoke tests on the setup. ??
+1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup. ??
 
 ## Deployment Procedure on AWS Cloud
 
@@ -160,11 +160,11 @@ Setup the secrets management key and any needed passwords. The default location 
 
 1. Type the command, `cd /hab/a2_deploy_workspace` and press **Enter**. This command sets up the initial workspace directory and changes the working directory to Chef Automate workspace configured.
 
-1. Type the command, `./scripts/credentials set postgresql –auto` and press **Enter**. This command rotates the credentials for Postgresql.
+1. Type the command, `./scripts/credentials set postgresql -auto` and press **Enter**. This command rotates the credentials for Postgresql.
 
-1. Type the command, `./scripts/credentials set elasticsearch –auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
+1. Type the command, `./scripts/credentials set elasticsearch -auto` and press **Enter**. This command rotates the credentials for ElasticSearch.
 
-1. Type the command, `chef-automate test –full` and press **Enter**. This command runs smoke tests on the setup. ??
+1. Type the command, `chef-automate test -full` and press **Enter**. This command runs smoke tests on the setup. ??
 
 ## Uninstall
 
@@ -176,7 +176,7 @@ Follow these steps to delete the *Terraform* and *HA Deployment Infrastructure*:
 
 1. Type the command, `rm -rf /hab/a2_deploy_workspace` and press **Enter**.
 
-(Optional) Create a uid/gid for hab user Habitat will automatically set a uid and gid for the hab user. If you need to override this, you can set uid/gid as per your requirements. If you don’t want to set this option, then leave it blank:
+(Optional) Create a uid/gid for hab user Habitat will automatically set a uid and gid for the hab user. If you need to override this, you can set uid/gid as per your requirements. If you don't want to set this option, then leave it blank:
 
 habitat_uid_gid=""
 

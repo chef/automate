@@ -37,8 +37,8 @@ Virtual machine is required for either of the Chef Automate High Availability (H
 - Memory: Minimum of 100GB
 - SSH: VPC to Port 22, publicly accessible
 -
-- VPC Services – of all regions – region in which you are supposed to create the infrastructure. Select the available VPC or create a new one.Which will have CIDR block and Ips available. AWS account has limit of 20 VPCs per region.  no 2 VPCs can communicate directly
-- Port 22 is mandatory? Once the basing system is ready, trigger the deployment. These are all AWS specific reqs – port 22 is a std port for SSh
+- VPC Services - of all regions - region in which you are supposed to create the infrastructure. Select the available VPC or create a new one.Which will have CIDR block and Ips available. AWS account has limit of 20 VPCs per region.  no 2 VPCs can communicate directly
+- Port 22 is mandatory? Once the basing system is ready, trigger the deployment. These are all AWS specific reqs - port 22 is a std port for SSh
 
 - Certificates
 - Key Pairs
@@ -71,7 +71,7 @@ For windows systems, the private key file is required to obtain the password use
 
 Configuring hosts for logging
 
-Back at the AWS Console under EC2 → Instances you should now see your fresh bastion server running.
+Back at the AWS Console under **EC2 > Instances** you should now see your fresh bastion server running.
 If you click into the white space under Name, you will see a little pencil icon appear. Click the pencil and spcify your host a more appropriate name, and then click the checkmark icon.
 From the buttons near the top of the screen, click Connect, and you will be shown a help window with instructions on using SSH to connect to your new bastion server
 SSH into the private instance
@@ -121,14 +121,14 @@ Harden the OS, which basically refers to increasing the security which has been 
 Specify appropriate security groups or create a security group for the bastion host.
 This will open up the port 22 which is usually used with SSH.
 Select a source, which is done to ensure that relevant people (who have access to add their IPs) have access to the Bastion host.
-The security groups of the current instances have to be changed to make sure that inbound SSH (if any) can be accessed through the Bastion Host’s IP address only.
-The local ~/.ssh/config file has to be edited to reflect the bastion host name, username, and a ‘Yes’ value for the ForwardAgent field. This is used to set up the SSH forwarding via the local machine to the bastion host so that the file used to access the EC2 instance is made available only when the user tries to connect to one of the servers.
+The security groups of the current instances have to be changed to make sure that inbound SSH (if any) can be accessed through the Bastion Host's IP address only.
+The local ~/.ssh/config file has to be edited to reflect the bastion host name, username, and a ‘Yes' value for the ForwardAgent field. This is used to set up the SSH forwarding via the local machine to the bastion host so that the file used to access the EC2 instance is made available only when the user tries to connect to one of the servers.
 Username refers to the person who has the rights to login to the server. Hostname refers to the IP address of the bastion host.
-This makes sure that the user can SSH into the Bastion server by just typing ‘ssh bastion’ from the command line interface.
+This makes sure that the user can SSH into the Bastion server by just typing ‘ssh bastion' from the command line interface.
 Bastion Host needs to be accessed with the help of SSH. into an existing server instance, and this way, a much tighter security would be built into the servers, by making these servers accessible only through a Bastion host.
 Copy any available VPC ID from aws web portal
 Navigate to the Subnet option from the Virtual Private Cloud menu of the AWS console.
-Note down the unique Ipv4 CIDR field in the subnet section. We need to derive a value for ‘aws_cidr_block_addr’.
+Note down the unique Ipv4 CIDR field in the subnet section. We need to derive a value for ‘aws_cidr_block_addr'.
 
 Follow the below approach to do so
 
