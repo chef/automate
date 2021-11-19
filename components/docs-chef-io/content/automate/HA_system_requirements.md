@@ -1,12 +1,13 @@
 +++
 title = "HA Requirements"
 
-draft = true
+draft = false
 
 gh_repo = "automate"
+
 [menu]
   [menu.automate]
-    title = "HA - System and Software Requirements"
+    title = "HA System and Software Requirements"
     parent = "automate/install"
     identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
     weight = 210
