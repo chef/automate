@@ -49,10 +49,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   public roleListState: { items: InfraRole[], total: number };
   public rolesListLoading = true;
   public authFailure = false;
-  public searching = false;
+  public loading = false;
   public searchValue = '';
   public currentPage = 1;
-  public per_page = 10;
+  public per_page = 100;
   public total: number;
   public roleToDelete: InfraRole;
   public deleteModalVisible = false;
@@ -80,7 +80,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
         this.roles = RolesState?.items;
         this.total = RolesState?.total;
         this.rolesListLoading = false;
-        this.searching = false;
+        this.loading = false;
         this.deleting = false;
       } else if (getRolesSt === EntityStatus.loadingFailure) {
         this.rolesListLoading = false;
@@ -91,7 +91,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
       filter(status => status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => {
-        this.searching = true;
+        this.loading = true;
         if (this.roles && this.roles.length === 0 &&
           this.currentPage !== 1) {
             this.currentPage = this.currentPage - 1;
@@ -102,10 +102,10 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   searchRoles(currentText: string) {
     this.currentPage = 1;
-    this.searching = true;
+    this.loading = true;
     this.searchValue = currentText;
     if ( currentText !== ''  && !Regex.patterns.NO_WILDCARD_ALLOW_HYPHEN.test(currentText)) {
-      this.searching = false;
+      this.loading = false;
       this.roles.length = 0;
       this.total = 0;
     } else {
@@ -115,7 +115,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
 
   onPageChange(event: number): void {
     this.currentPage = event;
-    this.searching = true;
+    this.loading = true;
     this.getRolesData();
   }
 
@@ -187,6 +187,7 @@ export class InfraRolesComponent implements OnInit, OnDestroy {
   onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
     this.currentPage = $event.pageIndex + 1;
     this.per_page = $event.pageSize;
+    this.loading = true;
     this.getRolesData();
   }
 }

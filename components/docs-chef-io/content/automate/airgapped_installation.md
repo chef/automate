@@ -7,10 +7,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Airgapped Installation"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/airgapped_installation.md Airgapped Installation"
-    weight = 40
+    title = "Install Airgapped"
+    parent = "automate/install"
+    identifier = "automate/install/airgapped_installation.md Airgapped Installation"
+    weight = 20
 +++
 
 ## Overview

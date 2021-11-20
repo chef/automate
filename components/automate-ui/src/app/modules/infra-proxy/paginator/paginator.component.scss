@@ -50,4 +50,14 @@
 ::ng-deep .mat-select-panel.mat-primary[aria-label="Items per page:"] {
   margin-top: 15px;
   width: 200px;
+  border-bottom: 1px solid $chef-grey;
+
+  .mat-option {
+    border-bottom: 1px solid $chef-grey;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+  }
 }

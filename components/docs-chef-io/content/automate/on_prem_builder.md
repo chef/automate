@@ -1,5 +1,5 @@
 +++
-title = "Install Chef Habitat Builder On-prem"
+title = "Install Chef Automate with Chef Habitat Builder On-prem"
 
 date = 2019-11-19T14:10:15-08:00
 
@@ -9,10 +9,10 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "Install Chef Habitat Builder On-prem"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/on_prem_builder.md Install Chef Habitat Builder On-prem"
-    weight = 50
+    title = "Install Habitat Builder On-prem"
+    parent = "automate/install"
+    identifier = "automate/install/on_prem_builder.md Install Chef Habitat Builder On-prem"
+    weight = 40
 +++
 
 This guide details how to install Chef Automate and deploy Chef Habitat Builder on-prem together. Enterprise customers may wish to set up an on-premises Chef Habitat Builder depot to store Chef Habitat packages for use by their own Chef Habitat Studios and Supervisors.

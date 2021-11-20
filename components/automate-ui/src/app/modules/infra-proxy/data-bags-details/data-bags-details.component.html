@@ -9,7 +9,7 @@
         (deleteClicked)="deleteDataBagItem()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
-      <chef-loading-spinner *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
+      <chef-loading-spinner class="spinner" *ngIf="dataBagsDetailsLoading" size="50" fixed></chef-loading-spinner>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Infra Servers</chef-breadcrumb>
         <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Organizations</chef-breadcrumb>
@@ -47,11 +47,17 @@
         <div class="search-create-container">
           <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items by name...">
           </app-infra-search-bar>
+          <app-paginator *ngIf="dataBagItems"
+            [length]= "total"
+            [pageSize]= "per_page"
+            [pageIndex]= "current_page"
+            (changePage)= "onUpdatePage($event)"
+          ></app-paginator>
           <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
         </div>
         <div class="section-container" *ngIf="dataBagItems">
-          <chef-loading-spinner *ngIf="searching || deleting" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
-          <div class="empty-section" *ngIf="!searching && !dataBagItems.length">
+          <chef-loading-spinner *ngIf="loading || deleting" size="50" fixed class="full-screen-spinner"></chef-loading-spinner>
+          <div class="empty-section" *ngIf="!loading && !dataBagItems.length">
             <img alt="No preview" src="/assets/img/no_preview.gif" />
             <p *ngIf="searchValue === ''">No data bag items available</p>
             <p *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
@@ -109,7 +115,7 @@
             (refreshData)="refreshData($event)">
           </app-edit-data-bag-item-modal>
           <app-page-picker
-            *ngIf="!searching"
+            *ngIf="!loading"
             class="item-list-paging"
             [total]="total"
             [perPage]="per_page"

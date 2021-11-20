@@ -378,7 +378,7 @@
     "/api/v0/cfgmgmt/nodes": {
       "get": {
         "summary": "List Checked-in Nodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
+        "description": "Returns a list of infra nodes that have checked in to Automate.\nAdding a filter makes a list of all nodes that meet the filter criteria.\nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nMax return payload size is 4MB, use pagination to fetch remaining data.\n\nExample:\n```\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n```\n\nAuthorization Action:\n```\ninfra:nodes:list\n```",
         "operationId": "ConfigMgmt_GetNodes",
         "responses": {
           "200": {

@@ -39,6 +39,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public policyfileToDelete: PolicyFile;
   public deleteModalVisible = false;
   public deleting = false;
+  public currentPage = 1;
+  public per_page = 100;
+  public total: number;
+  public searchArraylength: number;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -59,6 +63,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
         this.policyFiles = allPolicyFilesState;
         this.policyFilesListLoading = false;
         this.deleting = false;
+        this.total = this.policyFiles.length;
       } else if (getPolicyFilesSt === EntityStatus.loadingFailure) {
         this.policyFilesListLoading = false;
         this.authFailure = true;
@@ -86,9 +91,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
     this.resetKeyRedirection.emit(resetLink);
   }
 
-  onChangePage(pageOfItems: Array<any>) {
+  onChangePage($event: { page: number; pageOfItems: Array<any> }) {
     // update current page of items
-    this.pageOfItems = pageOfItems;
+    this.pageOfItems = $event.pageOfItems;
+    this.currentPage = $event.page;
   }
 
   ngOnDestroy(): void {
@@ -110,6 +116,7 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
       });
     }
     this.searching = false;
+    this.searchArraylength = this.searchArr.length;
   }
 
   public startpolicyFilesDelete(policyFile: PolicyFile): void {
@@ -128,5 +135,10 @@ export class PolicyFilesComponent implements OnInit, OnDestroy {
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
     this.deleting = false;
+  }
+
+  onUpdatePage($event: { pageIndex: number; pageSize: number; }) {
+    this.currentPage = $event.pageIndex + 1;
+    this.per_page = $event.pageSize;
   }
 }

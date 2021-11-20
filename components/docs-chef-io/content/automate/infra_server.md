@@ -8,9 +8,9 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Install Chef Infra Server With Automate"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/infra_server.md Install Chef Infra Server With Automate"
+    title = "Install Chef Infra Server"
+    parent = "automate/install"
+    identifier = "automate/install/infra_server.md Install Chef Infra Server With Automate"
     weight = 60
 +++
 

@@ -7,10 +7,10 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Monitoring Chef Automate"
-    parent = "automate/reference"
-    identifier = "automate/reference/monitoring.md Monitoring Chef Automate"
-    weight = 30
+    title = "Monitoring"
+    parent = "automate/configuring_automate"
+    identifier = "automate/configuring_automate/monitoring.md Monitoring Chef Automate"
+    weight = 50
 +++
 
 Use the authenticated https endpoint `/status` to monitor your Chef Automate installation.
@@ -30,7 +30,7 @@ The status of a service can be `OK`, `UNKNOWN`, or `CRITICAL`, and is reflected 
           {
           "service": "deployment-service",
           "status": "OK"
-        },  
+        },
         {
           "service": "config-mgmt-service",
           "status": "UNKNOWN"

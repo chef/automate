@@ -7,9 +7,8 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Telemetry"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/telemetry.md Telemetry"
-    weight = 50
+    parent = "automate/configure"
+    identifier = "automate/configure/telemetry.md Telemetry"
 +++
 
 ### About Telemetry

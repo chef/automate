@@ -24,7 +24,7 @@ import {
   ReportingSummaryStatus
 } from '../shared/reporting';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { saveAs } from 'file-saver';
+ import { saveAs } from 'file-saver';
 import {
   Chicklet,
   ReportingFilterTypes

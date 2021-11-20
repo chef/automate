@@ -8,9 +8,9 @@ gh_repo = "automate"
 [menu]
   [menu.automate]
     title = "Install Guide"
-    parent = "automate/getting_started"
-    identifier = "automate/getting_started/install.md Install Guide"
-    weight = 30
+    parent = "automate/install"
+    identifier = "automate/install/install.md Install Guide"
+    weight = 10
 +++
 
 Before beginning your installation, check the [System Requirements]({{< relref "system_requirements.md" >}}) for Chef Automate.

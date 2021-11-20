@@ -24,15 +24,17 @@ chef-loading-spinner {
       chef-loading-spinner {
         display: flex;
         margin: auto;
+        margin-top: -20px;
         background-color: $chef-white;
         opacity: 0.7;
-        height: 136vh;
         padding-bottom: 40vh;
-        width: calc(100% + 10px);
-        margin-top: -20px;
-        position: absolute;
+        position: fixed;
+        z-index: 999;
+        height: 100%;
+        width: 100%;
+        overflow: show;
         top: 0;
-        left: -35px;
+        left: 0;
         bottom: 0;
         right: 0;
       }

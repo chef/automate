@@ -20,7 +20,7 @@ chef-loading-spinner {
   }
 
   .item-details {
-    chef-loading-spinner {
+    chef-loading-spinner.spinner {
       display: flex;
       margin: auto auto;
       width: 100%;
@@ -232,14 +232,8 @@ tbody > .detail-row {
 }
 
 .full-screen-spinner {
-  display: flex;
-  margin: auto;
-  margin-top: 188px;
-  background-color: $chef-white;
-  opacity: 0.7;
-  width: initial;
-  height: 110vh;
-  padding-bottom: 40vh;
+  margin: -34px;
+  margin-top: -20px;
 }
 
 .right-button-box {
@@ -253,5 +247,6 @@ tbody > .detail-row {
 .dataBagItems {
   .page-body {
     padding: 0 25px 30px;
+    position: relative;
   }
 }

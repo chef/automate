@@ -1,5 +1,5 @@
 +++
-title = "Configuration"
+title = "Configuration Overview"
 
 date = 2018-05-08T18:54:09+00:00
 draft = false
@@ -7,9 +7,9 @@ draft = false
 gh_repo = "automate"
 [menu]
   [menu.automate]
-    title = "Configuration"
-    parent = "automate/configuring_automate"
-    identifier = "automate/configuring_automate/configuration.md Configuration"
+    title = "Overview"
+    parent = "automate/configure"
+    identifier = "automate/configure/configuration.md Configuration"
     weight = 10
 +++
 
@@ -483,9 +483,9 @@ Configuration to display a disclosure on the sign-in page. Requires a `.txt` or 
     # Validate your HTML at https://validator.w3.org/
 ```
 
-### Content Security Policy Header  
-Content-Security-Policy is the name of a HTTP response header that modern browsers use to enhance the security of the document (or web page).  
-The Content-Security-Policy header allows you to restrict how resources such as JavaScript, CSS, or pretty much anything that the browser loads.  
+### Content Security Policy Header
+Content-Security-Policy is the name of a HTTP response header that modern browsers use to enhance the security of the document (or web page).
+The Content-Security-Policy header allows you to restrict how resources such as JavaScript, CSS, or pretty much anything that the browser loads.
 
 Refer: https://owasp.org/www-community/controls/Content_Security_Policy
 
@@ -497,9 +497,9 @@ Content Security Policy header can be enabled in Automate by patching the follow
 ```
 
 
-{{< warning >}}  
-Enabling CSP header may break the SAML login.  
-This may happen if the IDP Login page has inline javascripts which CSP header prevents from getting evaluated by default.  
+{{< warning >}}
+Enabling CSP header may break the SAML login.
+This may happen if the IDP Login page has inline javascripts which CSP header prevents from getting evaluated by default.
 {{< /warning >}}
 
 ### Troubleshooting
