@@ -58,8 +58,7 @@ docker_run_1() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "/go/src/github.com/chef/automate:/go/src/github.com/chef/automate"
-            "--workdir" "/go/src/github.com/chef/automate"
+            "--volume" "/go/src/github.com/chef/automate:/go"
     )
 
     if [ -n "$SERVICES_CONFIG_PATH" ]; then
