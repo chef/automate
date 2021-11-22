@@ -30,7 +30,7 @@ pipelines:
   - verify_private:
       description: Pull Request validation tests requiring access keys
   - habitat/build:
-      description: Build the Habitat packages for Chef Automate ................1am
+      description: Build the Habitat packages for Chef Automate
   - nightly:
       description: Nightly tests against main
       definition: .expeditor/nightly.pipeline.yml
@@ -122,24 +122,27 @@ subscriptions:
   # When the habitat/build pipeline fails, unlock the staging area
   - workload: buildkite_build_failed:{{agent_id}}:habitat/build:*
     actions:
+      - bash:.expeditor/update_habitat.sh:
+          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
-      - bash:.expeditor/update_habitat.sh:
   # When the habitat/build pipeline completes successfully, unlock the staging area
   - workload: buildkite_build_passed:{{agent_id}}:habitat/build:*
     actions:
+      - bash:.expeditor/update_habitat.sh:
+          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
-      - bash:.expeditor/update_habitat.sh:
   # When the habitat/build pipeline is canceled, unlock the staging area
   - workload: buildkite_build_canceled:{{agent_id}}:habitat/build:*
     actions:
+      - bash:.expeditor/update_habitat.sh:
+          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
-      - bash:.expeditor/update_habitat.sh:
   # These actions are taken, in order they are specified, after the Habitat packages are successfully built
   - workload: buildkite_hab_build_group_published:{{agent_id}}:*
     actions:
