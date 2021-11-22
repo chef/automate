@@ -10,9 +10,9 @@ fi
 
 # Get latest version by retrieving and parsing the manifest for the
 # target version.
-TARGET_VERSION=${TARGET_VERSION:-"latest"}
+TARGET_VERSION="latest"
 MANIFEST_URL="http://packages.chef.io/files/stable/habitat/$TARGET_VERSION/manifest.json"
-
+echo "MANIFEST_URL: " $MANIFEST_URL
 MANIFEST=$(curl --silent "$MANIFEST_URL")
 PACKAGES=$(jq -r '.packages | ."x86_64-linux"[]' <<< "$MANIFEST")
 
