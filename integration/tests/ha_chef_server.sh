@@ -96,7 +96,7 @@ do_deploy() {
     pwd
     ls
     docker_run_1 "${_frontend1_container_name}"
-    docker_run_1 "${_frontend2_container_name}"
+    # docker_run_1 "${_frontend2_container_name}"
     echo "========PWD======\n"
     docker exec -t "$_frontend1_container_name" \
         "pwd"
@@ -108,11 +108,11 @@ do_deploy() {
     echo "========RUN======\n"
     docker exec -t "$_frontend1_container_name" \
         "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
-    docker exec -t "$_frontend2_container_name" \
-        "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
+#    docker exec -t "$_frontend2_container_name" \
+#        "${PWD}/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
 
     frontend1_ip=$(container_ip "$_frontend1_container_name")
-    frontend2_ip=$(container_ip "$_frontend2_container_name")
+#    frontend2_ip=$(container_ip "$_frontend2_container_name")
 
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
@@ -127,17 +127,17 @@ do_deploy() {
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
-    docker exec -t "$_frontend2_container_name" \
-        "$cli_bin" deploy config.toml \
-            --product chef-server \
-            --hartifacts "$test_hartifacts_path" \
-            --override-origin "$HAB_ORIGIN" \
-            --manifest-dir "$test_manifest_path" \
-            --admin-password chefautomate \
-            --bootstrap-bundle bootstrap.abb \
-            --accept-terms-and-mlsa
-
-    "$cli_bin" bootstrap bundle unpack bootstrap.abb
+#    docker exec -t "$_frontend2_container_name" \
+#        "$cli_bin" deploy config.toml \
+#            --product chef-server \
+#            --hartifacts "$test_hartifacts_path" \
+#            --override-origin "$HAB_ORIGIN" \
+#            --manifest-dir "$test_manifest_path" \
+#            --admin-password chefautomate \
+#            --bootstrap-bundle bootstrap.abb \
+#            --accept-terms-and-mlsa
+#
+#    "$cli_bin" bootstrap bundle unpack bootstrap.abb
 
     start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 
