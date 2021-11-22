@@ -47,6 +47,12 @@
         <div class="search-create-container">
           <app-infra-search-bar (searchButtonClick)="searchDataBagItems($event)" placeHolder="data bag items by name...">
           </app-infra-search-bar>
+          <app-paginator *ngIf="dataBagItems"
+            [length]= "total"
+            [pageSize]= "per_page"
+            [pageIndex]= "current_page"
+            (changePage)= "onUpdatePage($event)"
+          ></app-paginator>
           <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}', 'post', [serverId, orgId, dataBagName]]">
             <chef-button primary (click)="openDatabagItemModal()">Create Item</chef-button>
           </app-authorized>
