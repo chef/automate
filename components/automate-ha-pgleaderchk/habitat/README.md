@@ -22,7 +22,7 @@ This pkg expects to bind to PostgreSQL as `database` in order to use `port`, `su
 
 example:
 ```bash
-hab svc load chef/automate-backend-pgleaderchk --bind database:automate-backend-postgresql.default
+hab svc load chef/automate-ha-pgleaderchk --bind database:automate-ha-postgresql.default
 ```
 
 ## Topologies

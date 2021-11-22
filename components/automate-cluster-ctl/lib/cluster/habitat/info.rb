@@ -38,7 +38,7 @@ module AutomateCluster
         census = nil
         ssh = AutomateCluster::SSH.new
         ssh.connections(service: service) do |type, conn|
-          service_name = "automate-backend-#{service}"
+          service_name = "automate-ha-#{service}"
           data = conn.curl_hab("/services/#{service_name}/default")
           health = conn.curl_hab("/services/#{service_name}/default/health")
           member_id = data.dig("sys", "member_id")
