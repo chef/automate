@@ -24,7 +24,7 @@ import {
   ReportingSummaryStatus
 } from '../shared/reporting';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-// import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 import {
   Chicklet,
   ReportingFilterTypes
@@ -37,6 +37,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { AckDownloadReports } from 'app/entities/download-reports/download-reports.actions';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
+import { AppConfigService } from 'app/services/app-config/app-config.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -196,8 +197,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
     public reportData: ReportDataService,
     private route: ActivatedRoute,
     private layoutFacade: LayoutFacadeService,
-    private store: Store<NgrxStateAtom>
-  ) { }
+    private store: Store<NgrxStateAtom>,
+    private appConfigService: AppConfigService
+  ) {}
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
@@ -288,16 +290,18 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
     const onNext = data => {
-      this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
-      this.store.dispatch(new CreateNotification({
+      if (this.appConfigService.isLargeReportingEnabled) {
+        this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
+        this.store.dispatch(new CreateNotification({
         type: Type.info,
         message: 'Download request is submitted. You will get notification once it is ready for download.'
-      }));
-      /* if LCR is disabled then
-      const types = { 'json': 'application/json', 'csv': 'text/csv' };
-      const type = types[format];
-      const blob = new Blob([data], { type });
-      saveAs(blob, filename);*/
+        }));
+      } else {
+        const types = { 'json': 'application/json', 'csv': 'text/csv' };
+        const type = types[format];
+        const blob = new Blob([data], { type });
+        saveAs(blob, filename);
+      }
       this.hideDownloadStatus();
     };
 
