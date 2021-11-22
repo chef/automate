@@ -58,7 +58,6 @@ docker_run_1() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "/go/src/github.com/chef/automate:/go"
     )
 
     if [ -n "$SERVICES_CONFIG_PATH" ]; then
@@ -78,6 +77,9 @@ docker_run_1() {
             "--label" "buildkitejob=$BUILDKITE_JOB_ID"
         )
     fi
+    docker_run_args+=(
+        "--volume" "/go/src/github.com/chef/automate:/go"
+    )
 
     echo "${docker_run_args[*]}"
 
