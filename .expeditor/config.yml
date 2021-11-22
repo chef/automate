@@ -31,9 +31,6 @@ pipelines:
       description: Pull Request validation tests requiring access keys
   - habitat/build:
       description: Build the Habitat packages for Chef Automate
-      actions:
-      - bash:.expeditor/update_habitat.sh:
-          post_commit: false
   - nightly:
       description: Nightly tests against main
       definition: .expeditor/nightly.pipeline.yml
@@ -110,7 +107,9 @@ subscriptions:
             - components/automate-cli/pkg/status/error_codes.go
             - components/automate-cli/Makefile
             - .expeditor/generate-automate-cli-docs.sh
-      - bash:.expeditor/generate-automate-api-docs.sh:
+      - bash:
+          .expeditor/update_habitat.sh:
+          .expeditor/generate-automate-api-docs.sh:
           post_commit: false
           only_if_modified:
             - api/external/**/*.swagger.json
