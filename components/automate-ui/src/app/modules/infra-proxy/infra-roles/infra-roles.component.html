@@ -27,6 +27,12 @@
           (searchButtonClick)="searchRoles($event)"
           placeHolder="roles by name...">
         </app-infra-search-bar>
+        <app-paginator *ngIf="roles.length"
+          [length]= "total"
+          [pageSize]= "per_page"
+          [pageIndex]= "currentPage"
+          (changePage)= "onUpdatePage($event)"
+        ></app-paginator>
         <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'post', [serverId, orgId]]">
           <chef-button
             id="role-create"
@@ -39,11 +45,11 @@
       </div>
       <chef-loading-spinner
         class="full-screen-spinner"
-        *ngIf="searching || deleting"
+        *ngIf="loading || deleting"
         size="50"
         fixed>
       </chef-loading-spinner>
-      <div data-cy="empty-list" class="empty-section" *ngIf="!searching && !roles.length">
+      <div data-cy="empty-list" class="empty-section" *ngIf="!loading && !roles.length">
         <img alt="No preview" src="/assets/img/no_preview.gif" />
         <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
         <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
@@ -83,17 +89,7 @@
           </chef-tbody>
         </chef-table>
       </div>
-    </app-authorized>
-
-    <app-page-picker
-      *ngIf="!searching"
-      class="roles-list-paging"
-      [total]="total"
-      [perPage]="per_page"
-      [page]="currentPage"
-      (pageChanged)="onPageChange($event)">
-    </app-page-picker>
-
+      </app-authorized>
       <app-page-picker
         *ngIf="!loading"
         class="roles-list-paging"
