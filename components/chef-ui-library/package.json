@@ -46,7 +46,7 @@
     "@types/jest": "^24.0.16",
     "@types/node": "^12.6.8",
     "@types/puppeteer": "^1.12.4",
-    "highlight.js": ">=10.4.1",
+    "highlight.js": "^10.4.1",
     "jest": "^24.8.0",
     "jest-cli": "^24.8.0",
     "kind-of": "^6.0.3",
