@@ -23,8 +23,7 @@ class PackageQuerier
     def initialize(data={})
       @origin= data["origin"]
       @name = data["name"]
-      # @version = data["version"]
-      @version = 1.6.420
+      @version = data["version"]
       @release = data["release"]
       @source = data["source"] || "unknown source"
     end
