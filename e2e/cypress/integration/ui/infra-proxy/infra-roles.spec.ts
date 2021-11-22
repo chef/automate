@@ -149,7 +149,7 @@ describe('infra role', () => {
         });
       });
 
-      it('can change page and load data according to page', () => {
+      xit('can change page and load data according to page', () => {
         const page = 3;
         cy.get('[data-cy=roles-table-container] chef-th').contains('Name');
         cy.get('[data-cy=roles-table-container] chef-th').contains('Description');

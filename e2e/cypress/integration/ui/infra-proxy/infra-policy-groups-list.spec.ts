@@ -167,7 +167,7 @@ describe('infra policy groups', () => {
         getPolicyGroups().then((response) => {
           if (checkResponse(response)) {
             const groupCount = filterPolicyGroup(policies);
-            if (groupCount > 9 &&
+            if (groupCount > 100 &&
               cy.get('.policy-group-list-paging .page-picker-item').contains('3')) {
               cy.get('.policy-file-paging .page-picker-item').contains('3').click();
             }
