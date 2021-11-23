@@ -259,3 +259,60 @@ chef-subheading {
 #download-modal {
   text-align: center;
 }
+
+.reporting-download-side-panel {
+  
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+  
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+  
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+      word-break: break-all;
+    }
+  }
+
+  .side-panel-body {
+     font-size: 14px;
+     background: $chef-white;
+
+     .header-text h3 {
+      font-size: 20px !important;
+     }
+
+     .table-header {
+      font-size: 16px;
+     }
+
+    .failed-status {
+      color: $status-error
+    }
+
+    .running-status {
+      color: $chef-dark-grey
+    }
+
+    .success-status {
+      color: $chef-primary-bright
+    }
+
+    .error-message {
+      white-space: nowrap; 
+      max-width: 30px; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+  }
+  
+}

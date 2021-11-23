@@ -38,6 +38,7 @@ import { AckDownloadReports } from 'app/entities/download-reports/download-repor
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { DownloadReportsService } from 'app/entities/download-reports/download-reports.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -182,6 +183,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   showSummary = false;
 
+  showOpenReport = false;
+
   private suggestionSearchTerms = new Subject<
     { 'type': string, 'text': string, 'type_key': string }>();
 
@@ -198,7 +201,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
-    private appConfigService: AppConfigService
+    private appConfigService: AppConfigService,
+    public downloadReportsService: DownloadReportsService
   ) {}
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
@@ -290,7 +294,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
     const onNext = data => {
-      if (this.appConfigService.isLargeReportingEnabled) {
+      if (true || this.appConfigService.isLargeReportingEnabled) {
         this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
         this.store.dispatch(new CreateNotification({
         type: Type.info,
@@ -304,6 +308,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }
       this.hideDownloadStatus();
     };
+
+    console.log(this.downloadReportsService);
 
     this.downloadList = [filename];
     this.showDownloadStatus();
@@ -322,6 +328,14 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.downloadStatusVisible = false;
     this.downloadInProgress = false;
     this.downloadFailed = false;
+  }
+
+  onReportOpenClick() {
+    this.showOpenReport = true;
+  }
+
+  onReportCloseClick() {
+    this.showOpenReport = false;
   }
 
   onEndDateChanged(event) {

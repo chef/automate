@@ -219,7 +219,7 @@ export class StatsService {
 
   downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
     let url = '';
-    if (this.appConfigService.isLargeReportingEnabled) {
+    if (true || this.appConfigService.isLargeReportingEnabled) {
       url = `${CC_API_URL}/reporting/reportmanager/export`; // download Ack API
     } else {
       url = `${CC_API_URL}/reporting/export`; // direct download
@@ -269,6 +269,24 @@ export class StatsService {
     // In some cases, controls don't have results data.  In these
     // cases we want to display those controls as passed
     return 'passed';
+  }
+
+  getSingleReport(reportID: string, reportQuery: ReportQuery): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const body = { filters: formatted };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
+        data.profiles.forEach(p => {
+          p.controls.forEach(c => {
+            // precalculate overall control status from results
+            c.results = c.results || [];
+            c.status = this.getControlStatus(c);
+          });
+        });
+        return omitBy(data, isNil);
+      }));
   }
 
   private checkIfWaived(waivedStatus: string): boolean {
