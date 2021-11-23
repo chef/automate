@@ -124,13 +124,13 @@ export class JobAddComponent implements OnDestroy , OnInit {
       this.nodeManagerArray.forEach((manager) => {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotalFields) {
-            console.log('Res val in fields', res[manager.id]);
             this.fieldCounter++;
           }
         }
       });
       if (this.nodeManagerArray.length === this.nodeCount &&
         this.counter + this.fieldCounter === this.fieldCount ) {
+        console.log('search feilds count', this.counter,  this.fieldCounter);
         this.loadMore = true;
       }
     });
@@ -141,9 +141,10 @@ export class JobAddComponent implements OnDestroy , OnInit {
     ).subscribe(res => {
       this.counter = 0;
       this.nodeManagerArray.forEach((manager) => {
+        // console.log("res value", res, manager.id)
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
-            console.log('Res val in nodes', res[manager.id]);
+            console.log("res value", res[manager.id], manager.id);
             this.counter++;
             if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
               this.fieldCounter = this.fieldCounter + 1;
@@ -153,6 +154,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
       });
       if (this.nodeManagerArray.length === this.nodeCount &&
         this.counter + this.fieldCounter === this.fieldCount ) {
+        console.log('search nodes count', this.counter,  this.fieldCounter);
         this.loadMore = true;
       }
     });
@@ -163,6 +165,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
     this.isDestroyed.complete();
   }
 
+  
+  public earlierManagers: Manager[] = [];
   public setupForm() {
     const nodesGroup = this.fb.group({
       managers: this.fb.array([])
@@ -265,21 +269,25 @@ export class JobAddComponent implements OnDestroy , OnInit {
 
           this.managersArray.setControl(i, managerGroup);
 
-          this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
+          if (!this.earlierManagers.includes(manager)) {
 
-          switch (manager.type) {
-            case ('automate'): {
-              this.store.dispatch(new ManagerSearchFields({managerId, field: 'name'}));
-              this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
-              break;
+            this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
+
+            switch (manager.type) {
+              case ('automate'): {
+                this.store.dispatch(new ManagerSearchFields({managerId, field: 'name'}));
+                this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
+                break;
+              }
+              case ('aws-ec2'):
+              case ('azure-vm'):
+              case ('azure-api'): {
+                this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));
+                this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
+                break;
+              }
             }
-            case ('aws-ec2'):
-            case ('azure-vm'):
-            case ('azure-api'): {
-              this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));
-              this.store.dispatch(new ManagerSearchFields({managerId, field: 'tags'}));
-              break;
-            }
+
           }
         });
       });
@@ -437,6 +445,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
   }
 
   onLoadFunc(data) {
+    this.counter = 0;
+    this.fieldCounter = 0;
     this.notFirstTime = true;
     this.loadMore = false;
     let payload = {};

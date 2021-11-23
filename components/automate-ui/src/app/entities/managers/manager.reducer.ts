@@ -52,9 +52,9 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
-      managerEntityAdapter.removeAll(state);
+      // managerEntityAdapter.removeAll(state);
       // tslint:disable-next-line: no-shadowed-variable
-      const counter = set('counter', 0 , state);
+      const counter = set('counter', 0 , managerEntityAdapter.removeAll(state));
       const totalCount = set('total', action.payload.total, counter);
       // tslint:disable-next-line: no-shadowed-variable
       const searchstatus = set('searchstatus', EntityStatus.loadingSuccess, totalCount);
@@ -84,8 +84,9 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.ALL_NODES_FAILURE: {
+      console.log("inside search nodes failure");
       const {managerId} = action.payload;
-      return set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
+      return set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
     }
 
     case ManagerActionTypes.GET_NODES: {
@@ -120,18 +121,14 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
 
     case ManagerActionTypes.ALL_NODES: {
       const {managerId} = action.payload;
-      return set(`nodesByManager.${managerId}.loadingAllTotal`, true, state);
+      return set(`nodesByManager.${managerId}.loadingAllTotal`, true,
+        set(`nodesByManager.${managerId}.allTotal`, 0, state));
     }
 
     case ManagerActionTypes.ALL_NODES_SUCCESS: {
       const {managerId, total} = action.payload;
       const nodestatus = set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
       return set(`nodesByManager.${managerId}.allTotal`, total, nodestatus);
-    }
-
-    case ManagerActionTypes.ALL_NODES_FAILURE: {
-      const {managerId} = action.payload;
-      return set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
     }
 
     case ManagerActionTypes.GET: {
@@ -145,7 +142,6 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
 
     case ManagerActionTypes.GET_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
-
 
     case ManagerActionTypes.CREATE:
       return set('status', EntityStatus.loading, state);

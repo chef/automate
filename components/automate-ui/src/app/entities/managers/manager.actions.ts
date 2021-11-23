@@ -121,6 +121,11 @@ export interface ManagerSearchNodesSuccessPayload {
   nodes: any[];
   total: number;
 }
+
+export interface ManagerSearchNodesFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerSearchNodesSuccess implements Action {
   readonly type = ManagerActionTypes.SEARCH_NODES_SUCCESS;
   constructor(public payload: ManagerSearchNodesSuccessPayload) {}
@@ -128,7 +133,7 @@ export class ManagerSearchNodesSuccess implements Action {
 
 export class ManagerSearchNodesFailure implements Action {
   readonly type = ManagerActionTypes.SEARCH_NODES_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerSearchNodesFailurePayload) {}
 }
 
 export interface ManagerAllNodesPayload {

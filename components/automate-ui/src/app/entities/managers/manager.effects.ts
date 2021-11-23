@@ -213,7 +213,7 @@ export class ManagerEffects {
               map((resp: ManagerSearchNodesResponse) =>
                    new ManagerSearchNodesSuccess(Object.assign(resp, action.payload))),
               catchError((error: HttpErrorResponse) =>
-                     of(new ManagerSearchNodesFailure(error)))))));
+                     of(new ManagerSearchNodesFailure({...action.payload, error})))))));
 
   managerSearchNodesFailure$ = createEffect(() =>
     this.actions$.pipe(
