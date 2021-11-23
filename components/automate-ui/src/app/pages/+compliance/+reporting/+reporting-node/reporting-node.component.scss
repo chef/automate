@@ -612,6 +612,13 @@ dl.waiver-details {
   padding: 1em;
 }
 
-.reporting-controls-paging {
-  margin: 0 35px 35px;
+.wrapper {
+  height: 500px;
+  overflow-y: scroll;
+}
+
+::ng-deep .wrapper::-webkit-scrollbar {
+  width: 5px;
+  // background: $chef-cyan-blue;
+  border-radius: 5px;
 }

@@ -271,23 +271,19 @@ export class StatsService {
       }));
   }
 
-  getControlsList(reportID: string, reportQuery: ReportQuery, pageIndex): Observable<any> {
+  getControlsList(reportID: string, reportQuery: ReportQuery, pageIndex: number, perPage: number): Observable<any> {
     const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);
     const pagevalue = (pageIndex - 1);
     const pageParam = [
       ...formatted,
       {'type': 'from', 'values': [`${pagevalue}`]},
-      {'type': 'size', 'values': ['100']}
+      {'type': 'size', 'values': [`${perPage}`]}
     ];
     const body = { filters: pageParam };
 
     return this.httpClient.post<any>(url, body).pipe(
       map((data) => {
-        // data.control_elements.forEach(c => {
-        //     // precalculate overall control status from results
-        //     c.results = c.results || [];
-        // });
         return omitBy(data, isNil);
       }));
   }

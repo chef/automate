@@ -38,7 +38,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   openControls = {};
   controlList: any = {};
   pageIndex = 1;
-  perPage = 100;
+  perPage = 10;
+  controlsLoading = false;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -87,64 +88,64 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  onReportItemClick(_event, report) {
+  onReportItemClick(_event: any, report: any) {
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
 
     this.setActiveReport(report);
   }
 
-  onHistoryOpenClick(_event) {
+  onHistoryOpenClick(_event: any) {
     this.showScanHistory = true;
   }
 
-  onHistoryCloseClick(_event) {
+  onHistoryCloseClick(_event: any) {
     this.showScanHistory = false;
   }
 
-  onHistoryFilterClick(_event, status) {
+  onHistoryFilterClick(_event: any, status: string) {
     this.activeReportStatus = status;
   }
 
-  onFilterControlStatusClick(_event, status) {
+  onFilterControlStatusClick(_event: any, status: string) {
     this.activeStatusFilter = status;
   }
 
-  onViewSourceClick(_event, control) {
+  onViewSourceClick(_event: any, control: { showMetaData: boolean; }) {
     control.showMetaData = !control.showMetaData;
   }
 
-  filteredReports(reports, status) {
+  filteredReports(reports: any[], status: string) {
     if (status === 'all') {
       return reports;
     }
 
-    return reports.filter(r => r.status === status);
+    return reports.filter((r: { status: any; }) => r.status === status);
   }
 
-  filteredProfiles(profiles, status) {
-    return profiles.filter(p => {
+  filteredProfiles(profiles: any[], status: string) {
+    return profiles.filter((p: { controls: any; }) => {
       return this.filteredControls(p.controls, status).length > 0;
     });
   }
 
-  filteredControls(controls, status) {
-    return controls.filter(c => status === 'all' || c.status === status);
+  filteredControls(controls: any[], status: string) {
+    return controls.filter((c: { status: any; }) => status === 'all' || c.status === status);
   }
 
-  profilesByStatus(profiles, status) {
-    return profiles.filter(p => p.status === status);
+  profilesByStatus(profiles: any[], status: string) {
+    return profiles.filter((p: { status: any; }) => p.status === status);
   }
 
-  isHistoryFilterSelected(status): boolean {
+  isHistoryFilterSelected(status: string): boolean {
     return this.activeReportStatus === status;
   }
 
-  isReportSelected(report): boolean {
+  isReportSelected(report: { id: any; }): boolean {
     return this.activeReport.id === report.id;
   }
 
-  isControlStatusSelected(status): boolean {
+  isControlStatusSelected(status: string): boolean {
     return this.activeStatusFilter === status;
   }
 
@@ -152,21 +153,21 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.openControls[id] && this.openControls[id].open;
   }
 
-  toggleControl(control) {
+  toggleControl(control: { id: string | number; }) {
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
   }
 
-  openControlPane(control) {
+  openControlPane(control: { id: string | number; }) {
     return this.openControls[control.id].pane;
   }
 
-  showControlPane(control, pane) {
+  showControlPane(control: { id: string | number; }, pane: any) {
     this.openControls[control.id].pane = pane;
   }
 
-  statusIcon(status) {
+  statusIcon(status: any) {
     switch (status) {
       case ('failed'):
         return 'report_problem';
@@ -189,12 +190,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return 'minor';
   }
 
-  formatDuration(duration) {
+  formatDuration(duration: moment.DurationInputArg1) {
     const d = moment.duration(duration);
     return d.humanize();
   }
 
-  formatDaysAgo(timestamp) {
+  formatDaysAgo(timestamp: moment.MomentInput) {
     return moment(timestamp).fromNow();
   }
 
@@ -217,13 +218,20 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   getControlData(report: any) {
+    this.controlsLoading = true;
     const reportQuery = this.reportQueryService.getReportQueryForReport(report);
-    this.statsService.getControlsList(report.id, reportQuery, this.pageIndex)
+    this.statsService.getControlsList(report.id, reportQuery, this.pageIndex, this.perPage)
     .pipe(first())
     .subscribe(data => {
-      this.reportLoading = false;
+      this.reportLoading = false;      
       this.layoutFacade.ShowPageLoading(false);
-      this.controlList = Object.assign(data);
+      if (this.pageIndex === 1) {
+        this.controlList = Object.assign(data);
+      } else {
+        this.controlList.control_elements.push(...data.control_elements);
+      }
+      this.pageIndex++;
+      this.controlsLoading = false;
     });
   }
 
@@ -250,9 +258,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${fileFormat}`;
 
     const onComplete = () => this.downloadInProgress = false;
-    const onError = _e => this.downloadFailed = true;
+    const onError = (_e: any) => this.downloadFailed = true;
     const types = { 'json': 'application/json', 'csv': 'text/csv' };
-    const onNext = data => {
+    const onNext = (data: BlobPart) => {
       const type = types[fileFormat];
       const blob = new Blob([data], { type });
       saveAs(blob, filename);
@@ -266,8 +274,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       .subscribe(onNext, onError);
   }
 
-  onControlListPageChanged(event) {
-    this.pageIndex = event;
+  onScrollDown(event: any) {
+    console.log('scrolled down!!', event);
     this.getControlData(this.activeReport);
   }
 }
