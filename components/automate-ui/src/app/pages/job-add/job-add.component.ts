@@ -124,6 +124,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
       this.nodeManagerArray.forEach((manager) => {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotalFields) {
+            console.log('Res val in fields', res[manager.id]);
             this.fieldCounter++;
           }
         }
@@ -142,6 +143,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
       this.nodeManagerArray.forEach((manager) => {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
+            console.log('Res val in nodes', res[manager.id]);
             this.counter++;
             if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
               this.fieldCounter = this.fieldCounter + 1;

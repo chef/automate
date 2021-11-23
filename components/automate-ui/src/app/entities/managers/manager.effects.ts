@@ -234,7 +234,7 @@ export class ManagerEffects {
         map((resp: ManagerSearchNodesResponse) =>
              new ManagerAllNodesSuccess(Object.assign(resp, action.payload))),
         catchError((error: HttpErrorResponse) =>
-               of(new ManagerAllNodesFailure(error))));
+               of(new ManagerAllNodesFailure({...action.payload, error}))));
     })));
 
   managerAllNodesFailure$ = createEffect(() =>
@@ -256,7 +256,7 @@ export class ManagerEffects {
               map((resp: ManagerSearchFieldsResponse) =>
                    new ManagerSearchFieldsSuccess(Object.assign(resp, action.payload))),
               catchError((error: HttpErrorResponse) =>
-                     of(new ManagerSearchFieldsFailure(error)))))));
+                     of(new ManagerSearchFieldsFailure({...action.payload, error})))))));
 
   managerSearchFieldsFailure$ = createEffect(() =>
     this.actions$.pipe(

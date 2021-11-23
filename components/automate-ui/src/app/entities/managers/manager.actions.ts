@@ -145,6 +145,10 @@ export interface ManagerAllNodesSuccessPayload {
   nodes: any[];
   total: number;
 }
+export interface ManagerAllNodesFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerAllNodesSuccess implements Action {
   readonly type = ManagerActionTypes.ALL_NODES_SUCCESS;
   constructor(public payload: ManagerAllNodesSuccessPayload) {}
@@ -152,7 +156,7 @@ export class ManagerAllNodesSuccess implements Action {
 
 export class ManagerAllNodesFailure implements Action {
   readonly type = ManagerActionTypes.ALL_NODES_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerAllNodesFailurePayload) {}
 }
 
 export interface ManagerSearchFieldsPayload {
@@ -169,6 +173,11 @@ export interface ManagerSearchFieldsSuccessPayload {
   field: string;
   fields: string[];
 }
+
+export interface ManagerSearchFieldsFailurePayload {
+  managerId: string;
+  error: HttpErrorResponse;
+}
 export class ManagerSearchFieldsSuccess implements Action {
   readonly type = ManagerActionTypes.SEARCH_FIELDS_SUCCESS;
   constructor(public payload: ManagerSearchFieldsSuccessPayload) {}
@@ -176,7 +185,7 @@ export class ManagerSearchFieldsSuccess implements Action {
 
 export class ManagerSearchFieldsFailure implements Action {
   readonly type = ManagerActionTypes.SEARCH_FIELDS_FAILURE;
-  constructor(public payload: HttpErrorResponse) {}
+  constructor(public payload: ManagerSearchFieldsFailurePayload) {}
 }
 
 export class GetManager implements Action {
@@ -300,8 +309,10 @@ export type ManagerActions =
   | ManagerSearchNodesSuccess
   | ManagerAllNodes
   | ManagerAllNodesSuccess
+  | ManagerAllNodesFailure
   | ManagerSearchFields
   | ManagerSearchFieldsSuccess
+  | ManagerSearchFieldsFailure
   | GetManager
   | GetManagerSuccess
   | GetManagerFailure

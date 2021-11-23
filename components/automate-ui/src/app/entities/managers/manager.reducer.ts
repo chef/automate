@@ -78,6 +78,16 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set(`fieldsByManager.${managerId}.fields.${field}`, fields, fieldstatus);
     }
 
+    case ManagerActionTypes.SEARCH_FIELDS_FAILURE: {
+      const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
+    }
+
+    case ManagerActionTypes.ALL_NODES_FAILURE: {
+      const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotalFields`, false, state);
+    }
+
     case ManagerActionTypes.GET_NODES: {
       const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loading`, true, state);
@@ -117,6 +127,11 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       const {managerId, total} = action.payload;
       const nodestatus = set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
       return set(`nodesByManager.${managerId}.allTotal`, total, nodestatus);
+    }
+
+    case ManagerActionTypes.ALL_NODES_FAILURE: {
+      const {managerId} = action.payload;
+      return set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
     }
 
     case ManagerActionTypes.GET: {
