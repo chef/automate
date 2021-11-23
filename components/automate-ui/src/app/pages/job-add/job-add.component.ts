@@ -72,8 +72,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public nodeManagerArray: any;
   public checked: any;
   public counter: number;
-  public nodeCount: 10;
-  public fieldCount: 20;
+  public nodeCount = 10;
+  public fieldCount = 20;
   public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
