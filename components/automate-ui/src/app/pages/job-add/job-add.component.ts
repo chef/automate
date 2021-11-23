@@ -72,6 +72,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public nodeManagerArray: any;
   public checked: any;
   public counter: number;
+  public nodeCount: 10;
+  public fieldCount: 20;
   public model = { search: '', nodearray: '' };
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -126,7 +128,8 @@ export class JobAddComponent implements OnDestroy , OnInit {
           }
         }
       });
-      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
+      if (this.nodeManagerArray.length === this.nodeCount &&
+        this.counter + this.fieldCounter === this.fieldCount ) {
         this.loadMore = true;
       }
     });
@@ -140,13 +143,14 @@ export class JobAddComponent implements OnDestroy , OnInit {
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
             this.counter++;
-          if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
-            this.fieldCounter = this.fieldCounter + 1;
-          }
+            if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
+              this.fieldCounter = this.fieldCounter + 1;
+            }
           }
         }
       });
-      if (this.nodeManagerArray.length === 10 && this.counter + this.fieldCounter === 20 ) {
+      if (this.nodeManagerArray.length === this.nodeCount &&
+        this.counter + this.fieldCounter === this.fieldCount ) {
         this.loadMore = true;
       }
     });
