@@ -85,13 +85,13 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		if upgradeRunCmdFlags.upgradefrontends {
-			args = append(args, "--upgrade-frontends")
+			args = append(args, "--upgrade-frontends", "-y")
 		}
 		if upgradeRunCmdFlags.upgradebackends {
-			args = append(args, "--upgrade-backends")
+			args = append(args, "--upgrade-backends", "-y")
 		}
 		if upgradeRunCmdFlags.upgradeairgapbundles {
-			args = append(args, "--upgrade-airgap-bundles")
+			args = append(args, "--upgrade-airgap-bundles", "-y")
 		}
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")

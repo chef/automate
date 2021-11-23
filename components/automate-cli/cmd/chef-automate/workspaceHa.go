@@ -19,7 +19,6 @@ var workspaceCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	Args: cobra.RangeArgs(0, 2),
 	RunE: runWorkspaceCmd,
 }
 
