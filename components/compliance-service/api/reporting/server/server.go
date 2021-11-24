@@ -289,7 +289,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 // ExportReportManager populate the report manager request and sent for processing
 func (srv *Server) ExportReportManager(ctx context.Context, in *reporting.Query) (*reporting.CustomReportResponse, error) {
 	if srv.reportMgr == nil {
-		return nil, status.Error(codes.PermissionDenied, "customer not enabled for supporting large compliance reports")
+		return nil, status.Error(codes.PermissionDenied, "customer not enabled for large reporting")
 	}
 
 	responseID := &reporting.CustomReportResponse{}

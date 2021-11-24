@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"errors"
+
 	"github.com/chef/automate/api/interservice/report_manager"
 
 	"github.com/sirupsen/logrus"
@@ -26,18 +27,19 @@ type Compliance struct {
 }
 
 func NewCompliancePipeline(client *ingestic.ESClient, authzClient authz.ProjectsServiceClient,
-	nodeMgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient, messageBufferSize int, notifierClient notifier.Notifier, automateURL string, isSupportLCR bool) Compliance {
+	nodeMgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient,
+	messageBufferSize int, notifierClient notifier.Notifier, automateURL string, enableLargeReporting bool) Compliance {
 	in := make(chan message.Compliance, messageBufferSize)
 	pipes := []message.CompliancePipe{
 		processor.ComplianceProfile(client),
 		processor.ComplianceShared,
 		processor.ComplianceSummary,
-		processor.ComplianceReport(notifierClient, automateURL, isSupportLCR),
+		processor.ComplianceReport(notifierClient, automateURL, enableLargeReporting),
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		publisher.StoreCompliance(client, 100),
 	}
-	if isSupportLCR {
+	if enableLargeReporting {
 		pipes = append(pipes, publisher.ReportManagerPublisher(reportMgrClient))
 	}
 	compliancePipeline(in, pipes...)

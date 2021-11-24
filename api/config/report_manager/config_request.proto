@@ -28,6 +28,7 @@ message ConfigRequest {
 			message Service {
 				google.protobuf.StringValue host = 1 [deprecated=true];
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10152, protocol: "grpc" } ];
+				google.protobuf.BoolValue enable_large_reporting = 3;
 			}
 
 			message Objstore {

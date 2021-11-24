@@ -113,7 +113,8 @@ func WaivedStr(data *inspec_api.WaiverData) (str string) {
 
 // ReportProfilesFromInSpecProfiles extracts the reports specific information
 // from the profile, leaving out the static profile data
-func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSums []relaxting.ESInSpecSummaryProfile, isSupportLCR bool) (profilesRep []relaxting.ESInSpecReportProfile) {
+func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSums []relaxting.ESInSpecSummaryProfile,
+	enableLargeReporting bool) (profilesRep []relaxting.ESInSpecReportProfile) {
 	// Creating a profilesSums hash to lookup the sums based on the profile (name|sha) string
 	profilesSumsHash := make(map[string]relaxting.ESInSpecSummaryProfile, len(profilesSums))
 	for _, profileSums := range profilesSums {
@@ -130,7 +131,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSu
 			for i, result := range control.Results {
 				var trimSize int
 				trimSize = maxESKeywordBytesv1
-				if isSupportLCR {
+				if enableLargeReporting {
 					trimSize = maxESKeywordBytesv2
 				}
 				minResults[i] = &relaxting.ESInSpecReportControlsResult{
