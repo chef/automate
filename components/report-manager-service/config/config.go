@@ -4,7 +4,7 @@ import "github.com/chef/automate/lib/tls/certs"
 
 // Configuration for the Report Manager Service
 type ReportManager struct {
-	Service         Service
+	Service         Service `mapstructure:"service"`
 	Log             Log
 	CerealConfig    CerealConfig `mapstructure:"cereal"`
 	Storage         Storage      `mapstructure:"storage"`
@@ -17,9 +17,10 @@ type ObjStore struct {
 }
 
 type Service struct {
-	Port    int
-	Host    string
-	Message string
+	Port                 int
+	Host                 string
+	Message              string
+	EnableLargeReporting bool `mapstructure:"enable_large_reporting"`
 }
 
 type Log struct {
