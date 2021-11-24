@@ -18,13 +18,14 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
-func ComplianceReport(notifierClient notifier.Notifier, automateURL string, isSupportLCR bool) message.CompliancePipe {
+func ComplianceReport(notifierClient notifier.Notifier, automateURL string, enableLargeReporting bool) message.CompliancePipe {
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
-		return complianceReport(in, notifierClient, automateURL, isSupportLCR)
+		return complianceReport(in, notifierClient, automateURL, enableLargeReporting)
 	}
 }
 
-func complianceReport(in <-chan message.Compliance, notifierClient notifier.Notifier, automateURL string, isSupportLCR bool) <-chan message.Compliance {
+func complianceReport(in <-chan message.Compliance, notifierClient notifier.Notifier, automateURL string,
+	enableLargeReporting bool) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
@@ -54,7 +55,7 @@ func complianceReport(in <-chan message.Compliance, notifierClient notifier.Noti
 				Roles:            msg.Report.Roles,
 				Recipes:          msg.Report.Recipes,
 				ControlsSums:     *msg.Shared.AllProfileSums,
-				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums, isSupportLCR),
+				Profiles:         compliance.ReportProfilesFromInSpecProfiles(msg.Report.Profiles, msg.Shared.PerProfileSums, enableLargeReporting),
 				Status:           msg.Shared.Status,
 				StatusMessage:    msg.Shared.StatusMessage,
 				InSpecVersion:    msg.Report.Version,

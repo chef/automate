@@ -68,7 +68,7 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 	return nil
 }
 
-func dialer(t *testing.T, isForFailure bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
+func dialer(t *testing.T, isForFailure, enableLargeReporting bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 
 	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024 * 2))
@@ -78,8 +78,9 @@ func dialer(t *testing.T, isForFailure bool, db *storage.DB) func(context.Contex
 			T:          t,
 			ForFailure: isForFailure,
 		},
-		ObjBucket: "testBucket",
-		DataStore: db,
+		ObjBucket:            "testBucket",
+		DataStore:            db,
+		EnableLargeReporting: enableLargeReporting,
 	})
 
 	go func() {
@@ -111,7 +112,7 @@ func getTestData(t *testing.T) *compliance.Report {
 
 func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, nil)))
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, true, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -148,7 +149,22 @@ func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 
 func TestReportManagerServer_StoreReport_Fail(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, nil)))
+
+	t.Run("LargeReporting_NotEnabled", func(t *testing.T) {
+		conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, false, nil)))
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		client := pb.NewReportManagerServiceClient(conn)
+		stream, err := client.StoreReport(ctx)
+		assert.NoError(t, err)
+
+		_, err = stream.CloseAndRecv()
+		assert.Error(t, err)
+		assert.Equal(t, "rpc error: code = Unknown desc = customer not enabled for large reporting", err.Error())
+	})
+
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, true, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -232,7 +248,21 @@ func TestReportManagerServer_GetAllRequestsStatus(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, db)))
+
+	t.Run("LargeReporting_NotEnabled", func(t *testing.T) {
+		conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, false, db)))
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		client := pb.NewReportManagerServiceClient(conn)
+		_, err = client.GetAllRequestsStatus(ctx, &pb.AllStatusRequest{
+			RequestorId: "test_requestor_id",
+		})
+		assert.Error(t, err)
+		assert.Equal(t, "rpc error: code = Unknown desc = customer not enabled for large reporting", err.Error())
+	})
+
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, true, db)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
