@@ -270,7 +270,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
           this.managersArray.setControl(i, managerGroup);
 
           if (!this.earlierManagers.includes(manager)) {
-
+            this.earlierManagers.push(manager);
             this.store.dispatch(new ManagerAllNodes({managerId, query: {query: {filter_map: []}}}));
 
             switch (manager.type) {
