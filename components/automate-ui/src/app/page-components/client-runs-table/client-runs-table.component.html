@@ -44,7 +44,7 @@
           <chef-icon>settings</chef-icon>
         </chef-button>
         <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
-          <chef-dropdown [attr.visible]="columnDropdownVisible">
+          <chef-dropdown *ngIf="columnDropdownVisible" [attr.visible]="columnDropdownVisible">
             <chef-checkbox [checked]="columns.check_in"
               (change)="updateColumnVisibility('check_in')"> Check-In
             </chef-checkbox>
