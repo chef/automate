@@ -30,8 +30,8 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	c.Stdin = os.Stdin
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-	c.Stdout = io.MultiWriter(os.Stdout, &out)
-	c.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	c.Stdout = io.MultiWriter(&out)
+	c.Stderr = io.MultiWriter(&stderr)
 	err := c.Run()
 	if err != nil {
 		writer.Printf(stderr.String())
@@ -39,10 +39,10 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	}
 	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
 	if len(outStr) > 0 {
-		writer.Printf("\nout:\n%s", outStr)
+		writer.Printf("\n%s\n", outStr)
 	}
 	if len(errStr) > 0 {
-		writer.Printf("\nerr:\n%s\n", errStr)
+		writer.Printf("\n%s\n", errStr)
 	}
 	//writer.Printf("%s command execution done, exiting\n", command)
 	writer.StopSpinner()
@@ -60,13 +60,11 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 			panic(err)
 		}
 	}
-	writer.Printf("%s command execution started \n\n\n", command)
+	//writer.Printf("%s command execution started \n\n\n", command)
 	args = append([]string{command}, args...)
 	c := exec.Command("automate-cluster-ctl", args...)
 	c.Dir = AUTOMATE_HA_WORKSPACE_DIR
 	c.Stdin = os.Stdin
-	var out bytes.Buffer
-	var stderr bytes.Buffer
 	outfile, err := os.Create(logFilePath)
 	if err != nil {
 		panic(err)
@@ -76,15 +74,7 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 	c.Stderr = outfile
 	err = c.Start()
 	if err != nil {
-		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, helpDocs)
-	}
-	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
-	if len(outStr) > 0 {
-		writer.Printf("\nout:\n%s", outStr)
-	}
-	if len(errStr) > 0 {
-		writer.Printf("\nerr:\n%s\n", errStr)
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
 	executed := make(chan struct{})
@@ -192,8 +182,8 @@ func executeShellCommand(command string, args []string) error {
 	c.Stdin = os.Stdin
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-	c.Stdout = io.MultiWriter(os.Stdout, &out)
-	c.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	c.Stdout = io.MultiWriter(&out)
+	c.Stderr = io.MultiWriter(&stderr)
 	err := c.Run()
 	if err != nil {
 		writer.Printf(stderr.String())
