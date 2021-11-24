@@ -40,10 +40,10 @@ var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient, reportMgrClient report_manager.ReportManagerServiceClient,
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient authz.ProjectsServiceClient,
-	messageBufferSize int, isSupportLCR bool) *ComplianceIngestServer {
+	messageBufferSize int, enableLargeReporting bool) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient,
-		authzProjectsClient, mgrClient, reportMgrClient, messageBufferSize, notifierClient, automateURL, isSupportLCR)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient,
+		reportMgrClient, messageBufferSize, notifierClient, automateURL, enableLargeReporting)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,
