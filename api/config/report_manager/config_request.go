@@ -57,4 +57,8 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 	if logFormat := g.GetV1().GetLog().GetFormat().GetValue(); logFormat != "" {
 		c.V1.Sys.Log.Format.Value = logFormat
 	}
+
+	if largeReporting := g.GetV1().GetLargeReporting().GetEnableLargeReporting(); largeReporting != nil {
+		c.V1.Sys.Service.EnableLargeReporting = largeReporting
+	}
 }
