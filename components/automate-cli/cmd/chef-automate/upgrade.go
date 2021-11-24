@@ -85,7 +85,7 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 		}
-		response, err := writer.Prompt("Installation will get updaded to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
 		if err != nil {
 			return err
 		}
