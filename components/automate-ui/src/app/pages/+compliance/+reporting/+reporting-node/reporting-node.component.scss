@@ -627,3 +627,7 @@ dl.waiver-details {
     width: 102%;
   }
 }
+
+::ng-deep .wrapper::-webkit-scrollbar-thumb {
+  background: $chef-cyan-blue;
+}
