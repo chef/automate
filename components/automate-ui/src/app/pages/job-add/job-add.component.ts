@@ -445,8 +445,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
   }
 
   onLoadFunc(data) {
-    this.counter = 0;
-    this.fieldCounter = 0;
     this.notFirstTime = true;
     this.loadMore = false;
     let payload = {};
