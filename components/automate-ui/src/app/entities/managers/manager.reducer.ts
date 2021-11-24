@@ -52,7 +52,6 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
       return set('status', EntityStatus.loading, searchstatus);
 
     case ManagerActionTypes.SEARCH_SUCCESS: {
-      // managerEntityAdapter.removeAll(state);
       // tslint:disable-next-line: no-shadowed-variable
       const counter = set('counter', 0 , managerEntityAdapter.removeAll(state));
       const totalCount = set('total', action.payload.total, counter);
@@ -118,8 +117,11 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
 
     case ManagerActionTypes.ALL_NODES: {
       const {managerId} = action.payload;
-      return set(`nodesByManager.${managerId}.loadingAllTotal`, true,
-        set(`nodesByManager.${managerId}.allTotal`, 0, state));
+      return set(
+        `nodesByManager.${managerId}.loadingAllTotal`,
+        true,
+        set(`nodesByManager.${managerId}.allTotal`, 0, state)
+      );
     }
 
     case ManagerActionTypes.ALL_NODES_SUCCESS: {
