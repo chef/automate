@@ -84,7 +84,6 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.ALL_NODES_FAILURE: {
-      console.log("inside search nodes failure");
       const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loadingAllTotal`, false, state);
     }
@@ -170,6 +169,9 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
 
     case ManagerActionTypes.UPDATE_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
+
+    case ManagerActionTypes.FIRST_LOAD:
+      return ManagerEntityInitialState;
 
     default:
       return state;

@@ -36,7 +36,8 @@ export enum ManagerActionTypes {
   UPDATE_FAILURE        = 'MANAGER::UPDATE::FAILURE',
   NAV_LIST              = 'MANAGER::NAV::LIST',
   NAV_DETAIL            = 'MANAGER::NAV::DETAIL',
-  NAV_EDIT              = 'MANAGER::NAV::EDIT'
+  NAV_EDIT              = 'MANAGER::NAV::EDIT',
+  FIRST_LOAD            = 'MANAGER::FIRST_LOAD'
 }
 
 export interface ManagersSearchPayload {
@@ -300,6 +301,11 @@ export class NavManagerEdit implements Action {
   constructor(public payload: NavManagerEditPayload) {}
 }
 
+export class FirstLoad implements Action {
+  readonly type = ManagerActionTypes.FIRST_LOAD;
+  constructor() {}
+}
+
 export type ManagerActions =
   | ManagersSearch
   | ManagersSearchSuccess
@@ -332,4 +338,5 @@ export type ManagerActions =
   | UpdateManagerFailure
   | NavManagerDetail
   | NavManagerList
-  | NavManagerEdit;
+  | NavManagerEdit
+  | FirstLoad;

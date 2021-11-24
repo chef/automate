@@ -20,7 +20,8 @@ import {
   ManagerSearchFields,
   ManagerSearchNodes,
   ManagerAllNodes,
-  ManagersSearch
+  ManagersSearch,
+  FirstLoad
 } from '../../entities/managers/manager.actions';
 import { ProfilesSearch } from '../../entities/profiles/profile.actions';
 import { JobCreate } from '../../entities/jobs/job.actions';
@@ -75,6 +76,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   public nodeCount = 10;
   public fieldCount = 20;
   public model = { search: '', nodearray: '' };
+  public earlierManagers: Manager[] = [];
   constructor(
     private store: Store<NgrxStateAtom>,
     private fb: FormBuilder,
@@ -110,6 +112,7 @@ export class JobAddComponent implements OnDestroy , OnInit {
   }
 
   ngOnInit() {
+    this.store.dispatch(new FirstLoad());
     this.store.dispatch(
       new ManagersSearch({
         page: this.pagenumber,
@@ -144,7 +147,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
         // console.log("res value", res, manager.id)
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
-            console.log("res value", res[manager.id], manager.id);
             this.counter++;
             if (manager.type === 'aws-api' || manager.type === 'gcp-api') {
               this.fieldCounter = this.fieldCounter + 1;
@@ -165,8 +167,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
     this.isDestroyed.complete();
   }
 
-  
-  public earlierManagers: Manager[] = [];
   public setupForm() {
     const nodesGroup = this.fb.group({
       managers: this.fb.array([])
