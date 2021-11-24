@@ -38,7 +38,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   openControls = {};
   controlList: any = {};
   pageIndex = 1;
-  perPage = 10;
+  perPage = 100;
   controlsLoading = false;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -223,7 +223,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.getControlsList(report.id, reportQuery, this.pageIndex, this.perPage)
     .pipe(first())
     .subscribe(data => {
-      this.reportLoading = false;      
+      this.reportLoading = false;
       this.layoutFacade.ShowPageLoading(false);
       if (this.pageIndex === 1) {
         this.controlList = Object.assign(data);
@@ -274,8 +274,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       .subscribe(onNext, onError);
   }
 
-  onScrollDown(event: any) {
-    console.log('scrolled down!!', event);
+  onScrollDown() {
     this.getControlData(this.activeReport);
   }
 }

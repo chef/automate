@@ -59,7 +59,7 @@
                   </tr>
                   <tr>
                     <th>Platform</th>
-                    <!-- <td>{{ activeReport.platform.name }} {{ activeReport.platform.release }}</td> -->
+                    <td>{{ activeReport ?  activeReport.platform.name : '' }} {{ activeReport.platform.release }}</td>
                   </tr>
                 </table>
               </div>
@@ -140,31 +140,31 @@
           <chef-option class="filter all" value='all'>
             <span class="filter-label">Total Controls</span>
             <span class="filter-total">
-              <!-- <chef-icon class="filter-icon">storage</chef-icon> {{activeReport.controls.total | number}} -->
+              <chef-icon class="filter-icon">storage</chef-icon> {{activeReport.controls.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter failed" value='failed'>
             <span class="filter-label">Failed Controls</span>
             <span class="filter-total">
-              <!-- <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.total | number}} -->
+              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter passed" value='passed'>
             <span class="filter-label">Passed Controls</span>
             <span class="filter-total">
-              <!-- <chef-icon class="filter-icon">check_circle</chef-icon> {{activeReport.controls.passed.total | number}} -->
+              <chef-icon class="filter-icon">check_circle</chef-icon> {{activeReport.controls.passed.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter skipped" value='skipped'>
             <span class="filter-label">Skipped Controls</span>
             <span class="filter-total">
-              <!-- <chef-icon class="filter-icon">help</chef-icon> {{activeReport.controls.skipped.total | number}} -->
+              <chef-icon class="filter-icon">help</chef-icon> {{activeReport.controls.skipped.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter waived" value='waived'>
             <span class="filter-label">Waived Controls</span>
             <span class="filter-total">
-              <!-- <div class="filter-icon waived-icon"></div> {{activeReport.controls.waived.total | number}} -->
+              <div class="filter-icon waived-icon"></div> {{activeReport.controls.waived.total | number}}
             </span>
           </chef-option>
         </chef-phat-radio>
@@ -194,7 +194,7 @@
             infiniteScroll
             [infiniteScrollDistance]="2"
             [infiniteScrollThrottle]="50"
-            (scrolled)="onScrollDown($event)"
+            (scrolled)="onScrollDown()"
             [scrollWindow]="false">
             
             <ng-container *ngFor="let control of controlList.control_elements"> 

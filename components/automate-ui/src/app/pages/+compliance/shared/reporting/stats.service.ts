@@ -271,7 +271,8 @@ export class StatsService {
       }));
   }
 
-  getControlsList(reportID: string, reportQuery: ReportQuery, pageIndex: number, perPage: number): Observable<any> {
+  getControlsList(reportID: string, reportQuery: ReportQuery,
+     pageIndex: number, perPage: number): Observable<any> {
     const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);
     const pagevalue = (pageIndex - 1);

@@ -619,6 +619,9 @@ dl.waiver-details {
 
 ::ng-deep .wrapper::-webkit-scrollbar {
   width: 5px;
-  // background: $chef-cyan-blue;
   border-radius: 5px;
+}
+
+::ng-deep .wrapper::-webkit-scrollbar-thumb {
+  background: $chef-cyan-blue;
 }
