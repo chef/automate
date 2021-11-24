@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	ptoml "github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 )
 
 type awsDeployment struct {
@@ -42,7 +43,10 @@ func (a *awsDeployment) doProvisionJob(args []string) error {
 	writer.Printf("provisioning infra for automate HA \n\n\n\n")
 	args = args[1:]
 	args = append(args, "-y")
-	return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommandAsync("provision", args, provisionInfraHelpDocs)
+	}
+	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
 
 func (a *awsDeployment) generateConfig() error {

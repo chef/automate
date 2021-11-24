@@ -30,9 +30,8 @@ func runTestCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
 		return executeAutomateClusterCtlCommand("test", args, testHAHelpDocs)
 	} else {
-		return status.Wrap(errors.New("Test command only work with HA mode of automate"), status.ConfigError, testHAHelpDocs)
+		return status.Wrap(errors.New(AUTOMATE_HA_INVALID_BASTION), status.ConfigError, testHAHelpDocs)
 	}
-
 }
 
 func init() {

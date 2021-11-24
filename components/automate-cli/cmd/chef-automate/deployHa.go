@@ -4,6 +4,8 @@ package main
 
 import (
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func executeDeployment(args []string) error {
@@ -17,5 +19,8 @@ func executeDeployment(args []string) error {
 	}
 	args = append(args[:indexOfConfig], args[indexOfConfig+1:]...)
 	args = append(args, "-y")
-	return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs)
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommandAsync("deploy", args, automateHADeployHelpDocs)
+	}
+	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }
