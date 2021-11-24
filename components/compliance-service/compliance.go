@@ -176,7 +176,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	runner.ESClient = ingesticESClient
 	var reportmanagerClient reportmanager.ReportManagerServiceClient
 	reportmanagerClient = nil
-	if conf.Service.IsSupportLCR {
+	if conf.Service.EnableLargeReporting {
 		reportmanagerClient = createReportManager(connFactory, conf.ReportConfig.Endpoint)
 	}
 
@@ -204,8 +204,9 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServiceServer(s,
-		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient, reportmanagerClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, conf.Service.MessageBufferSize, conf.Service.IsSupportLCR))
+		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
+			reportmanagerClient, conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient,
+			conf.Service.MessageBufferSize, conf.Service.EnableLargeReporting))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
