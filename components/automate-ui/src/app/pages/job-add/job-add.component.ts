@@ -133,7 +133,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
       });
       if (this.nodeManagerArray.length === this.nodeCount &&
         this.counter + this.fieldCounter === this.fieldCount ) {
-        console.log('search feilds count', this.counter,  this.fieldCounter);
         this.loadMore = true;
       }
     });
@@ -144,7 +143,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
     ).subscribe(res => {
       this.counter = 0;
       this.nodeManagerArray.forEach((manager) => {
-        // console.log("res value", res, manager.id)
         if (manager.id in res) {
           if (!res[manager.id].loadingAllTotal) {
             this.counter++;
@@ -156,7 +154,6 @@ export class JobAddComponent implements OnDestroy , OnInit {
       });
       if (this.nodeManagerArray.length === this.nodeCount &&
         this.counter + this.fieldCounter === this.fieldCount ) {
-        console.log('search nodes count', this.counter,  this.fieldCounter);
         this.loadMore = true;
       }
     });

@@ -63,9 +63,7 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
     }
 
     case ManagerActionTypes.SEARCH_FAILURE:
-      let c = state.counter;
-      const counter = set('counter', --c , state);
-      return set('status', EntityStatus.loadingFailure, counter);
+      return set('status', EntityStatus.loadingFailure, state);
 
     case ManagerActionTypes.SEARCH_FIELDS: {
       const {managerId} = action.payload;
