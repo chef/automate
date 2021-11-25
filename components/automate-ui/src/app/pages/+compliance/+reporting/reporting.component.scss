@@ -32,6 +32,7 @@ chef-subheading {
 
     .dropdown {
       right: 0;
+      z-index: 1;
     }
   }
 
@@ -261,6 +262,8 @@ chef-subheading {
 }
 
 .reporting-download-side-panel {
+
+  z-index: 10;
   
   .side-panel-header {
     display: flex;
@@ -286,8 +289,9 @@ chef-subheading {
      font-size: 14px;
      background: $chef-white;
 
-     .header-text h3 {
-      font-size: 20px !important;
+     chef-tooltip {
+      width: 400px;
+      border: 1px solid $chef-grey;
      }
 
      .table-header {

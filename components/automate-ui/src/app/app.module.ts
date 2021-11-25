@@ -48,7 +48,6 @@ import { ChefSessionService } from './services/chef-session/chef-session.service
 import { ClientRunsStatsService } from './services/telemetry/client-runs-stats/client-runs-stats.service';
 import { ComplianceStatsService } from './services/telemetry/compliance-stats/compliance-stats.service';
 import { ConfigService } from './services/config/config.service';
-//import { DownloadReportsService } from './entities/download-reports/download-reports.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
 import { HttpClientAuthInterceptor } from './services/http/http-client-auth.interceptor';
@@ -343,7 +342,6 @@ import {
     DesktopRequests,
     DestinationRequests,
     DataFeedGlobalConfigRequests,
-    //DownloadReportsService,
     EnvironmentRequests,
     EventFeedService,
     FeatureFlagsService,

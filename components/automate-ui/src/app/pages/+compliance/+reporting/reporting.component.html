@@ -28,7 +28,7 @@
             <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
               <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
               <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
-              <chef-button tertiary (click)="downloadReportsService.onReportOpenClick()">Open Report</chef-button>
+              <chef-button tertiary (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()">Open Report</chef-button>
             </chef-click-outside>
           </chef-dropdown>
         </div>
@@ -182,15 +182,28 @@
               <th>Size</th>
               <th>Duration</th>
             </tr>
-            <tr *ngFor="let report of downloadReportsService.reportList; index as i">
-              <td [ngClass]="{'failed-status': report.status === 'failed', 'running-status': report.status === 'running', 'success-status': report.status === 'success'}">
-                <app-time [time]='report.created_at'></app-time></td>
-              <td *ngIf="report.status === 'success'">{{ downloadReportsService.byteConverter(report.report_size) }}</td>
-              <td *ngIf="report.status === 'failed'" class="failed-status error-message" [attr.title]="report.err_message">{{ report.err_message }}</td>
-              <td *ngIf="report.status === 'running'" class="running-status">In progress...</td>
-              <td *ngIf="report.status === 'success' || report.status === 'failed'">{{report.duration}}</td>
-            </tr>
+            <ng-container *ngIf="downloadReportsService.reportList.length > 0">
+              <tr *ngFor="let report of downloadReportsService.reportList; index as i">
+                <td [ngClass]="{'failed-status': report.status === 'failed', 'running-status': report.status === 'running', 'success-status': report.status === 'success'}">
+                  <app-time [time]='report.created_at'></app-time></td>
+                <td *ngIf="report.status === 'success'">{{ downloadReportsService.byteConverter(report.report_size) }}</td>
+                <ng-container *ngIf="report.status === 'failed'">
+                  <td [id]="'error-message-' + i" class="failed-status error-message">{{ report.err_message }}</td>
+                </ng-container>  
+                <td *ngIf="report.status === 'running'" class="running-status">In progress...</td>
+                <td *ngIf="report.status === 'success' || report.status === 'failed'">{{report.duration}}</td>
+                <ng-container *ngIf="report.status === 'failed'">
+                  <chef-tooltip
+                  [attr.for]="'error-message-' + i"
+                  position="top"
+                  delay="0">{{ report.err_message }}</chef-tooltip>
+                </ng-container>
+              </tr>
+            </ng-container>
           </table>
+          <ng-container *ngIf="downloadReportsService.reportList.length === 0">
+            <h4 class="display4" style="text-align: center;border-bottom: 5px solid #FFFFFF;">No reports are available to download.</h4>
+          </ng-container>
         </div>
       </chef-side-panel>
     </main>
