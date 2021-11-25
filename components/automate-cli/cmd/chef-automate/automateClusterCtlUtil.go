@@ -22,7 +22,8 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	if len(command) < 1 {
 		return errors.New("Invalid or empty command")
 	}
-	writer.Printf("%s command execution started \n\n\n", command)
+	//writer.Printf("%s command execution started \n\n\n", command)
+	writer.StartSpinner()
 	args = append([]string{command}, args...)
 	c := exec.Command("automate-cluster-ctl", args...)
 	c.Dir = "/hab/a2_deploy_workspace"
@@ -35,8 +36,6 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	if err != nil {
 		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, helpDocs)
-	} else {
-		writer.Printf("No error in executing commands")
 	}
 	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
 	if len(outStr) > 0 {
@@ -45,7 +44,8 @@ func executeAutomateClusterCtlCommand(command string, args []string, helpDocs st
 	if len(errStr) > 0 {
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
-	writer.Printf("%s command execution done, exiting\n", command)
+	//writer.Printf("%s command execution done, exiting\n", command)
+	writer.StopSpinner()
 	return err
 }
 
@@ -87,19 +87,45 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 		writer.Printf("\nerr:\n%s\n", errStr)
 	}
 	writer.Printf("%s command execution inprogress with process id : %d, + \n storing log in %s \n", command, c.Process.Pid, logFilePath)
-	tailFile(logFilePath)
+	executed := make(chan struct{})
+	go tailFile(logFilePath, executed)
+	_, err = c.Process.Wait()
+	if err != nil {
+		return err
+	}
+	time.Sleep(5 * time.Second)
+	close(executed)
 	return err
 }
 
-func tailFile(logFilePath string) {
+func tailFile(logFilePath string, executed chan struct{}) {
+	writer.Println("Starting tail function")
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
 	if err != nil {
 		writer.Printf(err.Error())
 		return
 	}
-	for line := range t.Lines {
-		writer.Println(line.Text)
+	var spinning bool = false
+	for {
+		select {
+		case <-executed:
+			writer.Println("Exiting as execution process completed")
+			_ = t.Stop()
+			return
+		case line := <-t.Lines:
+			if spinning {
+				writer.StopSpinner()
+				spinning = false
+			}
+			writer.Println(line.Text)
+		default:
+			if !spinning {
+				writer.StartSpinner()
+				spinning = true
+			}
+		}
+
 	}
 }
 
@@ -172,8 +198,6 @@ func executeShellCommand(command string, args []string) error {
 	if err != nil {
 		writer.Printf(stderr.String())
 		return status.Wrap(err, status.CommandExecutionError, "")
-	} else {
-		writer.Printf("No error in executing commands")
 	}
 	outStr, errStr := string(out.Bytes()), string(stderr.Bytes())
 	if len(outStr) > 0 {

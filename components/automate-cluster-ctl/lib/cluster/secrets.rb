@@ -44,7 +44,7 @@ module AutomateCluster
       if File.exist?(key_file)
         key = File.read(key_file)
       else
-        AutomateCluster.logger.warn "Secret storage has not been configured yet, please run `automate-cluster-ctl secrets init`"
+        AutomateCluster.logger.warn "Secret storage has not been configured yet, please run `chef-automate secrets init`"
         key = generate_key
       end
 
