@@ -27,6 +27,9 @@ var secretsCmd = &cobra.Command{
 }
 
 func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {
+	if !isA2HARBFileExist() {
+		return errors.New(AUTOMATE_HA_INVALID_BASTION)
+	}
 	operation := ""
 	for _, v := range args {
 		if v == "init" {
@@ -54,6 +57,7 @@ func runSecretsConfigCmd(cmd *cobra.Command, args []string) error {
 		}
 		args = append(args, response)
 	}
+
 	return executeSecretsCommand(args)
 }
 

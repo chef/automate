@@ -190,6 +190,9 @@ var sshCommand = &cobra.Command{
 }
 
 func runSshCommand(cmd *cobra.Command, args []string) error {
+	if !isA2HARBFileExist() {
+		return errors.New(AUTOMATE_HA_INVALID_BASTION)
+	}
 	infra, err := getAutomateHAInfraDetails()
 	if err != nil {
 		return err
