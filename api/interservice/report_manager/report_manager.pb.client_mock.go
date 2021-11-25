@@ -56,6 +56,26 @@ func (mr *MockReportManagerServiceClientMockRecorder) GetAllRequestsStatus(arg0,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllRequestsStatus", reflect.TypeOf((*MockReportManagerServiceClient)(nil).GetAllRequestsStatus), varargs...)
 }
 
+// GetPresignedURL mocks base method
+func (m *MockReportManagerServiceClient) GetPresignedURL(arg0 context.Context, arg1 *GetPresignedURLRequest, arg2 ...grpc.CallOption) (*GetPresignedURLResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetPresignedURL", varargs...)
+	ret0, _ := ret[0].(*GetPresignedURLResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPresignedURL indicates an expected call of GetPresignedURL
+func (mr *MockReportManagerServiceClientMockRecorder) GetPresignedURL(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPresignedURL", reflect.TypeOf((*MockReportManagerServiceClient)(nil).GetPresignedURL), varargs...)
+}
+
 // PrepareCustomReport mocks base method
 func (m *MockReportManagerServiceClient) PrepareCustomReport(arg0 context.Context, arg1 *CustomReportRequest, arg2 ...grpc.CallOption) (*CustomReportResponse, error) {
 	m.ctrl.T.Helper()
@@ -269,6 +289,21 @@ func (m *MockReportManagerServiceServer) GetAllRequestsStatus(arg0 context.Conte
 func (mr *MockReportManagerServiceServerMockRecorder) GetAllRequestsStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllRequestsStatus", reflect.TypeOf((*MockReportManagerServiceServer)(nil).GetAllRequestsStatus), arg0, arg1)
+}
+
+// GetPresignedURL mocks base method
+func (m *MockReportManagerServiceServer) GetPresignedURL(arg0 context.Context, arg1 *GetPresignedURLRequest) (*GetPresignedURLResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPresignedURL", arg0, arg1)
+	ret0, _ := ret[0].(*GetPresignedURLResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPresignedURL indicates an expected call of GetPresignedURL
+func (mr *MockReportManagerServiceServerMockRecorder) GetPresignedURL(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPresignedURL", reflect.TypeOf((*MockReportManagerServiceServer)(nil).GetPresignedURL), arg0, arg1)
 }
 
 // PrepareCustomReport mocks base method
