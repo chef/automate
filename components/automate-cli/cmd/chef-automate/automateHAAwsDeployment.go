@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/local-user-service/password"
 	ptoml "github.com/pelletier/go-toml"
 )
 
@@ -90,6 +91,16 @@ func (a *awsDeployment) validateConfigFields() *list.List {
 	}
 	if len(a.config.Architecture.ConfigInitials.BackupMount) < 1 {
 		errorList.PushBack("Invalid or empty backup_mount")
+	}
+	if len(a.config.Automate.Config.AdminPassword) > 0 {
+		val, err := password.NewValidator()
+		if err != nil {
+			errorList.PushBack(err.Error())
+		}
+		passvalErr := val.Validate(a.config.Automate.Config.AdminPassword)
+		if passvalErr != nil {
+			errorList.PushBack(passvalErr.Error())
+		}
 	}
 	if len(a.config.Automate.Config.InstanceCount) < 1 {
 		errorList.PushBack("Invalid or empty automate instance_count")
