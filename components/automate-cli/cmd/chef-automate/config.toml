@@ -23,9 +23,9 @@ ssh_key_file = "~/.ssh/A2HA.pem"
 backup_mount = "/mnt/automate_backups"
 
 [automate.config]
-admin_password = "abc"
+# admin_password = ""
 # automate load balancer fqdn IP or path
-fqdn = "test"
+# fqdn = ""
 instance_count = "1"
 # teams_port = ""
 config_file = "configs/automate.toml"
