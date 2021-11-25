@@ -123,3 +123,14 @@ func (s *Server) GetAllRequestsStatus(ctx context.Context, req *report_manager.A
 	}
 	return s.DataStore.GetAllStatus(req.RequestorId, time.Now().Add(-24*time.Hour))
 }
+
+func (s *Server) GetPresignedURL(ctx context.Context, req *report_manager.GetPresignedURLRequest) (
+	*report_manager.GetPresignedURLResponse, error) {
+	if !s.EnableLargeReporting {
+		return nil, fmt.Errorf("customer not enabled for large reporting")
+	}
+	if req.Id == "" || req.RequestorId == "" {
+		return &report_manager.GetPresignedURLResponse{}, fmt.Errorf("id and requestor should not be empty")
+	}
+	return s.DataStore.GetPreSignedURL(req.Id, req.RequestorId)
+}

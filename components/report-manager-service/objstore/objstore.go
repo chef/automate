@@ -3,6 +3,8 @@ package objstore
 import (
 	"context"
 	"io"
+	"net/url"
+	"time"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -16,6 +18,8 @@ type ObjectStore interface {
 	BucketExists(ctx context.Context, bucketName string) (bool, error)
 
 	MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) error
+
+	PresignedGetObject(ctx context.Context, bucketName, objectName string, expires time.Duration, reqParams url.Values) (*url.URL, error)
 }
 
 type ReportManagerObjStore struct {
@@ -37,4 +41,8 @@ func (rmc ReportManagerObjStore) BucketExists(ctx context.Context, bucketName st
 
 func (rmc ReportManagerObjStore) MakeBucket(ctx context.Context, bucketName string, opts minio.MakeBucketOptions) (err error) {
 	return rmc.ObjStoreClient.MakeBucket(ctx, bucketName, opts)
+}
+
+func (rmc ReportManagerObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
+	return rmc.ObjStoreClient.PresignedGetObject(ctx, bucketName, objectName, expires, reqParams)
 }

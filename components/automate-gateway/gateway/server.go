@@ -450,6 +450,11 @@ func (s *Server) startHTTPServer() error {
 	// custom mux route for export of all reports for a single node
 	mux.HandleFunc("/api/v0/compliance/reporting/node/export", s.NodeExportHandler)
 
+	//custom mux for export report from report manager
+	// needed b/c gateway does not support stream; corresponds to
+	// `rpc ExportFromReportManager(ExportFromReportManagerRequest) returns (stream ExportData) {};`
+	mux.HandleFunc("/api/v0/reportmanager/export/", s.ReportManagerExportHandler)
+
 	// custom mux route for export (ignores its request method)
 	// needed b/c gateway does not support stream; corresponds to
 	// https://github.com/chef/automate/blob/master/api/interservice/cfgmgmt/service/cfgmgmt.proto
