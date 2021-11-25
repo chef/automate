@@ -89,7 +89,6 @@ func executeAutomateClusterCtlCommandAsync(command string, args []string, helpDo
 }
 
 func tailFile(logFilePath string, executed chan struct{}) {
-	writer.Println("Starting tail function")
 	time.Sleep(1 * time.Second)
 	t, err := tail.TailFile(logFilePath, tail.Config{Follow: true, MustExist: true})
 	if err != nil {
