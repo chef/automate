@@ -201,7 +201,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
-    private appConfigService: AppConfigService,
+    public appConfigService: AppConfigService,
     public downloadReportsService: DownloadReportsService
   ) {}
 
