@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/chef/automate/components/report-manager-service/storage"
@@ -80,11 +82,11 @@ func TestOnStart(t *testing.T) {
 				DB: db,
 			}
 
-			query := `INSERT INTO custom_report_requests(id, requestor, status,created_at,updated_at) VALUES ($1, $2, $3, $4, $5);`
+			query := `INSERT INTO custom_report_requests(id, requestor, status, custom_report_type, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6);`
 			if tc.isDBFailure {
-				mock.ExpectExec(query).WithArgs("1234-5678", "reqID123", "running", sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
+				mock.ExpectExec(query).WithArgs("1234-5678", "reqID123", "running", "json", sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(fmt.Errorf("insert error"))
 			} else {
-				mock.ExpectExec(query).WithArgs("1234-5678", "reqID123", "running", sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs("1234-5678", "reqID123", "running", "json", sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 			}
 
 			workflowInstance := &CerealWorkflow{
@@ -201,7 +203,7 @@ func (r *TaskResult) Get(obj interface{}) error {
 	if r.failGet {
 		return fmt.Errorf("Error in fetching job results")
 	}
-	jsonString := `{"JobID":"1234-5678","ReportSize":8200}`
+	jsonString := `{"JobID":"1234-5678","ReportSize":8200,"PreSignedURL":"www.test.com/object"}`
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, obj)
 	return err
@@ -387,18 +389,18 @@ func TestOnTaskComplete(t *testing.T) {
 				workflowInstance.failGetParameters = true
 			}
 
-			query := `UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;`
+			query := `UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, custom_report_url = $4, updated_at = $5 WHERE id = $6;`
 			if tc.isDBFailure {
 				if !workflowInstance.isRetriesLeft {
-					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
+					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, "", sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
 				} else {
-					mock.ExpectExec(query).WithArgs("success", "", 8200, sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
+					mock.ExpectExec(query).WithArgs("success", "", 8200, "www.test.com/object", sqlmock.AnyArg(), "1234-5678").WillReturnError(fmt.Errorf("update error"))
 				}
 			} else {
 				if !workflowInstance.isRetriesLeft {
-					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
+					mock.ExpectExec(query).WithArgs("failed", "error in task execution", 0, "", sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
 				} else {
-					mock.ExpectExec(query).WithArgs("success", "", 8200, sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
+					mock.ExpectExec(query).WithArgs("success", "", 8200, "www.test.com/object", sqlmock.AnyArg(), "1234-5678").WillReturnResult(sqlmock.NewResult(1, 1))
 				}
 			}
 
@@ -438,13 +440,14 @@ func (t *CerealTask) GetMetadata() cereal.TaskMetadata {
 }
 
 type mockObjStore struct {
-	T                      *testing.T
-	ForGetObjectFailure    bool
-	ForPutObjectFailure    bool
-	ForUnmarshallFailure   bool
-	IsBucketExisted        bool
-	ForBucketExistenceFail bool
-	ForMakeBucketFail      bool
+	T                         *testing.T
+	ForGetObjectFailure       bool
+	ForPutObjectFailure       bool
+	ForUnmarshallFailure      bool
+	IsBucketExisted           bool
+	ForBucketExistenceFail    bool
+	ForMakeBucketFail         bool
+	ForPresignedGetObjectFail bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
@@ -506,6 +509,20 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 	return nil
 }
 
+func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
+	assert.Equal(m.T, "reqID123", bucketName)
+	assert.Equal(m.T, "1234-5678.json", objectName)
+	assert.Equal(m.T, time.Hour*25, expires)
+
+	if m.ForPresignedGetObjectFail {
+		return nil, fmt.Errorf("error in getting pre-signed URL")
+	}
+	link, err := url.Parse("www.test.com/object")
+	assert.NoError(m.T, err)
+	return link, nil
+
+}
+
 func TestRun(t *testing.T) {
 	tests := []struct {
 		name                       string
@@ -517,6 +534,7 @@ func TestRun(t *testing.T) {
 		isBucketExisted            bool
 		isBucketExistenceCheckFail bool
 		isCreateBucketFail         bool
+		isPresignedGetObjectFail   bool
 	}{
 		{
 			name:          "testRun_Success",
@@ -557,19 +575,25 @@ func TestRun(t *testing.T) {
 			isDataStorePutError: true,
 			expectedError:       "error in storing the data object to objectstore: error in storing object to object store",
 		},
+		{
+			name:                     "testRun_PreSignedURL_Fail",
+			isPresignedGetObjectFail: true,
+			expectedError:            "error in creating a presigned url for object: error in getting pre-signed URL",
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			task := worker.GenerateReportTask{
 				ObjStoreClient: mockObjStore{
-					T:                      t,
-					ForGetObjectFailure:    tc.isDataStoreGetError,
-					ForPutObjectFailure:    tc.isDataStorePutError,
-					ForUnmarshallFailure:   tc.isUnmarshalError,
-					IsBucketExisted:        tc.isBucketExisted,
-					ForBucketExistenceFail: tc.isBucketExistenceCheckFail,
-					ForMakeBucketFail:      tc.isCreateBucketFail,
+					T:                         t,
+					ForGetObjectFailure:       tc.isDataStoreGetError,
+					ForPutObjectFailure:       tc.isDataStorePutError,
+					ForUnmarshallFailure:      tc.isUnmarshalError,
+					IsBucketExisted:           tc.isBucketExisted,
+					ForBucketExistenceFail:    tc.isBucketExistenceCheckFail,
+					ForMakeBucketFail:         tc.isCreateBucketFail,
+					ForPresignedGetObjectFail: tc.isPresignedGetObjectFail,
 				},
 				ObjBucketName: "testBucket",
 			}
