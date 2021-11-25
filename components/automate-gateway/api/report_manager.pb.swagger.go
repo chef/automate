@@ -40,6 +40,16 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.ExportData": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "format": "byte",
+          "description": "Exported reports in JSON or CSV."
+        }
+      }
+    },
     "chef.automate.api.report_manager.DownloadRequestResponse": {
       "type": "object",
       "properties": {
@@ -100,6 +110,31 @@ func init() {
           "format": "int32"
         },
         "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    },
+    "grpc.gateway.runtime.StreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
           "type": "string"
         },
         "details": {
