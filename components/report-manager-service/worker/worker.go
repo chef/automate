@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/url"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -100,7 +101,8 @@ func (s *ReportWorkflow) OnStart(w cereal.WorkflowInstance,
 	}
 
 	logrus.Infof("Inserting task %s into DB", workflowParams.JobID)
-	err = s.DB.InsertTask(workflowParams.JobID, workflowParams.RequestorID, RunningStatus, startTime, startTime)
+	err = s.DB.InsertTask(workflowParams.JobID, workflowParams.RequestorID, RunningStatus,
+		workflowParams.RequestToProcess.ReportType, startTime, startTime)
 	if err != nil {
 		err = errors.Wrap(err, "failed to insert the record in postgres")
 		logrus.WithError(err).Error()
@@ -150,7 +152,8 @@ func (s *ReportWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			return w.Continue(&payload)
 		}
 		//if there are no retries left, update the failed status to db and set the object size as 0
-		dbErr := s.DB.UpdateTask(payload.JobID, FailedStatus, err.Error(), time.Now(), 0)
+		//and set the presigned URL as empty
+		dbErr := s.DB.UpdateTask(payload.JobID, FailedStatus, err.Error(), "", time.Now(), 0)
 		if dbErr != nil {
 			dbErr = errors.Wrap(dbErr, "failed to update the record in postgres")
 			logrus.WithError(dbErr).Error()
@@ -172,7 +175,7 @@ func (s *ReportWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 	}
 
 	//update the finished status to db
-	err = s.DB.UpdateTask(payload.JobID, SuccessStatus, "", time.Now(), jobResult.ReportSize)
+	err = s.DB.UpdateTask(payload.JobID, SuccessStatus, "", jobResult.PreSignedURL, time.Now(), jobResult.ReportSize)
 	if err != nil {
 		err = errors.Wrap(err, "failed to update the record in postgres")
 		logrus.WithError(err).Error()
@@ -199,6 +202,7 @@ type GenerateReportParameters struct {
 	EndTime          *time.Time
 	RequestToProcess *report_manager.CustomReportRequest
 	ReportSize       int64
+	PreSignedURL     string
 }
 
 func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -236,8 +240,9 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 	}
 
 	var reportSize int64
+	var objectName string
 	if job.RequestToProcess.ReportType == "json" {
-		reportSize, err = t.jsonExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
+		reportSize, objectName, err = t.jsonExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
 		if err != nil {
 			return nil, err
 		}
@@ -248,9 +253,20 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 		}*/
 	}
 
+	//get the presigned URL for the stored object
+	reqParams := make(url.Values)
+	//reqParams.Set("response-content-disposition", fmt.Sprintf("attachment; filename=\"%s.%s\"", "export", job.RequestToProcess.ReportType))
+	preSignedURL, err := t.ObjStoreClient.PresignedGetObject(ctx, job.RequestToProcess.RequestorId, objectName, time.Second*25*60*60, reqParams)
+	if err != nil {
+		err = errors.Wrap(err, "error in creating a presigned url for object")
+		logrus.WithError(err).Error()
+		return nil, err
+	}
+
 	endTime := time.Now().UTC().Round(time.Second)
 	job.EndTime = &endTime
 	job.ReportSize = reportSize
+	job.PreSignedURL = preSignedURL.String()
 
 	return &job, nil
 }
@@ -421,13 +437,13 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToP
 }
 
 func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*reporting.Report, jobID,
-	requestorID string) (int64, error) {
+	requestorID string) (int64, string, error) {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(finalData)
 	if err != nil {
 		err = errors.Wrap(err, "error in encoding the final data")
 		logrus.WithError(err).Error()
-		return 0, err
+		return 0, "", err
 	}
 
 	objectName := utils.GetObjName(jobID)
@@ -435,7 +451,7 @@ func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*repo
 	if err != nil {
 		err = errors.Wrap(err, "error in storing the data object to objectstore")
 		logrus.WithError(err).Error()
-		return 0, err
+		return 0, "", err
 	}
-	return info.Size, nil
+	return info.Size, objectName, nil
 }
