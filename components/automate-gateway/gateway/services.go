@@ -48,6 +48,7 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	inter_eventfeed_Req "github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/api/interservice/report_manager"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
@@ -964,6 +965,67 @@ func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Request) {
+
+	url := r.URL.Path
+	splitURL := strings.Split(url, "/")
+	if len(splitURL) <= 5 {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	const (
+		resource = "reportmanager:reports:download:{id}"
+		action   = "reportmanager:requests:list"
+	)
+
+	ctx, err := s.authRequest(r, resource, action)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	requestor := ctx.Value("requestorid")
+	if requestor == nil || requestor.(string) == "" {
+		http.Error(w, "invalid request, missing requestor info", http.StatusBadRequest)
+		return
+	}
+
+	reportMgrClient, err := s.clientsFactory.ReportManagerClient()
+	if err != nil {
+		http.Error(w, "grpc service for report manager unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	resp, err := reportMgrClient.GetPresignedURL(ctx, &report_manager.GetPresignedURLRequest{
+		Id:          splitURL[5],
+		RequestorId: requestor.(string),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	//incase of no records available, return error message
+	if resp.Url == "" {
+		http.Error(w, "either the record not exist or the requestor doesn't have access", http.StatusForbidden)
+	}
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, resp.GetUrl(), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.%s", "export", resp.ReportType))
+	w.Header().Set("Content-Type", "application/octet-stream; charset=UTF-8")
+	w.Header().Set("Content-Length", strconv.FormatInt(resp.ReportSize, 10))
+	io.Copy(w, res.Body)
 }
 
 func init() {
