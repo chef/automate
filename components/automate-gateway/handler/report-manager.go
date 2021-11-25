@@ -42,3 +42,8 @@ func (r *ReportManager) ListDownloadReportRequests(ctx context.Context, in *empt
 	}
 	return out, nil
 }
+
+func (r *ReportManager) ExportFromReportManager(*report_manager.ExportFromReportManagerRequest, report_manager.ReportManagerService_ExportFromReportManagerServer) error {
+	// Please see components/automate-gateway/services.go ReportManagerExportHandler for implementation
+	return nil
+}
