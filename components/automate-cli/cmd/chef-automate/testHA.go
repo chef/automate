@@ -13,21 +13,23 @@ Usage:
     chef-automate test
 		run smoke tests manually.
 `
+var testCommandFlags = struct {
+	full bool
+}{}
 
-func newTestCmd() *cobra.Command {
-	var testCmd = &cobra.Command{
-		Use:   "test",
-		Short: "Run Automate HA smoke tests",
-		Long:  "Run smoke test for Automate HA services.",
-		Args:  cobra.RangeArgs(0, 1),
-		RunE:  runTestCmd,
-	}
-
-	return testCmd
+var testCmd = &cobra.Command{
+	Use:   "test",
+	Short: "Run Automate HA smoke tests",
+	Long:  "Run smoke test for Automate HA services.",
+	Args:  cobra.RangeArgs(0, 1),
+	RunE:  runTestCmd,
 }
 
 func runTestCmd(cmd *cobra.Command, args []string) error {
 	if isA2HARBFileExist() {
+		if testCommandFlags.full {
+			args = append(args, "--full")
+		}
 		return executeAutomateClusterCtlCommand("test", args, testHAHelpDocs)
 	} else {
 		return status.Wrap(errors.New("Test command only work with HA mode of automate"), status.ConfigError, testHAHelpDocs)
@@ -36,5 +38,10 @@ func runTestCmd(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	RootCmd.AddCommand(newTestCmd())
+	testCmd.PersistentFlags().BoolVar(
+		&testCommandFlags.full,
+		"full",
+		false,
+		"Automate ha cluster test full")
+	RootCmd.AddCommand(testCmd)
 }
