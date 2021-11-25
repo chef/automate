@@ -10,6 +10,7 @@ service ReportManagerService {
 	rpc StoreReport(stream StoreReportRequest) returns (google.protobuf.Empty) {};
 	rpc PrepareCustomReport(CustomReportRequest) returns (CustomReportResponse) {};
 	rpc GetAllRequestsStatus(AllStatusRequest) returns (AllStatusResponse) {}; 
+	rpc GetPresignedURL(GetPresignedURLRequest) returns (GetPresignedURLResponse) {};
 }
 
 message StoreReportRequest {
@@ -51,4 +52,15 @@ message StatusResponse {
 	string err_message = 4;
 	google.protobuf.Timestamp created_at = 5;
 	google.protobuf.Timestamp ended_at = 6;
+}
+
+message GetPresignedURLRequest {
+	string id = 1;
+	string requestor_id = 2;
+}
+
+message GetPresignedURLResponse {
+	string url = 1;
+	string report_type = 2;
+	int64 report_size = 3;
 }
