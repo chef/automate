@@ -191,6 +191,45 @@
         ]
       }
     },
+    "/api/v0/infra/servers/{server_id}/automateinfraserverorgs": {
+      "post": {
+        "operationId": "InfraProxy_GetAutomateInfraServerOrgs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerOrgs"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Automate Infra Server ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.AutomateInfraServerOrgs"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{server_id}/automateinfraserverusers": {
       "get": {
         "operationId": "InfraProxy_GetAutomateInfraServerUsersList",
@@ -2643,6 +2682,19 @@
     }
   },
   "definitions": {
+    "chef.automate.api.infra_proxy.request.AutomateInfraServerOrgs": {
+      "type": "object",
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "title": "Automate Infra Server ID"
+        },
+        "webui_key": {
+          "type": "string",
+          "title": "Automate Infra Server Web UI key"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.request.ClientKey": {
       "type": "object",
       "properties": {
@@ -3210,6 +3262,50 @@
         "ip_address": {
           "type": "string",
           "description": "Chef Infra Server IP address."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerOrg": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef organization ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Chef organization name."
+        },
+        "admin_user": {
+          "type": "string",
+          "description": "Chef organization admin user."
+        },
+        "credential_id": {
+          "type": "string",
+          "description": "Chef organization credential ID."
+        },
+        "server_id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects this chef organization belongs to. May be empty."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.AutomateInfraServerOrgs": {
+      "type": "object",
+      "properties": {
+        "orgs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.AutomateInfraServerOrg"
+          },
+          "description": "Chef organization list."
         }
       }
     },

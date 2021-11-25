@@ -25,6 +25,20 @@ func (c *InfraProxyServer) GetAutomateInfraServerUsersList(ctx context.Context, 
 	}, nil
 }
 
+//GetAutomateInfraServerUsersList: Fetches server users list from backend DB
+func (c *InfraProxyServer) GetAutomateInfraServerOrgs(ctx context.Context, r *gwreq.AutomateInfraServerOrgs) (*gwres.AutomateInfraServerOrgs, error) {
+	req := &infra_req.AutomateInfraServerOrgs{
+		ServerId: r.ServerId,
+		WebuiKey: r.WebuiKey,
+	}
+	res, err := c.client.GetAutomateInfraServerOrgs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.AutomateInfraServerOrgs{
+		Orgs: fromUpstreamAutomateInfraServerOrgs(res.Orgs),
+	}, nil
+}
 func fromUpstreamAutomateInfraServerUsers(ul []*infra_res.AutomateInfraServerUsersListItem) []*gwres.AutomateInfraServerUsersListItem {
 	usersList := make([]*response.AutomateInfraServerUsersListItem, len(ul))
 
@@ -44,5 +58,26 @@ func fromUpstreamAutomateInfraServerUser(u *infra_res.AutomateInfraServerUsersLi
 		Connector:           u.Connector,
 		AutomateUserId:      u.AutomateUserId,
 		IsServerAdmin:       u.IsServerAdmin,
+	}
+}
+
+func fromUpstreamAutomateInfraServerOrgs(ol []*infra_res.AutomateInfraServerOrg) []*gwres.AutomateInfraServerOrg {
+	orgsList := make([]*response.AutomateInfraServerOrg, len(ol))
+
+	for i, org := range ol {
+		orgsList[i] = fromUpstreamAutomateInfraServerOrg(org)
+	}
+
+	return orgsList
+}
+
+func fromUpstreamAutomateInfraServerOrg(o *infra_res.AutomateInfraServerOrg) *gwres.AutomateInfraServerOrg {
+	return &gwres.AutomateInfraServerOrg{
+		Id:           o.Id,
+		Name:         o.Name,
+		AdminUser:    o.AdminUser,
+		CredentialId: o.CredentialId,
+		ServerId:     o.ServerId,
+		Projects:     o.Projects,
 	}
 }

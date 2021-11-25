@@ -8,6 +8,11 @@ message AutomateInfraServerUsers {
     repeated AutomateInfraServerUsersListItem users=1;
 }
 
+message AutomateInfraServerOrgs {
+    // Chef organization list.
+    repeated AutomateInfraServerOrg orgs = 1;
+}
+
 message AutomateInfraServerUsersListItem {
     // User id
     string id=1;
@@ -23,4 +28,19 @@ message AutomateInfraServerUsersListItem {
     string automate_user_id=6;
     // User is server admin or not
     bool is_server_admin=7;
+}
+
+message AutomateInfraServerOrg {
+    // Chef organization ID.
+    string id = 1;
+    // Chef organization name.
+    string name = 2;
+    // Chef organization admin user.
+    string admin_user = 3;
+    // Chef organization credential ID.
+    string credential_id = 4;
+    // Chef Infra Server ID.
+    string server_id = 5;
+    // List of projects this chef organization belongs to. May be empty.
+    repeated string projects = 6;
 }

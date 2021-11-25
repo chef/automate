@@ -7,3 +7,10 @@ message AutomateInfraServerUsers {
     // Automate Infra Server ID.
     string server_id = 1;
 }
+
+message AutomateInfraServerOrgs {
+    // Automate Infra Server ID
+    string server_id = 1;
+    // Automate Infra Server Web UI key
+    string webui_key = 2;
+}
