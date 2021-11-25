@@ -183,8 +183,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   showSummary = false;
 
-  showOpenReport = false;
-
   private suggestionSearchTerms = new Subject<
     { 'type': string, 'text': string, 'type_key': string }>();
 
@@ -309,8 +307,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
       this.hideDownloadStatus();
     };
 
-    console.log(this.downloadReportsService);
-
     this.downloadList = [filename];
     this.showDownloadStatus();
     this.statsService.downloadReport(format, reportQuery).pipe(
@@ -328,14 +324,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.downloadStatusVisible = false;
     this.downloadInProgress = false;
     this.downloadFailed = false;
-  }
-
-  onReportOpenClick() {
-    this.showOpenReport = true;
-  }
-
-  onReportCloseClick() {
-    this.showOpenReport = false;
   }
 
   onEndDateChanged(event) {
