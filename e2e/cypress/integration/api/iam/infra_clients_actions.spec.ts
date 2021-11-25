@@ -1,6 +1,6 @@
 describe('Infra Clients get', () => {
-let withInfraServersClientGetActionToken = '';
-let withoutInfraServersClientGetActionToken = '';
+    let withInfraServersClientGetActionToken = '';
+    let withoutInfraServersClientGetActionToken = '';
 
     const cypressPrefix = 'infra-server-client-actions-get';
     const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
@@ -132,7 +132,7 @@ describe('Infra Clients create', () => {
             {
                 effect: 'ALLOW',
                 actions: [
-                    'infra:infraServersOrgsClient:get'
+                    'infra:infraServersOrgsClient:create'
                 ],
                 projects: ['*']
             }]
@@ -208,7 +208,14 @@ describe('Infra Clients create', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersClientCreateActionToken },
                 method: 'POST',
-                url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients'
+                url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients',
+                body: {
+                    create_key: true,
+                    name: 'test',
+                    org_id: 'test-org',
+                    server_id: 'local-dev',
+                    validator: true
+                },
                 }).then((resp) => {
                     assert.equal(resp.status, 200);
                 });
@@ -219,6 +226,13 @@ describe('Infra Clients create', () => {
                 headers: { 'api-token': withoutInfraServersClientCreateActionToken },
                 method: 'POST',
                 url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients',
+                body: {
+                    create_key: true,
+                    name: 'test',
+                    org_id: 'test-org',
+                    server_id: 'local-dev',
+                    validator: true
+                },
                 failOnStatusCode: false
                 }).then((resp) => {
                 assert.equal(resp.status, 403);
@@ -322,18 +336,18 @@ describe('Infra Client delete', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersClientDeleteActionToken },
             method: 'DELETE',
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients/chef-load-1',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients/test',
             failOnStatusCode: false
             }).then((resp) => {
                 assert.equal(resp.status, 403);
             });
     });
 
-    it('policyfiles delete returns 200 when delete actions is allowed', () => {
+    it('client delete returns 200 when delete actions is allowed', () => {
         cy.request({
-            headers: { 'api-token': withInfraServersPolicyFilesDeleteActionToken },
+            headers: { 'api-token': withInfraServersClientDeleteActionToken },
             method: 'DELETE',
-            url: '/api/v0/infra/servers/local-dev/orgs/test-org/policyfiles/examplecb'
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients/test'
             }).then((resp) => {
             assert.equal(resp.status, 200);
         });
