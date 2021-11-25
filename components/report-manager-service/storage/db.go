@@ -86,16 +86,16 @@ func runMigrations(dbConf *config.Storage) error {
 	return nil
 }
 
-func (db *DB) InsertTask(id, requestorID, status string, createdTime, updatedTime time.Time) error {
-	_, err := db.Exec(insertTask, id, requestorID, status, createdTime, updatedTime)
+func (db *DB) InsertTask(id, requestorID, status, reportType string, createdTime, updatedTime time.Time) error {
+	_, err := db.Exec(insertTask, id, requestorID, status, reportType, createdTime, updatedTime)
 	if err != nil {
 		err = fmt.Errorf("error in executing the insert task: %w", err)
 	}
 	return err
 }
 
-func (db *DB) UpdateTask(id, status, msg string, updatedTime time.Time, objSize int64) error {
-	_, err := db.Exec(updateTask, status, msg, objSize, updatedTime, id)
+func (db *DB) UpdateTask(id, status, msg, preSignedURL string, updatedTime time.Time, objSize int64) error {
+	_, err := db.Exec(updateTask, status, msg, objSize, preSignedURL, updatedTime, id)
 	if err != nil {
 		err = fmt.Errorf("error in executing the update task: %w", err)
 	}
@@ -130,14 +130,42 @@ func (db *DB) GetAllStatus(id string, endTime time.Time) (*report_manager.AllSta
 	return &resp, nil
 }
 
+// PreSignedURLResponse used to read custom report's presigned URL and other details from DB
+type PreSignedURLResponse struct {
+	PresignedURL string `db:"custom_report_url"`
+	ReportType   string `db:"custom_report_type"`
+	ReportSize   int64  `db:"custom_report_size"`
+}
+
+func (db *DB) GetPreSignedURL(id, requestorID string) (*report_manager.GetPresignedURLResponse, error) {
+	var dbResp []*PreSignedURLResponse
+	resp := report_manager.GetPresignedURLResponse{}
+	_, err := db.Select(&dbResp, getPreSignedURL, id, requestorID)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in fetching the presigned url from db")
+	}
+	if len(dbResp) > 1 {
+		return nil, fmt.Errorf("multiple reports are available for given id and requestor")
+	}
+	for _, item := range dbResp {
+		resp.Url = item.PresignedURL
+		resp.ReportType = item.ReportType
+		resp.ReportSize = item.ReportSize
+	}
+	return &resp, nil
+}
+
 const insertTask = `
-INSERT INTO custom_report_requests(id, requestor, status,created_at,updated_at)
-VALUES ($1, $2, $3, $4, $5);
+INSERT INTO custom_report_requests(id, requestor, status, custom_report_type, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6);
 `
 const updateTask = `
-UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, updated_at = $4 WHERE id = $5;
+UPDATE custom_report_requests SET status = $1, message = $2, custom_report_size = $3, custom_report_url = $4, updated_at = $5 WHERE id = $6;
 `
 
 const getStatus = `
 SELECT id, status, message, custom_report_size, created_at, updated_at FROM custom_report_requests WHERE requestor = $1 AND created_at >= $2 ORDER BY created_at DESC;
+`
+const getPreSignedURL string = `
+SELECT custom_report_url, custom_report_type, custom_report_size FROM custom_report_requests where id = $1 and requestor = $2;
 `
