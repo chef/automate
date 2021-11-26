@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Certificate Rotation"
     parent = "automate/install"
-    identifier = "automate/install/HA_cert_rotataion.md Chef Automate Certificate Rotation"
+    identifier = "automate/install/ha_cert_rotataion.md Chef Automate Certificate Rotation"
     weight = 260
 +++
 

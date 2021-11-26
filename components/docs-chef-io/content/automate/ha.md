@@ -8,7 +8,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Overview"
     parent = "automate/install"
-    identifier = "automate/install/HA.md High Availability"
+    identifier = "automate/install/ha.md High Availability"
     weight = 200
 +++
 
@@ -86,7 +86,7 @@ Disaster Recovery (DR) is a comprehensive plan for recovering critical operation
 
 Chef Automate HA promotes the DR cluster through regular backup and restores measures syncing the data from the production cluster to the DR cluster. Typically, these two clusters are located in different data centers or cloud provider regions enabling a production environment in a short period with minimal data loss.
 
-### What happens during a Chef Automate HA failover?
+#### Failover System
 
 Chef Automate HA enables the ability of the system to continue functioning even after the failure of one or more servers. A part of HA is failover, which refers to the ability for client connections to migrate from one server to another in the event of server failure. The client applications can continue to operate with minimal downtime.
 
