@@ -306,7 +306,7 @@
                   <p class="node-name">
                     <strong><app-time [time]='report.end_time'></app-time></strong>
                   </p>
-                  <!-- <p>{{formatDaysAgo(report.end_time)}}</p> -->
+                  <p>{{formatDaysAgo(report.end_time)}}</p>
                 </div>
                 <chef-button secondary (click)="onReportItemClick($event, report)">
                   <chef-icon>chevron_right</chef-icon>
