@@ -14,12 +14,12 @@ class MinimumTests < Assert::Context
   test 'PostgreSQL leader is a functioning read/write database' do
     leader = harness.pg_promoted_leader
     assert_true !leader.nil?
-    codes = harness.run_pgbench(harness.postgresql_public_ips)
+    codes = harness.run_pgbench(harness.postgresql_private_ips)
     assert_equal [], codes.reject(&:zero?)
   end
 
   test 'Terraform outputs AWS PostgreSQL cluster public IPs' do
-    pub_ips = harness.postgresql_public_ips
+    pub_ips = harness.postgresql_private_ips
     assert_true !pub_ips.empty?
   end
 

@@ -142,20 +142,8 @@ module BackendUtils
       tf_output_value("automate_private_ips")
     end
 
-    def automate_public_ips
-      tf_output_value("automate_public_ips")
-    end
-
-    def chef_server_public_ips
-      tf_output_value("chef_server_public_ips")
-    end
-
     def postgresql_private_ips
       tf_output_value("postgresql_private_ips")
-    end
-
-    def postgresql_public_ips
-      tf_output_value("postgresql_public_ips")
     end
 
     def elasticsearch_private_ips
@@ -179,7 +167,7 @@ module BackendUtils
     end
 
     def pg_hab_elected_leader
-      each_alive(postgresql_public_ips) do |conn|
+      each_alive(postgresql_private_ips) do |conn|
         cmd = "#{curl_bin} -sk -H \"Authorization: Bearer #{hab_sup_http_gateway_auth_token}\" https://localhost:9631/census | #{jq_bin} \
           '.census_groups.\"automate-ha-postgresql.default\".population[] | select \
           (.leader == true) | \"\\(.sys.gossip_ip)\"'"
@@ -193,7 +181,7 @@ module BackendUtils
         index = index_of(postgresql_private_ips, ip)
         next unless index
 
-        leader = postgresql_public_ips[index]
+        leader = postgresql_private_ips[index]
         @backend_logger.info "/census says Habitat elected PostgreSQL topology leader is: #{leader}"
         return leader
       end
@@ -202,14 +190,14 @@ module BackendUtils
 
     def pg_promoted_leader
       index = 0
-      each_alive(postgresql_public_ips) do |conn|
+      each_alive(postgresql_private_ips) do |conn|
         output = conn.run_command("#{curl_bin} -s localhost:6432 | #{jq_bin} .Status").stdout.chomp
         conn.close
         next if output.nil? || output == ''
         status = JSON.parse(output)
         @backend_logger.info "#{conn.hostname} pgleaderchk: #{output} NOTE: replicas will show critical"
         if status == 'ok'
-          leader = postgresql_public_ips[index]
+          leader = postgresql_private_ips[index]
           @backend_logger.info "Read/Write PostgreSQL leader: #{leader}"
           return leader
         end
@@ -219,11 +207,11 @@ module BackendUtils
     end
 
     def pg_hab_elected_replicas
-      postgresql_public_ips - [pg_hab_elected_leader]
+      postgresql_private_ips - [pg_hab_elected_leader]
     end
 
     def pg_demoted_replicas
-      postgresql_public_ips - [pg_promoted_leader]
+      postgresql_private_ips - [pg_promoted_leader]
     end
 
     def index_of(arr, host_ip)

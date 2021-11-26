@@ -21,8 +21,8 @@ module AutomateCluster
         smoke_log_level = options[:verbose] ? '--log-level=debug' : '--log-level=info'
         base_inspec_cmd = "CHEF_LICENSE=accept-no-persist $(hab pkg path chef/inspec)/bin/inspec exec --sudo #{sudo_cmd_option} #{password_option} --key-files #{utils.ssh_key_file} #{smoke_log_level} --show-progress"
 
-        utils.backend_logger.info ">>>> Running Automate Frontend inspec smoke tests against: #{utils.automate_public_ips}"
-        utils.automate_public_ips.each do |ip|
+        utils.backend_logger.info ">>>> Running Automate Frontend inspec smoke tests against: #{utils.automate_private_ips}"
+        utils.automate_private_ips.each do |ip|
           begin
             cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-frontend-smoke/"
             utils.backend_logger.debug cmd
@@ -33,8 +33,8 @@ module AutomateCluster
           end
         end
 
-        utils.backend_logger.info ">>>> Running Automate Chef Server inspec smoke tests against: #{utils.chef_server_public_ips}"
-        utils.chef_server_public_ips.each do |ip|
+        utils.backend_logger.info ">>>> Running Automate Chef Server inspec smoke tests against: #{utils.chef_server_private_ips}"
+        utils.chef_server_private_ips.each do |ip|
           begin
             cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-frontend-chef-server-smoke/"
             utils.backend_logger.debug cmd
@@ -45,8 +45,8 @@ module AutomateCluster
           end
         end
 
-        utils.backend_logger.info ">>>> Running Automate PostgreSQL inspec smoke tests against: #{utils.postgresql_public_ips}"
-        utils.postgresql_public_ips.each do |ip|
+        utils.backend_logger.info ">>>> Running Automate PostgreSQL inspec smoke tests against: #{utils.postgresql_private_ips}"
+        utils.postgresql_private_ips.each do |ip|
           begin
             cmd = "#{base_inspec_cmd} --target ssh://#{utils.ssh_user}@#{ip} #{utils.top_level_dir}/inspec/automate-backend-postgresql-smoke/"
             utils.backend_logger.debug cmd

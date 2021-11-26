@@ -322,7 +322,7 @@ module AutomateCluster
           local_script_file.close
           remote_script_filename = remote_filename
 
-          frontends = utils.automate_public_ips + utils.chef_server_public_ips
+          frontends = utils.automate_private_ips + utils.chef_server_private_ips
           frontends.each do |frontend|
             conn = utils.train(frontend, opts).connection
             conn.wait_until_ready
