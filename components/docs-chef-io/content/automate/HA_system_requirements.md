@@ -79,3 +79,6 @@ VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv
 >>>>>>> 6f2ef1dc (netlify error fixes)
 =======
 >>>>>>> 53b13ce6 (Punit/Eng comments and more edits)
+=======
+VPC IP address ranges are defined using Classless interdomain routing (CIDR) IPv4 and IPv6 blocks. You can add primary and secondary CIDR blocks to your VPC, if the secondary CIDR block comes from the same address range as the primary block.
+>>>>>>> 76d95420 (2nd draft comment fixes - for aws)
