@@ -240,6 +240,120 @@ describe('Infra Clients create', () => {
         });
     });
 
+    describe('Infra Reset Client Key', () => {
+        let withInfraServersClientResetActionToken = '';
+        let withoutInfraServersClientResetActionToken = '';
+    
+        const cypressPrefix = 'infra-server-client-actions-reset';
+        const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+        const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+        const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+        const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+        const objectsToCleanUp = ['tokens', 'policies'];
+    
+        const withInfraServersClientResetPolicy = {
+        id: policyId1,
+        name: tokenId1,
+        projects: [],
+        members: [`token:${tokenId1}`],
+        statements: [
+            {
+                effect: 'ALLOW',
+                actions: [
+                    'infra:infraServersOrgsClient:update'
+                ],
+                projects: ['*']
+            }]
+        };
+    
+    
+        const withoutInfraServersClientResetPolicy = {
+            id: policyId2,
+            name: tokenId2,
+            projects: [],
+            members: [`token:${tokenId2}`],
+            statements: [
+            {
+                effect: 'DENY',
+                actions: [
+                    'infra:infraServersOrgsClient:update'
+                ],
+                projects: ['*']
+            }]
+        };
+    
+        before(() => {
+            cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    
+            cy.request({
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+                method: 'POST',
+                url: '/apis/iam/v2/tokens',
+                body: {
+                    id: tokenId1,
+                    name: tokenId1
+                }
+                }).then((resp) => {
+                    withInfraServersClientResetActionToken = resp.body.token.value;
+                });
+    
+            cy.request({
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+                method: 'POST',
+                url: '/apis/iam/v2/policies',
+                body: withInfraServersClientResetPolicy
+                }).then((resp) => {
+                    expect(resp.status).to.equal(200);
+                });
+    
+            cy.request({
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+                method: 'POST',
+                url: '/apis/iam/v2/tokens',
+                body: {
+                    id: tokenId2,
+                    name: tokenId2
+                }
+                }).then((resp) => {
+                    withoutInfraServersClientResetActionToken = resp.body.token.value;
+                });
+    
+            cy.request({
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+                method: 'POST',
+                url: '/apis/iam/v2/policies',
+                body: withoutInfraServersClientResetPolicy
+                }).then((resp) => {
+                    expect(resp.status).to.equal(200);
+                });
+            });
+    
+        after(() => {
+            cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+        });
+    
+        it('client put returns 403 when update actions is denied', () => {
+            cy.request({
+                headers: { 'api-token': withoutInfraServersClientResetActionToken },
+                method: 'PUT',
+                url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients/test/reset',
+                failOnStatusCode: false
+                }).then((resp) => {
+                    assert.equal(resp.status, 403);
+                });
+        });
+    
+        it('client put returns 200 when update actions is allowed', () => {
+            cy.request({
+                headers: { 'api-token': withInfraServersClientResetActionToken },
+                method: 'PUT',
+                url: '/api/v0/infra/servers/local-dev/orgs/test-org/clients/test/reset'
+                }).then((resp) => {
+                assert.equal(resp.status, 200);
+            });
+        });
+    });
+
 describe('Infra Client delete', () => {
     let withInfraServersClientDeleteActionToken = '';
     let withoutInfraServersClientDeleteActionToken = '';
