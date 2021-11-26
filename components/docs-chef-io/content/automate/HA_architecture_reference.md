@@ -9,11 +9,11 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Reference Architecture"
     parent = "automate/install"
-    identifier = "automate/install/HA_architecture_reference.md HA Reference Architecture"
+    identifier = "automate/install/ha_architecture_reference.md HA Reference Architecture"
     weight = 230
 +++
 
-## Reference Architecture
+## Chef Automate High Availability (HA) Architecture
 
 This section includes Chef Automate High Availability (HA) high-level reference architecture that interacts with the HA backend components on different providers or in different environments.
 

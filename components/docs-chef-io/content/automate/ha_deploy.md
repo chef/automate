@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Deploy"
     parent = "automate/install"
-    identifier = "automate/install/HA_deploy.md Chef Automate HA Deployment"
+    identifier = "automate/install/ha_deploy.md Chef Automate HA Deployment"
     weight = 220
 +++
 
@@ -46,8 +46,8 @@ Both types of deployment models require you to install and configure Chef Automa
 Follow these steps to install **Chef Automate** utility on the fresh server.
 
 - Open **Command Prompt** and navigate to your preferred location.
-- Type the `curl` command, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip` and press **Enter**. The command downloads the Chef Automate utility installer in .zip format.
-- Type the `gunzip` command, `gunzip - > chef-automate && chmod +x chef-automate` and press **Enter**. The command installs the utility and provides the execute permission to the Chef Automate file.
+- Type the `curl` and `gunzip` commands together, `curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate | cp -f chef-automate /usr/bin/chef-automate` and press **Enter**. The command downloads the Chef Automate utility installer in .zip format.
+- Type the  command,  and press **Enter**. The command installs the utility and provides the execute permission to the Chef Automate file.
 
   The installation of the Chef Automate utility completes and a confirmation message displays on your terminal as shown in the below screen.
 
@@ -59,13 +59,8 @@ Follow these steps to install **Chef Automate** utility on the fresh server.
 
 - Chef Automate Utility
 - Servers provisioned and accessible through SSH from each other.
-- List of Virtual Machines (VM) with public and private  numbers. Public IP address is not mandatory.
-- Create the HAB user --how?
-- Create following directories for all *Postgress* nodes using commands as listed:
-
-  - sudo mkdir -p /mnt/automate_backups/postgresql/pg_dump/
-  - sudo mkdir -p /mnt/automate_backups/postgresql/archive/
-  - sudo chown -R hab:hab /mnt/automate_backups/
+- List of Virtual Machines (VM) with public and private numbers. Public IP address is not mandatory.
+- Obtain IP address of the instances. 
 
 - All VMs must expose the port 22 for SSH. Yoy may need to open certain port across the VMs to establish the communication, which are:
 
@@ -151,6 +146,10 @@ volume type, size and iops
 aws region
 ssh_key_pair_name (this is same key-pair name what we have used to provision the bastion ec2 machine). In Section-I we have define the ssh_key_file, this should point to the same key file.
 Setup the secrets management key and any needed passwords. The default location for the secrets key and secret storage is set in the config file. The default location for the key is /etc/chef-automate/secrets.key and the secret store file is in /hab/a2_deploy_workspace/secrets.json
+
+provide the VPC and cider block detail as well.
+
+Arn link in config.toml… default certificate we can use - certificate manager — 
 
 
 1. Type the command, `./chef-automate secrets init` and press **Enter**. This command generates a new secrets key, which is used to encrypt the secret store.
