@@ -934,6 +934,10 @@ message ControlElement {
 	float impact = 4;
 	// The total number of results.
 	int32 results = 5;
+	// The control's status
+	string status = 6;
+	// Profile id
+	string profile_id = 7;
 }
 
 message ControlElements {

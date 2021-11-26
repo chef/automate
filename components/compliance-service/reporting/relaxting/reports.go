@@ -1057,7 +1057,10 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 	}
 
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
-		numProfiles := make([]string, 0)
+		numProfiles := make(map[int]struct {
+			Name   string
+			Sha256 string
+		}, 0)
 		// Extract the profile name for adding the root profile name to the return response.
 		for _, hit := range searchResult.Hits.Hits {
 			esInSpecReport := ESInSpecReport{}
@@ -1066,8 +1069,14 @@ func (backend *ES2Backend) GetNodeControlListItems(ctx context.Context, filters 
 				logrus.Errorf("error unmarshalling the search response: %+v", err)
 				return nil, err
 			}
-			for _, profile := range esInSpecReport.Profiles {
-				numProfiles = append(numProfiles, profile.Name)
+			for index, profile := range esInSpecReport.Profiles {
+				numProfiles[index] = struct {
+					Name   string
+					Sha256 string
+				}{
+					Name:   profile.Name,
+					Sha256: profile.SHA256,
+				}
 			}
 		}
 
@@ -1675,6 +1684,11 @@ func getProfileAndControlQueryWithPagination(filters map[string][]string) (*elas
 	numberOfProfiles := len(filters["profile_id"])
 	numberOfControls := len(filters["control"])
 
+	var status string
+	if temp, ok := filters["status"]; ok {
+		status = strings.Join(temp, "|")
+	}
+
 	if numberOfProfiles == 0 {
 		profileIds = ".*"
 	} else {
@@ -1689,19 +1703,28 @@ func getProfileAndControlQueryWithPagination(filters map[string][]string) (*elas
 
 	if numberOfProfiles > 0 && numberOfControls > 0 {
 		profileQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.sha256:/(%s)/", profileIds))
-		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
-		nestedControlQuery := elastic.NewNestedQuery("profiles.controls", controlQuery)
-		nestedControlQuery = nestedControlQuery.InnerHit(elastic.NewInnerHit())
+		controlQuery := controlQuery(controlIds, status)
+		nestedControlQuery, err := createPaginatedControl(controlQuery, filters)
+		if err != nil {
+			return nil, err
+		}
 		profileControlQuery = profileControlQuery.Must(profileQuery)
 		profileControlQuery = profileControlQuery.Must(nestedControlQuery)
 	} else if numberOfControls > 0 {
-		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
-		nestedControlQuery := elastic.NewNestedQuery("profiles.controls", controlQuery)
-		nestedControlQuery = nestedControlQuery.InnerHit(elastic.NewInnerHit())
+		controlQuery := controlQuery(controlIds, status)
+		nestedControlQuery, err := createPaginatedControl(controlQuery, filters)
+		if err != nil {
+			return nil, err
+		}
 		profileControlQuery = profileControlQuery.Must(nestedControlQuery)
 	} else if numberOfProfiles > 0 {
 		profileQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.sha256:/(%s)/", profileIds))
-		controlQuery := elastic.NewMatchAllQuery()
+		var controlQuery elastic.Query
+		if status != "" {
+			controlQuery = elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.status:/(%s)/", status))
+		} else {
+			controlQuery = elastic.NewMatchAllQuery()
+		}
 		nestedControlQuery, err := createPaginatedControl(controlQuery, filters)
 		if err != nil {
 			return nil, err
@@ -1709,7 +1732,12 @@ func getProfileAndControlQueryWithPagination(filters map[string][]string) (*elas
 		profileControlQuery = profileControlQuery.Must(profileQuery)
 		profileControlQuery = profileControlQuery.Must(nestedControlQuery)
 	} else {
-		controlQuery := elastic.NewMatchAllQuery()
+		var controlQuery elastic.Query
+		if status != "" {
+			controlQuery = elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.status:/(%s)/", status))
+		} else {
+			controlQuery = elastic.NewMatchAllQuery()
+		}
 		nestedControlQuery, err := createPaginatedControl(controlQuery, filters)
 		if err != nil {
 			return nil, err
@@ -1722,14 +1750,33 @@ func getProfileAndControlQueryWithPagination(filters map[string][]string) (*elas
 	return nestedQuery, nil
 }
 
+// controlQuery creates a query based on controlIds and status
+func controlQuery(controlIds, status string) elastic.Query {
+	var controlQuery elastic.Query
+	if status != "" {
+		idQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
+		statusQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.status:/(%s)/", status))
+		boolQuery := elastic.NewBoolQuery()
+		controlQuery = boolQuery.Must(idQuery, statusQuery)
+	} else {
+		controlQuery = elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
+	}
+	return controlQuery
+}
+
 // populateControlElements creates the control lists for each search hit.
-func populateControlElements(searchHits *elastic.SearchHit, profiles []string) ([]*reportingapi.ControlElement, error) {
+func populateControlElements(searchHits *elastic.SearchHit, profiles map[int]struct {
+	Name   string
+	Sha256 string
+}) ([]*reportingapi.ControlElement, error) {
 	var listControls = make([]*reportingapi.ControlElement, 0)
 	var tempControl struct {
-		ID      string
-		Impact  float32
-		Results []*reportingapi.Result
-		Title   string
+		ID        string
+		Impact    float32
+		Results   []*reportingapi.Result
+		Title     string
+		ProfileID string
+		Status    string
 	}
 	for _, innerhit := range searchHits.InnerHits["profiles.controls"].Hits.Hits {
 		control := &reportingapi.ControlElement{}
@@ -1738,13 +1785,23 @@ func populateControlElements(searchHits *elastic.SearchHit, profiles []string) (
 			logrus.Errorf("error unmarshalling the search control response: %+v", err)
 			return listControls, err
 		}
+
 		// store the control result to temporary control element
-		profileID := innerhit.Nested.Offset
+		profileOffset := innerhit.Nested.Offset
+		profile, ok := profiles[profileOffset]
+		if !ok {
+			err := fmt.Errorf("error in fetching profile information for given control")
+			logrus.Error(err)
+			return listControls, err
+		}
+
 		control.Id = tempControl.ID
 		control.Impact = tempControl.Impact
 		control.Results = int32(len(tempControl.Results))
 		control.Title = tempControl.Title
-		control.Profile = profiles[profileID]
+		control.Profile = profile.Name
+		control.ProfileId = profile.Sha256
+		control.Status = tempControl.Status
 		listControls = append(listControls, control)
 	}
 	return listControls, nil
