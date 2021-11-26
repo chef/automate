@@ -211,33 +211,34 @@
                 <chef-td >{{control.profile}}</chef-td>
                 <chef-td >{{control.results}}</chef-td>
                 <chef-td >
-                  <chef-button disabled secondary (click)="toggleControl(control)">
+                  <chef-button secondary (click)="toggleControl(control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
                   </chef-button>
                 </chef-td>
               </chef-tr>
-              <div class="control-detail" *ngIf="isOpenControl(control)">
-                <p *ngIf="control.desc.length">{{ control.desc }}</p>
+              <div class="control-detail" *ngIf="isOpenControl(control) && controlDetails.profiles[0].controls[0]">
+                <!-- <chef-loading-spinner *ngIf="!isOpenControl(control)" size="50"></chef-loading-spinner> -->
+                <p *ngIf="controlDetails.profiles[0].controls[0].desc">{{ controlDetails.profiles[0].controls[0].desc }}</p>
                 <chef-toggle
-                  [value]="openControls[control.id]?.pane"
-                  (change)="showControlPane(control, $event.target.value)">
+                  [value]="openControls[controlDetails.profiles[0].controls[0].id]?.pane"
+                  (change)="showControlPane(controlDetails.profiles[0].controls[0], $event.target.value)">
                   <chef-option value='results'>Results</chef-option>
                   <chef-option value='source'>Source</chef-option>
                 </chef-toggle>
-                <ng-container [ngSwitch]="openControlPane(control)">
+                <ng-container [ngSwitch]="openControlPane(controlDetails.profiles[0].controls[0])">
                   <div *ngSwitchCase="'results'">
-                    <div *ngIf="control.status === 'waived'">
+                    <div *ngIf="controlDetails.profiles[0].controls[0].status === 'waived'">
                       <p>This control was waived.</p>
                       <dl class="waiver-details">
                         <dt>Expires:</dt>
-                        <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                        <dd>{{ controlDetails.profiles[0].controls[0].waiver_data.expiration_date | datetime: RFC2822 }}</dd>
                         <dt>Reason:</dt>
-                        <dd>{{ control.waiver_data.justification }}</dd>
+                        <dd>{{ controlDetails.profiles[0].controls[0].waiver_data.justification }}</dd>
                       </dl>
                     </div>
                     <!-- show results of control even if waived -->
-                      <div class="result-item" *ngFor="let result of control.results">
+                    <div class="result-item" *ngFor="let result of controlDetails.profiles[0].controls[0].results ">
                       <div class="result-item-header">
                         <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
                         <p>{{ result.code_desc }}</p>
@@ -247,7 +248,7 @@
                       </div>
                     </div>
                     <!-- display message when there are no results -->
-                    <div class="result-item" *ngIf="control.results.length === 0">
+                    <div class="result-item" *ngIf="controlDetails.profiles[0].controls[0].results.length === 0">
                       <div class="result-item-header">
                         <p>No tests were executed</p>
                       </div>
@@ -256,7 +257,7 @@
                   <chef-snippet
                     class="source"
                     *ngSwitchCase="'source'"
-                    [code]="control.code"
+                    [code]="controlDetails.profiles[0].controls[0].code"
                     lang="ruby">
                   </chef-snippet>
                 </ng-container>

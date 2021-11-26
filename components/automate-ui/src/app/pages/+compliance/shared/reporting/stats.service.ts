@@ -289,6 +289,27 @@ export class StatsService {
       }));
   }
 
+  getControlDetails(reportID, profileId, controlId): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
+    const params = {"filters":[
+      {'type': 'profile_id', 'values': [`${profileId}`]},
+      {'type': 'control', 'values': [`${controlId}`]}]
+    };
+
+    return this.httpClient.post<any>(url, params).pipe(
+      map((data) => {
+        data.profiles.forEach(p => {
+          p.controls.forEach(c => {
+            // precalculate overall control status from results
+            c.results = c.results || [];
+            c.status = this.getControlStatus(c);
+          });
+        });
+        return omitBy(data, isNil);
+      })
+    );
+  }
+
   /* TODO Auth team: Helper functions that are only not private because
      they have unit testing. Should we delete their tests and make
      them private? */

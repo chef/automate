@@ -40,6 +40,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   pageIndex = 1;
   perPage = 100;
   controlsLoading = false;
+  controlDetails: any = {};
+  controlDetailsLoading = false;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -153,10 +155,18 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.openControls[id] && this.openControls[id].open;
   }
 
-  toggleControl(control: { id: string | number; }) {
+  toggleControl(control: { id: string | number; profile_id: string; }) {
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
+    if (toggled.open === true) {
+      this.statsService.getControlDetails(this.activeReport.id ,control.profile_id, control.id)
+      .pipe(first())
+      .subscribe(data => {
+        // this.controlDetailsLoading = false;
+        this.controlDetails = data;
+      })
+    }
   }
 
   openControlPane(control: { id: string | number; }) {
