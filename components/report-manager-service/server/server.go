@@ -23,27 +23,33 @@ import (
 
 // Server implementation for reporting
 type Server struct {
-	ObjStoreClient objstore.ObjectStore
-	CerealManager  *cereal.Manager
-	ctx            context.Context
-	ObjBucket      string
-	DataStore      *storage.DB
+	ObjStoreClient       objstore.ObjectStore
+	CerealManager        *cereal.Manager
+	ctx                  context.Context
+	ObjBucket            string
+	DataStore            *storage.DB
+	EnableLargeReporting bool
 }
 
 // New creates a new server
-func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string, db *storage.DB) *Server {
+func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string, db *storage.DB,
+	enableLargeReporting bool) *Server {
 	return &Server{
 		ObjStoreClient: objstore.ReportManagerObjStore{
 			ObjStoreClient: objStoreClient,
 		},
-		CerealManager: cerealManager,
-		ctx:           context.Background(),
-		ObjBucket:     objBucket,
-		DataStore:     db,
+		CerealManager:        cerealManager,
+		ctx:                  context.Background(),
+		ObjBucket:            objBucket,
+		DataStore:            db,
+		EnableLargeReporting: enableLargeReporting,
 	}
 }
 
 func (s *Server) StoreReport(stream report_manager.ReportManagerService_StoreReportServer) error {
+	if !s.EnableLargeReporting {
+		return fmt.Errorf("customer not enabled for large reporting")
+	}
 	reportData := bytes.Buffer{}
 
 	for {
@@ -84,6 +90,10 @@ func (s *Server) StoreReport(stream report_manager.ReportManagerService_StoreRep
 func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.CustomReportRequest) (
 	*report_manager.CustomReportResponse, error) {
 
+	if !s.EnableLargeReporting {
+		return nil, fmt.Errorf("customer not enabled for large reporting")
+	}
+
 	id := uuid.New()
 	err := s.CerealManager.EnqueueWorkflow(s.ctx, worker.ReportWorkflowName,
 		fmt.Sprintf("%s-%s", "report-workflow", id.String()),
@@ -105,8 +115,22 @@ func (s *Server) PrepareCustomReport(ctx context.Context, req *report_manager.Cu
 }
 
 func (s *Server) GetAllRequestsStatus(ctx context.Context, req *report_manager.AllStatusRequest) (*report_manager.AllStatusResponse, error) {
+	if !s.EnableLargeReporting {
+		return nil, fmt.Errorf("customer not enabled for large reporting")
+	}
 	if req.RequestorId == "" {
 		return &report_manager.AllStatusResponse{}, fmt.Errorf("empty requestore information")
 	}
 	return s.DataStore.GetAllStatus(req.RequestorId, time.Now().Add(-24*time.Hour))
+}
+
+func (s *Server) GetPresignedURL(ctx context.Context, req *report_manager.GetPresignedURLRequest) (
+	*report_manager.GetPresignedURLResponse, error) {
+	if !s.EnableLargeReporting {
+		return nil, fmt.Errorf("customer not enabled for large reporting")
+	}
+	if req.Id == "" || req.RequestorId == "" {
+		return &report_manager.GetPresignedURLResponse{}, fmt.Errorf("id and requestor should not be empty")
+	}
+	return s.DataStore.GetPreSignedURL(req.Id, req.RequestorId)
 }

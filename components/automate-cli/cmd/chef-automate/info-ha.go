@@ -3,6 +3,8 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 )
 
@@ -22,5 +24,8 @@ var infoCmd = &cobra.Command{
 }
 
 func runInfoConfigCmd(cmd *cobra.Command, args []string) error {
-	return executeAutomateClusterCtlCommand("info", args, infoHelpDocs)
+	if isA2HARBFileExist() {
+		return executeAutomateClusterCtlCommand("info", args, infoHelpDocs)
+	}
+	return errors.New(AUTOMATE_HA_INVALID_BASTION)
 }

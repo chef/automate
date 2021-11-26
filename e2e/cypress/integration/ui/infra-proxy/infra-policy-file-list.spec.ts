@@ -144,7 +144,7 @@ describe('infra policy file', () => {
       it('can change page and load data according to page', () => {
         getPolicyFile().then((response) => {
           if (checkResponse(response)) {
-            if (policies.length > 9 &&
+            if (policies.length > 100 &&
               cy.get('.policy-file-list-paging .page-picker-item').contains('3')) {
               cy.get('.policy-file-paging .page-picker-item').contains('3').click();
             }

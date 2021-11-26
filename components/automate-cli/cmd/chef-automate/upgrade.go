@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -83,15 +85,21 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 		if (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradebackends) || (upgradeRunCmdFlags.upgradefrontends && upgradeRunCmdFlags.upgradeairgapbundles) || (upgradeRunCmdFlags.upgradebackends && upgradeRunCmdFlags.upgradeairgapbundles) {
 			return status.New(status.InvalidCommandArgsError, "you cannot use 2 flags together ")
 		}
-
+		response, err := writer.Prompt("Installation will get updated to latest version if already not running on newer version press y to agree, n to to disagree? [y/n]")
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(response, "y") {
+			return errors.New("canceled upgrade")
+		}
 		if upgradeRunCmdFlags.upgradefrontends {
-			args = append(args, "--upgrade-frontends")
+			args = append(args, "--upgrade-frontends", "-y")
 		}
 		if upgradeRunCmdFlags.upgradebackends {
-			args = append(args, "--upgrade-backends")
+			args = append(args, "--upgrade-backends", "-y")
 		}
 		if upgradeRunCmdFlags.upgradeairgapbundles {
-			args = append(args, "--upgrade-airgap-bundles")
+			args = append(args, "--upgrade-airgap-bundles", "-y")
 		}
 		if upgradeRunCmdFlags.skipDeploy {
 			args = append(args, "--skip-deploy")

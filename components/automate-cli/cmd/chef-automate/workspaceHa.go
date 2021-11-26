@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,6 @@ var workspaceCmd = &cobra.Command{
 	Annotations: map[string]string{
 		NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 	},
-	Args: cobra.RangeArgs(0, 2),
 	RunE: runWorkspaceCmd,
 }
 
@@ -31,5 +31,5 @@ func runWorkspaceCmd(cmd *cobra.Command, args []string) error {
 		}
 		return executeAutomateClusterCtlCommand("workspace", args, workspaceCommandHelpDocs)
 	}
-	return status.New(status.InvalidCommandArgsError, workspaceCommandHelpDocs)
+	return status.Wrap(errors.New(AUTOMATE_HA_INVALID_BASTION), status.InvalidCommandArgsError, workspaceCommandHelpDocs)
 }

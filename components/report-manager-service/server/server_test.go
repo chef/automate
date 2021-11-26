@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -68,7 +69,11 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 	return nil
 }
 
-func dialer(t *testing.T, isForFailure bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
+func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
+	return nil, nil
+}
+
+func dialer(t *testing.T, isForFailure, enableLargeReporting bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 
 	s := grpc.NewServer(grpc.MaxRecvMsgSize(1024 * 2))
@@ -78,8 +83,9 @@ func dialer(t *testing.T, isForFailure bool, db *storage.DB) func(context.Contex
 			T:          t,
 			ForFailure: isForFailure,
 		},
-		ObjBucket: "testBucket",
-		DataStore: db,
+		ObjBucket:            "testBucket",
+		DataStore:            db,
+		EnableLargeReporting: enableLargeReporting,
 	})
 
 	go func() {
@@ -111,7 +117,7 @@ func getTestData(t *testing.T) *compliance.Report {
 
 func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, nil)))
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, true, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -148,7 +154,22 @@ func TestReportManagerServer_StoreReport_Success(t *testing.T) {
 
 func TestReportManagerServer_StoreReport_Fail(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, nil)))
+
+	t.Run("LargeReporting_NotEnabled", func(t *testing.T) {
+		conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, false, nil)))
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		client := pb.NewReportManagerServiceClient(conn)
+		stream, err := client.StoreReport(ctx)
+		assert.NoError(t, err)
+
+		_, err = stream.CloseAndRecv()
+		assert.Error(t, err)
+		assert.Equal(t, "rpc error: code = Unknown desc = customer not enabled for large reporting", err.Error())
+	})
+
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, true, true, nil)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -232,7 +253,21 @@ func TestReportManagerServer_GetAllRequestsStatus(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, db)))
+
+	t.Run("LargeReporting_NotEnabled", func(t *testing.T) {
+		conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, false, db)))
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		client := pb.NewReportManagerServiceClient(conn)
+		_, err = client.GetAllRequestsStatus(ctx, &pb.AllStatusRequest{
+			RequestorId: "test_requestor_id",
+		})
+		assert.Error(t, err)
+		assert.Equal(t, "rpc error: code = Unknown desc = customer not enabled for large reporting", err.Error())
+	})
+
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, true, db)))
 	assert.NoError(t, err)
 
 	defer conn.Close()
@@ -275,5 +310,61 @@ func TestReportManagerServer_GetAllRequestsStatus(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.EqualError(t, err, "rpc error: code = Unknown desc = empty requestore information")
+	})
+}
+
+func TestReportManagerServer_GetPresignedURL(t *testing.T) {
+	dbConn, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+	defer dbConn.Close()
+
+	db := &storage.DB{
+		DbMap: &gorp.DbMap{Db: dbConn, Dialect: gorp.PostgresDialect{}},
+	}
+
+	ctx := context.Background()
+
+	t.Run("LargeReporting_NotEnabled", func(t *testing.T) {
+		conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, false, db)))
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		client := pb.NewReportManagerServiceClient(conn)
+		_, err = client.GetPresignedURL(ctx, &pb.GetPresignedURLRequest{
+			Id:          "ack_id",
+			RequestorId: "req_id",
+		})
+		assert.Error(t, err)
+		assert.Equal(t, "rpc error: code = Unknown desc = customer not enabled for large reporting", err.Error())
+	})
+
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t, false, true, db)))
+	assert.NoError(t, err)
+
+	defer conn.Close()
+
+	query := `SELECT custom_report_url, custom_report_type, custom_report_size FROM custom_report_requests where id = $1 and requestor = $2;`
+	columns := []string{"custom_report_url", "custom_report_type", "custom_report_size"}
+
+	client := pb.NewReportManagerServiceClient(conn)
+
+	t.Run("Success", func(t *testing.T) {
+		mock.ExpectQuery(query).WithArgs("ack_id", "req_id").
+			WillReturnRows(sqlmock.NewRows(columns).AddRow("testurl.com", "json", 1024))
+		resp, err := client.GetPresignedURL(ctx, &pb.GetPresignedURLRequest{
+			Id:          "ack_id",
+			RequestorId: "req_id",
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "testurl.com", resp.Url)
+	})
+
+	t.Run("Fail", func(t *testing.T) {
+		_, err := client.GetPresignedURL(ctx, &pb.GetPresignedURLRequest{
+			Id:          "",
+			RequestorId: "",
+		})
+		assert.Error(t, err)
+		assert.EqualError(t, err, "rpc error: code = Unknown desc = id and requestor should not be empty")
 	})
 }

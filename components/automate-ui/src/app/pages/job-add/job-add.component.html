@@ -47,7 +47,6 @@
             *ngSwitchCase="Step['add-nodes']"
             [loadMore]= "loadMore"
             [nodeManagerLength]="nodeManagerArray.length"
-            (firstCall) = "firstCalled($event)"
             (clickCalled) = "clickCallChild($event)"
             (load) = "onLoadFunc($event)"
             [pageNo] = "pagenumber"
