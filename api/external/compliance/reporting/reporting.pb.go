@@ -3712,6 +3712,10 @@ type ControlElement struct {
 	Impact float32 `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
 	// The total number of results.
 	Results int32 `protobuf:"varint,5,opt,name=results,proto3" json:"results,omitempty"`
+	// The control's status
+	Status string `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	// Profile id
+	ProfileId string `protobuf:"bytes,7,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
 }
 
 func (x *ControlElement) Reset() {
@@ -3779,6 +3783,20 @@ func (x *ControlElement) GetResults() int32 {
 		return x.Results
 	}
 	return 0
+}
+
+func (x *ControlElement) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ControlElement) GetProfileId() string {
+	if x != nil {
+		return x.ProfileId
+	}
+	return ""
 }
 
 type ControlElements struct {
