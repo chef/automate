@@ -317,6 +317,11 @@ chef-subheading {
       text-overflow: ellipsis;
       cursor: pointer;
     }
+
+    .no-reports-message {
+      text-align: center;
+      border-bottom: 5px solid $chef-white;
+    }
   }
   
 }
