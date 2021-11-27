@@ -44,11 +44,14 @@ chef-modal.create-client-modal {
         background: $chef-white;
         border: 0.5px solid $chef-key-tab;
         height: 300px;
+        // width: 100%;
 
         chef-snippet {
           height: 298px;
-          width: 100%;
-        }
+          width: auto;
+          margin-left:-36px;
+          // margin-right:auto;
+                }
       }
 
       chef-checkbox {
@@ -87,7 +90,7 @@ chef-modal.create-client-modal {
           letter-spacing: 0.25px;
           width: calc(100% - 45px);
           color: $white;
-          margin-bottom: 0;
+          // margin-bottom: 0;
         }
 
       }
