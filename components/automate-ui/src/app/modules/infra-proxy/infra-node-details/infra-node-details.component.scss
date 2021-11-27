@@ -173,7 +173,7 @@ chef-loading-spinner {
 
 .label {
   font-size: 12px;
-  padding-left: 12px;
+  // padding-left: 12px;
 }
 
 .display-node-tags {
@@ -257,7 +257,7 @@ div#button-env {
 
 .label {
   font-size: 12px;
-  padding-left: 12px;
+  // padding-left: 12px;
 }
 
 .auto-height {
@@ -332,7 +332,7 @@ div#button-env {
 
   .attr {
     width: 98%;
-    margin-left: 28px;
+    margin-left: 16px;
     margin-right: 33px;
     margin-top: 16px;
     background: $chef-white;
@@ -383,6 +383,7 @@ div#button-env {
   .default {
     margin-top: 29px;
     max-width: 25%;
+    margin-left: 18px;
   }
 
   .label-items {
