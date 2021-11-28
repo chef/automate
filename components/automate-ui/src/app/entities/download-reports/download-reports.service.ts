@@ -1,15 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { saveAs } from 'file-saver';
 import { environment } from '../../../environments/environment';
+import { ReportType } from './download-reports.model';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 const REPORT_LIST_API_URL = environment.download_report_list_url;
+const CC_API_URL = environment.compliance_url;
 
 @Injectable({ providedIn: 'root'})
 export class DownloadReportsService {
   showOpenReport = false;
   reportList = [];
   private units = ['bytes', 'kb', 'mb', 'gb'];
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, 
+    private store: Store<NgrxStateAtom>) {}
 
   onReportOpenClick() {
     this.handleReportList();
@@ -22,7 +31,7 @@ export class DownloadReportsService {
 
   handleReportList() {
     this.fetchReportList().subscribe((responseData) => {
-      if (responseData && responseData['data'] && responseData['data'].length > 0) {
+      if (responseData && responseData['data'] && responseData['data'].length == 0) {
         this.reportList = responseData['data'];
         this.checkReportStatus();
       } else {
@@ -50,6 +59,32 @@ export class DownloadReportsService {
     }
   }
 
+  onLinkToDownload(report: ReportType) {
+    const filename = ''; // need to implement
+    const format = 'json' || 'csv'; // need to implement
+
+    this.downloadReport(report.acknowledgement_id).subscribe((data) => {
+      console.log(data);
+      const types = { 'json': 'application/json', 'csv': 'text/csv' };
+      const type = types[format]; // use report.format
+      const blob = new Blob([data], { type });
+      saveAs(blob, filename);
+    }, (error) => {
+      console.log(error);
+      this.store.dispatch(new CreateNotification({
+        type: Type.error,
+        message: 'Download failed.'
+        }));
+    });
+  }
+
+  downloadReport(ack_id: string): Observable<string> {
+    console.log(ack_id);
+    let url = `${CC_API_URL}/reporting/export`;
+    url = url + '/' + ack_id;
+    return this.httpClient.get<string>(url);
+  }
+
   byteConverter(value) {
     value = value * 1; // convert string to number
     let sizeIndex = 0;
@@ -68,4 +103,5 @@ export class DownloadReportsService {
     }
     return rem.toFixed(2) + this.units[sizeIndex];
   }
+
 }

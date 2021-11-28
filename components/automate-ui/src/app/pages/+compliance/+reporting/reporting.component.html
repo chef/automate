@@ -184,15 +184,26 @@
             </tr>
             <ng-container *ngIf="downloadReportsService.reportList.length > 0">
               <tr *ngFor="let report of downloadReportsService.reportList; index as i">
-                <td [ngClass]="{'failed-status': report.status === 'failed', 'running-status': report.status === 'running', 'success-status': report.status === 'success'}">
-                  <app-time [time]='report.created_at'></app-time></td>
+                <ng-container>
+                  <td *ngIf="report.status === 'success'" class="success-status">
+                    <a (click)="downloadReportsService.onLinkToDownload(report)" class="download-link">
+                      <app-time [time]='report.created_at'></app-time>
+                    </a>
+                  </td>
+                  <td *ngIf="report.status === 'failed'" class="failed-status">
+                    <app-time [time]='report.created_at'></app-time>
+                  </td>
+                  <td *ngIf="report.status === 'running'" class="running-status">
+                    <app-time [time]='report.created_at'></app-time>
+                  </td>
+                </ng-container>
                 <td *ngIf="report.status === 'success'">{{ downloadReportsService.byteConverter(report.report_size) }}</td>
                 <ng-container *ngIf="report.status === 'failed'">
                   <td [id]="'error-message-' + i" class="failed-status error-message">{{ report.err_message }}</td>
                 </ng-container>  
                 <td *ngIf="report.status === 'running'" class="running-status">In progress...</td>
                 <td *ngIf="report.status === 'success' || report.status === 'failed'">{{report.duration}}</td>
-                <ng-container *ngIf="report.status === 'failed'">
+                <ng-container *ngIf="report.status === 'failed'"> <!-- keep this tooltip at last to avoid extra empty space between columns  -->
                   <chef-tooltip
                   [attr.for]="'error-message-' + i"
                   position="top"

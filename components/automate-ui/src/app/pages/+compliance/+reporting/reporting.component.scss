@@ -272,12 +272,7 @@ chef-subheading {
     padding: 1em;
     background: $chef-white;
     border-bottom: 1px solid $chef-grey;
-  
-    .header-icon {
-      font-size: 2em;
-      color: $chef-dark-grey;
-    }
-  
+
     .header-text {
       margin: 0 1em;
       flex-grow: 1;
@@ -321,6 +316,11 @@ chef-subheading {
     .no-reports-message {
       text-align: center;
       border-bottom: 5px solid $chef-white;
+    }
+
+    .download-link {
+      text-decoration: underline;
+      cursor: pointer;
     }
   }
   

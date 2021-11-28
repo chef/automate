@@ -24,7 +24,7 @@ import {
   ReportingSummaryStatus
 } from '../shared/reporting';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
- import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 import {
   Chicklet,
   ReportingFilterTypes
@@ -285,7 +285,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   onDownloadOptPressed(format) {
     this.downloadOptsVisible = false;
-
     const reportQuery = this.reportQuery.getReportQuery();
     const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${format}`;
 
