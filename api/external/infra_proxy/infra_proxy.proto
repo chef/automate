@@ -265,46 +265,46 @@ service InfraProxy {
   rpc GetNodes (infra_proxy.request.Nodes) returns (infra_proxy.response.Nodes) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
   };
   rpc DeleteNode (infra_proxy.request.Node) returns (infra_proxy.response.DeleteNode) {
     option (google.api.http).delete = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:delete";
   };
   rpc UpdateNode (infra_proxy.request.NodeDetails) returns (infra_proxy.response.Node) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
   };
   rpc UpdateNodeAttributes (infra_proxy.request.UpdateNodeAttributes) returns (infra_proxy.response.UpdateNodeAttributes) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/attributes";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
   };
   rpc GetNode (infra_proxy.request.Node) returns (infra_proxy.response.Node) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
   };  
   rpc GetNodeExpandedRunList (infra_proxy.request.NodeExpandedRunList) returns (infra_proxy.response.NodeExpandedRunList) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/node/{name}/runlist/{environment}";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:get";
   }
   rpc UpdateNodeTags (infra_proxy.request.UpdateNodeTags) returns (infra_proxy.response.UpdateNodeTags) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/tags";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
   };
   rpc UpdateNodeEnvironment (infra_proxy.request.UpdateNodeEnvironment) returns (infra_proxy.response.UpdateNodeEnvironment) {
     option (google.api.http).put = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}/environment";
     option (google.api.http).body = "*";
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
+    option (chef.automate.api.iam.policy).action = "infra:infraServersOrgsNodes:update";
   };
 
   rpc GetPolicyfiles (infra_proxy.request.Policyfiles) returns (infra_proxy.response.Policyfiles) {
