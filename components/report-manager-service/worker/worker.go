@@ -3,8 +3,10 @@ package worker
 import (
 	"bytes"
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -247,15 +249,14 @@ func (t *GenerateReportTask) Run(ctx context.Context, task cereal.Task) (interfa
 			return nil, err
 		}
 	} else if job.RequestToProcess.ReportType == "csv" {
-		/*reportSize, err = t.csvExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
+		reportSize, objectName, err = t.csvExporter(ctx, finalData, job.JobID, job.RequestToProcess.RequestorId)
 		if err != nil {
 			return nil, err
-		}*/
+		}
 	}
 
 	//get the presigned URL for the stored object
 	reqParams := make(url.Values)
-	//reqParams.Set("response-content-disposition", fmt.Sprintf("attachment; filename=\"%s.%s\"", "export", job.RequestToProcess.ReportType))
 	preSignedURL, err := t.ObjStoreClient.PresignedGetObject(ctx, job.RequestToProcess.RequestorId, objectName, time.Second*25*60*60, reqParams)
 	if err != nil {
 		err = errors.Wrap(err, "error in creating a presigned url for object")
@@ -301,7 +302,6 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, reqToP
 			}
 			controlsMap[profile.Sha256] = controlMap
 		}
-
 		reportData := &reporting.Report{
 			Id:            cmpReport.ReportUuid,
 			NodeId:        cmpReport.NodeUuid,
@@ -448,6 +448,59 @@ func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*repo
 
 	objectName := utils.GetObjName(jobID)
 	info, err := t.ObjStoreClient.PutObject(ctx, requestorID, objectName, buf, -1, minio.PutObjectOptions{})
+	if err != nil {
+		err = errors.Wrap(err, "error in storing the data object to objectstore")
+		logrus.WithError(err).Error()
+		return 0, "", err
+	}
+	return info.Size, objectName, nil
+}
+
+func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*reporting.Report, jobID,
+	requestorID string) (int64, string, error) {
+
+	csvFile, err := os.Create("temp.csv")
+	if err != nil {
+		err = errors.Wrap(err, "error in creating a csv file")
+		logrus.WithError(err).Error()
+		return 0, "", err
+	}
+
+	defer os.Remove("temp.csv")
+	defer csvFile.Close()
+
+	csvWriter := csv.NewWriter(csvFile)
+	defer csvWriter.Flush()
+
+	for index, report := range finalData {
+		// for 0th index include headers
+		includeHeaders := false
+		if index == 0 {
+			includeHeaders = true
+		}
+		rows, err := utils.ReportToCSV(report, includeHeaders)
+		if err != nil {
+			err = errors.Wrap(err, "error in converting the report to csv format")
+			logrus.WithError(err).Error()
+			return 0, "", err
+		}
+		err = csvWriter.WriteAll(rows)
+		if err != nil {
+			err = errors.Wrap(err, "error in writing to file")
+			logrus.WithError(err).Error()
+			return 0, "", err
+		}
+	}
+
+	file, err := os.Open("temp.csv")
+	if err != nil {
+		err = errors.Wrap(err, "error in opening the csv file")
+		logrus.WithError(err).Error()
+		return 0, "", err
+	}
+
+	objectName := utils.GetCSVObjName(jobID)
+	info, err := t.ObjStoreClient.PutObject(ctx, requestorID, objectName, file, -1, minio.PutObjectOptions{ContentType: "application/csv"})
 	if err != nil {
 		err = errors.Wrap(err, "error in storing the data object to objectstore")
 		logrus.WithError(err).Error()
