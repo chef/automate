@@ -384,7 +384,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetClients", "infra:infraServers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetClients", "infra:infraServers:{server_id}:orgs:{org_id}:clients", "infra:infraServersOrgsClient:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Clients); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -399,7 +399,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServersOrgsClient:get", "GET", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Client); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -416,7 +416,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/CreateClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:update", "POST", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/CreateClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServersOrgsClient:create", "POST", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateClient); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -433,7 +433,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeleteClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:update", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/DeleteClient", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServersOrgsClient:delete", "DELETE", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Client); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -450,7 +450,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ResetClientKey", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServers:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ResetClientKey", "infra:servers:{server_id}:orgs:{org_id}:clients", "infra:infraServersOrgsClient:update", "PUT", "/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}/reset", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.ClientKey); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
