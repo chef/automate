@@ -142,6 +142,10 @@ module BackendUtils
       tf_output_value("automate_private_ips")
     end
 
+    def chef_server_private_ips
+      tf_output_value("chef_server_private_ips")
+    end
+
     def postgresql_private_ips
       tf_output_value("postgresql_private_ips")
     end
