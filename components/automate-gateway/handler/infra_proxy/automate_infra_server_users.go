@@ -25,7 +25,7 @@ func (c *InfraProxyServer) GetAutomateInfraServerUsersList(ctx context.Context, 
 	}, nil
 }
 
-//GetAutomateInfraServerUsersList: Fetches server users list from backend DB
+//GetAutomateInfraServerUsersList: Fetches an organisation of infra server
 func (c *InfraProxyServer) GetAutomateInfraServerOrgs(ctx context.Context, r *gwreq.AutomateInfraServerOrgs) (*gwres.AutomateInfraServerOrgs, error) {
 	req := &infra_req.AutomateInfraServerOrgs{
 		ServerId: r.ServerId,
