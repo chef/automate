@@ -32,7 +32,7 @@ module AutomateCluster
         cleanup_cmd = "echo #{sudo_pass} | #{sudo_cmd} #{sudo_options} -S rm -f #{remote_file}"
         output_dir = "#{local_log_dir}/#{log_prefix}"
         FileUtils.mkdir_p output_dir
-        hosts = utils.automate_public_ips + utils.chef_server_public_ips + utils.elasticsearch_public_ips + utils.postgresql_public_ips
+        hosts = utils.automate_private_ips + utils.chef_server_private_ips + utils.elasticsearch_private_ips + utils.postgresql_private_ips
         utils.each_alive(hosts) do |conn|
           utils.backend_logger.info ">>>> Gathering logs from remote #{conn.hostname}"
           utils.backend_logger.debug "Running: #{gather_cmd}"
