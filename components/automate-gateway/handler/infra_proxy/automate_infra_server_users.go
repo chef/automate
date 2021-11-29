@@ -39,6 +39,7 @@ func (c *InfraProxyServer) GetAutomateInfraServerOrgs(ctx context.Context, r *gw
 		Orgs: fromUpstreamAutomateInfraServerOrgs(res.Orgs),
 	}, nil
 }
+
 func fromUpstreamAutomateInfraServerUsers(ul []*infra_res.AutomateInfraServerUsersListItem) []*gwres.AutomateInfraServerUsersListItem {
 	usersList := make([]*response.AutomateInfraServerUsersListItem, len(ul))
 

@@ -17,9 +17,10 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS users_automate_user_id_index ON users (automate_user_id);
 
 -- create table org_users
+-- For temporary, we have removed the foreign key from org_users table as org_id which references orgs(id)
 CREATE TABLE IF NOT EXISTS org_users (
   id           TEXT PRIMARY KEY,
-  org_id       TEXT NOT NULL references orgs(id) ON DELETE RESTRICT,
+  org_id       TEXT NOT NULL,
   user_id      TEXT NOT NULL references users(id) ON DELETE RESTRICT, 
   is_admin     BOOLEAN NOT NULL DEFAULT FALSE
 );

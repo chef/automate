@@ -20,10 +20,11 @@ import (
 
 // ChefConfig is an infra-proxy server
 type ChefConfig struct {
-	Name    string
-	Key     string
-	SkipSSL bool
-	BaseURL string
+	Name       string
+	Key        string
+	SkipSSL    bool
+	BaseURL    string
+	IsWebuiKey bool
 }
 
 // ChefClient type definition for the chef client
@@ -81,10 +82,11 @@ func NewChefClient(config *ChefConfig) (*ChefClient, error) {
 
 	// build a client
 	client, err := chef.NewClient(&chef.Config{
-		Name:    config.Name,
-		Key:     config.Key,
-		SkipSSL: config.SkipSSL,
-		BaseURL: config.BaseURL,
+		Name:       config.Name,
+		Key:        config.Key,
+		SkipSSL:    config.SkipSSL,
+		BaseURL:    config.BaseURL,
+		IsWebuiKey: config.IsWebuiKey,
 	})
 
 	if err != nil {
@@ -200,7 +202,7 @@ func StructToJSON(data *structpb.Struct) (interface{}, error) {
 }
 
 //createChefServerClient: Creates a client with only server details
-func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminkey string, adminName string) (*ChefClient, error) {
+func (s *Server) createChefServerClient(ctx context.Context, serverID string, adminKey string, adminName string, isWebuiKey bool) (*ChefClient, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -215,10 +217,11 @@ func (s *Server) createChefServerClient(ctx context.Context, serverID string, ad
 	}
 
 	client, err := NewChefClient(&ChefConfig{
-		Name:    adminName,
-		Key:     adminkey,
-		SkipSSL: true,
-		BaseURL: baseURL,
+		Name:       adminName,
+		Key:        adminKey,
+		SkipSSL:    true,
+		BaseURL:    baseURL,
+		IsWebuiKey: isWebuiKey,
 	})
 
 	return client, err

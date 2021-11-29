@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
@@ -28,16 +27,15 @@ func (s *Server) GetAutomateInfraServerUsersList(ctx context.Context, req *reque
 	}, nil
 }
 
-//GetAutomateInfraServerUsersList: Fetches the list of automate infra server users from the DB
+//GetAutomateInfraServerUsersList: Fetches the list of automate infra server organisations from the chef server and saves it into the DB
 func (s *Server) GetAutomateInfraServerOrgs(ctx context.Context, req *request.AutomateInfraServerOrgs) (*response.AutomateInfraServerOrgs, error) {
 	// Get organization list from chef server
-	c, err := s.createChefServerClient(ctx, req.ServerId, req.WebuiKey, "pivotal")
+	// This function uses webui key, we have added one parameter isWebuiKey based on this we are adding one header while making request to the chef server
+	c, err := s.createChefServerClient(ctx, req.ServerId, req.WebuiKey, "pivotal", true)
 	if err != nil {
 		return nil, err
 	}
 	orgsList, err := c.client.Organizations.List()
-	fmt.Println("###orgsList###", orgsList)
-
 	if err != nil {
 		return nil, ParseAPIError(err)
 	}
