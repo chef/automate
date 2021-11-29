@@ -2,6 +2,7 @@ package worker_test
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -423,6 +424,7 @@ func TestOnTaskComplete(t *testing.T) {
 
 type CerealTask struct {
 	isParameterFailure bool
+	isCSVExport        bool
 }
 
 func (t *CerealTask) GetParameters(obj interface{}) error {
@@ -430,6 +432,9 @@ func (t *CerealTask) GetParameters(obj interface{}) error {
 		return fmt.Errorf("error in fetching parameters")
 	}
 	jsonString := `{"JobID":"1234-5678","RequestToProcess":{"requestor_id":"reqID123","report_type":"json","reports":[{"report_id":"r1","profiles":[{"profile_id":"r1p1","controls":["r1p1c1","r1p1c2"]},{"profile_id":"r1p2","controls":["r1p2c1","r1p2c2"]}]},{"report_id":"r2","profiles":[{"profile_id":"r2p1","controls":["r2p1c1","r2p1c2"]},{"profile_id":"r2p2","controls":["r2p2c1","r2p2c2"]}]}]}}`
+	if t.isCSVExport {
+		jsonString = `{"JobID":"1234-5678","RequestToProcess":{"requestor_id":"reqID123","report_type":"csv","reports":[{"report_id":"r1","profiles":[{"profile_id":"r1p1","controls":["r1p1c1","r1p1c2"]},{"profile_id":"r1p2","controls":["r1p2c1","r1p2c2"]}]},{"report_id":"r2","profiles":[{"profile_id":"r2p1","controls":["r2p1c1","r2p1c2"]},{"profile_id":"r2p2","controls":["r2p2c1","r2p2c2"]}]}]}}`
+	}
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, obj)
 	return err
@@ -448,22 +453,44 @@ type mockObjStore struct {
 	ForBucketExistenceFail    bool
 	ForMakeBucketFail         bool
 	ForPresignedGetObjectFail bool
+	ForCSVExporter            bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
 	opts minio.PutObjectOptions) (minio.UploadInfo, error) {
 	assert.Equal(m.T, "reqID123", bucketName)
-	assert.Equal(m.T, "1234-5678.json", objectName)
+	if m.ForCSVExporter {
+		assert.Equal(m.T, "1234-5678.csv", objectName)
+	} else {
+		assert.Equal(m.T, "1234-5678.json", objectName)
+	}
 	assert.Equal(m.T, int64(-1), objectSize)
 	if m.ForPutObjectFailure {
 		return minio.UploadInfo{}, fmt.Errorf("error in storing object to object store")
 	}
 
-	bytes, err := io.ReadAll(reader)
-	assert.NoError(m.T, err)
-	//expects new line at the end of the content
-	assert.Equal(m.T, `[{"id":"r1","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r1p1","title":"r1p1","full":"r1p1, v","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","full":"r1p2, v","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}]},{"id":"r2","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r2p1","title":"r2p1","full":"r2p1, v","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","full":"r2p2, v","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}]}]
+	if m.ForCSVExporter {
+		lines, err := csv.NewReader(reader).ReadAll()
+		assert.NoError(m.T, err)
+		assert.Equal(m.T, 2, len(lines))
+		assert.Equal(m.T, 22, len(lines[0]))
+		assert.Equal(m.T, []string{"Node Name", "End Time", "Platform Name", "Platform Release",
+			"Environment", "IPAddress", "FQDN", "Profile Name", "Profile Title", "Profile Version",
+			"Profile Summary", "Control ID", "Control Title", "Control Impact", "Waived (true/false)",
+			"Result Status", "Result Run Time", "Result Code Description", "Result Message",
+			"Result Skip Message", "Waiver Justification", "Waiver Expiration"},
+			lines[0])
+		assert.Equal(m.T, []string{"TestNode", "2021-11-17 10:53:52 +0000 UTC", "test_platform", "1.0",
+			"testEnv", "0.0.0.0", "test_fqdn", "r1p1", "r1p1", "v1", "test_summary", "r1p1c1", "r1p1c1",
+			"0.00", "false", "failed", "0.006", "test code desc", "test_msg", "test_skip_msg", "", ""},
+			lines[1])
+	} else {
+		bytes, err := io.ReadAll(reader)
+		assert.NoError(m.T, err)
+		//expects new line at the end of the content
+		assert.Equal(m.T, `[{"id":"r1","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r1p1","title":"r1p1","full":"r1p1, v","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","full":"r1p2, v","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}]},{"id":"r2","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r2p1","title":"r2p1","full":"r2p1, v","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","full":"r2p2, v","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}]}]
 `, string(bytes))
+	}
 
 	return minio.UploadInfo{
 		Size: 8200,
@@ -481,12 +508,16 @@ func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName stri
 
 	var json string
 	if objectName == "r1.json" {
-		json = `{"profiles":[{"name":"r1p1","title":"r1p1","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}],"report_uuid":"r1","node_uuid":"nodeID","node_name":"TestNode"}`
+		if m.ForCSVExporter {
+			json = `{"profiles":[{"name":"r1p1","title":"r1p1","sha256":"r1p1","version":"v1","summary":"test_summary","controls":[{"id":"r1p1c1","title":"r1p1c1","results":[{"status":"failed","code_desc":"test code desc","run_time":0.00642,"start_time":"2021-11-18T15:02:27+01:00","message":"test_msg","skip_message":"test_skip_msg"}]},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}],"report_uuid":"r1","node_uuid":"nodeID","node_name":"TestNode","environment":"testEnv","ipaddress":"0.0.0.0","fqdn":"test_fqdn","end_time":"2021-11-17T10:53:52Z","platform":{"name":"test_platform","release":"1.0"}}`
+		} else {
+			json = `{"profiles":[{"name":"r1p1","title":"r1p1","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}],"report_uuid":"r1","node_uuid":"nodeID","node_name":"TestNode"}`
+		}
+
 	} else if objectName == "r2.json" {
 		json = `{"profiles":[{"name":"r2p1","title":"r2p1","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}],"report_uuid":"r2","node_uuid":"nodeID","node_name":"TestNode"}`
 	}
-	//jsonBytes := []byte(json)
-	//return &jsonBytes, nil
+
 	return strings.NewReader(json), nil
 }
 
@@ -511,7 +542,12 @@ func (m mockObjStore) MakeBucket(ctx context.Context, bucketName string, opts mi
 
 func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string, objectName string, expires time.Duration, reqParams url.Values) (u *url.URL, err error) {
 	assert.Equal(m.T, "reqID123", bucketName)
-	assert.Equal(m.T, "1234-5678.json", objectName)
+	if m.ForCSVExporter {
+		assert.Equal(m.T, "1234-5678.csv", objectName)
+	} else {
+		assert.Equal(m.T, "1234-5678.json", objectName)
+	}
+
 	assert.Equal(m.T, time.Hour*25, expires)
 
 	if m.ForPresignedGetObjectFail {
@@ -535,10 +571,16 @@ func TestRun(t *testing.T) {
 		isBucketExistenceCheckFail bool
 		isCreateBucketFail         bool
 		isPresignedGetObjectFail   bool
+		isCSVExporter              bool
 	}{
 		{
 			name:          "testRun_Success",
 			expectedError: "",
+		},
+		{
+			name:          "testRun_CSVExporter_Success",
+			expectedError: "",
+			isCSVExporter: true,
 		},
 		{
 			name:            "testRun_Success_WithExistingBucket",
@@ -580,6 +622,12 @@ func TestRun(t *testing.T) {
 			isPresignedGetObjectFail: true,
 			expectedError:            "error in creating a presigned url for object: error in getting pre-signed URL",
 		},
+		{
+			name:                "testRun_CSVExporter_PutObject_Fail",
+			expectedError:       "error in storing the data object to objectstore: error in storing object to object store",
+			isCSVExporter:       true,
+			isDataStorePutError: true,
+		},
 	}
 
 	for _, tc := range tests {
@@ -594,11 +642,13 @@ func TestRun(t *testing.T) {
 					ForBucketExistenceFail:    tc.isBucketExistenceCheckFail,
 					ForMakeBucketFail:         tc.isCreateBucketFail,
 					ForPresignedGetObjectFail: tc.isPresignedGetObjectFail,
+					ForCSVExporter:            tc.isCSVExporter,
 				},
 				ObjBucketName: "testBucket",
 			}
 			result, err := task.Run(context.Background(), &CerealTask{
 				isParameterFailure: tc.isGetParametersFailure,
+				isCSVExport:        tc.isCSVExporter,
 			})
 			if tc.expectedError != "" {
 				assert.Error(t, err)
