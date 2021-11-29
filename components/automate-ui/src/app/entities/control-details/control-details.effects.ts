@@ -10,7 +10,8 @@ import {
   ControlDetailsActionTypes,
   GetControlDetails,
   GetControlDetailsSuccess,
-  GetControlDetailsFailure
+  GetControlDetailsFailure,
+  ControlDetailsSuccessPayload
 } from './control-details.action';
 
 import { ControlDetailsRequests } from './control-details.requests';
@@ -22,13 +23,13 @@ export class ControlDetailsEffects {
     private requests: ControlDetailsRequests
   ) { }
 
-
   GetControlDetails$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ControlDetailsActionTypes.GET),
       mergeMap(({ payload: { filters } }: GetControlDetails) =>
         this.requests.GetControlDetails(filters).pipe(
-          map((resp) => new GetControlDetailsSuccess(Response)),
+          // map((resp) => new GetControlDetailsSuccess(Response)),
+          map((resp: ControlDetailsSuccessPayload) => new GetControlDetailsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
           observableOf(new GetControlDetailsFailure(error)))))));
 

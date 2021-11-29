@@ -5,13 +5,13 @@ import { ControlDetailsActionTypes, ControlDetailsActions } from './control-deta
 import { ControlDetail } from './control-details.model';
 
 export interface ControlDetailsEntityState extends EntityState<ControlDetail> {
-  ControlDetailsState: any;
-  ControlDetails: {
+  controlDetailsStatus: any;
+  controlDetailsList: {
     items: ControlDetail[]
   };
 }
 
-const GET_STATUS = 'getAllStatus';
+const GET_STATUS = 'controlDetailsState';
 
 export const controlDetailsEntityAdapter: EntityAdapter<ControlDetail> =
   createEntityAdapter<ControlDetail>({
@@ -34,7 +34,7 @@ export function controlDetailsEntityReducer(
     case ControlDetailsActionTypes.GET_SUCCESS:
       return pipe(
         set(GET_STATUS, EntityStatus.loadingSuccess),
-        set('controlDetails.items', action.payload || [])
+        set('controlDetailsList.items', action.payload || [])
       )(state) as ControlDetailsEntityState;
 
     case ControlDetailsActionTypes.GET_FAILURE:

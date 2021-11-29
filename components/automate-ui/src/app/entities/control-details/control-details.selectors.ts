@@ -9,5 +9,10 @@ export const {
 
 export const getStatus = createSelector(
   ControlDetailsState,
-  (state) => state.ControlDetailsState
+  (state) => state.controlDetailsStatus
+);
+
+export const clientList = createSelector(
+  ControlDetailsState,
+  (state) => state.controlDetailsList
 );

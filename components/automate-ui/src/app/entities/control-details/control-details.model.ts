@@ -10,52 +10,52 @@ export interface ControlDetail {
   platform: {};
   statistics: {};
   profiles: [
-    {
-      name: string;
-      title: string;
-      maintainer: string;
-      copyright: string;
-      copyright_email: string;
-      license: string;
-      summary: string;
-      version: number;
-      owner: string;
-      full: string;
-      supports: [];
-      depends: [];
-      sha256: string;
-      groups: [];
-      controls: [
-        {
-          id: string;
-          code: string;
-          desc: string;
-          impact: number;
-          title: string;
-          source_location: {};
-          results: [
-            {
-              status: string;
-              code_desc: string;
-              run_time: number;
-              start_time: string;
-              message: string;
-              skip_message: string
-            }
-          ];
-          refs: [];
-          tags: {};
-          waived_str: string;
-          waiver_data: null;
-          removed_results_counts: null
-        }
-      ];
-      attributes: [];
-      latest_version: number;
-      status: string;
-      skip_message: string;
-      status_message: string;
-    }
+  //   {
+  //     name: string;
+  //     title: string;
+  //     maintainer: string;
+  //     copyright: string;
+  //     copyright_email: string;
+  //     license: string;
+  //     summary: string;
+  //     version: number;
+  //     owner: string;
+  //     full: string;
+  //     supports: [];
+  //     depends: [];
+  //     sha256: string;
+  //     groups: [];
+  //     controls: [
+  //       {
+  //         id: string;
+  //         code: string;
+  //         desc: string;
+  //         impact: number;
+  //         title: string;
+  //         source_location: {};
+  //         results: [
+  //           {
+  //             status: string;
+  //             code_desc: string;
+  //             run_time: number;
+  //             start_time: string;
+  //             message: string;
+  //             skip_message: string
+  //           }
+  //         ];
+  //         refs: [];
+  //         tags: {};
+  //         waived_str: string;
+  //         waiver_data: null;
+  //         removed_results_counts: null
+  //       }
+  //     ];
+  //     attributes: [];
+  //     latest_version: number;
+  //     status: string;
+  //     skip_message: string;
+  //     status_message: string;
+  //   }
   ];
   job_id: string;
   ipaddress: string;

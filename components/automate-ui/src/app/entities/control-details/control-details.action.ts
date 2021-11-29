@@ -12,10 +12,6 @@ export interface ControlDetailsSuccessPayload {
   controlDetails: ControlDetail[];
 }
 
-export interface ControlDetailsPayload {
-  report_id: string;
-}
-
 export class GetControlDetails implements Action {
   readonly type = ControlDetailsActionTypes.GET;
   constructor(public payload: Filters ) { }
@@ -23,7 +19,7 @@ export class GetControlDetails implements Action {
 
 export class GetControlDetailsSuccess implements Action {
   readonly type = ControlDetailsActionTypes.GET_SUCCESS;
-  constructor(public payload: ControlDetail) { }
+  constructor(public payload: ControlDetailsSuccessPayload) { }
 }
 
 export class GetControlDetailsFailure implements Action {
