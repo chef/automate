@@ -8,7 +8,13 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
-
+import { GetControlDetails } from 'app/entities/control-details/control-details.action';
+// import { ControlDetail } from 'app/entities/control-details/control-details.model';
+import { getStatus } from 'app/entities/control-details/control-details.selectors';
+import { Store } from '@ngrx/store';
+import { combineLatest } from 'rxjs';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
 @Component({
   selector: 'app-reporting-node',
   templateUrl: './reporting-node.component.html',
@@ -42,6 +48,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   controlsLoading = false;
   controlDetails: any = {};
   controlDetailsLoading = false;
+  isError = false;
+  reportId : string;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -49,7 +57,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private statsService: StatsService,
     private reportQueryService: ReportQueryService,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>,
   ) {
   }
 
@@ -77,6 +86,23 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         }
       });
     });
+
+    combineLatest([
+      this.store.select(getStatus)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([getStatusSt]) => {
+      if (getStatusSt === EntityStatus.loadingSuccess) {
+        this.controlDetailsLoading = false;
+        this.isError = false;
+        this.controlDetails = getStatusSt;
+      } else if (getStatusSt === EntityStatus.loadingSuccess) {
+        this.isError = true;
+        // console.log("errrr", error);
+        // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
+        // this.openControls[control.id] = toggled;
+      }
+    });
+    
 
     this.onPageChanged(1);
   }
@@ -152,20 +178,38 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   isOpenControl({ id }) {
+    // console.log(this.openControls[id] && this.openControls[id].open);
     return this.openControls[id] && this.openControls[id].open;
   }
 
   toggleControl(control: { id: string | number; profile_id: string; }) {
+    this.controlDetailsLoading = true;
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
+
     if (toggled.open === true) {
-      this.statsService.getControlDetails(this.activeReport.id ,control.profile_id, control.id)
-      .pipe(first())
-      .subscribe(data => {
-        // this.controlDetailsLoading = false;
-        this.controlDetails = data;
-      })
+      const payload = {
+        report_id : this.reportId,
+        filters : [
+          {'type': 'profile_id', 'values': [`${control.profile_id}`]},
+          {'type': 'control', 'values': [`${control.id}`]}]
+      }
+      this.store.dispatch(new GetControlDetails(payload));
+    //   this.statsService.getControlDetails(this.activeReport.id, control.profile_id, control.id)
+    //   .pipe(first())
+    //   .subscribe(
+    //     data => {
+    //     this.controlDetailsLoading = false;
+    //     this.isError = false;
+    //     this.controlDetails = data;
+    //   },
+    //   error => {
+    //     this.isError = true;
+    //     console.log("errrr", error);
+    //     const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
+    //     this.openControls[control.id] = toggled;
+    //   });
     }
   }
 

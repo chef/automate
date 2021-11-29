@@ -291,7 +291,7 @@ export class StatsService {
 
   getControlDetails(reportID, profileId, controlId): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
-    const params = {"filters":[
+    const params = {'filters': [
       {'type': 'profile_id', 'values': [`${profileId}`]},
       {'type': 'control', 'values': [`${controlId}`]}]
     };

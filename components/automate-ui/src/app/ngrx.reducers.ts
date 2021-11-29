@@ -15,6 +15,7 @@ import * as cdsEntity from './entities/cds/cds.reducer';
 import * as clientEntity from './entities/clients/client.reducer';
 import * as clientDetailsEntity from './entities/clients/client-details.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
+import * as controlDetails from './entities/control-details/control-details.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as cookbookDetailsEntity from './entities/cookbooks/cookbook-details.reducer';
 import * as cookbookVersionsEntity from './entities/cookbooks/cookbook-versions.reducer';
@@ -95,6 +96,7 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   cds: cdsEntity.CdsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
+  controlDetailsEntity: controlDetails.ControlDetailsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
   clients: clientEntity.ClientEntityState;
   clientDetail: clientDetailsEntity.ClientDetailsEntityState;
@@ -238,6 +240,7 @@ export const defaultInitialState = {
   clients: clientEntity.ClientEntityInitialState,
   clientDetails: clientDetailsEntity.ClientEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
+  controlDetailsEntity: controlDetails.ControlDetailsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
   cookbookDetails: cookbookDetailsEntity.CookbookDetailsEntityInitialState,
   cookbookVersions: cookbookVersionsEntity.CookbookVersionsEntityInitialState,
@@ -312,6 +315,7 @@ export const ngrxReducers = {
   clients: clientEntity.clientEntityReducer,
   clientDetails: clientDetailsEntity.clientDetailsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
+  controlDetailsEntity: controlDetails.controlDetailsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   cookbookDetails: cookbookDetailsEntity.cookbookDetailsEntityReducer,
   cookbookVersions: cookbookVersionsEntity.cookbookVersionsEntityReducer,
