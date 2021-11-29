@@ -76,6 +76,7 @@
             </chef-tr>
           </chef-thead>
           <chef-tbody>
+            <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes', 'get', [serverId, orgId]]">
             <chef-tr *ngFor="let node of nodes">
               <chef-td>
                 <a [routerLink]="['/infrastructure','chef-servers', serverId,
@@ -88,6 +89,7 @@
               <chef-td>{{ timeFromNow(node.check_in) }}</chef-td>
               <chef-td>{{ node.environment === '' ? '--' : node.environment}}</chef-td>
               <chef-td class="three-dot-column">
+                <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}', 'put', [serverId, orgId, node.name]]">
                 <mat-select panelClass="chef-control-menu">
                   <mat-option
                     data-cy="update-tag"
@@ -117,6 +119,7 @@
                     Reset Key
                     <chef-icon aria-hidden="true" class="primary">add</chef-icon>
                   </mat-option>
+                  <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}', 'delete', [serverId, orgId, node.name]]">
                   <mat-option
                     data-cy="delete"
                     class="secondary"
@@ -124,9 +127,12 @@
                     Delete
                     <chef-icon aria-hidden="true" class="primary">remove</chef-icon>
                   </mat-option>
+                  </app-authorized>
                 </mat-select>
+                </app-authorized>
               </chef-td>
             </chef-tr>
+          </app-authorized>
           </chef-tbody>
         </chef-table>
       </div>
