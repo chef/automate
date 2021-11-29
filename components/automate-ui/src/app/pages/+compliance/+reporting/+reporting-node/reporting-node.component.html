@@ -217,7 +217,7 @@
                   </chef-button>
                 </chef-td>
               </chef-tr>
-              <div class="control-detail" *ngIf=" !isError && isOpenControl(control)">
+              <div class="control-detail" *ngIf=" !isError && isOpenControl(control) && false">
                 <!-- <chef-loading-spinner *ngIf="controlDetailsLoading" size="50"></chef-loading-spinner> -->
                 <p *ngIf="controlDetails.profiles[0].controls[0].desc">{{ controlDetails.profiles[0].controls[0].desc }}</p>
                 <chef-toggle

@@ -11,7 +11,7 @@ export interface ControlDetailsEntityState extends EntityState<ControlDetail> {
   };
 }
 
-const GET_STATUS = 'controlDetailsState';
+const GET_STATUS = 'controlDetailsStatus';
 
 export const controlDetailsEntityAdapter: EntityAdapter<ControlDetail> =
   createEntityAdapter<ControlDetail>({
@@ -19,8 +19,8 @@ export const controlDetailsEntityAdapter: EntityAdapter<ControlDetail> =
 });
 
 export const ControlDetailsEntityInitialState: ControlDetailsEntityState =
-controlDetailsEntityAdapter.getInitialState(<ControlDetailsEntityState><unknown>{
-    getAllStatus: EntityStatus.notLoaded
+  controlDetailsEntityAdapter.getInitialState(<ControlDetailsEntityState>{
+    controlDetailsStatus: EntityStatus.notLoaded
   });
 
 export function controlDetailsEntityReducer(

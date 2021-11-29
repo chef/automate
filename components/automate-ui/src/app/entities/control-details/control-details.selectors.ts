@@ -1,18 +1,19 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { ControlDetailsEntityState, controlDetailsEntityAdapter } from './control-details.reducer';
+import { ControlDetailsEntityState
+  // , controlDetailsEntityAdapter 
+} from './control-details.reducer';
 
 export const ControlDetailsState = createFeatureSelector<ControlDetailsEntityState>('controlDetails');
-export const {
-  selectAll: allControlDetails,
-  selectEntities: controlDetailsEntities
-} = controlDetailsEntityAdapter.getSelectors(ControlDetailsState);
+// export const {
+//   selectAll: allControlDetails
+// } = controlDetailsEntityAdapter.getSelectors(ControlDetailsState);
 
-export const getStatus = createSelector(
+export const controlDetailsStatus = createSelector(
   ControlDetailsState,
   (state) => state.controlDetailsStatus
 );
 
-export const clientList = createSelector(
+export const controlDetailsList = createSelector(
   ControlDetailsState,
   (state) => state.controlDetailsList
 );

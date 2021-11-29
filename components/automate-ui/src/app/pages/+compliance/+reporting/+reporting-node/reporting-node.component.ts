@@ -10,7 +10,7 @@ import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
 import { GetControlDetails } from 'app/entities/control-details/control-details.action';
 // import { ControlDetail } from 'app/entities/control-details/control-details.model';
-import { getStatus } from 'app/entities/control-details/control-details.selectors';
+import { controlDetailsStatus, controlDetailsList } from 'app/entities/control-details/control-details.selectors';
 import { Store } from '@ngrx/store';
 import { combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -88,21 +88,21 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
-      this.store.select(getStatus)
+      this.store.select(controlDetailsStatus),
+      this.store.select(controlDetailsList)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([getStatusSt]) => {
-      if (getStatusSt === EntityStatus.loadingSuccess) {
+    .subscribe(([detailsStatusSt, detailsListSt]) => {
+      if (detailsStatusSt === EntityStatus.loadingSuccess) {
         this.controlDetailsLoading = false;
         this.isError = false;
-        this.controlDetails = getStatusSt;
-      } else if (getStatusSt === EntityStatus.loadingSuccess) {
+        this.controlDetails = detailsListSt;
+      } else if (detailsStatusSt === EntityStatus.loadingSuccess) {
         this.isError = true;
         // console.log("errrr", error);
         // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
         // this.openControls[control.id] = toggled;
       }
     });
-    
 
     this.onPageChanged(1);
   }
@@ -190,7 +190,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
     if (toggled.open === true) {
       const payload = {
-        report_id : this.reportId,
+        report_id : this.activeReport.id,
         filters : [
           {'type': 'profile_id', 'values': [`${control.profile_id}`]},
           {'type': 'control', 'values': [`${control.id}`]}]

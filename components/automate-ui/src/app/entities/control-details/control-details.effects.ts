@@ -26,8 +26,8 @@ export class ControlDetailsEffects {
   GetControlDetails$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ControlDetailsActionTypes.GET),
-      mergeMap(({ payload: { filters } }: GetControlDetails) =>
-        this.requests.GetControlDetails(filters).pipe(
+      mergeMap(({ payload }: GetControlDetails) =>
+        this.requests.GetControlDetails(payload).pipe(
           // map((resp) => new GetControlDetailsSuccess(Response)),
           map((resp: ControlDetailsSuccessPayload) => new GetControlDetailsSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
