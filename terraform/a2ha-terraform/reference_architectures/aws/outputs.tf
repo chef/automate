@@ -25,7 +25,3 @@ output "elasticsearch_public_ips" {
 output "postgresql_private_ips" {
   value = formatlist("%s", module.aws.postgresql_private_ips)
 }
-
-output "user" {
-  value = "action item Press ctrl + c to exit if processes not exited"
-}

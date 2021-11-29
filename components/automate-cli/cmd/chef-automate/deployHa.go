@@ -9,7 +9,6 @@ import (
 )
 
 func executeDeployment(args []string) error {
-	writer.Printf("A2HA deployment started \n\n\n")
 	var indexOfConfig = 0
 	for i, a := range args {
 		if strings.Contains(a, ".toml") {
