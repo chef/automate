@@ -220,8 +220,9 @@ class ManifestGenerator
     # of an implementation mistake in deployment-service, changing this
     # version is impossible without major feature work in
     # deployment-service to manage the upgrade.
+    hab_build_version = package_querier.get_latest(hab_pkg_channel, "core", "hab").pretty
     manifest["schema_version"] = "1"
-    manifest["hab_build"] = local_hab_version
+    manifest["hab_build"] = hab_build_version
     manifest["build"] = version
     manifest["hab"] = []
 
