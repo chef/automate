@@ -28,7 +28,9 @@
           [pageIndex]= "current_page"
           (changePage)= "onUpdatePage($event)"
         ></app-paginator>
+        <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients', 'post', [serverId, orgId]]">
         <chef-button class="create-client" primary (click)="openCreateClientModal()">Create Client</chef-button>
+        </app-authorized>
       </div>
       <chef-loading-spinner class="full-screen-spinner" *ngIf="loading || deleting" size="50" fixed></chef-loading-spinner>
       <div class="empty-section" *ngIf="!loading && !clients.length && current_page === 1">
@@ -44,16 +46,20 @@
           </chef-tr>
         </chef-thead>
         <chef-tbody>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients', 'get', [serverId, orgId]]">
           <chef-tr *ngFor="let client of clients">
             <chef-td>
               <a [routerLink]="['/infrastructure','chef-servers', serverId, 'organizations', orgId, 'clients', client.name]">{{ client.name }}</a>
             </chef-td>
             <chef-td class="three-dot-column">
+              <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}', 'delete', [serverId, orgId, client.name]]">
               <mat-select panelClass="chef-control-menu">
                 <mat-option data-cy="delete" (onSelectionChange)="startClientDelete(client)">Delete</mat-option>
               </mat-select>
+              </app-authorized>
             </chef-td>
           </chef-tr>
+          </app-authorized>
         </chef-tbody>
       </chef-table>
       <app-page-picker
