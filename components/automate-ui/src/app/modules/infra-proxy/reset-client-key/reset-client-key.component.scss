@@ -1,6 +1,7 @@
 @import "~styles/variables";
 
-chef-modal.reset-client-modal {
+
+chef-modal {
 
   [slot=title] {
     font-style: normal;
@@ -99,7 +100,7 @@ chef-modal.reset-client-modal {
           width: 16px;
           background-image: url('/assets/img/icon-check-circle.png');
           position: absolute;
-          top: -30px;
+          top: -51px;
           left: 8px;
         }
 
@@ -136,7 +137,9 @@ chef-modal.reset-client-modal {
       }
     }
   }
+}
 
+chef-modal.reset-client-modal {
   ::ng-deep {
     .modal {
       box-shadow: 0px 0px 30px 0px #CCC;
@@ -255,4 +258,80 @@ chef-modal.reset-client-modal {
 
   }
 
+}
+
+chef-modal.reset-modal {
+  ::ng-deep {
+    .modal {
+      box-shadow: 0px 0px 30px 0px $light-grey;
+      max-width: 528px;
+      min-width: 528px;
+      outline: none;
+
+      chef-button {
+        &.close {
+          border: none;
+          color: $chef-black;
+          margin-right: 22px;
+          margin-top: 16px;
+
+          &:hover, &:focus {
+            background: none;
+            outline: none;
+          }
+        }
+
+        button {
+          line-height: 20px;
+          letter-spacing: 0.5px;
+
+          &:focus {
+            outline: none;
+            border: 0.5px solid $chef-primary-bright;
+            border-radius: 4px;
+          }
+        }
+
+        .cancel-button.hydrated {
+          background: none;
+        }
+      }
+
+      chef-checkbox {
+        &[aria-checked=false] .check-wrap {
+          border-color: $chef-primary-bright;
+        }
+
+        &:focus {
+          outline: none;
+          border: 0.5px solid $chef-primary-bright;
+          border-radius: 4px;
+        }
+
+        .label-wrap {
+          margin-left: 8px;
+        }
+
+        .check-wrap {
+          width: 16px;
+          min-width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    .modal-overlay {
+      background-color: $chef-white;
+      opacity: 0.5;
+    }
+
+    chef-snippet pre {
+      font-size: 12px;
+      height: 297px;
+      width: 100%;
+      line-height: 20px;
+      letter-spacing: 0.25px;
+      padding: 1.5em;
+    }
+  }
 }
