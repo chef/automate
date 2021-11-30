@@ -16,6 +16,7 @@ import { saveAs } from 'file-saver';
 import { GetControlDetail } from 'app/entities/control-details/control-details.action';
 // import { ControlDetail } from 'app/entities/control-details/control-details.model';
 import { controlDetailStatus, controlDetailList } from 'app/entities/control-details/control-details.selectors';
+
 @Component({
   selector: 'app-reporting-node',
   templateUrl: './reporting-node.component.html',
@@ -47,10 +48,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   pageIndex = 1;
   perPage = 100;
   controlsLoading = false;
-  controlDetails: any = {};
+  controlDetails = {};
   controlDetailsLoading = false;
   isError = false;
   reportId : string;
+  reportIdArray: Array<string | number> = ['1','100'];
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -96,10 +98,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
         this.controlDetailsLoading = false;
         this.isError = false;
-        this.controlDetails = detailsListState;
+        this.controlDetails = detailsListState.items;
+        // console.log("this.controlDetails", this.controlDetails);
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
-        // console.log("errrr", error);
+        this.reportIdArray = this.reportIdArray.slice(0, -1);
         // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
         // this.openControls[control.id] = toggled;
       }
@@ -179,7 +182,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   isOpenControl({ id }) {
-    // console.log(this.openControls[id] && this.openControls[id].open);
     return this.openControls[id] && this.openControls[id].open;
   }
 
@@ -189,7 +191,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
 
-    if (toggled.open === true) {
+    if (toggled.open === true && !this.reportIdArray.includes(control.id)) {
+      this.reportIdArray.push(control.id);
+      console.log("added =====>", this.reportIdArray);
       const payload = {
         report_id : this.activeReport.id,
         filters : [
@@ -197,20 +201,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           {'type': 'control', 'values': [`${control.id}`]}]
       }
       this.store.dispatch(new GetControlDetail(payload));
-    //   this.statsService.getControlDetails(this.activeReport.id, control.profile_id, control.id)
-    //   .pipe(first())
-    //   .subscribe(
-    //     data => {
-    //     this.controlDetailsLoading = false;
-    //     this.isError = false;
-    //     this.controlDetails = data;
-    //   },
-    //   error => {
-    //     this.isError = true;
-    //     console.log("errrr", error);
-    //     const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
-    //     this.openControls[control.id] = toggled;
-    //   });
     }
   }
 
