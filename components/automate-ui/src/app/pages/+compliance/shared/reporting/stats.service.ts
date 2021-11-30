@@ -271,6 +271,24 @@ export class StatsService {
     return 'passed';
   }
 
+  getSingleReport(reportID: string, reportQuery: ReportQuery): Observable<any> {
+    const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
+    const formatted = this.formatFilters(reportQuery);
+    const body = { filters: formatted };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map((data) => {
+        data.profiles.forEach(p => {
+          p.controls.forEach(c => {
+            // precalculate overall control status from results
+            c.results = c.results || [];
+            c.status = this.getControlStatus(c);
+          });
+        });
+        return omitBy(data, isNil);
+      }));
+  }
+
   private checkIfWaived(waivedStatus: string): boolean {
     return waivedStatus === 'yes_run' || waivedStatus === 'yes';
   }
