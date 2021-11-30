@@ -54,7 +54,8 @@ var ComplianceRepDate = Mapping{
       }
     },
     "index": {
-      "refresh_interval": "1s"
+      "refresh_interval": "1s",
+      "max_inner_result_window": 10000
     }
   },
   "mappings": {
