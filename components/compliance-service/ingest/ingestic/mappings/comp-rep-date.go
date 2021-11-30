@@ -54,7 +54,8 @@ var ComplianceRepDate = Mapping{
       },
       "index": {
         "refresh_interval": "1s",
-        "number_of_shards": "5"
+        "number_of_shards": "5",
+        "max_inner_result_window": 10000
       }
     },
     "mappings": {
