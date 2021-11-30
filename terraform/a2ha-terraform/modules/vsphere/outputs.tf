@@ -45,23 +45,11 @@ output "automate_private_ips" {
   value = [vsphere_virtual_machine.chef_automate.*.default_ip_address]
 }
 
-output "automate_public_ips" {
-  value = [vsphere_virtual_machine.chef_automate.*.default_ip_address]
-}
-
 output "chef_server_private_ips" {
   value = [vsphere_virtual_machine.chef_server.*.default_ip_address]
 }
 
-output "chef_server_public_ips" {
-  value = [vsphere_virtual_machine.chef_server.*.default_ip_address]
-}
-
 output "postgresql_private_ips" {
-  value = [vsphere_virtual_machine.chef_automate_postgresql.*.default_ip_address]
-}
-
-output "postgresql_public_ips" {
   value = [vsphere_virtual_machine.chef_automate_postgresql.*.default_ip_address]
 }
 

@@ -30,10 +30,6 @@ variable "automate_private_ips" {
   default = []
 }
 
-variable "automate_public_ips" {
-  default = []
-}
-
 variable "automate_server_instance_type" {
   default = "t3a.medium"
 }
@@ -83,10 +79,6 @@ variable "chef_server_private_ips" {
   default = []
 }
 
-variable "chef_server_public_ips" {
-  default = []
-}
-
 variable "elasticsearch_ebs_volume_iops" {
   default = 300
 }
@@ -124,10 +116,6 @@ variable "postgresql_ebs_volume_type" {
 }
 
 variable "postgresql_private_ips" {
-  default = []
-}
-
-variable "postgresql_public_ips" {
   default = []
 }
 
