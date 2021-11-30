@@ -234,6 +234,18 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	reflection.Register(s)
 	logrus.Info("Starting GRPC server on " + binding)
 
+	// check the index setting
+	maxInnerResults, err := relaxting.GetMaxInnerResultWindow(esr)
+	if err != nil {
+		logrus.Fatalf("serveGrpc aborting, unable to get max inner results window of indices: %v", err)
+	}
+	if maxInnerResults != int64(10000) {
+		err = relaxting.SetMaxInnerResultWindow(esr)
+		if err != nil {
+			logrus.Fatalf("serveGrpc aborting, unable to set max inner results window of indices: %v", err)
+		}
+	}
+
 	// running ElasticSearch migration
 	err = relaxting.RunMigrations(esr, statusSrv)
 	if err != nil {
