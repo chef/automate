@@ -8,7 +8,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/go-gorp/gorp"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -96,33 +95,31 @@ func TestGetAllStatus(t *testing.T) {
 	createdAt := endedAt.Add(-10 * time.Minute)
 	endTime := endedAt.Add(-24 * time.Hour)
 
-	endedAtProto, err := ptypes.TimestampProto(endedAt)
-	assert.NoError(t, err)
-
-	createdAtProto, err := ptypes.TimestampProto(createdAt)
-	assert.NoError(t, err)
-
-	query := `SELECT id, status, message, custom_report_size, created_at, updated_at FROM custom_report_requests WHERE requestor = $1 AND created_at >= $2 ORDER BY created_at DESC;`
+	query := `SELECT id, status, message, custom_report_size, custom_report_type, created_at, updated_at FROM custom_report_requests WHERE requestor = $1 AND created_at >= $2 ORDER BY created_at DESC;`
 
 	t.Run("TestGetAllStatus_Success", func(t *testing.T) {
-		columns := []string{"id", "status", "message", "custom_report_size", "created_at", "updated_at"}
+		columns := []string{"id", "status", "message", "custom_report_size", "custom_report_type", "created_at", "updated_at"}
 
 		mock.ExpectQuery(query).WithArgs("reqID", endTime).
-			WillReturnRows(sqlmock.NewRows(columns).AddRow("1", "success", "", 1024*1024, createdAt, endedAt).
-				AddRow("2", "failed", "error in running task", 0, createdAt, endedAt).AddRow("3", "running", "", 0, createdAt, createdAt))
+			WillReturnRows(sqlmock.NewRows(columns).AddRow("1", "success", "", 1024*1024, "json", createdAt, endedAt).
+				AddRow("2", "failed", "error in running task", 0, "csv", createdAt, endedAt).AddRow("3", "running", nil, nil, nil, createdAt, createdAt))
 
 		resp, err := db.GetAllStatus("reqID", endTime)
 		assert.NoError(t, err)
-		assert.Equal(t, 3, len(resp.Data))
+		assert.Equal(t, 3, len(resp))
 
-		assert.Equal(t, "1", resp.Data[0].AcknowledgementId)
-		assert.Equal(t, "success", resp.Data[0].Status)
-		assert.Equal(t, int64(1048576), resp.Data[0].ReportSize)
-		assert.Equal(t, createdAtProto, resp.Data[0].CreatedAt)
-		assert.Equal(t, endedAtProto, resp.Data[0].EndedAt)
-		assert.Equal(t, "failed", resp.Data[1].Status)
-		assert.Equal(t, "error in running task", resp.Data[1].ErrMessage)
-		assert.Equal(t, "running", resp.Data[2].Status)
+		assert.Equal(t, "1", resp[0].ID)
+		assert.Equal(t, "success", resp[0].Status)
+		assert.Equal(t, int64(1048576), resp[0].ReportSize.Int64)
+		assert.Equal(t, "json", resp[0].ReportType.String)
+		assert.Equal(t, createdAt, resp[0].StartTime)
+		assert.Equal(t, endedAt, resp[0].EndTime)
+		assert.Equal(t, "failed", resp[1].Status)
+		assert.Equal(t, "error in running task", resp[1].Message.String)
+		assert.Equal(t, "running", resp[2].Status)
+		assert.Equal(t, "", resp[2].Message.String)
+		assert.Equal(t, "", resp[2].ReportType.String)
+		assert.Equal(t, int64(0), resp[2].ReportSize.Int64)
 	})
 
 	t.Run("TestGetAllStatus_Failed", func(t *testing.T) {
