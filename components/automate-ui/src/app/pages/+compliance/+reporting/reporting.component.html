@@ -176,11 +176,11 @@
           </chef-button>
         </div>
         <div class="side-panel-body">
-          <table class="table">
+          <table class="table" aria-label="download-report-list">
             <tr class="table-header">
-              <th>Report</th>
-              <th>Size</th>
-              <th>Duration</th>
+              <th scope="col">Report</th>
+              <th scope="col">Size</th>
+              <th scope="col">Duration</th>
             </tr>
             <ng-container *ngIf="downloadReportsService.reportList.length > 0">
               <tr *ngFor="let report of downloadReportsService.reportList; index as i">
