@@ -11,8 +11,8 @@ import {
   GetControlDetail,
   GetControlDetailSuccess,
   GetControlDetailFailure
-  ,
-  ControlDetailSuccessPayload
+  // ,
+  // ControlDetailSuccessPayload
 } from './control-details.action';
 
 import { ControlDetailRequests } from './control-details.requests';
@@ -29,8 +29,8 @@ export class ControlDetailEffects {
       ofType(ControlDetailActionTypes.GET),
       mergeMap(({ payload }: GetControlDetail) =>
         this.requests.GetControlDetail(payload).pipe(
-          // map((resp) => new GetControlDetailSuccess(resp)),
-          map((resp: ControlDetailSuccessPayload) => new GetControlDetailSuccess(resp)),
+          map((resp) => new GetControlDetailSuccess(resp)),
+          // map((resp: ControlDetailSuccessPayload) => new GetControlDetailSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
           observableOf(new GetControlDetailFailure(error)))))));
 
