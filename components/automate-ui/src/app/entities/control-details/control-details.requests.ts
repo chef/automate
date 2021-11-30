@@ -4,17 +4,17 @@ import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { ControlDetail } from './control-details.model';
 
-export interface ControlDetailsResponse {
-  controlDetails: ControlDetail[];
+export interface ControlDetailResponse {
+  controlDetail: ControlDetail[];
 }
 
 @Injectable()
-export class ControlDetailsRequests {
+export class ControlDetailRequests {
   constructor(private http: HttpClient) { }
 
-  public GetControlDetails(payload: any ) : Observable<ControlDetailsResponse> {
+  public GetControlDetail(payload: any ) : Observable<ControlDetailResponse> {
     const filters = {'filters': payload.filters};
     const url = `${env.compliance_url}/reporting/reports/id/${payload.report_id}`;
-    return this.http.post<ControlDetailsResponse>(url, filters);
+    return this.http.post<ControlDetailResponse>(url, filters);
   }
 }

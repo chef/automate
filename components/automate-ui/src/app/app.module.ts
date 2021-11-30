@@ -81,7 +81,7 @@ import { CookbookDetailsRequests } from './entities/cookbooks/cookbook-details.r
 import { CookbookVersionsRequests } from './entities/cookbooks/cookbook-versions.requests';
 import { ClientRequests } from './entities/clients/client.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
-import { ControlDetailsRequests } from './entities/control-details/control-details.requests';
+import { ControlDetailRequests } from './entities/control-details/control-details.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DataBagsRequests } from './entities/data-bags/data-bags.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
@@ -336,7 +336,7 @@ import {
     ComplianceStatsService,
     ConfigService,
     ClientRunsRequests,
-    ControlDetailsRequests,
+    ControlDetailRequests,
     CookbookDetailsRequests,
     CookbookRequests,
     CookbookVersionsRequests,

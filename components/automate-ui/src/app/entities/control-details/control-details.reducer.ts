@@ -1,43 +1,43 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from 'app/entities/entities';
-import { ControlDetailsActionTypes, ControlDetailsActions } from './control-details.action';
+import { ControlDetailActionTypes, ControlDetailActions } from './control-details.action';
 import { ControlDetail } from './control-details.model';
 
-export interface ControlDetailsEntityState extends EntityState<ControlDetail> {
-  controlDetailsStatus: any;
-  controlDetailsList: {
+export interface ControlDetailEntityState extends EntityState<ControlDetail> {
+  controlDetailStatus: EntityStatus;
+  controlDetailList: {
     items: ControlDetail[]
   };
 }
 
-const GET_STATUS = 'controlDetailsStatus';
+const GET_STATUS = 'controlDetailStatus';
 
-export const controlDetailsEntityAdapter: EntityAdapter<ControlDetail> =
+export const controlDetailEntityAdapter: EntityAdapter<ControlDetail> =
   createEntityAdapter<ControlDetail>({
-    selectId: (controlDetails: ControlDetail) => controlDetails.id
+    selectId: (controlDetail: ControlDetail) => controlDetail.id
 });
 
-export const ControlDetailsEntityInitialState: ControlDetailsEntityState =
-  controlDetailsEntityAdapter.getInitialState(<ControlDetailsEntityState>{
-    controlDetailsStatus: EntityStatus.notLoaded
+export const ControlDetailEntityInitialState: ControlDetailEntityState =
+  controlDetailEntityAdapter.getInitialState(<ControlDetailEntityState>{
+    controlDetailStatus: EntityStatus.notLoaded
   });
 
-export function controlDetailsEntityReducer(
-  state: ControlDetailsEntityState = ControlDetailsEntityInitialState,
-  action: ControlDetailsActions): ControlDetailsEntityState {
+export function controlDetailEntityReducer(
+  state: ControlDetailEntityState = ControlDetailEntityInitialState,
+  action: ControlDetailActions): ControlDetailEntityState {
 
   switch (action.type) {
-    case ControlDetailsActionTypes.GET:
-      return set(GET_STATUS, EntityStatus.loading, controlDetailsEntityAdapter.removeAll(state));
+    case ControlDetailActionTypes.GET:
+      return set(GET_STATUS, EntityStatus.loading, controlDetailEntityAdapter.removeAll(state));
 
-    case ControlDetailsActionTypes.GET_SUCCESS:
+    case ControlDetailActionTypes.GET_SUCCESS:
       return pipe(
         set(GET_STATUS, EntityStatus.loadingSuccess),
-        set('controlDetailsList.items', action.payload || [])
-      )(state) as ControlDetailsEntityState;
+        set('controlDetailList.items', action.payload || [])
+      )(state) as ControlDetailEntityState;
 
-    case ControlDetailsActionTypes.GET_FAILURE:
+    case ControlDetailActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
     default:
@@ -46,4 +46,4 @@ export function controlDetailsEntityReducer(
 }
 
 export const getEntityById = (id: string) =>
-  (state: ControlDetailsEntityState) => state.entities[id];
+  (state: ControlDetailEntityState) => state.entities[id];

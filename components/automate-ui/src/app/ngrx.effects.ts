@@ -6,7 +6,7 @@ import { ApiTokenEffects } from './entities/api-tokens/api-token.effects';
 import { AutomateSettingsEffects } from './entities/automate-settings/automate-settings.effects';
 import { CdsEffects } from './entities/cds/cds.effects';
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
-import { ControlDetailsEffects } from './entities/control-details/control-details.effects';
+import { ControlDetailEffects } from './entities/control-details/control-details.effects';
 import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { CookbookDetailsEffects } from './entities/cookbooks/cookbook-details.effects';
 import { CookbookVersionsEffects } from './entities/cookbooks/cookbook-versions.effects';
@@ -62,7 +62,7 @@ import { UserPreferencesEffects } from './services/user-preferences/user-prefere
       AutomateSettingsEffects,
       CdsEffects,
       ClientRunsEffects,
-      ControlDetailsEffects,
+      ControlDetailEffects,
       CookbookEffects,
       CookbookDetailsEffects,
       CookbookVersionsEffects,

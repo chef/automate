@@ -1,4 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { combineLatest } from 'rxjs';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
+import { isNil } from 'lodash/fp';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
 import { Subject, Observable } from 'rxjs';
@@ -8,13 +13,9 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
-import { GetControlDetails } from 'app/entities/control-details/control-details.action';
+import { GetControlDetail } from 'app/entities/control-details/control-details.action';
 // import { ControlDetail } from 'app/entities/control-details/control-details.model';
-import { controlDetailsStatus, controlDetailsList } from 'app/entities/control-details/control-details.selectors';
-import { Store } from '@ngrx/store';
-import { combineLatest } from 'rxjs';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { EntityStatus } from 'app/entities/entities';
+import { controlDetailStatus, controlDetailList } from 'app/entities/control-details/control-details.selectors';
 @Component({
   selector: 'app-reporting-node',
   templateUrl: './reporting-node.component.html',
@@ -88,15 +89,15 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
-      this.store.select(controlDetailsStatus),
-      this.store.select(controlDetailsList)
+      this.store.select(controlDetailStatus),
+      this.store.select(controlDetailList)
     ]).pipe(takeUntil(this.isDestroyed))
-    .subscribe(([detailsStatusSt, detailsListSt]) => {
-      if (detailsStatusSt === EntityStatus.loadingSuccess) {
+    .subscribe(([detailsStatusSt, detailsListState]) => {
+      if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
         this.controlDetailsLoading = false;
         this.isError = false;
-        this.controlDetails = detailsListSt;
-      } else if (detailsStatusSt === EntityStatus.loadingSuccess) {
+        this.controlDetails = detailsListState;
+      } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         // console.log("errrr", error);
         // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
@@ -195,7 +196,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           {'type': 'profile_id', 'values': [`${control.profile_id}`]},
           {'type': 'control', 'values': [`${control.id}`]}]
       }
-      this.store.dispatch(new GetControlDetails(payload));
+      this.store.dispatch(new GetControlDetail(payload));
     //   this.statsService.getControlDetails(this.activeReport.id, control.profile_id, control.id)
     //   .pipe(first())
     //   .subscribe(

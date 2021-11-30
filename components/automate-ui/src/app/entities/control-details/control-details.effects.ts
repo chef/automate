@@ -7,36 +7,37 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  ControlDetailsActionTypes,
-  GetControlDetails,
-  GetControlDetailsSuccess,
-  GetControlDetailsFailure,
-  ControlDetailsSuccessPayload
+  ControlDetailActionTypes,
+  GetControlDetail,
+  GetControlDetailSuccess,
+  GetControlDetailFailure
+  ,
+  ControlDetailSuccessPayload
 } from './control-details.action';
 
-import { ControlDetailsRequests } from './control-details.requests';
+import { ControlDetailRequests } from './control-details.requests';
 
 @Injectable()
-export class ControlDetailsEffects {
+export class ControlDetailEffects {
   constructor(
     private actions$: Actions,
-    private requests: ControlDetailsRequests
+    private requests: ControlDetailRequests
   ) { }
 
-  GetControlDetails$ = createEffect(() =>
+  GetControlDetail$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ControlDetailsActionTypes.GET),
-      mergeMap(({ payload }: GetControlDetails) =>
-        this.requests.GetControlDetails(payload).pipe(
-          // map((resp) => new GetControlDetailsSuccess(Response)),
-          map((resp: ControlDetailsSuccessPayload) => new GetControlDetailsSuccess(resp)),
+      ofType(ControlDetailActionTypes.GET),
+      mergeMap(({ payload }: GetControlDetail) =>
+        this.requests.GetControlDetail(payload).pipe(
+          // map((resp) => new GetControlDetailSuccess(resp)),
+          map((resp: ControlDetailSuccessPayload) => new GetControlDetailSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
-          observableOf(new GetControlDetailsFailure(error)))))));
+          observableOf(new GetControlDetailFailure(error)))))));
 
-  GetControlDetailsFailure$ = createEffect(() =>
+  GetControlDetailFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ControlDetailsActionTypes.GET_FAILURE),
-      map(({ payload }: GetControlDetailsFailure) => {
+      ofType(ControlDetailActionTypes.GET_FAILURE),
+      map(({ payload }: GetControlDetailFailure) => {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
