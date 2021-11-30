@@ -15,8 +15,10 @@ import (
 	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/components/report-manager-service/worker"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -121,7 +123,34 @@ func (s *Server) GetAllRequestsStatus(ctx context.Context, req *report_manager.A
 	if req.RequestorId == "" {
 		return &report_manager.AllStatusResponse{}, fmt.Errorf("empty requestore information")
 	}
-	return s.DataStore.GetAllStatus(req.RequestorId, time.Now().Add(-24*time.Hour))
+	resp := &report_manager.AllStatusResponse{}
+	dbResp, err := s.DataStore.GetAllStatus(req.RequestorId, time.Now().Add(-24*time.Hour))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, reportStatus := range dbResp {
+		createdAt, err := ptypes.TimestampProto(reportStatus.StartTime)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error in converting the created at with value %s to timestamppb.Timestamp", reportStatus.StartTime)
+		}
+		endedAt, err := ptypes.TimestampProto(reportStatus.EndTime)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error in converting the ended at with value %s to timestamppb.Timestamp", reportStatus.EndTime)
+		}
+
+		resp.Data = append(resp.Data, &report_manager.StatusResponse{
+			AcknowledgementId: reportStatus.ID,
+			Status:            reportStatus.Status,
+			ReportSize:        reportStatus.ReportSize.Int64,
+			ErrMessage:        reportStatus.Message.String,
+			CreatedAt:         createdAt,
+			EndedAt:           endedAt,
+			Duration:          utils.ComputeDuration(reportStatus.StartTime, reportStatus.EndTime),
+			ReportType:        reportStatus.ReportType.String,
+		})
+	}
+	return resp, nil
 }
 
 func (s *Server) GetPresignedURL(ctx context.Context, req *report_manager.GetPresignedURLRequest) (

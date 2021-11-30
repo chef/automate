@@ -44,6 +44,8 @@ message DownloadRequestResponse {
 	string err_message = 4;
 	google.protobuf.Timestamp created_at = 5;
 	google.protobuf.Timestamp ended_at = 6;
+	string duration = 7;
+	string report_type = 8;
 }
 
 message ExportFromReportManagerRequest {
