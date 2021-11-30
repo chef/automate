@@ -105,7 +105,7 @@ resource "null_resource" "postgresql" {
 
   provisioner "file" {
     destination = "${var.tmp_path}/pre_mount.sh"
-    content     = "${path.module}/templates/pre_mount.tpl"
+    source      = "${path.module}/templates/pre_mount.tpl"
   }
 
   provisioner "remote-exec" {
