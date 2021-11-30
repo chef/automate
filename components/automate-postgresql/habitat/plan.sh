@@ -1,7 +1,7 @@
 pkg_name="automate-postgresql"
 pkg_description="Wrapper package for core/postgresql"
 pkg_origin="chef"
-pkg_version="9.6.11"
+pkg_version="9.6.21"
 vendor_origin="core"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
