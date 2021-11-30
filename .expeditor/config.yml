@@ -107,8 +107,7 @@ subscriptions:
             - components/automate-cli/pkg/status/error_codes.go
             - components/automate-cli/Makefile
             - .expeditor/generate-automate-cli-docs.sh
-      - bash:
-          .expeditor/generate-automate-api-docs.sh:
+      - bash:.expeditor/generate-automate-api-docs.sh:
           post_commit: false
           only_if_modified:
             - api/external/**/*.swagger.json
@@ -122,24 +121,18 @@ subscriptions:
   # When the habitat/build pipeline fails, unlock the staging area
   - workload: buildkite_build_failed:{{agent_id}}:habitat/build:*
     actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
   # When the habitat/build pipeline completes successfully, unlock the staging area
   - workload: buildkite_build_passed:{{agent_id}}:habitat/build:*
     actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
   # When the habitat/build pipeline is canceled, unlock the staging area
   - workload: buildkite_build_canceled:{{agent_id}}:habitat/build:*
     actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
@@ -181,28 +174,4 @@ subscriptions:
   - workload: schedule_triggered:chef/automate:main:renew_wildcard_certs:*
     actions:
       - trigger_pipeline:renew-certs
-
-  - workload: buildkite_build_failed:{{agent_id}}:verify_private:*
-    actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
-      - unlock_staging_area:post_merge:
-          post_commit: true
-          always_run: true
-  # When the habitat/build pipeline completes successfully, unlock the staging area
-  - workload: buildkite_build_passed:{{agent_id}}:verify_private:*
-    actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
-      - unlock_staging_area:post_merge:
-          post_commit: true
-          always_run: true
-  # When the habitat/build pipeline is canceled, unlock the staging area
-  - workload: buildkite_build_canceled:{{agent_id}}:verify_private:*
-    actions:
-      - bash:.expeditor/update_habitat.sh:
-          pre_commit: true
-      - unlock_staging_area:post_merge:
-          post_commit: true
-          always_run: true
 

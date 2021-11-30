@@ -220,9 +220,8 @@ class ManifestGenerator
     # of an implementation mistake in deployment-service, changing this
     # version is impossible without major feature work in
     # deployment-service to manage the upgrade.
-    hab_build_version = package_querier.get_latest(hab_pkg_channel, "core", "hab").pretty
     manifest["schema_version"] = "1"
-    manifest["hab_build"] = hab_build_version
+    manifest["hab_build"] = local_hab_version
     manifest["build"] = version
     manifest["hab"] = []
 
@@ -309,9 +308,9 @@ unless no_pin_hab
   # components/automate-deployment/habitat/plan.sh
   #
   # WARNING: These pins are managed by .expeditor/update_habitat.sh.
-  pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "1.6.420", "release" => "20211101172443"}
-  pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "1.6.420", "release" => "20211101174842"}
-  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "15846",  "release" => "20211101174841"}
+  pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "1.6.181", "release" => "20201030172917"}
+  pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "1.6.181", "release" => "20201030181202"}
+  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "14772",  "release" => "20201030181158"}
 end
 
 # CONFIGURATION
