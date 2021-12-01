@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ReportType } from './download-reports.model';
 import { Store } from '@ngrx/store';
@@ -9,7 +9,6 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 import { downloadNotificationList } from './download-reports.selector';
 import { ClearNotificationReport } from './download-reports.actions';
-import { Subscription } from 'rxjs';
 import { saveAs } from 'file-saver';
 
 const REPORT_LIST_API_URL = environment.download_report_list_url;
@@ -24,16 +23,17 @@ export class DownloadReportsService implements OnDestroy {
   notificationItems = {};
   retryLongPoll = 0;
   private units = ['bytes', 'kb', 'mb', 'gb'];
-  constructor(private httpClient: HttpClient, 
+  constructor(private httpClient: HttpClient,
     private store: Store<NgrxStateAtom>) {
       this.onInit();
     }
 
   onInit() {
-    this.downloadSubscription = this.store.select(downloadNotificationList).subscribe((notificationItems) => {
+    this.downloadSubscription = this.store.select(downloadNotificationList)
+    .subscribe((notificationItems) => {
       this.notificationItems = notificationItems; // download ack_id list are read from store
     });
-  }  
+  }
 
   onReportOpenClick() {
     this.showOpenReport = true;
@@ -84,12 +84,12 @@ export class DownloadReportsService implements OnDestroy {
     const reportLength = this.reportList.length;
     if (reportLength > 0) {
       let isLongPollNeededNextTime = false;
-      for (let report of this.reportList) {
+      for (const report of this.reportList) {
         if (report.status === 'running') {
           isLongPollNeededNextTime = true;
         } else {
           const status = report.status;
-          const format = report.report_type.toUpperCase(); 
+          const format = report.report_type.toUpperCase();
           if (status === 'success') {
             if (this.notificationItems['ack_' + report.acknowledgement_id]) {
               this.store.dispatch(new ClearNotificationReport(report.acknowledgement_id));
@@ -114,7 +114,7 @@ export class DownloadReportsService implements OnDestroy {
           this.handleReportList();
         }, 10000);
         return;
-      } 
+      }
     }
     this.isLongPollRunning = false;
   }

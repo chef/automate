@@ -28,7 +28,7 @@
             <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
               <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
               <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
-              <chef-button tertiary *ngIf="true || appConfigService.isLargeReportingEnabled" (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()">Open Report</chef-button>
+              <chef-button tertiary *ngIf="appConfigService.isLargeReportingEnabled" (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()">Open Report</chef-button>
             </chef-click-outside>
           </chef-dropdown>
         </div>

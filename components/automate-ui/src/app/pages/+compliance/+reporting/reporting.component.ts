@@ -292,7 +292,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
     const onNext = data => {
-      if (true || this.appConfigService.isLargeReportingEnabled) {
+      if (this.appConfigService.isLargeReportingEnabled) {
         this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
         this.store.dispatch(new CreateNotification({
           type: Type.info,

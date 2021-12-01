@@ -28,9 +28,9 @@ export function downloadReportsEntityReducer(
       return set('list.notificationItems', {...state.list.notificationItems, ['ack_' + ackId]: 'running'}, state);
     case DownloadReportsActionTypes.CLEAR:
       const ack_Id = action.payload;
-      let cloneState = JSON.parse(JSON.stringify(state.list.notificationItems));
-      for (let props in cloneState) {
-        if (props == ('ack_' + ack_Id)) {
+      const cloneState = JSON.parse(JSON.stringify(state.list.notificationItems));
+      for (const props in cloneState) {
+        if (props === ('ack_' + ack_Id)) {
           delete cloneState['ack_' + ack_Id];
         }
       }
