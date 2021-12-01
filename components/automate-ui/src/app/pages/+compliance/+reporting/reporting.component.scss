@@ -327,6 +327,11 @@ chef-subheading {
       text-align: center;
       border-bottom: 5px solid $chef-white;
     }
+
+    .download-link {
+      text-decoration: underline;
+      cursor: pointer;
+    }
   }
 
 }

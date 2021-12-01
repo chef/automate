@@ -219,7 +219,7 @@ export class StatsService {
 
   downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
     let url = '';
-    if (this.appConfigService.isLargeReportingEnabled) {
+    if (true || this.appConfigService.isLargeReportingEnabled) {
       url = `${CC_API_URL}/reporting/reportmanager/export`; // download Ack API
     } else {
       url = `${CC_API_URL}/reporting/export`; // direct download

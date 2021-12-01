@@ -3,7 +3,7 @@ import { DownloadReportsEntityState } from './download-reports.reducer';
 
 export const downloadReportsState = createFeatureSelector<DownloadReportsEntityState>('downloadReports');
 
-export const downloadReportsList = createSelector(
+export const downloadNotificationList = createSelector(
   downloadReportsState,
-  (downloadReports) => downloadReports.list
+  (downloadReports) => downloadReports.list.notificationItems
 );

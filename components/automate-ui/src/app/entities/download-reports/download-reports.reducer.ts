@@ -5,7 +5,7 @@ import { DownloadReportsActionTypes, DownloadReportsActions } from './download-r
 
 export interface DownloadReportsEntityState {
   list: {
-    notificationStack: string[]
+    notificationItems: {}
   };
   error: HttpErrorResponse;
   status: EntityStatus;
@@ -13,7 +13,7 @@ export interface DownloadReportsEntityState {
 
 export const DownloadReportsEntityInitialState: DownloadReportsEntityState = {
   list: {
-    notificationStack: []
+    notificationItems: {}
   },
   error: null,
   status: EntityStatus.notLoaded
@@ -23,13 +23,19 @@ export function downloadReportsEntityReducer(
   state: DownloadReportsEntityState = DownloadReportsEntityInitialState,
   action: DownloadReportsActions): DownloadReportsEntityState {
   switch (action.type) {
-
     case DownloadReportsActionTypes.ADD:
       const ackId = action.payload;
-      return set('list.notificationStack', [...state.list.notificationStack, ackId], state);
-
+      return set('list.notificationItems', {...state.list.notificationItems, ['ack_' + ackId]: 'running'}, state);
+    case DownloadReportsActionTypes.CLEAR:
+      const ack_Id = action.payload;
+      let cloneState = JSON.parse(JSON.stringify(state.list.notificationItems));
+      for (let props in cloneState) {
+        if (props == ('ack_' + ack_Id)) {
+          delete cloneState['ack_' + ack_Id];
+        }
+      }
+      return set('list.notificationItems', { ...cloneState }, state);
     default:
       return state;
   }
 }
-

@@ -292,12 +292,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
     const onNext = data => {
-      if (this.appConfigService.isLargeReportingEnabled) {
+      if (true || this.appConfigService.isLargeReportingEnabled) {
         this.store.dispatch(new AckDownloadReports(JSON.parse(data).acknowledgement_id));
         this.store.dispatch(new CreateNotification({
-        type: Type.info,
-        message: 'Download request is submitted. You will get notification once it is ready for download.'
+          type: Type.info,
+          message: 'Download request is submitted. You will get notification once it is ready for download.'
         }));
+        this.downloadReportsService.initiateLongPolling();
       } else {
         const types = { 'json': 'application/json', 'csv': 'text/csv' };
         const type = types[format];
