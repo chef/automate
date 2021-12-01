@@ -55,7 +55,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 		}
 		errChannels = append(errChannels, insertInspecSummary(msg, client))
 		errChannels = append(errChannels, insertInspecReport(msg, client))
-		errChannels = append(errChannels, insertInspecReportRunInfo(msg, client))
+		//errChannels = append(errChannels, insertInspecReportRunInfo(msg, client))
 
 		for err := range merge(errChannels...) {
 			if err != nil {

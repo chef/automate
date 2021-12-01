@@ -18,7 +18,7 @@ var AllMappings = []Mapping{
 	ComplianceRepDate,
 	ComplianceSumDate,
 	ComplianceProfiles,
-	ComplianceRunInfo,
+	//ComplianceRunInfo,
 }
 
 const (
