@@ -76,4 +76,4 @@ Specify the action to restrict user access to the specific action
 | Delete Client | DELETE | infra:infraServersOrgsClient:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/clients/{name} |
 | Get Node | GET | infra:infraServersOrgsNodes:get | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
 | Update Node | POST | infra:infraServersOrgsNodes:update | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes |
-| Delete PolicyFiles | DELETE | infra:infraServersOrgsNodes:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name} |
+| Delete Node | DELETE | infra:infraServersOrgsNodes:delete | /api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name}| https://{{< example_fqdn "automate" >}}/api/v0/infra/servers/{server_id}/orgs/{org_id}/nodes/{name} |
