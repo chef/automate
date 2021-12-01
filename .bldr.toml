@@ -422,6 +422,7 @@ paths = [
   "components/automate-deployment/*",
   "components/automate-grpc/*",
   "components/es-sidecar-service/*",
+  "components/local-user-service/*",
   "lib/cereal/*",
   "lib/config/*",
   "lib/db/*",
