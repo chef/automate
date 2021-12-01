@@ -275,7 +275,7 @@ export class StatsService {
      pageIndex: number, perPage: number): Observable<any> {
     const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);
-    const pagevalue = (pageIndex - 1);
+    const pagevalue = (pageIndex - 1) * 100;
     const pageParam = [
       ...formatted,
       {'type': 'from', 'values': [`${pagevalue}`]},
