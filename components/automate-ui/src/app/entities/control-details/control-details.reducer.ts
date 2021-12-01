@@ -5,12 +5,14 @@ import { ControlDetailActionTypes, ControlDetailActions } from './control-detail
 import { ControlDetail } from './control-details.model';
 
 export interface ControlDetailEntityState extends EntityState<ControlDetail> {
+  controlsList: [];
   controlDetailStatus: EntityStatus;
-  controlDetailList: {
+  controlDetailList: [
     items: ControlDetail[]
-  };
+  ];
 }
 
+let controlList =[];
 const GET_STATUS = 'controlDetailStatus';
 
 export const controlDetailEntityAdapter: EntityAdapter<ControlDetail> =
@@ -29,12 +31,14 @@ export function controlDetailEntityReducer(
 
   switch (action.type) {
     case ControlDetailActionTypes.GET:
-      return set(GET_STATUS, EntityStatus.loading, controlDetailEntityAdapter.removeAll(state));
+      return set(GET_STATUS, EntityStatus.loading, state);
 
     case ControlDetailActionTypes.GET_SUCCESS:
+      controlList.push(action.payload);
       return pipe(
         set(GET_STATUS, EntityStatus.loadingSuccess),
-        set('controlDetailList.items', action.payload || [])
+        set('controlDetailList.items', action.payload || []),
+        set('controlsList', controlList)
       )(state) as ControlDetailEntityState;
 
     case ControlDetailActionTypes.GET_FAILURE:

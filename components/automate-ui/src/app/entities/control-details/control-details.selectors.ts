@@ -18,3 +18,8 @@ export const controlDetailList = createSelector(
   ControlDetailsState,
   (state) => state.controlDetailList
 );
+
+export const controlsList = createSelector(
+  ControlDetailsState,
+  (state) => state.controlsList
+);

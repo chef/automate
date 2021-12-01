@@ -14,8 +14,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
 import { GetControlDetail } from 'app/entities/control-details/control-details.action';
-// import { ControlDetail } from 'app/entities/control-details/control-details.model';
-import { controlDetailStatus, controlDetailList } from 'app/entities/control-details/control-details.selectors';
+import { controlDetailStatus, controlDetailList, controlsList } from 'app/entities/control-details/control-details.selectors';
 
 @Component({
   selector: 'app-reporting-node',
@@ -52,7 +51,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   controlDetailsLoading = false;
   isError = false;
   reportId : string;
-  reportIdArray: Array<string | number> = ['1','100'];
+  reportIdArray: Array<string | number> = [];
+  allControlList = [];
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -98,8 +98,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
         this.controlDetailsLoading = false;
         this.isError = false;
-        this.controlDetails = detailsListState.items;
-        // console.log("this.controlDetails", this.controlDetails);
+        this.controlDetails = detailsListState;
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         this.reportIdArray = this.reportIdArray.slice(0, -1);
@@ -191,16 +190,31 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
 
-    if (toggled.open === true && !this.reportIdArray.includes(control.id)) {
-      this.reportIdArray.push(control.id);
-      console.log("added =====>", this.reportIdArray);
-      const payload = {
-        report_id : this.activeReport.id,
-        filters : [
-          {'type': 'profile_id', 'values': [`${control.profile_id}`]},
-          {'type': 'control', 'values': [`${control.id}`]}]
+    if (toggled.open === true){
+      if (!this.reportIdArray.includes(control.id)) {
+        this.reportIdArray.push(control.id);
+        const payload = {
+          report_id : this.activeReport.id,
+          filters : [
+            {'type': 'profile_id', 'values': [`${control.profile_id}`]},
+            {'type': 'control', 'values': [`${control.id}`]}]
+        }
+        this.store.dispatch(new GetControlDetail(payload));
+      } else {
+        this.store.select(controlsList).subscribe(data =>{
+          this.allControlList = data;
+        });
+
+        this.allControlList.map((data) => {
+          data.profiles.forEach(p => {
+            p.controls.forEach(c => {
+              if(c.id === control.id){
+                this.controlDetails = data;            
+              }
+            });
+          });
+        });
       }
-      this.store.dispatch(new GetControlDetail(payload));
     }
   }
 
