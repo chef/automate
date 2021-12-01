@@ -207,7 +207,7 @@ describe('Nodes update', () => {
     it('Nodes put returns 200 when infraServersOrgsNodes update actions is allowed', () => {
         cy.request({
             headers: { 'api-token': withInfraServersNodesUpdateActionToken },
-            method: 'GET',
+            method: 'PUT',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin'
             }).then((resp) => {
                 assert.equal(resp.status, 200);
@@ -217,11 +217,127 @@ describe('Nodes update', () => {
     it('Nodes put returns 403 when infraServersOrgsNodes put actions is denied', () => {
         cy.request({
             headers: { 'api-token': withoutInfraServersNodesUpdateActionToken },
-            method: 'GET',
+            method: 'PUT',
             url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin',
             failOnStatusCode: false
             }).then((resp) => {
             assert.equal(resp.status, 403);
         });
     });
+});
+
+describe('Nodes delete', () => {
+    let withInfraServersNodesDeleteActionToken = '';
+    let withoutInfraServersNodesDeleteActionToken = '';
+
+    const cypressPrefix = 'infra-server-nodes-actions-delete';
+    const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
+    const objectsToCleanUp = ['tokens', 'policies'];
+
+    const withInfraServersNodesDeletePolicy = {
+    id: policyId1,
+    name: tokenId1,
+    projects: [],
+    members: [`token:${tokenId1}`],
+    statements: [
+        {
+            effect: 'ALLOW',
+            actions: [
+                'infra:infraServersOrgsNodes:delete'
+            ],
+            projects: ['*']
+        }]
+    };
+
+
+    const withoutInfraServersNodesDeletePolicy = {
+        id: policyId2,
+        name: tokenId2,
+        projects: [],
+        members: [`token:${tokenId2}`],
+        statements: [
+        {
+            effect: 'DENY',
+            actions: [
+                'infra:infraServersOrgsNodes:delete'
+            ],
+            projects: ['*']
+        }]
+    };
+
+    before(() => {
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId1,
+                name: tokenId1
+            }
+            }).then((resp) => {
+                withInfraServersNodesDeleteActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withInfraServersNodesDeletePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/tokens',
+            body: {
+                id: tokenId2,
+                name: tokenId2
+            }
+            }).then((resp) => {
+                withoutInfraServersNodesDeleteActionToken = resp.body.token.value;
+            });
+
+        cy.request({
+            headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+            method: 'POST',
+            url: '/apis/iam/v2/policies',
+            body: withoutInfraServersNodesDeletePolicy
+            }).then((resp) => {
+                expect(resp.status).to.equal(200);
+            });
+        });
+
+    after(() => {
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    });
+
+    it('Nodes delete returns 403 when infraServersOrgsNodes delete actions is denied', () => {
+        cy.request({
+            headers: { 'api-token': withoutInfraServersNodesDeleteActionToken },
+            method: 'DELETE',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin',
+            failOnStatusCode: false
+            }).then((resp) => {
+            assert.equal(resp.status, 403);
+        });
+    });
+
+    it('Nodes delete returns 200 when infraServersOrgsNodes delete actions is allowed', () => {
+        cy.request({
+            headers: { 'api-token': withInfraServersNodesDeleteActionToken },
+            method: 'DELETE',
+            url: '/api/v0/infra/servers/local-dev/orgs/test-org/nodes/test-admin'
+            }).then((resp) => {
+                assert.equal(resp.status, 200);
+            });
+    });
+
+ 
 });
