@@ -206,7 +206,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           this.allControlList = data;
         });
 
-        this.allControlList.map((data) => {
+        this.allControlList.forEach((data) => {
           data.profiles.forEach(p => {
             p.controls.forEach(c => {
               if (c.id === control.id) {
