@@ -12,7 +12,7 @@ export interface ControlDetailResponse {
 export class ControlDetailRequests {
   constructor(private http: HttpClient) { }
 
-  public GetControlDetail(payload: any ) : Observable<ControlDetailResponse> {
+  public GetControlDetail(payload: any): Observable<ControlDetailResponse> {
     const filters = {'filters': payload.filters};
     const url = `${env.compliance_url}/reporting/reports/id/${payload.report_id}`;
     return this.http.post<ControlDetailResponse>(url, filters);

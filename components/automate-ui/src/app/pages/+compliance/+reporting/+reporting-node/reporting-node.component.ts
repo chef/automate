@@ -1,12 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
 import { isNil } from 'lodash/fp';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
-import { Subject, Observable } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
@@ -50,9 +49,10 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   controlDetails = {};
   controlDetailsLoading = false;
   isError = false;
-  reportId : string;
+  reportId: string;
   reportIdArray: Array<string | number> = [];
   allControlList = [];
+  currentControl;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -61,7 +61,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private reportQueryService: ReportQueryService,
     private layoutFacade: LayoutFacadeService,
-    private store: Store<NgrxStateAtom>,
+    private store: Store<NgrxStateAtom>
   ) {
   }
 
@@ -99,6 +99,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.controlDetailsLoading = false;
         this.isError = false;
         this.controlDetails = detailsListState;
+        this.currentControl = this.controlDetails['profiles'][0].controls[0];
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         this.reportIdArray = this.reportIdArray.slice(0, -1);
@@ -190,7 +191,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
 
-    if (toggled.open === true){
+    if (toggled.open === true) {
       if (!this.reportIdArray.includes(control.id)) {
         this.reportIdArray.push(control.id);
         const payload = {
@@ -198,18 +199,20 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           filters : [
             {'type': 'profile_id', 'values': [`${control.profile_id}`]},
             {'type': 'control', 'values': [`${control.id}`]}]
-        }
+        };
         this.store.dispatch(new GetControlDetail(payload));
       } else {
-        this.store.select(controlsList).subscribe(data =>{
+        this.store.select(controlsList).subscribe(data => {
           this.allControlList = data;
         });
 
         this.allControlList.map((data) => {
           data.profiles.forEach(p => {
             p.controls.forEach(c => {
-              if(c.id === control.id){
-                this.controlDetails = data;            
+              if (c.id === control.id) {
+                this.controlDetailsLoading = false;
+                this.controlDetails = data;
+                this.currentControl = this.controlDetails['profiles'][0].controls[0];
               }
             });
           });

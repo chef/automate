@@ -5,16 +5,12 @@ import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-
 import {
   ControlDetailActionTypes,
   GetControlDetail,
   GetControlDetailSuccess,
   GetControlDetailFailure
-  // ,
-  // ControlDetailSuccessPayload
 } from './control-details.action';
-
 import { ControlDetailRequests } from './control-details.requests';
 
 @Injectable()
@@ -30,7 +26,6 @@ export class ControlDetailEffects {
       mergeMap(({ payload }: GetControlDetail) =>
         this.requests.GetControlDetail(payload).pipe(
           map((resp) => new GetControlDetailSuccess(resp)),
-          // map((resp: ControlDetailSuccessPayload) => new GetControlDetailSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
           observableOf(new GetControlDetailFailure(error)))))));
 
@@ -44,5 +39,4 @@ export class ControlDetailEffects {
           message: `Could not get control details: ${msg || payload.error}`
         });
     })));
-
 }

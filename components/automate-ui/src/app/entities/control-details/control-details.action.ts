@@ -5,7 +5,7 @@ import { ControlDetail, Filters } from './control-details.model';
 export enum ControlDetailActionTypes {
   GET = 'CONTROLDETAIL::GET',
   GET_SUCCESS = 'CONTROLDETAIL::GET::SUCCESS',
-  GET_FAILURE = 'CONTROLDETAIL::GET::FAILURE',
+  GET_FAILURE = 'CONTROLDETAIL::GET::FAILURE'
 }
 
 export interface ControlDetailSuccessPayload {

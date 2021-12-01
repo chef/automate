@@ -8,11 +8,11 @@ export interface ControlDetailEntityState extends EntityState<ControlDetail> {
   controlsList: [];
   controlDetailStatus: EntityStatus;
   controlDetailList: [
-    items: ControlDetail[]
+    ControlDetail[]
   ];
 }
 
-let controlList =[];
+const controlList = [];
 const GET_STATUS = 'controlDetailStatus';
 
 export const controlDetailEntityAdapter: EntityAdapter<ControlDetail> =
@@ -31,13 +31,13 @@ export function controlDetailEntityReducer(
 
   switch (action.type) {
     case ControlDetailActionTypes.GET:
-      return set(GET_STATUS, EntityStatus.loading, state);
+      return set(GET_STATUS, EntityStatus.loading, controlDetailEntityAdapter.removeAll(state));
 
     case ControlDetailActionTypes.GET_SUCCESS:
       controlList.push(action.payload);
       return pipe(
         set(GET_STATUS, EntityStatus.loadingSuccess),
-        set('controlDetailList.items', action.payload || []),
+        set('controlDetailList', action.payload || []),
         set('controlsList', controlList)
       )(state) as ControlDetailEntityState;
 
