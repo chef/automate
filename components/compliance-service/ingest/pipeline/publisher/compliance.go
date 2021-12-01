@@ -112,23 +112,23 @@ func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-cha
 	return out
 }
 
-func insertInspecReportRunInfo(msg message.Compliance, client *ingestic.ESClient) <-chan error {
-	out := make(chan error)
-	go func() {
-		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
-		start := time.Now()
-		err := client.InsertComplianceRunInfo(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime)
-		if err != nil {
-			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
-			out <- err
-		} else {
-			out <- nil
-		}
-		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
-		close(out)
-	}()
-	return out
-}
+//func insertInspecReportRunInfo(msg message.Compliance, client *ingestic.ESClient) <-chan error {
+//	out := make(chan error)
+//	go func() {
+//		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
+//		start := time.Now()
+//		err := client.InsertComplianceRunInfo(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime)
+//		if err != nil {
+//			logrus.WithFields(logrus.Fields{"error": err.Error()}).Error("Unable to ingest inspec_report object")
+//			out <- err
+//		} else {
+//			out <- nil
+//		}
+//		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "took": time.Since(start).Truncate(time.Millisecond)}).Debug("InsertInspecReport")
+//		close(out)
+//	}()
+//	return out
+//}
 
 func insertInspecProfile(msg message.Compliance, profile *relaxting.ESInspecProfile, client *ingestic.ESClient) <-chan error {
 	out := make(chan error)
