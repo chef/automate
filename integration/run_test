@@ -12,6 +12,14 @@ source "$1"
 BUILDKITE_JOB_ID="${BUILDKITE_JOB_ID:-"${test_build_slug}"}"
 complete_commandline="$0 $*"
 
+echo ".................................................."
+docker version
+echo ".................................................."
+hab pkg install --binlink core/docker/19.03.9/20210915094559
+echo ".=================================================="
+docker version
+echo ".=================================================="
+
 test_commandline() {
     local env_vars
     if [[ -n "$VAULT_UTIL_SECRETS" ]]; then
