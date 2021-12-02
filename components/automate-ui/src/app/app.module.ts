@@ -31,6 +31,7 @@ import { ChefComponentsModule } from './components/chef-components.module';
 import { ChefPipesModule } from './pipes/chef-pipes.module';
 import { ComplianceModule } from './pages/+compliance/compliance.module';
 import { ComplianceSharedModule } from './pages/+compliance/shared/shared.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
@@ -292,6 +293,7 @@ import {
     CookieModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    InfiniteScrollModule,
     InfraProxyModule,
     IntegrationsModule,
     NgrxEffectsModule,
