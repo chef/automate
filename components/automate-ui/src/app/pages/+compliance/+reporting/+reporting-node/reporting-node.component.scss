@@ -257,7 +257,10 @@ chef-tooltip[for='failed-count'] {
 }
 
 .controls-table {
-  padding: 2em 35px;
+  margin: 0 35px;
+  padding: 2em 0;
+  width: 91%;
+  overflow: hidden;
 
   chef-th,
   chef-td {
@@ -610,4 +613,17 @@ dl.waiver-details {
 
 .side-panel-footer {
   padding: 1em;
+}
+
+.wrapper {
+  height: 80vh;
+  overflow-y: scroll;
+  width: 103%;
+  padding-right: 15px;
+}
+
+@media screen and (max-width: 930px) {
+  .wrapper {
+    width: 102%;
+  }
 }
