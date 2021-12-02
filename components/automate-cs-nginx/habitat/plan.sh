@@ -9,7 +9,7 @@ pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
 pkg_version="14.4.4"
 pkg_deps=(
-  core/coreutils
+  core/coreutils/8.30
   chef/mlsa
   # TODO 2020-05-12: PIN PIN PIN
   #
