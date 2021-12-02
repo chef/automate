@@ -14,12 +14,16 @@ do_setup() {
     do_setup_default
 
     echo "Installing docker"
-    hab pkg install --binlink core/docker
+    #hab pkg install --binlink core/docker
+    hab pkg install --binlink core/docker/19.03.9/20210915094559
     echo "Installed docker"
     echo "Installing inspec"
     # inspec 4.17.7 is broken
     hab pkg install --binlink chef/inspec/4.16.0/20190829191134
     echo "Installed inspec"
+    echo "....................................................."
+    docker version
+    echo "....................................................."
 }
 
 do_create_config() {
