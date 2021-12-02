@@ -38,6 +38,7 @@ import { AckDownloadReports } from 'app/entities/download-reports/download-repor
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { AppConfigService } from 'app/services/app-config/app-config.service';
+import { DownloadReportsService } from 'app/entities/download-reports/download-reports.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -198,7 +199,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
-    private appConfigService: AppConfigService
+    public appConfigService: AppConfigService,
+    public downloadReportsService: DownloadReportsService
   ) {}
 
   private getAllUrlParameters(): Observable<Chicklet[]> {

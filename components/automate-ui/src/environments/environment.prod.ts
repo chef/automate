@@ -25,6 +25,7 @@ export const environment = {
   user_preference_url: '/api/v0/user-settings',
   compliance_stats_url: '/api/v0/compliance/reporting/stats',
   client_runs_stats_url: '/api/v0/cfgmgmt/telemetry',
+  download_report_list_url: '/api/v0/reportmanager',
   elasticsearch_url: '/api/v0/elasticsearch',
   notifier_url: '/api/v0/notifications',
   data_feed_url: '/api/v0/datafeed',
