@@ -1,13 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { EntityStatus } from 'app/entities/entities';
+import { isNil } from 'lodash/fp';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService, ReportCollection, reportFormat } from '../../shared/reporting/stats.service';
-import { Subject, Observable } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { ReportQueryService, ReturnParams, ReportQuery } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment/moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { takeUntil, first, finalize } from 'rxjs/operators';
 import { saveAs } from 'file-saver';
+import { GetControlDetail } from 'app/entities/control-details/control-details.action';
+import { controlDetailStatus, controlDetailList, controlsList } from 'app/entities/control-details/control-details.selectors';
 
 @Component({
   selector: 'app-reporting-node',
@@ -40,6 +46,13 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   pageIndex = 1;
   perPage = 100;
   controlsLoading = false;
+  controlDetails = {};
+  controlDetailsLoading = false;
+  isError = false;
+  reportId: string;
+  reportIdArray: Array<string | number> = [];
+  allControlList = [];
+  currentControl;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -47,7 +60,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private statsService: StatsService,
     private reportQueryService: ReportQueryService,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private store: Store<NgrxStateAtom>
   ) {
   }
 
@@ -74,6 +88,24 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
           this.setActiveReport(this.reports[0]);
         }
       });
+    });
+
+    combineLatest([
+      this.store.select(controlDetailStatus),
+      this.store.select(controlDetailList)
+    ]).pipe(takeUntil(this.isDestroyed))
+    .subscribe(([detailsStatusSt, detailsListState]) => {
+      if (detailsStatusSt === EntityStatus.loadingSuccess && !isNil(detailsListState)) {
+        this.controlDetailsLoading = false;
+        this.isError = false;
+        this.controlDetails = detailsListState;
+        this.currentControl = this.controlDetails['profiles'][0].controls[0];
+      } else if (detailsStatusSt === EntityStatus.loadingFailure) {
+        this.isError = true;
+        this.reportIdArray = this.reportIdArray.slice(0, -1);
+        // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
+        // this.openControls[control.id] = toggled;
+      }
     });
 
     this.onPageChanged(1);
@@ -153,10 +185,40 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     return this.openControls[id] && this.openControls[id].open;
   }
 
-  toggleControl(control: { id: string | number; }) {
+  toggleControl(control: { id: string | number; profile_id: string; }) {
+    this.controlDetailsLoading = true;
     const state = this.openControls[control.id];
     const toggled = state ? ({...state, open: !state.open}) : ({open: true, pane: 'results'});
     this.openControls[control.id] = toggled;
+
+    if (toggled.open === true) {
+      if (!this.reportIdArray.includes(control.id)) {
+        this.reportIdArray.push(control.id);
+        const payload = {
+          report_id : this.activeReport.id,
+          filters : [
+            {'type': 'profile_id', 'values': [`${control.profile_id}`]},
+            {'type': 'control', 'values': [`${control.id}`]}]
+        };
+        this.store.dispatch(new GetControlDetail(payload));
+      } else {
+        this.store.select(controlsList).subscribe(data => {
+          this.allControlList = data;
+        });
+
+        this.allControlList.forEach((data) => {
+          data.profiles.forEach(p => {
+            p.controls.forEach(c => {
+              if (c.id === control.id) {
+                this.controlDetailsLoading = false;
+                this.controlDetails = data;
+                this.currentControl = this.controlDetails['profiles'][0].controls[0];
+              }
+            });
+          });
+        });
+      }
+    }
   }
 
   openControlPane(control: { id: string | number; }) {
