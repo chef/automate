@@ -38,6 +38,8 @@ TODO: the app is not yet released and hence we cannot find it in the store.
 
 {{< /note >}}
 
+! the app is not yet releases and hence we cannot find in the store
+
 ## Setup
 
 You can set up automatic event creation and alerts for:
