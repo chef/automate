@@ -43,23 +43,23 @@ TODO: the app is not yet released and hence we cannot find it in the store.
 You can set up automatic event creation and alerts for:
 
 - Chef Infra client run alerts
-  
+
   Includes the client run alerts grouped by the message key. The message key is either set as cookbook or node in the properties section.
 
 - Chef InSpec scan alerts
-  
+
   Includes the Inspec scan run alerts grouped by the message key. The message key is either set as profile or node in the properties section.
 
 - Chef Infra client runs
-  
+
   Includes the client run records associated with the event created.
 
 - Chef InSpec scans
-  
+
   Includes the Inspec scan records associated with the events.
 
 - Scheduled Jobs
-  
+
   The scheduled jobs contain a script to delete the client runs and InSpec scans when the associated events are removed. Events are deleted by the event rules set by the clients.
 
   ![ServiceNow Event Creation modules](/images/automate/sn_event_menus.png)
