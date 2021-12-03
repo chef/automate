@@ -179,8 +179,7 @@
         </div>
 
         <chef-loading-spinner *ngIf="controlsLoading" size="50"></chef-loading-spinner>
-        <chef-table class="controls-table"
-         *ngIf="controlList != undefined">
+        <chef-table class="controls-table" *ngIf="controlList != undefined">
           <chef-thead>
             <chef-tr>
               <chef-th>Control</chef-th>
@@ -212,56 +211,55 @@
                 <chef-td >{{control.profile}}</chef-td>
                 <chef-td >{{control.results}}</chef-td>
                 <chef-td >
-                  <chef-button disabled secondary (click)="toggleControl(control)">
+                  <chef-button secondary (click)="toggleControl(control)">
                     <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
                     <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
                   </chef-button>
                 </chef-td>
               </chef-tr>
-              <div class="control-detail" *ngIf="isOpenControl(control)">
-                <p *ngIf="control.desc.length">{{ control.desc }}</p>
-                <chef-toggle
-                  [value]="openControls[control.id]?.pane"
-                  (change)="showControlPane(control, $event.target.value)">
-                  <chef-option value='results'>Results</chef-option>
-                  <chef-option value='source'>Source</chef-option>
-                </chef-toggle>
-                <ng-container [ngSwitch]="openControlPane(control)">
-                  <div *ngSwitchCase="'results'">
-                    <div *ngIf="control.status === 'waived'">
-                      <p>This control was waived.</p>
-                      <dl class="waiver-details">
-                        <dt>Expires:</dt>
-                        <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
-                        <dt>Reason:</dt>
-                        <dd>{{ control.waiver_data.justification }}</dd>
-                      </dl>
-                    </div>
-                    <!-- show results of control even if waived -->
-                      <div class="result-item" *ngFor="let result of control.results">
-                      <div class="result-item-header">
-                        <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
-                        <p>{{ result.code_desc }}</p>
+              <div class="control-detail" *ngIf="!isError && isOpenControl(control)">
+                <chef-loading-spinner *ngIf="controlDetailsLoading" size="50"></chef-loading-spinner>
+                <div *ngIf="!controlDetailsLoading">
+                  <p *ngIf="currentControl.desc">{{ currentControl.desc }}</p>
+                  <chef-toggle [value]="openControls[currentControl.id]?.pane"
+                    (change)="showControlPane(currentControl, $event.target.value)">
+                    <chef-option value='results'>Results</chef-option>
+                    <chef-option value='source'>Source</chef-option>
+                  </chef-toggle>
+                  <ng-container [ngSwitch]="openControlPane(currentControl)">
+                    <div *ngSwitchCase="'results'">
+                      <div *ngIf="currentControl.status === 'waived'">
+                        <p>This control was waived.</p>
+                        <dl class="waiver-details">
+                          <dt>Expires:</dt>
+                          <dd>{{ currentControl.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                          <dt>Reason:</dt>
+                          <dd>{{ currentControl.waiver_data.justification }}</dd>
+                        </dl>
                       </div>
-                      <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
-                        <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                      <!-- show results of control even if waived -->
+                      <div class="result-item" *ngFor="let result of currentControl.results ">
+                        <div class="result-item-header">
+                          <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                          <p>{{ result.code_desc }}</p>
+                        </div>
+                        <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
+                          <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                        </div>
+                      </div>
+                      <!-- display message when there are no results -->
+                      <div class="result-item" *ngIf="currentControl.results.length === 0">
+                        <div class="result-item-header">
+                          <p>No tests were executed</p>
+                        </div>
                       </div>
                     </div>
-                    <!-- display message when there are no results -->
-                    <div class="result-item" *ngIf="control.results.length === 0">
-                      <div class="result-item-header">
-                        <p>No tests were executed</p>
-                      </div>
-                    </div>
-                  </div>
-                  <chef-snippet
-                    class="source"
-                    *ngSwitchCase="'source'"
-                    [code]="control.code"
-                    lang="ruby">
-                  </chef-snippet>
-                </ng-container>
-              </div>
+                    <chef-snippet class="source" *ngSwitchCase="'source'" [code]="currentControl.code"
+                      lang="ruby">
+                    </chef-snippet>
+                  </ng-container>
+                </div>
+              </div>      
             </ng-container>
             
           </chef-tbody>
