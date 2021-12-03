@@ -192,7 +192,7 @@ Refer to ServiceNow's [Discovery](https://docs.servicenow.com/bundle/paris-it-op
 
 You can associate a single user with more than one roles.
 
-#### Role x_chef_automate.admin
+### Role x_chef_automate.admin
 
 You can assign the `x_chef_automate.admin` role to a user other than a System Administrator to allow another user to manage the application properties and logs.
 
@@ -297,21 +297,21 @@ The System Administrator authorization includes access to the tasks in the **Adm
 
 The **Admin** role grants user access to the:
 
-* Chef incidents menu
-* Client runs menu item
-* Chef InSpec scans menu item
-* Properties menu item
-* Support menu item
-* Logs menu item
+- Chef incidents menu
+- Client runs menu item
+- Chef InSpec scans menu item
+- Properties menu item
+- Support menu item
+- Logs menu item
 
 ### Role `x_chef_incident.user`
 
 The `x_chef_incident.user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
 
-* Chef Incidents menu
-* Chef Infra Client runs menu item
-* Chef InSpec scans menu item
-* Support menu item
+- Chef Incidents menu
+- Chef Infra Client runs menu item
+- Chef InSpec scans menu item
+- Support menu item
 
 {{< note >}}
 
@@ -388,27 +388,29 @@ You can assign the `x_chef_event.admin` role to a user other than a System Admin
 
 The System Administrator authorization includes access to the tasks in the **Admin** role.
 
-The **Admin** role grants user access to the: <dk>
+The **Admin** role grants user access to the following:
 
-* Chef incidents menu
-* Client runs menu item
-* Chef InSpec scans menu item
-* Properties menu item
-* Support menu item
-* Logs menu item
+- Chef Events menu
+- Client Infra Client Run Alerts menu item
+- Chef InSpec scans Alerts menu item
+- Client Infra Client Runs
+- Chef InSpec scans
+- Properties menu item
+- Support menu item
+- Logs menu item
 
-### Role `x_chef_incident.user` <dk>
+### Role `x_chef_event.chef_inspec_scans_user`
 
-The `x_chef_incident.user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
+The `x_chef_event.chef_inspec_scans_user` role is suitable for those users who require application access without administration rights. The role grants a user access to the:
 
-* Chef Incidents menu
-* Chef Infra Client runs menu item
-* Chef InSpec scans menu item
-* Support menu item
+- Chef Events menu
+- Chef Infra scans Alerts menu item
+- Chef InSpec scans menu item
+- Support menu item
 
 {{< note >}}
 
-Client run and Chef InSpec scan records are linked to incidents and is appropriate to assign this role to users who manage incidents in ServiceNow.
+Client run and Chef InSpec scan records are linked to events, and is appropriate to assign this role to users who manage events in ServiceNow.
 
 {{< /note >}}
 
@@ -421,26 +423,28 @@ The `x_chef_event.api` role is suitable for users responsible for integrating th
 `x_chef_event.client_run_message_key`
 : Used to associate a Chef Infra client run record with an event record. Possible values: `cookbook` and `node`. Default: `cookbook`.
 
-   Setting the value to `cookbook` creates an event for the failed cookbook. This associates all failing Chef Infra client runs with the corresponding event. `cookbook` is the default value because the number of nodes exceeds the number of cookbooks in any system. The message key description of the event provides information about the failure:
+   Setting the value to `cookbook` creates an event for the failed cookbook. This associate all failing Chef Infra client runs with the corresponding event. `cookbook` is the default value because the number of nodes exceeds the number of cookbooks in any system. The message key description of the event provides information about the failure.
 
-   ![CCR Failed Cookbook Description](/images/automate/SNOW_Failed_Cookbook.png) <dk>
+   ![Chef Events Client Runs page] data not available
 
-   The <dk>**Chef Infra Client runs** tab of the alerts displays the associated client run events. Setting the value to `node` creates an event for each failed node. All failing Chef Infra client runs for a node associates with the corresponding event. The message key description of the event provides information about the run failure for a node.
+   The **Chef Infra Client Run Alerts** tab of the alerts displays the associated client run events. Setting the value to `node` creates an event for each failed node. All failing Chef Infra client runs for a node associated with the corresponding event. The message key description of the event provides information about the run failure for a node.
 
-   ![CCR Failed Node Description](/images/automate/SNOW_Failed_Node_CCR.png) <dk>
+   ![Chef Events Client Run Alerts page](/images/automate/sn-event-clientrun-alerts.png)
 
 `x_chef_event.inspec_scan_message_key`
 
 : Used to associate a Chef InSpec scan record with an event record. Possible values: `profile` and `node`. Default: `profile`.
 
-   Setting the value to `profile` creates an event for the failed chef InSpec compliance profile with a message value. This associates all failing Chef InSpec compliance scans with the corresponding alerts. `profile` is the default value because the number of nodes exceeds the number of cookbooks in any system. The message key description of the event provides information about the failure.
+   Setting the value to `profile` creates an event for the failed chef InSpec compliance profile with a message value. This associate all failing Chef InSpec compliance scans with the corresponding alerts. `profile` is the default value because the number of nodes exceeds the number of cookbooks in any system. The message key description of the event provides information about the failure.
 
-   ![Scan Failed Profile Description](/images/automate/SNOW_Failed_Profile_Scan.png) <dk>
+   ![Chef Events InSpec Scans page](/images/automate/sn-event-inspecscans.png)
 
-   The **Chef InSpec scans** tab of the event displays the associated Chef InSpec scans. Setting the value to `node` creates an event for each failed node. All Chef InSpec scans failing for a node associates with the corresponding event. The message key description of the event indicates the failed node.
+   The **Chef InSpec scan Alerts** tab of the event displays the associated Chef InSpec scans. Setting the value to `node` creates an event for each failed node. All failing Chef InSpec scans for a node associated with the corresponding event. The message key description of the event indicates the failed node.
 
-   ![Scan Failed Node Description](/images/automate/SNOW_Failed_Node_Scan.png) <dk>
+   ![Chef Events InSpec Scan Alerts page](/images/automate/sn-event-inspecscans-alerts.png)
 
 `x_chef_events.logging.enabled`
 
 : Set to `Yes` to enable logging and `No` to disable it. Once enabled, authorized users can view the logs at **Chef Events** > **Logs** and **System logs** > **Application logs**. Default: `No`.
+
+ ![Chef Events Properties page](/images/automate/sn-event-app-properties.png)
