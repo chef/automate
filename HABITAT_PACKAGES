@@ -63,8 +63,6 @@ automate-cs-nginx components/automate-cs-nginx
 automate-workflow-web components/automate-workflow-web
 # Not managed by generator until we solve cross-dependency issue more
 # smoothly
-# automate-workflow-server components/automate-workflow-server
-# automate-workflow-ctl components/automate-workflow-ctl
 # Not managed by our generator yet
 data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
