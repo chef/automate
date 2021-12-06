@@ -34,6 +34,7 @@ require (
 	github.com/dave/jennifer v0.17.0
 	github.com/dexidp/dex v2.19.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dnlo/struct2csv v0.0.0-20190928115744-2f584471b24e
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect

@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -18,6 +19,7 @@ import (
 	"github.com/chef/automate/api/external/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
+	generator "github.com/chef/automate/components/automate-cli/pkg/reportgenerator"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	tslib "github.com/chef/automate/lib/grpc/timestamp"
@@ -53,6 +55,30 @@ var licenseUsageCmd = &cobra.Command{
 	RunE:   runLicenseUsageCmd,
 	Args:   cobra.RangeArgs(0, 1),
 	Hidden: true,
+}
+
+var uniqueNodeCounterCmd = &cobra.Command{
+	Use:   "uniqCountReport",
+	Short: "Generates the unique count of reported nodes on hourly basis between the time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateNodeCount(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
+}
+
+var nodeUsageCommand = &cobra.Command{
+	Use:   "nodeRunReport",
+	Short: "Generates daily reports for a span of time duration",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		validateArgs()
+		startTime, _ := convertStringToTime(CommandFlags.StartTime)
+		endTime, _ := convertStringToTime(CommandFlags.EndTime)
+		generator.GenerateNodeRunReport(CommandFlags.ESHostname, CommandFlags.ESPort, startTime, endTime)
+		return nil
+	},
 }
 
 var noLicenseAppliedMsg = `
@@ -299,10 +325,56 @@ func getScanInfo(hourAgo *tspb.Timestamp) ([]*scanNode, error) {
 	return scanJobNodes, nil
 }
 
+var CommandFlags = struct {
+	StartTime  string
+	EndTime    string
+	ESHostname string
+	ESPort     string
+}{}
+
+func validateArgs() {
+	if CommandFlags.StartTime == "" {
+		fmt.Println("Start Time needs to be mentioned")
+		os.Exit(1)
+	}
+	s, err := convertStringToTime(CommandFlags.StartTime)
+	if err != nil {
+		fmt.Println("The start time has to be in yyyy-mm-dd format")
+		os.Exit(1)
+	}
+	if CommandFlags.EndTime == "" {
+		CommandFlags.EndTime = time.Now().Format(time.RFC3339)
+	}
+	e, err := convertStringToTime(CommandFlags.EndTime)
+	if err != nil {
+		fmt.Println("The start time has to be in yyyy-mm-dd format")
+		os.Exit(1)
+	}
+
+	if e.Before(s) {
+		fmt.Println("End time cannot be before start time")
+		os.Exit(1)
+	}
+}
+
+func convertStringToTime(timeStr string) (time.Time, error) {
+	return time.Parse(time.RFC3339, fmt.Sprintf("%sT00:00:00.00Z", timeStr))
+}
+
 func init() {
 	RootCmd.AddCommand(licenseCmd)
 	licenseCmd.AddCommand(licenseStatusCmd)
 	licenseCmd.AddCommand(licenseApplyCmd)
 	licenseCmd.AddCommand(licenseUsageCmd)
+	licenseCmd.AddCommand(uniqueNodeCounterCmd)
+	licenseCmd.AddCommand(nodeUsageCommand)
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
+	uniqueNodeCounterCmd.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.StartTime, "start_time", "s", "", "start time of the report in yyyy-mm-dd format")
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.EndTime, "end_time", "e", "", "end time of the report in yyyy-mm-dd format")
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESHostname, "es_hostname", "n", "localhost", "hostname of the ES host")
+	nodeUsageCommand.Flags().StringVarP(&CommandFlags.ESPort, "es_port", "p", "10141", "port of the ES host")
 	licenseApplyCmd.Flags().BoolVarP(&licenseCmdFlags.forceSet, "force", "f", false, "Force set license")
 }
