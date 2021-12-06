@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"os"
 	"time"
@@ -459,14 +460,15 @@ func (t *GenerateReportTask) jsonExporter(ctx context.Context, finalData []*repo
 func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*reporting.Report, jobID,
 	requestorID string) (int64, string, error) {
 
-	csvFile, err := os.Create("temp.csv")
+	tempFile := fmt.Sprintf("/tmp/%s.csv", jobID)
+	csvFile, err := os.Create(tempFile)
 	if err != nil {
 		err = errors.Wrap(err, "error in creating a csv file")
 		logrus.WithError(err).Error()
 		return 0, "", err
 	}
 
-	defer os.Remove("temp.csv")
+	defer os.Remove(tempFile)
 	defer csvFile.Close()
 
 	csvWriter := csv.NewWriter(csvFile)
@@ -492,7 +494,7 @@ func (t *GenerateReportTask) csvExporter(ctx context.Context, finalData []*repor
 		}
 	}
 
-	file, err := os.Open("temp.csv")
+	file, err := os.Open(tempFile)
 	if err != nil {
 		err = errors.Wrap(err, "error in opening the csv file")
 		logrus.WithError(err).Error()
