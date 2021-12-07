@@ -61,7 +61,7 @@ func insertNodeInfo(msg message.ChefRun, client backend.Client) <-chan error {
 	go func() {
 		log.WithFields(log.Fields{
 			"entity_uuid": msg.Run.EntityUuid,
-		}).Info("IngestingNode Run Date Info")
+		}).Info("**IngestingNode Run Date Info")
 		// Ingest NodeState
 		err := client.InsertNodeRunDateInfo(msg.Ctx, msg.NodeRun)
 		if err != nil {
