@@ -3,6 +3,9 @@ package publisher
 import (
 	"fmt"
 	"sync"
+	"time"
+
+	"github.com/chef/automate/components/compliance-service/reporting/util"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,11 +39,16 @@ func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- messag
 			"buffer_size":  len(out),
 		}).Debug("Publishing ChefRun")
 
+		startOfAll := time.Now()
 		runc := insertChefRun(msg, client)
 		nodec := insertNode(msg, client)
 		attrc := insertNodeAttribute(msg, client)
+		startOfRunInfo := time.Now()
 		runInfo := insertNodeInfo(msg, client)
 		errc := merge(runc, nodec, attrc, runInfo)
+
+		util.TimeTrack(startOfAll, "rm-time for all chef_run pipeline")
+		util.TimeTrack(startOfRunInfo, "rm-time for run-info in chef_run pipeline")
 
 		for err := range errc {
 			if err != nil {

@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/reporting/util"
+
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -53,9 +55,14 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 				logrus.Debugf("storeCompliance: meta for profile %s already exists, no need to insert", profile.Sha256)
 			}
 		}
+		startOfAll := time.Now()
 		errChannels = append(errChannels, insertInspecSummary(msg, client))
 		errChannels = append(errChannels, insertInspecReport(msg, client))
+		startOfRunInfo := time.Now()
 		errChannels = append(errChannels, insertInspecReportRunInfo(msg, client))
+
+		util.TimeTrack(startOfAll, "rm-time for all compliance ingest pipeline")
+		util.TimeTrack(startOfRunInfo, "rm-time for run-info compliance ingestion pipeline")
 
 		for err := range merge(errChannels...) {
 			if err != nil {
