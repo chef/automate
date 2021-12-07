@@ -39,7 +39,7 @@ do_deploy() {
     local frontend1_ip frontend2_ip
 
     cli_bin=$(command -v "chef-automate")
-
+    cd ../..
     #shellcheck disable=SC2154
     hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
 
