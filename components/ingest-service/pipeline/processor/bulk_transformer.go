@@ -33,6 +33,7 @@ func runMsgToBulkRequestTransformer(in <-chan message.ChefRun, client backend.Cl
 				client.CreateBulkRunUpdateRequest(msg.NodeRun),
 				client.CreateBulkNodeUpdateRequest(msg.Node),
 				client.CreateBulkNodeAttributeUpdateRequest(msg.NodeAttribute),
+				client.CreateBulkNodeRunInfoUpdateRequest(msg.NodeRun),
 			}
 
 			message.PropagateChefRun(out, &msg)
