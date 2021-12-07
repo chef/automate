@@ -54,6 +54,10 @@ function compile_client_mocks() {
     pushd /src/api/external || return 1
       mockgen_debug -source secrets/secrets.pb.go -destination secrets/secrets.pb.client_mock.go -package secrets -self_package github.com/chef/automate/api/external/secrets
     popd || return 1
+
+    pushd /src/api/interservice || return 1
+      mockgen_debug -source infra_proxy/service/infra_proxy.pb.go -destination infra_proxy/service/infra_proxy.pb.client_mock.go -package=service -self_package github.com/chef/automate/api/interservice/infra_proxy/service
+    popd || return 1
   )
 }
 
