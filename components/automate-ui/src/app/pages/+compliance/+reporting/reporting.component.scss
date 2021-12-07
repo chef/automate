@@ -287,15 +287,25 @@ chef-subheading {
     chef-tooltip {
       width: 400px;
       border: 1px solid $chef-grey;
-     }
+    }
+
+    chef-tooltip.top {
+      transform: translate(-65%, calc(-100% - .75em));
+    }
+
+    chef-tooltip::after {
+      border-bottom: 1px solid $chef-grey;
+      border-right: 1px solid $chef-grey;
+      transform: translateX(275%) translateY(-50%) rotate(45deg);
+    }
 
     .table {
       width: 100%;
-     }
+    }
 
     .table-header {
       font-size: 16px;
-     }
+    }
 
     .failed-status {
       color: $status-error;
