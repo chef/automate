@@ -121,7 +121,7 @@ export class DownloadReportsService implements OnDestroy {
 
   onLinkToDownload(report: ReportType) {
     const format = report.report_type;
-    const filename = this.getFilename(report.created_at);
+    const filename = this.getFilename(report.created_at) + '.' + format;
     this.downloadReport(report.acknowledgement_id).subscribe((data) => {
       console.log(data);
       const types = { 'json': 'application/json', 'csv': 'text/csv' };
@@ -140,7 +140,7 @@ export class DownloadReportsService implements OnDestroy {
   downloadReport(ack_id: string): Observable<string> {
     let url = `${REPORT_LIST_API_URL}/export`;
     url = url + '/' + ack_id;
-    return this.httpClient.get<string>(url);
+    return this.httpClient.get(url, { responseType: 'text' });
   }
 
   getFilename(createdDate: string) {
