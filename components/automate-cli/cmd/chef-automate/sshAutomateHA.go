@@ -214,6 +214,9 @@ func runSshCommand(cmd *cobra.Command, args []string) error {
 	}
 	var sshString string = sshStrings[i-1]
 	sshTokens := strings.Split(sshString, " ")
+	for _, v := range sshTokens {
+		writer.Println(v)
+	}
 	return executeShellCommand(sshTokens[0], sshTokens[1:])
 }
 

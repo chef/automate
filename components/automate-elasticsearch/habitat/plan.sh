@@ -20,7 +20,7 @@ pkg_deps=(
   core/zlib
 
   chef/mlsa
-  core/curl # health_check
+  core/curl
   chef/automate-openjdk
   chef/automate-platform-tools
 )

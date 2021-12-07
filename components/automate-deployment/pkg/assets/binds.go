@@ -10,7 +10,7 @@ authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-ha-curator REQUIRED elasticsearch
 automate-ha-curator BINDING_MODE strict
-automate-ha-elasticsearch BINDING_MODE strict
+automate-ha-elasticsearch-copy BINDING_MODE strict
 automate-ha-elasticsidecar REQUIRED elasticsearch
 automate-ha-elasticsidecar BINDING_MODE strict
 automate-ha-haproxy OPTIONAL database pgleaderchk

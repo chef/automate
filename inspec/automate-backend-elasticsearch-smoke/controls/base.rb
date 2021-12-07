@@ -5,7 +5,7 @@
 title 'Chef Automate Backend Deploy Elasticsearch Smoke Tests'
 
 %w(
-  chef/automate-ha-elasticsearch
+  chef/automate-ha-elasticsearch-copy
   chef/automate-ha-kibana
   chef/automate-ha-metricbeat
   chef/automate-ha-journalbeat
@@ -16,15 +16,15 @@ title 'Chef Automate Backend Deploy Elasticsearch Smoke Tests'
   end
 end
 
-describe bash("HAB_LICENSE=accept-no-persist /hab/svc/automate-ha-elasticsearch/hooks/health-check") do
+describe bash("HAB_LICENSE=accept-no-persist /hab/svc/automate-ha-elasticsearch-copy/hooks/health-check") do
   its('exit_status') { should eq 0 }
 end
 
-describe x509_certificate('/hab/svc/automate-ha-elasticsearch/config/certificates/odfe-ssl.pem') do
+describe x509_certificate('/hab/svc/automate-ha-elasticsearch-copy/config/certificates/odfe-ssl.pem') do
   its('validity_in_days') { should be > 30 }
 end
 
-describe x509_certificate('/hab/svc/automate-ha-elasticsearch/config/certificates/odfe-admin.pem') do
+describe x509_certificate('/hab/svc/automate-ha-elasticsearch-copy/config/certificates/odfe-admin.pem') do
   its('validity_in_days') { should be > 30 }
 end
 
