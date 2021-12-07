@@ -5,13 +5,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/reporting/util"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -47,8 +46,8 @@ func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- messag
 		runInfo := insertNodeInfo(msg, client)
 		errc := merge(runc, nodec, attrc, runInfo)
 
-		util.TimeTrack(startOfAll, "rm-time for all chef_run pipeline")
-		util.TimeTrack(startOfRunInfo, "rm-time for run-info in chef_run pipeline")
+		TimeTrack(startOfAll, "rm-time for all chef_run pipeline")
+		TimeTrack(startOfRunInfo, "rm-time for run-info in chef_run pipeline")
 
 		for err := range errc {
 			if err != nil {
@@ -66,6 +65,12 @@ func ChefRun(in <-chan message.ChefRun, client backend.Client, out chan<- messag
 		}
 	}
 	close(out)
+}
+
+// TimeTrack logs out time between `start` and current time
+func TimeTrack(start time.Time, name string) {
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	logrus.Infof("TimeTrack: %s took %s", name, elapsed)
 }
 
 func merge(cs ...<-chan error) <-chan error {
