@@ -285,7 +285,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.getControlsList(report.id, reportQuery, this.pageIndex, this.perPage)
     .pipe(first())
     .subscribe(data => {
-      this.reportLoading = false;
+      this.controlsLoading = false;
       this.layoutFacade.ShowPageLoading(false);
       if (this.pageIndex === 1) {
         this.controlList = Object.assign(data);
