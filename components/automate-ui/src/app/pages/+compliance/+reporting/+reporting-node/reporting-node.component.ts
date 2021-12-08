@@ -103,8 +103,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       } else if (detailsStatusSt === EntityStatus.loadingFailure) {
         this.isError = true;
         this.reportIdArray = this.reportIdArray.slice(0, -1);
-        // const toggled = state ? ({...state, open: false}) : ({open: true, pane: 'results'});
-        // this.openControls[control.id] = toggled;
       }
     });
 
@@ -140,7 +138,9 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   onFilterControlStatusClick(_event: any, status: string) {
+    this.pageIndex = 1;
     this.activeStatusFilter = status;
+    this.getControlData(this.activeReport);
   }
 
   onViewSourceClick(_event: any, control: { showMetaData: boolean; }) {
@@ -279,22 +279,42 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.getControlData(report);
   }
 
+  getFilterCount(report: any) {
+    switch (this.activeStatusFilter) {
+      case ('failed'):
+        return report.controls.failed.total;
+      case ('passed'):
+        return report.controls.passed.total;
+      case ('skipped'):
+        return report.controls.skipped.total;
+      case ('waived'):
+        return report.controls.waived.total;
+      default:
+        return report.controls.total;
+    }
+  }
   getControlData(report: any) {
-    this.controlsLoading = true;
-    const reportQuery = this.reportQueryService.getReportQueryForReport(report);
-    this.statsService.getControlsList(report.id, reportQuery, this.pageIndex, this.perPage)
-    .pipe(first())
-    .subscribe(data => {
-      this.controlsLoading = false;
-      this.layoutFacade.ShowPageLoading(false);
-      if (this.pageIndex === 1) {
-        this.controlList = Object.assign(data);
-      } else {
-        this.controlList.control_elements.push(...data.control_elements);
-      }
-      this.pageIndex++;
-      this.controlsLoading = false;
-    });
+    const filterCount = this.getFilterCount(report);
+    if (filterCount > 0) {
+      this.controlsLoading = true;
+      const reportQuery = this.reportQueryService.getReportQueryForReport(report);
+      this.statsService.getControlsList(report.id, reportQuery, this.pageIndex,
+        this.perPage, this.activeStatusFilter)
+      .pipe(first())
+      .subscribe(data => {
+        this.controlsLoading = false;
+        this.layoutFacade.ShowPageLoading(false);
+        if (this.pageIndex === 1) {
+          this.controlList = Object.assign(data);
+        } else {
+          this.controlList.control_elements.push(...data.control_elements);
+        }
+        this.pageIndex++;
+        this.controlsLoading = false;
+      });
+    } else {
+      this.controlList = {};
+    }
   }
 
   toggleDownloadDropdown() {
