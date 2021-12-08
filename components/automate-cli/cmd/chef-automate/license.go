@@ -58,8 +58,8 @@ var licenseUsageCmd = &cobra.Command{
 }
 
 var uniqueNodeCounterCmd = &cobra.Command{
-	Use:   "uniqCountReport",
-	Short: "Generates the unique count of reported nodes on hourly basis between the time duration",
+	Use:   "uniqNodeRunReport",
+	Short: "Generates the unique count of reported Infra Client nodes on hourly basis between the time duration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
@@ -71,7 +71,7 @@ var uniqueNodeCounterCmd = &cobra.Command{
 
 var nodeUsageCommand = &cobra.Command{
 	Use:   "nodeRunReport",
-	Short: "Generates daily reports for a span of time duration",
+	Short: "Generates daily Infra Client Run reports for a span of time duration",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		validateArgs()
 		startTime, _ := convertStringToTime(CommandFlags.StartTime)
