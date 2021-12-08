@@ -58,15 +58,16 @@ func GenerateNodeRunReport(esHostName string, esPort string, startTime time.Time
 
 func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, endTime time.Time) {
 	filename := fmt.Sprintf("nodecount_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
-	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("Failed to open Node Count report")
 		os.Exit(1)
 	}
+	defer f.Close()
 	writer := struct2csv.NewWriter(f)
 	writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 
-	st := endTime
+	st := endTime.Add(24 * time.Hour)
 	for {
 		et := st
 		st = et.Add(24 * -time.Hour)
@@ -106,7 +107,6 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 	}
 	writer.Flush()
-	f.Close()
 	fmt.Println("The node count report is available in: ", filename)
 }
 
@@ -134,6 +134,14 @@ func getUniqueCounts(client *elastic.Client, startTime time.Time, endTime time.T
 }
 
 func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, endTime time.Time) {
+	filename := fmt.Sprintf("nodeinfo_%s_%s.csv", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		fmt.Println("Failed to open Node Detail report")
+		os.Exit(1)
+	}
+	defer f.Close()
+	writer := struct2csv.NewWriter(f)
 
 	var sourceFields = []string{
 		"entity_uuid",
@@ -153,7 +161,8 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 		"total_resource_count",
 	}
 
-	t := endTime.Add(-time.Hour * 24)
+	t := endTime.Add(24 * time.Hour)
+	//t := endTime.Add(-time.Hour * 24)
 	if t.Before(startTime) {
 		t = startTime
 	}
@@ -178,9 +187,6 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 		}
 
 		if searchResult.Hits.TotalHits > 0 {
-			filename := fmt.Sprintf("nodeinfo_%s_%s.csv", t.Format("2006-01-02"), endTime.Format("2006-01-02"))
-			f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
-			writer := struct2csv.NewWriter(f)
 
 			for ind, hit := range searchResult.Hits.Hits {
 				var s ConvergeInfo
@@ -197,8 +203,6 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 					writer.Flush()
 				}
 			}
-			f.Close()
-			fmt.Println("The details of the runs can be found in : ", filename)
 		}
 		if t == startTime {
 			break
@@ -210,4 +214,5 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 			t = startTime
 		}
 	}
+	fmt.Println("The details of the runs can be found in : ", filename)
 }
