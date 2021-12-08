@@ -70,6 +70,60 @@ docker_run() {
     docker run "${docker_run_args[@]}" "$image"
 }
 
+docker_run_1() {
+    local name="$1"
+    local image="$2"
+
+    if [ -z "$image" ]; then
+        image="chefes/a2-integration:latest"
+    fi
+
+    source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
+    source_dir=$(pwd)
+
+    local docker_run_args=(
+            "--detach"
+            "--env" "HOST_PWD=$source_dir"
+            "--env" "HAB_ORIGIN=$HAB_ORIGIN"
+            "--env" "HAB_STUDIO_SUP=false"
+            "--env" "HAB_NONINTERACTIVE=true"
+            "--env" "CONTAINER_HOSTNAME=$name"
+            "--hostname" "$name"
+            "--interactive"
+            "--name" "$name"
+            "--privileged"
+            "--rm"
+            "--tmpfs=/tmp:rw,noexec,nosuid"
+            "--tmpfs=/var/tmp:rw,noexec,nosuid"
+            "--tmpfs=/dev/shm:rw,noexec,nosuid"
+            "--tty"
+            "--volume" "$source_dir:$A2_WORK_DIR"
+            "--workdir" "$A2_WORK_DIR"
+    )
+
+    if [ -n "$SERVICES_CONFIG_PATH" ]; then
+    docker_run_args+=(
+            "--volume" "$SERVICES_CONFIG_PATH:/services"
+    )
+    fi
+
+    if [ "$CI" == "true" ]; then
+        buildkite_agent=$(command -v buildkite-agent)
+        docker_run_args+=(
+            "--env" "BUILDKITE_JOB_ID"
+            "--env" "BUILDKITE_BUILD_ID"
+            "--env" "BUILDKITE_AGENT_ACCESS_TOKEN"
+            "--env" "BUILDKITE"
+            "--volume" "$buildkite_agent:/usr/bin/buildkite-agent"
+            "--label" "buildkitejob=$BUILDKITE_JOB_ID"
+        )
+    fi
+
+    echo "${docker_run_args[*]}"
+
+    docker run "${docker_run_args[@]}" "$image"
+}
+
 service_config_path() {
     echo "$SERVICES_CONFIG_PATH"/"$1" 
 }

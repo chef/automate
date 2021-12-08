@@ -39,12 +39,11 @@ do_deploy() {
     local frontend1_ip frontend2_ip
 
     cli_bin=$(command -v "chef-automate")
-    cd ../..
     #shellcheck disable=SC2154
     hab pkg install --channel="$test_channel" --binlink chef/automate-cs-nginx
 
-    docker_run "${_frontend1_container_name}"
-    docker_run "${_frontend2_container_name}"
+    docker_run_1 "${_frontend1_container_name}"
+    docker_run_1 "${_frontend2_container_name}"
     #shellcheck disable=SC2154
     docker exec -t "$_frontend1_container_name" \
         "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$test_hartifacts_path"
