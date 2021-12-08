@@ -43,3 +43,12 @@ message GetServerStatus {
     // Chef Infra Server IP Address.
     string ip_address = 2;
 }
+
+message ValidateWebuiKey {
+    // Server FQDN
+    string fqdn = 1;
+    // Server Webui Key
+    string webui_key = 2;
+    // Server Webui key is availbale
+    bool is_webui_key = 3;
+}
