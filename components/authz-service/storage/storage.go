@@ -110,6 +110,12 @@ func DefaultPolicies() ([]Policy, error) {
 		return nil, err
 	}
 
+	// infra-viewer policy statements
+	s6, err := NewStatement(Allow, constants.InfraViewerRoleID, []string{}, []string{"*"}, []string{})
+	if err != nil {
+		return nil, err
+	}
+
 	typeManaged, err := NewType("chef-managed")
 	if err != nil {
 		return nil, err
@@ -162,7 +168,15 @@ func DefaultPolicies() ([]Policy, error) {
 		Type:       typeManaged,
 	}
 
-	return []Policy{adminPol, editorPol, viewerPol, ingestPol}, nil
+	infraViewerPol := Policy{
+		ID:         constants.InfraViewerPolicyID,
+		Name:       "InfraViewer",
+		Members:    []Member{},
+		Statements: []Statement{s6},
+		Type:       typeManaged,
+	}
+
+	return []Policy{adminPol, editorPol, viewerPol, ingestPol, infraViewerPol}, nil
 }
 
 // DefaultProjects defines the default Chef-managed projects provided on storage reset

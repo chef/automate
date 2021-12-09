@@ -2,10 +2,11 @@ package v2
 
 // IAM v2 default policy IDs.
 const (
-	AdminPolicyID  = "administrator-access"
-	EditorPolicyID = "editor-access"
-	ViewerPolicyID = "viewer-access"
-	IngestPolicyID = "ingest-access"
+	AdminPolicyID       = "administrator-access"
+	EditorPolicyID      = "editor-access"
+	ViewerPolicyID      = "viewer-access"
+	IngestPolicyID      = "ingest-access"
+	InfraViewerPolicyID = "infra-viewer"
 )
 
 // IAM v2 system policy IDs. These are never shown to the enduser
@@ -38,6 +39,7 @@ const (
 	ViewerRoleID       = "viewer"
 	IngestRoleID       = "ingest"
 	ProjectOwnerRoleID = "project-owner"
+	InfraViewerRoleID  = "infra-viewer"
 )
 
 // Subjects
