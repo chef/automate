@@ -9,6 +9,7 @@
 
   .sidenav-header {
     margin-bottom: 60px;
+    
 
     h2 {
       flex-grow: 2;
@@ -45,6 +46,9 @@
       .detail {
         color: $chef-primary-dark;
         font-size: 12px;
+      }
+      #web_key {
+        height: 80px;
       }
     }
 
@@ -135,4 +139,24 @@
     background: $chef-primary-bright;
     border-radius: 4px;
   }
+  .note_text{
+  position: absolute;
+width: 460px;
+height: 50px;
+left: 766px;
+top: 688px;
+
+/* P Mulish 14 Bold */
+
+font-family: Mulish;
+font-style: normal;
+font-weight: bold;
+font-size: 14px;
+line-height: 21px;
+/* or 150% */
+
+letter-spacing: 0.2px;
+
+color: #000000;
+}
 }

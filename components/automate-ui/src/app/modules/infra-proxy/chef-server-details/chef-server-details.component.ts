@@ -47,6 +47,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public fqdnForm: FormGroup;
   public ipForm: FormGroup;
   public orgForm: FormGroup;
+  public webKeyForm: FormGroup;
   public createModalVisible = false;
   public creatingServerOrg = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
@@ -82,6 +83,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       admin_key: ['', [Validators.required]],
       projects: [[]]
     });
+   
   }
 
   ngOnInit() {
@@ -119,6 +121,12 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
+    });
+    this.webKeyForm= this.fb.group({
+      web_key:['',[Validators.required,
+      Validators.pattern(Regex.patterns.NON_BLANK),
+    // Validators.pattern(Regex.patterns.VALID_web_key)
+  ]]
     });
 
     this.store.select(routeParams).pipe(
@@ -160,6 +168,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.updateServerForm.controls['name'].setValue(this.server.name);
       this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
       this.ipForm.controls['ip_address'].setValue(this.server.ip_address);
+      // this.webKeyForm.controls['web_key'].setValue(this.server.web_key);
       this.creatingServerOrg = false;
       this.orgsListLoading = false;
       this.closeCreateModal();

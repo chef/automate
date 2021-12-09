@@ -17,6 +17,7 @@ export class CreateChefServerModalComponent implements OnInit {
   @Input() createForm: FormGroup;
   @Input() fqdnForm: FormGroup;
   @Input() ipForm: FormGroup;
+  @Input() webKeyForm: FormGroup
   @HostBinding('class.active') isSlideOpen = false;
 
   public modifyID = false; // Whether the edit ID form is open or not.

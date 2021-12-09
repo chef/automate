@@ -134,15 +134,44 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div id="button-bar">
+      
+      </form>
+
+      <form [formGroup]="webKeyForm">
+        <div class="input-margin">
+          <chef-form-field>
+         <label>
+          <span class="label">WEB UI KEY <span aria-hidden="true">*</span></span>
+          <textarea
+            chefInput
+            name="web_key"
+            formControlName="web_key"
+            data-cy="web-key"
+            id="web_key"
+            cols="54"
+            rows="10"
+            autofocus></textarea>
+        </label>
+        <chef-error
+        *ngIf="webKeyForm.get('web_key').hasError('required') && webKeyForm.get('web_key').dirty">
+        WEB UI KEY is required.
+        </chef-error>
+        <chef-error
+        *ngIf="webKeyForm.get('web_key').hasError('pattern')">
+        WEB UI KEY is invalid.
+        </chef-error>
+        <span class="note_text">Note: A web UI Key is located <span id="cancel-server-popup">Here</span>(Need Better Help Text).</span>
+        </chef-form-field>
+        </div>
+       <div id="button-bar">
           <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeSeverSlider()">Cancel</chef-button>
           <chef-button [disabled]="!createForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
-            primary
+            primaryt
             data-cy="add-button"
             id="create-button-object-modal"
             (click)="createChefServer()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-            <span *ngIf="!creating">Add Chef Infra Server</span>
+            <span *ngIf="!creating">Add</span>
             <span *ngIf="creating">Adding Chef Infra Server ...</span>
           </chef-button>
         </div>
