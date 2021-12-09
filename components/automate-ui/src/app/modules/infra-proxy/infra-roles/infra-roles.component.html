@@ -54,8 +54,7 @@
         <p data-cy="no-roles" *ngIf="searchValue === ''">No roles available.</p>
         <p data-cy="no-records" *ngIf="searchValue != ''">No results found for "{{searchValue}}".</p>
       </div>
-    </div>
-    <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'get', [serverId, orgId]]">
+      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/roles', 'get', [serverId, orgId]]">
       <div id="roles-table-container" *ngIf="roles.length" data-cy="roles-table-container">
         <chef-table>
           <chef-thead>
