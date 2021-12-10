@@ -272,14 +272,18 @@ export class StatsService {
   }
 
   getControlsList(reportID: string, reportQuery: ReportQuery,
-     pageIndex: number, perPage: number): Observable<any> {
+     pageIndex: number, perPage: number, status: string): Observable<any> {
     const url = `${CC_API_URL}/reporting/reportcontrols/id/${reportID}`;
     const formatted = this.formatFilters(reportQuery);
-    const pagevalue = (pageIndex - 1) * 100;
+    const pagevalue = (pageIndex - 1) * perPage;
+    if (status === 'all') {
+      status = '';
+    }
     const pageParam = [
       ...formatted,
       {'type': 'from', 'values': [`${pagevalue}`]},
-      {'type': 'size', 'values': [`${perPage}`]}
+      {'type': 'size', 'values': [`${perPage}`]},
+      {'type': 'status', 'values': [`${status}`]}
     ];
     const body = { filters: pageParam };
 
