@@ -616,14 +616,18 @@ dl.waiver-details {
 }
 
 .wrapper {
-  height: 80vh;
+  height: 100vh;
   overflow-y: scroll;
-  width: 103%;
-  padding-right: 15px;
+  width: 100%;
 }
 
-@media screen and (max-width: 930px) {
-  .wrapper {
-    width: 102%;
-  }
+::ng-deep .wrapper::-webkit-scrollbar {
+  width: 5px;
+  background: transparent;
+  border-radius: 5px;
+}
+
+::ng-deep .wrapper::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
 }

@@ -1,4 +1,9 @@
-<div class="content-container">
+<div class="content-container wrapper"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  (scrolled)="onScrollDown()"
+  [scrollWindow]="false">
   <div class="container">
     <main>
       <chef-breadcrumbs>
@@ -178,7 +183,6 @@
           </div>
         </div>
 
-        <chef-loading-spinner *ngIf="controlsLoading" size="50"></chef-loading-spinner>
         <chef-table class="controls-table" *ngIf="controlList != undefined">
           <chef-thead>
             <chef-tr>
@@ -189,13 +193,7 @@
               <chef-th></chef-th>
             </chef-tr>
           </chef-thead>
-          <chef-tbody class="wrapper"
-            infiniteScroll
-            [infiniteScrollDistance]="2"
-            [infiniteScrollThrottle]="50"
-            (scrolled)="onScrollDown()"
-            [scrollWindow]="false">
-            
+          <chef-tbody>
             <ng-container *ngFor="let control of controlList.control_elements"> 
               <chef-tr>
                 <chef-td>
@@ -261,7 +259,7 @@
                 </div>
               </div>      
             </ng-container>
-            
+            <chef-loading-spinner *ngIf="controlsLoading" size="50"></chef-loading-spinner>
           </chef-tbody>
         </chef-table>
         <chef-scroll-top></chef-scroll-top>
