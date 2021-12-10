@@ -125,8 +125,9 @@ func runPatchCommand(cmd *cobra.Command, args []string) error {
 		then automate cluster ctl deploy will patch the config to automate
 	*/
 	if isA2HARBFileExist() {
-		
-		response, err := writer.Prompt("If you have created any new bundles using upgrade commands and not deployed it, this command will deploy that new airgap bundle with patching of configuration. Press y to agree, n to to disagree? [y/n]")
+		response, err := writer.Prompt(`If you have created any new bundles using upgrade commands and not deployed it, 
+		this command will deploy that new airgap bundle with patching of configuration. 
+		Press y to agree, n to to disagree? [y/n]`)
 		if err != nil {
 			return err
 		}
