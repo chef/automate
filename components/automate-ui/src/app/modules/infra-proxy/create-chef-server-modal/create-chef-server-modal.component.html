@@ -134,38 +134,30 @@
             </chef-error>
           </chef-form-field>
         </div>
-      
       </form>
-
-      <form [formGroup]="webKeyForm">
+      <form [formGroup]="webUIKeyForm">
         <div class="input-margin">
           <chef-form-field>
-         <label>
-          <span class="label">WEB UI KEY <span aria-hidden="true">*</span></span>
-          <textarea
-            chefInput
-            name="web_key"
-            formControlName="web_key"
-            data-cy="web-key"
-            id="web_key"
-            cols="54"
-            rows="10"
-            autofocus></textarea>
-        </label>
-        <chef-error
-        *ngIf="webKeyForm.get('web_key').hasError('required') && webKeyForm.get('web_key').dirty">
-        WEB UI KEY is required.
-        </chef-error>
-        <chef-error
-        *ngIf="webKeyForm.get('web_key').hasError('pattern')">
-        WEB UI KEY is invalid.
-        </chef-error>
-        <span class="note_text">Note: A web UI Key is located <span id="cancel-server-popup">Here</span>(Need Better Help Text).</span>
-        </chef-form-field>
+            <label>
+              <span class="label">WEB UI KEY <span aria-hidden="true">*</span></span>
+              <textarea
+                chefInput
+                formControlName="webui_key"
+                data-cy="webui_key"
+                id="webui_key"
+                (keyup)="handleInput($event)"
+                autofocus></textarea>
+            </label>
+            <chef-error
+            *ngIf="webUIKeyForm.get('webui_key').hasError('required') && webUIKeyForm.get('webui_key').dirty">
+            WEB UI KEY is required.
+            </chef-error>
+            <span class="note_text">Note: A web UI Key is located <span>Here</span>(Need Better Help Text).</span>
+          </chef-form-field>
         </div>
        <div id="button-bar">
           <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeSeverSlider()">Cancel</chef-button>
-          <chef-button [disabled]="!createForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
+          <chef-button [disabled]="!createForm?.valid || webUIKeyForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
             primaryt
             data-cy="add-button"
             id="create-button-object-modal"

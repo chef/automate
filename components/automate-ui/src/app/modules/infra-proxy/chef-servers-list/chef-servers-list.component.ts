@@ -35,6 +35,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public fqdnForm: FormGroup;
   public ipForm: FormGroup;
+  public webUIKeyForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
   public serverToDelete: Server;
   public deleteModalVisible = false;
@@ -64,6 +65,11 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       ip_address: ['', [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
+      ]]
+    });
+    this.webUIKeyForm = this.fb.group({
+      webui_key: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)
       ]]
     });
   }
@@ -134,7 +140,8 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       id: this.createChefServerForm.controls['id'].value,
       name: this.createChefServerForm.controls['name'].value.trim(),
       fqdn: this.fqdnForm.controls['fqdn'].value?.trim() || '',
-      ip_address: this.ipForm.controls['ip_address'].value?.trim() || ''
+      ip_address: this.ipForm.controls['ip_address'].value?.trim() || '',
+      webui_key: this.webUIKeyForm.controls['webui_key'].value || ''
     };
     this.store.dispatch(new CreateServer(server));
     this.resetCreateModal();
@@ -145,6 +152,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.createChefServerForm.reset();
     this.fqdnForm.reset();
     this.ipForm.reset();
+    this.webUIKeyForm.reset();
     this.conflictErrorEvent.emit(false);
   }
 
