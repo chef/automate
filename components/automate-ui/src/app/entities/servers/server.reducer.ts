@@ -14,6 +14,7 @@ export interface ServerEntityState extends EntityState<Server> {
   deleteStatus: EntityStatus;
   getUsers: User[];
   getUsersStatus: EntityStatus;
+  updateWebUIKeyStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -23,6 +24,7 @@ const UPDATE_STATUS = 'updateStatus';
 const GET_STATUS = 'getStatus';
 const DELETE_STATUS = 'deleteStatus';
 const GET_USERS_STATUS = 'getUsersStatus';
+const UPDATE_WEB_UI_KEY_STATUS = 'updateWebUIKeyStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
 
@@ -35,7 +37,8 @@ export const ServerEntityInitialState: ServerEntityState =
     getStatus: EntityStatus.notLoaded,
     deleteStatus: EntityStatus.notLoaded,
     getUsers: null,
-    getUsersStatus: EntityStatus.notLoaded
+    getUsersStatus: EntityStatus.notLoaded,
+    updateWebUIKeyStatus: EntityStatus.notLoaded
   });
 
 export function serverEntityReducer(
@@ -140,6 +143,16 @@ export function serverEntityReducer(
     case ServerActionTypes.GET_USERS_FAILURE:
       return set(
         GET_USERS_STATUS, EntityStatus.loadingFailure, state);
+
+    case ServerActionTypes.UPDATE:
+      return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loading, state);
+
+    case ServerActionTypes.UPDATE_SUCCESS:
+      return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingSuccess,
+        state);
+
+    case ServerActionTypes.UPDATE_FAILURE:
+      return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingFailure, state);
   }
 
   return state;

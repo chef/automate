@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { mapKeys, snakeCase } from 'lodash/fp';
 
 import { environment as env } from 'environments/environment';
-import { Server, User } from './server.model';
-import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
+import { Server, User, WebUIKey } from './server.model';
+import { CreateServerPayload, ServerSuccessPayload, WebUIKeyPayload } from './server.actions';
 
 export interface ServersResponse {
   servers: Server[];
@@ -48,5 +48,10 @@ export class ServerRequests {
 
   public getUser(payload): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${env.infra_proxy_url}/servers/${payload.server_id}/automateinfraserverusers`);
+  }
+
+  public updateWebUIKey(payload): Observable<WebUIKey> {
+    return this.http.put<WebUIKeyPayload>
+    (`${env.infra_proxy_url}/servers/${payload.server_id}`, payload.key);
   }
 }

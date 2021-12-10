@@ -1,0 +1,32 @@
+<div ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <img src="../../../../assets/img/Fill.png" alt="No Image">
+    <h1 slot="title">Update Web UI Key</h1>
+    <chef-button class="close" secondary (click)="closeUpdateWebUIKeySlider()">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="sidenav-body">
+    <form [formGroup]="updateKeyForm" (ngSubmit)="onSubmit()">
+      <div class="id-margin">
+        <chef-form-field>
+          <label *ngIf="!updated">
+            <span class="Keylabel">Web UI Key</span>
+            <textarea chefInput firstFocus name="webUiKey" formControlName="webUiKey" type="text" autocomplete="off"
+              (keyup)="handleInput($event)"></textarea>
+          </label>
+        </chef-form-field>
+        <span class="Text">Note: A web UI Key is located Here (Need Better Help text)</span>
+      </div>
+    </form>
+  </div>
+  <div class="button-bar">
+    <chef-button tertiary (click)="closeUpdateModal()">Cancel</chef-button>
+    <chef-button primary [disabled]="!updateKeyForm?.valid || conflictError || updating" id="create-button-object-modal"
+      (click)="onSubmit()">
+      <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
+      <span *ngIf="!updating">Upload Web UI Key</span>
+      <span *ngIf="updating">Uploading Web UI Key</span>
+    </chef-button>
+  </div>
+</div>

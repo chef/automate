@@ -21,6 +21,14 @@
                 <span class="heading">IP Address</span>
                 <span>{{ server?.ip_address }}</span>
               </li>
+              <li>
+                <span class="heading">Web UI Key</span>
+                <span>
+                  <a
+                  (click)="webUIKeySlider.slidePanel()"
+                  >Update</a>
+                </span>
+              </li>
             </ul>
           </div>
         </div>
@@ -48,6 +56,8 @@
         (deleteClicked)="deleteOrg()"
         objectAction="Delete">
       </app-delete-infra-object-modal>
+      <app-update-web-uikey-slider #webUIKeySlider>
+      </app-update-web-uikey-slider>
       <section class="page-body details-tab" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field>

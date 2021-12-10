@@ -1,0 +1,54 @@
+@import "~styles/variables";
+@import '../infra_shared/slide-panel';
+
+.sidenav-header {
+  img {
+    margin-right: 8px;
+    height: 12.5px;
+    margin-top: 10px;
+  }
+}
+
+.sidenav-body {
+  height: 485px;
+
+  .id-margin {
+    span .text {
+      font-weight: normal;
+      font-size: 16px;
+    }
+  }
+}
+
+chef-form-field {
+  label {
+    .Keylabel {
+      width: 226px;
+      height: 19px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 155px;
+    }
+
+  }
+}
+
+.id-margin {
+  p {
+    position: absolute;
+    width: 460px;
+    height: 50px;
+    font-family: Mulish;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 21px;
+  }
+}
+
+.button-bar {
+  display: flex;
+  justify-content: flex-end;
+}
