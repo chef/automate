@@ -1,17 +1,17 @@
-+++
-title = "HA Requirements"
+  +++
+  title = "HA Requirements"
 
-draft = false
+  draft = false
 
-gh_repo = "automate"
+  gh_repo = "automate"
 
-[menu]
-  [menu.automate]
-    title = "HA System and Software Requirements"
-    parent = "automate/install"
-    identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
-    weight = 210
-+++
+  [menu]
+    [menu.automate]
+      title = "HA System and Software Requirements"
+      parent = "automate/install"
+      identifier = "automate/install/ha_system_requirements.md HA System and Software Requirements"
+      weight = 210
+  +++
 
 ## System & Software Requirements
 
@@ -27,12 +27,12 @@ This section lists the recommended operating systems requirements, virtual machi
 
 ## Virtual Machine (VM) Instances Type
 
-| Instance          | Type         | RAM                                                   | Volume-size                             |
-| :---------------: | :----------: | :---------------------------------------------------: | :-------------------------------------: |
-| PostgreSQL        | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). |
-| Elasticsearch     | m5.large     | 8 GB RAM for test and 16 GB for production. vCPU - 2. | 50 GB (dedicated hard disk space assigned to '/'). |
-| Chef Automate     | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). |
-| Chef Infra Server | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). |
+| Instance          | Type         | RAM                                                   | Volume Size         | Volume Type | Volume iops |
+| :---------------: | :----------: | :---------------------------------------------------: | :-----------------: | :---------: | :---------: |
+| PostgreSQL        | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 150 |
+| Elasticsearch     | m5.large     | 8 GB RAM for test and 16 GB for production. vCPU - 2. | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 300 |
+| Chef Automate     | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 100 |
+| Chef Infra Server | t3.medium    | 4 GB RAM for test and 8 GB for production. vCPU - 2.  | 50 GB (dedicated hard disk space assigned to '/'). | |gp2 | | 100 |
 
 {{< note >}}
 
@@ -71,8 +71,6 @@ You require a minimum of three node clusters for ElaticSearcg and Postgres-sql i
 {{< /note >}}
 
 AWS limits the size of each VPC; a user cannot change the size once the VPC has been created. Amazon VPC also sets a limit of 200 subnets per VPC, each of which can support a minimum of 14 IP addresses. AWS places further limitations per account / per region, including limiting the number of VPCs to five, the number of Elastic IP addresses to five, the number of Internet gateways per VPC to one, the number of virtual private gateways to five and the number of customer gateways to 50.
-
-!--  Do we need to cover about firewall settings? https://github.com/chef/a2ha-docs/wiki/FireWall-Setting
 
 CIDR block -Classless Inter-Domain Routing. An internet protocol address allocation and route aggregation methodology. For more information, see Classless Inter-Domain Routing in Wikipedia.
 Subnet - A range of IP addresses in your VPC.
