@@ -13,18 +13,33 @@ gh_repo = "automate"
     weight = 50
 +++
 
+Identity Provider
+: An Identity Provider (IdP) is a service that stores and manages digital identities. IdPs provide authentication as a service.
+
+SAML
+: The Security Assertion Markup Language (SAML) is an open standard for exchanging authentication and authorization information between an identity provider and a service provider.
+
+Service Provider
+: A SAML service provider (SP)
+
 ## Authentication via Existing Identity Management Systems
 
 Chef Automate can integrate with existing SAML services to authenticate users in Chef Automate, and thus use their existing group memberships to determine their Chef Automate permissions.
 
 Chef Automate supports using both local users and externally managed users from an external identity provider (IdP).
+
 Both _one_ LDAP service (or MSAD for simplified configuration of Active Directory setups) and _one_ SAML IdP can be used.
+
 You do not need to configure an external IdP if you simply want to create users and teams local to Chef Automate.
+
 See the [Users]({{< relref "users.md" >}}) documentation for additional information.
 
 Chef Automate uses [Dex](https://github.com/dexidp/dex) to support SAML integrations.
-To configure authentication for your Chef Automate installation, create a TOML file that contains the partial SAML configuration.
-Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
+To configure your Chef Automate SAML authentication by:
+
+1. Create a TOML file with the partial SAML configuration.
+1. Apply your change with `chef-automate config patch </path/to/your-file.toml>`.
 
 {{% warning %}}
 You may only integrate one IdP using SAML and one IdP using LDAP at a time.
@@ -42,7 +57,9 @@ your existing configuration by following these steps:
 Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
 {{< /note >}}
 
-## Supported Identity Management Systems
+## Supported Identity Service Providers
+
+Chef Automate supports SAML logins initiated by the following Identity Service Providers (SP):
 
 - [Azure AD]({{< relref "#azure-ad" >}})
 - Office365
@@ -51,10 +68,9 @@ Users who sign in via SAML will have a session time of 24 hours before needing t
 - Ping
 - Tivoli Federated Identity Manager
 
-## Unsupported auth mode
+Chef Automate does not support SAML logins initiated by Identity Providers(IdP). This is a limitation of the [Dex](https://dexidp.io/) library, which Chef Automate uses for authentication.
 
-idP-initiated SAML logins are not supported with any of the above idPs due to the library we use to do the authentications.
-Fall back to the typical SP-initiated login mode and proceed with your Automate SAML configuration.
+If you have attempted to configure an IdP-initiated login and it has failed, fall back to the typical IAM/SP-initiated login mode for your Chef Automate SAML configuration.
 
 ### Azure AD
 
