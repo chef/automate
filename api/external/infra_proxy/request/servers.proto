@@ -43,3 +43,14 @@ message GetServerStatus {
     // Server FQDN
     string fqdn = 1;
 }
+
+message ValidateWebuiKey {
+    // Chef Infra Server ID.
+    string id = 1;
+    // Chef Server FQDN
+    string fqdn = 2;
+    // Chef Server Webui Key
+    string webui_key = 3;
+    // Chef Server Webui key is availbale
+    bool is_webui_key = 4;
+}

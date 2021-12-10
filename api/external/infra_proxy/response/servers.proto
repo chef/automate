@@ -49,3 +49,8 @@ message GetServerStatus {
     // Chef Server Keygem
     map<string, int32> keygen = 3;
 }
+
+message ValidateWebuiKey {
+    // Webui key is valid or not
+    bool valid = 1;
+}

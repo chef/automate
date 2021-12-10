@@ -2,6 +2,7 @@ package infra_proxy
 
 import (
 	"context"
+	"fmt"
 
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
@@ -35,6 +36,30 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	}
 	return &gwres.GetServer{
 		Server: fromUpstreamServer(res.Server),
+	}, nil
+}
+
+// ValidateWebuiKey validates the webui key
+func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.ValidateWebuiKey) (*gwres.ValidateWebuiKey, error) {
+	req := &infra_req.ValidateWebuiKey{
+		Id:         r.Id,
+		Fqdn:       r.Fqdn,
+		WebuiKey:   r.WebuiKey,
+		IsWebuiKey: r.IsWebuiKey,
+	}
+	fmt.Println("=========================================================", req.Id)
+	fmt.Println("=========================================================", req.Fqdn)
+	fmt.Println("=========================================================", req.WebuiKey)
+	fmt.Println("=========================================================", req.IsWebuiKey)
+
+	res, err := a.client.ValidateWebuiKey(ctx, req)
+	if err != nil {
+		fmt.Println("###############################################################", err)
+		log.Warnf("Validate webui key error:: %s", err.Error())
+		return nil, err
+	}
+	return &gwres.ValidateWebuiKey{
+		Valid: res.Valid,
 	}, nil
 }
 
