@@ -1,9 +1,9 @@
 +++
 title = "High Availability - System and Software Requirements"
 
-draft = false
+  draft = false
 
-gh_repo = "automate"
+  gh_repo = "automate"
 
 [menu]
   [menu.automate]

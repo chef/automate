@@ -24,17 +24,9 @@ Its purpose is to provide access to a private network from an external network, 
 Bastion servers are instances that resides within your public subnet and accessed using SSH. The purpose of a bastion host is to restrict access to a private network from an external network. Once remote connectivity establishes with the bastion host, it allows you to use SSH to login to other instances (within private subnets) deeper within your network.
 
 The bastion hosts provide secure access to Linux instances located in the private and public subnets.
-<<<<<<< HEAD
-=======
 
 ## Bastion Host for Chef Automate High Availability (HA)
 
-Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, which is actually a bastion host. This page explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
->>>>>>> 76d95420 (2nd draft comment fixes - for aws)
-
-## Bastion Host for Chef Automate High Availability (HA)
-
-<<<<<<< HEAD
 Virtual machine is required for either of the Chef Automate HA deployment types to trigger the deployment, which is actually a bastion host. This page explains the bastion host requirements and configurations for the two deployment modes of the Chef Automate HA.
 
 ### Bastion Server Requirements for Bare Infra Deployment Method
@@ -54,18 +46,6 @@ Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinf
 
 #### Prerequisites
 
-=======
-#### Prerequisites
-
-- Bastion Server/host IP address.
-- Memory: Minimum of 100GB
-- Hard Disk Space - 4 GB
-
-### Bastion Server Setup for AWS (Amazon Web Services) Deployment
-
-#### Prerequisites
-
->>>>>>> 76d95420 (2nd draft comment fixes - for aws)
 - Configure the AWS Credential on the bastion host. [Bastion Setup]({{< relref "ha_bastion_setup" >}})
 - Create the certificate for the DNS
 - Operating System (OS): Bastion host with Ubuntu 20.04 or centOs-7 or RHEL-7
@@ -73,7 +53,6 @@ Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinf
 - Memory: Minimum of 4GB
 - Hard Disk Space - 100 GB
 - SSH: VPC to Port 22, publicly accessible
-<<<<<<< HEAD
 - Setup Virtual Private Cloud (VPC) in AWS
 
 Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
@@ -224,3 +203,6 @@ Certificate is optional. Default certificate of Postgres n es. Required for load
 
 As a bastion server, it should have the public access with a public IPv4 address.
 >>>>>>> 76d95420 (2nd draft comment fixes - for aws)
+=======
+Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws_deploy.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
+>>>>>>> 12c6b48e (Chef Automate HA Writeup - Final 2nd Draft)
