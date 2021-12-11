@@ -6,7 +6,6 @@ directories:
   - ./components/applications-service
   - ./components/authn-service
   - ./components/authz-service
-  - ./components/automate-cli
   - ./components/automate-cs-bookshelf
   - ./components/automate-cs-nginx
   - ./components/automate-cs-oc-bifrost

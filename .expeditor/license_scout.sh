@@ -49,12 +49,12 @@ pushd components/automate-ui
 popd
 log "Finished installing Automate UI dependencies"
 
-log_section_start "Installing Elixir dependencies"
-pushd components/notifications-service/server
-  mix local.hex --force
-  mix deps.get
-popd
-log "Finished installing Elixir dependencies"
+#log_section_start "Installing Elixir dependencies"
+#pushd components/notifications-service/server
+#  mix local.hex --force
+#  mix deps.get
+#popd
+#log "Finished installing Elixir dependencies"
 
 log_section_start "Installing Ruby dependencies"
 pushd components/automate-workflow-ctl/
