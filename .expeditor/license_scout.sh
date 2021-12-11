@@ -66,6 +66,7 @@ log_section_start "Installing Go dependencies"
 go mod download
 log "Finished installing Go dependencies"
 
+gem install license_scout -v 2.5.1
 log_section_start "Running License Scout"
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json
