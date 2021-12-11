@@ -40,39 +40,39 @@ log_section_start "Installing License Scout"
 gem install license_scout -v 2.5.1
 log "Finished Installing License Scout"
 
-#log_section_start "Installing Chef UI Library dependencies"
-#pushd components/chef-ui-library
-#  log "BEGIN npm install"
-#  npm install
-#  log "END npm install"
-#  log "BEGIN npm run build"
-#  npm run build
-#  log "END npm run build"
-#  popd
-#log "Finished installing Chef UI Library dependencies"
-#
-#log_section_start "Installing Automate UI dependencies"
-#pushd components/automate-ui
-#  npm install
-#popd
-#log "Finished installing Automate UI dependencies"
+log_section_start "Installing Chef UI Library dependencies"
+pushd components/chef-ui-library
+  log "BEGIN npm install"
+  npm install
+  log "END npm install"
+  log "BEGIN npm run build"
+  npm run build
+  log "END npm run build"
+  popd
+log "Finished installing Chef UI Library dependencies"
 
-#log_section_start "Installing Elixir dependencies"
-#pushd components/notifications-service/server
-#  mix local.hex --force
-#  mix deps.get
-#popd
-#log "Finished installing Elixir dependencies"
+log_section_start "Installing Automate UI dependencies"
+pushd components/automate-ui
+  npm install
+popd
+log "Finished installing Automate UI dependencies"
 
-#log_section_start "Installing Ruby dependencies"
-#pushd components/automate-workflow-ctl/
-#  bundle install
-#popd
-#log "Finished installing Ruby dependencies"
+log_section_start "Installing Elixir dependencies"
+pushd components/notifications-service/server
+  mix local.hex --force
+  mix deps.get
+popd
+log "Finished installing Elixir dependencies"
 
-#log_section_start "Installing Go dependencies"
-#go mod download
-#log "Finished installing Go dependencies"
+log_section_start "Installing Ruby dependencies"
+pushd components/automate-workflow-ctl/
+  bundle install
+popd
+log "Finished installing Ruby dependencies"
+
+log_section_start "Installing Go dependencies"
+go mod download
+log "Finished installing Go dependencies"
 
 log_section_start "Running License Scout"
 # a bug requires the use of `--format csv` but the
