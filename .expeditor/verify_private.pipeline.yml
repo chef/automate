@@ -17,18 +17,18 @@ steps:
   # Building hugo currently depends on a github token
   #     https://github.com/chef/chef-hugo-theme
   # which is currently private.
-  - label: lint hugo site
-    command:
-      - .expeditor/buildkite/hugo_lint.sh
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      accounts:
-        - github
-      executor:
-        docker:
+#  - label: lint hugo site
+#    command:
+#      - .expeditor/buildkite/hugo_lint.sh
+#    timeout_in_minutes: 10
+#    retry:
+#      automatic:
+#        limit: 1
+#    expeditor:
+#      accounts:
+#        - github
+#      executor:
+#        docker:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
@@ -68,74 +68,74 @@ steps:
           privileged: true
 
 
-  - label: "[unit] license-control-service"
-    command:
-      - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh lcs_test
-      - echo "\$A2_LICENSE" > dev/license.jwt
-      - cd components/license-control-service
-      - make lint test
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        docker:
-
-  - label: "[unit] trial-license-service"
-    command:
-      - scripts/install_golang.sh
-      - echo "\$A2_LICENSE" > dev/license.jwt
-      - cd components/trial-license-service
-      - make static unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        docker:
-
-  - label: ":semgrep: Custom"
-    expeditor:
-      executor:
-        docker:
-          image: returntocorp/semgrep:0.32.0
-          entrypoint: semgrep
-          command: [
-            "--error",
-            "--exclude", "*.spec.ts",
-            "--config", "/go/src/github.com/chef/automate/.semgrep",
-            "/go/src/github.com/chef/automate"
-          ]
-
-  - label: ":semgrep: Security"
-    command:
-      - .expeditor/buildkite/semgrep.sh
-    timeout_in_minutes: 15
-    expeditor:
-      secrets: true
-    plugins:
-      # Temporary workaround per @tduffield; do not propagate this solution too much!
-      - chef/step-hook#v0.1.1:
-          pre-command:
-            - .expeditor/export_semgrep_token.sh
-      - docker#v3.7.0:
-          image: returntocorp/semgrep-agent:v1
-          propagate-environment: true
-          workdir: /go/src/github.com/chef/automate
-          environment:
-            - SEMGREP_TOKEN
-            - SEMGREP_ID
+#  - label: "[unit] license-control-service"
+#    command:
+#      - scripts/install_golang.sh
+#      - scripts/setup_buildkite_pg.sh lcs_test
+#      - echo "\$A2_LICENSE" > dev/license.jwt
+#      - cd components/license-control-service
+#      - make lint test
+#    timeout_in_minutes: 10
+#    retry:
+#      automatic:
+#        limit: 1
+#    expeditor:
+#      secrets:
+#        A2_LICENSE:
+#          path: secret/a2/license
+#          field: license
+#      executor:
+#        docker:
+#
+#  - label: "[unit] trial-license-service"
+#    command:
+#      - scripts/install_golang.sh
+#      - echo "\$A2_LICENSE" > dev/license.jwt
+#      - cd components/trial-license-service
+#      - make static unit
+#    timeout_in_minutes: 10
+#    retry:
+#      automatic:
+#        limit: 1
+#    expeditor:
+#      secrets:
+#        A2_LICENSE:
+#          path: secret/a2/license
+#          field: license
+#      executor:
+#        docker:
+#
+#  - label: ":semgrep: Custom"
+#    expeditor:
+#      executor:
+#        docker:
+#          image: returntocorp/semgrep:0.32.0
+#          entrypoint: semgrep
+#          command: [
+#            "--error",
+#            "--exclude", "*.spec.ts",
+#            "--config", "/go/src/github.com/chef/automate/.semgrep",
+#            "/go/src/github.com/chef/automate"
+#          ]
+#
+#  - label: ":semgrep: Security"
+#    command:
+#      - .expeditor/buildkite/semgrep.sh
+#    timeout_in_minutes: 15
+#    expeditor:
+#      secrets: true
+#    plugins:
+#      # Temporary workaround per @tduffield; do not propagate this solution too much!
+#      - chef/step-hook#v0.1.1:
+#          pre-command:
+#            - .expeditor/export_semgrep_token.sh
+#      - docker#v3.7.0:
+#          image: returntocorp/semgrep-agent:v1
+#          propagate-environment: true
+#          workdir: /go/src/github.com/chef/automate
+#          environment:
+#            - SEMGREP_TOKEN
+#            - SEMGREP_ID
 
   # Wait for the build to complete before starting anything below this
   # directive. All tests below this wait either require build assets

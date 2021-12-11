@@ -81,6 +81,7 @@ docker_run_1() {
     source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
     source_dir="${source_dir}/../.."
 
+    ls $source_dir
     local docker_run_args=(
             "--detach"
             "--env" "HOST_PWD=$source_dir"
