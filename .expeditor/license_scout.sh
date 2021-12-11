@@ -32,6 +32,14 @@ upload_dep_manifest() {
 
 trap upload_dep_manifest EXIT
 
+log_section_start "Uninstalling License Scout"
+yes | gem uninstall license_scout --force
+log "Finished Uninstalling License Scout"
+
+log_section_start "Installing License Scout"
+gem install license_scout -v 2.5.1
+log "Finished Installing License Scout"
+
 log_section_start "Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
   log "BEGIN npm install"
@@ -56,23 +64,15 @@ log "Finished installing Automate UI dependencies"
 #popd
 #log "Finished installing Elixir dependencies"
 
-log_section_start "Installing Ruby dependencies"
-pushd components/automate-workflow-ctl/
-  bundle install
-popd
-log "Finished installing Ruby dependencies"
+#log_section_start "Installing Ruby dependencies"
+#pushd components/automate-workflow-ctl/
+#  bundle install
+#popd
+#log "Finished installing Ruby dependencies"
 
 log_section_start "Installing Go dependencies"
 go mod download
 log "Finished installing Go dependencies"
-
-log_section_start "Uninstalling License Scout"
-yes | gem uninstall license_scout --force
-log "Finished Uninstalling License Scout"
-
-log_section_start "Installing License Scout"
-gem install license_scout -v 2.5.1
-log "Finished Installing License Scout"
 
 log_section_start "Running License Scout"
 # a bug requires the use of `--format csv` but the
