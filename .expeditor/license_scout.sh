@@ -77,5 +77,5 @@ log "Finished installing Go dependencies"
 log_section_start "Running License Scout"
 # a bug requires the use of `--format csv` but the
 # format of the generated manifest is still json
-license_scout -l debug --format csv
+license_scout --format csv
 log "Done!"
