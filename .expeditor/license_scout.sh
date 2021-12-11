@@ -67,7 +67,7 @@ go mod download
 log "Finished installing Go dependencies"
 
 log_section_start "Installing License Scout"
-gem uninstall license_scout
+gem uninstall license_scout --force
 gem install license_scout -v 2.5.1
 log_section_start "Finished Installing License Scout"
 
