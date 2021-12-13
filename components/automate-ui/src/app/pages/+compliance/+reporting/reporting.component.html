@@ -20,15 +20,15 @@
           (dateChanged)="onEndDateChanged($event)"
           (last24Selected)="onLast24Selected()">
         </app-reporting-searchbar>
-        <div class="download-report">
+        <div class="download-report" data-cy="download-dropdown">
           <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()">
             <chef-icon>cloud_download</chef-icon>
           </chef-button>
           <chef-dropdown class="dropdown" [visible]="downloadOptsVisible">
             <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
               <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
-              <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
-              <chef-button tertiary *ngIf="appConfigService.isLargeReportingEnabled" (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()">Open Report</chef-button>
+              <chef-button tertiary (click)="onDownloadOptPressed('csv')" data-cy="download-csv">Download CSV</chef-button>
+              <chef-button tertiary *ngIf="appConfigService.isLargeReportingEnabled" (click)="hideDownloadDropdown();downloadReportsService.onReportOpenClick()" data-cy="open-report">Open Report</chef-button>
             </chef-click-outside>
           </chef-dropdown>
         </div>
@@ -135,7 +135,7 @@
           <a class="nav-tab" routerLink="/compliance/reports/overview" routerLinkActive="active" queryParamsHandling="preserve">Overview</a>
         </li>
         <li class="nav-tabs-item">
-          <a class="nav-tab" routerLink="/compliance/reports/nodes" routerLinkActive="active" queryParamsHandling="preserve">
+          <a class="nav-tab" routerLink="/compliance/reports/nodes" routerLinkActive="active" queryParamsHandling="preserve" data-cy="nodes-tab">
             {{reportData.reportingSummary?.stats.nodes | number }} Nodes
           </a>
         </li>
@@ -171,19 +171,19 @@
           <div class="header-text">
             <h3><strong>Generated Reports</strong></h3>
           </div>
-          <chef-button secondary (click)="downloadReportsService.onReportCloseClick()">
+          <chef-button secondary (click)="downloadReportsService.onReportCloseClick()" data-cy="close-report-panel">
             <chef-icon>close</chef-icon>
           </chef-button>
         </div>
         <div class="side-panel-body">
-          <table class="table" aria-label="download-report-list">
+          <table class="table" aria-label="download-report-list" data-cy="download-report-list">
             <tr class="table-header">
               <th scope="col">Report</th>
               <th scope="col">Size</th>
               <th scope="col">Duration</th>
             </tr>
             <ng-container *ngIf="downloadReportsService.reportList.length > 0">
-              <tr *ngFor="let report of downloadReportsService.reportList; index as i">
+              <tr *ngFor="let report of downloadReportsService.reportList; index as i" [ngClass]="{'json': report.report_type === 'json', 'csv': report.report_type === 'csv'}">
                 <ng-container>
                   <td *ngIf="report.status === 'success'" class="success-status">
                     <a (click)="downloadReportsService.onLinkToDownload(report)" class="download-link">
