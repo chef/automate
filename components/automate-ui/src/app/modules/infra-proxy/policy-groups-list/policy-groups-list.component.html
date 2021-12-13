@@ -7,12 +7,17 @@
   </chef-thead>
   <chef-tbody>
     <chef-tr *ngFor="let policyGroup of policyGroups">
-      <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}', 'get', [serverId, orgId, policyGroup.policy_group]]">
         <chef-td>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}', 'get', [serverId, orgId, policyGroup.policy_group]]">
           <a [routerLink]="['/infrastructure','chef-servers', serverId,
             'organizations', orgId, 'policyGroups', policyGroup.policy_group]">{{policyGroup.policy_group}}</a>
+            </app-authorized>
         </chef-td>
-        <chef-td>{{policyGroup.occurrence}}</chef-td>
+        <chef-td>
+          <app-authorized [allOf]="['/api/v0/infra/servers/{server_id}/orgs/{org_id}/policygroups/{name}', 'get', [serverId, orgId, policyGroup.policy_group]]">
+          {{policyGroup.occurrence}}
+        </app-authorized>
+      </chef-td>
       </app-authorized>
     </chef-tr>
   </chef-tbody>
