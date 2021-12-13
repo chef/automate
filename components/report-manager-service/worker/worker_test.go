@@ -1,23 +1,34 @@
 package worker_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
+	"net"
+	"net/http"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/worker"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/go-gorp/gorp"
 	"github.com/minio/minio-go/v7"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/test/bufconn"
 )
 
 func TestOnStart(t *testing.T) {
@@ -155,7 +166,7 @@ func (w *CerealWorkflow) EnqueueTask(taskName cereal.TaskName, parameters interf
 	assert.Equal(w.t, "1234-5678", params.JobID)
 	assert.Equal(w.t, "reqID123", params.RequestToProcess.RequestorId)
 	assert.Equal(w.t, "json", params.RequestToProcess.ReportType)
-	assert.Equal(w.t, 2, len(params.RequestToProcess.Reports))
+	assert.Equal(w.t, 0, len(params.RequestToProcess.Filters))
 	return nil
 }
 
@@ -454,47 +465,56 @@ type mockObjStore struct {
 	ForMakeBucketFail         bool
 	ForPresignedGetObjectFail bool
 	ForCSVExporter            bool
+	ForObjectNotAvailable     bool
 }
 
 func (m mockObjStore) PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64,
 	opts minio.PutObjectOptions) (minio.UploadInfo, error) {
-	assert.Equal(m.T, "reqID123", bucketName)
-	if m.ForCSVExporter {
-		assert.Equal(m.T, "1234-5678.csv", objectName)
+	if m.ForObjectNotAvailable && objectName == "r1.json" {
+		assert.Equal(m.T, "testBucket", bucketName)
+		assert.Equal(m.T, "r1.json", objectName)
+		return minio.UploadInfo{
+			Size: 8200,
+		}, nil
 	} else {
-		assert.Equal(m.T, "1234-5678.json", objectName)
-	}
-	assert.Equal(m.T, int64(-1), objectSize)
-	if m.ForPutObjectFailure {
-		return minio.UploadInfo{}, fmt.Errorf("error in storing object to object store")
-	}
+		assert.Equal(m.T, "reqID123", bucketName)
+		if m.ForCSVExporter {
+			assert.Equal(m.T, "1234-5678.csv", objectName)
+		} else {
+			assert.Equal(m.T, "1234-5678.json", objectName)
+		}
+		assert.Equal(m.T, int64(-1), objectSize)
+		if m.ForPutObjectFailure {
+			return minio.UploadInfo{}, fmt.Errorf("error in storing object to object store")
+		}
 
-	if m.ForCSVExporter {
-		lines, err := csv.NewReader(reader).ReadAll()
-		assert.NoError(m.T, err)
-		assert.Equal(m.T, 2, len(lines))
-		assert.Equal(m.T, 22, len(lines[0]))
-		assert.Equal(m.T, []string{"Node Name", "End Time", "Platform Name", "Platform Release",
-			"Environment", "IPAddress", "FQDN", "Profile Name", "Profile Title", "Profile Version",
-			"Profile Summary", "Control ID", "Control Title", "Control Impact", "Waived (true/false)",
-			"Result Status", "Result Run Time", "Result Code Description", "Result Message",
-			"Result Skip Message", "Waiver Justification", "Waiver Expiration"},
-			lines[0])
-		assert.Equal(m.T, []string{"TestNode", "2021-11-17 10:53:52 +0000 UTC", "test_platform", "1.0",
-			"testEnv", "0.0.0.0", "test_fqdn", "r1p1", "r1p1", "v1", "test_summary", "r1p1c1", "r1p1c1",
-			"0.00", "false", "failed", "0.006", "test code desc", "test_msg", "test_skip_msg", "", ""},
-			lines[1])
-	} else {
-		bytes, err := io.ReadAll(reader)
-		assert.NoError(m.T, err)
-		//expects new line at the end of the content
-		assert.Equal(m.T, `[{"id":"r1","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r1p1","title":"r1p1","full":"r1p1, v","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","full":"r1p2, v","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}]},{"id":"r2","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r2p1","title":"r2p1","full":"r2p1, v","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","full":"r2p2, v","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}]}]
+		if m.ForCSVExporter {
+			lines, err := csv.NewReader(reader).ReadAll()
+			assert.NoError(m.T, err)
+			assert.Equal(m.T, 2, len(lines))
+			assert.Equal(m.T, 22, len(lines[0]))
+			assert.Equal(m.T, []string{"Node Name", "End Time", "Platform Name", "Platform Release",
+				"Environment", "IPAddress", "FQDN", "Profile Name", "Profile Title", "Profile Version",
+				"Profile Summary", "Control ID", "Control Title", "Control Impact", "Waived (true/false)",
+				"Result Status", "Result Run Time", "Result Code Description", "Result Message",
+				"Result Skip Message", "Waiver Justification", "Waiver Expiration"},
+				lines[0])
+			assert.Equal(m.T, []string{"TestNode", "2021-11-17 10:53:52 +0000 UTC", "test_platform", "1.0",
+				"testEnv", "0.0.0.0", "test_fqdn", "r1p1", "r1p1", "v1", "test_summary", "r1p1c1", "r1p1c1",
+				"0.00", "false", "failed", "0.006", "test code desc", "test_msg", "test_skip_msg", "", ""},
+				lines[1])
+		} else {
+			bytes, err := ioutil.ReadAll(reader)
+			assert.NoError(m.T, err)
+			//expects new line at the end of the content
+			assert.Equal(m.T, `[{"id":"r1","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r1p1","title":"r1p1","full":"r1p1, v","sha256":"r1p1","controls":[{"id":"r1p1c1","title":"r1p1c1"},{"id":"r1p1c2","title":"r1p1c2"}]},{"name":"r1p2","title":"r1p2","full":"r1p2, v","sha256":"r1p2","controls":[{"id":"r1p2c1","title":"r1p2c1"},{"id":"r1p2c2","title":"r1p2c2"}]}]},{"id":"r2","node_id":"nodeID","node_name":"TestNode","profiles":[{"name":"r2p1","title":"r2p1","full":"r2p1, v","sha256":"r2p1","controls":[{"id":"r2p1c1","title":"r2p1c1"},{"id":"r2p1c2","title":"r2p1c2"}]},{"name":"r2p2","title":"r2p2","full":"r2p2, v","sha256":"r2p2","controls":[{"id":"r2p2c1","title":"r2p2c1"},{"id":"r2p2c2","title":"r2p2c2"}]}]}]
 `, string(bytes))
-	}
+		}
 
-	return minio.UploadInfo{
-		Size: 8200,
-	}, nil
+		return minio.UploadInfo{
+			Size: 8200,
+		}, nil
+	}
 }
 
 func (m mockObjStore) GetObject(ctx context.Context, bucketName, objectName string, opts minio.GetObjectOptions) (io.Reader, error) {
@@ -559,19 +579,35 @@ func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string,
 
 }
 
+func (m mockObjStore) StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (info minio.ObjectInfo, err error) {
+	assert.Equal(m.T, "testBucket", bucketName)
+	if m.ForObjectNotAvailable && objectName == "r1.json" {
+		errResp := minio.ErrorResponse{
+			Code:       "NoSuchKey",
+			Message:    "The specified key does not exist.",
+			StatusCode: http.StatusNotFound,
+			RequestID:  "minio",
+		}
+		return minio.ObjectInfo{}, errResp
+	}
+
+	return minio.ObjectInfo{}, nil
+}
+
 func TestRun(t *testing.T) {
 	tests := []struct {
-		name                       string
-		isGetParametersFailure     bool
-		isDataStoreGetError        bool
-		isDataStorePutError        bool
-		isUnmarshalError           bool
-		expectedError              string
-		isBucketExisted            bool
-		isBucketExistenceCheckFail bool
-		isCreateBucketFail         bool
-		isPresignedGetObjectFail   bool
-		isCSVExporter              bool
+		name                            string
+		isGetParametersFailure          bool
+		isDataStoreGetError             bool
+		isDataStorePutError             bool
+		isUnmarshalError                bool
+		expectedError                   string
+		isBucketExisted                 bool
+		isBucketExistenceCheckFail      bool
+		isCreateBucketFail              bool
+		isPresignedGetObjectFail        bool
+		isCSVExporter                   bool
+		isObjectNotAvailableInDataStore bool
 	}{
 		{
 			name:          "testRun_Success",
@@ -628,10 +664,22 @@ func TestRun(t *testing.T) {
 			isCSVExporter:       true,
 			isDataStorePutError: true,
 		},
+		{
+			name:                            "testRun_Object_Not_in_ObjStore",
+			isObjectNotAvailableInDataStore: true,
+			expectedError:                   "",
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+
+			conn, err := grpc.DialContext(context.Background(), "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(t)))
+			assert.NoError(t, err)
+
+			defer conn.Close()
+			complianceReportingClient := reporting.NewReportingServiceClient(conn)
+
 			task := worker.GenerateReportTask{
 				ObjStoreClient: mockObjStore{
 					T:                         t,
@@ -643,8 +691,10 @@ func TestRun(t *testing.T) {
 					ForMakeBucketFail:         tc.isCreateBucketFail,
 					ForPresignedGetObjectFail: tc.isPresignedGetObjectFail,
 					ForCSVExporter:            tc.isCSVExporter,
+					ForObjectNotAvailable:     tc.isObjectNotAvailableInDataStore,
 				},
-				ObjBucketName: "testBucket",
+				ObjBucketName:             "testBucket",
+				ComplianceReportingClient: complianceReportingClient,
 			}
 			result, err := task.Run(context.Background(), &CerealTask{
 				isParameterFailure: tc.isGetParametersFailure,
@@ -654,10 +704,171 @@ func TestRun(t *testing.T) {
 				assert.Error(t, err)
 				assert.Equal(t, tc.expectedError, err.Error())
 			}
+			if tc.expectedError == "" {
+				assert.NoError(t, err)
+			}
 			if result != nil {
 				formattedResult := result.(*worker.GenerateReportParameters)
 				assert.Equal(t, int64(8200), formattedResult.ReportSize)
 			}
 		})
 	}
+}
+
+func dialer(t *testing.T) func(context.Context, string) (net.Conn, error) {
+	listener := bufconn.Listen(1024 * 1024)
+
+	server := grpc.NewServer()
+
+	reporting.RegisterReportingServiceServer(server, &mockReportingServer{})
+
+	go func() {
+		if err := server.Serve(listener); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	return func(context.Context, string) (net.Conn, error) {
+		return listener.Dial()
+	}
+}
+
+type mockReportingServer struct {
+	T *testing.T
+}
+
+func (m *mockReportingServer) GetReportListForReportManager(filters *reporting.ListFilters, stream reporting.ReportingService_GetReportListForReportManagerServer) error {
+
+	result := reporting.ReportListForReportManagerResponse{}
+	result.Reports = append(result.Reports, &reporting.ReportResponse{
+		ReportId: "r1",
+		Profiles: []*reporting.ProfileResponse{
+			{
+				ProfileId: "r1p1",
+				Controls:  []string{"r1p1c1", "r1p1c2"},
+			},
+			{
+				ProfileId: "r1p2",
+				Controls:  []string{"r1p2c1", "r1p2c2"},
+			},
+		},
+	})
+	result.Reports = append(result.Reports, &reporting.ReportResponse{
+		ReportId: "r2",
+		Profiles: []*reporting.ProfileResponse{
+			{
+				ProfileId: "r2p1",
+				Controls:  []string{"r2p1c1", "r2p1c2"},
+			},
+			{
+				ProfileId: "r2p2",
+				Controls:  []string{"r2p2c1", "r2p2c2"},
+			},
+		},
+	})
+
+	jsonBytes, _ := json.Marshal(result)
+
+	reader := bytes.NewReader(jsonBytes)
+	buffer := make([]byte, 1024)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		request := &reporting.ReportContentResponse{Content: buffer[:n]}
+		logrus.Debugf("sending %d bytes", n)
+		err = stream.Send(request)
+		assert.NoError(m.T, err)
+	}
+	return nil
+}
+
+func (m *mockReportingServer) Export(*reporting.Query, reporting.ReportingService_ExportServer) error {
+	return nil
+}
+func (m *mockReportingServer) ExportNode(*reporting.Query, reporting.ReportingService_ExportNodeServer) error {
+	return nil
+}
+
+func (m *mockReportingServer) ListReports(context.Context, *reporting.Query) (*reporting.ReportsSummaryLevelOne, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListReportIds(context.Context, *reporting.Query) (*reporting.ReportIds, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ReadReport(context.Context, *reporting.Query) (*reporting.Report, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListSuggestions(context.Context, *reporting.SuggestionRequest) (*reporting.Suggestions, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListProfiles(context.Context, *reporting.Query) (*reporting.ProfileMins, error) {
+	return nil, nil
+}
+
+func (m *mockReportingServer) ExportReportManager(context.Context, *reporting.Query) (*reporting.CustomReportResponse, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ReadNode(context.Context, *reporting.Id) (*reporting.Node, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListNodes(context.Context, *reporting.Query) (*reporting.Nodes, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListControlItems(context.Context, *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ReadNodeHeader(context.Context, *reporting.Query) (*reporting.NodeHeaderInfo, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) ListControlInfo(context.Context, *reporting.Query) (*reporting.ControlElements, error) {
+	return nil, nil
+}
+func (m *mockReportingServer) GetReportContent(context.Context, *reporting.ReportContentRequest) (*reporting.ReportContentResponse, error) {
+
+	report := compliance.Report{
+		ReportUuid: "r1",
+		NodeUuid:   "nodeID",
+		NodeName:   "TestNode",
+		Profiles: []*inspec.Profile{
+			{
+				Name:   "r1p1",
+				Title:  "r1p1",
+				Sha256: "r1p1",
+				Controls: []*inspec.Control{
+					{
+						Id:    "r1p1c1",
+						Title: "r1p1c1",
+					},
+					{
+						Id:    "r1p1c2",
+						Title: "r1p1c2",
+					},
+				},
+			},
+			{
+				Name:   "r1p2",
+				Title:  "r1p2",
+				Sha256: "r1p2",
+				Controls: []*inspec.Control{
+					{
+						Id:    "r1p2c1",
+						Title: "r1p2c1",
+					},
+					{
+						Id:    "r1p2c2",
+						Title: "r1p2c2",
+					},
+				},
+			},
+		},
+	}
+	jsonBytes, err := json.Marshal(report)
+	assert.NoError(m.T, err)
+
+	return &reporting.ReportContentResponse{
+		Content: jsonBytes,
+	}, nil
 }

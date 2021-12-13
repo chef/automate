@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/external/lib/errorutils"
+	ingest "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -18,6 +20,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -305,23 +308,6 @@ func (srv *Server) ExportReportManager(ctx context.Context, in *reporting.Query)
 		return responseID, err
 	}
 
-	// Retrieving the latest report ID for each node based on the provided filters
-	esIndex, err := relaxting.GetEsIndex(formattedFilters, false)
-	if err != nil {
-		return responseID, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
-	}
-
-	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters)
-	if err != nil {
-		return responseID, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
-	}
-
-	if reportIDs == nil || len(reportIDs.Ids) == 0 {
-		return nil, status.Error(codes.NotFound, "No reports found")
-	}
-
-	total := len(reportIDs.Ids)
-
 	//get requestor information from context
 	requestorID, err := auth_context.RequestorFromIncomingContext(ctx)
 	if err != nil {
@@ -331,19 +317,22 @@ func (srv *Server) ExportReportManager(ctx context.Context, in *reporting.Query)
 		return nil, status.Error(codes.NotFound, "missing requestor information in the context")
 	}
 
+	//convert formattedFilters to reportmanager.ListFilter
+	respFilters := []*reportmanager.ListFilter{}
+	for filter, values := range formattedFilters {
+		respFilters = append(respFilters, &reportmanager.ListFilter{
+			Type:   filter,
+			Values: values,
+		})
+	}
+
 	// get all report manager requests one by one.
 	reportMgrRequests := &reportmanager.CustomReportRequest{
 		RequestorId: requestorID,
 		ReportType:  in.Type,
+		Filters:     respFilters,
 	}
 
-	for idx := total - 1; idx >= 0; idx-- {
-		cur, err := srv.es.GetReportManagerRequest(reportIDs.Ids[idx], formattedFilters)
-		if err != nil {
-			return responseID, fmt.Errorf("failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err)
-		}
-		reportMgrRequests.Reports = append(reportMgrRequests.Reports, cur)
-	}
 	// send request to report manager
 	reportMgrResponse, err := srv.reportMgr.PrepareCustomReport(ctx, reportMgrRequests)
 	if err != nil {
@@ -352,6 +341,66 @@ func (srv *Server) ExportReportManager(ctx context.Context, in *reporting.Query)
 	responseID.AcknowledgementId = reportMgrResponse.AcknowledgementId
 
 	return responseID, nil
+}
+
+func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters, stream reporting.ReportingService_GetReportListForReportManagerServer) error {
+	formattedFilters := make(map[string][]string)
+
+	for _, filter := range filters.Filters {
+		formattedFilters[filter.Type] = filter.GetValues()
+	}
+
+	// Retrieving the latest report ID for each node based on the provided filters
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false)
+	if err != nil {
+		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters)
+	if err != nil {
+		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	if reportIDs == nil || len(reportIDs.Ids) == 0 {
+		return status.Error(codes.NotFound, "No reports found")
+	}
+
+	total := len(reportIDs.Ids)
+	resp := reporting.ReportListForReportManagerResponse{}
+
+	for idx, reportID := range reportIDs.Ids {
+		cur, err := srv.es.GetReportManagerRequest(reportID, formattedFilters)
+		if err != nil {
+			return fmt.Errorf("failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err)
+		}
+		resp.Reports = append(resp.Reports, cur)
+	}
+
+	//return &resp, nil
+	jsonBytes, err := json.Marshal(resp)
+	if err != nil {
+		return status.Errorf(codes.Internal, "error in marshalling report list to report manager: %s", err)
+	}
+
+	reader := bytes.NewReader(jsonBytes)
+	buffer := make([]byte, streamBufferSize)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return status.Errorf(codes.Internal, "error in reading the report from reader to buffer: %s", err)
+		}
+		request := &reporting.ReportContentResponse{Content: buffer[:n]}
+		logrus.Debugf("sending %d bytes", n)
+		err = stream.Send(request)
+		if err != nil {
+			return status.Errorf(codes.Internal, "Unable to send report stream: %s", err)
+		}
+	}
+	return nil
 }
 
 func validateReportQueryParams(formattedFilters map[string][]string) error {
@@ -606,4 +655,196 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 
 	filters["projects"] = projectsFilter
 	return filters, nil
+}
+
+func (srv *Server) GetReportContent(ctx context.Context, in *reporting.ReportContentRequest) (*reporting.ReportContentResponse, error) {
+	if in.GetId() == "" {
+		return nil, fmt.Errorf("id should not be empty")
+	}
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in getting the filters by project in getting the report content")
+	}
+	report, err := srv.es.GetReport(in.GetId(), formattedFilters)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in getting the report content")
+	}
+
+	//convert es report to ingest report format
+
+	resp := ingest.Report{
+		Version: report.Version,
+		Platform: &inspec.Platform{
+			Name:    report.GetPlatform().GetName(),
+			Release: report.GetPlatform().GetRelease(),
+		},
+		Statistics: &inspec.Statistics{
+			Duration: report.GetStatistics().GetDuration(),
+		},
+		//OtherChecks: ,
+		ReportUuid:  report.Id,
+		NodeUuid:    report.NodeId,
+		JobUuid:     report.JobId,
+		NodeName:    report.NodeName,
+		Environment: report.Environment,
+		Roles:       report.Roles,
+		//Recipes: ,
+		EndTime: report.GetEndTime().AsTime().Format(time.RFC3339),
+		//Type: report.T,
+		//SourceId: repor,
+		//SourceRegion: report.regi,
+		//SourceAccountId:report.sou
+		//PolicyName: report.Po,
+		//PolicyGroup: report.Poli,
+		OrganizationName: report.ChefOrganization,
+		//SourceFqdn: report.Fqdn,
+		//ChefTags: report.ChefTags,
+		Ipaddress: report.Ipaddress,
+		Fqdn:      report.Fqdn,
+		//Tags: report.ChefTags,
+		//AutomateManagerId: report.Mana,
+		//RunTimeLimit: report.R,
+		//AutomateManagerType: report.Ma,
+		Status:        report.Status,
+		StatusMessage: report.StatusMessage,
+
+		/*OtherChecks []string           `protobuf:"bytes,19,rep,name=other_checks,json=otherChecks,proto3" json:"other_checks,omitempty" toml:"other_checks,omitempty" mapstructure:"other_checks,omitempty"`
+		 */
+	}
+
+	for _, profile := range report.Profiles {
+		ingestProfile := inspec.Profile{
+			Name:           profile.Name,
+			Title:          profile.Title,
+			Version:        profile.Version,
+			Summary:        profile.Summary,
+			Maintainer:     profile.Maintainer,
+			License:        profile.License,
+			Copyright:      profile.Copyright,
+			CopyrightEmail: profile.CopyrightEmail,
+			Sha256:         profile.Sha256,
+			//ParentProfile:  profile.P,
+			Status:        profile.Status,
+			SkipMessage:   profile.SkipMessage,
+			StatusMessage: profile.StatusMessage,
+		}
+
+		for _, control := range profile.Controls {
+			ingestControl := inspec.Control{
+				Id:     control.Id,
+				Impact: control.Impact,
+				Title:  control.Title,
+				Code:   control.Code,
+				Desc:   control.Desc,
+				SourceLocation: &inspec.SourceLocation{
+					Ref:  control.GetSourceLocation().GetRef(),
+					Line: control.GetSourceLocation().GetLine(),
+				},
+				//Refs:                 control.Refs,
+				//Tags:                 control.Tags,
+				WaiverData: &inspec.WaiverData{
+					ExpirationDate:     control.GetWaiverData().GetExpirationDate(),
+					Justification:      control.GetWaiverData().GetJustification(),
+					Run:                control.GetWaiverData().GetRun(),
+					SkippedDueToWaiver: control.GetWaiverData().GetSkippedDueToWaiver(),
+					Message:            control.GetWaiverData().GetMessage(),
+				},
+				RemovedResultsCounts: &inspec.RemovedResultsCounts{
+					Failed:  control.GetRemovedResultsCounts().GetFailed(),
+					Skipped: control.GetRemovedResultsCounts().GetSkipped(),
+					Passed:  control.GetRemovedResultsCounts().GetPassed(),
+				},
+			}
+			for _, result := range control.Results {
+				ingestControl.Results = append(ingestControl.Results, &inspec.Result{
+					Status:    result.Status,
+					CodeDesc:  result.CodeDesc,
+					RunTime:   result.RunTime,
+					StartTime: result.StartTime,
+					//Resource  :result.R
+					Message:     result.Message,
+					SkipMessage: result.SkipMessage,
+				})
+			}
+
+			ingestProfile.Controls = append(ingestProfile.Controls, &ingestControl)
+		}
+
+		for _, support := range profile.Supports {
+			ingestProfile.Supports = append(ingestProfile.Supports, &inspec.Support{
+				Inspec:   support.InspecVersion,
+				OsName:   support.OsName,
+				OsFamily: support.OsFamily,
+				Release:  support.Release,
+				Platform: support.Platform,
+				//PlatformName: support.PlatformName,
+				//PlatformFamily :support.PlatformFamily
+
+			})
+		}
+
+		for _, attribute := range profile.Attributes {
+			ingestProfile.Attributes = append(ingestProfile.Attributes, &inspec.Attribute{
+				Name: attribute.Name,
+				//Options *_struct.Struct
+			})
+		}
+
+		for _, dependency := range profile.Depends {
+			ingestProfile.Depends = append(ingestProfile.Depends, &inspec.Dependency{
+				Name:        dependency.Name,
+				Url:         dependency.Url,
+				Path:        dependency.Path,
+				Git:         dependency.Git,
+				Branch:      dependency.Branch,
+				Tag:         dependency.Tag,
+				Commit:      dependency.Commit,
+				Version:     dependency.Version,
+				Supermarket: dependency.Supermarket,
+				Compliance:  dependency.Compliance,
+				Status:      dependency.Status,
+				SkipMessage: dependency.SkipMessage,
+			})
+		}
+
+		for _, group := range profile.Groups {
+			ingestProfile.Groups = append(ingestProfile.Groups, &inspec.Group{
+				Id:       group.Id,
+				Title:    group.Title,
+				Controls: group.GetControls(),
+			})
+		}
+
+		resp.Profiles = append(resp.Profiles, &ingestProfile)
+	}
+
+	jsonBytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, errors.Wrap(err, "error in marshalling the report content")
+	}
+
+	return &reporting.ReportContentResponse{
+		Content: jsonBytes,
+	}, nil
+
+	/*reader := bytes.NewReader(jsonBytes)
+	buffer := make([]byte, streamBufferSize)
+
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return status.Errorf(codes.Internal, "error in reading the report from reader to buffer: %s", err)
+		}
+		request := &reporting.ReportContentResponse{Content: buffer[:n]}
+		logrus.Debugf("sending %d bytes", n)
+		err = stream.Send(request)
+		if err != nil {
+			return status.Errorf(codes.Internal, "Unable to send report stream: %s", err)
+		}
+	}
+	return nil*/
 }

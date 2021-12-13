@@ -17,7 +17,6 @@ import (
 
 	"github.com/chef/automate/api/external/lib/errorutils"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	reportmanager "github.com/chef/automate/api/interservice/report_manager"
 	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
@@ -1831,8 +1830,8 @@ func paginatedParams(filters map[string][]string) (int, int, error) {
 }
 
 // GetReportManagerRequest takes report id and filters to populate the report manager request
-func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[string][]string) (*reportmanager.ReportRequest, error) {
-	mgrRequest := &reportmanager.ReportRequest{}
+func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[string][]string) (*reportingapi.ReportResponse, error) {
+	mgrRequest := &reportingapi.ReportResponse{}
 	var method = "GetReportManagerRequest"
 	searchResult, queryInfo, err := backend.getSearchResult(reportId, filters, method)
 	if err != nil {
@@ -1909,7 +1908,7 @@ func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[
 				}
 				mgrRequest.ReportId = hit.Id
 				for _, profile := range profiles {
-					tempProfile := &reportmanager.Profile{}
+					tempProfile := &reportingapi.ProfileResponse{}
 					tempProfile.ProfileId = profile.Sha256
 					for _, control := range profile.Controls {
 						tempProfile.Controls = append(tempProfile.Controls, control.Id)

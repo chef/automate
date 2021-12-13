@@ -353,6 +353,7 @@ lint:
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
       - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment interservice is exposed to automate-cli, we treat it like an external API
       - interservice/deployment/automate_deployment.proto
       # Used to parse external JSON:
@@ -372,6 +373,7 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto
@@ -395,6 +397,7 @@ lint:
       - external/nodes/nodes.proto
       - external/secrets/secrets.proto
       - external/user_settings/user_settings.proto
+      - external/report_manager/report_manager.proto
       # deployment protos are used by the CLI and can't be changed
       - interservice/authz/policy.proto
       # compliance protos used to parse external JSON:
@@ -413,6 +416,7 @@ lint:
       - interservice/nodemanager/nodes/nodes.proto
       - interservice/pg_sidecar/service.proto
       - interservice/user_settings/user_settings.proto
+      - interservice/report_manager/report_manager.proto
       # /components/
       - automate-deployment/pkg/persistence/boltdb/internal/v1/schema/v1.proto
       - automate-gateway/api/notifications/notifications.proto
