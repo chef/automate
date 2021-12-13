@@ -217,33 +217,7 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// 	webuiKey := `-----BEGIN RSA PRIVATE KEY-----
-	// MIIEpAIBAAKCAQEAslsIvcc6pwNbwTkyMzVhyiYbWgmc9TvlMJV8aGrLPJU+IQdr
-	// Rti8KN8NEW25qlRgxHfBnWiGVGijNgi/0zu6pi4gWjehsFgbNf5eEKV1LUEJmRVJ
-	// eGySuLBTRPUUvBXExijDEId8uXwdjgewo3mQuys9A29d4607ZIq7bPXBkPFsO+OZ
-	// 5lNZAs23oTywlWN0szK1YdvM8LFOcU6mWTmF1PyqWTcaZ5KWkVjDVFpIw9JDpmuH
-	// sQpws3tgLjlfdThGz5kohlUrveWRtjvec31ZU967YuMcJE1rxBtkE8zFsC18XE4N
-	// Tac6uOUokspLw2M/0GEuss2fi4swrPrPalzyaQIDAQABAoIBAHYDTlFkVibUTg4Y
-	// LmM72yzK8iYtXjHWI9x1zQ+6OigoCCgKpK0IE9hnXlo95DAUDMNzCiWBWADaC8Rh
-	// HaxDRUlYFAgd71qjsb2UReF12YbMFfG46BhKnvqdkTt7fvDE5qLHrept+9Uvjs6/
-	// v90rPtzZy1FOiy1vHnF0ane6VQ311QGslyP8798VA/OEiMOl+oPO9hzFAHauZZzM
-	// PtKkr3REXjW8xCCG9LuLO0DPka6L1+aojJi7xouo4EFYdoV7t8QqueYGaSLpz1r4
-	// n0CeZ4K6Jax0gjkdf0YaSaSzympSu/blRMe3HqQ8/OgNXWa3gQG4/rKW6bdKkg99
-	// +qSnV5ECgYEA6I8lsSYU5aHtst3qB8mSVla1az/k8btEt6caMw2zCf+qN8J8ydf8
-	// 3k8CQiXAFmQjLOtpAytqHu6B7l4oL9NMd2Q9L7eyYnNWXnxrpkYdwfkoFA+W5BPO
-	// A+5icrbqVs0l/ty9CbochuyKL+mGPeQh+ZwZrdwUxU4usf5WQ4hGoDsCgYEAxFU+
-	// CMSoyR72h0xgQmePGsLrIX6VdvH9OTBA/d5uaJsXQZPCKstbgPC0ToeWSSYaltJu
-	// rKiGj4wRY8XckyFyi29n+rEd0gtTwAgnM1Q7fAzA8m0kadteIY/Qy2W7NyUqWsy0
-	// 0JZ4dVfGYopdgGZYfQ1sIE6T2POW3F7fzhrkEasCgYEAzOmk2oyliRi/KwXiOm5g
-	// JPdN72xjPKQ3jmMM8MM3aK3/vBYAgpFv3Cpd4Q8GTDR70g6zfvl4Dj01+2S3oDxc
-	// ei62wx7nbVwXVDXpXJ8XhV0W9WYvHFRfCJO55z5JCabFveWeI737eN9fe4wWnt4v
-	// GZN0BP+QxbF375odRHAFWxUCgYEApDHJ/JlDs1fSw1pLkp17H91tuYhcxaohpWdG
-	// o0oXuiIic/R3yURjFVW45YgdVrWoPQRmDL2wM3LnxDJggyfQ3O3h3tWrY9OXSh1H
-	// c3T5fohIATbn4iPU+GqHKuO8i6ToZCGZAm0k9rXesuCWy+BMFuFX0TkGCsXFIC20
-	// LHFu1ZsCgYAW7O2hzct3E8GREk19w0tOxHE3FKALwVBJEB/CZ2gypbgWixo4I48E
-	// J3hFsOJtTfuVz8b5fHfcaLemXxGRKGP+q7LtX6qr1MPgTQuuUfgvZg3UjYHrRWws
-	// Lm9xOixzwT+kEcnvUW4Dr/YWwJd6R9Hqgl8aR3awwud5A1woJ6p/eQ==
-	// -----END RSA PRIVATE KEY-----`
+	// 	webuiKey := ""
 	// newSecret := &secrets.Secret{
 	// 	Name: "infra-proxy-service-webui-key",
 	// 	Type: "chef-server",
