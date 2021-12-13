@@ -49,6 +49,62 @@ postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
 
+for i in ${automate_server_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			sudo su -
+            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+            export HAB_LICENSE=accept-no-persist
+            hab pkg install core/netcat -bf
+			
+EOF
+done
+
+for i in ${chef_server_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			sudo su -
+            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+            export HAB_LICENSE=accept-no-persist
+            hab pkg install core/netcat -bf
+			
+EOF
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			sudo su -
+            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+            export HAB_LICENSE=accept-no-persist
+            hab pkg install core/netcat -bf
+			
+EOF
+done
+
+for i in ${postgresql_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			sudo su -
+            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+            export HAB_LICENSE=accept-no-persist
+            hab pkg install core/netcat -bf
+			
+EOF
+done
+
 
 #connection will be checked from bastion(provisioning) to automate. Ensuring that automate allow bastion connection on 9631 port 
 for i in ${automate_server_private_ip[@]};
@@ -57,11 +113,6 @@ do
 		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $bastion_to_automate_port & 1>/dev/null
 			
 EOF
@@ -71,9 +122,6 @@ done
 for i in ${automate_server_private_ip[@]};
 do 
 			echo -e "${GREEN}bastion is trying to connect automate on specific port. IP that mentioned below is automate's ip${NC}"
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \ | sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			nc -zv $i $bastion_to_automate_port >> output.txt
 			echo
 			echo
@@ -99,11 +147,6 @@ do
 		
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $bastion_to_elasticsearch_port & 1>/dev/null
 			  
 			 
@@ -142,11 +185,6 @@ do
 	do 
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $j & 1>/dev/null
 			  
 			 
@@ -166,11 +204,6 @@ do
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 				echo -e "${GREEN}automate is trying to connect elasticsearch on specific port. Ip that mentioned below is elasticsearch's ip${NC}"
-                sudo su -
-                curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-                export HAB_LICENSE=accept-no-persist
-                hab pkg install core/netcat -bf
 				nc -zv $k $j >> output.txt
 				echo
 				echo
@@ -204,12 +237,6 @@ do
 	do 
 		echo "elasticsearch $i" >> output.txt
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $j & 1>/dev/null
 			  
 			 
@@ -229,11 +256,6 @@ do
 			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
 
 				echo -e "${GREEN}elasticsearch is trying to connect elasticsearch in a cluster. All elasticsearch node will be tested. Ip mention below is elasticsearch ip${NC}"
-                sudo su -
-                curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-                export HAB_LICENSE=accept-no-persist
-                hab pkg install core/netcat -bf
 				nc -zv $k $j >> output.txt
 				echo
 				echo
@@ -267,12 +289,6 @@ do
 	do 
 		
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $j
 			  
 			 
@@ -292,11 +308,6 @@ do
 			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
 
 				echo -e "${GREEN}postgresql is trying to connect postgresql in a cluster. All postgresql node will be tested. Ip mention below is postgresql ip${NC}"
-                sudo su -
-                curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-                export HAB_LICENSE=accept-no-persist
-                hab pkg install core/netcat -bf
 				nc -zv $k $j >> output.txt
 				echo
 				echo
@@ -331,12 +342,6 @@ do
 	do 
 		
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $j
 			  
 			 
@@ -356,11 +361,6 @@ do
 			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
 		
 				echo -e "${GREEN}postgres is trying to connect elasticsearch. Below ip mention is elasticsearch ip${NC}"
-                sudo su -
-                curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-                export HAB_LICENSE=accept-no-persist
-                hab pkg install core/netcat -bf
 				nc -zv $k $j >> output.txt
 				echo
 				echo
@@ -393,12 +393,6 @@ do
 	for j in ${elasticsearch_to_postgres_port[@]}; 
 	do 
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $j & 1>/dev/null
 			  
 			 
@@ -418,11 +412,6 @@ do
 			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
 
 				echo -e "${GREEN}elasticsearch is trying to connnect postgres on specific port. Below ip mention is elasticsearch ip${NC}"
-                sudo su -
-                curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-                export HAB_LICENSE=accept-no-persist
-                hab pkg install core/netcat -bf
 				nc -zv $k $j >> output.txt
 				echo
 				echo
@@ -454,11 +443,6 @@ do
 			
 		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > /dev/null 2>&1 \
-| sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
 			ls /tmp | nc -l -p $kibana & 1>/dev/null
 			  			 
 EOF
