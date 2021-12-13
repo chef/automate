@@ -49,6 +49,7 @@ postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
 
+# Below 4 no of loop will install hab utilty from remote server.
 for i in ${automate_server_private_ip[@]};
 do 
 		
@@ -469,4 +470,48 @@ do
 
 EOF
 	
+done
+
+# Below 4 no of loop will remobe hab utilty from remote server.
+for i in ${automate_server_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+            sudo rm -rf /hab
+			
+EOF
+done
+
+for i in ${chef_server_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+            sudo rm -rf /hab
+			
+EOF
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+            sudo rm -rf /hab
+			
+EOF
+done
+
+for i in ${postgresql_private_ip[@]};
+do 
+		
+		
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+            sudo rm -rf /hab
+			
+EOF
 done
