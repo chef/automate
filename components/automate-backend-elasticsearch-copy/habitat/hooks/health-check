@@ -4,7 +4,7 @@
 
 # For details on the elasticsearch health colors, see:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
-status="$({{pkgPathFor "core/curl"}}/bin/curl -sk --cacert {{pkg.svc_path}}/config/certificates/MyRootCA.key  --key {{pkg.svc_path}}/config/certificates/odfe-admin.key  --cert {{pkg.svc_path}}/config/certificates/odfe-admin.pem https://{{svc.me.sys.ip}}:{{svc.me.cfg.http-port}}/_cat/health)"
+status="$({{pkgPathFor "core/curl"}}/bin/curl -sk /_cat/health)"
 color="$(echo "$status" | awk '{print $4}')"
 
 case $color in

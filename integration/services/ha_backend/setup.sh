@@ -81,7 +81,7 @@ PGLEADERCHK_PKG_NAME="automate-ha-pgleaderchk"
 pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
 proxy_pkg_ident="chef/automate-ha-haproxy"
 ELASTICSEARCH_PKG_NAME="automate-ha-elasticsearch-copy"
-elasticsearch_pkg_ident="chef/automate-ha-elasticsearch-copy"
+elasticsearch_pkg_ident="jayvikramsharma/automate-ha-elasticsearch-copy"
 ELASTICSIDECAR_PKG_NAME="automate-ha-elasticsidecar"
 elasticsidecar_pkg_ident="chef/$ELASTICSIDECAR_PKG_NAME"
 

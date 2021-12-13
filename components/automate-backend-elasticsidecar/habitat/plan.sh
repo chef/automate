@@ -19,7 +19,7 @@ pkg_build_deps=(
 pkg_interpreters=(bin/ruby)
 
 pkg_binds=(
-  [elasticsearch]="http-port transport-port root-ca admin-pem admin-key admin_username admin_password dashboard_username dashboard_password"
+  [elasticsearch]="http-port transport-port"
 )
 
 pkg_lib_dirs=(lib)

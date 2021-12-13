@@ -86,7 +86,7 @@ variable "elasticsearch_listen_port" {
 }
 
 variable "elasticsearch_pkg_ident" {
-  default = "chef/automate-ha-elasticsearch-copy"
+  default = "jayvikramsharma/automate-ha-elasticsearch-copy"
 }
 
 variable "elasticsearch_svc_load_args" {

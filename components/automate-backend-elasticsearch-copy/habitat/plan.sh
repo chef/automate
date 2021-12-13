@@ -2,8 +2,8 @@
 # UPSTREAM_PKG_IDENT="chef/elasticsearch-odfe/0.10.1.2"
 pkg_name="automate-ha-elasticsearch-copy"
 pkg_description="Wrapper package for elasticsearch-odfe"
-pkg_origin="chef"
-vendor_origin="chef"
+pkg_origin="jayvikramsharma"
+vendor_origin="jayvikramsharma"
 pkg_version="6.8.14"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -11,8 +11,13 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_source="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${pkg_version}.tar.gz"
 pkg_shasum=edcf3e951b91fcfb4a7bc0a0f2a58bce74c741dfd64c84c46d9777d75079d5c0
 pkg_deps=(
+  core/coreutils
   core/patchelf
+  core/glibc
+  core/zlib
+  chef/mlsa
   chef/automate-openjdk
+  chef/automate-platform-tools
 )
 pkg_lib_dirs=(lib)
 pkg_bin_dirs=(es/bin)
@@ -20,13 +25,13 @@ pkg_bin_dirs=(es/bin)
 pkg_exports=(
   [http-port]=es_yaml.http.port
   [transport-port]=es_yaml.transport.tcp.port
-  [root-ca]=opendistro_ssl.rootCA
-  [admin-pem]=opendistro_ssl.admin_cert
-  [admin-key]=opendistro_ssl.admin_key
-  [admin_username]=opendistro_auth.admin_username
-  [admin_password]=opendistro_auth.admin_password
-  [dashboard_username]=opendistro_auth.dashboard_username
-  [dashboard_password]=opendistro_auth.dashboard_password
+  #[root-ca]=opendistro_ssl.rootCA
+  #[admin-pem]=opendistro_ssl.admin_cert
+  #[admin-key]=opendistro_ssl.admin_key
+  #[admin_username]=opendistro_auth.admin_username
+  #[admin_password]=opendistro_auth.admin_password
+  #[dashboard_username]=opendistro_auth.dashboard_username
+  #[dashboard_password]=opendistro_auth.dashboard_password
 )
 pkg_exposes=(http-port transport-port)
 

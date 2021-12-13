@@ -5,7 +5,7 @@
 title 'Chef Automate Backend Deploy Elasticsearch Smoke Tests'
 
 %w(
-  chef/automate-ha-elasticsearch-copy
+  jayvikramsharma/automate-ha-elasticsearch-copy
   chef/automate-ha-kibana
   chef/automate-ha-metricbeat
   chef/automate-ha-journalbeat

@@ -34,39 +34,6 @@
     data = "/hab/svc/automate-ha-elasticsearch-copy/data"
     logs = "/hab/svc/automate-ha-elasticsearch-copy/logs"
 
-  [es_yaml.opendistro_security]
-    enable_snapshot_restore_privilege = true
-    check_snapshot_restore_write_privileges = true
-    # These are the dns we use for our generated certificates. Override if you're generating your own
-    nodes_dn = [ "CN=chefnode,O=Chef Software Inc,L=Seattle,ST=Washington,C=US" ]
-    [es_yaml.opendistro_security.authcz]
-      admin_dn = [ "CN=chefadmin,O=Chef Software Inc,L=Seattle,ST=Washington,C=US" ]
-    [es_yaml.opendistro_security.ssl]
-      [es_yaml.opendistro_security.ssl.http]
-        enabled = true
-        pemcert_filepath = "certificates/odfe-ssl.pem"
-        pemkey_filepath = "certificates/odfe-ssl.key"
-        pemtrustedcas_filepath = "certificates/MyRootCA.pem"
-
-        enabled_ciphers = [
-          "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-        ]
-        enabled_protocols = [
-          "TLSv1.2"
-        ]
-
-      [es_yaml.opendistro_security.ssl.transport]
-        enabled = true
-        pemcert_filepath = "certificates/odfe-ssl.pem"
-        pemkey_filepath = "certificates/odfe-ssl.key"
-        pemtrustedcas_filepath = "certificates/MyRootCA.pem"
-        enforce_hostname_verification = false
-
 # Runtime settings for jvm.options and the systemd service
 [runtime]
   max_open_files = ""
