@@ -36,7 +36,9 @@ export class ConfigService {
     customer_id: '',
     customer_name: '',
     max_nodes: 0,
-    deployment_id: this.defaultLicenseId
+    deployment_id: this.defaultLicenseId,
+    isESExternallyDeployed: false,
+    isPGExternallyDeployed: false
   };
 
   constructor(private httpClient: HttpClient) { }
@@ -60,7 +62,9 @@ export class ConfigService {
         customerId: configJson.customer_id,
         customerName: configJson.customer_name,
         maxNodes: configJson.max_nodes,
-        deploymentId: configJson.deployment_id
+        deploymentId: configJson.deployment_id,
+        isPGExternallyDeployed: configJson.isPGExternallyDeployed,
+        isESExternallyDeployed: configJson.isESExternallyDeployed
       })));
   }
 }
