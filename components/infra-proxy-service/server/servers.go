@@ -79,7 +79,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 	}, nil
 }
 
-// ValidateWebuiKey creates a new server
+// ValidateWebuiKey validate the webui key
 func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
 
 	if req.IsWebuiKey && req.Id != "" {
