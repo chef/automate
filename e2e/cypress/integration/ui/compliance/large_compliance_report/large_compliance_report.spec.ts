@@ -10,7 +10,6 @@ describe('login the app', () => {
         username = admin.username;
         connector = admin.connector;
         cy.visit('/compliance/reports/nodes').then(() => {
-          console.log('before test');
           cy.get('[data-cy=welcome-title]').should('exist').then(() => {
               cy.get('[data-cy=close-x]').click();
           });
@@ -19,9 +18,6 @@ describe('login the app', () => {
       cy.restoreStorage();
     });
     describe('api testing', () => {
-      console.log(adminIdToken);
-      console.log(username);
-      console.log(connector);
       describe('test acknowledgement api', () => {
         let apiStatus = 'initialize';
         before(() => {
@@ -77,10 +73,8 @@ describe('login the app', () => {
 
       it('is data exist for download', function() {
         cy.get('[data-cy=nodes-tab]').then(($anchor) => {
-          console.log($anchor);
           if($anchor.text().indexOf(' 0 Nodes ') === -1) {
             isDataloaded = true;
-            console.log(isDataloaded);
           } else {
             expect(isDataloaded).to.equal(false);
           }
@@ -99,15 +93,13 @@ describe('login the app', () => {
       });
 
       it('acknowledge the report', function() {
-        console.log('csv report test');
-        console.log(isDataloaded);
-        console.log(isLargeReportingEnabled);
         if (isDataloaded && isLargeReportingEnabled) {
           cy.server();
           cy.route({
               method: 'POST',
               url: '/api/v0/compliance/reporting/reportmanager/export'
           }).as('acknowledgement');
+          
           cy.get('[data-cy=download-dropdown]').click().then(() => {
             cy.get('[data-cy=download-csv]').click().then(() => {
               cy.wait('@acknowledgement')
@@ -119,20 +111,19 @@ describe('login the app', () => {
       });
 
       it('check the status of report', function() {
-        console.log('csv report test');
-        console.log(isDataloaded);
-        console.log(isLargeReportingEnabled);
         if (isDataloaded && isLargeReportingEnabled) {
           cy.server();
           cy.route({
               method: 'GET',
               url: '/api/v0/reportmanager/requests'
           }).as('reportStatus');
+
           cy.get('[data-cy=download-dropdown]').click().then(() => {
             cy.get('[data-cy=open-report]').click().then(() => {
               cy.wait('@reportStatus')
               .its('status')
               .should('be', 200);
+
               cy.get('[data-cy=download-report-list]').then(($table) => {
                 if ($table.find('.csv').length > 0) {
                   cy.get('.csv').then(($csv) => {
@@ -141,6 +132,7 @@ describe('login the app', () => {
                   });
                 }
               });
+
             });
           });
         }
@@ -161,6 +153,7 @@ describe('login the app', () => {
                         method: 'GET',
                         url: '/api/v0/reportmanager/export/**'
                       }).as('downloadReport');
+
                       cy.get('.success-status .download-link').first().click().then(() => {
                         cy.wait('@downloadReport')
                         .its('status')
