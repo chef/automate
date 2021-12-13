@@ -1191,6 +1191,52 @@ func TestOrgs(t *testing.T) {
 
 		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
+
+	t.Run("GetInfraServerOrgs", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Id:        "chef-infra-server",
+			Name:      "Chef Infra Server",
+			Fqdn:      "domain.com",
+			IpAddress: "",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
+
+		t.Run("when a valid server is submitted, return the associated orgs successfully", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+
+			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
+				ServerId: "chef-infra-server",
+			})
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+
+			for i := range resp.Orgs {
+				cleanupOrg(ctx, t, cl, resp.Orgs[i].Id, resp.Orgs[i].ServerId)
+			}
+		})
+
+		t.Run("when server does not include credential ID, raise an error", func(t *testing.T) {
+			ctx := context.Background()
+
+			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
+				ServerId: "chef-infra-server",
+			})
+
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+			for i := range resp.Orgs {
+				cleanupOrg(ctx, t, cl, resp.Orgs[i].Id, resp.Orgs[i].ServerId)
+			}
+		})
+
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
+	})
 }
 
 func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyServiceClient, orgID string, serverID string) {

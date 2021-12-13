@@ -212,26 +212,6 @@ func (s *Server) ResetOrgAdminKey(ctx context.Context, req *request.ResetOrgAdmi
 
 //GetInfraServerOrgs: Fetches the list of automate infra server organisations from the chef server and save it into the automate back end DB
 func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraServerOrgs) (*response.GetInfraServerOrgs, error) {
-	// // TODO:Remove store webui key part: START
-	// _, err := s.service.Secrets.Delete(ctx, &secrets.Id{Id: "1e2954bf-5021-46b0-8302-f8dbb85e2c0a"})
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// 	webuiKey := ""
-	// newSecret := &secrets.Secret{
-	// 	Name: "infra-proxy-service-webui-key",
-	// 	Type: "chef-server",
-	// 	Data: []*query.Kv{
-	// 		{Key: "key", Value: webuiKey},
-	// 	},
-	// }
-
-	// 	credentialID, err := s.service.Secrets.Create(ctx, newSecret)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	fmt.Println("#########credentialID#########", credentialID)
-	// TODO:Remove store webui key part: END
 
 	// Get the credential ID from servers table
 	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
