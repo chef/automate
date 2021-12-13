@@ -54,6 +54,12 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 
 	deploymentUUID := ToUUID(deploymentID)
 
+	autconfig, err := t.deploy_client.GetAutomateConfig(ctx, &deployment_service.GetAutomateConfigRequest{})
+	if err != nil {
+		log.Warnf("Failed to get Automate config")
+	} else {
+		log.Infof("AUT Config:: %v", autconfig)
+	}
 	//if deployment id is empty or a UUID don't turn it into a UUID
 
 	if r.License != nil {
