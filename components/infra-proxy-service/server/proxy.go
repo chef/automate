@@ -162,6 +162,20 @@ func GetAdminKeyFrom(secret *secrets.Secret) string {
 	return adminKey
 }
 
+// GetWebuiKeyFrom returns Webuikey
+func GetWebuiKeyFrom(secret *secrets.Secret) string {
+	webuiKey := ""
+	if secret != nil {
+		for _, item := range secret.Data {
+			if item.Key == "key" {
+				webuiKey = item.Value
+			}
+		}
+	}
+
+	return webuiKey
+}
+
 // ParseAPIError parses common Chef Infra Server API errors into a user-readable format.
 func ParseAPIError(err error) error {
 	chefError, _ := chef.ChefError(err)
