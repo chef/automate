@@ -53,4 +53,6 @@ message GetServerStatus {
 message ValidateWebuiKey {
     // Webui key is valid or not
     bool valid = 1;
+    // webui key validation errors
+    string error = 2;
 }

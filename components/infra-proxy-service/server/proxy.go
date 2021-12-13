@@ -167,7 +167,7 @@ func GetWebuiKeyFrom(secret *secrets.Secret) string {
 	webuiKey := ""
 	if secret != nil {
 		for _, item := range secret.Data {
-			if item.Key == "webuiKey" {
+			if item.Key == "key" {
 				webuiKey = item.Value
 			}
 		}
@@ -241,7 +241,7 @@ func (s *Server) createChefServerClient(ctx context.Context, serverID string, ke
 }
 
 // createCSClientWithFqdn: Creates a client with only server details
-func (s *Server) createCSClientWithFqdn(ctx context.Context, fqdn string, key string, isWebuiKey bool) (*ChefClient, error) {
+func (s *Server) createCSClientWithFqdn(ctx context.Context, fqdn string, key string, adminName string, isWebuiKey bool) (*ChefClient, error) {
 
 	baseURL, err := targetServerURL(fqdn, "")
 	if err != nil {
@@ -249,7 +249,7 @@ func (s *Server) createCSClientWithFqdn(ctx context.Context, fqdn string, key st
 	}
 
 	client, err := NewChefClient(&ChefConfig{
-		Name:       "",
+		Name:       adminName,
 		Key:        key,
 		SkipSSL:    true,
 		BaseURL:    baseURL,

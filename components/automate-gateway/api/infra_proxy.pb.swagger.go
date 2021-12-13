@@ -4719,6 +4719,10 @@ func init() {
           "type": "boolean",
           "format": "boolean",
           "title": "Webui key is valid or not"
+        },
+        "error": {
+          "type": "string",
+          "title": "webui key validation errors"
         }
       }
     },

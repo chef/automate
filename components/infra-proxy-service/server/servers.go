@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/chef/automate/api/external/common/query"
@@ -82,6 +81,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 // ValidateWebuiKey creates a new server
 func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
+
 	if req.IsWebuiKey && req.Id != "" {
 		server, err := s.service.Storage.GetServer(ctx, req.Id)
 		if err != nil {
@@ -97,20 +97,24 @@ func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebu
 		req.WebuiKey = GetWebuiKeyFrom(secret)
 	}
 
-	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, req.WebuiKey, true)
+	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, req.WebuiKey, "pivotal", true)
 	if err != nil {
-		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", err)
-		return nil, err
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
 	}
-	res, err := c.client.License.Get()
-	fmt.Println("====================================== check the response", res)
+	_, err = c.client.License.Get()
 	if err != nil {
-		fmt.Println("=================================================", err)
-		return nil, ParseAPIError(err)
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
 	}
 
 	return &response.ValidateWebuiKey{
-		Valid: false,
+		Valid: true,
+		Error: "",
 	}, nil
 }
 

@@ -2,7 +2,6 @@ package infra_proxy
 
 import (
 	"context"
-	"fmt"
 
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
@@ -47,19 +46,15 @@ func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.Valida
 		WebuiKey:   r.WebuiKey,
 		IsWebuiKey: r.IsWebuiKey,
 	}
-	fmt.Println("=========================================================", req.Id)
-	fmt.Println("=========================================================", req.Fqdn)
-	fmt.Println("=========================================================", req.WebuiKey)
-	fmt.Println("=========================================================", req.IsWebuiKey)
 
 	res, err := a.client.ValidateWebuiKey(ctx, req)
 	if err != nil {
-		fmt.Println("###############################################################", err)
 		log.Warnf("Validate webui key error:: %s", err.Error())
 		return nil, err
 	}
 	return &gwres.ValidateWebuiKey{
 		Valid: res.Valid,
+		Error: res.Error,
 	}, nil
 }
 
