@@ -1,5 +1,8 @@
 <div data-cy="chef-infra-server-slider" ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeSeverSlider()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
     <h2 slot="title">Add Chef Infra Server </h2>
     <chef-button 
     class="close"
