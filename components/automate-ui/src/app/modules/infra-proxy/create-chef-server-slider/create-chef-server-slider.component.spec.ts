@@ -6,11 +6,11 @@ import { MockComponent } from 'ng2-mock-component';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
 
-import { CreateChefServerModalComponent } from './create-chef-server-modal.component';
+import { CreateChefServerSliderComponent } from './create-chef-server-slider.component';
 
-describe('CreateChefServerModalComponent', () => {
-  let component: CreateChefServerModalComponent;
-  let fixture: ComponentFixture<CreateChefServerModalComponent>;
+describe('CreateChefServerSliderComponent', () => {
+  let component: CreateChefServerSliderComponent;
+  let fixture: ComponentFixture<CreateChefServerSliderComponent>;
 
   let createForm: FormGroup;
   let fqdnForm: FormGroup;
@@ -32,7 +32,7 @@ describe('CreateChefServerModalComponent', () => {
           inputs: ['visible'],
           outputs: ['close']
         }),
-        CreateChefServerModalComponent
+        CreateChefServerSliderComponent
       ],
       imports: [
         ReactiveFormsModule
@@ -43,7 +43,7 @@ describe('CreateChefServerModalComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateChefServerModalComponent);
+    fixture = TestBed.createComponent(CreateChefServerSliderComponent);
     component = fixture.componentInstance;
     // This form must mimic the createForm including Validators
     component.createForm = new FormBuilder().group({
