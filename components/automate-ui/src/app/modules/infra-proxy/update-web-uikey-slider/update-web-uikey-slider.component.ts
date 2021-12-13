@@ -10,7 +10,6 @@ import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-
 @Component({
   selector: 'app-update-web-uikey-slider',
   templateUrl: './update-web-uikey-slider.component.html',
@@ -92,7 +91,7 @@ export class UpdateWebUIKeySliderComponent implements OnInit, OnDestroy {
       server_id: this.serverId
     };
     console.log('Your form data : ', this.updateKeyForm.value, webuikey );
-    // this.store.dispatch(new UpdateWebUIKey(webuikey));
+    this.store.dispatch(new UpdateWebUIKey(webuikey));
     this.updateKeyForm.reset();
     this.toggleSlide();
 }
