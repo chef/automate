@@ -16,6 +16,8 @@ export interface Config {
   customerName: string;
   maxNodes: number;
   deploymentId: string;
+  isESExternallyDeployed: boolean;
+  isPGExternallyDeployed: boolean;
 }
 
 @Injectable()
