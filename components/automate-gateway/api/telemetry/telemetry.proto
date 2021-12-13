@@ -26,4 +26,6 @@ message TelemetryResponse {
   string telemetry_url = 8;
   int64 max_nodes = 9;
   string deployment_id = 10;
+  bool is_pg_externally_deployed = 11;
+  bool is_es_externally_deployed = 12;
 }

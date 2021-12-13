@@ -54,14 +54,16 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 
 	deploymentUUID := ToUUID(deploymentID)
 
-	autconfig, err := t.deploy_client.GetAutomateConfig(ctx, &deployment_service.GetAutomateConfigRequest{})
+	automateConfig, err := t.deploy_client.GetAutomateConfig(ctx, &deployment_service.GetAutomateConfigRequest{})
+	isPGExternallyDeployed := false
+	isESExternallyDeployed := false
 	if err != nil {
 		log.Warnf("Failed to get Automate config")
 	} else {
-		log.Infof("AUT Config:: %v", autconfig)
+		isPGExternallyDeployed = automateConfig.GetConfig().GetGlobal().GetV1().GetExternal().GetPostgresql().GetEnable().GetValue()
+		isESExternallyDeployed = automateConfig.GetConfig().GetGlobal().GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue()
 	}
 	//if deployment id is empty or a UUID don't turn it into a UUID
-
 	if r.License != nil {
 		//Licenses can have more than one entitlement
 		//We can add them together to see what the maximum entitlement is
@@ -76,21 +78,26 @@ func (t *TelemetryServer) GetTelemetryConfiguration(ctx context.Context, request
 		}
 
 		return &telemetry.TelemetryResponse{
-			LicenseId:        r.License.Id,
-			CustomerName:     r.License.Customer,
-			CustomerId:       r.License.CustomerId,
-			LicenseType:      r.License.Type,
-			TelemetryEnabled: tel.TelemetryEnabled,
-			TelemetryUrl:     tel.TelemetryUrl,
-			MaxNodes:         maxNodes,
-			DeploymentId:     deploymentUUID,
+			LicenseId:              r.License.Id,
+			CustomerName:           r.License.Customer,
+			CustomerId:             r.License.CustomerId,
+			LicenseType:            r.License.Type,
+			TelemetryEnabled:       tel.TelemetryEnabled,
+			TelemetryUrl:           tel.TelemetryUrl,
+			MaxNodes:               maxNodes,
+			DeploymentId:           deploymentUUID,
+			IsPgExternallyDeployed: isPGExternallyDeployed,
+			IsEsExternallyDeployed: isESExternallyDeployed,
 		}, nil
 	}
 
 	return &telemetry.TelemetryResponse{
-		TelemetryEnabled: tel.TelemetryEnabled,
-		TelemetryUrl:     tel.TelemetryUrl,
-		DeploymentId:     deploymentUUID}, nil
+		TelemetryEnabled:       tel.TelemetryEnabled,
+		TelemetryUrl:           tel.TelemetryUrl,
+		DeploymentId:           deploymentUUID,
+		IsPgExternallyDeployed: isPGExternallyDeployed,
+		IsEsExternallyDeployed: isESExternallyDeployed,
+	}, nil
 }
 
 func (t *TelemetryServer) getDeploymentID(ctx context.Context) (string, error) {
