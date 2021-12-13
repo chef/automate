@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS users_automate_user_id_index ON users (automate_user_
 -- create table org_users
 CREATE TABLE IF NOT EXISTS org_users (
   id           TEXT PRIMARY KEY,
-  org_id       TEXT NOT NULL references orgs(id) ON DELETE RESTRICT,
+  org_id       TEXT NOT NULL,
   user_id      TEXT NOT NULL references users(id) ON DELETE RESTRICT, 
   is_admin     BOOLEAN NOT NULL DEFAULT FALSE
 );
