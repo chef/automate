@@ -382,7 +382,15 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "event-service", WriteMetadata: false},
 		{Name: "local-user-service", WriteMetadata: false},
 		{Name: "pg-sidecar-service", WriteMetadata: false},
-		{Name: "data-feed-service", WriteMetadata: false},
+		{Name: "data-feed-service",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "data_feed_service",
+					User: "data-feed",
+				},
+			},
+		},
 		{Name: "automate-cds", WriteMetadata: false},
 
 		// Chef Server Stuff
