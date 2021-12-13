@@ -1,32 +1,44 @@
 <div ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
-    <img src="../../../../assets/img/Fill.png" alt="No Image">
-    <h1 slot="title">Update Web UI Key</h1>
-    <chef-button class="close" secondary (click)="closeUpdateWebUIKeySlider()">
+    <chef-button class="back-button" secondary (click)="closeUpdateModal()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
+    <h1 data-cy="title" slot="title">Update Web UI Key</h1>
+    <chef-button class="close" secondary (click)="closeUpdateModal()">
       <chef-icon>close</chef-icon>
     </chef-button>
   </div>
-  <div class="sidenav-body">
-    <form [formGroup]="updateKeyForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="updateKeyForm">
+    <div class="sidenav-body">
       <div class="id-margin">
         <chef-form-field>
-          <label *ngIf="!updated">
+          <label>
             <span class="Keylabel">Web UI Key</span>
-            <textarea chefInput firstFocus name="webUiKey" formControlName="webUiKey" type="text" autocomplete="off"
-              (keyup)="handleInput($event)"></textarea>
+            <textarea 
+              chefInput 
+              firstFocus
+              name="webUiKey"
+              formControlName="webUiKey"
+              type="text"
+              autocomplete="off"
+              (keyup)="handleInput($event)" 
+              data-cy="enter-key">
+            </textarea>
           </label>
         </chef-form-field>
         <span class="Text">Note: A web UI Key is located Here (Need Better Help text)</span>
       </div>
-    </form>
-  </div>
-  <div class="button-bar">
-    <chef-button tertiary (click)="closeUpdateModal()">Cancel</chef-button>
-    <chef-button primary [disabled]="!updateKeyForm?.valid || conflictError || updating" id="create-button-object-modal"
-      (click)="onSubmit()">
-      <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
-      <span *ngIf="!updating">Upload Web UI Key</span>
-      <span *ngIf="updating">Uploading Web UI Key</span>
-    </chef-button>
-  </div>
+    </div>
+    <div class="button-bar">
+      <chef-button tertiary data-cy="cancel" (click)="closeUpdateModal()">Cancel</chef-button>
+      <chef-button primary data-cy="Upload"
+        [disabled]="!updateKeyForm?.valid || conflictError || updating"
+        id="upload-button-object-modal"
+        (click)="uploadWebUIKey()">
+        <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
+        <span *ngIf="!updating">Upload Web UI Key</span>
+        <span *ngIf="updating">Uploading Web UI Key</span>
+      </chef-button>
+    </div>
+  </form>
 </div>

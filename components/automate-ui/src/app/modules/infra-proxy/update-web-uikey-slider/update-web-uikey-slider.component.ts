@@ -4,7 +4,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { Utilities } from 'app/helpers/utilities/utilities';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Store } from '@ngrx/store';
-import { UpdateWebUIKey } from 'app/entities/servers/server.actions';
+// import { UpdateWebUIKey } from 'app/entities/servers/server.actions';
 import { saveError, updateWebUIKey } from 'app/entities/servers/server.selectors';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,8 +16,6 @@ import { isNil } from 'lodash/fp';
   styleUrls: ['./update-web-uikey-slider.component.scss']
 })
 export class UpdateWebUIKeySliderComponent implements OnInit, OnDestroy {
-
-  @Input() openEvent: EventEmitter<boolean>;
   @HostBinding('class.active') isSlideOpen = false;
   @Input() serverId: string;
 
@@ -29,7 +27,6 @@ export class UpdateWebUIKeySliderComponent implements OnInit, OnDestroy {
   public checkedValidator = false;
   public ui_key: any;
   public updatedKey: string;
-  public privateKey: string;
   public error: string;
   private isDestroyed = new Subject<boolean>();
   public conflictErrorEvent = new EventEmitter<boolean>();
@@ -45,14 +42,8 @@ export class UpdateWebUIKeySliderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.openEvent.pipe(takeUntil(this.isDestroyed))
-    .subscribe(() => {
-    this.updated = false;
-    this.conflictError = false;
     this.server = this.serverId;
     this.error = '';
-    this.privateKey = '';
-  });
 
   combineLatest([
     this.store.select(saveError),
@@ -84,21 +75,17 @@ export class UpdateWebUIKeySliderComponent implements OnInit, OnDestroy {
     this.conflictError = false;
   }
 
-  onSubmit() {
+  uploadWebUIKey() {
     this.updating = true;
     const webuikey = {
       key: this.updateKeyForm.controls['webUiKey'].value,
       server_id: this.serverId
     };
     console.log('Your form data : ', this.updateKeyForm.value, webuikey );
-    this.store.dispatch(new UpdateWebUIKey(webuikey));
+    // this.store.dispatch(new UpdateWebUIKey(webuikey));
     this.updateKeyForm.reset();
     this.toggleSlide();
 }
-
-  closeUpdateWebUIKeySlider() {
-    this.toggleSlide();
-  }
 
   toggleSlide() {
     this.isSlideOpen = !this.isSlideOpen;

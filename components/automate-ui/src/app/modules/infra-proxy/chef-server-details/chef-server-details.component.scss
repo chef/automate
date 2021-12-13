@@ -42,6 +42,15 @@ chef-page-header {
             font-weight: bold;
             width: 30%;
           }
+
+          &.webUIKeyStatus {
+            text-transform: uppercase;
+          }
+
+          &.update-link {
+            padding-left: 10px;
+            text-decoration: underline;
+          }
         }
       }
     }
