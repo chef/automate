@@ -123,7 +123,7 @@ func (p *postgres) GetAutomateInfraServerUsers(ctx context.Context, serverId str
 		user := storage.User{}
 		if err := rows.Scan(&user.ID, &user.ServerID, &user.InfraServerUsername, &user.CredentialID, &user.Connector,
 			&user.AutomateUserID, &user.IsServerAdmin, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err // TODO: continue or return??
+			return nil, err
 		}
 		users = append(users, user)
 	}
