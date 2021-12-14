@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -217,6 +218,9 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	server, err := s.service.Storage.GetServer(ctx, req.ServerId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
+	}
+	if server.CredentialID == "" {
+		return nil, errors.New("webui key is not available with server")
 	}
 	// Get web ui key from secrets service
 	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})

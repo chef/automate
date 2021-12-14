@@ -1227,8 +1227,6 @@ func TestOrgs(t *testing.T) {
 			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
 				ServerId: "chef-infra-server",
 			})
-			fmt.Println("##########resp###########", resp)
-			fmt.Println("##########err###############", err)
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 
