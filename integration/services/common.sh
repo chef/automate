@@ -81,6 +81,7 @@ docker_run_1() {
     source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
     source_dir="${source_dir}/../.."
 
+    pwd
     ls $source_dir
     local docker_run_args=(
             "--detach"
@@ -93,7 +94,6 @@ docker_run_1() {
             "--interactive"
             "--name" "$name"
             "--privileged"
-            "--rm"
             "--tmpfs=/tmp:rw,noexec,nosuid"
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
