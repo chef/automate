@@ -2,6 +2,8 @@ describe('login the app', () => {
   let adminIdToken = '';
   let username = '';
   let connector = '';
+  let isDataloaded = false;
+  let isLargeReportingEnabled = false;
   describe('large compliance report', () => {
     before(() => {
       cy.adminLogin('/').then(() => {
@@ -18,6 +20,29 @@ describe('login the app', () => {
       cy.restoreStorage();
     });
     describe('api testing', () => {
+
+      it('is data exist for download', function() {
+        cy.get('[data-cy=nodes-tab]').then(($anchor) => {
+          const dataLabel = $anchor.text().trim();
+          if(dataLabel.indexOf('0 Nodes') === 0 || dataLabel.indexOf('Nodes') === 0) {
+            expect(isDataloaded).to.equal(false);
+          } else {
+            isDataloaded = true;
+          }
+        });
+      });
+
+      it('is large reporting enabled', function() {
+        cy.get('[data-cy=download-dropdown]').then($dropdown => {
+          // is LCR enabled
+          if ($dropdown.find('[data-cy=open-report]').length > 0) {
+            isLargeReportingEnabled = true;
+          } else {
+            expect(isLargeReportingEnabled).to.equal(false);
+          }
+        });
+      });
+
       describe('test acknowledgement api', () => {
         let apiStatus = 'initialize';
         before(() => {
@@ -40,7 +65,9 @@ describe('login the app', () => {
         });
   
         it('response status 200', function () {
-          expect(apiStatus).to.equal('success');
+          if (isDataloaded && isLargeReportingEnabled) {
+            expect(apiStatus).to.equal('success');
+          }
         });
       });
 
@@ -62,35 +89,14 @@ describe('login the app', () => {
         });
   
         it('response status 200', function () {
-          expect(apiStatus).to.equal('success');
+          if (isLargeReportingEnabled) {
+            expect(apiStatus).to.equal('success');
+          }
         });
       });
     });
 
     describe('download the report', () => {
-      let isDataloaded = false;
-      let isLargeReportingEnabled = false;
-
-      it('is data exist for download', function() {
-        cy.get('[data-cy=nodes-tab]').then(($anchor) => {
-          if($anchor.text().indexOf(' 0 Nodes ') === -1) {
-            isDataloaded = true;
-          } else {
-            expect(isDataloaded).to.equal(false);
-          }
-        });
-      });
-
-      it('is large reporting enabled', function() {
-        cy.get('[data-cy=download-dropdown]').then($dropdown => {
-          // is LCR enabled
-          if ($dropdown.find('[data-cy=open-report]').length > 0) {
-            isLargeReportingEnabled = true;
-          } else {
-            expect(isLargeReportingEnabled).to.equal(false);
-          }
-        });
-      });
 
       it('acknowledge the report', function() {
         if (isDataloaded && isLargeReportingEnabled) {
