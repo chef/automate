@@ -1228,7 +1228,8 @@ func TestOrgs(t *testing.T) {
 				ServerId: "chef-infra-server",
 			})
 			require.Nil(t, resp)
-			grpctest.AssertCode(t, codes.NotFound, err)
+
+			require.Contains(t, err.Error(), fmt.Sprintf("webui key is not available with server"))
 
 		})
 		cleanupServer(ctx, t, cl, serverRes.Server.Id)
