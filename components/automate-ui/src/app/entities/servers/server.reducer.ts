@@ -144,14 +144,14 @@ export function serverEntityReducer(
       return set(
         GET_USERS_STATUS, EntityStatus.loadingFailure, state);
 
-    case ServerActionTypes.UPDATE:
+    case ServerActionTypes.UPDATE_WEB_UI_KEY:
       return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loading, state);
 
-    case ServerActionTypes.UPDATE_SUCCESS:
+    case ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS:
       return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingSuccess,
         state);
 
-    case ServerActionTypes.UPDATE_FAILURE:
+    case ServerActionTypes.UPDATE_WEB_UI_KEY_FAILURE:
       return set(UPDATE_WEB_UI_KEY_STATUS, EntityStatus.loadingFailure, state);
   }
 

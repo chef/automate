@@ -65,7 +65,6 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public users;
   public usersListLoading;
   public authFailure = false;
-  public openUpdateSlider = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,

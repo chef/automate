@@ -50,6 +50,7 @@ export class ServerRequests {
     return this.http.get<UserResponse>(`${env.infra_proxy_url}/servers/${payload.server_id}/automateinfraserverusers`);
   }
 
+  // Need to change API endpoint for update WebUIKey
   public updateWebUIKey(payload): Observable<WebUIKey> {
     return this.http.put<WebUIKeyPayload>
     (`${env.infra_proxy_url}/servers/${payload.server_id}`, payload.key);
