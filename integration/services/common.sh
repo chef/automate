@@ -97,6 +97,7 @@ docker_run_1() {
             "--tmpfs=/tmp:rw,noexec,nosuid"
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
+            "--rm"
             "--tty"
             "--volume" "$source_dir:$A2_WORK_DIR"
             "--workdir" "$A2_WORK_DIR"
