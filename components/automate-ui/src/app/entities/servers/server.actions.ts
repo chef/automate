@@ -71,6 +71,7 @@ export interface CreateServerPayload {
   name: string;
   fqdn: string;
   ip_address: string;
+  webui_key: string;
 }
 
 export class CreateServer implements Action {
