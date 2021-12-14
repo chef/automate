@@ -1214,31 +1214,31 @@ func TestOrgs(t *testing.T) {
 		// 	}
 		// })
 
-		t.Run("when server does not include credential ID, raise an error", func(t *testing.T) {
-			ctx := context.Background()
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef Infra Server",
-				Fqdn:      "domain.com",
-				IpAddress: "",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
-			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
-			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
-				ServerId: "chef-infra-server",
-			})
+		// t.Run("when server does not include credential ID, raise an error", func(t *testing.T) {
+		// 	ctx := context.Background()
+		// 	serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		// 		Id:        "chef-infra-server",
+		// 		Name:      "Chef Infra Server",
+		// 		Fqdn:      "domain.com",
+		// 		IpAddress: "",
+		// 	})
+		// 	require.NoError(t, err)
+		// 	require.NotNil(t, serverRes)
+		// 	secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+		// 	secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+		// 	secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+		// 	resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
+		// 		ServerId: "chef-infra-server",
+		// 	})
 
-			require.Nil(t, resp)
-			grpctest.AssertCode(t, codes.NotFound, err)
-			for i := range resp.Orgs {
-				cleanupOrg(ctx, t, cl, resp.Orgs[i].Id, resp.Orgs[i].ServerId)
-			}
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		// 	require.Nil(t, resp)
+		// 	grpctest.AssertCode(t, codes.NotFound, err)
+		// 	for i := range resp.Orgs {
+		// 		cleanupOrg(ctx, t, cl, resp.Orgs[i].Id, resp.Orgs[i].ServerId)
+		// 	}
+		// 	cleanupServer(ctx, t, cl, serverRes.Server.Id)
 
-		})
+		// })
 
 	})
 }
