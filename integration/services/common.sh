@@ -26,7 +26,10 @@ docker_run() {
     fi
 
     source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
-
+    if [[ ! -z $HOST_PWD && -d $HOST_PWD ]]; then
+        echo "Updating HOST_PWD to have :"
+        HOST_PWD="${HOST_PWD}:"
+    fi
     local docker_run_args=(
             "--detach"
             "--env" "HOST_PWD"
@@ -43,7 +46,7 @@ docker_run() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "$A2_WORK_DIR"
+            "--volume" "${HOST_PWD}${A2_WORK_DIR}"
             "--workdir" "$A2_WORK_DIR"
     )
 
@@ -83,6 +86,10 @@ docker_run_1() {
 
     pwd
     ls $source_dir
+    if [[ ! -z $HOST_PWD && -d $HOST_PWD ]]; then
+        echo "Updating HOST_PWD to have :"
+        HOST_PWD="${HOST_PWD}:"
+    fi
     local docker_run_args=(
             "--detach"
             "--env" "HOST_PWD"
@@ -99,7 +106,7 @@ docker_run_1() {
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--rm"
             "--tty"
-            "--volume" "$A2_WORK_DIR"
+            "--volume" "${HOST_PWD}${A2_WORK_DIR}"
             "--workdir" "$A2_WORK_DIR"
     )
 
