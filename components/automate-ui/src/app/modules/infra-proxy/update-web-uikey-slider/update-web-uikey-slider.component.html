@@ -13,7 +13,7 @@
       <div class="id-margin">
         <chef-form-field>
           <label>
-            <span class="Keylabel">Web UI Key</span>
+            <span class="Keylabel">Web UI Key <span aria-hidden="true">*</span></span>
             <textarea 
               chefInput 
               firstFocus
@@ -25,6 +25,10 @@
               data-cy="enter-key">
             </textarea>
           </label>
+          <chef-error class="textarea-error"
+            *ngIf="updateKeyForm.get('webUiKey').hasError('required') && updateKeyForm.get('webUiKey').dirty">
+            WEB UI KEY is required.
+          </chef-error>
         </chef-form-field>
         <span class="bottom-note">Note: A web UI Key is located Here (Need Better Help text)</span>
       </div>

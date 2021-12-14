@@ -23,7 +23,9 @@
               </li>
               <li>
                 <span class="heading">Web UI Key</span>
-                <span class="webUIKeyStatus">Valid</span>
+                <span *ngIf="isValid" class="webUIKeyStatus">Valid</span>
+                <img src="../../../../assets/img/warning.png" alt="warning" />
+                <span *ngIf="!isValid" class="invalidStatus">Invalid</span>
                 <span class="update-link" data-cy="open-WebKey-slider">
                   <a 
                   (click)="webUIKeySlider.slidePanel()"

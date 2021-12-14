@@ -65,6 +65,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public users;
   public usersListLoading;
   public authFailure = false;
+  public isValid = false;
 
   constructor(
     private fb: FormBuilder,
