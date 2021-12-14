@@ -14,7 +14,7 @@ import { CookbooksComponent } from './cookbooks/cookbooks.component';
 import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CookbookDependenciesComponent } from './cookbook-dependencies/cookbook-dependencies.component';
 import { CookbookDependenciesDetailsComponent } from './cookbook-dependencies-details/cookbook-dependencies-details.component';
-import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
+import { CreateChefServerSliderComponent } from './create-chef-server-slider/create-chef-server-slider.component';
 import { CreateEnvironmentModalComponent } from './create-environment-modal/create-environment-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { CreateDataBagModalComponent } from './create-data-bag-modal/create-data-bag-modal.component';
@@ -74,7 +74,7 @@ import { TreeTableModule } from './tree-table/tree-table.module';
     CookbookDetailsComponent,
     CookbookDependenciesComponent,
     CookbookDependenciesDetailsComponent,
-    CreateChefServerModalComponent,
+    CreateChefServerSliderComponent,
     CreateEnvironmentModalComponent,
     CreateOrgModalComponent,
     CreateDataBagModalComponent,
