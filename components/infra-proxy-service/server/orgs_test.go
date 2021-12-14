@@ -1194,7 +1194,14 @@ func TestOrgs(t *testing.T) {
 
 	t.Run("GetInfraServerOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
-
+		serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+			Id:        "chef-infra-server",
+			Name:      "Chef Infra Server",
+			Fqdn:      "domain.com",
+			IpAddress: "",
+		})
+		require.NoError(t, err)
+		require.NotNil(t, serverRes)
 		// TODO: Need to add the webui key with server after the webui key changes in create server API
 		// t.Run("when a valid server is submitted, return the associated orgs successfully", func(t *testing.T) {
 		// 	ctx := context.Background()
@@ -1216,14 +1223,6 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when server does not include credential ID, raise an error", func(t *testing.T) {
 			ctx := context.Background()
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Id:        "chef-infra-server",
-				Name:      "Chef Infra Server",
-				Fqdn:      "domain.com",
-				IpAddress: "",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
 
 			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
 				ServerId: "chef-infra-server",
@@ -1231,10 +1230,9 @@ func TestOrgs(t *testing.T) {
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
 
 		})
-
+		cleanupServer(ctx, t, cl, serverRes.Server.Id)
 	})
 }
 
