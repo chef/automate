@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dnlo/struct2csv"
+	"github.com/gocarina/gocsv"
 	elastic "gopkg.in/olivere/elastic.v6"
 	"os"
 	"time"
@@ -64,29 +64,50 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		os.Exit(1)
 	}
 	defer f.Close()
-	writer := struct2csv.NewWriter(f)
-	writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
+	writer := gocsv.DefaultCSVWriter(f)
+	//writer := struct2csv.NewWriter(f)
+	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
+	if err != nil {
+		fmt.Println("Error while writing csv")
+		os.Exit(1)
+	}
 
 	st := endTime.Add(24 * time.Hour)
 	for {
 		et := st
 		st = et.Add(24 * -time.Hour)
 
-		writer.Write([]string{"Day Count"})
+		err = writer.Write([]string{"Day Count"})
+		if err != nil {
+			fmt.Println("Error while writing csv")
+			os.Exit(1)
+		}
 		dayCount, ok := getUniqueCounts(client, st, et)
 		if ok {
-			writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
+			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
+			if err != nil {
+				fmt.Println("Error while writing csv")
+				os.Exit(1)
+			}
 		}
 		t := et.Add(-time.Hour)
 		if t.Before(st) {
 			t = st
 		}
-		writer.Write([]string{"Hourly Count"})
+		err = writer.Write([]string{"Hourly Count"})
+		if err != nil {
+			fmt.Println("Error while writing csv")
+			os.Exit(1)
+		}
 		writer.Flush()
 		for {
 			metric, ok := getUniqueCounts(client, t, et)
 			if ok && *metric.Value > 0 {
-				writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
+				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
+				if err != nil {
+					fmt.Println("Error while writing csv")
+					os.Exit(1)
+				}
 				writer.Flush()
 			}
 
@@ -100,7 +121,11 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 				t = st
 			}
 		}
-		writer.Write([]string{"", "", ""})
+		err = writer.Write([]string{"", "", ""})
+		if err != nil {
+			fmt.Println("Error while writing csv")
+			os.Exit(1)
+		}
 		writer.Flush()
 		if st == startTime {
 			break
@@ -141,7 +166,9 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 		os.Exit(1)
 	}
 	defer f.Close()
-	writer := struct2csv.NewWriter(f)
+
+	//	writer := struct2csv.NewWriter(f)
+	writer := gocsv.DefaultCSVWriter(f)
 
 	var sourceFields = []string{
 		"entity_uuid",
@@ -197,9 +224,17 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 				}
 
 				if ind == 0 {
-					writer.WriteStructs([]ConvergeInfo{s})
+					err = gocsv.Marshal(s, f)
+					if err != nil {
+						fmt.Println("Error while writing csv")
+						os.Exit(1)
+					}
 				} else {
-					writer.WriteStruct(s)
+					err = gocsv.Marshal(s, f)
+					if err != nil {
+						fmt.Println("Error while writing csv")
+						os.Exit(1)
+					}
 					writer.Flush()
 				}
 			}

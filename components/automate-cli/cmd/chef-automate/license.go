@@ -358,7 +358,8 @@ func validateArgs() {
 }
 
 func convertStringToTime(timeStr string) (time.Time, error) {
-	return time.Parse(time.RFC3339, fmt.Sprintf("%sT00:00:00.00Z", timeStr))
+	// return time.Parse(time.RFC3339, fmt.Sprintf("%sT00:00:00.00Z", timeStr))
+	return time.Parse("2006-01-02", timeStr)
 }
 
 func init() {
