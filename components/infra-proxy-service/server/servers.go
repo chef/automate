@@ -29,8 +29,9 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		Target:  "server",
 		Request: *req,
 		Rules: validation.Rules{
-			"Id":   []string{"required"},
-			"Name": []string{"required"},
+			"Id":       []string{"required"},
+			"Name":     []string{"required"},
+			"WebuiKey": []string{"required"},
 		},
 	}).Validate()
 
@@ -42,8 +43,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
 	}
 
-	// validate the new webui key
-
+	// TODO: validate the new webui key
 	newSecret := &secrets.Secret{
 		Name: "infra-proxy-service-webui-key",
 		Type: "chef-server",
