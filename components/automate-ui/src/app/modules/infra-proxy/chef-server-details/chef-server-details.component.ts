@@ -18,7 +18,7 @@ import {
 
 import { Server } from 'app/entities/servers/server.model';
 import { GetServer, UpdateServer
-  // , GetUsers 
+  // , GetUsers
 } from 'app/entities/servers/server.actions';
 import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
