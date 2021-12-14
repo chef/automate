@@ -1224,18 +1224,13 @@ func TestOrgs(t *testing.T) {
 			})
 			require.NoError(t, err)
 			require.NotNil(t, serverRes)
-			// secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
-			// secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
-			// secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
 			resp, err := cl.GetInfraServerOrgs(ctx, &request.GetInfraServerOrgs{
 				ServerId: "chef-infra-server",
 			})
 
 			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
-			for i := range resp.Orgs {
-				cleanupOrg(ctx, t, cl, resp.Orgs[i].Id, resp.Orgs[i].ServerId)
-			}
 			cleanupServer(ctx, t, cl, serverRes.Server.Id)
 
 		})

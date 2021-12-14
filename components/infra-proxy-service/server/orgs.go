@@ -224,7 +224,7 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 		return nil, err
 	}
 	// Get organization list from chef server
-	c, err := s.createChefServerClient(ctx, req.ServerId, GetWebuiKeyFrom(secret), "pivotal", true)
+	c, err := s.createChefServerClient(ctx, req.ServerId, GetAdminKeyFrom(secret), "pivotal", true)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (s *Server) GetInfraServerOrgs(ctx context.Context, req *request.GetInfraSe
 	// Save organisations in backend DB
 	orgs := []storage.Org{}
 	for key := range orgsList {
-		org, err := s.service.Storage.StoreOrg(ctx, key, key, "pivotal", "", req.ServerId, nil)
+		org, err := s.service.Storage.StoreOrg(ctx, key, key, "", "", req.ServerId, nil)
 		if err != nil {
 			return nil, service.ParseStorageError(err, *req, "org")
 		}
