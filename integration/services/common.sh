@@ -29,7 +29,7 @@ docker_run() {
 
     local docker_run_args=(
             "--detach"
-            "--env" "HOST_PWD=$source_dir"
+            "--env" "HOST_PWD"
             "--env" "HAB_ORIGIN=$HAB_ORIGIN"
             "--env" "HAB_STUDIO_SUP=false"
             "--env" "HAB_NONINTERACTIVE=true"
@@ -43,7 +43,7 @@ docker_run() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "$source_dir:$A2_WORK_DIR"
+            "--volume" "$A2_WORK_DIR"
             "--workdir" "$A2_WORK_DIR"
     )
 
@@ -85,7 +85,7 @@ docker_run_1() {
     ls $source_dir
     local docker_run_args=(
             "--detach"
-            "--env" "HOST_PWD=$source_dir"
+            "--env" "HOST_PWD"
             "--env" "HAB_ORIGIN=$HAB_ORIGIN"
             "--env" "HAB_STUDIO_SUP=false"
             "--env" "HAB_NONINTERACTIVE=true"
@@ -99,7 +99,7 @@ docker_run_1() {
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--rm"
             "--tty"
-            "--volume" "$source_dir:$A2_WORK_DIR"
+            "--volume" "$A2_WORK_DIR"
             "--workdir" "$A2_WORK_DIR"
     )
 
