@@ -4,11 +4,11 @@ import { FormGroup } from '@angular/forms';
 import { Utilities } from 'app/helpers/utilities/utilities';
 
 @Component({
-  selector: 'app-create-chef-server-modal',
-  templateUrl: './create-chef-server-modal.component.html',
-  styleUrls: ['./create-chef-server-modal.component.scss']
+  selector: 'app-create-chef-server-slider',
+  templateUrl: './create-chef-server-slider.component.html',
+  styleUrls: ['./create-chef-server-slider.component.scss']
 })
-export class CreateChefServerModalComponent implements OnInit {
+export class CreateChefServerSliderComponent implements OnInit {
   @Input() visible = false;
   @Input() creating = false;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
@@ -17,6 +17,7 @@ export class CreateChefServerModalComponent implements OnInit {
   @Input() createForm: FormGroup;
   @Input() fqdnForm: FormGroup;
   @Input() ipForm: FormGroup;
+  @Input() webUIKeyForm: FormGroup;
   @HostBinding('class.active') isSlideOpen = false;
 
   public modifyID = false; // Whether the edit ID form is open or not.

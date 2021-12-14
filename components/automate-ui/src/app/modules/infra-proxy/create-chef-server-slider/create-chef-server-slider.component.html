@@ -1,5 +1,8 @@
 <div data-cy="chef-infra-server-slider" ngClass="{slide : isSlideOpen}">
   <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeSeverSlider()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
     <h2 slot="title">Add Chef Infra Server </h2>
     <chef-button 
     class="close"
@@ -134,15 +137,36 @@
             </chef-error>
           </chef-form-field>
         </div>
-        <div id="button-bar">
+      </form>
+      <form [formGroup]="webUIKeyForm">
+        <div class="input-margin">
+          <chef-form-field>
+            <label>
+              <span class="label">WEB UI KEY <span aria-hidden="true">*</span></span>
+              <textarea
+                chefInput
+                formControlName="webui_key"
+                data-cy="webui_key"
+                id="webui_key"
+                (keyup)="handleInput($event)"
+                autofocus></textarea>
+            </label>
+            <chef-error
+            *ngIf="webUIKeyForm.get('webui_key').hasError('required') && webUIKeyForm.get('webui_key').dirty">
+            WEB UI KEY is required.
+            </chef-error>
+            <span class="note_text">Note: A web UI Key is located <span>Here</span>(Need Better Help Text).</span>
+          </chef-form-field>
+        </div>
+       <div id="button-bar">
           <chef-button id="cancel-server-popup" tertiary [disabled]="creating" (click)="closeSeverSlider()">Cancel</chef-button>
-          <chef-button [disabled]="!createForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
-            primary
+          <chef-button [disabled]="!createForm?.valid || webUIKeyForm?.valid || creating || conflictError || (selected === 'fqdn') ? !fqdnForm?.valid : !ipForm?.valid"
+            primaryt
             data-cy="add-button"
             id="create-button-object-modal"
             (click)="createChefServer()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
-            <span *ngIf="!creating">Add Chef Infra Server</span>
+            <span *ngIf="!creating">Add</span>
             <span *ngIf="creating">Adding Chef Infra Server ...</span>
           </chef-button>
         </div>
