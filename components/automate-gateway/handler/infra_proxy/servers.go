@@ -48,8 +48,10 @@ func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.Valida
 
 	res, err := a.client.ValidateWebuiKey(ctx, req)
 	if err != nil {
-		log.Warnf("Validate webui key error:: %s", err.Error())
-		return nil, err
+		return &gwres.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
 	}
 	return &gwres.ValidateWebuiKey{
 		Valid: res.Valid,
