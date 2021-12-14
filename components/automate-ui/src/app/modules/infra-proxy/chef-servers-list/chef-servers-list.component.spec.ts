@@ -125,7 +125,8 @@ describe('ChefServersListComponent', () => {
       id: '1',
       name: 'new server',
       fqdn: 'xyz.com',
-      ip_address: '1.1.1.1'
+      ip_address: '1.1.1.1',
+      webui_key: 'test WebUI Key'
     };
 
     beforeEach(() => {
@@ -143,11 +144,13 @@ describe('ChefServersListComponent', () => {
       component.createChefServerForm.controls['name'].setValue('any');
       component.fqdnForm.controls['fqdn'].setValue('any');
       component.ipForm.controls['ip_address'].setValue('any');
+      component.webUIKeyForm.controls['webui_key'].setValue('any');
       component.openCreateModal();
       expect(component.createChefServerForm.controls['id'].value).toBe(null);
       expect(component.createChefServerForm.controls['name'].value).toBe(null);
       expect(component.fqdnForm.controls['fqdn'].value).toBe(null);
       expect(component.ipForm.controls['ip_address'].value).toBe(null);
+      expect(component.webUIKeyForm.controls['webui_key'].value).toBe(null);
     });
 
     it('on success, closes slider and adds new server', () => {
@@ -155,6 +158,7 @@ describe('ChefServersListComponent', () => {
       component.createChefServerForm.controls['name'].setValue(server.name);
       component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
       component.ipForm.controls['ip_address'].setValue(server.ip_address);
+      component.webUIKeyForm.controls['webui_key'].setValue(server.webui_key);
       component.createChefServer();
 
       store.dispatch(new CreateServerSuccess({ 'server': server }));
@@ -169,6 +173,7 @@ describe('ChefServersListComponent', () => {
       component.createChefServerForm.controls['name'].setValue(server.name);
       component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
       component.ipForm.controls['ip_address'].setValue(server.ip_address);
+      component.webUIKeyForm.controls['webui_key'].setValue(server.webui_key);
       component.createChefServer();
 
       const conflict = <HttpErrorResponse>{
@@ -188,6 +193,7 @@ describe('ChefServersListComponent', () => {
       component.createChefServerForm.controls['name'].setValue(server.name);
       component.fqdnForm.controls['fqdn'].setValue(server.fqdn);
       component.ipForm.controls['ip_address'].setValue(server.ip_address);
+      component.webUIKeyForm.controls['webui_key'].setValue(server.webui_key);
       component.createChefServer();
 
       const error = <HttpErrorResponse>{
