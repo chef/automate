@@ -68,7 +68,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 	//writer := struct2csv.NewWriter(f)
 	err = writer.Write([]string{"Start Time", "End Time", "Unique Node Count"})
 	if err != nil {
-		fmt.Println("Error while writing csv")
+		fmt.Println("Error while writing csv: ", err)
 		os.Exit(1)
 	}
 
@@ -79,14 +79,14 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 
 		err = writer.Write([]string{"Day Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv")
+			fmt.Println("Error while writing csv: ", err)
 			os.Exit(1)
 		}
 		dayCount, ok := getUniqueCounts(client, st, et)
 		if ok {
 			err = writer.Write([]string{st.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *dayCount.Value)})
 			if err != nil {
-				fmt.Println("Error while writing csv")
+				fmt.Println("Error while writing csv: ", err)
 				os.Exit(1)
 			}
 		}
@@ -96,7 +96,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 		err = writer.Write([]string{"Hourly Count"})
 		if err != nil {
-			fmt.Println("Error while writing csv")
+			fmt.Println("Error while writing csv: ", err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -105,7 +105,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 			if ok && *metric.Value > 0 {
 				err = writer.Write([]string{t.Format(time.RFC3339), et.Format(time.RFC3339), fmt.Sprintf("%f", *metric.Value)})
 				if err != nil {
-					fmt.Println("Error while writing csv")
+					fmt.Println("Error while writing csv: ", err)
 					os.Exit(1)
 				}
 				writer.Flush()
@@ -123,7 +123,7 @@ func queryElasticSearchNodeCount(client *elastic.Client, startTime time.Time, en
 		}
 		err = writer.Write([]string{"", "", ""})
 		if err != nil {
-			fmt.Println("Error while writing csv")
+			fmt.Println("Error while writing csv: ", err)
 			os.Exit(1)
 		}
 		writer.Flush()
@@ -224,15 +224,15 @@ func queryElasticSearchNodeReport(client *elastic.Client, startTime time.Time, e
 				}
 
 				if ind == 0 {
-					err = gocsv.Marshal(s, f)
+					err = gocsv.Marshal([]ConvergeInfo{s}, f)
 					if err != nil {
-						fmt.Println("Error while writing csv")
+						fmt.Println("Error while writing csv: ", err)
 						os.Exit(1)
 					}
 				} else {
-					err = gocsv.Marshal(s, f)
+					err = gocsv.MarshalWithoutHeaders([]ConvergeInfo{s}, f)
 					if err != nil {
-						fmt.Println("Error while writing csv")
+						fmt.Println("Error while writing csv: ", err)
 						os.Exit(1)
 					}
 					writer.Flush()
