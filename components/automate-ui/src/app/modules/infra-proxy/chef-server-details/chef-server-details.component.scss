@@ -50,6 +50,10 @@ chef-page-header {
           &.update-link {
             padding-left: 10px;
             text-decoration: underline;
+
+            a {
+              cursor: pointer;
+            }
           }
         }
       }

@@ -1,13 +1,21 @@
 @import "~styles/variables";
 @import '../infra_shared/slide-panel';
 
+:host {
+  width: 50%;
+  padding: 32px 0;
+}
+
 .sidenav-header {
+  padding: 0px 19px;
+
   .back-button {
     margin-left: 0;
   }
 }
 
 .sidenav-body {
+  padding: 0 32px;
 
   .id-margin {
     height: 75vh;
@@ -34,7 +42,12 @@ chef-form-field {
   }
 }
 
+.bottom-note {
+  padding-top: 10px;
+}
+
 .button-bar {
   display: flex;
   justify-content: flex-end;
+  padding: 0 25px;
 }
