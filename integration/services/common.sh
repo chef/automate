@@ -29,7 +29,7 @@ docker_run() {
 
     local docker_run_args=(
             "--detach"
-            "--env" "HOST_PWD"
+            "--env" "HOST_PWD=$source_dir"
             "--env" "HAB_ORIGIN=$HAB_ORIGIN"
             "--env" "HAB_STUDIO_SUP=false"
             "--env" "HAB_NONINTERACTIVE=true"
