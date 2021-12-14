@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
@@ -19,6 +20,7 @@ import (
 	"github.com/chef/automate/components/report-manager-service/storage"
 	"github.com/chef/automate/components/report-manager-service/utils"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/pcmp"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
@@ -390,7 +392,6 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, jobID 
 			if !ok {
 				continue
 			}
-			//TODO:: Fix Profile status
 			profileData := &reporting.Profile{
 				Name:           compProfile.Name,
 				Title:          compProfile.Title,
@@ -426,14 +427,17 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, jobID 
 				if !ok {
 					continue
 				}
-				//TODO: Add Tags and waived_str at control level
+
+				//TODO: Add Tags at control level
 				controlData := &reporting.Control{
-					Id:     compControl.Id,
-					Code:   compControl.Code,
-					Desc:   compControl.Desc,
-					Impact: compControl.Impact,
-					Title:  compControl.Title,
+					Id:        compControl.Id,
+					Code:      compControl.Code,
+					Desc:      compControl.Desc,
+					Impact:    compControl.Impact,
+					Title:     compControl.Title,
+					WaivedStr: WaivedStr(compControl.WaiverData),
 				}
+
 				if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
 					compControl.SourceLocation.Line != 0) {
 					controlData.SourceLocation = &reporting.SourceLocation{
@@ -635,4 +639,21 @@ func (t *GenerateReportTask) getReportsList(ctx context.Context, listFilters []*
 		return nil, errors.Wrap(err, fmt.Sprintf("%s:error in unmarshaling to report list", "methodName"))
 	}
 	return &reportList, nil
+}
+
+// WaivedStr returns a string label based on the control waived status
+func WaivedStr(data *inspec.WaiverData) (str string) {
+	if data == nil || pcmp.DeepEqual(*data, inspec.WaiverData{}) {
+		return inspec.ControlWaivedStrNo
+	}
+
+	if strings.HasPrefix(data.Message, "Waiver expired") {
+		return inspec.ControlWaivedStrNoExpired
+	}
+
+	if data.Run {
+		return inspec.ControlWaivedStrYesRun
+	}
+
+	return inspec.ControlWaivedStrYes
 }
