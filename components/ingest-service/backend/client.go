@@ -65,6 +65,8 @@ type Client interface {
 	// @param (data)
 	CreateBulkNodeAttributeUpdateRequest(NodeAttribute) elastic.BulkableRequest
 	// @param (data)
+	CreateBulkNodeRunInfoUpdateRequest(Run) elastic.BulkableRequest
+	// @param (data)
 	CreateBulkRunUpdateRequest(Run) elastic.BulkableRequest
 	// @param (context, bulkableRequests)
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error

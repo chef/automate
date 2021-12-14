@@ -50,6 +50,11 @@ func (es *Backend) CreateBulkNodeAttributeUpdateRequest(nodeAttr backend.NodeAtt
 	return es.createBulkUpdateRequestToIndexWithID(mapping, nodeAttr.EntityUUID, nodeAttr)
 }
 
+func (es *Backend) CreateBulkNodeRunInfoUpdateRequest(node backend.Run) elastic.BulkableRequest {
+	mapping := mappings.NodeRunInfo
+	return es.createBulkRequestUpsertNodeInfo(mapping, node.EntityUuid, node.EndTime)
+}
+
 // MarkForDeleteMultipleNodesByID marks for delete multiple nodes by their IDs
 func (es *Backend) MarkForDeleteMultipleNodesByID(ctx context.Context, nodeIDs []string) (int, error) {
 	if len(nodeIDs) == 0 {
