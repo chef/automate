@@ -4,6 +4,7 @@ export interface Server {
   fqdn: string;
   ip_address: string;
   orgs_count?: number;
+  webui_key?: string;
 }
 
 export interface User {

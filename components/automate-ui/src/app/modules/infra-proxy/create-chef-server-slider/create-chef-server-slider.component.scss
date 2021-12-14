@@ -19,6 +19,10 @@
       line-height: 27px;
       margin-bottom: 10px;
     }
+
+    .back-button {
+      margin-left: 0;
+    }
   }
 
   .flex-container {
@@ -45,6 +49,12 @@
       .detail {
         color: $chef-primary-dark;
         font-size: 12px;
+      }
+
+      #webui_key {
+        height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
     }
 
@@ -135,4 +145,10 @@
     background: $chef-primary-bright;
     border-radius: 4px;
   }
+}
+
+.note_text {
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.2px;
 }

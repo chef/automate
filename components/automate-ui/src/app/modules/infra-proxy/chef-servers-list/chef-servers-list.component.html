@@ -6,17 +6,18 @@
         <chef-heading>Chef Infra Servers</chef-heading>
         <chef-subheading>Manage Chef Infra Servers with Chef Automate</chef-subheading>
       </chef-page-header>
-      <app-create-chef-server-modal 
+      <app-create-chef-server-slider
         #server
         [visible]="createModalVisible" 
         [creating]="creatingChefServer"
         [createForm]="createChefServerForm"
         [fqdnForm]="fqdnForm"
         [ipForm]="ipForm"
+        [webUIKeyForm]="webUIKeyForm"
         (close)="closeCreateModal()"
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createChefServer()">
-      </app-create-chef-server-modal>
+      </app-create-chef-server-slider>
       <app-delete-infra-object-modal
         [visible]="deleteModalVisible"
         objectNoun="server"
