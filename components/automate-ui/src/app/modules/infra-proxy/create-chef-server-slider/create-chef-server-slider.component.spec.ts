@@ -6,16 +6,16 @@ import { MockComponent } from 'ng2-mock-component';
 import { Regex } from 'app/helpers/auth/regex';
 import { using } from 'app/testing/spec-helpers';
 
-import { CreateChefServerModalComponent } from './create-chef-server-modal.component';
+import { CreateChefServerSliderComponent } from './create-chef-server-slider.component';
 
-describe('CreateChefServerModalComponent', () => {
-  let component: CreateChefServerModalComponent;
-  let fixture: ComponentFixture<CreateChefServerModalComponent>;
+describe('CreateChefServerSliderComponent', () => {
+  let component: CreateChefServerSliderComponent;
+  let fixture: ComponentFixture<CreateChefServerSliderComponent>;
 
   let createForm: FormGroup;
   let fqdnForm: FormGroup;
   let ipForm: FormGroup;
-
+  let webUIKeyForm: FormGroup;
   let errors = {};
 
   beforeEach( waitForAsync(() => {
@@ -32,7 +32,7 @@ describe('CreateChefServerModalComponent', () => {
           inputs: ['visible'],
           outputs: ['close']
         }),
-        CreateChefServerModalComponent
+        CreateChefServerSliderComponent
       ],
       imports: [
         ReactiveFormsModule
@@ -43,7 +43,7 @@ describe('CreateChefServerModalComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateChefServerModalComponent);
+    fixture = TestBed.createComponent(CreateChefServerSliderComponent);
     component = fixture.componentInstance;
     // This form must mimic the createForm including Validators
     component.createForm = new FormBuilder().group({
@@ -63,10 +63,17 @@ describe('CreateChefServerModalComponent', () => {
         Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
     });
+    component.webUIKeyForm = new FormBuilder().group({
+      webui_key: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)
+      ]]
+    });
+
     component.conflictErrorEvent = new EventEmitter();
     createForm = component.createForm;
     fqdnForm = component.fqdnForm;
     ipForm = component.ipForm;
+    webUIKeyForm = component.webUIKeyForm;
     fixture.detectChanges();
   });
 
@@ -80,12 +87,14 @@ describe('CreateChefServerModalComponent', () => {
         expect(createForm.valid).toBeFalsy();
         expect(fqdnForm.valid).toBeFalsy();
         expect(ipForm.valid).toBeFalsy();
+        expect(webUIKeyForm).toBeFalsy();
       });
 
       it('when name is missing', () => {
         createForm.controls['id'].setValue('test');
         fqdnForm.controls['fqdn'].setValue('test.net');
         ipForm.controls['ip_address'].setValue('1.2.3.4');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
         errors = createForm.controls['name'].errors || {};
 
@@ -97,6 +106,7 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['name'].setValue('test');
         fqdnForm.controls['fqdn'].setValue('test.net');
         ipForm.controls['ip_address'].setValue('1.2.3.4');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
         errors = createForm.controls['id'].errors || {};
 
@@ -108,6 +118,7 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
         ipForm.controls['ip_address'].setValue('1.2.3.4');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
         errors = fqdnForm.controls['fqdn'].errors || {};
 
@@ -119,6 +130,7 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
         fqdnForm.controls['fqdn'].setValue('test.net');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
         errors = ipForm.controls['ip_address'].errors || {};
 
@@ -130,6 +142,7 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['name'].setValue('test');
         createForm.controls['id'].setValue('test');
         fqdnForm.controls['fqdn'].setValue('chef.internal');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
         ipForm.controls['ip_address'].setValue('1.2234.3.4');
         errors = ipForm.controls['ip_address'].errors || {};
@@ -162,6 +175,7 @@ describe('CreateChefServerModalComponent', () => {
           createForm.controls['name'].setValue('test');
           createForm.controls['id'].setValue('test');
           ipForm.controls['ip_address'].setValue('1.2.3.4');
+          webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
           fqdnForm.controls['fqdn'].setValue(input);
           errors = fqdnForm.controls['fqdn'].errors || {};
@@ -181,6 +195,7 @@ describe('CreateChefServerModalComponent', () => {
         createForm.controls['id'].setValue('test');
         fqdnForm.controls['fqdn'].setValue('chef.internal');
         ipForm.controls['ip_address'].setValue('1.2.3.4');
+        webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
         expect(createForm.valid).toBeTruthy();
       });
 
@@ -202,6 +217,7 @@ describe('CreateChefServerModalComponent', () => {
           createForm.controls['name'].setValue('test');
           createForm.controls['id'].setValue('test');
           ipForm.controls['ip_address'].setValue('1.2.3.4');
+          webUIKeyForm.controls['webui_key'].setValue('testWebUIKey');
 
           fqdnForm.controls['fqdn'].setValue(input);
           errors = fqdnForm.controls['fqdn'].errors || {};
