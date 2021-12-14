@@ -14,8 +14,8 @@ NO_GIT=${NO_GIT:-false}
 SED=${SED:-sed}
 
 if [[ "$NO_GIT" != "true" ]]; then
-    branch="expeditor/bump-chef-server"
-    git checkout -b "$branch"
+    branch="shaik-6037/change_to_stable"
+    # git checkout -b "$branch"
 fi
 
 declare -A hab_packages
@@ -23,6 +23,7 @@ declare -A file_for_pkg
 
 manifest_for_channel() {
     local channel="$1"
+    # echo $channel
     local url="https://packages.chef.io/manifests/$channel/chef-server/latest.json"
     curl "$url"
 }
