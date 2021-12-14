@@ -20,7 +20,8 @@ destroy_services_config_path() {
 docker_run() {
     local name="$1"
     local image="$2"
-
+    local volume_mount=""
+    
     if [ -z "$image" ]; then
         image="chefes/a2-integration:latest"
     fi
@@ -28,7 +29,7 @@ docker_run() {
     source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
     if [[ ! -z $HOST_PWD ]]; then
         echo "Updating HOST_PWD to have :"
-        HOST_PWD="${HOST_PWD}:"
+        volume_mount="${HOST_PWD}:"
     fi
     local docker_run_args=(
             "--detach"
@@ -46,7 +47,7 @@ docker_run() {
             "--tmpfs=/var/tmp:rw,noexec,nosuid"
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--tty"
-            "--volume" "${HOST_PWD}${A2_WORK_DIR}"
+            "--volume" "${volume_mount}${A2_WORK_DIR}"
             "--workdir" "$A2_WORK_DIR"
     )
 
@@ -76,7 +77,8 @@ docker_run() {
 docker_run_1() {
     local name="$1"
     local image="$2"
-
+    local volume_mount=""
+    
     if [ -z "$image" ]; then
         image="chefes/a2-integration:latest"
     fi
@@ -88,7 +90,7 @@ docker_run_1() {
     ls $source_dir
     if [[ ! -z $HOST_PWD ]]; then
         echo "Updating HOST_PWD to have :"
-        HOST_PWD="${HOST_PWD}:"
+        volume_mount="${HOST_PWD}:"
     fi
     local docker_run_args=(
             "--detach"
@@ -106,7 +108,7 @@ docker_run_1() {
             "--tmpfs=/dev/shm:rw,noexec,nosuid"
             "--rm"
             "--tty"
-            "--volume" "${HOST_PWD}${A2_WORK_DIR}"
+            "--volume" "${volume_mount}${A2_WORK_DIR}"
             "--workdir" "$A2_WORK_DIR"
     )
 
