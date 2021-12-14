@@ -82,10 +82,18 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 // ValidateWebuiKey validate the webui key
 func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
 
-	if req.IsWebuiKey && req.Id != "" {
+	webuiKey := req.WebuiKey
+	if req.WebuiKey == "" {
 		server, err := s.service.Storage.GetServer(ctx, req.Id)
 		if err != nil {
 			return nil, service.ParseStorageError(err, *req, "server")
+		}
+
+		if server.CredentialID == "" {
+			return &response.ValidateWebuiKey{
+				Valid: false,
+				Error: "Webui key is not available for this server.",
+			}, nil
 		}
 
 		// Get web ui key from secrets service
@@ -94,10 +102,10 @@ func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebu
 			return nil, err
 		}
 
-		req.WebuiKey = GetWebuiKeyFrom(secret)
+		webuiKey = GetAdminKeyFrom(secret)
 	}
 
-	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, req.WebuiKey, "pivotal", true)
+	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, webuiKey, "pivotal", true)
 	if err != nil {
 		return &response.ValidateWebuiKey{
 			Valid: false,

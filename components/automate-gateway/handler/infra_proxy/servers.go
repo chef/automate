@@ -41,10 +41,9 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 // ValidateWebuiKey validates the webui key
 func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.ValidateWebuiKey) (*gwres.ValidateWebuiKey, error) {
 	req := &infra_req.ValidateWebuiKey{
-		Id:         r.Id,
-		Fqdn:       r.Fqdn,
-		WebuiKey:   r.WebuiKey,
-		IsWebuiKey: r.IsWebuiKey,
+		Id:       r.Id,
+		Fqdn:     r.Fqdn,
+		WebuiKey: r.WebuiKey,
 	}
 
 	res, err := a.client.ValidateWebuiKey(ctx, req)

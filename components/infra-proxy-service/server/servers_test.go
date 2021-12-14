@@ -485,10 +485,9 @@ func TestServers(t *testing.T) {
 
 		t.Run("when a valid webui key, return valid true", func(t *testing.T) {
 			resp, err := cl.ValidateWebuiKey(ctx, &request.ValidateWebuiKey{
-				Id:         "",
-				WebuiKey:   "--KEY--",
-				Fqdn:       "example.com",
-				IsWebuiKey: false,
+				Id:       "",
+				Fqdn:     "example.com",
+				WebuiKey: "--KEY--",
 			})
 
 			require.NoError(t, err)

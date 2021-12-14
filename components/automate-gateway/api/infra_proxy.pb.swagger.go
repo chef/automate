@@ -3265,12 +3265,7 @@ func init() {
         },
         "webui_key": {
           "type": "string",
-          "title": "Chef Server Webui Key"
-        },
-        "is_webui_key": {
-          "type": "boolean",
-          "format": "boolean",
-          "title": "Chef Server Webui key is availbale"
+          "title": "Optional Chef Server Webui Key"
         }
       }
     },

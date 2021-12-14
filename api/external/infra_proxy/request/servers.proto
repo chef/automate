@@ -49,8 +49,6 @@ message ValidateWebuiKey {
     string id = 1;
     // Chef Server FQDN
     string fqdn = 2;
-    // Chef Server Webui Key
+    // Optional Chef Server Webui Key
     string webui_key = 3;
-    // Chef Server Webui key is availbale
-    bool is_webui_key = 4;
 }

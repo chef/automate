@@ -123,7 +123,7 @@ func (s *Server) createClient(ctx context.Context, orgID string, serverID string
 
 	client, err := NewChefClient(&ChefConfig{
 		Name:    org.AdminUser,
-		Key:     GetOrgAdminKeyFrom(secret),
+		Key:     GetAdminKeyFrom(secret),
 		SkipSSL: true,
 		BaseURL: baseURL,
 	})
@@ -148,8 +148,8 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 	return baseURL.String(), nil
 }
 
-// GetOrgAdminKeyFrom returns AdminKey
-func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
+// GetAdminKeyFrom returns AdminKey
+func GetAdminKeyFrom(secret *secrets.Secret) string {
 	adminKey := ""
 	if secret != nil {
 		for _, item := range secret.Data {
@@ -160,19 +160,6 @@ func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
 	}
 
 	return adminKey
-}
-
-// GetWebuiKeyFrom returns Webuikey
-func GetWebuiKeyFrom(secret *secrets.Secret) string {
-	webuiKey := ""
-	if secret != nil {
-		for _, item := range secret.Data {
-			if item.Key == "key" {
-				webuiKey = item.Value
-			}
-		}
-	}
-	return webuiKey
 }
 
 // ParseAPIError parses common Chef Infra Server API errors into a user-readable format.
