@@ -27,6 +27,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -438,6 +439,23 @@ func (t *GenerateReportTask) prepareCustomReportData(ctx context.Context, jobID 
 					WaivedStr: WaivedStr(compControl.WaiverData),
 				}
 
+				//process the tags
+				tags, err := getTags(compControl.GetTags().GetFields())
+				if err != nil {
+					err = errors.Wrap(err, "error in getting the tags")
+					logrus.WithError(err).Error()
+					return nil, err
+				}
+				controlData.Tags = tags
+
+				stringTags, err := getStringTags(compControl.GetTags().GetFields())
+				if err != nil {
+					err = errors.Wrap(err, "error in getting the stringTags")
+					logrus.WithError(err).Error()
+					return nil, err
+				}
+				controlData.StringTags = stringTags
+
 				if compControl.SourceLocation != nil && (compControl.SourceLocation.Ref != "" ||
 					compControl.SourceLocation.Line != 0) {
 					controlData.SourceLocation = &reporting.SourceLocation{
@@ -656,4 +674,47 @@ func WaivedStr(data *inspec.WaiverData) (str string) {
 	}
 
 	return inspec.ControlWaivedStrYes
+}
+
+func getTags(fields map[string]*structpb.Value) (string, error) {
+	tags := make(map[string]interface{})
+	for key, value := range fields {
+		tags[key] = value
+	}
+	tagsJson, err := json.Marshal(tags)
+	if err != nil {
+		return "", err
+	}
+	return string(tagsJson), nil
+}
+
+func getStringTags(fields map[string]*structpb.Value) (map[string]*reporting.TagValues, error) {
+	resp := make(map[string]*reporting.TagValues)
+	for tKey, tValue := range fields {
+		if _, isNullValue := tValue.GetKind().(*structpb.Value_NullValue); isNullValue {
+			resp[tKey] = &reporting.TagValues{
+				Values: []string{},
+			}
+		} else if _, isStringValue := tValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+			resp[tKey] = &reporting.TagValues{
+				Values: []string{tValue.GetStringValue()},
+			}
+		} else if _, isListValue := tValue.GetKind().(*structpb.Value_ListValue); isListValue {
+			stringValues := make([]string, 0)
+			for _, listValue := range tValue.GetListValue().Values {
+				if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+					stringValues = append(stringValues, listValue.GetStringValue())
+				}
+			}
+			if len(stringValues) > 0 {
+				resp[tKey] = &reporting.TagValues{
+					Values: stringValues,
+				}
+			}
+		}
+	}
+	if len(resp) > 0 {
+		return resp, nil
+	}
+	return nil, nil
 }
