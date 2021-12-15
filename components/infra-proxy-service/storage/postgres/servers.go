@@ -9,19 +9,19 @@ import (
 )
 
 // StoreServer saves a server to the DB.
-func (p *postgres) StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (storage.Server, error) {
-	return p.insertServer(ctx, id, name, fqdn, ipAddress)
+func (p *postgres) StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string, credentialId string) (storage.Server, error) {
+	return p.insertServer(ctx, id, name, fqdn, ipAddress, credentialId)
 }
 
 func (p *postgres) insertServer(ctx context.Context,
-	id string, name string, fqdn string, ipAddress string) (storage.Server, error) {
+	id string, name string, fqdn string, ipAddress string, credentialId string) (storage.Server, error) {
 
 	var server storage.Server
 	err := p.db.QueryRowContext(ctx,
-		`INSERT INTO servers (id, name, fqdn, ip_address, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, now(), now())
+		`INSERT INTO servers (id, name, fqdn, ip_address, credential_id, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, now(), now())
 		RETURNING id, name, fqdn, ip_address, created_at, updated_at`,
-		id, name, fqdn, ipAddress).
+		id, name, fqdn, ipAddress, credentialId).
 		Scan(&server.ID, &server.Name, &server.Fqdn, &server.IPAddress, &server.CreatedAt, &server.UpdatedAt)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
