@@ -243,8 +243,6 @@ github.com/ghodss/yaml v0.0.0-20180820084758-c7ce16629ff4/go.mod h1:4dBDuWmgqj2H
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39 h1:8aiwjJixH9Dws9c0mE6yeghmrVhe6csuB+onSjeW31Q=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/go-chef/chef v0.23.2-0.20201213054559-3243f736d651 h1:r1JMgPxoXlMKblknr8f6f3SafrfL2oKyPCqglTQN7xA=
-github.com/go-chef/chef v0.23.2-0.20201213054559-3243f736d651/go.mod h1:9Ptf9dFZDkpC3qLxpNhHMyG6TxCmMzonqPKXTh+xVm4=
 github.com/go-delve/delve v1.3.1 h1:LI0X4aAE0N7ay8uR48aMJ6GNTxamIpcxi1THjwJjenI=
 github.com/go-delve/delve v1.3.1/go.mod h1:LLw6qJfIsRK9WcwV2IRRqsdlgrqzOeuGrQOCOIhDpt8=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
