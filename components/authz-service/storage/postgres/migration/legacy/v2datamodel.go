@@ -278,7 +278,17 @@ func defaultRoles() []v2Role {
 		Type: ChefManaged,
 	}
 
-	return []v2Role{owner, editor, viewer, ingest}
+	infraViewer := v2Role{
+		ID:   constants.InfraViewerRoleID,
+		Name: "InfraViewer",
+		Actions: []string{
+			"infra:*:list",
+			"infra:*:get",
+		},
+		Type: ChefManaged,
+	}
+
+	return []v2Role{owner, editor, viewer, ingest, infraViewer}
 }
 
 // v2DefaultPolicies shipped with IAM v2, and also the set of policies to which we
@@ -297,6 +307,9 @@ func v2DefaultPolicies() []v2Policy {
 
 	// ingest policy statements
 	s5 := newV2Statement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
+
+	// infraViewer policy statements
+	s6 := newV2Statement(Allow, constants.InfraViewerRoleID, []string{}, []string{"*"}, []string{})
 
 	admin := v2Member{Name: constants.LocalAdminsTeamSubject}
 	editors := v2Member{Name: constants.LocalEditorsTeamSubject}
@@ -334,5 +347,13 @@ func v2DefaultPolicies() []v2Policy {
 		Type:       ChefManaged,
 	}
 
-	return []v2Policy{adminPol, editorPol, viewerPol, ingestPol}
+	infraViewerPol := v2Policy{
+		ID:         constants.InfraViewerPolicyID,
+		Name:       "InfraViewer",
+		Members:    []v2Member{},
+		Statements: []v2Statement{s6},
+		Type:       ChefManaged,
+	}
+
+	return []v2Policy{adminPol, editorPol, viewerPol, ingestPol, infraViewerPol}
 }

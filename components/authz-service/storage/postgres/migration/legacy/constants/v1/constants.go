@@ -110,6 +110,8 @@ const (
 
 	// ApplicationsServiceGroupsPolicyID correlates to the policy applications:serviceGroups
 	ApplicationsServiceGroupsPolicyID = "aee14d59-da0b-4974-ba6d-1a018b024874"
+
+	InfraViewerPolicyID = "4r6e4d59-0hdb-1954-sd6v-5v018b075wyu"
 )
 
 // These are only used for testing and memstore purposes.
@@ -152,6 +154,7 @@ var (
 		OcErchefIngestEventsPolicyID,
 		CSNginxComplianceProfilesPolicyID,
 		CSNginxComplianceDataCollectorPolicyID,
+		InfraViewerPolicyID,
 	}
 
 	DefaultPolicyIDs = append(DeletablePolicyIDs[:], NonDeletablePolicyIDs[:]...)
