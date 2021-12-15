@@ -368,8 +368,10 @@ func (srv *Server) GetReportListForReportManager(filters *reporting.ListFilters,
 	total := len(reportIDs.Ids)
 	resp := reporting.ReportListForReportManagerResponse{}
 
-	for idx, reportID := range reportIDs.Ids {
-		cur, err := srv.es.GetReportManagerRequest(reportID, formattedFilters)
+	for idx := total - 1; idx >= 0; idx-- {
+		//for idx, reportID := range reportIDs.Ids {
+		//cur, err := srv.es.GetReportManagerRequest(reportID, formattedFilters)
+		cur, err := srv.es.GetReportManagerRequest(reportIDs.Ids[idx], formattedFilters)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err)
 		}

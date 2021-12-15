@@ -73,7 +73,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	myName := "getNodeReportIdsFromTimeseries"
 	var repIds reportingapi.ReportIds
 
-	nodeReport := make(map[string]reportingapi.ReportData, 0)
+	//nodeReport := make(map[string]reportingapi.ReportData, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
@@ -127,7 +127,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	if outermostAgg != nil {
 		for _, nodeBucket := range outermostAgg.Buckets {
 			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
-			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
+			//nodeID := fmt.Sprintf("%s", nodeBucket.Key)
 			for _, hit := range topHits.Hits.Hits {
 				var et EndTimeSource
 				if hit.Source != nil {
@@ -146,11 +146,13 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 				repData.Id = hit.Id
 				repData.EndTime = endTimeTimestamp
 
-				nodeReport[nodeID] = repData
+				repIds.Ids = append(repIds.Ids, repData.Id)
+				repIds.ReportData = append(repIds.ReportData, &repData)
+				//nodeReport[nodeID] = repData
 			}
 		}
 	}
-	reportIds := make([]string, len(nodeReport))
+	/*reportIds := make([]string, len(nodeReport))
 	reportData := make([]*reportingapi.ReportData, len(nodeReport))
 	i := 0
 	for _, v := range nodeReport {
@@ -160,10 +162,10 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		i++
 	}
 	repIds.Ids = reportIds
-	repIds.ReportData = reportData
+	repIds.ReportData = reportData*/
 
 	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
-		len(reportIds), searchResult.TookInMillis)
+		len(repIds.Ids), searchResult.TookInMillis)
 
 	return &repIds, nil
 }
