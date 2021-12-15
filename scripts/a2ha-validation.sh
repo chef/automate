@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GREEN='\033[0;32m'
+GREEN='\033[0;35m'
 NC='\033[0m' # No Color
 #post list of from to where connection will be checked.
 bastion_to_automate_port=9631
@@ -47,6 +47,8 @@ postgresql_private_ip=${postgresql_private_ip//,/ }
 postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
+
+
 
 # Below 4 no of loop will install hab utilty from remote server.
 for i in ${automate_server_private_ip[@]};
@@ -217,8 +219,11 @@ done
 
 for i in ${automate_server_private_ip[@]};
 do 
+            
 			echo -e "${GREEN}bastion is trying to connect automate $i on $bastion_to_automate_port port.${NC}"
-			nc -zv $i $bastion_to_automate_port 2>&1
+            
+			nc -zv $i $bastion_to_automate_port > output.txt 2>&1
+            cat output.txt | grep "Connection refused"
 			echo
 			echo
 				
@@ -251,8 +256,11 @@ done
 
 for i in ${elasticsearch_private_ip[@]};
 do 
+
 			echo -e "${GREEN}bastion is trying to connect elasticsearch $i on $bastion_to_elasticsearch_port port.${NC}"
-			nc -zv $i $bastion_to_elasticsearch_port 2>&1
+            
+			nc -zv $i $bastion_to_elasticsearch_port > output.txt 2>&1
+            cat output.txt | grep "Connection refused"
 			echo
 			echo
 			
@@ -288,9 +296,6 @@ EOF
 			
 done
 
-echo ${elasticsearch_private_ip[1]}
-
-
 for i in ${automate_server_private_ip[@]};
 do 
 	for j in ${elasticsearch_port[@]}; 
@@ -301,7 +306,9 @@ do
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 				echo -e "${GREEN}automate $i is trying to connect elasticsearch $k on $j port.${NC}"
-				nc -zv $k $j 2>&1
+                
+				nc -zv $k $j > output.txt 2>&1
+                cat output.txt | grep "Connection refused"
 				echo
 				echo
 
@@ -353,8 +360,10 @@ do
 		do
 
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
-				echo -e "${GREEN}elasticsearch $i is trying to connect elasticsearch $k in a cluster.${NC}"
-				nc -zv $k $j 2>&1
+				echo -e "${GREEN}elasticsearch $i is trying to connect elasticsearch $k on a port $j.${NC}"
+                
+				nc -zv $k $j > output.txt 2>&1
+                cat output.txt | grep "Connection refused"
 				echo
 				echo
 								
@@ -415,8 +424,10 @@ do
 
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-				echo -e "${GREEN}postgresql $i is trying to connect postgresql $k in a cluster. All postgresql node will be tested. Ip mention below is postgresql ip${NC}"
-				nc -zv $k $j 2>&1
+				echo -e "${GREEN}postgresql $i is trying to connect postgresql $k on a $j port.${NC}"
+                
+				nc -zv $k $j > output.txt 2>&1
+                cat output.txt | grep "Connection refused"
 				echo
 				echo
 		
@@ -479,8 +490,10 @@ do
 
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
 		
-				echo -e "${GREEN}postgres $i is trying to connect elasticsearch $k. ${NC}"
-				nc -zv $k $j 2>&1
+				echo -e "${GREEN}postgres $i is trying to connect elasticsearch $k on a $j port. ${NC}"
+                
+				nc -zv $k $j > output.txt 2>&1
+                cat output.txt | grep "Connection refused"
 				echo
 				echo
 
@@ -541,7 +554,9 @@ do
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
 
 				echo -e "${GREEN}elasticsearch $i is trying to connnect postgres $k on $j port. ${NC}"
-				nc -zv $k $j 2>&1
+                
+				nc -zv $k $j > output.txt 2>&1
+                cat output.txt | grep "Connection refused"
 				echo
 				echo
 				
@@ -592,7 +607,9 @@ done
 for i in ${elasticsearch_private_ip[@]};
 do 
 			echo -e "${GREEN}bastion is trying to connect elasticsearch on $kibana port. IP that mentioned below is elasticsearch' ip${NC}"
-			nc -zv $i $kibana 2>&1
+            
+			nc -zv $i $kibana > output.txt 2>&1
+            cat output.txt | grep "Connection refused"
 			echo
 			echo
 			
