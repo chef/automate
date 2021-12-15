@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Reference Architecture"
     parent = "automate/install"
     identifier = "automate/install/ha_architecture_reference.md HA Reference Architecture"
-    weight = 230
+    weight = 220
 +++
 
 ## Chef Automate High Availability (HA) Architecture

@@ -1,5 +1,5 @@
 +++
-title = "HA Deployment"
+title = "Chef Automate HA AWS Deployment Procedure"
 
 draft = false
 
@@ -7,9 +7,9 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Deploy"
+    title = "Chef Automate HA AWS Deployment Procedure"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy.md Chef Automate HA Deployment"
+    identifier = "automate/install/ha_deploy_aws.md Chef Automate HA AWS Deployment Procedure"
     weight = 220
 +++
 

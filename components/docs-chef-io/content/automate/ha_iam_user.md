@@ -1,3 +1,18 @@
++++
+title = "HA IAM User"
+
+draft = true
+
+gh_repo = "automate"
+
+[menu]
+  [menu.automate]
+    title = "HA IAM User"
+    parent = "automate/install"
+    identifier = "automate/install/ha_iam_user.md HA IAM User"
+    weight = 270
++++
+
 ### IAM User
 
 Note: you will by default login as the ubuntu user, but can switch to root access, if needed, using the sudo command.

@@ -10,7 +10,7 @@ gh_repo = "automate"
     title = "HA Bastion Setup"
     parent = "automate/install"
     identifier = "automate/install/ha_bastion_setup.md HA Bastion Setup"
-    weight = 240
+    weight = 220
 +++
 
 ## Bastion Host

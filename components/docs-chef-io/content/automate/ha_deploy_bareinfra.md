@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Deployment Procedure for Bare Metal Infrastructure"
     parent = "automate/install"
-    identifier = "automate/install/ha_deploy_bareinfra_deploy.md Chef Automate HA Deployment"
+    identifier = "automate/install/ha_deploy_bareinfra.md HA Deployment Procedure for Bare Metal Infrastructure"
     weight = 220
 +++
 
