@@ -37,7 +37,7 @@ This section explains the Bare Metal Infrastructure Deployment (existing_node) t
 - Ensure you have [Chef Automate utility](( {{< relref "ha_auto_install.md" >}})) installed, else download and install the latest version.
 - Servers provisioned and accessible through SSH from each other.
 - Obtain load balancer IP addresses for all four instances - Chef Automate, Chef Server, Postgress, Elasticsearch.
-- Create the certificates for security and authentication purposes. _optional_ 
+- Create the certificates for security and authentication purposes. _optional_
 - Rotate the certificates if the certificates are expired or compromised. _optional_
 
 ## Deployment Procedure on Bare Infrastructure
