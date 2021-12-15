@@ -1,5 +1,5 @@
 +++
-title = "HA Glossary"
+title = "HA Components"
 
 draft = false
 
@@ -7,7 +7,7 @@ gh_repo = "automate"
 
 [menu]
   [menu.automate]
-    title = "HA Glossary"
+    title = "HA Components"
     parent = "automate/install"
     identifier = "automate/install/ha_components.md HA Components"
     weight = 230

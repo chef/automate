@@ -1,7 +1,7 @@
 +++
 title = "HA Troubleshooting"
 
-draft = false
+draft = true
 
 gh_repo = "automate"
 
@@ -9,7 +9,7 @@ gh_repo = "automate"
   [menu.automate]
     title = "HA Troubleshooting"
     parent = "automate/install"
-    identifier = "automate/install/ha_troubleshoot.md Troubleshooting"
+    identifier = "automate/install/ha_troubleshoot.md HA Troubleshooting"
     weight = 290
 +++
 
