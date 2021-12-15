@@ -8,12 +8,12 @@ vendor_origin=${vendor_origin:-"chef"}
 pkg_deps=(
   core/coreutils/8.30/20200305231640
   core/ruby/2.5.7/20200404130135
-  core/bundler/1.17.3/20200404130802
+  core/bundler/2.1.4/20200504102934
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
   # make sure that this package always gets built whenever
   # automate-workflow-server gets built so we have to share all
   # in-repo dependencies.
-  ${local_platform_tools_origin:-chef}/automate-platform-tools/0.1.0/20200421190513
+  ${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
   core/gcc

@@ -178,6 +178,15 @@
       ]
     },
     {
+      "name": "workflow",
+      "type": "product",
+      "dependencies": ["automate"],
+      "services": [
+        "chef/automate-workflow-server",
+        "chef/automate-workflow-nginx"
+      ]
+    },
+    {
       "name": "builder",
       "type": "product",
       "aliases": ["depot"],

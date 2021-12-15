@@ -896,7 +896,11 @@ paths = [
   "lib/user/*"
 ]
 
-
+[automate-workflow-nginx]
+plan_path = "components/automate-workflow-nginx"
+paths = [
+  "components/automate-workflow-nginx/*"
+]
 
 [automate-workflow-web]
 plan_path = "components/automate-workflow-web"
