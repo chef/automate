@@ -297,11 +297,15 @@ function infra_service_load_sample_users() {
   done
   shift $((OPTIND -1))
 
-  local timestamp=$(date +%s%N)
-  local server_prefix="chef-server-${timestamp}"
-  local server_id="${server_prefix}-id"
+  local timestamp
+  local server_prefix
+  local server_id
   local fqdn="api.chef.io"
-  local ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+  local ip_address
+  timestamp=$(date +%s%N)
+  server_prefix="chef-server-${timestamp}"
+  server_id="${server_prefix}-id"
+  ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
   # Add server in automate
   chef-automate dev grpcurl infra-proxy-service -- -d \
     "$(cat << EOF
