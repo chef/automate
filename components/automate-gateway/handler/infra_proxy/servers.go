@@ -2,6 +2,7 @@ package infra_proxy
 
 import (
 	"context"
+
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
@@ -44,6 +45,7 @@ func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServ
 		Name:      r.Name,
 		Fqdn:      r.Fqdn,
 		IpAddress: r.IpAddress,
+		WebuiKey:  r.WebuiKey,
 	}
 	res, err := a.client.CreateServer(ctx, req)
 	if err != nil {
