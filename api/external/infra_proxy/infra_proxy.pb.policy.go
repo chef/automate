@@ -50,6 +50,8 @@ func init() {
 					return m.Fqdn
 				case "ip_address":
 					return m.IpAddress
+				case "webui_key":
+					return m.WebuiKey
 				default:
 					return ""
 				}
