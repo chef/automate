@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/chef/automate/api/external/common/query"
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
@@ -27,8 +29,9 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		Target:  "server",
 		Request: *req,
 		Rules: validation.Rules{
-			"Id":   []string{"required"},
-			"Name": []string{"required"},
+			"Id":       []string{"required"},
+			"Name":     []string{"required"},
+			"WebuiKey": []string{"required"},
 		},
 	}).Validate()
 
@@ -38,6 +41,19 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	if req.Fqdn == "" && req.IpAddress == "" {
 		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
+	}
+
+	// TODO: validate the new webui key
+	newSecret := &secrets.Secret{
+		Name: "infra-proxy-service-webui-key",
+		Type: "chef-server",
+		Data: []*query.Kv{
+			{Key: "key", Value: req.WebuiKey},
+		},
+	}
+	credential, err := s.service.Secrets.Create(ctx, newSecret)
+	if err != nil {
+		return nil, err
 	}
 
 	// commenting this code because sometimes chef-services are down that time we can't able to check the server status and not able to add or update the server.
@@ -53,7 +69,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		}
 	*/
 
-	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress)
+	server, err := s.service.Storage.StoreServer(ctx, req.Id, req.Name, req.Fqdn, req.IpAddress, credential.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, *req, "server")
 	}
