@@ -1912,6 +1912,7 @@ func (backend *ES2Backend) GetReportManagerRequest(reportId string, filters map[
 					tempProfile.ProfileId = profile.Sha256
 					for _, control := range profile.Controls {
 						tempProfile.Controls = append(tempProfile.Controls, control.Id)
+						sort.Strings(tempProfile.Controls)
 					}
 					mgrRequest.Profiles = append(mgrRequest.Profiles, tempProfile)
 				}
