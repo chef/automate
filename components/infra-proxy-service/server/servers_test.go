@@ -47,6 +47,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			}
 			resp, err := cl.CreateServer(ctx, req)
 			require.NoError(t, err)
@@ -80,6 +81,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server ID")
@@ -94,6 +96,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			}
 			resp1, err := cl.CreateServer(ctx, req1)
 			require.NoError(t, err)
@@ -105,6 +108,7 @@ func TestServers(t *testing.T) {
 				Name:      "New chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			}
 			resp2, err := cl.CreateServer(ctx, req2)
 			assert.Nil(t, resp2)
@@ -117,9 +121,22 @@ func TestServers(t *testing.T) {
 				Id:        "chef-infra-server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server name")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the server webui key is missing, raise invalid argument error", func(t *testing.T) {
+			resp, err := cl.CreateServer(ctx, &request.CreateServer{
+				Id:        "chef-infra-server",
+				Name:      "New chef infra server",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
+			})
+			assert.Nil(t, resp)
+			assert.Error(t, err, "must supply server webui key")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	})
@@ -140,6 +157,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -149,6 +167,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
 				IpAddress: "",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
@@ -174,6 +193,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -229,6 +249,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -257,6 +278,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -297,6 +319,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
 				IpAddress: "",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -325,6 +348,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "api.chef.io",
 				IpAddress: "",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp1)
@@ -386,6 +410,7 @@ func TestServers(t *testing.T) {
 				Name:      "Chef infra server",
 				Fqdn:      "example.com",
 				IpAddress: "0.0.0.0",
+				WebuiKey:  "--KEY--",
 			})
 			require.NoError(t, err)
 			require.NotNil(t, resp)
