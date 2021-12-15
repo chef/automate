@@ -10,7 +10,7 @@ import (
 type Storage interface {
 	GetServer(ctx context.Context, id string) (Server, error)
 	GetServers(ctx context.Context) ([]Server, error)
-	StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
+	StoreServer(ctx context.Context, id string, name string, fqdn string, ipAddress string, credentialId string) (Server, error)
 	DeleteServer(ctx context.Context, id string) (Server, error)
 	EditServer(ctx context.Context, id string, name string, fqdn string, ipAddress string) (Server, error)
 
