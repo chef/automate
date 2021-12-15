@@ -5,6 +5,7 @@
 env:
   DOCKER_CONFIG: /var/lib/buildkite-agent/.docker
   HAB_BLDR_CHANNEL: "stable"
+  HAB_FALLBACK_CHANNEL: "stable2021-q2"
 
 expeditor:
   defaults:
