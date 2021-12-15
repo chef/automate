@@ -12,7 +12,6 @@ postgres_to_elasticsearch_port=(9200 9638 9631)
 elasticsearch_to_postgres_port=(9638 9631)
 kibana=5601
 
-rm output.txt
 #Taking and filtering ssh_key from config.toml file
 SSH_KEY=$(grep -E '(^|\s)ssh_key_file($|\s)' config.toml | cut -c13- | sed 's/"//g' | sed 's/=//g')
 
@@ -33,7 +32,7 @@ chef_server_private_ip=${chef_server_private_ip// /}
 chef_server_private_ip=${chef_server_private_ip//,/ }
 chef_server_private_ip=${chef_server_private_ip##[}
 chef_server_private_ip=${chef_server_private_ip%]}
-eval chef_server_ip_list=($chef_server_private_ip)
+eval chef_server_private_ip=($chef_server_private_ip)
 
 elasticsearch_private_ip=$(grep -E '(^|\s)elasticsearch_private_ips($|\s)' config.toml | cut -c29-)
 elasticsearch_private_ip=${elasticsearch_private_ip// /}
@@ -56,10 +55,10 @@ do
 		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
+	    sudo su -
+        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+        export HAB_LICENSE=accept-no-persist
+        hab pkg install core/netcat -bf
 			
 EOF
 done
@@ -70,10 +69,10 @@ do
 		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
+	    sudo su -
+        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+        export HAB_LICENSE=accept-no-persist
+        hab pkg install core/netcat -bf
 			
 EOF
 done
@@ -84,10 +83,10 @@ do
 		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
+	    sudo su -
+        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+        export HAB_LICENSE=accept-no-persist
+        hab pkg install core/netcat -bf
 			
 EOF
 done
@@ -98,32 +97,128 @@ do
 		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-			sudo su -
-            curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-            export HAB_LICENSE=accept-no-persist
-            hab pkg install core/netcat -bf
+	    sudo su -
+        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+        export HAB_LICENSE=accept-no-persist
+        hab pkg install core/netcat -bf
 			
 EOF
 done
 
+for i in ${automate_server_private_ip[@]};
+do
+
+                ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+                    ps aux | grep 'nc -l -p $bastion_to_automate_port' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do
+
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $bastion_to_elasticsearch_port' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do
+	for j in ${elasticsearch_port[@]};
+	do
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+	done
+
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do
+	for j in ${elasticsearch_to_elasticsearch_port[@]};
+	do
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+	done
+
+done
+
+for i in ${postgresql_private_ip[@]};
+do
+	for j in ${postgres_to_postgres_port[@]};
+	do
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+	done
+
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do
+	for j in ${postgres_to_elasticsearch_port[@]};
+	do
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+	done
+
+done
+
+for i in ${postgresql_private_ip[@]};
+do
+	for j in ${elasticsearch_to_postgres_port[@]};
+	do
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+
+EOF
+
+	done
+
+done
+
+for i in ${elasticsearch_private_ip[@]};
+do
+
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
+			ps aux | grep 'nc -l -p $kibana' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+EOF
+
+done	
 
 #connection will be checked from bastion(provisioning) to automate. Ensuring that automate allow bastion connection on 9631 port 
 for i in ${automate_server_private_ip[@]};
 do 
 		
-		
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+		(ls /tmp | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
 
-			ls /tmp | nc -l -p $bastion_to_automate_port & 1>/dev/null
-			
 EOF
 done
 
-
 for i in ${automate_server_private_ip[@]};
 do 
-			echo -e "${GREEN}bastion is trying to connect automate on specific port. IP that mentioned below is automate's ip${NC}"
-			nc -zv $i $bastion_to_automate_port >> output.txt
+			echo -e "${GREEN}bastion is trying to connect automate $i on $bastion_to_automate_port port.${NC}"
+			nc -zv $i $bastion_to_automate_port 2>&1
 			echo
 			echo
 				
@@ -133,24 +228,22 @@ done
 for i in ${automate_server_private_ip[@]};
 do 
 	
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			
+		ssh -n -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			echo "enter in ps"
 			ps aux | grep 'nc -l -p $bastion_to_automate_port' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
-
+			echo "done ps"
 EOF
 			
 done
 
 #connection will be checked from bastion(provisioning) to elasticsearch. Ensuring that automate allow bastion connection on 9631 port 
 for i in ${elasticsearch_private_ip[@]};
-do 
-	
-		
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+do
 
-			ls /tmp | nc -l -p $bastion_to_elasticsearch_port & 1>/dev/null
-			  
-			 
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			(ls /tmp | nc -l -p $bastion_to_elasticsearch_port &) | sleep 2 && exit
+
+
 EOF
 				
 done
@@ -158,8 +251,8 @@ done
 
 for i in ${elasticsearch_private_ip[@]};
 do 
-			echo -e "${GREEN}bastion is trying to connect elasticsearch on specific port. IP that mentioned below is elasticsearch' ip${NC}"
-			nc -zv $i $bastion_to_elasticsearch_port >> output.txt
+			echo -e "${GREEN}bastion is trying to connect elasticsearch $i on $bastion_to_elasticsearch_port port.${NC}"
+			nc -zv $i $bastion_to_elasticsearch_port 2>&1
 			echo
 			echo
 			
@@ -169,7 +262,7 @@ done
 for i in ${elasticsearch_private_ip[@]};
 do 
 	
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $bastion_to_elasticsearch_port' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -184,9 +277,9 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 	for j in ${elasticsearch_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			ls /tmp | nc -l -p $j & 1>/dev/null
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
 			  
 			 
 EOF
@@ -194,6 +287,9 @@ EOF
 	done
 			
 done
+
+echo ${elasticsearch_private_ip[1]}
+
 
 for i in ${automate_server_private_ip[@]};
 do 
@@ -204,12 +300,13 @@ do
 
 			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-				echo -e "${GREEN}automate is trying to connect elasticsearch on specific port. Ip that mentioned below is elasticsearch's ip${NC}"
-				nc -zv $k $j >> output.txt
+				echo -e "${GREEN}automate $i is trying to connect elasticsearch $k on $j port.${NC}"
+				nc -zv $k $j 2>&1
 				echo
 				echo
 
 EOF
+
 		done
 	done
 			
@@ -219,7 +316,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 	for j in ${elasticsearch_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -237,8 +334,9 @@ do
 	for j in ${elasticsearch_to_elasticsearch_port[@]}; 
 	do 
 		echo "elasticsearch $i" >> output.txt
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-			ls /tmp | nc -l -p $j & 1>/dev/null
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
 			  
 			 
 EOF
@@ -254,13 +352,21 @@ do
 		for k in ${elasticsearch_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
-
-				echo -e "${GREEN}elasticsearch is trying to connect elasticsearch in a cluster. All elasticsearch node will be tested. Ip mention below is elasticsearch ip${NC}"
-				nc -zv $k $j >> output.txt
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
+				echo -e "${GREEN}elasticsearch $i is trying to connect elasticsearch $k in a cluster.${NC}"
+				nc -zv $k $j 2>&1
 				echo
 				echo
 								
+EOF
+
+
+			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
+
+				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+				echo
+				echo
+
 EOF
 		done
 	done
@@ -271,7 +377,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 	for j in ${elasticsearch_to_elasticsearch_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -289,8 +395,9 @@ do
 	for j in ${postgres_to_postgres_port[@]}; 
 	do 
 		
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-			ls /tmp | nc -l -p $j
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
 			  
 			 
 EOF
@@ -306,14 +413,24 @@ do
 		for k in ${postgresql_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
-				echo -e "${GREEN}postgresql is trying to connect postgresql in a cluster. All postgresql node will be tested. Ip mention below is postgresql ip${NC}"
-				nc -zv $k $j >> output.txt
+				echo -e "${GREEN}postgresql $i is trying to connect postgresql $k in a cluster. All postgresql node will be tested. Ip mention below is postgresql ip${NC}"
+				nc -zv $k $j 2>&1
 				echo
 				echo
-			
+		
 EOF
+
+
+			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
+
+				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+				echo
+				echo
+
+EOF
+
 		done
 	done
 			
@@ -323,7 +440,7 @@ for i in ${postgresql_private_ip[@]};
 do 
 	for j in ${postgres_to_postgres_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -342,8 +459,9 @@ do
 	for j in ${postgres_to_elasticsearch_port[@]}; 
 	do 
 		
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-			ls /tmp | nc -l -p $j
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
 			  
 			 
 EOF
@@ -359,14 +477,23 @@ do
 		for k in ${elasticsearch_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
 		
-				echo -e "${GREEN}postgres is trying to connect elasticsearch. Below ip mention is elasticsearch ip${NC}"
-				nc -zv $k $j >> output.txt
+				echo -e "${GREEN}postgres $i is trying to connect elasticsearch $k. ${NC}"
+				nc -zv $k $j 2>&1
 				echo
 				echo
 
 EOF
+
+			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
+
+				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+				echo
+				echo
+
+EOF
+
 		done
 	done
 			
@@ -376,7 +503,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 	for j in ${postgres_to_elasticsearch_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -393,8 +520,9 @@ for i in ${postgresql_private_ip[@]};
 do 
 	for j in ${elasticsearch_to_postgres_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-			ls /tmp | nc -l -p $j & 1>/dev/null
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $j &) | sleep 2 && exit
 			  
 			 
 EOF
@@ -410,15 +538,25 @@ do
 		for k in ${postgresql_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash  << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
 
-				echo -e "${GREEN}elasticsearch is trying to connnect postgres on specific port. Below ip mention is elasticsearch ip${NC}"
-				nc -zv $k $j >> output.txt
+				echo -e "${GREEN}elasticsearch $i is trying to connnect postgres $k on $j port. ${NC}"
+				nc -zv $k $j 2>&1
 				echo
 				echo
 				
 				
 EOF
+
+
+			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
+
+				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
+				echo
+				echo
+
+EOF
+
 		done
 	done
 			
@@ -428,7 +566,7 @@ for i in ${postgresql_private_ip[@]};
 do 
 	for j in ${elasticsearch_to_postgres_port[@]}; 
 	do 
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -442,9 +580,9 @@ done
 for i in ${elasticsearch_private_ip[@]};
 do 
 			
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
-
-			ls /tmp | nc -l -p $kibana & 1>/dev/null
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			
+			(ls /tmp | nc -l -p $kibana &) | sleep 2 && exit
 			  			 
 EOF
 				
@@ -453,8 +591,8 @@ done
 
 for i in ${elasticsearch_private_ip[@]};
 do 
-			echo -e "${GREEN}bastion is trying to connect elasticsearch on specific port. IP that mentioned below is elasticsearch' ip${NC}"
-			nc -zv $i $kibana >> output.txt
+			echo -e "${GREEN}bastion is trying to connect elasticsearch on $kibana port. IP that mentioned below is elasticsearch' ip${NC}"
+			nc -zv $i $kibana 2>&1
 			echo
 			echo
 			
@@ -464,7 +602,7 @@ done
 for i in ${elasticsearch_private_ip[@]};
 do 
 	
-		ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 			
 			ps aux | grep 'nc -l -p $kibana' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
 
@@ -472,13 +610,14 @@ EOF
 	
 done
 
+
 # Below 4 no of loop will remobe hab utilty from remote server.
 for i in ${automate_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-            sudo rm -rf /hab
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash >> output.txt << EOF
+			sudo rm -rf /hab
 			
 EOF
 done
@@ -487,8 +626,7 @@ for i in ${chef_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash >> output.txt << EOF
             sudo rm -rf /hab
 			
 EOF
@@ -498,8 +636,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash >> output.txt << EOF
             sudo rm -rf /hab
 			
 EOF
@@ -509,8 +646,7 @@ for i in ${postgresql_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash >> output.txt << EOF
             sudo rm -rf /hab
 			
 EOF
