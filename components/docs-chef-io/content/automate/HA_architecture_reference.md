@@ -9,7 +9,11 @@ gh_repo = "automate"
   [menu.automate]
     title = "High Availability (HA) Architecture"
     parent = "automate/install"
+<<<<<<< HEAD
     identifier = "automate/install/ha_architecture_reference.md High Availability (HA) Architecture"
+=======
+    identifier = "automate/install/ha_architecture_reference.md HA Reference Architecture"
+>>>>>>> 294e790f (netlify error fixes)
     weight = 220
 +++
 

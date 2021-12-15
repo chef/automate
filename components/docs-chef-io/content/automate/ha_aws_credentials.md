@@ -1,6 +1,17 @@
++++
+title = "HA AWS Credentials"
 
+draft = true
 
+gh_repo = "automate"
 
+[menu]
+  [menu.automate]
+    title = "HA AWS Credentials"
+    parent = "automate/install"
+    identifier = "automate/install/ha_aws_credentials.md HA AWS Credentials"
+    weight = 250
++++
 
 ### AWS Credentials
 
