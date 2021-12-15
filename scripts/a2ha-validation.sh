@@ -48,17 +48,13 @@ postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
 
-
+#This will install hab in bastion server to verify port 
+curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+export HAB_LICENSE=accept-no-persist
+hab pkg install core/netcat -bf
+			
 
 # Below 5 no of loop will install hab utilty from remote server.
-for i in ${automate_server_private_ip[@]};
-do 
-		
-        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-        export HAB_LICENSE=accept-no-persist
-        hab pkg install core/netcat -bf
-			
-done
 
 for i in ${automate_server_private_ip[@]};
 do 
@@ -678,11 +674,4 @@ do
 EOF
 done
 
-for i in ${automate_server_private_ip[@]};
-do 
-		
-        curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-        export HAB_LICENSE=accept-no-persist
-        hab pkg install core/netcat -bf
-			
-done
+sudo rm -rf /hab
