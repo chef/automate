@@ -2865,6 +2865,10 @@ func init() {
         "ip_address": {
           "type": "string",
           "description": "Chef Infra Server IP address."
+        },
+        "webui_key": {
+          "type": "string",
+          "description": "Chef Infra Server Webui key."
         }
       }
     },

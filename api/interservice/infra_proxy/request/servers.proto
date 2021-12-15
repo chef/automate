@@ -12,6 +12,8 @@ message CreateServer {
     string fqdn = 3;
     // Chef Infra Server IP address.
     string ip_address = 4;
+    // Chef Infra Server Webui key.
+    string webui_key = 5;
 }
 
 message UpdateServer {
