@@ -331,10 +331,7 @@ div#button-env {
   }
 
   .attr {
-    width: 98%;
-    margin-left: 28px;
-    margin-right: 33px;
-    margin-top: 16px;
+    width: 100%;
     background: $chef-white;
     border: 1px solid $chef-key-tab;
     box-sizing: border-box;
@@ -369,7 +366,6 @@ div#button-env {
   }
 
   .label {
-    margin-left: 39px;
     height: 20px;
     left: 200px;
     top: 238px;
@@ -381,13 +377,11 @@ div#button-env {
   }
 
   .default {
-    margin-top: 29px;
     max-width: 25%;
   }
 
   .label-items {
-    margin-bottom: 16px;
-    height: 55px;
+    height: 30px;
   }
 
   .version-dropdown {
