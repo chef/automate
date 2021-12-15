@@ -40,7 +40,7 @@ Virtual machine is required for either of the Chef Automate HA deployment types 
 - Hard Disk Space - 4 GB
 - Ports to be publicly accessible: 22 and 9631
 
-Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinfra_deploy.md" >}}) section for bare infra Chef Automate HA deployment procedure.
+Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinfra.md" >}}) section for bare infra Chef Automate HA deployment procedure.
 
 ### Bastion Server Setup for AWS (Amazon Web Services) Deployment
 
@@ -54,4 +54,4 @@ Refer [Chef Automate HA Deployment for Bare Infra]({{< relref "ha_deploy_bareinf
 - SSH: VPC to Port 22, publicly accessible
 - Setup Virtual Private Cloud (VPC) in AWS 
 
-Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws_deploy.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
+Refer [Chef Automate HA Deployment using AWS]({{< relref "ha_deploy_aws.md" >}}) section for building an bastion host and Chef Automate HA deployment procedure using AWS.
