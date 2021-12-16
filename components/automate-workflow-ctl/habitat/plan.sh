@@ -16,9 +16,9 @@ pkg_deps=(
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 )
 pkg_build_deps=(
-  core/gcc
-  core/git
-  core/make
+  core/gcc/9.1.0/20200305180723
+  core/git/2.26.2/20200601121014
+  core/make/4.2.1/20200306002515
 )
 pkg_lib_dirs=(lib)
 pkg_bin_dirs=(bin)
