@@ -26,7 +26,7 @@ pkg_deps=(
   # shared with automate-workflow-ctl until we either combine these
   # packages or remove all shared dependencies between the two
   # packages.
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  ${local_platform_tools_origin:-chef}/automate-platform-tools/0.1.0/20211118152356
 
   core/ruby/2.5.7/20200404130135
   core/bundler/2.1.4/20200504102934
