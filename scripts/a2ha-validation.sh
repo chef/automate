@@ -1,6 +1,7 @@
 #!/bin/bash
 
-GREEN='\033[0;35m'
+RED='\033[0;31m'
+PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 #post list of from to where connection will be checked.
 bastion_to_automate_port=9631
@@ -48,11 +49,15 @@ postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
 
+echo
+echo -e "${PURPLE}Port checking process is started. It will take around 7-10 min. Please wait for some time.${NC}"
+echo 
+
 #This will install hab in bastion server to verify port 
-curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
-export HAB_LICENSE=accept-no-persist
-hab pkg install core/netcat -bf
-			
+curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > output.txt 2<&1 \ | sudo bash > output.txt 2<&1
+export HAB_LICENSE=accept-no-persist > output.txt 2<&1
+hab pkg install core/netcat -bf > output.txt 2<&1
+
 
 # Below 5 no of loop will install hab utilty from remote server.
 
@@ -60,7 +65,7 @@ for i in ${automate_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -74,7 +79,7 @@ for i in ${chef_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -88,7 +93,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -102,7 +107,7 @@ for i in ${postgresql_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -115,8 +120,8 @@ done
 for i in ${automate_server_private_ip[@]};
 do
 
-                ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-                    ps aux | grep 'nc -l -p $bastion_to_automate_port' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
+        ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+            ps aux | grep 'nc -l -p $bastion_to_automate_port' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
 
 EOF
 
@@ -152,6 +157,7 @@ do
 	for j in ${elasticsearch_to_elasticsearch_port[@]};
 	do
 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+
 			ps aux | grep 'nc -l -p $j' | awk {'print $2'} | xargs kill -9 > /dev/null 2>&1
 
 EOF
@@ -225,12 +231,14 @@ done
 for i in ${automate_server_private_ip[@]};
 do 
             
-			echo -e "${GREEN}bastion is trying to connect automate $i on $bastion_to_automate_port port.${NC}"
-            
+            rm output.txt > /dev/null 2>&1
 			nc -zv $i $bastion_to_automate_port > output.txt 2>&1
-            cat output.txt | grep "Connection refused"
-			echo
-			echo
+			
+			VAR1=$( cat output.txt | grep -ow "Connection refused" )
+			if [ "$VAR1" = "Connection refused" ]; then
+				echo -e "${RED}bastion is not able to connect automate $i on $bastion_to_automate_port port. Please check${NC}"
+			fi
+
 				
 done
 
@@ -239,9 +247,8 @@ for i in ${automate_server_private_ip[@]};
 do 
 	
 		ssh -n -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-			echo "enter in ps"
+			
 			ps aux | grep 'nc -l -p $bastion_to_automate_port' | awk {'print $2'} | xargs kill -9 1>/dev/null 2>&1
-			echo "done ps"
 EOF
 			
 done
@@ -262,12 +269,15 @@ done
 for i in ${elasticsearch_private_ip[@]};
 do 
 
-			echo -e "${GREEN}bastion is trying to connect elasticsearch $i on $bastion_to_elasticsearch_port port.${NC}"
-            
+			
+            rm output.txt > /dev/null 2>&1
 			nc -zv $i $bastion_to_elasticsearch_port > output.txt 2>&1
-            cat output.txt | grep "Connection refused"
-			echo
-			echo
+			
+			VAR1=$( cat output.txt | grep -ow "Connection refused" )
+			if [ "$VAR1" = "Connection refused" ]; then
+				echo -e "${RED}bastion is not able to connect elasticsearch $i on $bastion_to_elasticsearch_port port. Please check${NC}"
+			fi
+
 			
 done
 
@@ -308,14 +318,16 @@ do
 		for k in ${elasticsearch_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
 
-				echo -e "${GREEN}automate $i is trying to connect elasticsearch $k on $j port.${NC}"
-                
-				nc -zv $k $j > output.txt 2>&1
-                cat output.txt | grep "Connection refused"
-				echo
-				echo
+                rm output.txt > /dev/null 2>&1
+				nc -zv $k $j >> output.txt 2>&1
+				VAR1=$( cat output.txt | grep -ow "Connection refused" )
+				VAR2="Connection refused"
+				if [ "$VAR1" = "$VAR2" ]; then
+					echo -e "${RED}Automate is not able to connect elasticsearch $i on $j port. IP that mentioned below is automate's ip${NC}"
+				fi
+
 
 EOF
 
@@ -364,13 +376,17 @@ do
 		for k in ${elasticsearch_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
-				echo -e "${GREEN}elasticsearch $i is trying to connect elasticsearch $k on a port $j.${NC}"
-                
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1   << EOF
+				
+				#echo -e "${PURPLE}elasticsearch $i is trying to connect elasticsearch $k on a port $j.${NC}"
+                rm output.txt > /dev/null 2>&1
 				nc -zv $k $j > output.txt 2>&1
-                cat output.txt | grep "Connection refused"
-				echo
-				echo
+				
+				VAR1=$(cat output.txt | grep -ow "Connection refused")
+				if [ "$VAR1" = "Connection refused" ]; then
+					echo -e "${RED}Elasticsearch $i is not able to connect elasticsearch $k on $j port. Please check${NC}"
+				fi
+
 								
 EOF
 
@@ -378,8 +394,7 @@ EOF
 			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
 				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
-				echo
-				echo
+
 
 EOF
 		done
@@ -427,14 +442,16 @@ do
 		for k in ${postgresql_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1  << EOF
 
-				echo -e "${GREEN}postgresql $i is trying to connect postgresql $k on a $j port.${NC}"
-                
+                rm output.txt > /dev/null 2>&1
 				nc -zv $k $j > output.txt 2>&1
-                cat output.txt | grep "Connection refused"
-				echo
-				echo
+				
+				VAR1=$(cat output.txt | grep -ow "Connection refused")
+				if [ "$VAR1" = "Connection refused" ]; then
+					echo -e "${RED}Postgresql $i is not able to connect postgresql $k on $j port. Please check${NC}"
+				fi
+
 		
 EOF
 
@@ -442,8 +459,7 @@ EOF
 			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
 				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
-				echo
-				echo
+
 
 EOF
 
@@ -493,22 +509,23 @@ do
 		for k in ${elasticsearch_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1  << EOF
 		
-				echo -e "${GREEN}postgres $i is trying to connect elasticsearch $k on a $j port. ${NC}"
-                
+                rm output.txt > /dev/null 2>&1
 				nc -zv $k $j > output.txt 2>&1
-                cat output.txt | grep "Connection refused"
-				echo
-				echo
+				
+				VAR1=$(cat output.txt | grep -ow "Connection refused")
+				if [ "$VAR1" = "Connection refused" ]; then
+					echo -e "${RED}Postgres $i is not able to connect elasticserch $k on $j port. Please check${NC}"
+				fi
+
 
 EOF
 
 			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
 				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
-				echo
-				echo
+
 
 EOF
 
@@ -556,14 +573,16 @@ do
 		for k in ${postgresql_private_ip[@]};
 		do
 
-			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash  << EOF
+			ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1  << EOF
 
-				echo -e "${GREEN}elasticsearch $i is trying to connnect postgres $k on $j port. ${NC}"
-                
+                rm output.txt > /dev/null 2>&1
 				nc -zv $k $j > output.txt 2>&1
-                cat output.txt | grep "Connection refused"
-				echo
-				echo
+				
+				VAR1=$(cat output.txt | grep -ow "Connection refused")
+				if [ "$VAR1" = "Connection refused" ]; then
+					echo -e "${RED}Elasticsearch $i is not able to connect postgresql $k on $j port. Please check${NC}"
+				fi
+
 				
 				
 EOF
@@ -572,8 +591,7 @@ EOF
 			ssh -i $SSH_KEY $SSH_USER@$k /bin/bash << EOF
 
 				(ls /tmp | nc -l -p $j &) | sleep 2 && exit
-				echo
-				echo
+
 
 EOF
 
@@ -611,12 +629,14 @@ done
 
 for i in ${elasticsearch_private_ip[@]};
 do 
-			echo -e "${GREEN}bastion is trying to connect elasticsearch on $kibana port. IP that mentioned below is elasticsearch' ip${NC}"
-            
+			#echo -e "${PURPLE}bastion is trying to connect elasticsearch on $kibana port. IP that mentioned below is elasticsearch' ip${NC}"
+            rm output.txt > /dev/null 2>&1
 			nc -zv $i $kibana > output.txt 2>&1
-            cat output.txt | grep "Connection refused"
-			echo
-			echo
+			
+			VAR1=$(cat output.txt | grep -ow "Connection refused")
+			if [ "$VAR1" = "Connection refused" ]; then
+				echo -e "${RED}Bastion is not able to connect Elasticsearch $i on $j port. Please check${NC}"
+			fi
 			
 done
 
@@ -632,6 +652,9 @@ EOF
 	
 done
 
+echo
+echo -e "${PURPLE}If you see error above then please check that port and make connection open for the specific scenario. If you don't see the error then you can start the deployment ${NC}"
+echo
 
 # Below 4 no of loop will remobe hab utilty from remote server.
 for i in ${automate_server_private_ip[@]};
