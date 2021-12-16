@@ -29,7 +29,7 @@ var AllMappings = []Mapping{
 	NodeState,
 	ConvergeHistory,
 	NodeAttribute,
-	//	NodeRunInfo,
+	NodeRunInfo,
 }
 
 // Mapping type is the representation of an ES mapping, it contains
