@@ -27,7 +27,7 @@ docker_run() {
     fi
 
     source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
-    if [[ ! -z $HOST_PWD ]]; then
+    if [[ -n $HOST_PWD ]]; then
         echo "Updating HOST_PWD to have :"
         volume_mount="${HOST_PWD}:"
     fi
@@ -87,8 +87,8 @@ docker_run_1() {
     source_dir="${source_dir}/../.."
 
     pwd
-    ls $source_dir
-    if [[ ! -z $HOST_PWD ]]; then
+    ls "$source_dir"
+    if [[ -n $HOST_PWD ]]; then
         echo "Updating HOST_PWD to have :"
         volume_mount="${HOST_PWD}:"
     fi
