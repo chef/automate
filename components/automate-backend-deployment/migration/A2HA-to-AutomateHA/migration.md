@@ -15,7 +15,7 @@ In some scenario we are required to migrate A2HA data to Automate HA cluster`(as
    
 
 
-3) Create a aib file from any of chef-automate frontend node of A2HA. This will create a bundle of all necessary keys. Like pivotal.pem, secret key etc. Usually this will not be included in regular backup`(step 1)` so make sure you create a bundle for that.
+3) Create a abb file from any of chef-automate frontend node of A2HA. This will create a bundle of all necessary keys. Like pivotal.pem, secret key etc. Usually this will not be included in regular backup`(step 1)` so make sure you create a bundle for that.
 
 
     `sudo chef-automate bootstrap bundle create bootstrap.abb`
