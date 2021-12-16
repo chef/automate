@@ -49,14 +49,10 @@ postgresql_private_ip=${postgresql_private_ip##[}
 postgresql_private_ip=${postgresql_private_ip%]}
 eval postgresql_private_ip=($postgresql_private_ip)
 
-echo
-echo -e "${PURPLE}Port checking process is started. It will take around 7-10 min. Please wait for some time.${NC}"
-echo 
-
 #This will install hab in bastion server to verify port 
-curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh > output.txt 2<&1 \ | sudo bash > output.txt 2<&1
-export HAB_LICENSE=accept-no-persist > output.txt 2<&1
-hab pkg install core/netcat -bf > output.txt 2<&1
+curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
+export HAB_LICENSE=accept-no-persist
+hab pkg install core/netcat -bf
 
 
 # Below 5 no of loop will install hab utilty from remote server.
@@ -65,7 +61,7 @@ for i in ${automate_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -79,7 +75,7 @@ for i in ${chef_server_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -93,7 +89,7 @@ for i in ${elasticsearch_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -107,7 +103,7 @@ for i in ${postgresql_private_ip[@]};
 do 
 		
 		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash > output.txt 2<&1 << EOF
+		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
 
 	    sudo su -
         curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh \ | sudo bash
@@ -218,22 +214,25 @@ EOF
 
 done	
 
-#connection will be checked from bastion(provisioning) to automate. Ensuring that automate allow bastion connection on 9631 port 
-for i in ${automate_server_private_ip[@]};
-do 
-		
-		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
-		(ls /tmp | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
+echo
+echo -e "${PURPLE}Port checking process is started. It will take around 7-10 min. Please wait for some time.${NC}"
+echo 
 
-EOF
-done
+#connection will be checked from bastion(provisioning) to automate. Ensuring that automate allow bastion connection on 9631 port 
+# for i in ${automate_server_private_ip[@]};
+# do 
+		
+# 		ssh -i $SSH_KEY $SSH_USER@$i /bin/bash << EOF
+# 		(ls /tmp | nc -l -p $bastion_to_automate_port &) | sleep 2 && exit
+
+# EOF
+# done
 
 for i in ${automate_server_private_ip[@]};
 do 
             
             rm output.txt > /dev/null 2>&1
 			nc -zv $i $bastion_to_automate_port > output.txt 2>&1
-			
 			VAR1=$( cat output.txt | grep -ow "Connection refused" )
 			if [ "$VAR1" = "Connection refused" ]; then
 				echo -e "${RED}bastion is not able to connect automate $i on $bastion_to_automate_port port. Please check${NC}"
@@ -653,7 +652,7 @@ EOF
 done
 
 echo
-echo -e "${PURPLE}If you see error above then please check that port and make connection open for the specific scenario. If you don't see the error then you can start the deployment ${NC}"
+echo -e "${PURPLE}Thank you for your patience. Port checking process is completed If you see error above in red color then please check that port and make connection open for the specific scenario. If you don't see the error then you can start the deployment ${NC}"
 echo
 
 # Below 4 no of loop will remobe hab utilty from remote server.
