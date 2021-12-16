@@ -26,7 +26,6 @@ docker_run() {
         image="chefes/a2-integration:latest"
     fi
 
-    source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
     if [[ -n $HOST_PWD ]]; then
         echo "Updating HOST_PWD to have :"
         volume_mount="${HOST_PWD}:"
