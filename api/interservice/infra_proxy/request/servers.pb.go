@@ -370,6 +370,72 @@ func (x *GetServerStatus) GetIpAddress() string {
 	return ""
 }
 
+type ValidateWebuiKey struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Chef Infra Server ID.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	// Chef Server FQDN
+	Fqdn string `protobuf:"bytes,2,opt,name=fqdn,proto3" json:"fqdn,omitempty" toml:"fqdn,omitempty" mapstructure:"fqdn,omitempty"`
+	// Optional Chef Server Webui Key
+	WebuiKey string `protobuf:"bytes,3,opt,name=webui_key,json=webuiKey,proto3" json:"webui_key,omitempty" toml:"webui_key,omitempty" mapstructure:"webui_key,omitempty"`
+}
+
+func (x *ValidateWebuiKey) Reset() {
+	*x = ValidateWebuiKey{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_interservice_infra_proxy_request_servers_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ValidateWebuiKey) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateWebuiKey) ProtoMessage() {}
+
+func (x *ValidateWebuiKey) ProtoReflect() protoreflect.Message {
+	mi := &file_interservice_infra_proxy_request_servers_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateWebuiKey.ProtoReflect.Descriptor instead.
+func (*ValidateWebuiKey) Descriptor() ([]byte, []int) {
+	return file_interservice_infra_proxy_request_servers_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ValidateWebuiKey) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ValidateWebuiKey) GetFqdn() string {
+	if x != nil {
+		return x.Fqdn
+	}
+	return ""
+}
+
+func (x *ValidateWebuiKey) GetWebuiKey() string {
+	if x != nil {
+		return x.WebuiKey
+	}
+	return ""
+}
+
 var File_interservice_infra_proxy_request_servers_proto protoreflect.FileDescriptor
 
 var file_interservice_infra_proxy_request_servers_proto_rawDesc = []byte{
@@ -402,11 +468,17 @@ var file_interservice_infra_proxy_request_servers_proto_rawDesc = []byte{
 	0x61, 0x74, 0x75, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x12, 0x1d, 0x0a, 0x0a, 0x69, 0x70, 0x5f, 0x61,
 	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x69, 0x70,
-	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x42, 0x3f, 0x5a, 0x3d, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f, 0x61, 0x75, 0x74, 0x6f, 0x6d,
-	0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x73, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79,
-	0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x53, 0x0a, 0x10, 0x56, 0x61, 0x6c, 0x69, 0x64,
+	0x61, 0x74, 0x65, 0x57, 0x65, 0x62, 0x75, 0x69, 0x4b, 0x65, 0x79, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x66,
+	0x71, 0x64, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x66, 0x71, 0x64, 0x6e, 0x12,
+	0x1b, 0x0a, 0x09, 0x77, 0x65, 0x62, 0x75, 0x69, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x77, 0x65, 0x62, 0x75, 0x69, 0x4b, 0x65, 0x79, 0x42, 0x3f, 0x5a, 0x3d,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x66, 0x2f,
+	0x61, 0x75, 0x74, 0x6f, 0x6d, 0x61, 0x74, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x69, 0x6e, 0x74,
+	0x65, 0x72, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61, 0x5f,
+	0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -421,14 +493,15 @@ func file_interservice_infra_proxy_request_servers_proto_rawDescGZIP() []byte {
 	return file_interservice_infra_proxy_request_servers_proto_rawDescData
 }
 
-var file_interservice_infra_proxy_request_servers_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_interservice_infra_proxy_request_servers_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_interservice_infra_proxy_request_servers_proto_goTypes = []interface{}{
-	(*CreateServer)(nil),    // 0: chef.automate.domain.infra_proxy.request.CreateServer
-	(*UpdateServer)(nil),    // 1: chef.automate.domain.infra_proxy.request.UpdateServer
-	(*DeleteServer)(nil),    // 2: chef.automate.domain.infra_proxy.request.DeleteServer
-	(*GetServers)(nil),      // 3: chef.automate.domain.infra_proxy.request.GetServers
-	(*GetServer)(nil),       // 4: chef.automate.domain.infra_proxy.request.GetServer
-	(*GetServerStatus)(nil), // 5: chef.automate.domain.infra_proxy.request.GetServerStatus
+	(*CreateServer)(nil),     // 0: chef.automate.domain.infra_proxy.request.CreateServer
+	(*UpdateServer)(nil),     // 1: chef.automate.domain.infra_proxy.request.UpdateServer
+	(*DeleteServer)(nil),     // 2: chef.automate.domain.infra_proxy.request.DeleteServer
+	(*GetServers)(nil),       // 3: chef.automate.domain.infra_proxy.request.GetServers
+	(*GetServer)(nil),        // 4: chef.automate.domain.infra_proxy.request.GetServer
+	(*GetServerStatus)(nil),  // 5: chef.automate.domain.infra_proxy.request.GetServerStatus
+	(*ValidateWebuiKey)(nil), // 6: chef.automate.domain.infra_proxy.request.ValidateWebuiKey
 }
 var file_interservice_infra_proxy_request_servers_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -516,6 +589,18 @@ func file_interservice_infra_proxy_request_servers_proto_init() {
 				return nil
 			}
 		}
+		file_interservice_infra_proxy_request_servers_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ValidateWebuiKey); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -523,7 +608,7 @@ func file_interservice_infra_proxy_request_servers_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_interservice_infra_proxy_request_servers_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

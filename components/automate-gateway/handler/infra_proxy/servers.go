@@ -38,6 +38,27 @@ func (a *InfraProxyServer) GetServer(ctx context.Context, r *gwreq.GetServer) (*
 	}, nil
 }
 
+// ValidateWebuiKey validates the webui key
+func (a *InfraProxyServer) ValidateWebuiKey(ctx context.Context, r *gwreq.ValidateWebuiKey) (*gwres.ValidateWebuiKey, error) {
+	req := &infra_req.ValidateWebuiKey{
+		Id:       r.Id,
+		Fqdn:     r.Fqdn,
+		WebuiKey: r.WebuiKey,
+	}
+
+	res, err := a.client.ValidateWebuiKey(ctx, req)
+	if err != nil {
+		return &gwres.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+	return &gwres.ValidateWebuiKey{
+		Valid: res.Valid,
+		Error: res.Error,
+	}, nil
+}
+
 // CreateServer posts a server upstream
 func (a *InfraProxyServer) CreateServer(ctx context.Context, r *gwreq.CreateServer) (*gwres.CreateServer, error) {
 	req := &infra_req.CreateServer{
