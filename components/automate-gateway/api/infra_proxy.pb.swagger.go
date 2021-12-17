@@ -97,6 +97,38 @@ func init() {
         ]
       }
     },
+    "/api/v0/infra/servers/validate": {
+      "post": {
+        "operationId": "InfraProxy_ValidateWebuiKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ValidateWebuiKey"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/grpc.gateway.runtime.Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.request.ValidateWebuiKey"
+            }
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/api/v0/infra/servers/{id}": {
       "get": {
         "operationId": "InfraProxy_GetServer",
@@ -3220,6 +3252,23 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.request.ValidateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Chef Infra Server ID."
+        },
+        "fqdn": {
+          "type": "string",
+          "title": "Chef Server FQDN"
+        },
+        "webui_key": {
+          "type": "string",
+          "title": "Optional Chef Server Webui Key"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.AutomateInfraServerUsers": {
       "type": "object",
       "properties": {
@@ -4655,6 +4704,20 @@ func init() {
         "email": {
           "type": "string",
           "title": "User email"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.ValidateWebuiKey": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Webui key is valid or not"
+        },
+        "error": {
+          "type": "string",
+          "title": "webui key validation errors"
         }
       }
     },

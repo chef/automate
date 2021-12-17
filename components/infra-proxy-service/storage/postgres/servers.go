@@ -38,11 +38,11 @@ func (p *postgres) GetServer(ctx context.Context, id string) (storage.Server, er
 func (p *postgres) getServer(ctx context.Context, q querier, id string) (storage.Server, error) {
 	var s storage.Server
 	err := q.QueryRowContext(ctx,
-		`SELECT s.id, s.name, s.fqdn, s.ip_address, s.updated_at, s.created_at,
+		`SELECT s.id, s.name, s.fqdn, s.ip_address, s.credential_id, s.updated_at, s.created_at,
 		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
 		FROM servers s
 		WHERE s.id = $1`, id).
-		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
+		Scan(&s.ID, &s.Name, &s.Fqdn, &s.IPAddress, &s.CredentialID, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
 	}
