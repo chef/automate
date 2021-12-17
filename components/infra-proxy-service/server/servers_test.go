@@ -40,6 +40,9 @@ func TestServers(t *testing.T) {
 
 	t.Run("CreateServer", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
+		secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+		secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 		t.Run("when a valid server is submitted, creates the new server successfully", func(t *testing.T) {
 			req := &request.CreateServer{
@@ -137,6 +140,19 @@ func TestServers(t *testing.T) {
 			})
 			assert.Nil(t, resp)
 			assert.Error(t, err, "must supply server webui key")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the server webui key is invalid, raise invalid argument error", func(t *testing.T) {
+			resp, err := cl.CreateServer(ctx, &request.CreateServer{
+				Id:        "chef-infra-server",
+				Name:      "New chef infra server",
+				Fqdn:      "example.com",
+				IpAddress: "0.0.0.0",
+				WebuiKey:  "fake webui key",
+			})
+			assert.Nil(t, resp)
+			assert.Error(t, err, "webui key is not valid.")
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	})
@@ -473,6 +489,29 @@ func TestServers(t *testing.T) {
 			})
 			assert.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
+		})
+	})
+
+	t.Run("ValidateWebuiKey", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
+
+		secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+		secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+		secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+		t.Run("when a valid webui key, return valid true", func(t *testing.T) {
+			resp, err := cl.ValidateWebuiKey(ctx, &request.ValidateWebuiKey{
+				Id:       "",
+				Fqdn:     "example.com",
+				WebuiKey: "--KEY--",
+			})
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+
+			assert.Equal(t, true, resp.Valid)
+			assert.Equal(t, "", resp.Error)
+
 		})
 	})
 }
