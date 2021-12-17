@@ -25,6 +25,23 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/ValidateWebuiKey", "infra:infraServers", "infra:infraServers:get", "POST", "/api/v0/infra/servers/validate", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.ValidateWebuiKey); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "fqdn":
+					return m.Fqdn
+				case "webui_key":
+					return m.WebuiKey
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetServer", "infra:infraServers:{id}", "infra:infraServers:get", "GET", "/api/v0/infra/servers/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetServer); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
