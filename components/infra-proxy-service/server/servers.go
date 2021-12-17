@@ -43,7 +43,23 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, errors.Wrap(err, "FQDN or IP required to add the server.")
 	}
 
-	// TODO: validate the new webui key
+	// validate the new webui key
+	validateWebuiKey := request.ValidateWebuiKey{
+		Id:       req.Id,
+		Fqdn:     req.Fqdn,
+		WebuiKey: req.WebuiKey,
+	}
+
+	res, err := s.ValidateWebuiKey(ctx, &validateWebuiKey)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !res.Valid {
+		return nil, errors.New(res.Error)
+	}
+
 	newSecret := &secrets.Secret{
 		Name: "infra-proxy-service-webui-key",
 		Type: "chef-server",
@@ -76,6 +92,53 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	return &response.CreateServer{
 		Server: fromStorageServer(server),
+	}, nil
+}
+
+// ValidateWebuiKey validate the webui key
+func (s *Server) ValidateWebuiKey(ctx context.Context, req *request.ValidateWebuiKey) (*response.ValidateWebuiKey, error) {
+
+	webuiKey := req.WebuiKey
+	if req.WebuiKey == "" {
+		server, err := s.service.Storage.GetServer(ctx, req.Id)
+		if err != nil {
+			return nil, service.ParseStorageError(err, *req, "server")
+		}
+
+		if server.CredentialID == "" {
+			return &response.ValidateWebuiKey{
+				Valid: false,
+				Error: "Webui key is not available for this server.",
+			}, nil
+		}
+
+		// Get web ui key from secrets service
+		secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+		if err != nil {
+			return nil, err
+		}
+
+		webuiKey = GetAdminKeyFrom(secret)
+	}
+
+	c, err := s.createCSClientWithFqdn(ctx, req.Fqdn, webuiKey, "pivotal", true)
+	if err != nil {
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+	_, err = c.client.License.Get()
+	if err != nil {
+		return &response.ValidateWebuiKey{
+			Valid: false,
+			Error: err.Error(),
+		}, nil
+	}
+
+	return &response.ValidateWebuiKey{
+		Valid: true,
+		Error: "",
 	}, nil
 }
 
