@@ -1,15 +1,15 @@
 #!/bin/bash
 
-set -euo pipefail
+#set -euo pipefail
 
-echo -e "$CHEF_CI_SSH_PRIVATE_KEY" > chef-ci-ad-ssh
+#echo -e "$CHEF_CI_SSH_PRIVATE_KEY" > chef-ci-ad-ssh
 
 export HAB_LICENSE=accept-no-persist
 
-instances_to_test=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json" |\
+instances_to_test=$(curl --silent "https://a2-dev.cd.chef.co/assets/data.json" |\
   jq --raw-output '.[] | select(.tags | any(. == "chef-automate-cli")) | .fqdn')
-delete=saeed="a2-airgapped-local-inplace-upgrade-dev.cd.chef.co"
-instances_to_test=( "${array[@]/$delete}" )
+delete="a2-airgapped-local-inplace-upgrade-dev.cd.chef.co"
+instances_to_test=( "${instances_to_test[@]/$delete}" )
 for instance in ${instances_to_test[*]}
 do
   echo "--- Executing a2-deploy-smoke profile against $instance"
