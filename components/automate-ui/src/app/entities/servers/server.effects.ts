@@ -32,12 +32,16 @@ import {
   UsersSuccessPayload,
   UpdateWebUIKey,
   UpdateWebUIKeySuccess,
-  UpdateWebUIKeyFailure
+  UpdateWebUIKeyFailure,
+  ValidateWebUIKey,
+  ValidateWebUIKeySuccess,
+  ValidateWebUIKeyFailure,
 } from './server.actions';
 
 import {
   ServerRequests,
-  ServerResponse
+  ServerResponse,
+  ValidateWebUIKeyResponse
 } from './server.requests';
 
 @Injectable()
@@ -214,6 +218,31 @@ export class ServerEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not update Web UI Key ${msg || payload.error}.`
+      });
+    })));
+
+  ValidateWebUIKey$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY),
+    mergeMap(({ payload }: ValidateWebUIKey) =>
+      this.requests.validateWebUIKey(payload).pipe(
+        map((resp: ValidateWebUIKeyResponse) => new ValidateWebUIKeySuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new ValidateWebUIKeyFailure(error)))))));
+
+  ValidateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS),
+    map(({ payload }: ValidateWebUIKeySuccess) => new CreateNotification({
+    type: Type.info,
+    message: `Successfully updated Web UI Key ${payload}.`
+  }))));
+
+  ValidateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE),
+    map(({ payload }: UpdateWebUIKeyFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not validated Web UI Key ${msg || payload.error}.`
       });
     })));
 }
