@@ -18,7 +18,7 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- apply - Apply Chef Automate license
-- nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
-- status - Retrieve Chef Automate license status
-- uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on hourly basis between the time duration
+- license apply - Apply Chef Automate license
+- license nodeRunReport - Generates daily Infra Client Run reports for a span of time duration
+- license status - Retrieve Chef Automate license status
+- license uniqNodeRunReport - Generates the unique count of reported Infra Client nodes on hourly basis between the time duration
