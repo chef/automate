@@ -45,6 +45,7 @@ do_build() {
 }
 
 do_install() {
+
   pushd "${pkg_prefix}" || return 1
   rsync -avz "${source_dir}/" .
 
