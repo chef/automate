@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Server , User } from './server.model';
+import { Server , User, WebUIKey } from './server.model';
 
 export enum ServerActionTypes {
   GET_ALL                        = 'SERVER::GET_ALL',
@@ -21,7 +21,10 @@ export enum ServerActionTypes {
   DELETE_FAILURE                 = 'SERVER::CREATE::DELETE::FAILURE',
   GET_USERS                      = 'SERVER::GET_USERS',
   GET_USERS_SUCCESS              = 'SERVER::GET_USERS::SUCCESS',
-  GET_USERS_FAILURE              = 'SERVER::GET_USERS::FAILURE'
+  GET_USERS_FAILURE              = 'SERVER::GET_USERS::FAILURE',
+  UPDATE_WEB_UI_KEY              = 'SERVER::UPDATE_WEB_UI_KEY',
+  UPDATE_WEB_UI_KEY_SUCCESS      = 'SERVER::UPDATE_WEB_UI_KEY::SUCCESS',
+  UPDATE_WEB_UI_KEY_FAILURE      = 'SERVER::UPDATE_WEB_UI_KEY::FAILURE'
 }
 
 
@@ -141,6 +144,29 @@ export class GetUsersFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface WebUIKeyPayload {
+  server_id: any;
+  key: string;
+}
+
+export class UpdateWebUIKey implements Action {
+  readonly type = ServerActionTypes.UPDATE_WEB_UI_KEY;
+
+  constructor(public payload: WebUIKey) { }
+}
+
+export class UpdateWebUIKeySuccess implements Action {
+  readonly type = ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS;
+
+  constructor(public payload: WebUIKeyPayload) { }
+}
+
+export class UpdateWebUIKeyFailure implements Action {
+  readonly type = ServerActionTypes.UPDATE_WEB_UI_KEY_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServerActions =
   | GetServers
   | GetServersSuccess
@@ -159,4 +185,7 @@ export type ServerActions =
   | DeleteServerFailure
   | GetUsers
   | GetUsersSuccess
-  | GetUsersFailure;
+  | GetUsersFailure
+  | UpdateWebUIKey
+  | UpdateWebUIKeySuccess
+  | UpdateWebUIKeyFailure;

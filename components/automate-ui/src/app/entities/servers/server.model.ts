@@ -16,3 +16,8 @@ export interface User {
   automate_user_id: string;
   is_server_admin: boolean;
 }
+
+export interface WebUIKey {
+  server_id: string;
+  key: string;
+}
