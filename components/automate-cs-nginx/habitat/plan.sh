@@ -7,21 +7,21 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="14.11.21"
+pkg_version="14.4.4"
 pkg_deps=(
-  core/coreutils
-  chef/mlsa
+  core/coreutils/8.30/20200305231640
+  chef/mlsa/1.0.1/20200421170200
   # TODO 2020-05-12: PIN PIN PIN
   #
   # All dependencies that are shared between this package and the
   # chef-server-* packages are pinned to the versions required by the
   # chef-server-* packages.
   #
-  core/curl
-  core/ruby26
+  core/curl/7.68.0/20200601114640
+  core/ruby26/2.6.5/20200404043345
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/14.11.21/20211213230613"
-  "${vendor_origin}/chef-server-ctl/14.11.21/20211213230135"
+  "${vendor_origin}/chef-server-nginx/14.4.4/20210520121142"
+  "${vendor_origin}/chef-server-ctl/14.4.4/20210520120637"
 )
 
 pkg_bin_dirs=(bin)
