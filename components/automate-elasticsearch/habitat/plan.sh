@@ -16,8 +16,8 @@ pkg_build_deps=(
 )
 pkg_deps=(
   core/coreutils/8.30/20200305231640
-  core/glibc
-  core/zlib
+  core/glibc/2.29/20200305172459
+  core/zlib/1.2.11/20200305174519
 
   chef/mlsa/1.0.1/20200421170200
   core/curl/7.68.0/20200319191535 # health_check
