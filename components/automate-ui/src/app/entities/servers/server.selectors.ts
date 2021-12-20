@@ -56,3 +56,8 @@ export const getUsersStatus = createSelector(
   serverState,
   (state) => state.getUsersStatus
 );
+
+export const updateWebUIKey = createSelector(
+  serverState,
+  (state) => state.updateWebUIKeyStatus
+);
