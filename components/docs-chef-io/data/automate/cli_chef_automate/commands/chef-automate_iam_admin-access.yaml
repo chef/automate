@@ -17,5 +17,5 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- chef-automate iam - Chef Automate iam commands
-- restore - Restore the factory default admin user, team, and access
+- chef-automate iam - Chef Automate IAM commands
+- iam admin-access restore - Restore the factory default admin user, team, and access

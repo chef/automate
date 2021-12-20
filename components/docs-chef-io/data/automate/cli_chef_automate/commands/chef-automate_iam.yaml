@@ -18,6 +18,8 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- admin-access - Manage and restore default admin access
-- token - Manage tokens
-- version - Retrieve IAM version in use
+- iam admin-access - Manage and restore default admin access
+- iam admin-access restore - Restore default admin access
+- iam token - Manage tokens
+- iam token create - Generate a token
+- iam version - Retrieve IAM version in use

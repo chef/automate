@@ -20,4 +20,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- node-delete - Delete node by node uuid
+- infrastructure node-delete - Delete node by node uuid

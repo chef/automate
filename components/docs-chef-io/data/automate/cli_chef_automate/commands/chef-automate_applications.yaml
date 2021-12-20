@@ -18,5 +18,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- remove-svcs - Remove services from the applications database
-- show-svcs - Show services in the applications database
+- applications remove-svcs - Remove services from the applications database
+- applications show-svcs - Show services in the applications database

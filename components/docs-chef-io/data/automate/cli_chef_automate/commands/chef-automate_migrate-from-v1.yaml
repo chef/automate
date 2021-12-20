@@ -93,6 +93,7 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- gen-config - Generate a config file
+- migrate-from-v1 gen-config - Generate a config file
+- migrate-from-v1 status - Watch the status of the migration from Chef Automate v1
 aliases:
 - upgrade-from-v1

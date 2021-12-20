@@ -41,4 +41,5 @@ inherited_options:
   usage: |
     How long to wait for a operation to complete before raising an error
 see_also:
-- chef-automate backup integrity - Chef Automate shared object integrity
+- backup integrity - Chef Automate shared object integrity
+- backup integrity show - Chef Automate shared object integrity metadata

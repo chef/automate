@@ -19,4 +19,4 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- 'chef-automate airgap bundle - '
+- airgap bundle - Manage a Chef Automate Airgap bundle

@@ -1,5 +1,6 @@
 name: chef-automate airgap bundle
 usage: chef-automate airgap bundle COMMAND [flags]
+description: Create and manage Chef Automate Airgap Installation Bundle.
 options:
 - name: help
   shorthand: h
@@ -16,6 +17,6 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- 'chef-automate airgap - '
-- 'create - '
-- 'info - '
+- airgap - Manage an airgap installation
+- airgap bundle create - Create an airgap installation bundle
+- airgap bundle info - Get information on an airgap installation bundle

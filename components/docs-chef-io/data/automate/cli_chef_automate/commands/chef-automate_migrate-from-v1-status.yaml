@@ -18,3 +18,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
+- chef-automate migrate-from-v1 - Migrate from Chef Automate v1

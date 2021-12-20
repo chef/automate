@@ -21,7 +21,7 @@ options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- 'airgap - '
+- airgap - Create and manage Chef Automate Airgap Installation Bundle
 - applications - Manage applications observability features
 - backup - Chef Automate backup
 - config - Chef Automate configuration

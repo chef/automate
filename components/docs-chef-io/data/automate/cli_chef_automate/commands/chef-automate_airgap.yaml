@@ -17,4 +17,4 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate - Chef Automate CLI
-- 'bundle - '
+- airgap bundle - Manage a Chef Automate Airgap bundle

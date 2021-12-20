@@ -40,5 +40,5 @@ inherited_options:
   usage: The S3 session token when assuming an IAM role
 see_also:
 - chef-automate backup - Chef Automate backup
-- show - show the shared object integrity metadata
-- validate - validate the shared object integrity
+- backup show - Show the shared object integrity metadata
+- backup validate - Validate the shared object integrity
