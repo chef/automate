@@ -29,7 +29,11 @@ import {
   GetUsers,
   GetUsersSuccess,
   GetUsersFailure,
-  UsersSuccessPayload
+  UsersSuccessPayload,
+  UpdateWebUIKey,
+  UpdateWebUIKeySuccess,
+  UpdateWebUIKeyFailure,
+  WebUIKeyPayload
 } from './server.actions';
 
 import {
@@ -186,6 +190,31 @@ export class ServerEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get users: ${msg || error}`
+      });
+    })));
+
+  UpdateWebUIKey$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY),
+    mergeMap(({ payload}: UpdateWebUIKey) =>
+      this.requests.updateWebUIKey(payload).pipe(
+        map((resp: WebUIKeyPayload) => new UpdateWebUIKeySuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new UpdateWebUIKeyFailure(error)))))));
+
+  UpdateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_SUCCESS),
+    map(({ payload: webuikey }: UpdateWebUIKeySuccess) => new CreateNotification({
+    type: Type.info,
+    message: `Successfully updated Web UI Key ${webuikey.server_id}.`
+  }))));
+
+  UpdateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
+    ofType(ServerActionTypes.UPDATE_WEB_UI_KEY_FAILURE),
+    map(({ payload }: UpdateWebUIKeyFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update Web UI Key ${msg || payload.error}.`
       });
     })));
 }
