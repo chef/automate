@@ -1,0 +1,48 @@
+<div ngClass="{slide : isSlideOpen}">
+  <div class="sidenav-header">
+    <chef-button class="back-button" secondary (click)="closeUpdateModal()" data-cy="back-button">
+      <chef-icon>arrow_back</chef-icon>
+    </chef-button>
+    <h1 data-cy="title" slot="title">Update Web UI Key</h1>
+    <chef-button class="close" secondary (click)="closeUpdateModal()">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <form [formGroup]="updateKeyForm">
+    <div class="sidenav-body">
+      <div class="id-margin">
+        <chef-form-field>
+          <label>
+            <span class="Keylabel">Web UI Key <span aria-hidden="true">*</span></span>
+            <textarea 
+              chefInput 
+              firstFocus
+              name="webUiKey"
+              formControlName="webUiKey"
+              type="text"
+              autocomplete="off"
+              (keyup)="handleInput($event)" 
+              data-cy="enter-key">
+            </textarea>
+          </label>
+          <chef-error class="textarea-error"
+            *ngIf="updateKeyForm.get('webUiKey').hasError('required') && updateKeyForm.get('webUiKey').dirty">
+            WEB UI KEY is required.
+          </chef-error>
+        </chef-form-field>
+        <span class="bottom-note">Note: A web UI Key is located Here (Need Better Help text)</span>
+      </div>
+    </div>
+    <div class="button-bar">
+      <chef-button tertiary data-cy="cancel" (click)="closeUpdateModal()">Cancel</chef-button>
+      <chef-button primary data-cy="Upload"
+        [disabled]="!updateKeyForm?.valid || conflictError || updating"
+        id="upload-button-object-modal"
+        (click)="uploadWebUIKey()">
+        <chef-loading-spinner *ngIf="updating"></chef-loading-spinner>
+        <span *ngIf="!updating">Upload Web UI Key</span>
+        <span *ngIf="updating">Uploading Web UI Key</span>
+      </chef-button>
+    </div>
+  </form>
+</div>
