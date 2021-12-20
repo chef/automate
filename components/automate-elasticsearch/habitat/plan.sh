@@ -52,6 +52,7 @@ do_build() {
 }
 
 do_install() {
+
   cd "$HAB_CACHE_SRC_PATH/elasticsearch-${pkg_version}"
   install -vDm644 README.textile "${pkg_prefix}/README.textile"
   install -vDm644 LICENSE.txt "${pkg_prefix}/LICENSE.txt"
