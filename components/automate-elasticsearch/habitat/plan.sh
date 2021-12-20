@@ -22,7 +22,7 @@ pkg_deps=(
   chef/mlsa/1.0.1/20200421170200
   core/curl/7.68.0/20200319191535 # health_check
   chef/automate-openjdk
-  chef/automate-platform-tools
+  chef/automate-platform-tools/0.1.0/20211118152356
 )
 pkg_bin_dirs=(es/bin)
 pkg_lib_dirs=(lib)
