@@ -11,6 +11,7 @@ max_locks_per_transaction = 64
 max_wal_size = "1GB"
 min_wal_size = "80MB"
 wal_keep_segments = 32
+wal_keep_size = "512MB"
 checkpoint_timeout = "5mins"
 checkpoint_completion_target = 0.5
 md5_auth_cidr_addresses = ["0.0.0.0/0", "::0/0"]

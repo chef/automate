@@ -55,6 +55,7 @@ message ConfigRequest {
 				google.protobuf.StringValue ssl_ciphers = 15;
 				google.protobuf.StringValue log_disconnections = 16;
 				google.protobuf.StringValue client_min_messages = 17;
+				google.protobuf.StringValue wal_keep_size = 18;
 			}
 
 			message Superuser {

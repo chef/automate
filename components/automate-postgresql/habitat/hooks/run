@@ -26,7 +26,27 @@ ensure_dir_ownership
 ensure_key_ownership
 
 echo "Starting PostgreSQL"
-export PGDATA={{pkg.svc_data_path}}/pgdata
+PGDATA_9_6={{pkg.svc_data_path}}/pgdata
+export PGDATA={{pkg.svc_data_path}}/pgdata13
+
+if [ `cat $PGDATA_9_6/PG_VERSION`=='9.6' ]; then
+  echo "Old data directory found"
+  new_pg13_build=$(ls -t /hab/pkgs/core/postgresql13/13.4 | head -n 1)
+  old_pg9_build=$(ls -t /hab/pkgs/core/postgresql/9.6.11 | head -n 1)
+  old_pg9_bin="/hab/pkgs/core/postgresql/9.6.11/$old_pg9_build/bin"
+  new_pg13_bin="/hab/pkgs/core/postgresql13/13.4/$new_pg13_build/bin"
+  $new_pg13_bin/pg_upgrade --old-bindir $old_pg9_bin --new-bindir $new_pg13_bin --old-datadir $PGDATA_9_6 --new-datadir $PGDATA --link --check
+  if [ $? -eq 0 ]; then
+      echo "PG_UPGRADE CHECK SUCCESSFUL"
+      echo "Now do actual pg_upgrade"
+      $new_pg13_bin/pg_upgrade --old-bindir $old_pg9_bin --new-bindir $new_pg13_bin --old-datadir $PGDATA_9_6 --new-datadir $PGDATA --link
+  else
+      echo "PG_UPGRADE CHECK FAILED"
+  fi
+else
+  echo "New data directory"
+fi
+
 
 pidfile="$PGDATA/postmaster.pid"
 if [ -f  "$pidfile" ]; then

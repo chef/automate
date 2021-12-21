@@ -327,6 +327,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 # max_wal_size = "1GB"
 # min_wal_size = "80MB"
 # wal_keep_segments = 32
+# wal_keep_size = "512MB"
 # checkpoint_timeout = "5min"
 # checkpoint_completion_target = 0.5
 # max_connections = 100
