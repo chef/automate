@@ -1,5 +1,7 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
+echo {{pkg.svc_config_path}}
+
 exec service-health 127.0.0.1 {{cfg.service.port}} "pg-sidecar-service" \
   {{pkg.svc_config_path}}/service.crt \
   {{pkg.svc_config_path}}/service.key \

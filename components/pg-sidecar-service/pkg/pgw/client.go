@@ -592,7 +592,6 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 	sqitchPGURI := strings.Replace(pgURI, "postgresql://", "db:pg://", 1)
 
 	sqitchArgs := command.Args(
-		"--quiet",
 		"--top-dir", dir,
 		"--engine", "pg",
 		"deploy",
@@ -600,6 +599,7 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 	)
 
 	environment := connInfo.PsqlCmdOptions()
+	log.Errorln("environment::::", environment)
 	cmdArgs := []command.Opt{
 		sqitchArgs,
 		command.Envvar("TZ", "UTC"),

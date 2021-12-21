@@ -57,6 +57,7 @@ automate-minio BINDING_MODE strict
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed
 automate-postgresql BINDING_MODE strict
+automate-postgresql13 BINDING_MODE strict
 automate-prometheus OPTIONAL applications-service automate-gateway
 automate-prometheus BINDING_MODE relaxed
 automate-ui BINDING_MODE strict

@@ -51,9 +51,9 @@ func TLSCertPathsFromDir(dir string) TLSCertPaths {
 }
 
 var A2SuperuserCerts = TLSCertPaths{
-	Cert:     "/hab/svc/automate-postgresql/config/server.crt",
-	Key:      "/hab/svc/automate-postgresql/config/server.key",
-	RootCert: "/hab/svc/automate-postgresql/config/root.crt",
+	Cert:     "/hab/svc/automate-postgresql13/config/server.crt",
+	Key:      "/hab/svc/automate-postgresql13/config/server.key",
+	RootCert: "/hab/svc/automate-postgresql13/config/root.crt",
 }
 
 // NOTE(ssd) 2019-08-19: This is a bit of duplication with code in

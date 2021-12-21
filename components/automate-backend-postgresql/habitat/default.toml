@@ -7,7 +7,7 @@ max_connections = 350
 max_locks_per_transaction = 64
 max_wal_size = "1GB"
 min_wal_size = "80MB"
-wal_keep_segments = 100
+wal_keep_size = 1600
 checkpoint_timeout = "5min"
 checkpoint_completion_target = 0.5
 

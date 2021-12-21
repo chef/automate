@@ -36,9 +36,9 @@ var testExpectedEnv = []string{
 	"PGHOST=test-db.example.com",
 	"PGPORT=5432",
 	"PGSSLMODE=verify-ca",
-	"PGSSLKEY=/hab/svc/automate-postgresql/config/server.key",
-	"PGSSLCERT=/hab/svc/automate-postgresql/config/server.crt",
-	"PGSSLROOTCERT=/hab/svc/automate-postgresql/config/root.crt",
+	"PGSSLKEY=/hab/svc/automate-postgresql13/config/server.key",
+	"PGSSLCERT=/hab/svc/automate-postgresql13/config/server.crt",
+	"PGSSLROOTCERT=/hab/svc/automate-postgresql13/config/root.crt",
 	"PGTZ=UTC",
 	"HAB_LICENSE=accept-no-persist",
 }
@@ -50,7 +50,7 @@ var connInfo = &pg.A2ConnInfo{
 	Certs: pg.A2SuperuserCerts,
 }
 
-var connURITemplate = "postgresql://test-user@test-db.example.com:5432/%s?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
+var connURITemplate = "postgresql://test-user@test-db.example.com:5432/%s?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql13/config/server.crt&sslkey=/hab/svc/automate-postgresql13/config/server.key&sslrootcert=/hab/svc/automate-postgresql13/config/root.crt"
 
 func connURI(dbName string) string {
 	return fmt.Sprintf(connURITemplate, dbName)

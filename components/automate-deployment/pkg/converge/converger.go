@@ -16,6 +16,7 @@ import (
 const (
 	deploymentServiceName    = "deployment-service"
 	postgresqlServiceName    = "automate-postgresql"
+	postgresql13ServiceName  = "automate-postgresql13"
 	pgGatewayServiceName     = "automate-pg-gateway"
 	esGatewayServiceName     = "automate-es-gateway"
 	elasticsearchServiceName = "automate-elasticsearch"

@@ -384,6 +384,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "event-gateway", WriteMetadata: false},
 		{Name: "automate-load-balancer", WriteMetadata: false},
 		{Name: "automate-postgresql", WriteMetadata: false},
+		{Name: "automate-postgresql13", WriteMetadata: false},
 		{Name: "automate-pg-gateway", WriteMetadata: false},
 		{Name: "automate-ui", WriteMetadata: false},
 		{Name: "backup-gateway", WriteMetadata: false},

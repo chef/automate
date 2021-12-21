@@ -39,6 +39,7 @@ import (
 	pggateway "github.com/chef/automate/api/config/pg_gateway"
 	pgsidecar "github.com/chef/automate/api/config/pg_sidecar"
 	postgresql "github.com/chef/automate/api/config/postgresql"
+	postgresql13 "github.com/chef/automate/api/config/postgresql13"
 	prometheus "github.com/chef/automate/api/config/prometheus"
 	sampledata "github.com/chef/automate/api/config/sample_data"
 	secrets "github.com/chef/automate/api/config/secrets"
@@ -91,6 +92,7 @@ func NewAutomateConfig() *AutomateConfig {
 		PgGateway:        pggateway.NewConfigRequest(),
 		PgSidecar:        pgsidecar.NewConfigRequest(),
 		Postgresql:       postgresql.NewConfigRequest(),
+		Postgresql13:     postgresql13.NewConfigRequest(),
 		Prometheus:       prometheus.NewConfigRequest(),
 		SampleData:       sampledata.NewConfigRequest(),
 		Secrets:          secrets.NewConfigRequest(),
@@ -143,6 +145,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		PgGateway:        pggateway.DefaultConfigRequest(),
 		PgSidecar:        pgsidecar.DefaultConfigRequest(),
 		Postgresql:       postgresql.DefaultConfigRequest(),
+		Postgresql13:     postgresql13.DefaultConfigRequest(),
 		Prometheus:       prometheus.DefaultConfigRequest(),
 		SampleData:       sampledata.DefaultConfigRequest(),
 		Secrets:          secrets.DefaultConfigRequest(),
@@ -162,7 +165,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Postgresql13.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate(), c.InfraProxy.Validate(), c.Cds.Validate(), c.SampleData.Validate(), c.UserSettings.Validate())
 	if err == nil {
 		return nil
 	}
@@ -193,6 +196,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.LicenseControl.SetGlobalConfig(c.Global)
 	c.Notifications.SetGlobalConfig(c.Global)
 	c.Postgresql.SetGlobalConfig(c.Global)
+	c.Postgresql13.SetGlobalConfig(c.Global)
 	c.Session.SetGlobalConfig(c.Global)
 	c.Teams.SetGlobalConfig(c.Global)
 	c.UI.SetGlobalConfig(c.Global)
@@ -259,6 +263,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Notifications, true
 	case "automate-postgresql":
 		return c.Postgresql, true
+	case "automate-postgresql13":
+		return c.Postgresql13, true
 	case "session-service":
 		return c.Session, true
 	case "teams-service":

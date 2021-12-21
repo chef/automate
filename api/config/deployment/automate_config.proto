@@ -31,6 +31,7 @@ import "config/local_user/config_request.proto";
 import "config/nodemanager/config_request.proto";
 import "config/notifications/config_request.proto";
 import "config/postgresql/config_request.proto";
+import "config/postgresql13/config_request.proto";
 import "config/pg_gateway/config_request.proto";
 import "config/pg_sidecar/config_request.proto";
 import "config/prometheus/config_request.proto";
@@ -71,6 +72,7 @@ message AutomateConfig {
 	chef.automate.domain.license_control.ConfigRequest license_control = 16;
 	chef.automate.domain.notifications.ConfigRequest notifications = 14;
 	chef.automate.infra.postgresql.ConfigRequest postgresql = 15;
+	chef.automate.infra.postgresql13.ConfigRequest postgresql13 = 49;
 	chef.automate.domain.session.ConfigRequest session = 17;
 	chef.automate.domain.teams.ConfigRequest teams = 18;
 	chef.automate.ui.ConfigRequest u_i = 9;

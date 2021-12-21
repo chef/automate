@@ -7,14 +7,14 @@ document "postgresql_load_env" <<DOC
 DOC
 function postgresql_load_env() {
   # TODO @afiune Read from toml file
-  export PGPORT="5432"
+  export PGPORT="5433"
   export PGHOST="0.0.0.0"
   export PGUSER="automate"
   
   export PGDATABASE="postgres"
   export PGSSLMODE="verify-ca"
-  export PGSSLCERT="/hab/svc/automate-postgresql/config/server.crt"
-  export PGSSLKEY="/hab/svc/automate-postgresql/config/server.key"
-  export PGSSLROOTCERT="/hab/svc/automate-postgresql/config/root.crt"
+  export PGSSLCERT="/hab/svc/automate-postgresql13/config/server.crt"
+  export PGSSLKEY="/hab/svc/automate-postgresql13/config/server.key"
+  export PGSSLROOTCERT="/hab/svc/automate-postgresql13/config/root.crt"
 }
 

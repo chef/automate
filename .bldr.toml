@@ -62,6 +62,12 @@ paths = [
   "components/automate-postgresql/*"
 ]
 
+[automate-postgresql13]
+plan_path = "components/automate-postgresql13"
+paths = [
+  "components/automate-postgresql13/*"
+]
+
 [automate-debug]
 plan_path = "components/automate-debug"
 paths = [
@@ -194,6 +200,7 @@ paths = [
   "api/config/pg_gateway/*",
   "api/config/pg_sidecar/*",
   "api/config/postgresql/*",
+  "api/config/postgresql13/*",
   "api/config/prometheus/*",
   "api/config/sample_data/*",
   "api/config/secrets/*",
@@ -486,6 +493,7 @@ paths = [
   "api/config/pg_sidecar/*",
   "api/config/platform/*",
   "api/config/postgresql/*",
+  "api/config/postgresql13/*",
   "api/config/prometheus/*",
   "api/config/sample_data/*",
   "api/config/secrets/*",

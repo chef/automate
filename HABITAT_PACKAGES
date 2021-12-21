@@ -22,6 +22,7 @@ backup-gateway components/backup-gateway
 automate-openjdk components/automate-openjdk
 automate-elasticsearch components/automate-elasticsearch
 automate-postgresql components/automate-postgresql
+automate-postgresql13 components/automate-postgresql13
 automate-debug components/automate-debug
 #
 # Tier 2

@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-postgresql13",
+  "data_service": true
+}

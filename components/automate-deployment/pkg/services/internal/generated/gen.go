@@ -25,6 +25,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/automate-postgresql13",
+      "metadata": {
+        "name": "chef/automate-postgresql13",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-pg-gateway",
       "metadata": null
     },
@@ -523,6 +533,7 @@ var ProductMetadataJSON = `
       "type": "base",
       "services": [
         "chef/automate-postgresql",
+        "chef/automate-postgresql13",
         "chef/automate-pg-gateway",
         "chef/pg-sidecar-service"
       ],
@@ -628,7 +639,8 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-cds",
-        "chef/user-settings-service"
+        "chef/user-settings-service",
+        "chef/automate-postgresql13"
       ],
       "packages": null,
       "dependencies": [

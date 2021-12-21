@@ -26,7 +26,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Pg = DefaultPGConfig()
 	c.V1.Sys.Logger.Level = w.String("ERROR")
-	c.V1.Sys.Service.Port = w.Int32(5433)
+	c.V1.Sys.Service.Port = w.Int32(5432)
 	c.V1.Sys.Service.Host = w.String("127.0.0.1")
 	c.V1.Sys.Superuser.Name = w.String("automate")
 
@@ -44,7 +44,7 @@ func DefaultPGConfig() *ConfigRequest_V1_System_PGConfig {
 	c := NewPGConfig()
 	c.MaxWalSize = w.String("1GB")
 	c.MinWalSize = w.String("80MB")
-	c.WalKeepSegments = w.Int32(32)
+	c.WalKeepSize = w.Int32(32)
 	c.CheckpointTimeout = w.String("5min")
 	c.CheckpointCompletionTarget = w.Float(0.5)
 	c.MaxConnections = w.Int32(100)

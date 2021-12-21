@@ -15,9 +15,9 @@ import (
 
 const (
 	defaultPGSuperuserName         = "automate"
-	defaultPGSuperuserCertPath     = "/hab/svc/automate-postgresql/config/server.crt"
-	defaultPGSuperuserKeyPath      = "/hab/svc/automate-postgresql/config/server.key"
-	defaultPGSuperuserRootCertPath = "/hab/svc/automate-postgresql/config/root.crt"
+	defaultPGSuperuserCertPath     = "/hab/svc/automate-postgresql13/config/server.crt"
+	defaultPGSuperuserKeyPath      = "/hab/svc/automate-postgresql13/config/server.key"
+	defaultPGSuperuserRootCertPath = "/hab/svc/automate-postgresql13/config/root.crt"
 )
 
 var ErrNoPlatformEnvironment = errors.New("Platform environment not correctly configured." +

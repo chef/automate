@@ -23,6 +23,7 @@ directories:
   - ./components/automate-pg-gateway
   - ./components/automate-platform-tools
   - ./components/automate-postgresql
+  - ./components/automate-postgresql13
   - ./components/automate-prometheus
   - ./components/automate-ui
   - ./components/automate-ui-devproxy

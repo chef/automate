@@ -300,6 +300,7 @@ pins = {
   # while still allowing the clients of these databases to upgrade their client
   # libraries if any fixes are shipped there.
   "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20200929122522"},
+  "automate-postgresql13"    => {"origin" => "chef", "name" => "automate-postgresql13",    "version" => "13.4", "release" => "20210827075515"},
   # "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20200929123629"},
 }
 

@@ -323,10 +323,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 # host = "0.0.0.0"
 # port = 5432
 [postgresql.v1.sys.pg]
-# md5_auth_cidr_addresses = ["0.0.0.0/0", "::0/0"]
-# max_wal_size = "1GB"
-# min_wal_size = "80MB"
-# wal_keep_segments = 32
+  wal_keep_size = 512
 # checkpoint_timeout = "5min"
 # checkpoint_completion_target = 0.5
 # max_connections = 100
