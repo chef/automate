@@ -1,3 +1,5 @@
+# stable channel
+
 pkg_name=automate-dex
 pkg_description="Automate specific wrapper plan for Dex"
 pkg_origin=chef

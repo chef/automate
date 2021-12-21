@@ -1,6 +1,8 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2039
 #shellcheck disable=SC2154
+# stable channel
+
 
 pkg_name="automate-builder-api-proxy"
 pkg_origin="chef"

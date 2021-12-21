@@ -1,4 +1,6 @@
 # NOTE/TODO: remove this when we cut over the packages
+# stable channel
+
 chef_automate_dev_only_pkg=true
 
 pkg_name=notifications-service

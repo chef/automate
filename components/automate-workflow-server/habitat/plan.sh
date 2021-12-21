@@ -1,3 +1,5 @@
+# stable channel
+
 pkg_name="automate-workflow-server"
 pkg_origin="chef"
 vendor_origin=${vendor_origin:-chef}

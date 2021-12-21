@@ -1,5 +1,6 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
+# stable channel
 
 pkg_name=automate-cs-nginx
 pkg_origin=chef
