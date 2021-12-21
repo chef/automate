@@ -13,7 +13,14 @@ import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
-  getStatus, serverFromRoute, updateStatus, getUsers, getUsersStatus, updateWebUIKey, validateWebUIKeyStatus
+  getStatus,
+  serverFromRoute,
+  updateStatus,
+  getUsers,
+  getUsersStatus,
+  updateWebUIKey,
+  validateWebUIKeyStatus,
+  getValidateWebUIKeyStatus
 } from 'app/entities/servers/server.selectors';
 
 import { Server, WebUIKey } from 'app/entities/servers/server.model';
@@ -30,7 +37,6 @@ import {
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
 import { ProjectConstants } from 'app/entities/projects/project.model';
-// import { ValidateWebUIKeyResponse } from 'app/entities/servers/server.requests';
 
 export type ChefServerTabName = 'orgs' | 'users' | 'details';
 @Component({
@@ -66,7 +72,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   public users;
   public usersListLoading;
   public authFailure = false;
-  public isValid;
+  public isValid = false;
+  public isServerLoaded = false;
 
 
   public updateWebuiKeyForm: FormGroup;
@@ -168,6 +175,9 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
       this.server = { ...ServerState };
+      if (this.isServerLoaded) {
+        this.validateWebUIKey(this.server);
+      }
       this.orgs = allOrgsState;
       this.updateServerForm.controls['name'].setValue(this.server.name);
       this.fqdnForm.controls['fqdn'].setValue(this.server.fqdn);
@@ -175,23 +185,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       this.creatingServerOrg = false;
       this.orgsListLoading = false;
       this.closeCreateModal();
-    });
-
-    // valiate the webui key
-    this.store.pipe(
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe(() => {
-        debugger
-        this.store.dispatch(new ValidateWebUIKey(this.server));
-      });
-
-    this.store.select(validateWebUIKeyStatus).pipe(
-      filter(status => status === EntityStatus.loadingSuccess),
-      takeUntil(this.isDestroyed))
-      .subscribe((validateWebuiKey) => {
-        debugger
-        this.isValid = validateWebuiKey;
+      this.isServerLoaded = true;
     });
 
     combineLatest([
@@ -316,6 +310,20 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  // validate the webui ui key
+  private validateWebUIKey(server: Server): void {
+    this.store.dispatch(new ValidateWebUIKey(server));
+    combineLatest([
+      this.store.select(validateWebUIKeyStatus),
+      this.store.select(getValidateWebUIKeyStatus)
+    ]).pipe(takeUntil(this.isDestroyed))
+      .subscribe(([validateWebUISt, getValidateWebUIkeyState]) => {
+        if (validateWebUISt === EntityStatus.loadingSuccess && !isNil(getValidateWebUIkeyState)) {
+          this.isValid = getValidateWebUIkeyState.valid;
+        }
+      });
   }
 
   saveServer(): void {

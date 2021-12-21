@@ -231,10 +231,14 @@ export class ServerEffects {
 
   ValidateWebUIKeySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_SUCCESS),
-    map(({ payload }: ValidateWebUIKeySuccess) => new CreateNotification({
-    type: Type.info,
-    message: `Successfully updated Web UI Key ${payload}.`
-  }))));
+    map(({ payload }: ValidateWebUIKeySuccess) => {
+      if (!payload.valid) {
+        return new CreateNotification({
+          type: Type.error,
+          message: `Invalid webui key: ${payload.error}`
+        });
+      }
+    })));
 
   ValidateWebUIKeyFailure$ = createEffect(() => this.actions$.pipe(
     ofType(ServerActionTypes.VALIDATE_WEB_UI_KEY_FAILURE),
