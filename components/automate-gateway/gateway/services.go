@@ -1020,6 +1020,7 @@ func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Reque
 	//incase of no records available, return error message
 	if resp.Url == "" {
 		http.Error(w, "either the record not exist or the requestor doesn't have access", http.StatusForbidden)
+		return
 	}
 
 	client := http.Client{}
@@ -1030,13 +1031,19 @@ func (s *Server) ReportManagerExportHandler(w http.ResponseWriter, r *http.Reque
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer res.Body.Close() // nolint: errcheck
+
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s.%s", "export", resp.ReportType))
 	w.Header().Set("Content-Type", "application/octet-stream; charset=UTF-8")
 	w.Header().Set("Content-Length", strconv.FormatInt(resp.ReportSize, 10))
-	io.Copy(w, res.Body)
+	_, err = io.Copy(w, res.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func init() {

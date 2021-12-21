@@ -49,7 +49,7 @@ func DefaultGlobalConfig() *GlobalConfig {
 				IdleTimeoutMinutes: w.Int32(30),
 			},
 			LargeReporting: &LargeReporting{
-				EnableLargeReporting:  w.Bool(false),
+				EnableLargeReporting: w.Bool(false),
 			},
 		},
 	}
