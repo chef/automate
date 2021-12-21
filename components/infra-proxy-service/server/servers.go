@@ -347,7 +347,12 @@ func (s *Server) UpdateWebuiKey(ctx context.Context, req *request.UpdateWebuiKey
 		}
 		return &response.UpdateWebuiKey{}, nil
 	}
-	newSecret.Id = server.CredentialID
+
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: server.CredentialID})
+	if err != nil {
+		return nil, err
+	}
+	newSecret.Id = secret.GetId()
 
 	_, err = s.service.Secrets.Update(ctx, newSecret)
 	if err != nil {
