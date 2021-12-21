@@ -1123,6 +1123,7 @@ paths = [
   "api/interservice/compliance/*",
   "api/interservice/event/*",
   "api/interservice/nodemanager/*",
+  "api/interservice/report_manager/*",
   "api/interservice/user_settings/*",
   "components/authz-service/*",
   "components/automate-grpc/*",
