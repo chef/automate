@@ -19,7 +19,7 @@ func NewConfigRequest() *ConfigRequest {
 				CustomSettings: &ConfigRequest_V1_System_CustomSettings{
 					Banner:          &ConfigRequest_V1_Banner{},
 					SessionSettings: &ConfigRequest_V1_SessionSettings{},
-					LargeReporting: &ConfigRequest_V1_LargeReporting{},
+					LargeReporting:  &ConfigRequest_V1_LargeReporting{},
 				},
 			},
 			Svc: &ConfigRequest_V1_Service{},

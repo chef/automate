@@ -89,6 +89,7 @@ var a2Config = config{
 		{regex: `components/automate-ui/src/app/modules/infra-proxy/org-edit/org-edit.component.html`},
 		{regex: `components/automate-minio/habitat/config/private.key`},
 		{regex: `components/backup-gateway/habitat/config/private.key`},
+		{regex: `components/report-manager-minio-gateway/habitat/config/private.key`},
 		{regex: `components/compliance-service/api/tests/containers/key.pem`},
 		{regex: `components/compliance-service/docs/elastic/api_compliance.rst`},
 		{regex: `components/compliance-service/generator/targets/client_containers/vagrant`},
