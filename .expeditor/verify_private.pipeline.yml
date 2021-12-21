@@ -76,6 +76,7 @@ steps:
       - cd components/license-control-service
       - make lint test
     timeout_in_minutes: 10
+    soft_fail: true
     retry:
       automatic:
         limit: 1

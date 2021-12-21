@@ -363,6 +363,16 @@ func DefaultSpecs(serviceNames []string) []Spec {
 				},
 			},
 		},
+		{
+			Name:          "data-feed-service",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "data_feed_service",
+					User: "data-feed",
+				},
+			},
+		},
 		// NOTE(ssd) 2018-04-16:
 		// The following services don't have anything to back
 		// up yet. Some of them may in the future once we have
@@ -382,7 +392,6 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "event-service", WriteMetadata: false},
 		{Name: "local-user-service", WriteMetadata: false},
 		{Name: "pg-sidecar-service", WriteMetadata: false},
-		{Name: "data-feed-service", WriteMetadata: false},
 		{Name: "automate-cds", WriteMetadata: false},
 
 		// Chef Server Stuff
