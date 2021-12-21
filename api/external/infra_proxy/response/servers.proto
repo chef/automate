@@ -56,3 +56,6 @@ message ValidateWebuiKey {
     // webui key validation errors
     string error = 2;
 }
+
+message UpdateWebuiKey {
+}
