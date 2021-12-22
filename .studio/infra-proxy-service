@@ -297,11 +297,15 @@ function infra_service_load_sample_users() {
   done
   shift $((OPTIND -1))
 
-  local timestamp=$(date +%s%N)
-  local server_prefix="chef-server-${timestamp}"
-  local server_id="${server_prefix}-id"
+  local timestamp
+  local server_prefix
+  local server_id
   local fqdn="api.chef.io"
-  local ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+  local ip_address
+  timestamp=$(date +%s%N)
+  server_prefix="chef-server-${timestamp}"
+  server_id="${server_prefix}-id"
+  ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
   # Add server in automate
   chef-automate dev grpcurl infra-proxy-service -- -d \
     "$(cat << EOF
@@ -315,16 +319,14 @@ EOF
     timestamp=$(date +%s%N)
     local userId="${user_prefix}-${timestamp}-id"
     local infraServerUsername="infra-user-${timestamp}"
-    local credentialId="${user_prefix}-${timestamp}-secrets"
     local automateUserId="${user_prefix}-${timestamp}"
     chef-automate dev psql -d chef_infra_proxy << EOF
       INSERT INTO users (
 		  id, server_id, 
 		  infra_server_username, 
-		  credential_id, 
   		automate_user_id,
 		  created_at,updated_at)
-      VALUES ('${userId}', '${server_id}', '${infraServerUsername}', '${credentialId}','${automateUserId}',now(), now())
+      VALUES ('${userId}', '${server_id}', '${infraServerUsername}','${automateUserId}',now(), now())
 EOF
   done  
   log_line "Sample data loaded of $records users for server with server name '$server_prefix' and server id '$server_id'"
