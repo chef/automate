@@ -58,3 +58,8 @@ message ResetOrgAdminKey {
     // Chef organization admin key.
     string admin_key = 3;
 }
+
+message GetInfraServerOrgs {
+    // Automate Infra Server ID
+    string server_id = 1;
+}
