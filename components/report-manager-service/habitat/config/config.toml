@@ -23,6 +23,13 @@ max_idle_conns = {{cfg.storage.max_idle_conns}}
 [objstore]
 bucket = "{{cfg.objstore.bucket}}"
 
+[compliance]
+{{~#eachAlive bind.compliance-service.members as |compliance-service|}}
+{{~#if @last}}
+target = "127.0.0.1:{{compliance-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
 [cereal]
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
