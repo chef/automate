@@ -107,6 +107,11 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{id}";
     option (chef.automate.api.iam.policy).action = "infra:infraServers:update";
   };
+  rpc GetInfraServerOrgs (infra_proxy.request.GetInfraServerOrgs) returns (infra_proxy.response.GetInfraServerOrgs) {
+    option (google.api.http).get = "/api/v0/infra/servers/{server_id}/infraserverorgs";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:infraserverorgs";
+    option (chef.automate.api.iam.policy).action = "infra:infraServers:get";
+  };
 
   rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
     option (google.api.http).get = "/api/v0/infra/servers/{server_id}/orgs/{org_id}/cookbooks";

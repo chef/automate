@@ -108,6 +108,19 @@ func (a *InfraProxyServer) DeleteOrg(ctx context.Context, r *gwreq.DeleteOrg) (*
 	}, nil
 }
 
+//GetInfraServerOrgs: Fetches the list of automate infra server's organisations from the chef server and save it into the automate back end DB
+func (c *InfraProxyServer) GetInfraServerOrgs(ctx context.Context, r *gwreq.GetInfraServerOrgs) (*gwres.GetInfraServerOrgs, error) {
+	req := &infra_req.GetInfraServerOrgs{
+		ServerId: r.ServerId,
+	}
+	res, err := c.client.GetInfraServerOrgs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &gwres.GetInfraServerOrgs{
+		Orgs: fromUpstreamOrgs(res.Orgs),
+	}, nil
+}
 func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 	return &gwres.Org{
 		Id:           t.GetId(),
