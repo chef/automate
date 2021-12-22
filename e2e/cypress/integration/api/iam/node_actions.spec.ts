@@ -339,5 +339,5 @@ describe('Nodes delete', () => {
             });
     });
 
- 
+
 });
