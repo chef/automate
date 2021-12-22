@@ -115,14 +115,14 @@ describe('Infra Clients get', () => {
 describe('Infra Clients create', () => {
     let withInfraServersClientCreateActionToken = '';
     let withoutInfraServersClientCreateActionToken = '';
-    
+
         const cypressPrefix = 'infra-server-client-actions-create';
         const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
         const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
         const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
         const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
         const objectsToCleanUp = ['tokens', 'policies'];
-    
+
         const withInfraServersClientCreatePolicy = {
         id: policyId1,
         name: tokenId1,
@@ -137,8 +137,8 @@ describe('Infra Clients create', () => {
                 projects: ['*']
             }]
         };
-    
-    
+
+
         const withoutInfraServersClientCreatePolicy = {
             id: policyId2,
             name: tokenId2,
@@ -153,10 +153,10 @@ describe('Infra Clients create', () => {
                 projects: ['*']
             }]
         };
-    
+
         before(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -168,7 +168,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     withInfraServersClientCreateActionToken = resp.body.token.value;
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -177,7 +177,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     expect(resp.status).to.equal(200);
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -189,7 +189,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     withoutInfraServersClientCreateActionToken = resp.body.token.value;
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -199,11 +199,11 @@ describe('Infra Clients create', () => {
                     expect(resp.status).to.equal(200);
                 });
             });
-    
+
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
         });
-    
+
         it('client post returns 200 when create actions is allowed', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersClientCreateActionToken },
@@ -215,12 +215,12 @@ describe('Infra Clients create', () => {
                     org_id: 'test-org',
                     server_id: 'local-dev',
                     validator: true
-                },
+                }
                 }).then((resp) => {
                     assert.equal(resp.status, 200);
                 });
         });
-    
+
         it('clients post returns 403 when create actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersClientCreateActionToken },
@@ -243,14 +243,14 @@ describe('Infra Clients create', () => {
     describe('Infra Reset Client Key', () => {
         let withInfraServersClientResetActionToken = '';
         let withoutInfraServersClientResetActionToken = '';
-    
+
         const cypressPrefix = 'infra-server-client-actions-reset';
         const policyId1 = `${cypressPrefix}-pol-1-${Cypress.moment().format('MMDDYYhhmm')}`;
         const policyId2 = `${cypressPrefix}-pol-2-${Cypress.moment().format('MMDDYYhhmm')}`;
         const tokenId1 = `${cypressPrefix}-token-1-${Cypress.moment().format('MMDDYYhhmm')}`;
         const tokenId2 = `${cypressPrefix}-token-2-${Cypress.moment().format('MMDDYYhhmm')}`;
         const objectsToCleanUp = ['tokens', 'policies'];
-    
+
         const withInfraServersClientResetPolicy = {
         id: policyId1,
         name: tokenId1,
@@ -265,8 +265,8 @@ describe('Infra Clients create', () => {
                 projects: ['*']
             }]
         };
-    
-    
+
+
         const withoutInfraServersClientResetPolicy = {
             id: policyId2,
             name: tokenId2,
@@ -281,10 +281,10 @@ describe('Infra Clients create', () => {
                 projects: ['*']
             }]
         };
-    
+
         before(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -296,7 +296,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     withInfraServersClientResetActionToken = resp.body.token.value;
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -305,7 +305,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     expect(resp.status).to.equal(200);
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -317,7 +317,7 @@ describe('Infra Clients create', () => {
                 }).then((resp) => {
                     withoutInfraServersClientResetActionToken = resp.body.token.value;
                 });
-    
+
             cy.request({
                 headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
@@ -327,11 +327,11 @@ describe('Infra Clients create', () => {
                     expect(resp.status).to.equal(200);
                 });
             });
-    
+
         after(() => {
             cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
         });
-    
+
         it('client put returns 403 when update actions is denied', () => {
             cy.request({
                 headers: { 'api-token': withoutInfraServersClientResetActionToken },
@@ -342,7 +342,7 @@ describe('Infra Clients create', () => {
                     assert.equal(resp.status, 403);
                 });
         });
-    
+
         it('client put returns 200 when update actions is allowed', () => {
             cy.request({
                 headers: { 'api-token': withInfraServersClientResetActionToken },
