@@ -73,6 +73,10 @@ func (m mockObjStore) PresignedGetObject(ctx context.Context, bucketName string,
 	return nil, nil
 }
 
+func (m mockObjStore) StatObject(ctx context.Context, bucketName string, objectName string, opts minio.GetObjectOptions) (info minio.ObjectInfo, err error) {
+	return minio.ObjectInfo{}, nil
+}
+
 func dialer(t *testing.T, isForFailure, enableLargeReporting bool, db *storage.DB) func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 
