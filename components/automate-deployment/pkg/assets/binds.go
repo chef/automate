@@ -67,7 +67,7 @@ automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
 cereal-service REQUIRED automate-pg-gateway pg-sidecar-service
 cereal-service BINDING_MODE strict
-compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service report-manager-service secrets-service
+compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway automate-pg-gateway pg-sidecar-service
@@ -98,7 +98,7 @@ notifications-service BINDING_MODE strict
 pg-sidecar-service REQUIRED automate-pg-gateway
 pg-sidecar-service BINDING_MODE strict
 report-manager-minio-gateway BINDING_MODE strict
-report-manager-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service report-manager-minio-gateway
+report-manager-service REQUIRED automate-pg-gateway cereal-service compliance-service pg-sidecar-service report-manager-minio-gateway
 report-manager-service BINDING_MODE strict
 sample-data-service BINDING_MODE strict
 secrets-service REQUIRED automate-pg-gateway pg-sidecar-service

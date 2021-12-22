@@ -20,7 +20,19 @@ service ReportingService {
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
 	rpc ReadNodeHeader(Query) returns (NodeHeaderInfo) {};
 	rpc ListControlInfo(Query) returns (ControlElements) {};
+	rpc GetReportContent(ReportContentRequest) returns (ReportContentResponse) {};
+	rpc GetReportListForReportManager(ListFilters) returns (stream ReportContentResponse) {};
 }
+
+message ReportContentRequest {
+	string id =1;
+	repeated ListFilter filters = 2;
+}
+
+message ReportContentResponse {
+	bytes content = 1;
+}
+
 message ExportData {
 	bytes content = 1;
 }
@@ -44,6 +56,11 @@ message ListFilter {
 	repeated string values = 20;
 	string type = 21;
 }
+
+message ListFilters {
+	repeated ListFilter filters = 1;
+}
+
 message Total {
 	int32 total = 1;
 }
@@ -358,6 +375,21 @@ message ControlElement {
 message ControlElements {
 	repeated ControlElement control_elements = 1;
 }
+
 message CustomReportResponse {
 	string acknowledgement_id = 1;
+}
+
+message ReportListForReportManagerResponse {
+	repeated ReportResponse reports = 1;
+}
+
+message ReportResponse {
+	string report_id = 1;
+	repeated ProfileResponse profiles = 2;
+}
+
+message ProfileResponse {
+	string profile_id = 1;
+	repeated string controls = 2;
 }
