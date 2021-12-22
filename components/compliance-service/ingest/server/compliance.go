@@ -29,11 +29,12 @@ import (
 )
 
 type ComplianceIngestServer struct {
-	compliancePipeline pipeline.Compliance
-	client             *ingestic.ESClient
-	mgrClient          manager.NodeManagerServiceClient
-	automateURL        string
-	notifierClient     notifier.Notifier
+	compliancePipeline   pipeline.Compliance
+	client               *ingestic.ESClient
+	mgrClient            manager.NodeManagerServiceClient
+	automateURL          string
+	notifierClient       notifier.Notifier
+	enableLargeReporting bool
 }
 
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
@@ -46,11 +47,12 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 		reportMgrClient, messageBufferSize, notifierClient, automateURL, enableLargeReporting)
 
 	return &ComplianceIngestServer{
-		compliancePipeline: compliancePipeline,
-		client:             esClient,
-		mgrClient:          mgrClient,
-		automateURL:        automateURL,
-		notifierClient:     notifierClient,
+		compliancePipeline:   compliancePipeline,
+		client:               esClient,
+		mgrClient:            mgrClient,
+		automateURL:          automateURL,
+		notifierClient:       notifierClient,
+		enableLargeReporting: enableLargeReporting,
 	}
 }
 
@@ -126,8 +128,16 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(stream ingest_api.Compl
 			return err
 		}
 	}
+	jsonBytes := reportData.Bytes()
+	reportSize := len(jsonBytes)
+	if !s.enableLargeReporting && reportSize > 4194304 {
+		err := fmt.Errorf("received message larger than max (%d vs %d), please enable large reporting to process big reports", reportSize, 4194304)
+		logrus.Error(err)
+		return err
+	}
+
 	in := &compliance.Report{}
-	err = json.Unmarshal(reportData.Bytes(), &in)
+	err = json.Unmarshal(jsonBytes, &in)
 	if err != nil {
 		return fmt.Errorf("error in converting report bytes to compliance report struct: %w", err)
 	}
