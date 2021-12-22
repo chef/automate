@@ -74,7 +74,7 @@ func ReportToCSV(report *reportingapi.Report, includeHeader bool) (response [][]
 					case "Node Name":
 						row = append(row, report.NodeName)
 					case "End Time":
-						row = append(row, timestamp.String())
+						row = append(row, timestamp.Format(time.RFC3339))
 					case "Environment":
 						row = append(row, report.Environment)
 					case "FQDN":

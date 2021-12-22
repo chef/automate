@@ -24,6 +24,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
   [cereal-service]="port"
   [report-manager-minio-gateway]="port"
+  [compliance-service]="port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"

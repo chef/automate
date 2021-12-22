@@ -37,7 +37,7 @@ func TestSimpleExport(t *testing.T) {
 	report := getSampleReport(t)
 	data, err := ReportToCSV(report, true)
 	assert.NoError(t, err)
-	line := []string{"Node1", `2021-11-18 00:00:00 +0000 UTC`, "", "", "test-env", "test.ip.address", "api.example.com", "ProfileName", `Profile, Title`, "1.2.3", "Profile summary", "ControlID1", "Control Title", "0.12", "false", "passed", "12345.000", "super complex code", "all done", `we don't skip`, "", ""}
+	line := []string{"Node1", `2021-11-18T00:00:00Z`, "", "", "test-env", "test.ip.address", "api.example.com", "ProfileName", `Profile, Title`, "1.2.3", "Profile summary", "ControlID1", "Control Title", "0.12", "false", "passed", "12345.000", "super complex code", "all done", `we don't skip`, "", ""}
 	expected := getCSVHeader()
 	expected = append(expected, line)
 	assert.Equal(t, expected, data, "ReportToCSV with empty simple report works.")
@@ -94,7 +94,7 @@ func TestExportWaiverData(t *testing.T) {
 	}
 	data, err := ReportToCSV(report, true)
 	assert.NoError(t, err, "ReportToCSV with a waiver report including waiver data generates without errors.")
-	line := []string{"Node1", "2021-11-18 00:00:00 +0000 UTC", "", "", "test-env", "test.ip.address", "api.example.com", "ProfileName", `Profile, Title`, "1.2.3", "Profile summary", "ControlID1", "Control Title", "0.12", "true", "passed", "12345.000", `super complex code`, `all done`, `we don't skip`, "some reason", "some-date"}
+	line := []string{"Node1", "2021-11-18T00:00:00Z", "", "", "test-env", "test.ip.address", "api.example.com", "ProfileName", `Profile, Title`, "1.2.3", "Profile summary", "ControlID1", "Control Title", "0.12", "true", "passed", "12345.000", `super complex code`, `all done`, `we don't skip`, "some reason", "some-date"}
 	expected := getCSVHeader()
 	expected = append(expected, line)
 	assert.Equal(t, expected, data)
@@ -105,5 +105,5 @@ func TestTimeStampError(t *testing.T) {
 	report.EndTime = nil
 	resp, err := ReportToCSV(report, true)
 	assert.NoError(t, err)
-	assert.Equal(t, "0001-01-01 00:00:00 +0000 UTC", resp[1][1])
+	assert.Equal(t, "0001-01-01T00:00:00Z", resp[1][1])
 }

@@ -71,6 +71,10 @@ func initConfig() error {
 		conf.CerealConfig.Target = "127.0.0.1:10101"
 	}
 
+	if conf.ComplianceConfig.Target == "" {
+		conf.ComplianceConfig.Target = "127.0.0.1:10121"
+	}
+
 	if conf.Storage.URI == "" {
 		var err error
 		conf.Storage.URI, err = platform_config.PGURIFromEnvironment(conf.Storage.Database)

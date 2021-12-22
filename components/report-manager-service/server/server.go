@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	cc_reporting "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/objstore"
 	"github.com/chef/automate/components/report-manager-service/storage"
@@ -25,26 +26,28 @@ import (
 
 // Server implementation for reporting
 type Server struct {
-	ObjStoreClient       objstore.ObjectStore
-	CerealManager        *cereal.Manager
-	ctx                  context.Context
-	ObjBucket            string
-	DataStore            *storage.DB
-	EnableLargeReporting bool
+	ObjStoreClient            objstore.ObjectStore
+	ComplianceReportingClient cc_reporting.ReportingServiceClient
+	CerealManager             *cereal.Manager
+	ctx                       context.Context
+	ObjBucket                 string
+	DataStore                 *storage.DB
+	EnableLargeReporting      bool
 }
 
 // New creates a new server
 func New(objStoreClient *minio.Client, cerealManager *cereal.Manager, objBucket string, db *storage.DB,
-	enableLargeReporting bool) *Server {
+	enableLargeReporting bool, complianceReportingClient cc_reporting.ReportingServiceClient) *Server {
 	return &Server{
 		ObjStoreClient: objstore.ReportManagerObjStore{
 			ObjStoreClient: objStoreClient,
 		},
-		CerealManager:        cerealManager,
-		ctx:                  context.Background(),
-		ObjBucket:            objBucket,
-		DataStore:            db,
-		EnableLargeReporting: enableLargeReporting,
+		ComplianceReportingClient: complianceReportingClient,
+		CerealManager:             cerealManager,
+		ctx:                       context.Background(),
+		ObjBucket:                 objBucket,
+		DataStore:                 db,
+		EnableLargeReporting:      enableLargeReporting,
 	}
 }
 

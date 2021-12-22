@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	cc_reporting "github.com/chef/automate/api/interservice/compliance/reporting"
+
 	"github.com/chef/automate/api/interservice/report_manager"
 	"github.com/chef/automate/components/report-manager-service/config"
 	"github.com/chef/automate/components/report-manager-service/server"
@@ -103,14 +105,14 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 	}
 
 	s := connFactory.NewServer()
-
+	complianceReportingClient := getComplianceReportingClient(connFactory, conf.ComplianceConfig.Target)
 	//register health server for health status
 	health.RegisterHealthServer(s, health.NewService())
 	report_manager.RegisterReportManagerServiceServer(s,
-		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName, db, conf.Service.EnableLargeReporting))
+		server.New(objStoreClient, cerealManager, conf.ObjStore.BucketName, db, conf.Service.EnableLargeReporting, complianceReportingClient))
 
 	//Initiate the cereal manager with 2 workers
-	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName)
+	err = worker.InitCerealManager(cerealManager, 2, db, objStoreClient, conf.ObjStore.BucketName, complianceReportingClient)
 	if err != nil {
 		logrus.Fatalf("failed to initiate cereal manager: %v", err)
 	}
@@ -121,4 +123,17 @@ func serveGrpc(ctx context.Context, conf config.ReportManager, objStoreClient *m
 	logrus.Info("Starting GRPC server on " + grpcBinding)
 
 	return s.Serve(lis)
+}
+
+func getComplianceReportingClient(connFactory *secureconn.Factory, address string) cc_reporting.ReportingServiceClient {
+	if address == "" || address == ":0" {
+		logrus.Fatal("compliance reporting cannot be empty or Dial will get stuck")
+	}
+
+	logrus.Debugf("Connecting to compliance reporting %q", address)
+	conn, err := connFactory.Dial("compliance-service", address)
+	if err != nil {
+		logrus.Fatalf("compliance-service, error grpc dialing to manager %s", err.Error())
+	}
+	return cc_reporting.NewReportingServiceClient(conn)
 }
